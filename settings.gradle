@@ -1,1 +1,2 @@
-include ':app', ':fhirengine'
+include ':example'
+include ':fhirengine'
