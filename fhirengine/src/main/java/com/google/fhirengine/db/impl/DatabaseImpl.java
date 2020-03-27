@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
+
 import com.google.fhir.r4.core.Id;
 import com.google.fhir.shaded.common.base.Joiner;
 import com.google.fhir.shaded.protobuf.Any;
@@ -38,10 +39,11 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
     String RESOURCE = "resource";
   }
 
-  /**  */
+  /** Unique indices */
   private interface UniqueIndices {
     String RESOURCE_TYPE_RESOURCE_ID_UNIQUE_INDEX =
-        Joiner.on("_").join(Tables.RESOURCES, ResourcesColumns.RESOURCE_TYPE, ResourcesColumns.RESOURCE_ID);
+        Joiner.on("_")
+            .join(Tables.RESOURCES, ResourcesColumns.RESOURCE_TYPE, ResourcesColumns.RESOURCE_ID);
   }
 
   private static String CREATE_RESOURCES_TABLE =
@@ -96,25 +98,28 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
   public <M extends Message> M select(Class<M> clazz, String id) throws ResourceNotFoundException {
     String type = getResourceType(clazz);
     String[] columns = new String[]{ResourcesColumns.RESOURCE};
-    String whereClause = ResourcesColumns.RESOURCE_TYPE + " = ? AND " + ResourcesColumns.RESOURCE_ID + " = ?";
+    String whereClause =
+        ResourcesColumns.RESOURCE_TYPE + " = ? AND " + ResourcesColumns.RESOURCE_ID + " = ?";
     String[] whereArgs = new String[]{type, id};
-    Cursor cursor = getReadableDatabase().query(Tables.RESOURCES, columns, whereClause, whereArgs, null, null, null);
-    if (cursor == null) {
-      throw new SQLException("Null cursor!");
-    }
-    if (cursor.getCount() == 0) {
-      throw new ResourceNotFoundException(type, id);
-    }
-    if (cursor.getCount() > 1) {
-      throw new SQLException("Unexpected number of records!");
-    }
-
+    Cursor cursor = getReadableDatabase()
+        .query(Tables.RESOURCES, columns, whereClause, whereArgs, null, null, null);
     try {
+      if (cursor == null) {
+        throw new SQLException("Null cursor!");
+      }
+      if (cursor.getCount() == 0) {
+        throw new ResourceNotFoundException(type, id);
+      }
+      if (cursor.getCount() > 1) {
+        throw new SQLException("Unexpected number of records!");
+      }
       cursor.moveToFirst();
       Any a = Any.parseFrom(cursor.getBlob(0));
       return a.unpack(clazz);
     } catch (InvalidProtocolBufferException e) {
       throw new SQLException("Deserialization error!", e);
+    } finally {
+      cursor.close();
     }
   }
 
