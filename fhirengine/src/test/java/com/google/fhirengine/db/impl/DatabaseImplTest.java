@@ -7,8 +7,8 @@ import androidx.test.core.app.ApplicationProvider;
 import com.google.fhir.r4.core.AdministrativeGenderCode;
 import com.google.fhir.r4.core.Id;
 import com.google.fhir.r4.core.Patient;
-import com.google.fhirengine.db.ResourceAlreadyExistsException;
-import com.google.fhirengine.db.ResourceNotFoundException;
+import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
+import com.google.fhirengine.db.ResourceNotFoundInDbException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,22 +50,22 @@ public class DatabaseImplTest {
 
   @Test
   public void insert_existingResource_shouldThrowResourceAlreadyExistsException() throws Exception {
-    ResourceAlreadyExistsException resourceAlreadyExistsException =
-        assertThrows(ResourceAlreadyExistsException.class, () -> database.insert(TEST_PATIENT_1));
+    ResourceAlreadyExistsInDbException resourceAlreadyExistsInDbException =
+        assertThrows(ResourceAlreadyExistsInDbException.class, () -> database.insert(TEST_PATIENT_1));
     assertEquals(
         "Resource with type " + Patient.class.getName() + " and id " + TEST_PATIENT_1_ID +
             " already exists!",
-        resourceAlreadyExistsException.getMessage());
+        resourceAlreadyExistsInDbException.getMessage());
   }
 
   @Test
   public void select_nonexistentResource_shouldThrowResourceNotFondException() throws Exception {
-    ResourceNotFoundException resourceNotFoundException =
-        assertThrows(ResourceNotFoundException.class, () ->
+    ResourceNotFoundInDbException resourceNotFoundInDbException =
+        assertThrows(ResourceNotFoundInDbException.class, () ->
             database.select(Patient.class, "nonexistent_patient"));
     assertEquals(
         "Resource not found with type com.google.fhir.r4.core.Patient and id nonexistent_patient!",
-        resourceNotFoundException.getMessage());
+        resourceNotFoundInDbException.getMessage());
   }
 
   @Test

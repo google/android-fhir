@@ -16,8 +16,8 @@ import com.google.fhir.shaded.protobuf.Descriptors;
 import com.google.fhir.shaded.protobuf.InvalidProtocolBufferException;
 import com.google.fhir.shaded.protobuf.Message;
 import com.google.fhirengine.db.Database;
-import com.google.fhirengine.db.ResourceAlreadyExistsException;
-import com.google.fhirengine.db.ResourceNotFoundException;
+import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
+import com.google.fhirengine.db.ResourceNotFoundInDbException;
 
 import javax.inject.Inject;
 
@@ -75,7 +75,7 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
   }
 
   @Override
-  public <M extends Message> void insert(M resource) throws ResourceAlreadyExistsException {
+  public <M extends Message> void insert(M resource) throws ResourceAlreadyExistsInDbException {
     String type = getResourceType(resource.getClass());
     String id = getResourceId(resource);
     ContentValues contentValues = new ContentValues();
@@ -85,7 +85,7 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
     try {
       getWritableDatabase().insertOrThrow(Tables.RESOURCES, null, contentValues);
     } catch (SQLiteConstraintException e) {
-      throw new ResourceAlreadyExistsException(type, id, e);
+      throw new ResourceAlreadyExistsInDbException(type, id, e);
     }
   }
 
@@ -95,7 +95,8 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
   }
 
   @Override
-  public <M extends Message> M select(Class<M> clazz, String id) throws ResourceNotFoundException {
+  public <M extends Message> M select(Class<M> clazz, String id)
+      throws ResourceNotFoundInDbException {
     String type = getResourceType(clazz);
     String[] columns = new String[]{ResourcesColumns.RESOURCE};
     String whereClause =
@@ -108,7 +109,7 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
         throw new SQLException("Null cursor!");
       }
       if (cursor.getCount() == 0) {
-        throw new ResourceNotFoundException(type, id);
+        throw new ResourceNotFoundInDbException(type, id);
       }
       if (cursor.getCount() > 1) {
         throw new SQLException("Unexpected number of records!");
