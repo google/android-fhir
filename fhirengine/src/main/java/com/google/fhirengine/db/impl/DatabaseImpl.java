@@ -9,15 +9,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
-import com.google.fhir.r4.core.Id;
 import com.google.fhir.shaded.common.base.Joiner;
 import com.google.fhir.shaded.protobuf.Any;
-import com.google.fhir.shaded.protobuf.Descriptors;
 import com.google.fhir.shaded.protobuf.InvalidProtocolBufferException;
 import com.google.fhir.shaded.protobuf.Message;
 import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
+import com.google.fhirengine.proto.ProtoUtils;
 
 import javax.inject.Inject;
 
@@ -76,8 +75,8 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
 
   @Override
   public <M extends Message> void insert(M resource) throws ResourceAlreadyExistsInDbException {
-    String type = getResourceType(resource.getClass());
-    String id = getResourceId(resource);
+    String type = ProtoUtils.getResourceType(resource.getClass());
+    String id = ProtoUtils.getResourceId(resource);
     ContentValues contentValues = new ContentValues();
     contentValues.put(ResourcesColumns.RESOURCE_TYPE, type);
     contentValues.put(ResourcesColumns.RESOURCE_ID, id);
@@ -95,9 +94,9 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
   }
 
   @Override
-  public <M extends Message> M select(Class<M> clazz, String id)
-      throws ResourceNotFoundInDbException {
-    String type = getResourceType(clazz);
+  public <M extends Message> M select(Class<M> clazz, String id) throws
+      ResourceNotFoundInDbException {
+    String type = ProtoUtils.getResourceType(clazz);
     String[] columns = new String[]{ResourcesColumns.RESOURCE};
     String whereClause =
         ResourcesColumns.RESOURCE_TYPE + " = ? AND " + ResourcesColumns.RESOURCE_ID + " = ?";
@@ -129,18 +128,4 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
     throw new UnsupportedOperationException("Not implemented yet!");
   }
 
-  /** Returns the FHIR resource type. */
-  private static <M extends Message> String getResourceType(Class<M> clazz) {
-    return clazz.getName();
-  }
-
-  /** Returns the value of the id field of the FHIR resource. */
-  private static <M extends Message> String getResourceId(M resource) {
-    for (Descriptors.FieldDescriptor field : resource.getDescriptorForType().getFields()) {
-      if (field.getName().equals("id")) {
-        return ((Id) resource.getField(field)).getValue();
-      }
-    }
-    throw new IllegalArgumentException("Missing ID!");
-  }
 }
