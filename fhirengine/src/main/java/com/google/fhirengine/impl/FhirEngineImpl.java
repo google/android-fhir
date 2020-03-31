@@ -1,8 +1,9 @@
 package com.google.fhirengine.impl;
 
-import com.google.fhir.shaded.protobuf.Message;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.db.Database;
+
+import org.hl7.fhir.r4.model.Resource;
 
 import javax.inject.Inject;
 
@@ -17,22 +18,22 @@ public class FhirEngineImpl implements FhirEngine {
   }
 
   @Override
-  public <M extends Message> void save(M resource) {
+  public <R extends Resource> void save(R resource) {
     throw new UnsupportedOperationException("Not implemented yet!");
   }
 
   @Override
-  public <M extends Message> void update(M resource) {
+  public <R extends Resource> void update(R resource) {
     throw new UnsupportedOperationException("Not implemented yet!");
   }
 
   @Override
-  public <M extends Message> M load(Class<M> clazz, String id) {
+  public <R extends Resource> R load(Class<R> clazz, String id) {
     throw new UnsupportedOperationException("Not implemented yet!");
   }
 
   @Override
-  public <M extends Message> M remove(Class<M> clazz, String id) {
+  public <R extends Resource> R remove(Class<R> clazz, String id) {
     throw new UnsupportedOperationException("Not implemented yet!");
   }
 }
