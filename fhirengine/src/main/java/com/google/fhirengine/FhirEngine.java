@@ -1,37 +1,36 @@
 package com.google.fhirengine;
 
-import com.google.fhir.shaded.protobuf.Message;
-import com.google.fhirengine.db.ResourceNotFoundInDbException;
+import org.hl7.fhir.r4.model.Resource;
 
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 public interface FhirEngine {
   /**
    * Saves a FHIR {@code resource} in the local storage.
    *
-   * @param <M> The resource type which should be a subtype of {@link Message}.
+   * @param <R> The resource type which should be a subtype of {@link Resource}.
    * @throws ResourceAlreadyExistsException if the resource already exists
    */
-  <M extends Message> void save(M resource) throws ResourceAlreadyExistsException;
+  <R extends Resource> void save(R resource) throws ResourceAlreadyExistsException;
 
   /**
    * Updates a FHIR {@code resource} in the local storage.
    *
-   * @param <M> The resource type which should be a subtype of {@link Message}.
+   * @param <R> The resource type which should be a subtype of {@link Resource}.
    */
-  <M extends Message> void update(M resource);
+  <R extends Resource> void update(R resource);
 
   /**
    * Returns a FHIR resource of type {@code clazz} with {@code id} from the local storage.
    *
-   * @param <M> The resource type which should be a subtype of {@link Message}.
+   * @param <R> The resource type which should be a subtype of {@link Resource}.
    * @throws ResourceNotFoundException if the resource is not found
    */
-  <M extends Message> M load(Class<M> clazz, String id) throws ResourceNotFoundException;
+  <R extends Resource> R load(Class<R> clazz, String id) throws ResourceNotFoundException;
 
   /**
    * Removes a FHIR resource of type {@code clazz} with {@code id} from the local storage.
    *
-   * @param <M> The resource type which should be a subtype of {@link Message}.
+   * @param <R> The resource type which should be a subtype of {@link Resource}.
    */
-  <M extends Message> M remove(Class<M> clazz, String id);
+  <R extends Resource> R remove(Class<R> clazz, String id);
 }

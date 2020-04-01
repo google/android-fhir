@@ -1,13 +1,14 @@
 package com.google.fhirengine.impl;
 
-import com.google.fhir.shaded.protobuf.Message;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.ResourceAlreadyExistsException;
 import com.google.fhirengine.ResourceNotFoundException;
 import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
-import com.google.fhirengine.proto.ProtoUtils;
+import com.google.fhirengine.resource.ResourceUtils;
+
+import org.hl7.fhir.r4.model.Resource;
 
 import javax.inject.Inject;
 
@@ -22,31 +23,32 @@ public class FhirEngineImpl implements FhirEngine {
   }
 
   @Override
-  public <M extends Message> void save(M resource) throws ResourceAlreadyExistsException {
+  public <R extends Resource> void save(R resource) throws ResourceAlreadyExistsException {
     try {
       database.insert(resource);
     } catch (ResourceAlreadyExistsInDbException e) {
-      throw new ResourceAlreadyExistsException(ProtoUtils.getResourceType(resource.getClass()),
-          ProtoUtils.getResourceId(resource), e);
+      throw new ResourceAlreadyExistsException(
+          ResourceUtils.getResourceType(resource.getClass()).name(),
+          resource.getId(), e);
     }
   }
 
   @Override
-  public <M extends Message> void update(M resource) {
+  public <R extends Resource> void update(R resource) {
     throw new UnsupportedOperationException("Not implemented yet!");
   }
 
   @Override
-  public <M extends Message> M load(Class<M> clazz, String id) throws ResourceNotFoundException {
+  public <R extends Resource> R load(Class<R> clazz, String id) throws ResourceNotFoundException {
     try {
       return database.select(clazz, id);
     } catch (ResourceNotFoundInDbException e) {
-      throw new ResourceNotFoundException(clazz.getName(), id, e);
+      throw new ResourceNotFoundException(ResourceUtils.getResourceType(clazz).name(), id, e);
     }
   }
 
   @Override
-  public <M extends Message> M remove(Class<M> clazz, String id) {
+  public <R extends Resource> R remove(Class<R> clazz, String id) {
     throw new UnsupportedOperationException("Not implemented yet!");
   }
 }

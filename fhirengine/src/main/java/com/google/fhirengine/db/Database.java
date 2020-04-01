@@ -1,36 +1,36 @@
 package com.google.fhirengine.db;
 
-import com.google.fhir.shaded.protobuf.Message;
+import org.hl7.fhir.r4.model.Resource;
 
 /** The interface for the FHIR resource database. */
 public interface Database {
   /**
    * Inserts the {@code resource} into the FHIR resource database.
    *
-   * @param <M> The resource type
+   * @param <R> The resource type
    * @throws ResourceAlreadyExistsInDbException if the resource already exists in the database
    */
-  <M extends Message> void insert(M resource) throws ResourceAlreadyExistsInDbException;
+  <R extends Resource> void insert(R resource) throws ResourceAlreadyExistsInDbException;
 
   /**
    * Updates the {@code resource}.
    *
-   * @param <M> The resource type
+   * @param <R> The resource type
    */
-  <M extends Message> void update(M resource);
+  <R extends Resource> void update(R resource);
 
   /**
    * Selects the FHIR resource of type {@code clazz} with {@code id}.
    *
-   * @param <M> The resource type
+   * @param <R> The resource type
    * @throws ResourceNotFoundInDbException if the resource is not found in the database
    */
-  <M extends Message> M select(Class<M> clazz, String id) throws ResourceNotFoundInDbException;
+  <R extends Resource> R select(Class<R> clazz, String id) throws ResourceNotFoundInDbException;
 
   /**
    * Deletes the FHIR resource of type {@code clazz} with {@code id}.
    *
-   * @param <M> The resource type
+   * @param <R> The resource type
    */
-  <M extends Message> void delete(Class<M> clazz, String id);
+  <R extends Resource> void delete(Class<R> clazz, String id);
 }
