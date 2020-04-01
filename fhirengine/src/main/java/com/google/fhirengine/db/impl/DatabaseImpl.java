@@ -9,17 +9,18 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
-import com.google.fhir.r4.core.Id;
-import com.google.fhir.shaded.common.base.Joiner;
-import com.google.fhir.shaded.protobuf.Any;
-import com.google.fhir.shaded.protobuf.Descriptors;
-import com.google.fhir.shaded.protobuf.InvalidProtocolBufferException;
-import com.google.fhir.shaded.protobuf.Message;
+import com.google.common.base.Joiner;
 import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.ResourceAlreadyExistsException;
 import com.google.fhirengine.db.ResourceNotFoundException;
 
+import org.hl7.fhir.r4.model.Resource;
+
+import java.lang.reflect.InvocationTargetException;
+
 import javax.inject.Inject;
+
+import ca.uhn.fhir.parser.IParser;
 
 /** Helper class that manages the FHIR resource database, and provides a database connection. */
 public class DatabaseImpl extends SQLiteOpenHelper implements Database {
@@ -51,16 +52,19 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
           ResourcesColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
           ResourcesColumns.RESOURCE_TYPE + " TEXT NOT NULL," +
           ResourcesColumns.RESOURCE_ID + " INTEGER NOT NULL," +
-          ResourcesColumns.RESOURCE + " BLOB NOT NULL);";
+          ResourcesColumns.RESOURCE + " TEXT NOT NULL);";
   private static String CREATE_INDEX =
       "CREATE UNIQUE INDEX " + UniqueIndices.RESOURCE_TYPE_RESOURCE_ID_UNIQUE_INDEX + " ON " +
           Tables.RESOURCES + " ( " +
           ResourcesColumns.RESOURCE_TYPE + ", " +
           ResourcesColumns.RESOURCE_ID + ")";
 
+  private final IParser iParser;
+
   @Inject
-  DatabaseImpl(Context context) {
+  DatabaseImpl(Context context, IParser iParser) {
     super(context, DB_NAME, null, DB_VERSION);
+    this.iParser = iParser;
   }
 
   @Override
@@ -75,13 +79,13 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
   }
 
   @Override
-  public <M extends Message> void insert(M resource) throws ResourceAlreadyExistsException {
-    String type = getResourceType(resource.getClass());
-    String id = getResourceId(resource);
+  public <R extends Resource> void insert(R resource) throws ResourceAlreadyExistsException {
+    String type = resource.getResourceType().name();
+    String id = resource.getId();
     ContentValues contentValues = new ContentValues();
     contentValues.put(ResourcesColumns.RESOURCE_TYPE, type);
     contentValues.put(ResourcesColumns.RESOURCE_ID, id);
-    contentValues.put(ResourcesColumns.RESOURCE, Any.pack(resource).toByteArray());
+    contentValues.put(ResourcesColumns.RESOURCE, iParser.encodeResourceToString(resource));
     try {
       getWritableDatabase().insertOrThrow(Tables.RESOURCES, null, contentValues);
     } catch (SQLiteConstraintException e) {
@@ -90,13 +94,25 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
   }
 
   @Override
-  public <M extends Message> void update(M resource) {
+  public <R extends Resource> void update(R resource) {
     throw new UnsupportedOperationException("Not implemented yet!");
   }
 
   @Override
-  public <M extends Message> M select(Class<M> clazz, String id) throws ResourceNotFoundException {
-    String type = getResourceType(clazz);
+  public <R extends Resource> R select(Class<R> clazz, String id) throws ResourceNotFoundException {
+    String type;
+    try {
+      type = clazz.getConstructor().newInstance().getResourceType().name();
+    } catch (NoSuchMethodException e) {
+      throw new IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e);
+    } catch (IllegalAccessException e) {
+      throw new IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e);
+    } catch (InstantiationException e) {
+      throw new IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e);
+    } catch (InvocationTargetException e) {
+      throw new IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e);
+    }
+
     String[] columns = new String[]{ResourcesColumns.RESOURCE};
     String whereClause =
         ResourcesColumns.RESOURCE_TYPE + " = ? AND " + ResourcesColumns.RESOURCE_ID + " = ?";
@@ -114,32 +130,14 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
         throw new SQLException("Unexpected number of records!");
       }
       cursor.moveToFirst();
-      Any a = Any.parseFrom(cursor.getBlob(0));
-      return a.unpack(clazz);
-    } catch (InvalidProtocolBufferException e) {
-      throw new SQLException("Deserialization error!", e);
+      return iParser.parseResource(clazz, cursor.getString(0));
     } finally {
       cursor.close();
     }
   }
 
   @Override
-  public <M extends Message> void delete(Class<M> clazz, String id) {
+  public <R extends Resource> void delete(Class<R> clazz, String id) {
     throw new UnsupportedOperationException("Not implemented yet!");
-  }
-
-  /** Returns the FHIR resource type. */
-  private static <M extends Message> String getResourceType(Class<M> clazz) {
-    return clazz.getName();
-  }
-
-  /** Returns the value of the id field of the FHIR resource. */
-  private static <M extends Message> String getResourceId(M resource) {
-    for (Descriptors.FieldDescriptor field : resource.getDescriptorForType().getFields()) {
-      if (field.getName().equals("id")) {
-        return ((Id) resource.getField(field)).getValue();
-      }
-    }
-    throw new IllegalArgumentException("Missing ID!");
   }
 }

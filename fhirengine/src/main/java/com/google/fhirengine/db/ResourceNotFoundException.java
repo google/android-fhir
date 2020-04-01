@@ -1,7 +1,5 @@
 package com.google.fhirengine.db;
 
-import com.google.fhir.shaded.protobuf.Message;
-
 /** Thrown to indicate that the requested resource is not found in the database. */
 public class ResourceNotFoundException extends Exception {
   private String type;
