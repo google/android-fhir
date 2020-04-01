@@ -8,11 +8,11 @@ import ca.uhn.fhir.parser.IParser;
 
 import static org.junit.Assert.assertEquals;
 
-public class JsonUtils {
+public class TestingUtils {
   private final IParser iParser;
 
   @Inject
-  public JsonUtils(IParser iParser) {
+  public TestingUtils(IParser iParser) {
     this.iParser = iParser;
   }
 

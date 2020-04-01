@@ -5,22 +5,25 @@ import android.os.Build;
 
 import androidx.test.core.app.ApplicationProvider;
 
-import com.google.fhir.r4.core.AdministrativeGenderCode;
-import com.google.fhir.r4.core.Id;
-import com.google.fhir.r4.core.Patient;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.ResourceAlreadyExistsException;
 import com.google.fhirengine.ResourceNotFoundException;
 import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.impl.DatabaseImpl;
 import com.google.fhirengine.db.impl.DatabaseModule;
+import com.google.fhirengine.resource.ResourceModule;
+import com.google.fhirengine.resource.TestingUtils;
 
+import org.hl7.fhir.r4.model.Enumerations;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import dagger.BindsInstance;
@@ -34,28 +37,41 @@ import static org.junit.Assert.assertThrows;
 @Config(sdk = Build.VERSION_CODES.P)
 public class FhirEngineImplTest {
   private static final String TEST_PATIENT_1_ID = "test_patient_1";
-  private static final Patient TEST_PATIENT_1 = Patient.newBuilder()
-      .setId(Id.newBuilder().setValue(TEST_PATIENT_1_ID))
-      .setGender(Patient.GenderCode.newBuilder().setValue(AdministrativeGenderCode.Value.MALE))
-      .build();
-  private static final String TEST_PATIENT_2_ID = "test_patient_2";
-  private static final Patient TEST_PATIENT_2 = Patient.newBuilder()
-      .setId(Id.newBuilder().setValue(TEST_PATIENT_2_ID))
-      .setGender(Patient.GenderCode.newBuilder().setValue(AdministrativeGenderCode.Value.MALE))
-      .build();
+  private static final Patient TEST_PATIENT_1;
 
-  private FhirEngine fhirEngine;
+  static {
+    TEST_PATIENT_1 = new Patient();
+    TEST_PATIENT_1.setId(TEST_PATIENT_1_ID);
+    TEST_PATIENT_1.setGender(Enumerations.AdministrativeGender.MALE);
+  }
+
+  private static final String TEST_PATIENT_2_ID = "test_patient_2";
+  private static final Patient TEST_PATIENT_2;
+
+  static {
+    TEST_PATIENT_2 = new Patient();
+    TEST_PATIENT_2.setId(TEST_PATIENT_2_ID);
+    TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE);
+  }
+
+  @Inject
+  FhirEngine fhirEngine;
+
+  @Inject
+  TestingUtils testingUtils;
 
   @Singleton
-  @Component(modules = {DatabaseModule.class})
+  @Component(modules = {FhirEngineModule.class, DatabaseModule.class, ResourceModule.class})
   public interface TestComponent {
 
     Database getDatabase();
 
+    void inject(FhirEngineImplTest fhirEngineImplTest);
+
     @Component.Builder
     interface Builder {
       @BindsInstance
-      Builder context(Context context);
+      Builder withContext(Context context);
 
       TestComponent build();
     }
@@ -63,16 +79,16 @@ public class FhirEngineImplTest {
 
   @Before
   public void setUp() throws Exception {
-    TestComponent a = DaggerFhirEngineImplTest_TestComponent.builder()
-        .context(ApplicationProvider.getApplicationContext()).build();
-    fhirEngine = new FhirEngineImpl(a.getDatabase());
+    DaggerFhirEngineImplTest_TestComponent.builder()
+        .withContext(ApplicationProvider.getApplicationContext()).build().inject(this);
     fhirEngine.save(TEST_PATIENT_1);
   }
 
   @Test
   public void save_shouldSaveResource() throws Exception {
     fhirEngine.save(TEST_PATIENT_2);
-    assertEquals(TEST_PATIENT_2, fhirEngine.load(Patient.class, TEST_PATIENT_2_ID));
+    testingUtils
+        .assertResourceEquals(TEST_PATIENT_2, fhirEngine.load(Patient.class, TEST_PATIENT_2_ID));
   }
 
   @Test
@@ -81,7 +97,7 @@ public class FhirEngineImplTest {
         assertThrows(ResourceAlreadyExistsException.class,
             () -> fhirEngine.save(TEST_PATIENT_1));
     assertEquals(
-        "Resource with type " + Patient.class.getName() + " and id " + TEST_PATIENT_1_ID +
+        "Resource with type " + ResourceType.Patient.name() + " and id " + TEST_PATIENT_1_ID +
             " already exists!",
         resourceAlreadyExistsInDbException.getMessage());
   }
@@ -92,12 +108,14 @@ public class FhirEngineImplTest {
         assertThrows(ResourceNotFoundException.class, () ->
             fhirEngine.load(Patient.class, "nonexistent_patient"));
     assertEquals(
-        "Resource not found with type com.google.fhir.r4.core.Patient and id nonexistent_patient!",
+        "Resource not found with type " + ResourceType.Patient.name() +
+            " and id nonexistent_patient!",
         resourceNotFoundInDbException.getMessage());
   }
 
   @Test
   public void load_shouldReturnResource() throws Exception {
-    assertEquals(TEST_PATIENT_1, fhirEngine.load(Patient.class, TEST_PATIENT_1_ID));
+    testingUtils
+        .assertResourceEquals(TEST_PATIENT_1, fhirEngine.load(Patient.class, TEST_PATIENT_1_ID));
   }
 }

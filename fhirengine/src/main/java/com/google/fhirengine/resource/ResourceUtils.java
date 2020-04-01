@@ -1,4 +1,4 @@
-package com.google.fhirengine.proto;
+package com.google.fhirengine.resource;
 
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
