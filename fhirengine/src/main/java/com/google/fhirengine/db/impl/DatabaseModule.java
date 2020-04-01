@@ -13,9 +13,4 @@ import dagger.Provides;
 public abstract class DatabaseModule {
   @Binds
   abstract Database bindDatabase(DatabaseImpl database);
-
-  @Provides
-  static IParser getIParser() {
-    return FhirContext.forR4().newJsonParser();
-  }
 }

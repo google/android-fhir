@@ -8,8 +8,9 @@ public interface Database {
    * Inserts the {@code resource} into the FHIR resource database.
    *
    * @param <R> The resource type
+   * @throws ResourceAlreadyExistsInDbException if the resource already exists in the database
    */
-  <R extends Resource> void insert(R resource) throws ResourceAlreadyExistsException;
+  <R extends Resource> void insert(R resource) throws ResourceAlreadyExistsInDbException;
 
   /**
    * Updates the {@code resource}.
@@ -22,9 +23,9 @@ public interface Database {
    * Selects the FHIR resource of type {@code clazz} with {@code id}.
    *
    * @param <R> The resource type
-   * @throws ResourceNotFoundException if the resource is not found
+   * @throws ResourceNotFoundInDbException if the resource is not found in the database
    */
-  <R extends Resource> R select(Class<R> clazz, String id) throws ResourceNotFoundException;
+  <R extends Resource> R select(Class<R> clazz, String id) throws ResourceNotFoundInDbException;
 
   /**
    * Deletes the FHIR resource of type {@code clazz} with {@code id}.

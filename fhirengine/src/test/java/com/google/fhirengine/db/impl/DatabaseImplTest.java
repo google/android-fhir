@@ -1,11 +1,15 @@
 package com.google.fhirengine.db.impl;
 
+import android.content.Context;
 import android.os.Build;
 
 import androidx.test.core.app.ApplicationProvider;
 
-import com.google.fhirengine.db.ResourceAlreadyExistsException;
-import com.google.fhirengine.db.ResourceNotFoundException;
+import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
+import com.google.fhirengine.db.ResourceNotFoundInDbException;
+import com.google.fhirengine.impl.FhirEngineImplTest;
+import com.google.fhirengine.resource.ResourceModule;
+import com.google.fhirengine.resource.TestingUtils;
 
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Patient;
@@ -17,8 +21,12 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import ca.uhn.fhir.context.FhirContext;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import ca.uhn.fhir.parser.IParser;
+import dagger.BindsInstance;
+import dagger.Component;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -45,32 +53,51 @@ public class DatabaseImplTest {
     TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE);
   }
 
-  private final IParser iParser = FhirContext.forR4().newJsonParser();
+  @Inject
+  IParser iParser;
+  @Inject
+  TestingUtils testingUtils;
+  @Inject
+  DatabaseImpl database;
 
-  private DatabaseImpl database;
+  @Singleton
+  @Component(modules = {DatabaseModule.class, ResourceModule.class})
+  public interface TestComponent {
+    void inject(DatabaseImplTest databaseImplTest);
+
+    @Component.Builder
+    interface Builder {
+      @BindsInstance
+      Builder withContext(Context context);
+
+      TestComponent build();
+    }
+  }
 
   @Before
   public void setUp() throws Exception {
-    database = new DatabaseImpl(ApplicationProvider.getApplicationContext(), iParser);
+    DaggerDatabaseImplTest_TestComponent.builder()
+        .withContext(ApplicationProvider.getApplicationContext()).build().inject(this);
     database.insert(TEST_PATIENT_1);
   }
 
   @Test
   public void insert_shouldInsertResource() throws Exception {
     database.insert(TEST_PATIENT_2);
-    assertResourceEquals(TEST_PATIENT_2, database.select(Patient.class, TEST_PATIENT_2_ID));
+    testingUtils
+        .assertResourceEquals(TEST_PATIENT_2, database.select(Patient.class, TEST_PATIENT_2_ID));
   }
 
   @Test
-  public void insert_existingResource_shouldThrowResourceAlreadyExistsException()
-      throws Exception {
-    ResourceAlreadyExistsException resourceAlreadyExistsException =
-        assertThrows(ResourceAlreadyExistsException.class, () -> database.insert(TEST_PATIENT_1));
+  public void insert_existingResource_shouldThrowResourceAlreadyExistsException() throws Exception {
+    ResourceAlreadyExistsInDbException resourceAlreadyExistsInDbException =
+        assertThrows(ResourceAlreadyExistsInDbException.class,
+            () -> database.insert(TEST_PATIENT_1));
     assertEquals(
         "Resource with type " + TEST_PATIENT_1.getResourceType().name() + " and id " +
             TEST_PATIENT_1_ID +
             " already exists!",
-        resourceAlreadyExistsException.getMessage());
+        resourceAlreadyExistsInDbException.getMessage());
   }
 
   @Test
@@ -83,22 +110,17 @@ public class DatabaseImplTest {
 
   @Test
   public void select_nonexistentResource_shouldThrowResourceNotFondException() throws Exception {
-    ResourceNotFoundException resourceNotFoundException =
-        assertThrows(ResourceNotFoundException.class, () ->
+    ResourceNotFoundInDbException resourceNotFoundInDbException =
+        assertThrows(ResourceNotFoundInDbException.class, () ->
             database.select(Patient.class, "nonexistent_patient"));
     assertEquals("Resource not found with type " + ResourceType.Patient.name() +
             " and id nonexistent_patient!",
-        resourceNotFoundException.getMessage());
+        resourceNotFoundInDbException.getMessage());
   }
 
   @Test
   public void select_shouldReturnResource() throws Exception {
-    assertResourceEquals(TEST_PATIENT_1, database.select(Patient.class, TEST_PATIENT_1_ID));
-  }
-
-  /** Asserts that the {@code expected} and the {@code actual} FHIR resources are equal. */
-  private void assertResourceEquals(Resource expected, Resource actual) {
-    assertEquals(iParser.encodeResourceToString(expected),
-        iParser.encodeResourceToString(actual));
+    testingUtils
+        .assertResourceEquals(TEST_PATIENT_1, database.select(Patient.class, TEST_PATIENT_1_ID));
   }
 }

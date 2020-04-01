@@ -11,12 +11,11 @@ import android.provider.BaseColumns;
 
 import com.google.common.base.Joiner;
 import com.google.fhirengine.db.Database;
-import com.google.fhirengine.db.ResourceAlreadyExistsException;
-import com.google.fhirengine.db.ResourceNotFoundException;
+import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
+import com.google.fhirengine.db.ResourceNotFoundInDbException;
+import com.google.fhirengine.resource.ResourceUtils;
 
 import org.hl7.fhir.r4.model.Resource;
-
-import java.lang.reflect.InvocationTargetException;
 
 import javax.inject.Inject;
 
@@ -79,7 +78,7 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
   }
 
   @Override
-  public <R extends Resource> void insert(R resource) throws ResourceAlreadyExistsException {
+  public <R extends Resource> void insert(R resource) throws ResourceAlreadyExistsInDbException {
     String type = resource.getResourceType().name();
     String id = resource.getId();
     ContentValues contentValues = new ContentValues();
@@ -89,7 +88,7 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
     try {
       getWritableDatabase().insertOrThrow(Tables.RESOURCES, null, contentValues);
     } catch (SQLiteConstraintException e) {
-      throw new ResourceAlreadyExistsException(type, id, e);
+      throw new ResourceAlreadyExistsInDbException(type, id, e);
     }
   }
 
@@ -99,19 +98,9 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
   }
 
   @Override
-  public <R extends Resource> R select(Class<R> clazz, String id) throws ResourceNotFoundException {
-    String type;
-    try {
-      type = clazz.getConstructor().newInstance().getResourceType().name();
-    } catch (NoSuchMethodException e) {
-      throw new IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e);
-    } catch (IllegalAccessException e) {
-      throw new IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e);
-    } catch (InstantiationException e) {
-      throw new IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e);
-    } catch (InvocationTargetException e) {
-      throw new IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e);
-    }
+  public <R extends Resource> R select(Class<R> clazz, String id)
+      throws ResourceNotFoundInDbException {
+    String type = ResourceUtils.getResourceType(clazz).name();
 
     String[] columns = new String[]{ResourcesColumns.RESOURCE};
     String whereClause =
@@ -124,7 +113,7 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
         throw new SQLException("Null cursor!");
       }
       if (cursor.getCount() == 0) {
-        throw new ResourceNotFoundException(type, id);
+        throw new ResourceNotFoundInDbException(type, id);
       }
       if (cursor.getCount() > 1) {
         throw new SQLException("Unexpected number of records!");
