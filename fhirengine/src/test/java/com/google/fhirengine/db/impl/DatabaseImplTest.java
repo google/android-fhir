@@ -7,7 +7,6 @@ import androidx.test.core.app.ApplicationProvider;
 
 import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
-import com.google.fhirengine.impl.FhirEngineImplTest;
 import com.google.fhirengine.resource.ResourceModule;
 import com.google.fhirengine.resource.TestingUtils;
 
@@ -98,6 +97,23 @@ public class DatabaseImplTest {
             TEST_PATIENT_1_ID +
             " already exists!",
         resourceAlreadyExistsInDbException.getMessage());
+  }
+
+  @Test
+  public void update_nonexistentResource_shouldUpdateResource() throws Exception {
+    Patient patient = new Patient();
+    patient.setId(TEST_PATIENT_1_ID);
+    patient.setGender(Enumerations.AdministrativeGender.FEMALE);
+    database.update(patient);
+    testingUtils
+        .assertResourceEquals(patient, database.select(Patient.class, TEST_PATIENT_1_ID));
+  }
+
+  @Test
+  public void update_existingResource_shouldInsertResource() throws Exception {
+    database.update(TEST_PATIENT_2);
+    testingUtils
+        .assertResourceEquals(TEST_PATIENT_2, database.select(Patient.class, TEST_PATIENT_2_ID));
   }
 
   @Test

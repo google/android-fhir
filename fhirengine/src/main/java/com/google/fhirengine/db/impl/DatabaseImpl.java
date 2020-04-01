@@ -94,7 +94,18 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
 
   @Override
   public <R extends Resource> void update(R resource) {
-    throw new UnsupportedOperationException("Not implemented yet!");
+    String type = resource.getResourceType().name();
+    String id = resource.getId();
+    ContentValues contentValues = new ContentValues();
+    contentValues.put(ResourcesColumns.RESOURCE_TYPE, type);
+    contentValues.put(ResourcesColumns.RESOURCE_ID, id);
+    contentValues.put(ResourcesColumns.RESOURCE, iParser.encodeResourceToString(resource));
+    SQLiteDatabase database = getWritableDatabase();
+    try {
+      database.replaceOrThrow(Tables.RESOURCES, null, contentValues);
+    } finally {
+      database.close();
+    }
   }
 
   @Override
