@@ -85,10 +85,13 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
     contentValues.put(ResourcesColumns.RESOURCE_TYPE, type);
     contentValues.put(ResourcesColumns.RESOURCE_ID, id);
     contentValues.put(ResourcesColumns.RESOURCE, iParser.encodeResourceToString(resource));
+    SQLiteDatabase database = getWritableDatabase();
     try {
-      getWritableDatabase().insertOrThrow(Tables.RESOURCES, null, contentValues);
+      database.insertOrThrow(Tables.RESOURCES, null, contentValues);
     } catch (SQLiteConstraintException e) {
       throw new ResourceAlreadyExistsInDbException(type, id, e);
+    } finally {
+      database.close();
     }
   }
 
@@ -106,7 +109,8 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
     String whereClause =
         ResourcesColumns.RESOURCE_TYPE + " = ? AND " + ResourcesColumns.RESOURCE_ID + " = ?";
     String[] whereArgs = new String[]{type, id};
-    Cursor cursor = getReadableDatabase()
+    SQLiteDatabase database = getReadableDatabase();
+    Cursor cursor = database
         .query(Tables.RESOURCES, columns, whereClause, whereArgs, null, null, null);
     try {
       if (cursor == null) {
@@ -122,6 +126,7 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
       return iParser.parseResource(clazz, cursor.getString(0));
     } finally {
       cursor.close();
+      database.close();
     }
   }
 
