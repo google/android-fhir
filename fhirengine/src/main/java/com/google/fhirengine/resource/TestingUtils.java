@@ -8,6 +8,7 @@ import ca.uhn.fhir.parser.IParser;
 
 import static org.junit.Assert.assertEquals;
 
+/** Utilities for testing. */
 public class TestingUtils {
   private final IParser iParser;
 
