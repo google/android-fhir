@@ -35,7 +35,7 @@ public class FhirEngineImpl implements FhirEngine {
 
   @Override
   public <R extends Resource> void update(R resource) {
-    throw new UnsupportedOperationException("Not implemented yet!");
+    database.update(resource);
   }
 
   @Override
