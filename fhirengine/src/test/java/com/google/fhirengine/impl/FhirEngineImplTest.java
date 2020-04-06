@@ -103,20 +103,20 @@ public class FhirEngineImplTest {
   }
 
   @Test
-  public void update_nonexistentResource_shouldUpdateResource() throws Exception {
+  public void update_nonexistentResource_shouldInsertResource() throws Exception {
+    fhirEngine.update(TEST_PATIENT_2);
+    testingUtils
+        .assertResourceEquals(TEST_PATIENT_2, fhirEngine.load(Patient.class, TEST_PATIENT_2_ID));
+  }
+
+  @Test
+  public void update_shouldUpdateResource() throws Exception {
     Patient patient = new Patient();
     patient.setId(TEST_PATIENT_1_ID);
     patient.setGender(Enumerations.AdministrativeGender.FEMALE);
     fhirEngine.update(patient);
     testingUtils
         .assertResourceEquals(patient, fhirEngine.load(Patient.class, TEST_PATIENT_1_ID));
-  }
-
-  @Test
-  public void update_existingResource_shouldInsertResource() throws Exception {
-    fhirEngine.update(TEST_PATIENT_2);
-    testingUtils
-        .assertResourceEquals(TEST_PATIENT_2, fhirEngine.load(Patient.class, TEST_PATIENT_2_ID));
   }
 
   @Test
