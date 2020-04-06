@@ -50,7 +50,7 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
       "CREATE TABLE " + Tables.RESOURCES + " ( " +
           ResourcesColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
           ResourcesColumns.RESOURCE_TYPE + " TEXT NOT NULL," +
-          ResourcesColumns.RESOURCE_ID + " INTEGER NOT NULL," +
+          ResourcesColumns.RESOURCE_ID + " TEXT NOT NULL," +
           ResourcesColumns.RESOURCE + " TEXT NOT NULL);";
   private static String CREATE_INDEX =
       "CREATE UNIQUE INDEX " + UniqueIndices.RESOURCE_TYPE_RESOURCE_ID_UNIQUE_INDEX + " ON " +
