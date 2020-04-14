@@ -24,8 +24,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.fhirengine.DaggerFhirEngineComponent;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.ResourceAlreadyExistsException;
+import com.google.fhirengine.ResourceNotFoundException;
 
+import org.cqframework.cql.elm.execution.VersionedIdentifier;
 import org.hl7.fhir.r4.model.Library;
+import org.opencds.cqf.cql.execution.CqlEngine;
+import org.opencds.cqf.cql.execution.CqlLibraryReader;
+import org.opencds.cqf.cql.execution.EvaluationResult;
+import org.opencds.cqf.cql.execution.LibraryLoader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,12 +39,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+import javax.xml.bind.JAXBException;
+
 import ca.uhn.fhir.context.FhirContext;
 
 public class MainActivity extends AppCompatActivity {
 
   private static final String DUMMY_ANC_LIBRARY =
       "https://raw.githubusercontent.com/who-int/anc-cds/develop/input/resources/library/library-ANCDummy.json";
+  public static final String LIBRARY_ID = "Library/library-ANCDummy";
 
   FhirEngine fhirEngine;
 
@@ -51,6 +60,13 @@ public class MainActivity extends AppCompatActivity {
     button.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         new DownloadAncLibrary().execute(DUMMY_ANC_LIBRARY);
+      }
+    });
+
+    final Button evaluateButton = findViewById(R.id.evaluate_button);
+    evaluateButton.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        new EvaluateAncLibrary().execute(LIBRARY_ID);
       }
     });
 
@@ -81,6 +97,34 @@ public class MainActivity extends AppCompatActivity {
       } catch (ResourceAlreadyExistsException e) {
         e.printStackTrace();
       }
+      return null;
+    }
+  }
+
+  private class EvaluateAncLibrary extends AsyncTask<String, String, Void> {
+    @Override
+    protected Void doInBackground(String... strings) {
+      Library library;
+      try {
+        library = fhirEngine.load(Library.class, strings[0]);
+        org.cqframework.cql.elm.execution.Library cqlLibrary =
+            CqlLibraryReader.read(new String(library.getContent().get(0).getData()));
+        CqlEngine cqlEngine = new CqlEngine(new LibraryLoader() {
+          @Override
+          public org.cqframework.cql.elm.execution.Library load(
+              VersionedIdentifier libraryIdentifier) {
+            return cqlLibrary;
+          }
+        });
+        EvaluationResult result = cqlEngine.evaluate(new VersionedIdentifier());
+      } catch (JAXBException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
+        e.printStackTrace();
+      } catch (ResourceNotFoundException e) {
+        e.printStackTrace();
+      }
+
       return null;
     }
   }
