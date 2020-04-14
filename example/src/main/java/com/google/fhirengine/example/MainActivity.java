@@ -10,11 +10,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.fhirengine.DaggerFhirEngineComponent;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.ResourceAlreadyExistsException;
+import com.google.fhirengine.ResourceNotFoundException;
 
 import org.cqframework.cql.elm.execution.VersionedIdentifier;
 import org.hl7.fhir.r4.model.Library;
+<<<<<<< HEAD
 import org.opencds.cqf.cql.elm.execution.ObjectFactoryEx;
 import org.opencds.cqf.cql.execution.CqlEngine;
+=======
+import org.opencds.cqf.cql.execution.CqlEngine;
+import org.opencds.cqf.cql.execution.CqlLibraryReader;
+>>>>>>> 8e8b3a0... Add a button which will evaluate the hard-coded library.
 import org.opencds.cqf.cql.execution.EvaluationResult;
 import org.opencds.cqf.cql.execution.LibraryLoader;
 
@@ -25,6 +31,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+import javax.xml.bind.JAXBException;
 
 import ca.uhn.fhir.context.FhirContext;
 
