@@ -34,6 +34,7 @@ import org.opencds.cqf.cql.execution.EvaluationResult;
 import org.opencds.cqf.cql.execution.LibraryLoader;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -107,8 +108,9 @@ public class MainActivity extends AppCompatActivity {
       Library library;
       try {
         library = fhirEngine.load(Library.class, strings[0]);
+        InputStream inputStream = new ByteArrayInputStream(library.getContent().get(0).getData());
         org.cqframework.cql.elm.execution.Library cqlLibrary =
-            CqlLibraryReader.read(new String(library.getContent().get(0).getData()));
+            CqlLibraryReader.read(inputStream);
         CqlEngine cqlEngine = new CqlEngine(new LibraryLoader() {
           @Override
           public org.cqframework.cql.elm.execution.Library load(
