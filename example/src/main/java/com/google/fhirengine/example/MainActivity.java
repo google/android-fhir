@@ -24,24 +24,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.fhirengine.DaggerFhirEngineComponent;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.ResourceAlreadyExistsException;
-import com.google.fhirengine.ResourceNotFoundException;
 
 import org.cqframework.cql.elm.execution.VersionedIdentifier;
 import org.hl7.fhir.r4.model.Library;
 import org.opencds.cqf.cql.elm.execution.ObjectFactoryEx;
 import org.opencds.cqf.cql.execution.CqlEngine;
-import org.opencds.cqf.cql.execution.CqlLibraryReader;
 import org.opencds.cqf.cql.execution.EvaluationResult;
 import org.opencds.cqf.cql.execution.LibraryLoader;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import ca.uhn.fhir.context.FhirContext;
@@ -107,63 +103,56 @@ public class MainActivity extends AppCompatActivity {
   private class EvaluateAncLibrary extends AsyncTask<String, String, Void> {
     @Override
     protected Void doInBackground(String... strings) {
-      Library library;
-      try {
-        library = fhirEngine.load(Library.class, strings[0]);
-        InputStream inputStream = new ByteArrayInputStream(library.getContent().get(0).getData());
-        ObjectFactoryEx objectFactoryEx = new ObjectFactoryEx();
-        org.cqframework.cql.elm.execution.Library cqlLibrary =
-            objectFactoryEx.createLibrary()
-                .withIdentifier(objectFactoryEx.createVersionedIdentifier().withId("ANCFHIRDummy").withVersion("0.1.0"))
-                .withSchemaIdentifier(objectFactoryEx.createVersionedIdentifier().withId("urn:hl7-org:elm").withVersion("r1"))
-                .withUsings(
-                    objectFactoryEx.createLibraryUsings().withDef(
-                        objectFactoryEx.createUsingDef().withLocalIdentifier("System").withUri("urn:hl7-org:elm-types:r1")
-                    )
-                    .withDef(
-                        objectFactoryEx.createUsingDef().withLocalIdentifier("FHIR").withUri("http://hl7.org/fhir").withVersion("4.0.0")
-                    )
-                )
-                .withStatements(
+      ObjectFactoryEx objectFactoryEx = new ObjectFactoryEx();
+      org.cqframework.cql.elm.execution.Library cqlLibrary =
+          objectFactoryEx.createLibrary()
+              .withIdentifier(objectFactoryEx.createVersionedIdentifier().withId("ANCFHIRDummy")
+                  .withVersion("0.1.0"))
+              .withSchemaIdentifier(
+                  objectFactoryEx.createVersionedIdentifier().withId("urn:hl7-org:elm")
+                      .withVersion("r1"))
+              .withUsings(
+                  objectFactoryEx.createLibraryUsings().withDef(
+                      objectFactoryEx.createUsingDef().withLocalIdentifier("System")
+                          .withUri("urn:hl7-org:elm-types:r1")
+                  )
+                      .withDef(
+                          objectFactoryEx.createUsingDef().withLocalIdentifier("FHIR")
+                              .withUri("http://hl7.org/fhir").withVersion("4.0.0")
+                      )
+              )
+              .withStatements(
                   objectFactoryEx.createLibraryStatements().withDef(
                       objectFactoryEx.createExpressionDef()
-                      .withName("Patient")
-                      .withContext("Patient")
-                      .withExpression(
-                          objectFactoryEx.createSingletonFrom()
-                          .withOperand(
-                              objectFactoryEx.createRetrieve()
-                              .withDataType(QName.valueOf("fhir:Patient"))
+                          .withName("Patient")
+                          .withContext("Patient")
+                          .withExpression(
+                              objectFactoryEx.createSingletonFrom()
+                                  .withOperand(
+                                      objectFactoryEx.createRetrieve()
+                                          .withDataType(QName.valueOf("fhir:Patient"))
+                                  )
                           )
-                      )
                   )
-                    .withDef(
-                        objectFactoryEx.createExpressionDef()
-                        .withName("Observations")
-                        .withContext("Patient")
-                        .withExpression(
-                            objectFactoryEx.createRetrieve()
-                            .withDataType(QName.valueOf("fhir:Observation"))
-                        )
-                    )
-                );
+                      .withDef(
+                          objectFactoryEx.createExpressionDef()
+                              .withName("Observations")
+                              .withContext("Patient")
+                              .withExpression(
+                                  objectFactoryEx.createRetrieve()
+                                      .withDataType(QName.valueOf("fhir:Observation"))
+                              )
+                      )
+              );
 
-            //CqlLibraryReader.read(inputStream);
-        CqlEngine cqlEngine = new CqlEngine(new LibraryLoader() {
-          @Override
-          public org.cqframework.cql.elm.execution.Library load(
-              VersionedIdentifier libraryIdentifier) {
-            return cqlLibrary;
-          }
-        });
-        EvaluationResult result = cqlEngine.evaluate(new VersionedIdentifier());
-      } catch (JAXBException e) {
-        e.printStackTrace();
-      } catch (IOException e) {
-        e.printStackTrace();
-      } catch (ResourceNotFoundException e) {
-        e.printStackTrace();
-      }
+      CqlEngine cqlEngine = new CqlEngine(new LibraryLoader() {
+        @Override
+        public org.cqframework.cql.elm.execution.Library load(
+            VersionedIdentifier libraryIdentifier) {
+          return cqlLibrary;
+        }
+      });
+      EvaluationResult result = cqlEngine.evaluate(new VersionedIdentifier());
 
       return null;
     }
