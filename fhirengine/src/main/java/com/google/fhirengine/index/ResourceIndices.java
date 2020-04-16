@@ -34,7 +34,7 @@ public class ResourceIndices {
 
   public ResourceIndices(ResourceType resourceType, String id) {
     this.resourceType = resourceType;
-    this.id = id;;
+    this.id = id;
   }
 
   /** Returns the {@link ResourceType} of the resource. */
