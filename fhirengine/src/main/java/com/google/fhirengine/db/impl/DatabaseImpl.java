@@ -145,6 +145,7 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
         ContentValues stringIndexContentValues = new ContentValues();
         stringIndexContentValues.put(StringIndicesColumns.RESOURCE_TYPE, type);
         stringIndexContentValues.put(StringIndicesColumns.INDEX_NAME, stringIndex.name());
+        stringIndexContentValues.put(StringIndicesColumns.INDEX_PATH, stringIndex.path());
         stringIndexContentValues.put(StringIndicesColumns.INDEX_VALUE, stringIndex.value());
         stringIndexContentValues.put(StringIndicesColumns.RESOURCE_ID, id);
         database.replaceOrThrow(Tables.STRING_INDICES, null, stringIndexContentValues);
