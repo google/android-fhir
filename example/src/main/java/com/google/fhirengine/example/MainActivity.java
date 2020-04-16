@@ -24,17 +24,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.fhirengine.DaggerFhirEngineComponent;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.ResourceAlreadyExistsException;
-import com.google.fhirengine.ResourceNotFoundException;
+import com.google.fhirengine.cql.FhirEngineDataProvider;
 
 import org.cqframework.cql.elm.execution.VersionedIdentifier;
 import org.hl7.fhir.r4.model.Library;
-<<<<<<< HEAD
+import org.opencds.cqf.cql.data.DataProvider;
 import org.opencds.cqf.cql.elm.execution.ObjectFactoryEx;
 import org.opencds.cqf.cql.execution.CqlEngine;
-=======
-import org.opencds.cqf.cql.execution.CqlEngine;
-import org.opencds.cqf.cql.execution.CqlLibraryReader;
->>>>>>> 8e8b3a0... Add a button which will evaluate the hard-coded library.
 import org.opencds.cqf.cql.execution.EvaluationResult;
 import org.opencds.cqf.cql.execution.LibraryLoader;
 
@@ -43,9 +39,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.bind.JAXBException;
 
 import ca.uhn.fhir.context.FhirContext;
 
@@ -158,7 +156,9 @@ public class MainActivity extends AppCompatActivity {
                               objectFactoryEx.createSingletonFrom()
                                   .withOperand(
                                       objectFactoryEx.createRetrieve()
-                                          .withDataType(QName.valueOf("fhir:Patient"))
+                                          .withDataType(
+                                              new QName("http://hl7.org/fhir", "Patient", "fhir")
+                                          )
                                   )
                           )
                   )
@@ -168,7 +168,8 @@ public class MainActivity extends AppCompatActivity {
                               .withContext("Patient")
                               .withExpression(
                                   objectFactoryEx.createRetrieve()
-                                      .withDataType(QName.valueOf("fhir:Observation"))
+                                      .withDataType(
+                                          new QName("http://hl7.org/fhir", "Observation", "fhir"))
                               )
                       )
                       .withDef(
@@ -197,14 +198,18 @@ public class MainActivity extends AppCompatActivity {
                       )
               );
 
+      Map<String, DataProvider> dataProviderMap = new HashMap<>();
+      dataProviderMap.put("http://hl7.org/fhir", new FhirEngineDataProvider());
+
       CqlEngine cqlEngine = new CqlEngine(new LibraryLoader() {
         @Override
         public org.cqframework.cql.elm.execution.Library load(
             VersionedIdentifier libraryIdentifier) {
           return cqlLibrary;
         }
-      });
-      EvaluationResult result = cqlEngine.evaluate(new VersionedIdentifier());
+      }, dataProviderMap, null, EnumSet.noneOf(CqlEngine.Options.class));
+      EvaluationResult result =
+          cqlEngine.evaluate(new VersionedIdentifier().withId("ANCFHIRDummy"));
 
       return null;
     }
