@@ -13,9 +13,16 @@ import com.google.common.base.Joiner;
 import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
+import com.google.fhirengine.index.FhirIndexer;
+import com.google.fhirengine.index.ResourceIndices;
+import com.google.fhirengine.index.StringIndex;
 import com.google.fhirengine.resource.ResourceUtils;
 
 import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -30,6 +37,7 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
   /** Table names */
   interface Tables {
     String RESOURCES = "resources";
+    String STRING_INDICES = "string_indices";
   }
 
   /** {@link Tables#RESOURCES} columns. */
@@ -39,11 +47,30 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
     String RESOURCE = "resource";
   }
 
+  /** {@link Tables#STRING_INDICES} columns. */
+  interface StringIndicesColumns extends BaseColumns {
+    String RESOURCE_TYPE = "resource_type";
+    String INDEX_NAME = "index_name";
+    String INDEX_PATH = "index_path";
+    String INDEX_VALUE = "index_value";
+    String RESOURCE_ID = "resource_id";
+  }
+
   /** Unique indices */
   private interface UniqueIndices {
     String RESOURCE_TYPE_RESOURCE_ID_UNIQUE_INDEX =
         Joiner.on("_")
             .join(Tables.RESOURCES, ResourcesColumns.RESOURCE_TYPE, ResourcesColumns.RESOURCE_ID);
+
+  }
+
+  /** Indices */
+  private interface Indices {
+    String STRING_INDICES_TABLE_RESOURCE_TYPE_INDEX_NAME_INDEX_VALUE_INDEX =
+        Joiner.on("_")
+            .join(Tables.STRING_INDICES, StringIndicesColumns.RESOURCE_TYPE,
+                StringIndicesColumns.INDEX_NAME,
+                StringIndicesColumns.INDEX_VALUE);
   }
 
   private static String CREATE_RESOURCES_TABLE =
@@ -52,24 +79,44 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
           ResourcesColumns.RESOURCE_TYPE + " TEXT NOT NULL," +
           ResourcesColumns.RESOURCE_ID + " TEXT NOT NULL," +
           ResourcesColumns.RESOURCE + " TEXT NOT NULL);";
-  private static String CREATE_INDEX =
+  private static String CREATE_RESOURCE_TABLE_UNIQUE_INDEX =
       "CREATE UNIQUE INDEX " + UniqueIndices.RESOURCE_TYPE_RESOURCE_ID_UNIQUE_INDEX + " ON " +
           Tables.RESOURCES + " ( " +
           ResourcesColumns.RESOURCE_TYPE + ", " +
-          ResourcesColumns.RESOURCE_ID + ")";
+          ResourcesColumns.RESOURCE_ID + ");";
+
+  private static String CREATE_STRING_INDICES_TABLE =
+      "CREATE TABLE " + Tables.STRING_INDICES + " ( " +
+          StringIndicesColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+          StringIndicesColumns.RESOURCE_TYPE + " TEXT NOT NULL," +
+          StringIndicesColumns.INDEX_NAME + " TEXT NOT NULL," +
+          StringIndicesColumns.INDEX_PATH + " TEXT NOT NULL," +
+          StringIndicesColumns.INDEX_VALUE + " TEXT NOT NULL," +
+          StringIndicesColumns.RESOURCE_ID + " TEXT NOT NULL);";
+  private static String CREATE_STRING_INDICES_TABLE_INDEX =
+      "CREATE INDEX " + Indices.STRING_INDICES_TABLE_RESOURCE_TYPE_INDEX_NAME_INDEX_VALUE_INDEX +
+          " ON " +
+          Tables.STRING_INDICES + " ( " +
+          StringIndicesColumns.RESOURCE_TYPE + ", " +
+          StringIndicesColumns.INDEX_NAME + ", " +
+          StringIndicesColumns.INDEX_VALUE + ");";
 
   private final IParser iParser;
+  private final FhirIndexer fhirIndexer;
 
   @Inject
-  DatabaseImpl(Context context, IParser iParser) {
+  DatabaseImpl(Context context, IParser iParser, FhirIndexer fhirIndexer) {
     super(context, DB_NAME, null, DB_VERSION);
     this.iParser = iParser;
+    this.fhirIndexer = fhirIndexer;
   }
 
   @Override
   public void onCreate(SQLiteDatabase sqLiteDatabase) {
     sqLiteDatabase.execSQL(CREATE_RESOURCES_TABLE);
-    sqLiteDatabase.execSQL(CREATE_INDEX);
+    sqLiteDatabase.execSQL(CREATE_STRING_INDICES_TABLE);
+    sqLiteDatabase.execSQL(CREATE_RESOURCE_TABLE_UNIQUE_INDEX);
+    sqLiteDatabase.execSQL(CREATE_STRING_INDICES_TABLE_INDEX);
   }
 
   @Override
@@ -87,7 +134,25 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
     contentValues.put(ResourcesColumns.RESOURCE, iParser.encodeResourceToString(resource));
     SQLiteDatabase database = getWritableDatabase();
     try {
+      database.beginTransaction();
+
+      // Insert resource itself.
       database.insertOrThrow(Tables.RESOURCES, null, contentValues);
+
+      // Insert string indices.
+      ResourceIndices resourceIndices = fhirIndexer.index(resource);
+      for (StringIndex stringIndex : resourceIndices.getStringIndices()) {
+        ContentValues stringIndexContentValues = new ContentValues();
+        stringIndexContentValues.put(StringIndicesColumns.RESOURCE_TYPE, type);
+        stringIndexContentValues.put(StringIndicesColumns.INDEX_NAME, stringIndex.name());
+        stringIndexContentValues.put(StringIndicesColumns.INDEX_PATH, stringIndex.path());
+        stringIndexContentValues.put(StringIndicesColumns.INDEX_VALUE, stringIndex.value());
+        stringIndexContentValues.put(StringIndicesColumns.RESOURCE_ID, id);
+        database.replaceOrThrow(Tables.STRING_INDICES, null, stringIndexContentValues);
+      }
+
+      database.setTransactionSuccessful();
+      database.endTransaction();
     } catch (SQLiteConstraintException e) {
       throw new ResourceAlreadyExistsInDbException(type, id, e);
     } finally {
