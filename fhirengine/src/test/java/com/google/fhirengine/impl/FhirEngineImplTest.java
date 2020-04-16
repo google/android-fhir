@@ -11,6 +11,7 @@ import com.google.fhirengine.ResourceNotFoundException;
 import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.impl.DatabaseImpl;
 import com.google.fhirengine.db.impl.DatabaseModule;
+import com.google.fhirengine.index.impl.FhirIndexerModule;
 import com.google.fhirengine.resource.ResourceModule;
 import com.google.fhirengine.resource.TestingUtils;
 
@@ -61,7 +62,8 @@ public class FhirEngineImplTest {
   TestingUtils testingUtils;
 
   @Singleton
-  @Component(modules = {FhirEngineModule.class, DatabaseModule.class, ResourceModule.class})
+  @Component(modules = {FhirEngineModule.class, DatabaseModule.class, FhirIndexerModule.class,
+      ResourceModule.class})
   public interface TestComponent {
 
     Database getDatabase();
