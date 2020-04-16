@@ -7,7 +7,6 @@ import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
 import com.google.fhirengine.resource.ResourceModule;
 
-import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Patient;
 import org.junit.Before;
@@ -20,8 +19,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import dagger.Component;
-
-import static org.junit.Assert.assertEquals;
 
 /** Unit tests for {@link FhirIndexerImpl}. */
 @RunWith(RobolectricTestRunner.class)
