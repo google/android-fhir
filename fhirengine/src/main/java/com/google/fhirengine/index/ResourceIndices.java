@@ -29,8 +29,11 @@ public class ResourceIndices {
   /** The ID of the resource. */
   private final String id;
 
-  /** Maps from the index definitions to the index values */
+  /** The string indices. */
   private final List<StringIndex> stringIndices = new ArrayList<>();
+
+  /** The reference indices. */
+  private final List<ReferenceIndex> referenceIndices = new ArrayList<>();
 
   public ResourceIndices(ResourceType resourceType, String id) {
     this.resourceType = resourceType;
@@ -52,8 +55,18 @@ public class ResourceIndices {
     stringIndices.add(stringIndex);
   }
 
+  /** Adds reference values to the index. */
+  public void addReferenceIndex(ReferenceIndex referenceIndex) {
+    referenceIndices.add(referenceIndex);
+  }
+
   /** Returns the string indices. */
   public ImmutableList<StringIndex> getStringIndices() {
     return ImmutableList.copyOf(stringIndices);
+  }
+
+  /** Returns the reference indices. */
+  public ImmutableList<ReferenceIndex> getReferenceIndices() {
+    return ImmutableList.copyOf(referenceIndices);
   }
 }

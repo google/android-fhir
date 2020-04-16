@@ -3,12 +3,15 @@ package com.google.fhirengine.index.impl;
 import android.os.Build;
 
 import com.google.common.truth.Truth;
+import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
 import com.google.fhirengine.resource.ResourceModule;
 
 import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Reference;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +36,15 @@ public class FhirIndexerImplTest {
     TEST_PATIENT_1.addName(new HumanName().addGiven("Tom"));
   }
 
+  private static final String TEST_OBSERVATION_1_ID = "test_observation_1";
+  private static final Observation TEST_OBSERVATION_1;
+
+  static {
+    TEST_OBSERVATION_1 = new Observation();
+    TEST_OBSERVATION_1.setId(TEST_OBSERVATION_1_ID);
+    TEST_OBSERVATION_1.setSubject(new Reference().setReference("Patient/" + TEST_PATIENT_1_ID));
+  }
+
   @Inject
   FhirIndexerImpl fhirIndexer;
 
@@ -52,6 +64,14 @@ public class FhirIndexerImplTest {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_1);
     Truth.assertThat(resourceIndices.getStringIndices())
         .contains(StringIndex.create("given", "Patient.name.given", "Tom"));
+  }
+
+  @Test
+  public void index_observation_shouldIndexSubject() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(TEST_OBSERVATION_1);
+    Truth.assertThat(resourceIndices.getReferenceIndices())
+        .contains(ReferenceIndex
+            .create("subject", "Observation.subject", "Patient/" + TEST_PATIENT_1_ID));
   }
 
   // TODO: improve the tests.
