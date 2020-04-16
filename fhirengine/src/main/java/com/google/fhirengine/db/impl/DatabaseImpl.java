@@ -50,7 +50,7 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
       "CREATE TABLE " + Tables.RESOURCES + " ( " +
           ResourcesColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
           ResourcesColumns.RESOURCE_TYPE + " TEXT NOT NULL," +
-          ResourcesColumns.RESOURCE_ID + " INTEGER NOT NULL," +
+          ResourcesColumns.RESOURCE_ID + " TEXT NOT NULL," +
           ResourcesColumns.RESOURCE + " TEXT NOT NULL);";
   private static String CREATE_INDEX =
       "CREATE UNIQUE INDEX " + UniqueIndices.RESOURCE_TYPE_RESOURCE_ID_UNIQUE_INDEX + " ON " +
@@ -85,16 +85,30 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
     contentValues.put(ResourcesColumns.RESOURCE_TYPE, type);
     contentValues.put(ResourcesColumns.RESOURCE_ID, id);
     contentValues.put(ResourcesColumns.RESOURCE, iParser.encodeResourceToString(resource));
+    SQLiteDatabase database = getWritableDatabase();
     try {
-      getWritableDatabase().insertOrThrow(Tables.RESOURCES, null, contentValues);
+      database.insertOrThrow(Tables.RESOURCES, null, contentValues);
     } catch (SQLiteConstraintException e) {
       throw new ResourceAlreadyExistsInDbException(type, id, e);
+    } finally {
+      database.close();
     }
   }
 
   @Override
   public <R extends Resource> void update(R resource) {
-    throw new UnsupportedOperationException("Not implemented yet!");
+    String type = resource.getResourceType().name();
+    String id = resource.getId();
+    ContentValues contentValues = new ContentValues();
+    contentValues.put(ResourcesColumns.RESOURCE_TYPE, type);
+    contentValues.put(ResourcesColumns.RESOURCE_ID, id);
+    contentValues.put(ResourcesColumns.RESOURCE, iParser.encodeResourceToString(resource));
+    SQLiteDatabase database = getWritableDatabase();
+    try {
+      database.replaceOrThrow(Tables.RESOURCES, null, contentValues);
+    } finally {
+      database.close();
+    }
   }
 
   @Override
@@ -106,7 +120,8 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
     String whereClause =
         ResourcesColumns.RESOURCE_TYPE + " = ? AND " + ResourcesColumns.RESOURCE_ID + " = ?";
     String[] whereArgs = new String[]{type, id};
-    Cursor cursor = getReadableDatabase()
+    SQLiteDatabase database = getReadableDatabase();
+    Cursor cursor = database
         .query(Tables.RESOURCES, columns, whereClause, whereArgs, null, null, null);
     try {
       if (cursor == null) {
@@ -122,6 +137,7 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
       return iParser.parseResource(clazz, cursor.getString(0));
     } finally {
       cursor.close();
+      database.close();
     }
   }
 
