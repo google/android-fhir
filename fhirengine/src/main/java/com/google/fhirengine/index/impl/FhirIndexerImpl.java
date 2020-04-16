@@ -1,11 +1,14 @@
 package com.google.fhirengine.index.impl;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.fhirengine.index.FhirIndexer;
+import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
 
+import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.StringType;
 
@@ -30,8 +33,12 @@ public class FhirIndexerImpl implements FhirIndexer {
   /** The string representing the string search parameter type. */
   private static final String SEARCH_PARAM_DEFINITION_TYPE_STRING = "string";
 
+  /** The string representing the string search parameter type. */
+  private static final String SEARCH_PARAM_DEFINITION_TYPE_REFERENCE = "reference";
+
   /** Tag for logging. */
   private static final String TAG = "FhirIndexerImpl";
+  public static final String DOT_NOTATION_REGEX = "^[a-zA-Z0-9\\.]+$";
 
   @Inject
   public FhirIndexerImpl() {
@@ -51,10 +58,21 @@ public class FhirIndexerImpl implements FhirIndexer {
       if (searchParamDefinition != null) {
         String path = searchParamDefinition.path();
         String type = searchParamDefinition.type();
-        if (type.equals(SEARCH_PARAM_DEFINITION_TYPE_STRING) && path.matches("^[a-zA-Z0-9\\.]+$")) {
+        if (type.equals(SEARCH_PARAM_DEFINITION_TYPE_STRING) && hasDotNotationOnly(path)) {
           for (String value : getStringValues(getValuesForPath(resource, path))) {
             resourceIndices.addStringIndex(StringIndex
                 .create(searchParamDefinition.name(), searchParamDefinition.path(), value));
+          }
+        }
+
+        if (type.equals(SEARCH_PARAM_DEFINITION_TYPE_REFERENCE) && hasDotNotationOnly(path)) {
+          for (Reference reference : getReferenceValues(getValuesForPath(resource, path))) {
+            String referenceString = reference.getReference();
+            if (!TextUtils.isEmpty(referenceString)) {
+              resourceIndices.addReferenceIndex(ReferenceIndex
+                  .create(searchParamDefinition.name(), searchParamDefinition.path(),
+                      referenceString));
+            }
           }
         }
 
@@ -141,8 +159,27 @@ public class FhirIndexerImpl implements FhirIndexer {
     return stringValues;
   }
 
+  /** Returns the reference values for the list of {@code objects}. */
+  private List<Reference> getReferenceValues(List<Object> objects) {
+    List<Reference> references = new ArrayList<>();
+    for (Object object : objects) {
+      if (Reference.class.isAssignableFrom(object.getClass())) {
+        references.add((Reference) object);
+      }
+    }
+    return references;
+  }
+
   /** Returns the name of the method to retrieve the field {@code fieldName}. */
   private static String getGetterName(String fieldName) {
     return GETTER_PREFIX + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+  }
+
+  /**
+   * Returns whether the given path only uses a dot notation with no additional expressions such as
+   * where() or exists().
+   */
+  private static boolean hasDotNotationOnly(String path) {
+    return path.matches(DOT_NOTATION_REGEX);
   }
 }

@@ -14,6 +14,7 @@ import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
 import com.google.fhirengine.index.FhirIndexer;
+import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
 import com.google.fhirengine.resource.ResourceUtils;
@@ -38,6 +39,7 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
   interface Tables {
     String RESOURCES = "resources";
     String STRING_INDICES = "string_indices";
+    String REFERENCES_INDICES = "references_indices";
   }
 
   /** {@link Tables#RESOURCES} columns. */
@@ -49,6 +51,15 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
 
   /** {@link Tables#STRING_INDICES} columns. */
   interface StringIndicesColumns extends BaseColumns {
+    String RESOURCE_TYPE = "resource_type";
+    String INDEX_NAME = "index_name";
+    String INDEX_PATH = "index_path";
+    String INDEX_VALUE = "index_value";
+    String RESOURCE_ID = "resource_id";
+  }
+
+  /** {@link Tables#STRING_INDICES} columns. */
+  interface ReferenceIndicesColumns extends BaseColumns {
     String RESOURCE_TYPE = "resource_type";
     String INDEX_NAME = "index_name";
     String INDEX_PATH = "index_path";
@@ -71,20 +82,28 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
             .join(Tables.STRING_INDICES, StringIndicesColumns.RESOURCE_TYPE,
                 StringIndicesColumns.INDEX_NAME,
                 StringIndicesColumns.INDEX_VALUE);
+    String REFERENCE_INDICES_TABLE_RESOURCE_TYPE_INDEX_NAME_INDEX_VALUE_INDEX =
+        Joiner.on("_")
+            .join(Tables.REFERENCES_INDICES, ReferenceIndicesColumns.RESOURCE_TYPE,
+                ReferenceIndicesColumns.INDEX_NAME,
+                ReferenceIndicesColumns.INDEX_VALUE);
   }
 
+  /** Query to create the {@link Tables#RESOURCES} table. */
   private static String CREATE_RESOURCES_TABLE =
       "CREATE TABLE " + Tables.RESOURCES + " ( " +
           ResourcesColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
           ResourcesColumns.RESOURCE_TYPE + " TEXT NOT NULL," +
           ResourcesColumns.RESOURCE_ID + " TEXT NOT NULL," +
           ResourcesColumns.RESOURCE + " TEXT NOT NULL);";
+  /** Query to create the unique index for the {@link Tables#RESOURCES} table. */
   private static String CREATE_RESOURCE_TABLE_UNIQUE_INDEX =
       "CREATE UNIQUE INDEX " + UniqueIndices.RESOURCE_TYPE_RESOURCE_ID_UNIQUE_INDEX + " ON " +
           Tables.RESOURCES + " ( " +
           ResourcesColumns.RESOURCE_TYPE + ", " +
           ResourcesColumns.RESOURCE_ID + ");";
 
+  /** Query to create the {@link Tables#STRING_INDICES} table. */
   private static String CREATE_STRING_INDICES_TABLE =
       "CREATE TABLE " + Tables.STRING_INDICES + " ( " +
           StringIndicesColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -93,6 +112,7 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
           StringIndicesColumns.INDEX_PATH + " TEXT NOT NULL," +
           StringIndicesColumns.INDEX_VALUE + " TEXT NOT NULL," +
           StringIndicesColumns.RESOURCE_ID + " TEXT NOT NULL);";
+  /** Query to create the index for the {@link Tables#STRING_INDICES} table. */
   private static String CREATE_STRING_INDICES_TABLE_INDEX =
       "CREATE INDEX " + Indices.STRING_INDICES_TABLE_RESOURCE_TYPE_INDEX_NAME_INDEX_VALUE_INDEX +
           " ON " +
@@ -100,6 +120,24 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
           StringIndicesColumns.RESOURCE_TYPE + ", " +
           StringIndicesColumns.INDEX_NAME + ", " +
           StringIndicesColumns.INDEX_VALUE + ");";
+
+  /** Query to create the {@link Tables#REFERENCES_INDICES} table. */
+  private static String CREATE_REFERENCE_INDICES_TABLE =
+      "CREATE TABLE " + Tables.REFERENCES_INDICES + " ( " +
+          ReferenceIndicesColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+          ReferenceIndicesColumns.RESOURCE_TYPE + " TEXT NOT NULL," +
+          ReferenceIndicesColumns.INDEX_NAME + " TEXT NOT NULL," +
+          ReferenceIndicesColumns.INDEX_PATH + " TEXT NOT NULL," +
+          ReferenceIndicesColumns.INDEX_VALUE + " TEXT NOT NULL," +
+          ReferenceIndicesColumns.RESOURCE_ID + " TEXT NOT NULL);";
+  /** Query to create the index for the {@link Tables#REFERENCES_INDICES} table. */
+  private static String CREATE_REFERENCE_INDICES_TABLE_INDEX =
+      "CREATE INDEX " + Indices.REFERENCE_INDICES_TABLE_RESOURCE_TYPE_INDEX_NAME_INDEX_VALUE_INDEX +
+          " ON " +
+          Tables.REFERENCES_INDICES + " ( " +
+          ReferenceIndicesColumns.RESOURCE_TYPE + ", " +
+          ReferenceIndicesColumns.INDEX_NAME + ", " +
+          ReferenceIndicesColumns.INDEX_VALUE + ");";
 
   private final IParser iParser;
   private final FhirIndexer fhirIndexer;
@@ -115,8 +153,10 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
   public void onCreate(SQLiteDatabase sqLiteDatabase) {
     sqLiteDatabase.execSQL(CREATE_RESOURCES_TABLE);
     sqLiteDatabase.execSQL(CREATE_STRING_INDICES_TABLE);
+    sqLiteDatabase.execSQL(CREATE_REFERENCE_INDICES_TABLE);
     sqLiteDatabase.execSQL(CREATE_RESOURCE_TABLE_UNIQUE_INDEX);
     sqLiteDatabase.execSQL(CREATE_STRING_INDICES_TABLE_INDEX);
+    sqLiteDatabase.execSQL(CREATE_REFERENCE_INDICES_TABLE_INDEX);
   }
 
   @Override
@@ -139,8 +179,9 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
       // Insert resource itself.
       database.insertOrThrow(Tables.RESOURCES, null, contentValues);
 
-      // Insert string indices.
       ResourceIndices resourceIndices = fhirIndexer.index(resource);
+
+      // Insert string indices.
       for (StringIndex stringIndex : resourceIndices.getStringIndices()) {
         ContentValues stringIndexContentValues = new ContentValues();
         stringIndexContentValues.put(StringIndicesColumns.RESOURCE_TYPE, type);
@@ -149,6 +190,18 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
         stringIndexContentValues.put(StringIndicesColumns.INDEX_VALUE, stringIndex.value());
         stringIndexContentValues.put(StringIndicesColumns.RESOURCE_ID, id);
         database.replaceOrThrow(Tables.STRING_INDICES, null, stringIndexContentValues);
+      }
+
+      // Insert reference indices.
+      for (ReferenceIndex referenceIndex : resourceIndices.getReferenceIndices()) {
+        ContentValues referenceIndexContentValues = new ContentValues();
+        referenceIndexContentValues.put(ReferenceIndicesColumns.RESOURCE_TYPE, type);
+        referenceIndexContentValues.put(ReferenceIndicesColumns.INDEX_NAME, referenceIndex.name());
+        referenceIndexContentValues.put(ReferenceIndicesColumns.INDEX_PATH, referenceIndex.path());
+        referenceIndexContentValues
+            .put(ReferenceIndicesColumns.INDEX_VALUE, referenceIndex.value());
+        referenceIndexContentValues.put(ReferenceIndicesColumns.RESOURCE_ID, id);
+        database.replaceOrThrow(Tables.REFERENCES_INDICES, null, referenceIndexContentValues);
       }
 
       database.setTransactionSuccessful();
