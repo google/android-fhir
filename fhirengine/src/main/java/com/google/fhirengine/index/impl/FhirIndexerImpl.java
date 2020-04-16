@@ -1,5 +1,7 @@
 package com.google.fhirengine.index.impl;
 
+import android.util.Log;
+
 import com.google.fhirengine.index.FhirIndexer;
 import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
@@ -20,13 +22,16 @@ import ca.uhn.fhir.model.api.annotation.SearchParamDefinition;
 public class FhirIndexerImpl implements FhirIndexer {
 
   /** The prefix of getter methods for retrieving field values. */
-  public static final String GETTER_PREFIX = "get";
+  private static final String GETTER_PREFIX = "get";
 
   /** The regular expression for the separator */
-  public static final String SEPARATOR_REGEX = "\\.";
+  private static final String SEPARATOR_REGEX = "\\.";
 
   /** The string representing the string search parameter type. */
-  public static final String SEARCH_PARAM_DEFINITION_TYPE_STRING = "string";
+  private static final String SEARCH_PARAM_DEFINITION_TYPE_STRING = "string";
+
+  /** Tag for logging. */
+  private static final String TAG = "FhirIndexerImpl";
 
   @Inject
   public FhirIndexerImpl() {
@@ -91,11 +96,11 @@ public class FhirIndexerImpl implements FhirIndexer {
           continue;
         }
       } catch (InvocationTargetException e) {
-        e.printStackTrace();
+        Log.w(TAG, e);
       } catch (NoSuchMethodException e) {
-        e.printStackTrace();
+        Log.w(TAG, e);
       } catch (IllegalAccessException e) {
-        e.printStackTrace();
+        Log.w(TAG, e);
       }
       // If the field is a list, extract elements of the list. Otherwise, use the field value
       // directly.
