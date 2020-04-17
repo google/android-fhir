@@ -87,7 +87,7 @@ public class FhirEngineLibraryLoader implements LibraryLoader {
                     objectFactoryEx.createExpressionDef()
                         .withName("ObservationsWithCode").withContext("Patient").withExpression(
                         objectFactoryEx.createRetrieve()
-                            .withDataType(QName.valueOf("fhir:Observation"))
+                            .withDataType(new QName("http://hl7.org/fhir", "Observation", "fhir"))
                             .withCodeProperty("code")
                             .withCodes(
                                 objectFactoryEx.createToList()
@@ -99,7 +99,7 @@ public class FhirEngineLibraryLoader implements LibraryLoader {
                     objectFactoryEx.createExpressionDef()
                         .withName("ObservationsWithValueSet").withContext("Patient").withExpression(
                         objectFactoryEx.createRetrieve()
-                            .withDataType(QName.valueOf("fhir:Observation"))
+                            .withDataType(new QName("http://hl7.org/fhir", "Observation", "fhir"))
                             .withCodeProperty("code")
                             .withCodes(
                                 objectFactoryEx.createValueSetRef()
