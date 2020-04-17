@@ -10,26 +10,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.fhirengine.DaggerFhirEngineComponent;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.ResourceAlreadyExistsException;
-import com.google.fhirengine.cql.FhirEngineDataProvider;
 
-import org.cqframework.cql.elm.execution.VersionedIdentifier;
 import org.hl7.fhir.r4.model.Library;
-import org.opencds.cqf.cql.data.DataProvider;
-import org.opencds.cqf.cql.elm.execution.ObjectFactoryEx;
-import org.opencds.cqf.cql.execution.CqlEngine;
 import org.opencds.cqf.cql.execution.EvaluationResult;
-import org.opencds.cqf.cql.execution.LibraryLoader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.namespace.QName;
 
 import ca.uhn.fhir.context.FhirContext;
 
@@ -94,109 +83,7 @@ public class MainActivity extends AppCompatActivity {
   private class EvaluateAncLibrary extends AsyncTask<String, String, Void> {
     @Override
     protected Void doInBackground(String... strings) {
-      ObjectFactoryEx objectFactoryEx = new ObjectFactoryEx();
-      org.cqframework.cql.elm.execution.Library cqlLibrary =
-          objectFactoryEx.createLibrary()
-              .withIdentifier(objectFactoryEx.createVersionedIdentifier().withId("ANCFHIRDummy")
-                  .withVersion("0.1.0"))
-              .withSchemaIdentifier(
-                  objectFactoryEx.createVersionedIdentifier().withId("urn:hl7-org:elm")
-                      .withVersion("r1"))
-              .withUsings(
-                  objectFactoryEx.createLibraryUsings().withDef(
-                      objectFactoryEx.createUsingDef().withLocalIdentifier("System")
-                          .withUri("urn:hl7-org:elm-types:r1")
-                  )
-                      .withDef(
-                          objectFactoryEx.createUsingDef().withLocalIdentifier("FHIR")
-                              .withUri("http://hl7.org/fhir").withVersion("4.0.0")
-                      )
-              )
-              .withCodeSystems(
-                  objectFactoryEx.createLibraryCodeSystems().withDef(
-                      objectFactoryEx.createCodeSystemDef().withName("OpenMRSEntity")
-                          .withId("http://opernmrs.org/concepts")
-                  )
-              )
-              .withValueSets(
-                  objectFactoryEx.createLibraryValueSets().withDef(
-                      objectFactoryEx.createValueSetDef().withName("LMPCodes")
-                          .withId("http://fhir.org/guides/who/anc-cds/ValueSet/lmp-observation-code")
-                  )
-              )
-              .withCodes(
-                  objectFactoryEx.createLibraryCodes().withDef(
-                      objectFactoryEx.createCodeDef().withName("LMP")
-                          .withId("1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-                          .withDisplay("Date of last menstrual period").withCodeSystem(
-                              objectFactoryEx.createCodeSystemRef().withName("OpenMRSEntity")
-                      )
-                  )
-              )
-              .withStatements(
-                  objectFactoryEx.createLibraryStatements().withDef(
-                      objectFactoryEx.createExpressionDef()
-                          .withName("Patient")
-                          .withContext("Patient")
-                          .withExpression(
-                              objectFactoryEx.createSingletonFrom()
-                                  .withOperand(
-                                      objectFactoryEx.createRetrieve()
-                                          .withDataType(
-                                              new QName("http://hl7.org/fhir", "Patient", "fhir")
-                                          )
-                                  )
-                          )
-                  )
-                      .withDef(
-                          objectFactoryEx.createExpressionDef()
-                              .withName("Observations")
-                              .withContext("Patient")
-                              .withExpression(
-                                  objectFactoryEx.createRetrieve()
-                                      .withDataType(
-                                          new QName("http://hl7.org/fhir", "Observation", "fhir"))
-                              )
-                      )
-                      .withDef(
-                          objectFactoryEx.createExpressionDef()
-                              .withName("ObservationsWithCode").withContext("Patient").withExpression(
-                                  objectFactoryEx.createRetrieve()
-                                      .withDataType(QName.valueOf("fhir:Observation"))
-                                      .withCodeProperty("code")
-                                      .withCodes(
-                                          objectFactoryEx.createToList()
-                                              .withOperand(objectFactoryEx.createCodeRef().withName("LMP"))
-                                      )
-                              )
-                          )
-                      .withDef(
-                          objectFactoryEx.createExpressionDef()
-                              .withName("ObservationsWithValueSet").withContext("Patient").withExpression(
-                                      objectFactoryEx.createRetrieve()
-                                          .withDataType(QName.valueOf("fhir:Observation"))
-                                          .withCodeProperty("code")
-                                          .withCodes(
-                                              objectFactoryEx.createValueSetRef()
-                                                  .withName("LMPCodes")
-                                          )
-                              )
-                      )
-              );
-
-      Map<String, DataProvider> dataProviderMap = new HashMap<>();
-      dataProviderMap.put("http://hl7.org/fhir", new FhirEngineDataProvider());
-
-      CqlEngine cqlEngine = new CqlEngine(new LibraryLoader() {
-        @Override
-        public org.cqframework.cql.elm.execution.Library load(
-            VersionedIdentifier libraryIdentifier) {
-          return cqlLibrary;
-        }
-      }, dataProviderMap, null, EnumSet.noneOf(CqlEngine.Options.class));
-      EvaluationResult result =
-          cqlEngine.evaluate(new VersionedIdentifier().withId("ANCFHIRDummy"));
-
+      EvaluationResult evaluationResult = fhirEngine.evaluateCql("ANCFHIRDummy");
       return null;
     }
   }
