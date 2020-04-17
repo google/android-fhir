@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import com.google.common.base.Joiner;
 import com.google.fhirengine.db.Database;
@@ -22,12 +23,17 @@ import com.google.fhirengine.resource.ResourceUtils;
 
 import org.hl7.fhir.r4.model.Resource;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 
 import ca.uhn.fhir.parser.IParser;
 
 /** Helper class that manages the FHIR resource database, and provides a database connection. */
 public class DatabaseImpl extends SQLiteOpenHelper implements Database {
+  /** Tag for logging. */
+  private static String TAG = "DatabaseImpl";
 
   private static String DB_NAME = "FHIRDB";
   private static int DB_VERSION = 1;
@@ -313,5 +319,37 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
   @Override
   public <R extends Resource> void delete(Class<R> clazz, String id) {
     throw new UnsupportedOperationException("Not implemented yet!");
+  }
+
+  @Override
+  public <R extends Resource> List<R> searchByReference(Class<R> clazz, String reference,
+      String value) {
+    String type = ResourceUtils.getResourceType(clazz).name();
+
+    String[] columns = new String[]{ReferenceIndicesColumns.RESOURCE_ID};
+    String whereClause =
+        ReferenceIndicesColumns.RESOURCE_TYPE + " = ? AND " + ReferenceIndicesColumns.INDEX_PATH +
+            " = ? AND " + ReferenceIndicesColumns.INDEX_VALUE + " = ?";
+    String[] whereArgs = new String[]{type, reference, value};
+    SQLiteDatabase database = getReadableDatabase();
+    Cursor cursor = database
+        .query(Tables.REFERENCES_INDICES, columns, whereClause, whereArgs, null, null, null);
+
+    List<R> resources = new ArrayList<>();
+    try {
+      while (cursor.moveToNext()) {
+        String id = cursor.getString(0);
+        try {
+          resources.add(select(clazz, id));
+        } catch (ResourceNotFoundInDbException e) {
+          Log.w(TAG, "Database inconsistent.", e);
+          continue;
+        }
+      }
+      return resources;
+    } finally {
+      cursor.close();
+      database.close();
+    }
   }
 }
