@@ -121,6 +121,27 @@ public class MainActivity extends AppCompatActivity {
                               .withUri("http://hl7.org/fhir").withVersion("4.0.0")
                       )
               )
+              .withCodeSystems(
+                  objectFactoryEx.createLibraryCodeSystems().withDef(
+                      objectFactoryEx.createCodeSystemDef().withName("OpenMRSEntity")
+                          .withId("http://opernmrs.org/concepts")
+                  )
+              )
+              .withValueSets(
+                  objectFactoryEx.createLibraryValueSets().withDef(
+                      objectFactoryEx.createValueSetDef().withName("LMPCodes")
+                          .withId("http://fhir.org/guides/who/anc-cds/ValueSet/lmp-observation-code")
+                  )
+              )
+              .withCodes(
+                  objectFactoryEx.createLibraryCodes().withDef(
+                      objectFactoryEx.createCodeDef().withName("LMP")
+                          .withId("1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+                          .withDisplay("Date of last menstrual period").withCodeSystem(
+                              objectFactoryEx.createCodeSystemRef().withName("OpenMRSEntity")
+                      )
+                  )
+              )
               .withStatements(
                   objectFactoryEx.createLibraryStatements().withDef(
                       objectFactoryEx.createExpressionDef()
@@ -141,6 +162,30 @@ public class MainActivity extends AppCompatActivity {
                               .withExpression(
                                   objectFactoryEx.createRetrieve()
                                       .withDataType(QName.valueOf("fhir:Observation"))
+                              )
+                      )
+                      .withDef(
+                          objectFactoryEx.createExpressionDef()
+                              .withName("ObservationsWithCode").withContext("Patient").withExpression(
+                                  objectFactoryEx.createRetrieve()
+                                      .withDataType(QName.valueOf("fhir:Observation"))
+                                      .withCodeProperty("code")
+                                      .withCodes(
+                                          objectFactoryEx.createToList()
+                                              .withOperand(objectFactoryEx.createCodeRef().withName("LMP"))
+                                      )
+                              )
+                          )
+                      .withDef(
+                          objectFactoryEx.createExpressionDef()
+                              .withName("ObservationsWithValueSet").withContext("Patient").withExpression(
+                                      objectFactoryEx.createRetrieve()
+                                          .withDataType(QName.valueOf("fhir:Observation"))
+                                          .withCodeProperty("code")
+                                          .withCodes(
+                                              objectFactoryEx.createValueSetRef()
+                                                  .withName("LMPCodes")
+                                          )
                               )
                       )
               );
