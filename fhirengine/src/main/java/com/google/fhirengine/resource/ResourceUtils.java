@@ -21,8 +21,12 @@ import java.lang.reflect.InvocationTargetException;
 
 /** Utilities for the HAPI FHIR resources. */
 public class ResourceUtils {
+
+  /** The HAPI Fhir package prefix for R4 resources. */
+  public static final String R4_RESOURCE_PACKAGE_PREFIX = "org.hl7.fhir.r4.model.";
+
   /** Returns the FHIR resource type. */
-  public static <M extends Resource> ResourceType getResourceType(Class<M> clazz) {
+  public static <R extends Resource> ResourceType getResourceType(Class<R> clazz) {
     try {
       return clazz.getConstructor().newInstance().getResourceType();
     } catch (NoSuchMethodException e) {
@@ -33,6 +37,16 @@ public class ResourceUtils {
       throw new IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e);
     } catch (InvocationTargetException e) {
       throw new IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e);
+    }
+  }
+
+  /** Returns the {@link Class} object for the resource type. */
+  public static <R extends Resource> Class<R> getResourceClass(String resourceType) {
+    try {
+      return (Class<R>) Class.forName(R4_RESOURCE_PACKAGE_PREFIX + resourceType);
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+      return null;
     }
   }
 }
