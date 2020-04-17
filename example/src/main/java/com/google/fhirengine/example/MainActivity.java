@@ -26,11 +26,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.fhirengine.DaggerFhirEngineComponent;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.ResourceAlreadyExistsException;
-import com.google.fhirengine.resource.ResourceUtils;
 
 import org.hl7.fhir.r4.model.Library;
 import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
 import org.opencds.cqf.cql.execution.EvaluationResult;
 import org.opencds.cqf.cql.execution.LibraryResult;
 
@@ -43,8 +41,6 @@ import java.util.List;
 import java.util.Map;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.parser.IParser;
-import ca.uhn.fhir.parser.JsonParser;
 
 public class MainActivity extends AppCompatActivity {
 
