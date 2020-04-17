@@ -21,7 +21,6 @@ import com.google.fhirengine.db.impl.DatabaseModule;
 import com.google.fhirengine.impl.FhirEngineModule;
 import com.google.fhirengine.index.impl.FhirIndexerModule;
 import com.google.fhirengine.resource.ResourceModule;
-import com.google.fhirengine.search.impl.SearchModule;
 
 import javax.inject.Singleton;
 

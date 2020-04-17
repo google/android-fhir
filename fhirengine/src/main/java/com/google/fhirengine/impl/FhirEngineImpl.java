@@ -17,17 +17,12 @@ package com.google.fhirengine.impl;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.ResourceAlreadyExistsException;
 import com.google.fhirengine.ResourceNotFoundException;
-import com.google.fhirengine.cql.FhirEngineDataProvider;
-import com.google.fhirengine.cql.FhirEngineLibraryLoader;
 import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
 import com.google.fhirengine.resource.ResourceUtils;
-import com.google.fhirengine.search.SearchEngine;
-import com.google.fhirengine.search.SearchRequestBuilder;
 
 import org.cqframework.cql.elm.execution.VersionedIdentifier;
-import org.fhir.ucum.Search;
 import org.hl7.fhir.r4.model.Resource;
 import org.opencds.cqf.cql.data.DataProvider;
 import org.opencds.cqf.cql.execution.CqlEngine;
@@ -35,7 +30,6 @@ import org.opencds.cqf.cql.execution.EvaluationResult;
 import org.opencds.cqf.cql.execution.LibraryLoader;
 
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
