@@ -45,8 +45,8 @@ import ca.uhn.fhir.context.FhirContext;
 public class MainActivity extends AppCompatActivity {
 
   private static final String DUMMY_ANC_LIBRARY =
-      "https://raw.githubusercontent.com/who-int/anc-cds/develop/input/resources/library/library-ANCDummy.json";
-  public static final String LIBRARY_ID = "Library/library-ANCDummy";
+      "https://raw.githubusercontent.com/who-int/anc-cds/develop/input/resources/library/library-ANCFHIRTerminologyDummy.json";
+  public static final String LIBRARY_ID = "Library/library-ANCFHIRTerminologyDummy";
 
   FhirEngine fhirEngine;
   TextView textView;
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("WrongThread")
     @Override
     protected EvaluationResult doInBackground(String... strings) {
-      return fhirEngine.evaluateCql("ANCFHIRDummy");
+      return fhirEngine.evaluateCql(strings[0]);
     }
 
     @Override
