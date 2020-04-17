@@ -15,6 +15,9 @@
 package com.google.fhirengine.db;
 
 import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
+
+import java.util.List;
 
 /** The interface for the FHIR resource database. */
 public interface Database {
@@ -48,4 +51,14 @@ public interface Database {
    * @param <R> The resource type
    */
   <R extends Resource> void delete(Class<R> clazz, String id);
+
+  /**
+   * Returns a {@link List} of {@link Resource}s that are of type {@code clazz} and have {@code
+   * reference} with {@code value}.
+   * <p>
+   * For example, a search for {@link org.hl7.fhir.r4.model.Observation}s with {@code reference}
+   * 'subject' and {@code value} 'Patient/1' will return all observations associated with the
+   * particular patient.
+   */
+  <R extends Resource> List<R> searchByReference(Class<R> clazz, String reference, String value);
 }
