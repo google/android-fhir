@@ -14,27 +14,37 @@
 
 package com.google.fhirengine.example;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.fhirengine.DaggerFhirEngineComponent;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.ResourceAlreadyExistsException;
+import com.google.fhirengine.resource.ResourceUtils;
 
 import org.hl7.fhir.r4.model.Library;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.opencds.cqf.cql.execution.EvaluationResult;
+import org.opencds.cqf.cql.execution.LibraryResult;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.parser.IParser;
+import ca.uhn.fhir.parser.JsonParser;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
   public static final String LIBRARY_ID = "Library/library-ANCDummy";
 
   FhirEngine fhirEngine;
+  TextView textView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
         new EvaluateAncLibrary().execute(LIBRARY_ID);
       }
     });
+
+    textView = findViewById(R.id.evaluate_result);
 
     // Gets FHIR Engine using Dagger component.
     fhirEngine = DaggerFhirEngineComponent.builder()
@@ -94,11 +107,32 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
-  private class EvaluateAncLibrary extends AsyncTask<String, String, Void> {
+  private class EvaluateAncLibrary extends AsyncTask<String, String, EvaluationResult> {
+    @SuppressLint("WrongThread")
     @Override
-    protected Void doInBackground(String... strings) {
-      EvaluationResult evaluationResult = fhirEngine.evaluateCql("ANCFHIRDummy");
-      return null;
+    protected EvaluationResult doInBackground(String... strings) {
+      return fhirEngine.evaluateCql("ANCFHIRDummy");
+    }
+
+    @Override
+    protected void onPostExecute(EvaluationResult result) {
+      StringBuilder stringBuilder = new StringBuilder();
+      for (LibraryResult libraryResult : result.libraryResults.values()) {
+        for (Map.Entry<String, Object> entry : libraryResult.expressionResults.entrySet()) {
+          stringBuilder.append(entry.getKey());
+          Object value = entry.getValue();
+          if (value == null) {
+            stringBuilder.append("null");
+          } else if (List.class.isAssignableFrom(value.getClass())) {
+            for (Object listItem : (List) value) {
+              stringBuilder
+                  .append(FhirContext.forR4().newJsonParser()
+                      .encodeResourceToString((Resource) listItem));
+            }
+          }
+        }
+      }
+      textView.setText(stringBuilder.toString());
     }
   }
 }
