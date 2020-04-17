@@ -1,9 +1,11 @@
 package com.google.fhirengine.example;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,20 +13,18 @@ import com.google.fhirengine.DaggerFhirEngineComponent;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.ResourceAlreadyExistsException;
 
-import org.cqframework.cql.elm.execution.VersionedIdentifier;
 import org.hl7.fhir.r4.model.Library;
-import org.opencds.cqf.cql.elm.execution.ObjectFactoryEx;
-import org.opencds.cqf.cql.execution.CqlEngine;
+import org.hl7.fhir.r4.model.Resource;
 import org.opencds.cqf.cql.execution.EvaluationResult;
-import org.opencds.cqf.cql.execution.LibraryLoader;
+import org.opencds.cqf.cql.execution.LibraryResult;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-
-import javax.xml.namespace.QName;
+import java.util.List;
+import java.util.Map;
 
 import ca.uhn.fhir.context.FhirContext;
 
@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
   public static final String LIBRARY_ID = "Library/library-ANCDummy";
 
   FhirEngine fhirEngine;
+  TextView textView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
         new EvaluateAncLibrary().execute(LIBRARY_ID);
       }
     });
+
+    textView = findViewById(R.id.evaluate_result);
 
     // Gets FHIR Engine using Dagger component.
     fhirEngine = DaggerFhirEngineComponent.builder()
@@ -86,106 +89,36 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
-  private class EvaluateAncLibrary extends AsyncTask<String, String, Void> {
+  private class EvaluateAncLibrary extends AsyncTask<String, String, EvaluationResult> {
+    @SuppressLint("WrongThread")
     @Override
-    protected Void doInBackground(String... strings) {
-      ObjectFactoryEx objectFactoryEx = new ObjectFactoryEx();
-      org.cqframework.cql.elm.execution.Library cqlLibrary =
-          objectFactoryEx.createLibrary()
-              .withIdentifier(objectFactoryEx.createVersionedIdentifier().withId("ANCFHIRDummy")
-                  .withVersion("0.1.0"))
-              .withSchemaIdentifier(
-                  objectFactoryEx.createVersionedIdentifier().withId("urn:hl7-org:elm")
-                      .withVersion("r1"))
-              .withUsings(
-                  objectFactoryEx.createLibraryUsings().withDef(
-                      objectFactoryEx.createUsingDef().withLocalIdentifier("System")
-                          .withUri("urn:hl7-org:elm-types:r1")
-                  )
-                      .withDef(
-                          objectFactoryEx.createUsingDef().withLocalIdentifier("FHIR")
-                              .withUri("http://hl7.org/fhir").withVersion("4.0.0")
-                      )
-              )
-              .withCodeSystems(
-                  objectFactoryEx.createLibraryCodeSystems().withDef(
-                      objectFactoryEx.createCodeSystemDef().withName("OpenMRSEntity")
-                          .withId("http://opernmrs.org/concepts")
-                  )
-              )
-              .withValueSets(
-                  objectFactoryEx.createLibraryValueSets().withDef(
-                      objectFactoryEx.createValueSetDef().withName("LMPCodes")
-                          .withId("http://fhir.org/guides/who/anc-cds/ValueSet/lmp-observation-code")
-                  )
-              )
-              .withCodes(
-                  objectFactoryEx.createLibraryCodes().withDef(
-                      objectFactoryEx.createCodeDef().withName("LMP")
-                          .withId("1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-                          .withDisplay("Date of last menstrual period").withCodeSystem(
-                              objectFactoryEx.createCodeSystemRef().withName("OpenMRSEntity")
-                      )
-                  )
-              )
-              .withStatements(
-                  objectFactoryEx.createLibraryStatements().withDef(
-                      objectFactoryEx.createExpressionDef()
-                          .withName("Patient")
-                          .withContext("Patient")
-                          .withExpression(
-                              objectFactoryEx.createSingletonFrom()
-                                  .withOperand(
-                                      objectFactoryEx.createRetrieve()
-                                          .withDataType(QName.valueOf("fhir:Patient"))
-                                  )
-                          )
-                  )
-                      .withDef(
-                          objectFactoryEx.createExpressionDef()
-                              .withName("Observations")
-                              .withContext("Patient")
-                              .withExpression(
-                                  objectFactoryEx.createRetrieve()
-                                      .withDataType(QName.valueOf("fhir:Observation"))
-                              )
-                      )
-                      .withDef(
-                          objectFactoryEx.createExpressionDef()
-                              .withName("ObservationsWithCode").withContext("Patient").withExpression(
-                                  objectFactoryEx.createRetrieve()
-                                      .withDataType(QName.valueOf("fhir:Observation"))
-                                      .withCodeProperty("code")
-                                      .withCodes(
-                                          objectFactoryEx.createToList()
-                                              .withOperand(objectFactoryEx.createCodeRef().withName("LMP"))
-                                      )
-                              )
-                          )
-                      .withDef(
-                          objectFactoryEx.createExpressionDef()
-                              .withName("ObservationsWithValueSet").withContext("Patient").withExpression(
-                                      objectFactoryEx.createRetrieve()
-                                          .withDataType(QName.valueOf("fhir:Observation"))
-                                          .withCodeProperty("code")
-                                          .withCodes(
-                                              objectFactoryEx.createValueSetRef()
-                                                  .withName("LMPCodes")
-                                          )
-                              )
-                      )
-              );
+    protected EvaluationResult doInBackground(String... strings) {
+      return fhirEngine.evaluateCql("ANCFHIRDummy");
+    }
 
-      CqlEngine cqlEngine = new CqlEngine(new LibraryLoader() {
-        @Override
-        public org.cqframework.cql.elm.execution.Library load(
-            VersionedIdentifier libraryIdentifier) {
-          return cqlLibrary;
+    @Override
+    protected void onPostExecute(EvaluationResult result) {
+      StringBuilder stringBuilder = new StringBuilder();
+      for (LibraryResult libraryResult : result.libraryResults.values()) {
+        for (Map.Entry<String, Object> entry : libraryResult.expressionResults.entrySet()) {
+          stringBuilder.append(entry.getKey());
+          Object value = entry.getValue();
+          if (value == null) {
+            stringBuilder.append("null");
+          } else if (List.class.isAssignableFrom(value.getClass())) {
+            for (Object listItem : (List) value) {
+              stringBuilder
+                  .append(FhirContext.forR4().newJsonParser()
+                      .encodeResourceToString((Resource) listItem));
+            }
+          } else if (Resource.class.isAssignableFrom(value.getClass())) {
+            stringBuilder
+                .append(FhirContext.forR4().newJsonParser()
+                    .encodeResourceToString((Resource) value));
+          }
         }
-      });
-      EvaluationResult result = cqlEngine.evaluate(new VersionedIdentifier());
-
-      return null;
+      }
+      textView.setText(stringBuilder.toString());
     }
   }
 }

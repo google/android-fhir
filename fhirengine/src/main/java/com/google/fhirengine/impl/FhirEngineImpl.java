@@ -8,18 +8,31 @@ import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
 import com.google.fhirengine.resource.ResourceUtils;
 
+import org.cqframework.cql.elm.execution.VersionedIdentifier;
 import org.hl7.fhir.r4.model.Resource;
+import org.opencds.cqf.cql.data.DataProvider;
+import org.opencds.cqf.cql.execution.CqlEngine;
+import org.opencds.cqf.cql.execution.EvaluationResult;
+import org.opencds.cqf.cql.execution.LibraryLoader;
+import org.opencds.cqf.cql.terminology.TerminologyProvider;
+
+import java.util.EnumSet;
+import java.util.Map;
 
 import javax.inject.Inject;
 
 /** Implementation of {@link FhirEngine}. */
 public class FhirEngineImpl implements FhirEngine {
 
-  private Database database;
+  private final Database database;
+  private final CqlEngine cqlEngine;
 
   @Inject
-  public FhirEngineImpl(Database database) {
+  public FhirEngineImpl(Database database, LibraryLoader libraryLoader,
+      Map<String, DataProvider> dataProviderMap, TerminologyProvider terminologyProvider) {
     this.database = database;
+    this.cqlEngine = new CqlEngine(libraryLoader, dataProviderMap, terminologyProvider,
+        EnumSet.noneOf(CqlEngine.Options.class));
   }
 
   @Override
@@ -50,5 +63,10 @@ public class FhirEngineImpl implements FhirEngine {
   @Override
   public <R extends Resource> R remove(Class<R> clazz, String id) {
     throw new UnsupportedOperationException("Not implemented yet!");
+  }
+
+  @Override
+  public EvaluationResult evaluateCql(String libraryVersionId) {
+    return cqlEngine.evaluate(new VersionedIdentifier().withId(libraryVersionId));
   }
 }
