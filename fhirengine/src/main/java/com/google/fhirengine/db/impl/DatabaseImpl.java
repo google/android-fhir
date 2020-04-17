@@ -22,6 +22,7 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.common.base.Joiner;
@@ -339,13 +340,21 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
   public <R extends Resource> List<R> searchByReference(Class<R> clazz, String reference,
       String value) {
     String type = ResourceUtils.getResourceType(clazz).name();
-
     String[] columns = new String[]{ReferenceIndicesColumns.RESOURCE_ID};
-    String whereClause =
-        ReferenceIndicesColumns.RESOURCE_TYPE + " = ? AND " + ReferenceIndicesColumns.INDEX_PATH +
-            " = ? AND " + ReferenceIndicesColumns.INDEX_VALUE + " = ?";
-    String[] whereArgs = new String[]{type, reference, value};
     SQLiteDatabase database = getReadableDatabase();
+
+    String whereClause;
+    String[] whereArgs;
+    if (TextUtils.isEmpty(reference) || TextUtils.isEmpty(value)) {
+      whereClause =
+          ReferenceIndicesColumns.RESOURCE_TYPE + " = ?";
+      whereArgs = new String[]{type};
+    } else {
+      whereClause =
+          ReferenceIndicesColumns.RESOURCE_TYPE + " = ? AND " + ReferenceIndicesColumns.INDEX_PATH +
+              " = ? AND " + ReferenceIndicesColumns.INDEX_VALUE + " = ?";
+      whereArgs = new String[]{type, reference, value};
+    }
     Cursor cursor = database
         .query(Tables.REFERENCES_INDICES, columns, whereClause, whereArgs, null, null, null);
 
