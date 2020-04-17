@@ -14,6 +14,7 @@ import org.opencds.cqf.cql.data.DataProvider;
 import org.opencds.cqf.cql.execution.CqlEngine;
 import org.opencds.cqf.cql.execution.EvaluationResult;
 import org.opencds.cqf.cql.execution.LibraryLoader;
+import org.opencds.cqf.cql.terminology.TerminologyProvider;
 
 import java.util.EnumSet;
 import java.util.Map;
@@ -28,9 +29,9 @@ public class FhirEngineImpl implements FhirEngine {
 
   @Inject
   public FhirEngineImpl(Database database, LibraryLoader libraryLoader,
-      Map<String, DataProvider> dataProviderMap) {
+      Map<String, DataProvider> dataProviderMap, TerminologyProvider terminologyProvider) {
     this.database = database;
-    this.cqlEngine = new CqlEngine(libraryLoader, dataProviderMap, null,
+    this.cqlEngine = new CqlEngine(libraryLoader, dataProviderMap, terminologyProvider,
         EnumSet.noneOf(CqlEngine.Options.class));
   }
 

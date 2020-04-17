@@ -3,6 +3,7 @@ package com.google.fhirengine.cql;
 import org.opencds.cqf.cql.data.DataProvider;
 import org.opencds.cqf.cql.execution.LibraryLoader;
 import org.opencds.cqf.cql.retrieve.RetrieveProvider;
+import org.opencds.cqf.cql.terminology.TerminologyProvider;
 
 import dagger.Binds;
 import dagger.Module;
@@ -22,4 +23,8 @@ public abstract class CqlModule {
   @IntoMap
   @StringKey("http://hl7.org/fhir")
   abstract DataProvider bindDataProvider(FhirEngineDataProvider dataProvider);
+
+  @Binds
+  abstract TerminologyProvider bindTerminologyProvider(
+      FhirEngineTerminologyProvider terminologyProvider);
 }
