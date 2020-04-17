@@ -1,6 +1,7 @@
 package com.google.fhirengine;
 
 import org.hl7.fhir.r4.model.Resource;
+import org.opencds.cqf.cql.execution.EvaluationResult;
 
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 public interface FhirEngine {
@@ -33,4 +34,7 @@ public interface FhirEngine {
    * @param <R> The resource type which should be a subtype of {@link Resource}.
    */
   <R extends Resource> R remove(Class<R> clazz, String id);
+
+  /** Returns the result of a CQL evaluation provided with the ID of the library. */
+  EvaluationResult evaluateCql(String libraryVersionId);
 }
