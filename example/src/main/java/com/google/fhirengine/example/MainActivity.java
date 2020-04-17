@@ -129,6 +129,10 @@ public class MainActivity extends AppCompatActivity {
                   .append(FhirContext.forR4().newJsonParser()
                       .encodeResourceToString((Resource) listItem));
             }
+          } else if (Resource.class.isAssignableFrom(value.getClass())) {
+            stringBuilder
+                .append(FhirContext.forR4().newJsonParser()
+                    .encodeResourceToString((Resource) value));
           }
         }
       }
