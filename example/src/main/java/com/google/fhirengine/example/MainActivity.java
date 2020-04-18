@@ -29,7 +29,6 @@ import com.google.fhirengine.DaggerFhirEngineComponent;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.ResourceAlreadyExistsException;
 
-import org.hl7.fhir.r4.model.Library;
 import org.hl7.fhir.r4.model.Resource;
 import org.opencds.cqf.cql.execution.EvaluationResult;
 import org.opencds.cqf.cql.execution.LibraryResult;
@@ -49,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
   FhirEngine fhirEngine;
   EditText cqlLibraryUrlInput;
+  EditText fhirResourceUrlInput;
   TextView evaluationResultTextView;
 
   @Override
@@ -57,12 +57,20 @@ public class MainActivity extends AppCompatActivity {
     setContentView(R.layout.activity_main);
 
     cqlLibraryUrlInput = findViewById(R.id.cql_text_input);
+    fhirResourceUrlInput = findViewById(R.id.fhir_resource_url_input);
     evaluationResultTextView = findViewById(R.id.evaluate_result);
 
     final Button button = findViewById(R.id.load_cql_lib_button);
     button.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        new DownloadAncLibrary().execute(cqlLibraryUrlInput.getText().toString());
+        new DownloadFhirResource().execute(cqlLibraryUrlInput.getText().toString());
+      }
+    });
+
+    final Button downloadFhirResourceButton = findViewById(R.id.download_fhir_resource_button);
+    downloadFhirResourceButton.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        new DownloadFhirResource().execute(fhirResourceUrlInput.getText().toString());
       }
     });
 
@@ -79,11 +87,12 @@ public class MainActivity extends AppCompatActivity {
         .context(this).build().getFhirEngine();
   }
 
-  private class DownloadAncLibrary extends AsyncTask<String, String, Void> {
+  private class DownloadFhirResource extends AsyncTask<String, String, Void> {
     @Override
     protected Void doInBackground(String... strings) {
       String result = "";
       InputStream stream = null;
+      Resource resource = null;
       try {
         stream = (InputStream) new URL(strings[0]).getContent();
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
@@ -94,17 +103,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         FhirContext fhirContext = FhirContext.forR4();
-        Library library = (Library) fhirContext.newJsonParser().parseResource(result);
-        fhirEngine.save(library);
-        Snackbar.make(cqlLibraryUrlInput, "Library loaded " + library.getId(), Snackbar.LENGTH_SHORT)
+        resource = (Resource) fhirContext.newJsonParser().parseResource(result);
+        fhirEngine.save(resource);
+        Snackbar.make(cqlLibraryUrlInput,
+            "Loaded " + resource.getResourceType().name() + " with ID " + resource.getId(),
+            Snackbar.LENGTH_SHORT)
             .show();
       } catch (IOException e) {
         e.printStackTrace();
         Snackbar.make(cqlLibraryUrlInput, "Something went wrong...", Snackbar.LENGTH_SHORT).show();
       } catch (ResourceAlreadyExistsException e) {
         e.printStackTrace();
-        Snackbar.make(cqlLibraryUrlInput, "The library was already loaded...", Snackbar.LENGTH_SHORT)
-            .show();
+        if (resource != null) {
+          Snackbar.make(cqlLibraryUrlInput,
+              "The " + resource.getResourceType().name() + " with ID " + resource.getId() +
+                  " was already loaded...", Snackbar.LENGTH_SHORT)
+              .show();
+        }
       }
       return null;
     }
