@@ -22,6 +22,7 @@ import androidx.test.core.app.ApplicationProvider;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.ResourceAlreadyExistsException;
 import com.google.fhirengine.ResourceNotFoundException;
+import com.google.fhirengine.cql.CqlModule;
 import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.impl.DatabaseImpl;
 import com.google.fhirengine.db.impl.DatabaseModule;
@@ -76,8 +77,8 @@ public class FhirEngineImplTest {
   TestingUtils testingUtils;
 
   @Singleton
-  @Component(modules = {FhirEngineModule.class, DatabaseModule.class, FhirIndexerModule.class,
-      ResourceModule.class})
+  @Component(modules = {FhirEngineModule.class, CqlModule.class, DatabaseModule.class,
+      FhirIndexerModule.class, ResourceModule.class})
   public interface TestComponent {
 
     Database getDatabase();
