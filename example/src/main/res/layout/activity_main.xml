@@ -1,66 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
-    <Button
-            android:id="@+id/load_cql_lib_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:text="Download"
-            app:layout_constraintBottom_toTopOf="@+id/evaluate_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView"
-            app:layout_constraintVertical_bias="0.048" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <Button
-            android:id="@+id/evaluate_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Evaluate"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+        <TextView
+                android:id="@+id/cql_title"
+                android:layout_width="157dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="16dp"
+                android:text="CQL Library"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-            android:id="@+id/evaluate_result"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TextView"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/evaluate_button" />
+        <EditText
+                android:id="@+id/cql_text_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="URL"
+                android:inputType="text"
+                app:layout_constraintEnd_toStartOf="@+id/load_cql_lib_button"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/cql_title"
+                app:layout_constraintTop_toBottomOf="@+id/cql_title" />
 
-    <EditText
-            android:id="@+id/cql_text_input"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:hint="URL"
-            android:inputType="text"
-            app:layout_constraintEnd_toStartOf="@+id/load_cql_lib_button"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/textView"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
+        <Button
+                android:id="@+id/load_cql_lib_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:text="Download"
+                app:layout_constraintBottom_toTopOf="@+id/evaluate_button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/cql_text_input"
+                app:layout_constraintVertical_bias="0.0" />
 
-    <TextView
-            android:id="@+id/textView"
-            android:layout_width="157dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginLeft="24dp"
-            android:layout_marginTop="16dp"
-            android:text="CQL Library"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display4"
-            android:textSize="24sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+                android:id="@+id/fhir_resource_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:text="FHIR Resource"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="@+id/cql_text_input"
+                app:layout_constraintTop_toBottomOf="@+id/cql_text_input" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+                android:id="@+id/fhir_resource_title2"
+                android:layout_width="157dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:text="FHIR Resource"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="@+id/cql_text_input"
+                app:layout_constraintTop_toBottomOf="@+id/cql_text_input" />
+
+        <EditText
+                android:id="@+id/fhir_resource_url_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="URL"
+                android:inputType="text"
+                app:layout_constraintEnd_toStartOf="@+id/download_fhir_resource_button"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/fhir_resource_title"
+                app:layout_constraintTop_toBottomOf="@+id/fhir_resource_title" />
+
+        <Button
+                android:id="@+id/download_fhir_resource_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Download"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.948"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/fhir_resource_url_input"
+                app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+                android:id="@+id/evaluation_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Evaluation"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="@+id/fhir_resource_url_input"
+                app:layout_constraintTop_toBottomOf="@+id/fhir_resource_url_input" />
+
+        <Button
+                android:id="@+id/evaluate_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Evaluate"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.921"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/evaluation_title"
+                app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+                android:id="@+id/evaluate_result"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical"
+                android:text="Evaluation Result"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/evaluate_button"
+                app:layout_constraintHorizontal_bias="0.413"
+                app:layout_constraintStart_toStartOf="@+id/fhir_resource_url_input"
+                app:layout_constraintTop_toBottomOf="@+id/evaluate_button"
+                app:layout_constraintVertical_bias="0.0" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
