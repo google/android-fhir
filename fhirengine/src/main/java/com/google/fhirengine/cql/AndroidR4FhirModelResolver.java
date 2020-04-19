@@ -5,6 +5,8 @@ import org.opencds.cqf.cql.model.R4FhirModelResolver;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import ca.uhn.fhir.context.BaseRuntimeChildDefinition;
 import ca.uhn.fhir.context.RuntimeResourceDefinition;
 
@@ -16,6 +18,7 @@ class AndroidR4FhirModelResolver extends R4FhirModelResolver {
    */
   public static final String NAMESPACE_URI_PREFIX = "{http://hl7.org/fhir}";
 
+  @Inject
   public AndroidR4FhirModelResolver() {
     super();
   }
