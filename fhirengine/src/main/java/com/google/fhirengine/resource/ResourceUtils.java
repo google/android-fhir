@@ -43,6 +43,12 @@ public class ResourceUtils {
   /** Returns the {@link Class} object for the resource type. */
   public static <R extends Resource> Class<R> getResourceClass(String resourceType) {
     try {
+      // Remove any curly brackets in the resource type string. This is to work around an issue with
+      // JSON deserialization in the CQL engine on Android. The resource type string incorrectly
+      // includes namespace prefix in curly brackets, e.g. "{http://hl7.org/fhir}Patient" instead of
+      // "Patient".
+      // TODO: remove this once a fix has been found for the CQL engine on Android.
+      resourceType = resourceType.replaceAll("\\{[^}]*\\}", "");
       return (Class<R>) Class.forName(R4_RESOURCE_PACKAGE_PREFIX + resourceType);
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
