@@ -1,4 +1,7 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 29
@@ -35,19 +38,29 @@ configurations {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.room:room-runtime:2.2.5'
+    // robolectric does not seem to be computing test classpath properly, not sure why
+    testImplementation 'androidx.lifecycle:lifecycle-livedata-core:2.2.0'
+    kapt "androidx.room:room-compiler:2.2.5"
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.google.dagger:dagger:2.16'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
+    kapt 'com.google.dagger:dagger-compiler:2.16'
     testImplementation 'androidx.test:core:1.0.0'
     testImplementation 'org.robolectric:robolectric:4.3.1'
     api 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:4.2.0'
     implementation("com.google.guava:guava:28.2-android")
     testImplementation 'com.google.dagger:dagger:2.16'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
-    testAnnotationProcessor 'com.google.dagger:dagger-compiler:2.16'
+    kapt 'com.google.dagger:dagger-compiler:2.16'
+    kaptTest 'com.google.dagger:dagger-compiler:2.16'
     api 'com.google.auto.value:auto-value-annotations:1.6'
-    annotationProcessor 'com.google.auto.value:auto-value:1.6'
+    kapt 'com.google.auto.value:auto-value:1.6'
+
     testImplementation "com.google.truth:truth:1.0.1"
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }

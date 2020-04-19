@@ -15,6 +15,7 @@
 package com.google.fhirengine.db.impl;
 
 import com.google.fhirengine.db.Database;
+import com.google.fhirengine.db.roomimpl.RoomDbImpl;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
@@ -25,6 +26,8 @@ import dagger.Provides;
 /** Dagger module for the FHIR resource database. */
 @Module
 public abstract class DatabaseModule {
+//  @Binds
+//  abstract Database bindDatabase(DatabaseImpl database);
   @Binds
-  abstract Database bindDatabase(DatabaseImpl database);
+  abstract Database bindDatabase(RoomDbImpl database);
 }
