@@ -10,11 +10,13 @@
             android:id="@+id/load_cql_lib_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Load CQL Library"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:text="Download"
             app:layout_constraintBottom_toTopOf="@+id/evaluate_button"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            app:layout_constraintVertical_bias="0.048" />
 
     <Button
             android:id="@+id/evaluate_button"
@@ -35,5 +37,30 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/evaluate_button" />
+
+    <EditText
+            android:id="@+id/cql_text_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="URL"
+            android:inputType="text"
+            app:layout_constraintEnd_toStartOf="@+id/load_cql_lib_button"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/textView"
+            app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <TextView
+            android:id="@+id/textView"
+            android:layout_width="157dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="16dp"
+            android:text="CQL Library"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+            android:textSize="24sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
