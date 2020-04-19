@@ -10,6 +10,8 @@ import org.opencds.cqf.cql.execution.LibraryLoader;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -20,6 +22,9 @@ import javax.inject.Inject;
 public class FhirEngineLibraryLoader implements LibraryLoader {
   private final Database database;
 
+  /** Cached libraries. */
+  Map<String, Library> libraryMap = new HashMap<>();
+
   @Inject
   public FhirEngineLibraryLoader(Database database) {
     this.database = database;
@@ -27,17 +32,30 @@ public class FhirEngineLibraryLoader implements LibraryLoader {
 
   @Override
   public Library load(VersionedIdentifier libraryIdentifier) {
-    org.hl7.fhir.r4.model.Library library;
+    for (String key : libraryMap.keySet()) {
+      // TODO: Change this to an exact match once the libraries are correctly indexed by their name
+      //  instead of FHIR resource ID.
+      if (key.contains(libraryIdentifier.getId())) {
+        return libraryMap.get(key);
+      }
+    }
+    org.hl7.fhir.r4.model.Library fhirLibrary;
     try {
-      library = database.select(org.hl7.fhir.r4.model.Library.class, libraryIdentifier.getId());
+      fhirLibrary =
+          database.select(org.hl7.fhir.r4.model.Library.class, libraryIdentifier.getId());
     } catch (ResourceNotFoundInDbException e) {
       e.printStackTrace();
       throw new RuntimeException(e);
     }
 
-    StringReader stringReader = new StringReader(new String(library.getContent().get(0).getData()));
+    StringReader stringReader =
+        new StringReader(new String(fhirLibrary.getContent().get(0).getData()));
     try {
-      return JsonCqlLibraryReader.read(stringReader);
+      Library cqlLibrary = JsonCqlLibraryReader.read(stringReader);
+
+      // TODO: Index the libraries by name rather than FHIR resource ID.
+      libraryMap.put(libraryIdentifier.getId(), cqlLibrary);
+      return cqlLibrary;
     } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException(e);
