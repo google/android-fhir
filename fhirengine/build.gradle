@@ -27,6 +27,13 @@ android {
     }
 }
 
+configurations {
+    all {
+        exclude module: 'json'
+        exclude module: 'xpp3'
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.13'
@@ -44,11 +51,21 @@ dependencies {
     api 'com.google.auto.value:auto-value-annotations:1.6'
     annotationProcessor 'com.google.auto.value:auto-value:1.6'
     testImplementation "com.google.truth:truth:1.0.1"
-    api('org.opencds.cqf:cql-engine:1.3.12.1') {
+    api('org.opencds.cqf:cql-engine:1.3.14-SNAPSHOT') {
         exclude group: 'org.hamcrest', module: 'hamcrest-all'
+        exclude group: 'com.sun.xml.bind', module: 'jaxb-impl'
+        exclude group: 'com.sun.xml.bind', module: 'jaxb-core'
+        exclude group: 'jakarta.activation', module: 'jakarta.activation-api'
+        exclude group: 'com.sun.activation', module: 'javax.activation'
+        exclude group: 'jakarta.xml.bind', module: 'jakarta.xml.bind-api'
     }
-    implementation('org.opencds.cqf:cql-engine-fhir:1.3.12.1') {
+    implementation('org.opencds.cqf:cql-engine-fhir:1.3.14-SNAPSHOT') {
         exclude group: 'org.hamcrest', module: 'hamcrest-all'
+        exclude group: 'com.sun.xml.bind', module: 'jaxb-impl'
+        exclude group: 'com.sun.xml.bind', module: 'jaxb-core'
+        exclude group: 'jakarta.activation', module: 'jakarta.activation-api'
+        exclude group: 'com.sun.activation', module: 'javax.activation'
+        exclude group: 'jakarta.xml.bind', module: 'jakarta.xml.bind-api'
         // TODO: the following line can be removed from the next CQL engine release.
         exclude group: 'ca.uhn.hapi.fhir', module: 'hapi-fhir-jpaserver-base'
     }
