@@ -24,6 +24,16 @@ public abstract class CqlModule {
   @StringKey("http://hl7.org/fhir")
   abstract DataProvider bindDataProvider(FhirEngineDataProvider dataProvider);
 
+  /**
+   * Binds the data provider for an empty namespace URI. This is a workaround for an inconsistency
+   * issue on Android where the namespace URI is incorrectly interpreted as part of the type name,
+   * leaving the namespace URI empty.
+   */
+  @Binds
+  @IntoMap
+  @StringKey("")
+  abstract DataProvider bindDefaultDataProvider(FhirEngineDataProvider dataProvider);
+
   @Binds
   abstract TerminologyProvider bindTerminologyProvider(
       FhirEngineTerminologyProvider terminologyProvider);
