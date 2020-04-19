@@ -2,6 +2,7 @@ package com.google.fhirengine.cql;
 
 import org.opencds.cqf.cql.data.DataProvider;
 import org.opencds.cqf.cql.execution.LibraryLoader;
+import org.opencds.cqf.cql.model.ModelResolver;
 import org.opencds.cqf.cql.retrieve.RetrieveProvider;
 import org.opencds.cqf.cql.terminology.TerminologyProvider;
 
@@ -37,4 +38,7 @@ public abstract class CqlModule {
   @Binds
   abstract TerminologyProvider bindTerminologyProvider(
       FhirEngineTerminologyProvider terminologyProvider);
+
+  @Binds
+  abstract ModelResolver bindModelResolver(AndroidR4FhirModelResolver modelResolver);
 }
