@@ -277,10 +277,10 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
       }
 
       database.setTransactionSuccessful();
-      database.endTransaction();
     } catch (SQLiteConstraintException e) {
       throw new ResourceAlreadyExistsInDbException(type, id, e);
     } finally {
+      database.endTransaction();
       database.close();
     }
   }
