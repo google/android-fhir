@@ -112,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
   }
 
   private class EvaluateAncLibrary extends AsyncTask<String, String, EvaluationResult> {
-    @SuppressLint("WrongThread")
     @Override
     protected EvaluationResult doInBackground(String... strings) {
       return fhirEngine.evaluateCql(strings[0]);
