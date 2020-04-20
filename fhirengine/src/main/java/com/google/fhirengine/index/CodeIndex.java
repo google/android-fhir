@@ -5,8 +5,8 @@ import com.google.auto.value.AutoValue;
 /** An code index for a specific resource. */
 @AutoValue
 public abstract class CodeIndex {
-  public static CodeIndex create(String name, String path, String system, String code) {
-    return new AutoValue_CodeIndex(name, path, system, code);
+  public static CodeIndex create(String name, String path, String system, String value) {
+    return new AutoValue_CodeIndex(name, path, system, value);
   }
 
   /** The name of the code index, e.g. "code". */
@@ -18,6 +18,6 @@ public abstract class CodeIndex {
   /** The system of the code index, e.g. "http://openmrs.org/concepts". */
   public abstract String system();
 
-  /** The code of the code index, e.g. "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA". */
-  public abstract String code();
+  /** The value of the code index, e.g. "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA". */
+  public abstract String value();
 }

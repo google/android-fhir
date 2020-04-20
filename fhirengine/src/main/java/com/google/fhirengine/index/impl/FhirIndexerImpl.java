@@ -3,11 +3,14 @@ package com.google.fhirengine.index.impl;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.fhirengine.index.CodeIndex;
 import com.google.fhirengine.index.FhirIndexer;
 import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
 
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.StringType;
@@ -33,8 +36,11 @@ public class FhirIndexerImpl implements FhirIndexer {
   /** The string representing the string search parameter type. */
   private static final String SEARCH_PARAM_DEFINITION_TYPE_STRING = "string";
 
-  /** The string representing the string search parameter type. */
+  /** The string representing the reference search parameter type. */
   private static final String SEARCH_PARAM_DEFINITION_TYPE_REFERENCE = "reference";
+
+  /** The string representing the code search parameter type. */
+  private static final String SEARCH_PARAM_DEFINITION_TYPE_CODE = "token";
 
   /** Tag for logging. */
   private static final String TAG = "FhirIndexerImpl";
@@ -72,6 +78,18 @@ public class FhirIndexerImpl implements FhirIndexer {
               resourceIndices.addReferenceIndex(ReferenceIndex
                   .create(searchParamDefinition.name(), searchParamDefinition.path(),
                       referenceString));
+            }
+          }
+        }
+
+        if (type.equals(SEARCH_PARAM_DEFINITION_TYPE_CODE) && hasDotNotationOnly(path)) {
+          for (Coding code : getCodeValues(getValuesForPath(resource, path))) {
+            String system = code.getSystem();
+            String value = code.getCode();
+            if (!TextUtils.isEmpty(system) && !TextUtils.isEmpty(value)) {
+              resourceIndices.addCodeIndex(CodeIndex
+                  .create(searchParamDefinition.name(), searchParamDefinition.path(),
+                      system, value));
             }
           }
         }
@@ -168,6 +186,17 @@ public class FhirIndexerImpl implements FhirIndexer {
       }
     }
     return references;
+  }
+
+  /** Returns the code values for the list of {@code objects}. */
+  private List<Coding> getCodeValues(List<Object> objects) {
+    List<Coding> codes = new ArrayList<>();
+    for (Object object : objects) {
+      if (CodeableConcept.class.isAssignableFrom(object.getClass())) {
+        codes.addAll(((CodeableConcept) object).getCoding());
+      }
+    }
+    return codes;
   }
 
   /** Returns the name of the method to retrieve the field {@code fieldName}. */
