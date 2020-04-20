@@ -13,6 +13,7 @@ import com.google.common.base.Joiner;
 import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
+import com.google.fhirengine.index.CodeIndex;
 import com.google.fhirengine.index.FhirIndexer;
 import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
@@ -20,10 +21,6 @@ import com.google.fhirengine.index.StringIndex;
 import com.google.fhirengine.resource.ResourceUtils;
 
 import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -39,7 +36,8 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
   interface Tables {
     String RESOURCES = "resources";
     String STRING_INDICES = "string_indices";
-    String REFERENCES_INDICES = "references_indices";
+    String REFERENCE_INDICES = "reference_indices";
+    String CODE_INDICES = "code_indices";
   }
 
   /** {@link Tables#RESOURCES} columns. */
@@ -58,12 +56,22 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
     String RESOURCE_ID = "resource_id";
   }
 
-  /** {@link Tables#STRING_INDICES} columns. */
+  /** {@link Tables#REFERENCE_INDICES} columns. */
   interface ReferenceIndicesColumns extends BaseColumns {
     String RESOURCE_TYPE = "resource_type";
     String INDEX_NAME = "index_name";
     String INDEX_PATH = "index_path";
     String INDEX_VALUE = "index_value";
+    String RESOURCE_ID = "resource_id";
+  }
+
+  /** {@link Tables#CODE_INDICES} columns. */
+  interface CodeIndicesColumns extends BaseColumns {
+    String RESOURCE_TYPE = "resource_type";
+    String INDEX_NAME = "index_name";
+    String INDEX_PATH = "index_path";
+    String INDEX_VALUE_SYSTEM = "index_value_system";
+    String INDEX_VALUE_CODE = "index_value_code";
     String RESOURCE_ID = "resource_id";
   }
 
@@ -84,9 +92,15 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
                 StringIndicesColumns.INDEX_VALUE);
     String REFERENCE_INDICES_TABLE_RESOURCE_TYPE_INDEX_NAME_INDEX_VALUE_INDEX =
         Joiner.on("_")
-            .join(Tables.REFERENCES_INDICES, ReferenceIndicesColumns.RESOURCE_TYPE,
+            .join(Tables.REFERENCE_INDICES, ReferenceIndicesColumns.RESOURCE_TYPE,
                 ReferenceIndicesColumns.INDEX_NAME,
                 ReferenceIndicesColumns.INDEX_VALUE);
+    String CODE_INDICES_TABLE_RESOURCE_TYPE_INDEX_NAME_INDEX_VALUE_SYSTE_INDEX_VALUE_CODE_INDEX =
+        Joiner.on("_")
+            .join(Tables.CODE_INDICES, CodeIndicesColumns.RESOURCE_TYPE,
+                CodeIndicesColumns.INDEX_NAME,
+                CodeIndicesColumns.INDEX_VALUE_SYSTEM,
+                CodeIndicesColumns.INDEX_VALUE_CODE);
   }
 
   /** Query to create the {@link Tables#RESOURCES} table. */
@@ -121,23 +135,44 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
           StringIndicesColumns.INDEX_NAME + ", " +
           StringIndicesColumns.INDEX_VALUE + ");";
 
-  /** Query to create the {@link Tables#REFERENCES_INDICES} table. */
+  /** Query to create the {@link Tables#REFERENCE_INDICES} table. */
   private static String CREATE_REFERENCE_INDICES_TABLE =
-      "CREATE TABLE " + Tables.REFERENCES_INDICES + " ( " +
+      "CREATE TABLE " + Tables.REFERENCE_INDICES + " ( " +
           ReferenceIndicesColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
           ReferenceIndicesColumns.RESOURCE_TYPE + " TEXT NOT NULL," +
           ReferenceIndicesColumns.INDEX_NAME + " TEXT NOT NULL," +
           ReferenceIndicesColumns.INDEX_PATH + " TEXT NOT NULL," +
           ReferenceIndicesColumns.INDEX_VALUE + " TEXT NOT NULL," +
           ReferenceIndicesColumns.RESOURCE_ID + " TEXT NOT NULL);";
-  /** Query to create the index for the {@link Tables#REFERENCES_INDICES} table. */
+  /** Query to create the index for the {@link Tables#REFERENCE_INDICES} table. */
   private static String CREATE_REFERENCE_INDICES_TABLE_INDEX =
       "CREATE INDEX " + Indices.REFERENCE_INDICES_TABLE_RESOURCE_TYPE_INDEX_NAME_INDEX_VALUE_INDEX +
           " ON " +
-          Tables.REFERENCES_INDICES + " ( " +
+          Tables.REFERENCE_INDICES + " ( " +
           ReferenceIndicesColumns.RESOURCE_TYPE + ", " +
           ReferenceIndicesColumns.INDEX_NAME + ", " +
           ReferenceIndicesColumns.INDEX_VALUE + ");";
+
+  /** Query to create the {@link Tables#CODE_INDICES} table. */
+  private static String CREATE_CODE_INDICES_TABLE =
+      "CREATE TABLE " + Tables.CODE_INDICES + " ( " +
+          CodeIndicesColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+          CodeIndicesColumns.RESOURCE_TYPE + " TEXT NOT NULL," +
+          CodeIndicesColumns.INDEX_NAME + " TEXT NOT NULL," +
+          CodeIndicesColumns.INDEX_PATH + " TEXT NOT NULL," +
+          CodeIndicesColumns.INDEX_VALUE_SYSTEM + " TEXT NOT NULL," +
+          CodeIndicesColumns.INDEX_VALUE_CODE + " TEXT NOT NULL," +
+          CodeIndicesColumns.RESOURCE_ID + " TEXT NOT NULL);";
+  /** Query to create the index for the {@link Tables#CODE_INDICES} table. */
+  private static String CREATE_CODE_INDICES_TABLE_INDEX =
+      "CREATE INDEX " +
+          Indices.CODE_INDICES_TABLE_RESOURCE_TYPE_INDEX_NAME_INDEX_VALUE_SYSTE_INDEX_VALUE_CODE_INDEX +
+          " ON " +
+          Tables.CODE_INDICES + " ( " +
+          CodeIndicesColumns.RESOURCE_TYPE + ", " +
+          CodeIndicesColumns.INDEX_NAME + ", " +
+          CodeIndicesColumns.INDEX_VALUE_SYSTEM + ", " +
+          CodeIndicesColumns.INDEX_VALUE_CODE + ");";
 
   private final IParser iParser;
   private final FhirIndexer fhirIndexer;
@@ -154,9 +189,11 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
     sqLiteDatabase.execSQL(CREATE_RESOURCES_TABLE);
     sqLiteDatabase.execSQL(CREATE_STRING_INDICES_TABLE);
     sqLiteDatabase.execSQL(CREATE_REFERENCE_INDICES_TABLE);
+    sqLiteDatabase.execSQL(CREATE_CODE_INDICES_TABLE);
     sqLiteDatabase.execSQL(CREATE_RESOURCE_TABLE_UNIQUE_INDEX);
     sqLiteDatabase.execSQL(CREATE_STRING_INDICES_TABLE_INDEX);
     sqLiteDatabase.execSQL(CREATE_REFERENCE_INDICES_TABLE_INDEX);
+    sqLiteDatabase.execSQL(CREATE_CODE_INDICES_TABLE_INDEX);
   }
 
   @Override
@@ -201,7 +238,21 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
         referenceIndexContentValues
             .put(ReferenceIndicesColumns.INDEX_VALUE, referenceIndex.value());
         referenceIndexContentValues.put(ReferenceIndicesColumns.RESOURCE_ID, id);
-        database.replaceOrThrow(Tables.REFERENCES_INDICES, null, referenceIndexContentValues);
+        database.replaceOrThrow(Tables.REFERENCE_INDICES, null, referenceIndexContentValues);
+      }
+
+      // Insert code indices.
+      for (CodeIndex codeIndex : resourceIndices.getCodeIndices()) {
+        ContentValues codeIndexContentValues = new ContentValues();
+        codeIndexContentValues.put(CodeIndicesColumns.RESOURCE_TYPE, type);
+        codeIndexContentValues.put(CodeIndicesColumns.INDEX_NAME, codeIndex.name());
+        codeIndexContentValues.put(CodeIndicesColumns.INDEX_PATH, codeIndex.path());
+        codeIndexContentValues
+            .put(CodeIndicesColumns.INDEX_VALUE_SYSTEM, codeIndex.system());
+        codeIndexContentValues
+            .put(CodeIndicesColumns.INDEX_VALUE_CODE, codeIndex.value());
+        codeIndexContentValues.put(CodeIndicesColumns.RESOURCE_ID, id);
+        database.replaceOrThrow(Tables.CODE_INDICES, null, codeIndexContentValues);
       }
 
       database.setTransactionSuccessful();

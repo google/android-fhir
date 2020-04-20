@@ -35,6 +35,9 @@ public class ResourceIndices {
   /** The reference indices. */
   private final List<ReferenceIndex> referenceIndices = new ArrayList<>();
 
+  /** The code indices. */
+  private final List<CodeIndex> codeIndices = new ArrayList<>();
+
   public ResourceIndices(ResourceType resourceType, String id) {
     this.resourceType = resourceType;
     this.id = id;
@@ -60,6 +63,11 @@ public class ResourceIndices {
     referenceIndices.add(referenceIndex);
   }
 
+  /** Adds code values to the index. */
+  public void addCodeIndex(CodeIndex codeIndex) {
+    codeIndices.add(codeIndex);
+  }
+
   /** Returns the string indices. */
   public ImmutableList<StringIndex> getStringIndices() {
     return ImmutableList.copyOf(stringIndices);
@@ -68,5 +76,10 @@ public class ResourceIndices {
   /** Returns the reference indices. */
   public ImmutableList<ReferenceIndex> getReferenceIndices() {
     return ImmutableList.copyOf(referenceIndices);
+  }
+
+  /** Returns the code indices. */
+  public ImmutableList<CodeIndex> getCodeIndices() {
+    return ImmutableList.copyOf(codeIndices);
   }
 }

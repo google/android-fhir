@@ -3,11 +3,14 @@ package com.google.fhirengine.index.impl;
 import android.os.Build;
 
 import com.google.common.truth.Truth;
+import com.google.fhirengine.index.CodeIndex;
 import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
 import com.google.fhirengine.resource.ResourceModule;
 
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
@@ -27,6 +30,9 @@ import dagger.Component;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = Build.VERSION_CODES.P)
 public class FhirIndexerImplTest {
+  private static final String TEST_CODE_SYSTEM_1 = "http://openmrs.org/concepts";
+  private static final String TEST_CODE_VALUE_1 = "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+
   private static final String TEST_PATIENT_1_ID = "test_patient_1";
   private static final Patient TEST_PATIENT_1;
 
@@ -43,6 +49,9 @@ public class FhirIndexerImplTest {
     TEST_OBSERVATION_1 = new Observation();
     TEST_OBSERVATION_1.setId(TEST_OBSERVATION_1_ID);
     TEST_OBSERVATION_1.setSubject(new Reference().setReference("Patient/" + TEST_PATIENT_1_ID));
+    TEST_OBSERVATION_1
+        .setCode(new CodeableConcept()
+            .addCoding(new Coding().setSystem(TEST_CODE_SYSTEM_1).setCode(TEST_CODE_VALUE_1)));
   }
 
   @Inject
@@ -72,6 +81,14 @@ public class FhirIndexerImplTest {
     Truth.assertThat(resourceIndices.getReferenceIndices())
         .contains(ReferenceIndex
             .create("subject", "Observation.subject", "Patient/" + TEST_PATIENT_1_ID));
+  }
+
+  @Test
+  public void index_observation_shouldIndexCode() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(TEST_OBSERVATION_1);
+    Truth.assertThat(resourceIndices.getCodeIndices())
+        .contains(CodeIndex
+            .create("code", "Observation.code", TEST_CODE_SYSTEM_1, TEST_CODE_VALUE_1));
   }
 
   // TODO: improve the tests.

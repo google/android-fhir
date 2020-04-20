@@ -9,12 +9,12 @@ public abstract class ReferenceIndex {
     return new AutoValue_ReferenceIndex(name, path, value);
   }
 
-  /** The name of the string index, e.g. given. */
+  /** The name of the string index, e.g. "given". */
   public abstract String name();
 
-  /** The path of the string index, e.g. Patient.name.given. */
+  /** The path of the string index, e.g. "Patient.name.given". */
   public abstract String path();
 
-  /** The value of the string index, e.g. Tom. */
+  /** The value of the string index, e.g. "Tom". */
   public abstract String value();
 }
