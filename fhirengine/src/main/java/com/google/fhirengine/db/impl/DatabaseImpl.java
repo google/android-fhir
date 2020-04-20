@@ -356,7 +356,7 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
       whereArgs = new String[]{type, reference, value};
     }
     Cursor cursor = database
-        .query(Tables.REFERENCES_INDICES, columns, whereClause, whereArgs, null, null, null);
+        .query(Tables.REFERENCE_INDICES, columns, whereClause, whereArgs, null, null, null);
 
     List<R> resources = new ArrayList<>();
     try {
