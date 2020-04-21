@@ -17,7 +17,10 @@ import org.opencds.cqf.cql.execution.LibraryLoader;
 import org.opencds.cqf.cql.terminology.TerminologyProvider;
 
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -67,6 +70,13 @@ public class FhirEngineImpl implements FhirEngine {
 
   @Override
   public EvaluationResult evaluateCql(String libraryVersionId) {
-    return cqlEngine.evaluate(new VersionedIdentifier().withId(libraryVersionId));
+    Map<String, Object> context = new HashMap<>();
+    context.put("Patient", "mom");
+    VersionedIdentifier versionedIdentifier = new VersionedIdentifier().withId(libraryVersionId);
+    Set<String> expressions = new HashSet<>();
+    expressions.add("Has Anaemia");
+    Map<VersionedIdentifier, Set<String>> map = new HashMap<>();
+    map.put(versionedIdentifier, expressions);
+    return cqlEngine.evaluate(context, null, map);
   }
 }
