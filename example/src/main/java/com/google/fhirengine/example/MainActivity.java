@@ -1,6 +1,5 @@
 package com.google.fhirengine.example;
 
-import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -34,8 +33,9 @@ public class MainActivity extends AppCompatActivity {
 
   FhirEngine fhirEngine;
   EditText cqlLibraryUrlInput;
-  EditText fhirResourceUrlInput;
+  EditText evaluationUrlInput;
   TextView evaluationResultTextView;
+  EditText fhirResourceUrlInput;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     cqlLibraryUrlInput = findViewById(R.id.cql_text_input);
     fhirResourceUrlInput = findViewById(R.id.fhir_resource_url_input);
     evaluationResultTextView = findViewById(R.id.evaluate_result);
+    evaluationUrlInput = findViewById(R.id.evaluation_text_input);
 
     final Button button = findViewById(R.id.load_cql_lib_button);
     button.setOnClickListener(new View.OnClickListener() {
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     final Button evaluateButton = findViewById(R.id.evaluate_button);
     evaluateButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        new EvaluateAncLibrary().execute(LIBRARY_ID);
+        new EvaluateAncLibrary().execute(evaluationUrlInput.getText().toString());
       }
     });
 
@@ -116,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
     protected EvaluationResult doInBackground(String... strings) {
       return fhirEngine.evaluateCql(strings[0]);
     }
+
 
     @Override
     protected void onPostExecute(EvaluationResult result) {
