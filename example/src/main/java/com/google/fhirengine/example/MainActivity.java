@@ -30,7 +30,7 @@ import java.util.Map;
 import ca.uhn.fhir.context.FhirContext;
 
 public class MainActivity extends AppCompatActivity {
-  public static final String LIBRARY_ID = "ANCFHIRTerminologyDummy";
+  public static final String LIBRARY_ID = "ANCRecommendationA2";
 
   FhirEngine fhirEngine;
   EditText cqlLibraryUrlInput;
