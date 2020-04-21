@@ -39,7 +39,10 @@ import com.google.fhirengine.resource.ResourceUtils;
 import org.hl7.fhir.r4.model.Resource;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -359,11 +362,107 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
         .query(Tables.REFERENCE_INDICES, columns, whereClause, whereArgs, null, null, null);
 
     List<R> resources = new ArrayList<>();
+    Set<String> ids = new HashSet<>();
     try {
       while (cursor.moveToNext()) {
         String id = cursor.getString(0);
+        ids.add(id);
+      }
+      Iterator<String> it = ids.iterator();
+      while (it.hasNext()) {
         try {
-          resources.add(select(clazz, id));
+          resources.add(select(clazz, it.next()));
+        } catch (ResourceNotFoundInDbException e) {
+          Log.w(TAG, "Database inconsistent.", e);
+          continue;
+        }
+      }
+      return resources;
+    } finally {
+      cursor.close();
+      database.close();
+    }
+  }
+
+  @Override
+  public <R extends Resource> List<R> searchByString(Class<R> clazz, String string,
+      String value) {
+    String type = ResourceUtils.getResourceType(clazz).name();
+    String[] columns = new String[]{StringIndicesColumns.RESOURCE_ID};
+    SQLiteDatabase database = getReadableDatabase();
+
+    String whereClause;
+    String[] whereArgs;
+    if (TextUtils.isEmpty(string) || TextUtils.isEmpty(value)) {
+      whereClause =
+          StringIndicesColumns.RESOURCE_TYPE + " = ?";
+      whereArgs = new String[]{type};
+    } else {
+      whereClause =
+          StringIndicesColumns.RESOURCE_TYPE + " = ? AND " + StringIndicesColumns.INDEX_PATH +
+              " = ? AND " + StringIndicesColumns.INDEX_VALUE + " = ?";
+      whereArgs = new String[]{type, string, value};
+    }
+    Cursor cursor = database
+        .query(Tables.STRING_INDICES, columns, whereClause, whereArgs, null, null, null);
+
+    List<R> resources = new ArrayList<>();
+    Set<String> ids = new HashSet<>();
+    try {
+      while (cursor.moveToNext()) {
+        String id = cursor.getString(0);
+        ids.add(id);
+      }
+      Iterator<String> it = ids.iterator();
+      while (it.hasNext()) {
+        try {
+          resources.add(select(clazz, it.next()));
+        } catch (ResourceNotFoundInDbException e) {
+          Log.w(TAG, "Database inconsistent.", e);
+          continue;
+        }
+      }
+      return resources;
+    } finally {
+      cursor.close();
+      database.close();
+    }
+  }
+
+  @Override
+  public <R extends Resource> List<R> searchByCode(Class<R> clazz, String string, String system,
+      String value) {
+    String type = ResourceUtils.getResourceType(clazz).name();
+    String[] columns = new String[]{CodeIndicesColumns.RESOURCE_ID};
+    SQLiteDatabase database = getReadableDatabase();
+
+    String whereClause;
+    String[] whereArgs;
+    if (TextUtils.isEmpty(string) || TextUtils.isEmpty(value)) {
+      whereClause =
+          CodeIndicesColumns.RESOURCE_TYPE + " = ?";
+      whereArgs = new String[]{type};
+    } else {
+      whereClause =
+          CodeIndicesColumns.RESOURCE_TYPE + " = ? AND " + CodeIndicesColumns.INDEX_PATH +
+              " = ? AND " + CodeIndicesColumns.INDEX_VALUE_SYSTEM + " = ?AND " +
+              CodeIndicesColumns.INDEX_VALUE_CODE + " = ?";
+      whereArgs = new String[]{type, string, system, value};
+    }
+    Cursor cursor = database
+        .query(Tables.CODE_INDICES, columns, whereClause, whereArgs, null, null, null);
+
+    List<R> resources = new ArrayList<>();
+    Set<String> ids = new HashSet<>();
+    try {
+      while (cursor.moveToNext()) {
+        String id = cursor.getString(0);
+        ids.add(id);
+      }
+      Iterator<String> it = ids.iterator();
+      while (it.hasNext()) {
+        try {
+          resources.add(select(clazz, it.next()));
         } catch (ResourceNotFoundInDbException e) {
           Log.w(TAG, "Database inconsistent.", e);
           continue;
