@@ -30,11 +30,12 @@ import java.util.Map;
 import ca.uhn.fhir.context.FhirContext;
 
 public class MainActivity extends AppCompatActivity {
-  public static final String LIBRARY_ID = "ANCRecommendationA2";
-
   FhirEngine fhirEngine;
   EditText cqlLibraryUrlInput;
   EditText fhirResourceUrlInput;
+  EditText libraryInput;
+  EditText contextInput;
+  EditText expressionInput;
   TextView evaluationResultTextView;
 
   @Override
@@ -44,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
 
     cqlLibraryUrlInput = findViewById(R.id.cql_text_input);
     fhirResourceUrlInput = findViewById(R.id.fhir_resource_url_input);
+    libraryInput = findViewById(R.id.library_input);
+    contextInput = findViewById(R.id.context_input);
+    expressionInput = findViewById(R.id.expression_input);
     evaluationResultTextView = findViewById(R.id.evaluate_result);
 
     final Button button = findViewById(R.id.load_cql_lib_button);
@@ -63,7 +67,9 @@ public class MainActivity extends AppCompatActivity {
     final Button evaluateButton = findViewById(R.id.evaluate_button);
     evaluateButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        new EvaluateAncLibrary().execute(LIBRARY_ID);
+        new EvaluateAncLibrary().execute(
+            new String[]{libraryInput.getText().toString(), contextInput.getText().toString(),
+                expressionInput.getText().toString()});
       }
     });
 
@@ -114,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
   private class EvaluateAncLibrary extends AsyncTask<String, String, EvaluationResult> {
     @Override
     protected EvaluationResult doInBackground(String... strings) {
-      return fhirEngine.evaluateCql(strings[0]);
+      return fhirEngine.evaluateCql(strings[0], strings[1], strings[2]);
     }
 
     @Override

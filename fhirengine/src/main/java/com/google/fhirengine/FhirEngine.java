@@ -36,5 +36,5 @@ public interface FhirEngine {
   <R extends Resource> R remove(Class<R> clazz, String id);
 
   /** Returns the result of a CQL evaluation provided with the ID of the library. */
-  EvaluationResult evaluateCql(String libraryVersionId);
+  EvaluationResult evaluateCql(String libraryVersionId, String context, String expression);
 }
