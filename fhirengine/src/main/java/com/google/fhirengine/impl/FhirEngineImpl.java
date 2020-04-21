@@ -83,14 +83,15 @@ public class FhirEngineImpl implements FhirEngine {
   }
 
   @Override
-  public EvaluationResult evaluateCql(String libraryVersionId) {
-    Map<String, Object> context = new HashMap<>();
-    context.put("Patient", "mom");
+  public EvaluationResult evaluateCql(String libraryVersionId, String context, String expression) {
+    Map<String, Object> contextMap = new HashMap<>();
+    String[] contextSplit = context.split("\\/");
+    contextMap.put(contextSplit[0], contextSplit[1]);
     VersionedIdentifier versionedIdentifier = new VersionedIdentifier().withId(libraryVersionId);
     Set<String> expressions = new HashSet<>();
-    expressions.add("Has Anaemia");
+    expressions.add(expression);
     Map<VersionedIdentifier, Set<String>> map = new HashMap<>();
     map.put(versionedIdentifier, expressions);
-    return cqlEngine.evaluate(context, null, map);
+    return cqlEngine.evaluate(contextMap, null, map);
   }
 }
