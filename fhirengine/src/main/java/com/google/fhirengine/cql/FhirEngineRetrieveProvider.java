@@ -12,6 +12,7 @@ import org.opencds.cqf.cql.runtime.Interval;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -46,10 +47,10 @@ public class FhirEngineRetrieveProvider implements org.opencds.cqf.cql.retrieve.
               TextUtils.isEmpty((String) contextValue) ? null : context + "/" + contextValue));
       return result;
     } else if (codeList.size() == 1) {
-      // TODO: create a database method that search by code as well as reference.
       Code code = codeList.get(0);
       ImmutableList<Object> result = ImmutableList.copyOf(database
-          .searchByCode(ResourceUtils.getResourceClass(dataType), dataType + "." + codePath,
+          .searchByReferenceAndCode(ResourceUtils.getResourceClass(dataType),dataType + "." + contextPath,
+              TextUtils.isEmpty((String) contextValue) ? null : context + "/" + contextValue, dataType + "." + codePath,
               code.getSystem(), code.getCode()));
       return result;
     } else {

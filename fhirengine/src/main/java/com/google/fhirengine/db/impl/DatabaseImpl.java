@@ -325,6 +325,40 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
     throw new UnsupportedOperationException("Not implemented yet!");
   }
 
+  private <R extends Resource> Set<String> searchIdByReference(Class<R> clazz, String reference,
+      String value) {
+    String type = ResourceUtils.getResourceType(clazz).name();
+    String[] columns = new String[]{ReferenceIndicesColumns.RESOURCE_ID};
+    SQLiteDatabase database = getReadableDatabase();
+
+    String whereClause;
+    String[] whereArgs;
+    if (TextUtils.isEmpty(reference) || TextUtils.isEmpty(value)) {
+      whereClause =
+          ReferenceIndicesColumns.RESOURCE_TYPE + " = ?";
+      whereArgs = new String[]{type};
+    } else {
+      whereClause =
+          ReferenceIndicesColumns.RESOURCE_TYPE + " = ? AND " + ReferenceIndicesColumns.INDEX_PATH +
+              " = ? AND " + ReferenceIndicesColumns.INDEX_VALUE + " = ?";
+      whereArgs = new String[]{type, reference, value};
+    }
+    Cursor cursor = database
+        .query(Tables.REFERENCE_INDICES, columns, whereClause, whereArgs, null, null, null);
+
+    Set<String> ids = new HashSet<>();
+    try {
+      while (cursor.moveToNext()) {
+        String id = cursor.getString(0);
+        ids.add(id);
+      }
+      return ids;
+    } finally {
+      cursor.close();
+      database.close();
+    }
+  }
+
   @Override
   public <R extends Resource> List<R> searchByReference(Class<R> clazz, String reference,
       String value) {
@@ -364,6 +398,42 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
         }
       }
       return resources;
+    } finally {
+      cursor.close();
+      database.close();
+    }
+  }
+
+  private  <R extends Resource> Set<String> searchByCode(Class<R> clazz, String string, String system,
+      String value) {
+    String type = ResourceUtils.getResourceType(clazz).name();
+    String[] columns = new String[]{CodeIndicesColumns.RESOURCE_ID};
+    SQLiteDatabase database = getReadableDatabase();
+
+    String whereClause;
+    String[] whereArgs;
+    if (TextUtils.isEmpty(string) || TextUtils.isEmpty(value)) {
+      whereClause =
+          CodeIndicesColumns.RESOURCE_TYPE + " = ?";
+      whereArgs = new String[]{type};
+    } else {
+      whereClause =
+          CodeIndicesColumns.RESOURCE_TYPE + " = ? AND " + CodeIndicesColumns.INDEX_PATH +
+              " = ? AND " + CodeIndicesColumns.INDEX_VALUE_SYSTEM + " = ?AND " +
+              CodeIndicesColumns.INDEX_VALUE_CODE + " = ?";
+      whereArgs = new String[]{type, string, system, value};
+    }
+    Cursor cursor = database
+        .query(Tables.CODE_INDICES, columns, whereClause, whereArgs, null, null, null);
+
+    List<R> resources = new ArrayList<>();
+    Set<String> ids = new HashSet<>();
+    try {
+      while (cursor.moveToNext()) {
+        String id = cursor.getString(0);
+        ids.add(id);
+      }
+      return ids;
     } finally {
       cursor.close();
       database.close();
@@ -416,48 +486,26 @@ public class DatabaseImpl extends SQLiteOpenHelper implements Database {
   }
 
   @Override
-  public <R extends Resource> List<R> searchByCode(Class<R> clazz, String string, String system,
+  public <R extends Resource> List<R> searchByReferenceAndCode(Class<R> clazz, String reference,
+      String refvalue, String string, String system,
       String value) {
-    String type = ResourceUtils.getResourceType(clazz).name();
-    String[] columns = new String[]{CodeIndicesColumns.RESOURCE_ID};
-    SQLiteDatabase database = getReadableDatabase();
 
-    String whereClause;
-    String[] whereArgs;
-    if (TextUtils.isEmpty(string) || TextUtils.isEmpty(value)) {
-      whereClause =
-          CodeIndicesColumns.RESOURCE_TYPE + " = ?";
-      whereArgs = new String[]{type};
-    } else {
-      whereClause =
-          CodeIndicesColumns.RESOURCE_TYPE + " = ? AND " + CodeIndicesColumns.INDEX_PATH +
-              " = ? AND " + CodeIndicesColumns.INDEX_VALUE_SYSTEM + " = ?AND " +
-              CodeIndicesColumns.INDEX_VALUE_CODE + " = ?";
-      whereArgs = new String[]{type, string, system, value};
-    }
-    Cursor cursor = database
-        .query(Tables.CODE_INDICES, columns, whereClause, whereArgs, null, null, null);
 
+    Set<String> refs = searchIdByReference(clazz, reference, refvalue);
+    Set<String> codes = searchByCode(clazz, string, system, value);
+
+    refs.retainAll(codes);
+
+    Iterator<String> it = refs.iterator();
     List<R> resources = new ArrayList<>();
-    Set<String> ids = new HashSet<>();
-    try {
-      while (cursor.moveToNext()) {
-        String id = cursor.getString(0);
-        ids.add(id);
+    while (it.hasNext()) {
+      try {
+        resources.add(select(clazz, it.next()));
+      } catch (ResourceNotFoundInDbException e) {
+        Log.w(TAG, "Database inconsistent.", e);
+        continue;
       }
-      Iterator<String> it = ids.iterator();
-      while (it.hasNext()) {
-        try {
-          resources.add(select(clazz, it.next()));
-        } catch (ResourceNotFoundInDbException e) {
-          Log.w(TAG, "Database inconsistent.", e);
-          continue;
-        }
-      }
-      return resources;
-    } finally {
-      cursor.close();
-      database.close();
     }
+    return resources;
   }
 }
