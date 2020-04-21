@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
       StringBuilder stringBuilder = new StringBuilder();
       for (LibraryResult libraryResult : result.libraryResults.values()) {
         for (Map.Entry<String, Object> entry : libraryResult.expressionResults.entrySet()) {
-          stringBuilder.append(entry.getKey());
+          stringBuilder.append(entry.getKey() + " -> ");
           Object value = entry.getValue();
           if (value == null) {
             stringBuilder.append("null");
@@ -142,6 +142,8 @@ public class MainActivity extends AppCompatActivity {
             stringBuilder
                 .append(FhirContext.forR4().newJsonParser()
                     .encodeResourceToString((Resource) value));
+          } else {
+            stringBuilder.append(value.toString());
           }
         }
       }
