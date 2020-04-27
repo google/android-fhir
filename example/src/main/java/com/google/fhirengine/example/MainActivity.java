@@ -14,6 +14,7 @@
 
 package com.google.fhirengine.example;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -136,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
     protected EvaluationResult doInBackground(String... strings) {
       return fhirEngine.evaluateCql(strings[0], strings[1], strings[2]);
     }
-
 
     @Override
     protected void onPostExecute(EvaluationResult result) {
