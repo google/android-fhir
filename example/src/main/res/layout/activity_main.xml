@@ -6,9 +6,41 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+        <Button
+                android:id="@+id/enter_libname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ENTER"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.95"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/fhir_resource_url_input"
+                app:layout_constraintVertical_bias="0.26" />
+
+        <TextView
+                android:id="@+id/context_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="33dp"
+                android:layout_marginEnd="304dp"
+                android:layout_marginRight="304dp"
+                android:layout_marginBottom="129dp"
+                android:text="Context"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toTopOf="@+id/evaluation_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lib_name_input"
+                app:layout_constraintVertical_bias="0.092" />
 
         <TextView
                 android:id="@+id/cql_title"
@@ -27,7 +59,7 @@
                 android:id="@+id/cql_text_input"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 android:hint="URL"
                 android:inputType="text"
                 app:layout_constraintEnd_toStartOf="@+id/load_cql_lib_button"
@@ -93,14 +125,20 @@
                 app:layout_constraintTop_toTopOf="@+id/fhir_resource_url_input"
                 app:layout_constraintVertical_bias="0.0" />
 
+
         <TextView
                 android:id="@+id/evaluation_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:text="Evaluation"
+                android:layout_marginStart="4dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginTop="204dp"
+                android:layout_marginEnd="268dp"
+                android:layout_marginRight="268dp"
+                android:text="Expression"
                 android:textAppearance="@style/TextAppearance.AppCompat.Display4"
                 android:textSize="24sp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/fhir_resource_url_input"
                 app:layout_constraintTop_toBottomOf="@+id/fhir_resource_url_input" />
 
@@ -111,10 +149,26 @@
                 android:text="Evaluate"
                 app:layout_constraintBottom_toBottomOf="@+id/evaluation_title"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.921"
+                app:layout_constraintHorizontal_bias="0.884"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/evaluation_title"
-                app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintVertical_bias="0.24" />
+
+        <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/evaluation_text_input"
+                android:layout_width="226dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="28dp"
+                android:layout_marginRight="28dp"
+                android:layout_marginBottom="24dp"
+                android:hint="URL"
+                app:layout_constraintBottom_toTopOf="@+id/evaluate_result"
+                app:layout_constraintEnd_toStartOf="@+id/evaluate_button"
+                app:layout_constraintHorizontal_bias="0.965"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/evaluation_title"
+                app:layout_constraintVertical_bias="1.0" />
 
         <TextView
                 android:id="@+id/library"
@@ -200,6 +254,38 @@
                 app:layout_constraintStart_toStartOf="@+id/expression"
                 app:layout_constraintTop_toBottomOf="@+id/expression"
                 app:layout_constraintVertical_bias="1.0" />
+
+        <TextView
+                android:id="@+id/lib_name_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="31dp"
+                android:layout_marginEnd="245dp"
+                android:layout_marginRight="245dp"
+                android:layout_marginBottom="10dp"
+                android:text="Library Name"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toTopOf="@+id/context_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fhir_resource_url_input"
+                app:layout_constraintVertical_bias="0.0" />
+
+        <EditText
+                android:id="@+id/lib_name_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="256dp"
+                android:hint="Text"
+                android:inputType="text"
+                app:layout_constraintEnd_toStartOf="@+id/load_cql_lib_button"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/cql_title"
+                app:layout_constraintTop_toBottomOf="@+id/cql_title" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
