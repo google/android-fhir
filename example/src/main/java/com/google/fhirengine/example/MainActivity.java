@@ -1,5 +1,6 @@
 package com.google.fhirengine.example;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -36,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
   EditText contextInput;
   EditText expressionInput;
   TextView evaluationResultTextView;
-  EditText fhirResourceUrlInput;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
     contextInput = findViewById(R.id.context_input);
     expressionInput = findViewById(R.id.expression_input);
     evaluationResultTextView = findViewById(R.id.evaluate_result);
-    evaluationUrlInput = findViewById(R.id.evaluation_text_input);
 
     final Button button = findViewById(R.id.load_cql_lib_button);
     button.setOnClickListener(new View.OnClickListener() {
@@ -123,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
     protected EvaluationResult doInBackground(String... strings) {
       return fhirEngine.evaluateCql(strings[0], strings[1], strings[2]);
     }
-
 
     @Override
     protected void onPostExecute(EvaluationResult result) {
