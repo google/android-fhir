@@ -15,14 +15,15 @@
 package com.google.fhirengine.index.impl;
 
 import android.os.Build;
-
 import com.google.common.truth.Truth;
 import com.google.fhirengine.index.CodeIndex;
 import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
 import com.google.fhirengine.resource.ResourceModule;
-
+import dagger.Component;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.HumanName;
@@ -34,11 +35,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import dagger.Component;
 
 /** Unit tests for {@link FhirIndexerImpl}. */
 @RunWith(RobolectricTestRunner.class)
@@ -63,13 +59,12 @@ public class FhirIndexerImplTest {
     TEST_OBSERVATION_1 = new Observation();
     TEST_OBSERVATION_1.setId(TEST_OBSERVATION_1_ID);
     TEST_OBSERVATION_1.setSubject(new Reference().setReference("Patient/" + TEST_PATIENT_1_ID));
-    TEST_OBSERVATION_1
-        .setCode(new CodeableConcept()
+    TEST_OBSERVATION_1.setCode(
+        new CodeableConcept()
             .addCoding(new Coding().setSystem(TEST_CODE_SYSTEM_1).setCode(TEST_CODE_VALUE_1)));
   }
 
-  @Inject
-  FhirIndexerImpl fhirIndexer;
+  @Inject FhirIndexerImpl fhirIndexer;
 
   @Singleton
   @Component(modules = {FhirIndexerModule.class, ResourceModule.class})
@@ -93,16 +88,17 @@ public class FhirIndexerImplTest {
   public void index_observation_shouldIndexSubject() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_OBSERVATION_1);
     Truth.assertThat(resourceIndices.getReferenceIndices())
-        .contains(ReferenceIndex
-            .create("subject", "Observation.subject", "Patient/" + TEST_PATIENT_1_ID));
+        .contains(
+            ReferenceIndex.create(
+                "subject", "Observation.subject", "Patient/" + TEST_PATIENT_1_ID));
   }
 
   @Test
   public void index_observation_shouldIndexCode() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_OBSERVATION_1);
     Truth.assertThat(resourceIndices.getCodeIndices())
-        .contains(CodeIndex
-            .create("code", "Observation.code", TEST_CODE_SYSTEM_1, TEST_CODE_VALUE_1));
+        .contains(
+            CodeIndex.create("code", "Observation.code", TEST_CODE_SYSTEM_1, TEST_CODE_VALUE_1));
   }
 
   // TODO: improve the tests.

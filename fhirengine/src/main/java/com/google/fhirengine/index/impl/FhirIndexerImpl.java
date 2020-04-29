@@ -16,27 +16,22 @@ package com.google.fhirengine.index.impl;
 
 import android.text.TextUtils;
 import android.util.Log;
-
+import ca.uhn.fhir.model.api.annotation.SearchParamDefinition;
 import com.google.fhirengine.index.CodeIndex;
 import com.google.fhirengine.index.FhirIndexer;
 import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
-
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.inject.Inject;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.StringType;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import ca.uhn.fhir.model.api.annotation.SearchParamDefinition;
 
 /** Implementation of {@link FhirIndexer}. */
 public class FhirIndexerImpl implements FhirIndexer {
@@ -58,11 +53,11 @@ public class FhirIndexerImpl implements FhirIndexer {
 
   /** Tag for logging. */
   private static final String TAG = "FhirIndexerImpl";
+
   public static final String DOT_NOTATION_REGEX = "^[a-zA-Z0-9\\.]+$";
 
   @Inject
-  public FhirIndexerImpl() {
-  }
+  public FhirIndexerImpl() {}
 
   @Override
   public <R extends Resource> ResourceIndices index(R resource) {
@@ -80,8 +75,9 @@ public class FhirIndexerImpl implements FhirIndexer {
         String type = searchParamDefinition.type();
         if (type.equals(SEARCH_PARAM_DEFINITION_TYPE_STRING) && hasDotNotationOnly(path)) {
           for (String value : getStringValues(getValuesForPath(resource, path))) {
-            resourceIndices.addStringIndex(StringIndex
-                .create(searchParamDefinition.name(), searchParamDefinition.path(), value));
+            resourceIndices.addStringIndex(
+                StringIndex.create(
+                    searchParamDefinition.name(), searchParamDefinition.path(), value));
           }
         }
 
@@ -89,9 +85,9 @@ public class FhirIndexerImpl implements FhirIndexer {
           for (Reference reference : getReferenceValues(getValuesForPath(resource, path))) {
             String referenceString = reference.getReference();
             if (!TextUtils.isEmpty(referenceString)) {
-              resourceIndices.addReferenceIndex(ReferenceIndex
-                  .create(searchParamDefinition.name(), searchParamDefinition.path(),
-                      referenceString));
+              resourceIndices.addReferenceIndex(
+                  ReferenceIndex.create(
+                      searchParamDefinition.name(), searchParamDefinition.path(), referenceString));
             }
           }
         }
@@ -101,9 +97,9 @@ public class FhirIndexerImpl implements FhirIndexer {
             String system = code.getSystem();
             String value = code.getCode();
             if (!TextUtils.isEmpty(system) && !TextUtils.isEmpty(value)) {
-              resourceIndices.addCodeIndex(CodeIndex
-                  .create(searchParamDefinition.name(), searchParamDefinition.path(),
-                      system, value));
+              resourceIndices.addCodeIndex(
+                  CodeIndex.create(
+                      searchParamDefinition.name(), searchParamDefinition.path(), system, value));
             }
           }
         }
@@ -132,9 +128,9 @@ public class FhirIndexerImpl implements FhirIndexer {
 
   /**
    * Returns the list of field values for {@code fieldName} in each of the {@code objects}.
-   * <p>
-   * If the field is a {@link List}, the list will be expanded and each element of the {@link List}
-   * will be added to the returned value.
+   *
+   * <p>If the field is a {@link List}, the list will be expanded and each element of the {@link
+   * List} will be added to the returned value.
    */
   private static List<Object> getFieldValues(List<Object> objects, String fieldName) {
     List<Object> fieldValues = new ArrayList<>();
@@ -165,9 +161,9 @@ public class FhirIndexerImpl implements FhirIndexer {
 
   /**
    * Returns the representative string values for the list of {@code objects}.
-   * <p>
-   * If an object in the list is a Java {@link String}, the returned list will contain the value of
-   * the Java {@link String}. If an object in the list is a FHIR {@link StringType}, the returned
+   *
+   * <p>If an object in the list is a Java {@link String}, the returned list will contain the value
+   * of the Java {@link String}. If an object in the list is a FHIR {@link StringType}, the returned
    * list will contain the value of the FHIR {@link StringType}. If an object in the list matches a
    * server defined search type (HumanName, Address, etc), the returned list will contain the string
    * value representative of the type.

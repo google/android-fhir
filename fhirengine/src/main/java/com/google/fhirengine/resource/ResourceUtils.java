@@ -14,10 +14,9 @@
 
 package com.google.fhirengine.resource;
 
+import java.lang.reflect.InvocationTargetException;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
-
-import java.lang.reflect.InvocationTargetException;
 
 /** Utilities for the HAPI FHIR resources. */
 public class ResourceUtils {

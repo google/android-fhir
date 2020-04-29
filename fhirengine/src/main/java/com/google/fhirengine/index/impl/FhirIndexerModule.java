@@ -14,10 +14,9 @@
 
 package com.google.fhirengine.index.impl;
 
+import com.google.fhirengine.index.FhirIndexer;
 import dagger.Binds;
 import dagger.Module;
-
-import com.google.fhirengine.index.FhirIndexer;
 
 /** Dagger module for FHIR Indexer. */
 @Module

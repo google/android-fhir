@@ -15,7 +15,6 @@
 package com.google.fhirengine.impl;
 
 import com.google.fhirengine.FhirEngine;
-
 import dagger.Binds;
 import dagger.Module;
 

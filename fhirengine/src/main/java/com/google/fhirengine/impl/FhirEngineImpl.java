@@ -21,10 +21,8 @@ import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
 import com.google.fhirengine.resource.ResourceUtils;
-
-import org.hl7.fhir.r4.model.Resource;
-
 import javax.inject.Inject;
+import org.hl7.fhir.r4.model.Resource;
 
 /** Implementation of {@link FhirEngine}. */
 public class FhirEngineImpl implements FhirEngine {
@@ -42,8 +40,7 @@ public class FhirEngineImpl implements FhirEngine {
       database.insert(resource);
     } catch (ResourceAlreadyExistsInDbException e) {
       throw new ResourceAlreadyExistsException(
-          ResourceUtils.getResourceType(resource.getClass()).name(),
-          resource.getId(), e);
+          ResourceUtils.getResourceType(resource.getClass()).name(), resource.getId(), e);
     }
   }
 

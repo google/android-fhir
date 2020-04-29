@@ -14,13 +14,11 @@
 
 package com.google.fhirengine.resource;
 
-import org.hl7.fhir.r4.model.Resource;
-
-import javax.inject.Inject;
+import static org.junit.Assert.assertEquals;
 
 import ca.uhn.fhir.parser.IParser;
-
-import static org.junit.Assert.assertEquals;
+import javax.inject.Inject;
+import org.hl7.fhir.r4.model.Resource;
 
 /** Utilities for testing. */
 public class TestingUtils {
@@ -33,7 +31,6 @@ public class TestingUtils {
 
   /** Asserts that the {@code expected} and the {@code actual} FHIR resources are equal. */
   public void assertResourceEquals(Resource expected, Resource actual) {
-    assertEquals(iParser.encodeResourceToString(expected),
-        iParser.encodeResourceToString(actual));
+    assertEquals(iParser.encodeResourceToString(expected), iParser.encodeResourceToString(actual));
   }
 }
