@@ -12,16 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.fhirengine.db.impl;
+package com.google.fhirengine.db.impl
 
-import com.google.fhirengine.db.Database;
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import org.hl7.fhir.r4.model.ResourceType
 
-import dagger.Binds;
-import dagger.Module;
-
-/** Dagger module for the FHIR resource database. */
-@Module
-public abstract class DatabaseModule {
-  @Binds
-  abstract Database bindDatabase(DatabaseImpl database);
-}
+@Entity(
+        indices = [
+            Index(
+                    value = ["resourceType", "resourceId"],
+                    unique = true
+            )
+        ]
+)
+data class ResourceEntity(
+        @PrimaryKey(
+                autoGenerate = true
+        )
+        val id: Long,
+        val resourceType: ResourceType,
+        val resourceId: String,
+        val serializedResource: String
+)

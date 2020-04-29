@@ -21,7 +21,6 @@ import androidx.test.core.app.ApplicationProvider;
 
 import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
-import com.google.fhirengine.db.roomimpl.RoomDbImpl;
 import com.google.fhirengine.index.impl.FhirIndexerModule;
 import com.google.fhirengine.resource.ResourceModule;
 import com.google.fhirengine.resource.TestingUtils;
@@ -73,7 +72,7 @@ public class DatabaseImplTest {
   @Inject
   TestingUtils testingUtils;
   @Inject
-  RoomDbImpl database;
+  DatabaseImpl database;
 
   @Singleton
   @Component(modules = {DatabaseModule.class, FhirIndexerModule.class, ResourceModule.class})
