@@ -86,23 +86,21 @@ public class FhirIndexerImplTest {
   public void index_patient_shouldIndexGivenName() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_1);
     Truth.assertThat(resourceIndices.getStringIndices())
-        .contains(StringIndex.create("given", "Patient.name.given", "Tom"));
+        .contains(new StringIndex("given", "Patient.name.given", "Tom"));
   }
 
   @Test
   public void index_observation_shouldIndexSubject() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_OBSERVATION_1);
     Truth.assertThat(resourceIndices.getReferenceIndices())
-        .contains(ReferenceIndex
-            .create("subject", "Observation.subject", "Patient/" + TEST_PATIENT_1_ID));
+        .contains(new ReferenceIndex("subject", "Observation.subject", "Patient/" + TEST_PATIENT_1_ID));
   }
 
   @Test
   public void index_observation_shouldIndexCode() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_OBSERVATION_1);
     Truth.assertThat(resourceIndices.getCodeIndices())
-        .contains(CodeIndex
-            .create("code", "Observation.code", TEST_CODE_SYSTEM_1, TEST_CODE_VALUE_1));
+        .contains(new CodeIndex("code", "Observation.code", TEST_CODE_SYSTEM_1, TEST_CODE_VALUE_1));
   }
 
   // TODO: improve the tests.
