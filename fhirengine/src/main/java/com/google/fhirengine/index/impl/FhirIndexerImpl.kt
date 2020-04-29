@@ -21,63 +21,61 @@ import java.util.*
 import javax.inject.Inject
 
 /** Implementation of [FhirIndexer].  */
-class FhirIndexerImpl @Inject constructor() : FhirIndexer {
+internal class FhirIndexerImpl @Inject constructor() : FhirIndexer {
     override fun <R : Resource> index(resource: R): ResourceIndices {
         return extractIndexValues(resource)
     }
 
     /** Extracts the values to be indexed for `resource`.  */
     private fun <R : Resource> extractIndexValues(resource: R): ResourceIndices {
-        val resourceIndices = ResourceIndices(resource.resourceType, resource.id)
-        resource.javaClass.fields.forEach { f ->
-            val searchParamDefinition = f.getAnnotation(SearchParamDefinition::class.java)
-            if (searchParamDefinition != null) {
-                val path: String = searchParamDefinition.path
-                if (path.hasDotNotationOnly()) {
-                    when(searchParamDefinition.type) {
-                        SEARCH_PARAM_DEFINITION_TYPE_STRING -> {
-                            getStringValues(getValuesForPath(resource, path)).forEach { value ->
-                                resourceIndices.addStringIndex(StringIndex(
+        val indexBuilder = ResourceIndices.Builder(resource.resourceType, resource.id)
+        resource.javaClass.fields.asSequence().mapNotNull {
+            it.getAnnotation(SearchParamDefinition::class.java)
+        }.filter {
+            it.path.hasDotNotationOnly()
+        }.forEach { searchParamDefinition ->
+            when (searchParamDefinition.type) {
+                SEARCH_PARAM_DEFINITION_TYPE_STRING -> {
+                    resource.getValuesForPath(searchParamDefinition).stringValues().forEach { value ->
+                        indexBuilder.addStringIndex(StringIndex(
+                                name = searchParamDefinition.name,
+                                path = searchParamDefinition.path,
+                                value = value
+                        ))
+                    }
+                }
+                SEARCH_PARAM_DEFINITION_TYPE_REFERENCE -> {
+                    resource.getValuesForPath(searchParamDefinition).referenceValues().forEach { reference ->
+                        reference.reference?.let { referenceValue ->
+                            if (referenceValue.isNotEmpty()) {
+                                indexBuilder.addReferenceIndex(ReferenceIndex(
                                         name = searchParamDefinition.name,
                                         path = searchParamDefinition.path,
-                                        value = value
+                                        value = referenceValue
                                 ))
                             }
                         }
-                        SEARCH_PARAM_DEFINITION_TYPE_REFERENCE -> {
-                            getReferenceValues(getValuesForPath(resource, path)).forEach { reference ->
-                                reference.reference?.let { referenceValue ->
-                                    if (referenceValue.isNotEmpty()) {
-                                        resourceIndices.addReferenceIndex(ReferenceIndex(
-                                                name = searchParamDefinition.name,
-                                                path = searchParamDefinition.path,
-                                                value = referenceValue
-                                        ))
-                                    }
-                                }
-                            }
-                        }
-                        SEARCH_PARAM_DEFINITION_TYPE_CODE -> {
-                            getCodeValues(getValuesForPath(resource, path)).forEach { code ->
-                                val system = code.system
-                                val value = code.code
-                                if (system?.isNotEmpty() == true && value?.isNotEmpty() == true) {
-                                    resourceIndices.addCodeIndex(CodeIndex(
-                                            name = searchParamDefinition.name,
-                                            path = searchParamDefinition.path,
-                                            system = system,
-                                            value = value
-                                    ))
-                                }
-                            }
-                        }
-                        // TODO: Implement number, date, token, reference, composite, quantity, URI,
-                        //  and special search parameter types.
                     }
                 }
+                SEARCH_PARAM_DEFINITION_TYPE_CODE -> {
+                    resource.getValuesForPath(searchParamDefinition).codeValues().forEach { code ->
+                        val system = code.system
+                        val value = code.code
+                        if (system?.isNotEmpty() == true && value?.isNotEmpty() == true) {
+                            indexBuilder.addCodeIndex(CodeIndex(
+                                    name = searchParamDefinition.name,
+                                    path = searchParamDefinition.path,
+                                    system = system,
+                                    value = value
+                            ))
+                        }
+                    }
+                }
+                // TODO: Implement number, date, token, reference, composite, quantity, URI,
+                //  and special search parameter types.
             }
         }
-        return resourceIndices
+        return indexBuilder.build()
     }
 
     /**
@@ -90,8 +88,8 @@ class FhirIndexerImpl @Inject constructor() : FhirIndexer {
      * server defined search type (HumanName, Address, etc), the returned list will contain the string
      * value representative of the type.
      */
-    private fun getStringValues(objects: List<Any?>?): List<String> {
-        return objects?.mapNotNull {
+    private fun List<Any?>?.stringValues(): Sequence<String> {
+        return this?.asSequence()?.mapNotNull {
             when (it) {
                 is String -> {
                     it
@@ -106,23 +104,23 @@ class FhirIndexerImpl @Inject constructor() : FhirIndexer {
                     null
                 }
             }
-        } ?: emptyList()
+        } ?: emptySequence()
     }
 
     /** Returns the reference values for the list of `objects`.  */
-    private fun getReferenceValues(objects: List<Any?>?): List<Reference> {
-        return objects?.filterIsInstance(Reference::class.java) ?: emptyList()
+    private fun List<Any?>?.referenceValues(): Sequence<Reference> {
+        return this?.asSequence()?.filterIsInstance(Reference::class.java) ?: emptySequence()
     }
 
     /** Returns the code values for the list of `objects`.  */
-    private fun getCodeValues(objects: List<Any?>?): List<Coding> {
-        return objects?.flatMap {
+    private fun List<Any?>?.codeValues(): Sequence<Coding> {
+        return this?.asSequence()?.flatMap {
             if (it is CodeableConcept) {
-                it.coding
+                it.coding.asSequence()
             } else {
-                emptyList()
+                emptySequence()
             }
-        } ?: emptyList()
+        } ?: emptySequence()
     }
 
     companion object {
@@ -140,16 +138,14 @@ class FhirIndexerImpl @Inject constructor() : FhirIndexer {
         private const val TAG = "FhirIndexerImpl"
         private val DOT_NOTATION_REGEX = "^[a-zA-Z0-9.]+$".toRegex()
         /** Returns the list of values corresponding to the `path` in the `resource`.  */
-        private fun getValuesForPath(resource: Resource, path: String): List<Any>? {
-            val paths = path.split(SEPARATOR_REGEX).toTypedArray()
+        private fun Resource.getValuesForPath(definition: SearchParamDefinition): List<Any>? {
+            val paths = definition.path.split(SEPARATOR_REGEX)
             if (paths.size <= 1) {
                 return null
             }
-            var objects: List<Any> = listOf(resource)
-            for (i in 1 until paths.size) {
-                objects = getFieldValues(objects, paths[i])
+            return paths.asSequence().drop(1).fold(listOf<Any>(this)) { acc, next ->
+                getFieldValues(acc, next)
             }
-            return objects
         }
 
         /**
@@ -164,7 +160,7 @@ class FhirIndexerImpl @Inject constructor() : FhirIndexer {
             objects.mapNotNull {
                 val value = try {
                     it?.javaClass?.getMethod(getGetterName(fieldName))?.invoke(it)
-                } catch (error : Throwable) {
+                } catch (error: Throwable) {
                     Log.w(TAG, error)
                     null
                 }
@@ -174,7 +170,7 @@ class FhirIndexerImpl @Inject constructor() : FhirIndexer {
                             fieldValues.add(subValue)
                         }
                     }
-                } else if (value != null){
+                } else if (value != null) {
                     fieldValues.add(value)
                 }
             }

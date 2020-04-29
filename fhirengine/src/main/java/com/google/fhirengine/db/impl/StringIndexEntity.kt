@@ -14,16 +14,14 @@
 
 package com.google.fhirengine.db.impl
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.*
+import com.google.fhirengine.index.StringIndex
 import org.hl7.fhir.r4.model.ResourceType
 
 @Entity(
         indices = [
             Index(
-                    value = ["resourceType", "indexName", "indexValue"]
+                    value = ["resourceType", "index_name", "index_value"]
             ),
             Index(
                     // keep this index for faster foreign lookup
@@ -47,8 +45,7 @@ internal data class StringIndexEntity(
         @PrimaryKey(autoGenerate = true)
         val id: Long,
         val resourceType: ResourceType,
-        val indexName: String,
-        val indexPath: String,
-        val indexValue: String,
+        @Embedded(prefix = "index_")
+        val index : StringIndex,
         val resourceId: String
 )
