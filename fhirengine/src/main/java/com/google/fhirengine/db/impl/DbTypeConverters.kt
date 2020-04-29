@@ -24,6 +24,6 @@ object DbTypeConverters {
 
     @JvmStatic
     @TypeConverter
-    fun stringToResourceType(data : String) = resourceTypeLookup[data]
+    fun stringToResourceType(data: String) = resourceTypeLookup[data]
             ?: throw IllegalArgumentException("invalid resource type: $data")
 }
