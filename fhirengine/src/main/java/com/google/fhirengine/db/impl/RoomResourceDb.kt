@@ -1,4 +1,18 @@
-package com.google.fhirengine.db.roomimpl
+// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package com.google.fhirengine.db.impl
 
 import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
@@ -14,7 +28,7 @@ import org.hl7.fhir.r4.model.ResourceType
 import javax.inject.Inject
 
 @Database(
-        entities = [ResourceEntity::class, StringIndexEntity::class, ReferenceIndexEntitiy::class],
+        entities = [ResourceEntity::class, StringIndexEntity::class, ReferenceIndexEntity::class],
         version = 1,
         exportSchema = false
 )
@@ -22,7 +36,7 @@ import javax.inject.Inject
         DbTypeConverters::class
 )
 abstract class RoomResourceDb : RoomDatabase() {
-    abstract fun dao(): com.google.fhirengine.db.roomimpl.Dao
+    abstract fun dao(): com.google.fhirengine.db.impl.Dao
 }
 
 @Dao
@@ -47,6 +61,11 @@ abstract class Dao {
         )
         insertResource(entity)
         val index = fhirIndexer.index(resource)
+        // TODO Move StringIndices to persistable types
+        //  https://github.com/jingtang10/fhir-engine/issues/31
+        //  we can either use room-autovalue integration or go w/ embedded data classes.
+        //  we may also want to merge them:
+        //  https://github.com/jingtang10/fhir-engine/issues/33
         index.stringIndices.forEach {
             insertStringIndex(
                     StringIndexEntity(
@@ -61,7 +80,7 @@ abstract class Dao {
         }
         index.referenceIndices.forEach {
             insertReferenceIndex(
-                    ReferenceIndexEntitiy(
+                    ReferenceIndexEntity(
                             id = 0,
                             resourceType = entity.resourceType,
                             indexName = it.name(),
@@ -80,7 +99,7 @@ abstract class Dao {
     abstract fun insertStringIndex(stringIndexEntity: StringIndexEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertReferenceIndex(referenceIndexEntity: ReferenceIndexEntitiy)
+    abstract fun insertReferenceIndex(referenceIndexEntity: ReferenceIndexEntity)
 
     @Query("DELETE FROM ResourceEntity WHERE resourceId = :resourceId AND resourceType = :resourceType")
     abstract fun deleteResource(
@@ -96,14 +115,16 @@ abstract class Dao {
 }
 
 
-class RoomDbImpl @Inject constructor(
+class DatabaseImpl @Inject constructor(
         context: Context,
         private val iParser: IParser,
         fhirIndexer: FhirIndexer
 ) : com.google.fhirengine.db.Database {
     val db = Room
             .inMemoryDatabaseBuilder(context, RoomResourceDb::class.java)
-            .allowMainThreadQueries() // we shouldn't do this but robolectric ¯\_(ツ)_/¯
+            // TODO https://github.com/jingtang10/fhir-engine/issues/32
+            //  don't allow main thread queries
+            .allowMainThreadQueries()
             .build()
     val dao by lazy {
         db.dao().also {

@@ -11,17 +11,19 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+package com.google.fhirengine.db.impl
 
-package com.google.fhirengine.db.impl;
+import androidx.room.TypeConverter
+import org.hl7.fhir.r4.model.ResourceType
 
-import com.google.fhirengine.db.Database;
+object DbTypeConverters {
+    private val resourceTypeLookup = ResourceType.values().associateBy { it.name }
+    @JvmStatic
+    @TypeConverter
+    fun typeToString(resourceType: ResourceType) = resourceType.name
 
-import dagger.Binds;
-import dagger.Module;
-
-/** Dagger module for the FHIR resource database. */
-@Module
-public abstract class DatabaseModule {
-  @Binds
-  abstract Database bindDatabase(DatabaseImpl database);
+    @JvmStatic
+    @TypeConverter
+    fun stringToResourceType(data : String) = resourceTypeLookup[data]
+            ?: throw IllegalArgumentException("invalid resource type: $data")
 }
