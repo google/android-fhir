@@ -20,9 +20,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import org.hl7.fhir.r4.model.ResourceType
 
-/**
- * TODO not sure why StringIndexEntity and ReferenceIndexEntity are two separate tables
- */
 @Entity(
         indices = [
             Index(
@@ -44,7 +41,7 @@ import org.hl7.fhir.r4.model.ResourceType
             )
         ]
 )
-data class ReferenceIndexEntity(
+internal data class ReferenceIndexEntity(
         @PrimaryKey(autoGenerate = true)
         val id: Long,
         val resourceType: ResourceType,

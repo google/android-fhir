@@ -35,12 +35,12 @@ import javax.inject.Inject
 @TypeConverters(
         DbTypeConverters::class
 )
-abstract class RoomResourceDb : RoomDatabase() {
+internal abstract class RoomResourceDb : RoomDatabase() {
     abstract fun dao(): com.google.fhirengine.db.impl.Dao
 }
 
 @Dao
-abstract class Dao {
+internal abstract class Dao {
     // this is ugly but there is no way to inject these right now in Room as it is the one creating
     // the dao
     lateinit var fhirIndexer: FhirIndexer
@@ -115,7 +115,7 @@ abstract class Dao {
 }
 
 
-class DatabaseImpl @Inject constructor(
+internal class DatabaseImpl @Inject constructor(
         context: Context,
         private val iParser: IParser,
         fhirIndexer: FhirIndexer
@@ -136,7 +136,7 @@ class DatabaseImpl @Inject constructor(
     override fun <R : Resource> insert(resource: R) {
         try {
             dao.insert(resource)
-        } catch (constraintException : SQLiteConstraintException) {
+        } catch (constraintException: SQLiteConstraintException) {
             throw ResourceAlreadyExistsInDbException(
                     resource.resourceType.name,
                     resource.id,
