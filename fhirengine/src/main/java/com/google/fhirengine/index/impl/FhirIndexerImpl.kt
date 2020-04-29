@@ -36,7 +36,7 @@ internal class FhirIndexerImpl @Inject constructor() : FhirIndexer {
         }.forEach { searchParamDefinition ->
             when (searchParamDefinition.type) {
                 SEARCH_PARAM_DEFINITION_TYPE_STRING -> {
-                    resource.getValuesForPath(searchParamDefinition).stringValues().forEach { value ->
+                    resource.valuesForPath(searchParamDefinition).stringValues().forEach { value ->
                         indexBuilder.addStringIndex(StringIndex(
                                 name = searchParamDefinition.name,
                                 path = searchParamDefinition.path,
@@ -45,20 +45,18 @@ internal class FhirIndexerImpl @Inject constructor() : FhirIndexer {
                     }
                 }
                 SEARCH_PARAM_DEFINITION_TYPE_REFERENCE -> {
-                    resource.getValuesForPath(searchParamDefinition).referenceValues().forEach { reference ->
-                        reference.reference?.let { referenceValue ->
-                            if (referenceValue.isNotEmpty()) {
-                                indexBuilder.addReferenceIndex(ReferenceIndex(
-                                        name = searchParamDefinition.name,
-                                        path = searchParamDefinition.path,
-                                        value = referenceValue
-                                ))
-                            }
+                    resource.valuesForPath(searchParamDefinition).referenceValues().forEach { reference ->
+                        if (reference.reference?.isNotEmpty() == true) {
+                            indexBuilder.addReferenceIndex(ReferenceIndex(
+                                    name = searchParamDefinition.name,
+                                    path = searchParamDefinition.path,
+                                    value = reference.reference
+                            ))
                         }
                     }
                 }
                 SEARCH_PARAM_DEFINITION_TYPE_CODE -> {
-                    resource.getValuesForPath(searchParamDefinition).codeValues().forEach { code ->
+                    resource.valuesForPath(searchParamDefinition).codeValues().forEach { code ->
                         val system = code.system
                         val value = code.code
                         if (system?.isNotEmpty() == true && value?.isNotEmpty() == true) {
@@ -88,8 +86,8 @@ internal class FhirIndexerImpl @Inject constructor() : FhirIndexer {
      * server defined search type (HumanName, Address, etc), the returned list will contain the string
      * value representative of the type.
      */
-    private fun List<Any?>?.stringValues(): Sequence<String> {
-        return this?.asSequence()?.mapNotNull {
+    private fun Sequence<Any>.stringValues(): Sequence<String> {
+        return mapNotNull {
             when (it) {
                 is String -> {
                     it
@@ -104,24 +102,73 @@ internal class FhirIndexerImpl @Inject constructor() : FhirIndexer {
                     null
                 }
             }
-        } ?: emptySequence()
+        }
     }
 
     /** Returns the reference values for the list of `objects`.  */
-    private fun List<Any?>?.referenceValues(): Sequence<Reference> {
-        return this?.asSequence()?.filterIsInstance(Reference::class.java) ?: emptySequence()
+    private fun Sequence<Any>.referenceValues(): Sequence<Reference> {
+        return filterIsInstance(Reference::class.java)
     }
 
     /** Returns the code values for the list of `objects`.  */
-    private fun List<Any?>?.codeValues(): Sequence<Coding> {
-        return this?.asSequence()?.flatMap {
+    private fun Sequence<Any>.codeValues(): Sequence<Coding> {
+        return flatMap {
             if (it is CodeableConcept) {
                 it.coding.asSequence()
             } else {
                 emptySequence()
             }
-        } ?: emptySequence()
+        }
     }
+
+    /** Returns the list of values corresponding to the `path` in the `resource`.  */
+    private fun Resource.valuesForPath(definition: SearchParamDefinition): Sequence<Any> {
+        val paths = definition.path.split(SEPARATOR_REGEX)
+        if (paths.size <= 1) {
+            return emptySequence()
+        }
+        return paths.asSequence().drop(1).fold(sequenceOf<Any>(this)) { acc, next ->
+            getFieldValues(acc, next)
+        }
+    }
+
+    /**
+     * Returns the list of field values for `fieldName` in each of the `objects`.
+     *
+     *
+     * If the field is a [Collection], it will be expanded and each element of the [Collection]
+     * will be added to the returned value.
+     */
+    private fun getFieldValues(objects: Sequence<Any>, fieldName: String): Sequence<Any> {
+        return objects.asSequence().flatMap {
+            val value = try {
+                it.javaClass.getMethod(getGetterName(fieldName)).invoke(it)
+            } catch (error: Throwable) {
+                Log.w(TAG, error)
+                null
+            }
+            if (value is Collection<*>) {
+                value.asSequence()
+            } else {
+                sequenceOf(value)
+            }
+        }.filterNotNull()
+    }
+
+    /** Returns the name of the method to retrieve the field `fieldName`.  */
+    private fun getGetterName(fieldName: String): String {
+        // TODO replace w/ capitalize once the localized version of it is not experimental
+        return GETTER_PREFIX +
+                fieldName.substring(0, 1).toUpperCase(Locale.US) +
+                fieldName.substring(1)
+    }
+
+    /**
+     * Returns whether the given path only uses a dot notation with no additional expressions such as
+     * where() or exists().
+     */
+    @Suppress("NOTHING_TO_INLINE")
+    private inline fun String.hasDotNotationOnly() = matches(DOT_NOTATION_REGEX)
 
     companion object {
         /** The prefix of getter methods for retrieving field values.  */
@@ -137,59 +184,5 @@ internal class FhirIndexerImpl @Inject constructor() : FhirIndexer {
         /** Tag for logging.  */
         private const val TAG = "FhirIndexerImpl"
         private val DOT_NOTATION_REGEX = "^[a-zA-Z0-9.]+$".toRegex()
-        /** Returns the list of values corresponding to the `path` in the `resource`.  */
-        private fun Resource.getValuesForPath(definition: SearchParamDefinition): List<Any>? {
-            val paths = definition.path.split(SEPARATOR_REGEX)
-            if (paths.size <= 1) {
-                return null
-            }
-            return paths.asSequence().drop(1).fold(listOf<Any>(this)) { acc, next ->
-                getFieldValues(acc, next)
-            }
-        }
-
-        /**
-         * Returns the list of field values for `fieldName` in each of the `objects`.
-         *
-         *
-         * If the field is a [Collection], it will be expanded and each element of the [Collection]
-         * will be added to the returned value.
-         */
-        private fun getFieldValues(objects: List<Any?>, fieldName: String): List<Any> {
-            val fieldValues: MutableList<Any> = ArrayList()
-            objects.mapNotNull {
-                val value = try {
-                    it?.javaClass?.getMethod(getGetterName(fieldName))?.invoke(it)
-                } catch (error: Throwable) {
-                    Log.w(TAG, error)
-                    null
-                }
-                if (value is Collection<*>) {
-                    value.forEach { subValue ->
-                        if (subValue != null) {
-                            fieldValues.add(subValue)
-                        }
-                    }
-                } else if (value != null) {
-                    fieldValues.add(value)
-                }
-            }
-            return fieldValues
-        }
-
-        /** Returns the name of the method to retrieve the field `fieldName`.  */
-        private fun getGetterName(fieldName: String): String {
-            // TODO replace w/ capitalize once the localized version of it is not experimental
-            return GETTER_PREFIX +
-                    fieldName.substring(0, 1).toUpperCase(Locale.US) +
-                    fieldName.substring(1)
-        }
-
-        /**
-         * Returns whether the given path only uses a dot notation with no additional expressions such as
-         * where() or exists().
-         */
-        @Suppress("NOTHING_TO_INLINE")
-        private inline fun String.hasDotNotationOnly() = matches(DOT_NOTATION_REGEX)
     }
 }
