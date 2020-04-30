@@ -24,7 +24,38 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-   
+
+    - name: Make files executable
+      run: chmod +x ./gradlew && chmod +x ./fhirengine/checksum.sh
+
+    - name: Generate cache key
+      run: ./fhirengine/checksum.sh checksum.txt
+
+    - name: Copy CI gradle.properties
+      run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+
+    - uses: actions/cache@v1
+      with:
+        path: ~/.gradle/caches/modules-2
+        key: ${{ runner.os }}-gradlemodules-${{ hashFiles('checksum.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-gradlemodules-
+    - uses: actions/cache@v1
+      with:
+        path: ~/.gradle/caches/jars-3
+        key: ${{ runner.os }}-gradlejars-${{ hashFiles('checksum.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-gradlejars-
+    - uses: actions/cache@v1
+      with:
+        path: ~/.gradle/caches/build-cache-1
+        key: ${{ runner.os }}-gradlebuildcache-${{ hashFiles('checksum.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-gradlebuildcache-
+
+#    - name: Ktlint
+#      run: ./gradlew ktlint --stacktrace
+
     - name: Build with Gradle
       run: ./gradlew build
       
