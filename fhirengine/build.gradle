@@ -27,6 +27,12 @@ android {
     }
 }
 
+configurations {
+    all {
+        exclude group: 'xpp3', module: 'xpp3'
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.13'
