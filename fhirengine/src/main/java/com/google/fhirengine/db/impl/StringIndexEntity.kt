@@ -44,11 +44,11 @@ import org.hl7.fhir.r4.model.ResourceType
 // TODO merge index entities if it makes sense
 //  https://github.com/jingtang10/fhir-engine/issues/33
 internal data class StringIndexEntity(
-        @PrimaryKey(autoGenerate = true)
-        val id: Long,
-        val resourceType: ResourceType,
-        val indexName: String,
-        val indexPath: String,
-        val indexValue: String,
-        val resourceId: String
+    @PrimaryKey(autoGenerate = true)
+    val id: Long,
+    val resourceType: ResourceType,
+    val indexName: String,
+    val indexPath: String,
+    val indexValue: String,
+    val resourceId: String
 )

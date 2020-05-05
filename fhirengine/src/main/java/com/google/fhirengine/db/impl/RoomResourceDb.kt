@@ -14,9 +14,15 @@
 
 package com.google.fhirengine.db.impl
 
-import androidx.room.*
 import androidx.room.Dao
+import androidx.room.Database
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import ca.uhn.fhir.parser.IParser
+import ca.uhn.fhir.rest.annotation.Transaction
 import com.google.fhirengine.index.FhirIndexer
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -97,13 +103,13 @@ internal abstract class Dao {
 
     @Query("DELETE FROM ResourceEntity WHERE resourceId = :resourceId AND resourceType = :resourceType")
     abstract fun deleteResource(
-            resourceId: String,
-            resourceType: ResourceType
+        resourceId: String,
+        resourceType: ResourceType
     )
 
     @Query("SELECT serializedResource FROM ResourceEntity WHERE resourceId = :resourceId AND resourceType = :resourceType")
     abstract fun getResource(
-            resourceId: String,
-            resourceType: ResourceType
+        resourceId: String,
+        resourceType: ResourceType
     ): String?
 }

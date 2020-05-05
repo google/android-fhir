@@ -22,17 +22,17 @@ import com.google.fhirengine.db.ResourceAlreadyExistsInDbException
 import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.resource.ResourceUtils
-import org.hl7.fhir.r4.model.Resource
 import javax.inject.Inject
+import org.hl7.fhir.r4.model.Resource
 
 /**
  * The implementation for the persistence layer using Room.
  * See docs for [com.google.fhirengine.db.Database] for the API docs.
  */
 internal class DatabaseImpl @Inject constructor(
-        context: Context,
-        private val iParser: IParser,
-        fhirIndexer: FhirIndexer
+    context: Context,
+    private val iParser: IParser,
+    fhirIndexer: FhirIndexer
 ) : com.google.fhirengine.db.Database {
     val db = Room.inMemoryDatabaseBuilder(context, RoomResourceDb::class.java)
             // TODO https://github.com/jingtang10/fhir-engine/issues/32
