@@ -16,17 +16,14 @@ We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle
 Java/Kotlin coding style in the codebase. Run the following command to check the codebase:
 
 ```
-./gradlew sC
+./gradlew spotlessCheck
 ```
 
-where `sC` is short for `spotlessCheck`, and run the following command to apply fixes to the
-violations:
+and run the following command to apply fixes to the violations:
 
 ```
-./gradlew sA
+./gradlew spotlessApply
 ```
-
-where `sA` is short for `spotlessApply`.
 
 ### License Headers
 

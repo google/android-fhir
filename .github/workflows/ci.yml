@@ -53,8 +53,8 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradlebuildcache-
 
-    - name: SpotlessCheck
-      run: ./gradlew sC
+    - name: Spotless check
+      run: ./gradlew spotlessCheck
 
     - name: Build with Gradle
       run: ./gradlew build
