@@ -31,7 +31,7 @@ android {
 
 configurations {
     all {
-        exclude group: 'xpp3', module: 'xpp3'
+        exclude module: 'xpp3'
     }
 }
 

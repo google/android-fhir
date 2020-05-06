@@ -53,8 +53,8 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradlebuildcache-
 
-#    - name: Ktlint
-#      run: ./gradlew ktlint --stacktrace
+    - name: Spotless check
+      run: ./gradlew spotlessCheck
 
     - name: Build with Gradle
       run: ./gradlew build

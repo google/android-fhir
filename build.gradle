@@ -1,5 +1,4 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
     ext.kotlin_version = '1.3.72'
 
@@ -10,6 +9,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.0-beta05'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:3.26.1"
 
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -21,6 +21,22 @@ allprojects {
     repositories {
         google()
         jcenter()
+    }
+}
+
+subprojects {
+    apply plugin: 'com.diffplug.gradle.spotless'
+    spotless {
+        java {
+            target '**/*.java'
+            googleJavaFormat()
+            licenseHeaderFile "${project.rootProject.projectDir}/license-header.txt"
+        }
+        kotlin {
+            target '**/*.kt'
+            ktlint()
+            licenseHeaderFile "${project.rootProject.projectDir}/license-header.txt"
+        }
     }
 }
 

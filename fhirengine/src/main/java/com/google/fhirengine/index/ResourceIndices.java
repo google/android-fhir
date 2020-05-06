@@ -1,40 +1,33 @@
-// Copyright 2020 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.google.fhirengine.index;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
-
-import org.hl7.fhir.r4.model.ResourceType;
-import org.hl7.fhir.r4.model.StringType;
-
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-
-import ca.uhn.fhir.model.api.annotation.SearchParamDefinition;
+import org.hl7.fhir.r4.model.ResourceType;
 
 /**
  * Encapsulation of a FHIR resource (its resource type and ID) and all the indices that are
  * extracted from the resource.
- * <p>
- * For example, for a {@link org.hl7.fhir.r4.model.Patient}, this class should include the patient's
- * resource type, ID, and all the field values of the patient that should be indexed such as name,
- * email address.
+ *
+ * <p>For example, for a {@link org.hl7.fhir.r4.model.Patient}, this class should include the
+ * patient's resource type, ID, and all the field values of the patient that should be indexed such
+ * as name, email address.
  */
 public class ResourceIndices {
   /** The resource type. */
@@ -58,7 +51,7 @@ public class ResourceIndices {
   }
 
   /** Returns the {@link ResourceType} of the resource. */
-  public ResourceType getResourceType(){
+  public ResourceType getResourceType() {
     return resourceType;
   }
 
