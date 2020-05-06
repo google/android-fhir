@@ -30,10 +30,12 @@ subprojects {
         java {
             target '**/*.java'
             googleJavaFormat()
+            licenseHeaderFile "${project.rootProject.projectDir}/license-header.txt"
         }
         kotlin {
             target '**/*.kt'
             ktlint()
+            licenseHeaderFile "${project.rootProject.projectDir}/license-header.txt"
         }
     }
 }
