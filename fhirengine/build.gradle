@@ -36,23 +36,23 @@ configurations {
 }
 
 dependencies {
-    api 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:4.2.0'
-    api 'com.google.auto.value:auto-value-annotations:1.6'
+    api "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiFhirStructuresR4Version"
+    api "com.google.auto.value:auto-value-annotations:$autoValueVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.room:room-runtime:2.2.5'
-    implementation 'com.google.dagger:dagger:2.16'
-    implementation("com.google.guava:guava:28.2-android")
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    kapt 'com.google.dagger:dagger-compiler:2.16'
-    kapt "androidx.room:room-compiler:2.2.5"
-    kapt 'com.google.auto.value:auto-value:1.6'
-    testImplementation 'androidx.test:core:1.0.0'
-    testImplementation 'org.robolectric:robolectric:4.3.1'
-    testImplementation 'com.google.dagger:dagger:2.16'
-    testImplementation 'androidx.lifecycle:lifecycle-livedata-core:2.2.0'
-    testImplementation 'junit:junit:4.13'
-    testImplementation "com.google.truth:truth:1.0.1"
-    kaptTest 'com.google.dagger:dagger-compiler:2.16'
+    implementation "androidx.room:room-runtime:$roomVersion"
+    implementation "com.google.dagger:dagger:$daggerVersion"
+    implementation "com.google.guava:guava:$guavaVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
+    kapt "androidx.room:room-compiler:$roomVersion"
+    kapt "com.google.auto.value:auto-value:$autoValueVersion"
+    testImplementation "androidx.test:core:$testVersion"
+    testImplementation "org.robolectric:robolectric:$roboelectricVersion"
+    testImplementation "com.google.dagger:dagger:$daggerVersion"
+    testImplementation "androidx.lifecycle:lifecycle-livedata-core:2.2.0"
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation "com.google.truth:truth:$truthVersion"
+    kaptTest "com.google.dagger:dagger-compiler:$daggerVersion"
 }
 repositories {
     mavenCentral()
