@@ -16,7 +16,7 @@
 
 package com.google.fhirengine.index
 
-/** An string index for a specific resource.  */
+/** A reference index for a specific resource.  */
 internal data class ReferenceIndex(
     /** The name of the string index, e.g. "given".  */
     val name: String,

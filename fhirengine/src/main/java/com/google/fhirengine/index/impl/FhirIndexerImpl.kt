@@ -146,7 +146,6 @@ internal class FhirIndexerImpl @Inject constructor() : FhirIndexer {
     /**
      * Returns the list of field values for `fieldName` in each of the `objects`.
      *
-     *
      * If the field is a [Collection], it will be expanded and each element of the [Collection]
      * will be added to the returned value.
      */

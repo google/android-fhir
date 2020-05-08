@@ -16,7 +16,7 @@
 
 package com.google.fhirengine.index
 
-/** An code index for a specific resource.  */
+/** A code index for a specific resource.  */
 internal data class CodeIndex(
     /** The name of the code index, e.g. "code".  */
     private val name: String,
