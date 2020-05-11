@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.example;
+package com.google.fhirengine.db.impl
 
-import static org.junit.Assert.*;
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import org.hl7.fhir.r4.model.ResourceType
 
-import org.junit.Test;
-
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
- */
-public class ExampleUnitTest {
-  @Test
-  public void addition_isCorrect() {
-    assertEquals(4, 2 + 2);
-  }
-}
+@Entity(
+        indices = [
+            Index(
+                    value = ["resourceType", "resourceId"],
+                    unique = true
+            )
+        ]
+)
+internal data class ResourceEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long,
+    val resourceType: ResourceType,
+    val resourceId: String,
+    val serializedResource: String
+)
