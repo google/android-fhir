@@ -17,19 +17,15 @@
 package com.google.fhirengine.index.impl;
 
 import android.os.Build;
-
 import com.google.common.truth.Truth;
 import com.google.fhirengine.index.CodeIndex;
 import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
 import com.google.fhirengine.resource.ResourceModule;
-
 import dagger.Component;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.HumanName;
@@ -50,25 +46,25 @@ public class FhirIndexerImplTest {
   private static final String TEST_CODE_SYSTEM_1 = "http://openmrs.org/concepts";
   private static final String TEST_CODE_VALUE_1 = "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
-  private static final Patient TEST_PATIENT_0 = null;
+  private static final Patient TEST_PATIENT_NULL = null;
 
   private static final String TEST_PATIENT_1_ID = "test_patient_1";
   private static final Patient TEST_PATIENT_1;
   private static final String TEST_PATIENT_1_GIVEN_NAME = "Tom";
 
-  private static final Patient TEST_PATIENT_NULL_FIELDS;
-  private static final Patient TEST_PATIENT_EMPTY_FIELDS;
+  private static final Patient TEST_PATIENT_NULL_GIVEN_NAME;
+  private static final Patient TEST_PATIENT_EMPTY_GIVEN_NAME;
 
   static {
     TEST_PATIENT_1 = patientMaker(TEST_PATIENT_1_ID, TEST_PATIENT_1_GIVEN_NAME);
   }
 
   static {
-    TEST_PATIENT_NULL_FIELDS = patientMaker(null, null);
+    TEST_PATIENT_NULL_GIVEN_NAME = patientMaker(null, null);
   }
 
   static {
-    TEST_PATIENT_EMPTY_FIELDS = patientMaker("", "");
+    TEST_PATIENT_EMPTY_GIVEN_NAME = patientMaker("", "");
   }
 
   private static final String TEST_OBSERVATION_1_ID = "test_observation_1";
@@ -83,8 +79,7 @@ public class FhirIndexerImplTest {
             .addCoding(new Coding().setSystem(TEST_CODE_SYSTEM_1).setCode(TEST_CODE_VALUE_1)));
   }
 
-  @Inject
-  FhirIndexerImpl fhirIndexer;
+  @Inject FhirIndexerImpl fhirIndexer;
 
   @Singleton
   @Component(modules = {FhirIndexerModule.class, ResourceModule.class})
@@ -122,20 +117,19 @@ public class FhirIndexerImplTest {
   }
 
   @Test
-  public void index_null_Resource() throws Exception {
-    Assert.assertThrows(NullPointerException.class, () -> fhirIndexer.index(TEST_PATIENT_0));
+  public void index_nullResource_shouldThrowNullPointerException() throws Exception {
+    Assert.assertThrows(NullPointerException.class, () -> fhirIndexer.index(TEST_PATIENT_NULL));
   }
 
   @Test
-  public void index_patient_null_fields() throws Exception {
-    ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_NULL_FIELDS);
-    Truth.assertThat(resourceIndices.getStringIndices())
-        .contains(StringIndex.create("given", "Patient.name.given", null));
+  public void index_patientNullGivenName_shouldThrowNullPointerException() throws Exception {
+    Assert.assertThrows(
+        NullPointerException.class, () -> fhirIndexer.index(TEST_PATIENT_NULL_GIVEN_NAME));
   }
 
   @Test
-  public void index_patient_empty_fields() throws Exception {
-    ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_EMPTY_FIELDS);
+  public void index_patientEmptyGivenName_shouldIndexEmptyGivenName() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_EMPTY_GIVEN_NAME);
     Truth.assertThat(resourceIndices.getStringIndices())
         .contains(StringIndex.create("given", "Patient.name.given", ""));
   }
