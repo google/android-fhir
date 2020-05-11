@@ -49,22 +49,24 @@ internal class FhirIndexerImpl @Inject constructor() : FhirIndexer {
                 SEARCH_PARAM_DEFINITION_TYPE_STRING -> {
                     resource.valuesForPath(searchParamDefinition).stringValues().forEach { value ->
                         indexBuilder.addStringIndex(StringIndex(
-                                name = searchParamDefinition.name,
-                                path = searchParamDefinition.path,
-                                value = value
+                            name = searchParamDefinition.name,
+                            path = searchParamDefinition.path,
+                            value = value
                         ))
                     }
                 }
                 SEARCH_PARAM_DEFINITION_TYPE_REFERENCE -> {
-                    resource.valuesForPath(searchParamDefinition).referenceValues().forEach { reference ->
-                        if (reference.reference?.isNotEmpty() == true) {
-                            indexBuilder.addReferenceIndex(ReferenceIndex(
+                    resource.valuesForPath(searchParamDefinition)
+                        .referenceValues()
+                        .forEach { reference ->
+                            if (reference.reference?.isNotEmpty() == true) {
+                                indexBuilder.addReferenceIndex(ReferenceIndex(
                                     name = searchParamDefinition.name,
                                     path = searchParamDefinition.path,
                                     value = reference.reference
-                            ))
+                                ))
+                            }
                         }
-                    }
                 }
                 SEARCH_PARAM_DEFINITION_TYPE_CODE -> {
                     resource.valuesForPath(searchParamDefinition).codeValues().forEach { code ->
@@ -72,10 +74,10 @@ internal class FhirIndexerImpl @Inject constructor() : FhirIndexer {
                         val value = code.code
                         if (system?.isNotEmpty() == true && value?.isNotEmpty() == true) {
                             indexBuilder.addCodeIndex(CodeIndex(
-                                    name = searchParamDefinition.name,
-                                    path = searchParamDefinition.path,
-                                    system = system,
-                                    value = value
+                                name = searchParamDefinition.name,
+                                path = searchParamDefinition.path,
+                                system = system,
+                                value = value
                             ))
                         }
                     }
@@ -90,12 +92,11 @@ internal class FhirIndexerImpl @Inject constructor() : FhirIndexer {
     /**
      * Returns the representative string values for the list of `objects`.
      *
-     *
      * If an object in the list is a Java [String], the returned list will contain the value of
      * the Java [String]. If an object in the list is a FHIR [StringType], the returned
      * list will contain the value of the FHIR [StringType]. If an object in the list matches a
-     * server defined search type (HumanName, Address, etc), the returned list will contain the string
-     * value representative of the type.
+     * server defined search type (HumanName, Address, etc), the returned list will contain the
+     * string value representative of the type.
      */
     private fun Sequence<Any>.stringValues(): Sequence<String> {
         return mapNotNull {
@@ -108,8 +109,9 @@ internal class FhirIndexerImpl @Inject constructor() : FhirIndexer {
                 }
                 else -> {
                     // TODO: Implement the server defined search parameters. According to
-                    //  https://www.hl7.org/fhir/searchparameter-registry.html, name, device name, and
-                    //  address are defined by the server (the FHIR Engine library in this case).
+                    //  https://www.hl7.org/fhir/searchparameter-registry.html, name, device name,
+                    //  and address are defined by the server
+                    //  (the FHIR Engine library in this case).
                     null
                 }
             }
@@ -174,8 +176,8 @@ internal class FhirIndexerImpl @Inject constructor() : FhirIndexer {
     }
 
     /**
-     * Returns whether the given path only uses a dot notation with no additional expressions such as
-     * where() or exists().
+     * Returns whether the given path only uses a dot notation with no additional expressions such
+     * as where() or exists().
      */
     @Suppress("NOTHING_TO_INLINE")
     private inline fun String.hasDotNotationOnly() = matches(DOT_NOTATION_REGEX)
