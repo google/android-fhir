@@ -17,21 +17,26 @@
 package com.google.fhirengine.index.impl;
 
 import android.os.Build;
+
 import com.google.common.truth.Truth;
 import com.google.fhirengine.index.CodeIndex;
 import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
 import com.google.fhirengine.resource.ResourceModule;
+
 import dagger.Component;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,13 +50,25 @@ public class FhirIndexerImplTest {
   private static final String TEST_CODE_SYSTEM_1 = "http://openmrs.org/concepts";
   private static final String TEST_CODE_VALUE_1 = "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
+  private static final Patient TEST_PATIENT_0 = null;
+
   private static final String TEST_PATIENT_1_ID = "test_patient_1";
   private static final Patient TEST_PATIENT_1;
+  private static final String TEST_PATIENT_1_GIVEN_NAME = "Tom";
+
+  private static final Patient TEST_PATIENT_NULL_FIELDS;
+  private static final Patient TEST_PATIENT_EMPTY_FIELDS;
 
   static {
-    TEST_PATIENT_1 = new Patient();
-    TEST_PATIENT_1.setId(TEST_PATIENT_1_ID);
-    TEST_PATIENT_1.addName(new HumanName().addGiven("Tom"));
+    TEST_PATIENT_1 = patientMaker(TEST_PATIENT_1_ID, TEST_PATIENT_1_GIVEN_NAME);
+  }
+
+  static {
+    TEST_PATIENT_NULL_FIELDS = patientMaker(null, null);
+  }
+
+  static {
+    TEST_PATIENT_EMPTY_FIELDS = patientMaker("", "");
   }
 
   private static final String TEST_OBSERVATION_1_ID = "test_observation_1";
@@ -66,7 +83,8 @@ public class FhirIndexerImplTest {
             .addCoding(new Coding().setSystem(TEST_CODE_SYSTEM_1).setCode(TEST_CODE_VALUE_1)));
   }
 
-  @Inject FhirIndexerImpl fhirIndexer;
+  @Inject
+  FhirIndexerImpl fhirIndexer;
 
   @Singleton
   @Component(modules = {FhirIndexerModule.class, ResourceModule.class})
@@ -83,7 +101,7 @@ public class FhirIndexerImplTest {
   public void index_patient_shouldIndexGivenName() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_1);
     Truth.assertThat(resourceIndices.getStringIndices())
-        .contains(StringIndex.create("given", "Patient.name.given", "Tom"));
+        .contains(StringIndex.create("given", "Patient.name.given", TEST_PATIENT_1_GIVEN_NAME));
   }
 
   @Test
@@ -103,5 +121,31 @@ public class FhirIndexerImplTest {
             CodeIndex.create("code", "Observation.code", TEST_CODE_SYSTEM_1, TEST_CODE_VALUE_1));
   }
 
-  // TODO: improve the tests.
+  @Test
+  public void index_null_Resource() throws Exception {
+    Assert.assertThrows(NullPointerException.class, () -> fhirIndexer.index(TEST_PATIENT_0));
+  }
+
+  @Test
+  public void index_patient_null_fields() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_NULL_FIELDS);
+    Truth.assertThat(resourceIndices.getStringIndices())
+        .contains(StringIndex.create("given", "Patient.name.given", null));
+  }
+
+  @Test
+  public void index_patient_empty_fields() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_EMPTY_FIELDS);
+    Truth.assertThat(resourceIndices.getStringIndices())
+        .contains(StringIndex.create("given", "Patient.name.given", ""));
+  }
+
+  /** Convenience method to make a new @{@link Patient} and set it's id and given name. */
+  private static Patient patientMaker(String id, String given) {
+    Patient p = new Patient();
+    p.setId(id);
+    return p.addName(new HumanName().addGiven(given));
+  }
+
+  // TODO: improve the tests further.
 }
