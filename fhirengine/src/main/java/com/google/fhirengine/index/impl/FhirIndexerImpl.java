@@ -19,7 +19,7 @@ package com.google.fhirengine.index.impl;
 import android.text.TextUtils;
 import android.util.Log;
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition;
-import com.google.fhirengine.index.CodeIndex;
+
 import com.google.fhirengine.index.FhirIndexer;
 import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;

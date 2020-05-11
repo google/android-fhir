@@ -73,6 +73,15 @@ public interface Database {
    */
   <R extends Resource> List<R> searchByString(Class<R> clazz, String string, String value);
 
+  /**
+   * Returns a {@link List} of {@link Resource}s that are of type {@code clazz} and have {@code
+   * string} with {@code value}.
+   * <p>
+   * For example, a search for {@link org.hl7.fhir.r4.model.Patient}s with {@code string} 'given'
+   * and {@code value} 'Tom' will return all patients with a given name Tom.
+   */
+  <R extends Resource> List<R> searchByCode(Class<R> clazz, String code, String system, String value);
+
   <R extends Resource> List<R> searchByReferenceAndCode(Class<R> clazz, String reference,
       String refvalue, String string, String system,
       String value);

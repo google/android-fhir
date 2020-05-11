@@ -16,13 +16,8 @@
 
 package com.google.fhirengine.db.impl
 
+import androidx.room.*
 import androidx.room.Dao
-import androidx.room.Database
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.annotation.Transaction
 import com.google.fhirengine.index.FhirIndexer
@@ -30,7 +25,7 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 @Database(
-        entities = [ResourceEntity::class, StringIndexEntity::class, ReferenceIndexEntity::class],
+        entities = [ResourceEntity::class, StringIndexEntity::class, ReferenceIndexEntity::class, CodeIndexEntity::class],
         version = 1,
         exportSchema = false
 )
@@ -47,6 +42,7 @@ internal abstract class Dao {
     // the dao
     lateinit var fhirIndexer: FhirIndexer
     lateinit var iParser: IParser
+
     @Transaction
     open fun update(resource: Resource) {
         deleteResource(resource.id, resource.resourceType)
@@ -105,13 +101,22 @@ internal abstract class Dao {
 
     @Query("DELETE FROM ResourceEntity WHERE resourceId = :resourceId AND resourceType = :resourceType")
     abstract fun deleteResource(
-        resourceId: String,
-        resourceType: ResourceType
+            resourceId: String,
+            resourceType: ResourceType
     )
 
     @Query("SELECT serializedResource FROM ResourceEntity WHERE resourceId = :resourceId AND resourceType = :resourceType")
     abstract fun getResource(
-        resourceId: String,
-        resourceType: ResourceType
+            resourceId: String,
+            resourceType: ResourceType
     ): String?
+
+    @Query("SELECT ResourceEntity.serializedResource FROM ResourceEntity JOIN ReferenceIndexEntity ON ResourceEntity.resourceType = ReferenceIndexEntity.resourceType AND ResourceEntity.resourceId = ReferenceIndexEntity.resourceId WHERE ReferenceIndexEntity.resourceType = :resourceType AND ReferenceIndexEntity.indexPath = :indexPath AND ReferenceIndexEntity.indexValue = :indexValue")
+    abstract fun getResourceByReferenceIndex(resourceType: String, indexPath: String, indexValue: String): List<String>
+
+    @Query("SELECT ResourceEntity.serializedResource FROM ResourceEntity JOIN StringIndexEntity ON ResourceEntity.resourceType = StringIndexEntity.resourceType AND ResourceEntity.resourceId = StringIndexEntity.resourceId WHERE StringIndexEntity.resourceType = :resourceType AND StringIndexEntity.indexPath = :indexPath AND StringIndexEntity.indexValue = :indexValue")
+    abstract fun getResourceByStringIndex(resourceType: String, indexPath: String, indexValue: String): List<String>
+
+    @Query("SELECT ResourceEntity.serializedResource FROM ResourceEntity JOIN CodeIndexEntity ON ResourceEntity.resourceType = CodeIndexEntity.resourceType AND ResourceEntity.resourceId = CodeIndexEntity.resourceId WHERE CodeIndexEntity.resourceType = :resourceType AND CodeIndexEntity.index_path = :indexPath AND CodeIndexEntity.index_system = :indexSystem AND CodeIndexEntity.index_value = :indexValue")
+    abstract fun getResourceByCodeIndex(resourceType: String, indexPath: String, indexSystem: String, indexValue: String): List<String>
 }
