@@ -49,22 +49,29 @@ public class FhirIndexerImplTest {
   private static final Patient TEST_PATIENT_NULL = null;
 
   private static final String TEST_PATIENT_1_ID = "test_patient_1";
-  private static final Patient TEST_PATIENT_1;
   private static final String TEST_PATIENT_1_GIVEN_NAME = "Tom";
+  private static final Patient TEST_PATIENT_1;
 
-  private static final Patient TEST_PATIENT_NULL_GIVEN_NAME;
-  private static final Patient TEST_PATIENT_EMPTY_GIVEN_NAME;
-
-  static {
-    TEST_PATIENT_1 = patientMaker(TEST_PATIENT_1_ID, TEST_PATIENT_1_GIVEN_NAME);
-  }
+  private static final Patient TEST_PATIENT_NULL_FIELDS;
+  private static final Patient TEST_PATIENT_EMPTY_FIELDS;
 
   static {
-    TEST_PATIENT_NULL_GIVEN_NAME = patientMaker(null, null);
-  }
+    TEST_PATIENT_1 = new Patient();
+    TEST_PATIENT_1.setId(TEST_PATIENT_1_ID);
+    TEST_PATIENT_1.addName(new HumanName().addGiven(TEST_PATIENT_1_GIVEN_NAME));
 
-  static {
-    TEST_PATIENT_EMPTY_GIVEN_NAME = patientMaker("", "");
+    TEST_PATIENT_NULL_FIELDS = new Patient();
+    TEST_PATIENT_NULL_FIELDS.setId((String)null);
+    TEST_PATIENT_NULL_FIELDS.addName(new HumanName().addGiven(null));
+    TEST_PATIENT_NULL_FIELDS.setManagingOrganization(new Reference().setReference(null));
+    TEST_PATIENT_NULL_FIELDS.setLanguage(null);
+
+    TEST_PATIENT_EMPTY_FIELDS = new Patient();
+    TEST_PATIENT_EMPTY_FIELDS.setId("anonymous_patient");
+    TEST_PATIENT_EMPTY_FIELDS.addName(new HumanName().addGiven(""));
+    TEST_PATIENT_EMPTY_FIELDS.setManagingOrganization(new Reference().setReference(""));
+    TEST_PATIENT_EMPTY_FIELDS.setLanguage("");
+
   }
 
   private static final String TEST_OBSERVATION_1_ID = "test_observation_1";
@@ -122,21 +129,31 @@ public class FhirIndexerImplTest {
   @Test
   public void index_patientNullGivenName_shouldThrowNullPointerException() throws Exception {
     Assert.assertThrows(
-        NullPointerException.class, () -> fhirIndexer.index(TEST_PATIENT_NULL_GIVEN_NAME));
+        IllegalStateException.class, () -> fhirIndexer.index(TEST_PATIENT_NULL_FIELDS));
   }
 
   @Test
-  public void index_patientEmptyGivenName_shouldIndexEmptyGivenName() throws Exception {
-    ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_EMPTY_GIVEN_NAME);
-    Truth.assertThat(resourceIndices.getStringIndices())
-        .contains(new StringIndex("given", "Patient.name.given", ""));
+  public void index_patientNullOrganisation_shouldThrowNullPointerException() throws Exception {
+    Assert.assertThrows(
+        IllegalStateException.class, () -> fhirIndexer.index(TEST_PATIENT_NULL_FIELDS));
   }
 
-  /** Convenience method to make a new @{@link Patient} and set it's id and given name. */
-  private static Patient patientMaker(String id, String given) {
-    Patient p = new Patient();
-    p.setId(id);
-    return p.addName(new HumanName().addGiven(given));
+  @Test
+  public void index_patientNullLanguage_shouldThrowNullPointerException() throws Exception {
+    Assert.assertThrows(
+        IllegalStateException.class, () -> fhirIndexer.index(TEST_PATIENT_NULL_FIELDS));
+  }
+
+  @Test
+  public void index_patientEmptyOrganisation_shouldNotIndexOrganisation() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_EMPTY_FIELDS);
+    Truth.assertThat(resourceIndices.getReferenceIndices()).isEmpty();
+  }
+
+  @Test
+  public void index_patientEmptyLanguage_shouldNotIndexLanguage() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_EMPTY_FIELDS);
+    Truth.assertThat(resourceIndices.getCodeIndices()).isEmpty();
   }
 
   // TODO: improve the tests further.
