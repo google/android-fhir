@@ -37,7 +37,6 @@ configurations {
 
 dependencies {
     api "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiFhirStructuresR4Version"
-    api "com.google.auto.value:auto-value-annotations:$autoValueVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "androidx.room:room-runtime:$roomVersion"
     implementation "com.google.dagger:dagger:$daggerVersion"
@@ -45,7 +44,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
-    kapt "com.google.auto.value:auto-value:$autoValueVersion"
     testImplementation "androidx.test:core:$testVersion"
     testImplementation "org.robolectric:robolectric:$roboelectricVersion"
     testImplementation "com.google.dagger:dagger:$daggerVersion"

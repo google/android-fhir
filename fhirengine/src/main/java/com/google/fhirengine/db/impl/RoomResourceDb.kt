@@ -73,9 +73,7 @@ internal abstract class Dao {
                     StringIndexEntity(
                             id = 0,
                             resourceType = entity.resourceType,
-                            indexName = it.name(),
-                            indexPath = it.path(),
-                            indexValue = it.value(),
+                            index = it,
                             resourceId = entity.resourceId
                     )
             )
@@ -85,9 +83,7 @@ internal abstract class Dao {
                     ReferenceIndexEntity(
                             id = 0,
                             resourceType = entity.resourceType,
-                            indexName = it.name(),
-                            indexPath = it.path(),
-                            indexValue = it.value(),
+                            index = it,
                             resourceId = entity.resourceId
                     )
             )

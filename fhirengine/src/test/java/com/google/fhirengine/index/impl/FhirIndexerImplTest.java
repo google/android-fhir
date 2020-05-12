@@ -96,7 +96,7 @@ public class FhirIndexerImplTest {
   public void index_patient_shouldIndexGivenName() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_1);
     Truth.assertThat(resourceIndices.getStringIndices())
-        .contains(StringIndex.create("given", "Patient.name.given", TEST_PATIENT_1_GIVEN_NAME));
+        .contains(new StringIndex("given", "Patient.name.given", TEST_PATIENT_1_GIVEN_NAME));
   }
 
   @Test
@@ -104,16 +104,14 @@ public class FhirIndexerImplTest {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_OBSERVATION_1);
     Truth.assertThat(resourceIndices.getReferenceIndices())
         .contains(
-            ReferenceIndex.create(
-                "subject", "Observation.subject", "Patient/" + TEST_PATIENT_1_ID));
+            new ReferenceIndex("subject", "Observation.subject", "Patient/" + TEST_PATIENT_1_ID));
   }
 
   @Test
   public void index_observation_shouldIndexCode() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_OBSERVATION_1);
     Truth.assertThat(resourceIndices.getCodeIndices())
-        .contains(
-            CodeIndex.create("code", "Observation.code", TEST_CODE_SYSTEM_1, TEST_CODE_VALUE_1));
+        .contains(new CodeIndex("code", "Observation.code", TEST_CODE_SYSTEM_1, TEST_CODE_VALUE_1));
   }
 
   @Test
@@ -131,7 +129,7 @@ public class FhirIndexerImplTest {
   public void index_patientEmptyGivenName_shouldIndexEmptyGivenName() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_EMPTY_GIVEN_NAME);
     Truth.assertThat(resourceIndices.getStringIndices())
-        .contains(StringIndex.create("given", "Patient.name.given", ""));
+        .contains(new StringIndex("given", "Patient.name.given", ""));
   }
 
   /** Convenience method to make a new @{@link Patient} and set it's id and given name. */
