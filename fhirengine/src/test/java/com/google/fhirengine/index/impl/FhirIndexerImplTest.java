@@ -50,7 +50,6 @@ public class FhirIndexerImplTest {
   private static final String TEST_CODE_SYSTEM_1 = "http://openmrs.org/concepts";
   private static final String TEST_CODE_VALUE_1 = "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
-  private static final Patient TEST_PATIENT_NULL = null;
   private static final Patient TEST_PATIENT_NULL_ID;
 
   // TEST_PATIENT_1 loosely based on https://www.hl7.org/fhir/patient-example-b.json.html
@@ -202,74 +201,76 @@ public class FhirIndexerImplTest {
   }
 
   @Test
-  public void index_nullResource_shouldThrowIllegalArgumentException() throws Exception {
-    Assert.assertThrows(IllegalArgumentException.class, () -> fhirIndexer.index(TEST_PATIENT_NULL));
+  public void index_null_shouldThrowIllegalArgumentException() throws Exception {
+    Assert.assertThrows(IllegalArgumentException.class, () -> fhirIndexer.index(null));
   }
 
   @Test
-  public void index_patientNullGivenName_shouldNotIndexGivenName() throws Exception {
+  public void index_patient_nullGivenName_shouldNotIndexGivenName() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_NULL_FIELDS);
     Truth.assertThat(
         resourceIndices.getStringIndices().stream()
-            .allMatch(
-                stringIndex ->
-                    !stringIndex.getPath().equals("Patient.name.given")
-                        && !stringIndex.getName().equals("given")));
+            .noneMatch(stringIndex -> stringIndex.getPath().equals("Patient.name.given")));
+    Truth.assertThat(
+        resourceIndices.getStringIndices().stream()
+            .noneMatch(stringIndex -> stringIndex.getName().equals("given")));
   }
 
   @Test
-  public void index_patientNullOrganisation_shouldNotIndexOrganisation() throws Exception {
+  public void index_patient_nullOrganisation_shouldNotIndexOrganisation() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_NULL_FIELDS);
     Truth.assertThat(
         resourceIndices.getReferenceIndices().stream()
-            .allMatch(
-                referenceIndex ->
-                    !referenceIndex.getPath().equals("Patient.managingOrganization")
-                        && !referenceIndex.getName().equals("organization")));
+            .noneMatch(
+                referenceIndex -> referenceIndex.getPath().equals("Patient.managingOrganization")));
+    Truth.assertThat(
+        resourceIndices.getReferenceIndices().stream()
+            .noneMatch(referenceIndex -> referenceIndex.getName().equals("organization")));
   }
 
   @Test
-  public void index_patientEmptyGivenName_shouldNotIndexGivenName() throws Exception {
+  public void index_patient_emptyGivenName_shouldNotIndexGivenName() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_NULL_FIELDS);
     Truth.assertThat(
         resourceIndices.getStringIndices().stream()
-            .allMatch(
-                stringIndex ->
-                    !stringIndex.getPath().equals("Patient.name.given")
-                        && !stringIndex.getName().equals("given")));
+            .noneMatch(stringIndex -> stringIndex.getPath().equals("Patient.name.given")));
+    Truth.assertThat(
+        resourceIndices.getStringIndices().stream()
+            .noneMatch(stringIndex -> stringIndex.getName().equals("given")));
   }
 
   @Test
-  public void index_patientEmptyOrganisation_shouldNotIndexOrganisation() throws Exception {
+  public void index_patient_emptyOrganisation_shouldNotIndexOrganisation() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_EMPTY_FIELDS);
     Truth.assertThat(
         resourceIndices.getReferenceIndices().stream()
-            .allMatch(
-                referenceIndex ->
-                    !referenceIndex.getPath().equals("Patient.managingOrganization")
-                        && !referenceIndex.getName().equals("organization")));
+            .noneMatch(
+                referenceIndex -> referenceIndex.getPath().equals("Patient.managingOrganization")));
+    Truth.assertThat(
+        resourceIndices.getReferenceIndices().stream()
+            .noneMatch(referenceIndex -> referenceIndex.getName().equals("organization")));
   }
 
   @Test
-  public void index_observationNullCode_shouldNotIndexCode() throws Exception {
+  public void index_observation_nullCode_shouldNotIndexCode() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_OBSERVATION_NULL_CODE);
     Truth.assertThat(
         resourceIndices.getStringIndices().stream()
-            .allMatch(
-                stringIndex ->
-                    !stringIndex.getPath().equals("Observation.code")
-                        && !stringIndex.getName().equals("code")));
+            .noneMatch(stringIndex -> stringIndex.getPath().equals("Observation.code")));
+    Truth.assertThat(
+        resourceIndices.getStringIndices().stream()
+            .noneMatch(stringIndex -> stringIndex.getName().equals("code")));
   }
 
   @Test
-  public void index_observationEmptyCode_shouldNotIndexCode() throws Exception {
+  public void index_observation_emptyCode_shouldNotIndexCode() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_OBSERVATION_EMPTY_CODE);
     Truth.assertThat(
         resourceIndices.getStringIndices().stream()
-            .allMatch(
-                stringIndex ->
-                    !stringIndex.getPath().equals("Observation.code")
-                        && !stringIndex.getName().equals("code")));
+            .noneMatch(stringIndex -> stringIndex.getPath().equals("Observation.code")));
+    Truth.assertThat(
+        resourceIndices.getStringIndices().stream()
+            .noneMatch(stringIndex -> stringIndex.getName().equals("code")));
   }
 
   // TODO: improve the tests further.
