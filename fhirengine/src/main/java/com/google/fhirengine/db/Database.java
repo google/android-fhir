@@ -16,10 +16,8 @@
 
 package com.google.fhirengine.db;
 
-import org.hl7.fhir.r4.model.Resource;
-import org.hl7.fhir.r4.model.ResourceType;
-
 import java.util.List;
+import org.hl7.fhir.r4.model.Resource;
 
 /** The interface for the FHIR resource database. */
 public interface Database {
@@ -57,8 +55,8 @@ public interface Database {
   /**
    * Returns a {@link List} of {@link Resource}s that are of type {@code clazz} and have {@code
    * reference} with {@code value}.
-   * <p>
-   * For example, a search for {@link org.hl7.fhir.r4.model.Observation}s with {@code reference}
+   *
+   * <p>For example, a search for {@link org.hl7.fhir.r4.model.Observation}s with {@code reference}
    * 'subject' and {@code value} 'Patient/1' will return all observations associated with the
    * particular patient.
    */
@@ -67,8 +65,8 @@ public interface Database {
   /**
    * Returns a {@link List} of {@link Resource}s that are of type {@code clazz} and have {@code
    * string} with {@code value}.
-   * <p>
-   * For example, a search for {@link org.hl7.fhir.r4.model.Patient}s with {@code string} 'given'
+   *
+   * <p>For example, a search for {@link org.hl7.fhir.r4.model.Patient}s with {@code string} 'given'
    * and {@code value} 'Tom' will return all patients with a given name Tom.
    */
   <R extends Resource> List<R> searchByString(Class<R> clazz, String string, String value);
@@ -76,13 +74,18 @@ public interface Database {
   /**
    * Returns a {@link List} of {@link Resource}s that are of type {@code clazz} and have {@code
    * string} with {@code value}.
-   * <p>
-   * For example, a search for {@link org.hl7.fhir.r4.model.Patient}s with {@code string} 'given'
+   *
+   * <p>For example, a search for {@link org.hl7.fhir.r4.model.Patient}s with {@code string} 'given'
    * and {@code value} 'Tom' will return all patients with a given name Tom.
    */
-  <R extends Resource> List<R> searchByCode(Class<R> clazz, String code, String system, String value);
+  <R extends Resource> List<R> searchByCode(
+      Class<R> clazz, String code, String system, String value);
 
-  <R extends Resource> List<R> searchByReferenceAndCode(Class<R> clazz, String reference,
-      String refvalue, String string, String system,
+  <R extends Resource> List<R> searchByReferenceAndCode(
+      Class<R> clazz,
+      String reference,
+      String refvalue,
+      String string,
+      String system,
       String value);
 }

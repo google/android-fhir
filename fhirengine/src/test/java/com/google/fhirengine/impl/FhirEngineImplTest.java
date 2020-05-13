@@ -71,8 +71,14 @@ public class FhirEngineImplTest {
   @Inject TestingUtils testingUtils;
 
   @Singleton
-  @Component(modules = {FhirEngineModule.class, CqlModule.class, DatabaseModule.class,
-      FhirIndexerModule.class, ResourceModule.class})
+  @Component(
+      modules = {
+        FhirEngineModule.class,
+        CqlModule.class,
+        DatabaseModule.class,
+        FhirIndexerModule.class,
+        ResourceModule.class
+      })
   public interface TestComponent {
 
     Database getDatabase();

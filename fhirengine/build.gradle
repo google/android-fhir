@@ -46,7 +46,6 @@ configurations {
 
 dependencies {
     api "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiFhirStructuresR4Version"
-    api "com.google.auto.value:auto-value-annotations:$autoValueVersion"
     api "org.opencds.cqf:cql-engine:$cqlEngineVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "androidx.room:room-runtime:$roomVersion"

@@ -17,22 +17,25 @@
 package com.google.fhirengine;
 
 import android.content.Context;
-
 import com.google.fhirengine.cql.CqlModule;
 import com.google.fhirengine.db.impl.DatabaseModule;
 import com.google.fhirengine.impl.FhirEngineModule;
 import com.google.fhirengine.index.impl.FhirIndexerModule;
 import com.google.fhirengine.resource.ResourceModule;
-
-import javax.inject.Singleton;
-
 import dagger.BindsInstance;
 import dagger.Component;
+import javax.inject.Singleton;
 
 /** Dagger component for creating {@link FhirEngine}. */
 @Singleton
-@Component(modules = {FhirEngineModule.class, FhirIndexerModule.class, DatabaseModule.class,
-    CqlModule.class, ResourceModule.class})
+@Component(
+    modules = {
+      FhirEngineModule.class,
+      FhirIndexerModule.class,
+      DatabaseModule.class,
+      CqlModule.class,
+      ResourceModule.class
+    })
 public interface FhirEngineComponent {
 
   FhirEngine getFhirEngine();

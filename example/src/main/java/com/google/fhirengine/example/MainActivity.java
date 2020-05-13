@@ -22,18 +22,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
-
+import ca.uhn.fhir.context.FhirContext;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.fhirengine.DaggerFhirEngineComponent;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.ResourceAlreadyExistsException;
-
-import org.hl7.fhir.r4.model.Resource;
-import org.opencds.cqf.cql.execution.EvaluationResult;
-import org.opencds.cqf.cql.execution.LibraryResult;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,8 +35,9 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-
-import ca.uhn.fhir.context.FhirContext;
+import org.hl7.fhir.r4.model.Resource;
+import org.opencds.cqf.cql.execution.EvaluationResult;
+import org.opencds.cqf.cql.execution.LibraryResult;
 
 public class MainActivity extends AppCompatActivity {
   FhirEngine fhirEngine;
@@ -67,32 +62,37 @@ public class MainActivity extends AppCompatActivity {
     evaluationResultTextView = findViewById(R.id.evaluate_result);
 
     final Button button = findViewById(R.id.load_cql_lib_button);
-    button.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        new DownloadFhirResource().execute(cqlLibraryUrlInput.getText().toString());
-      }
-    });
+    button.setOnClickListener(
+        new View.OnClickListener() {
+          public void onClick(View v) {
+            new DownloadFhirResource().execute(cqlLibraryUrlInput.getText().toString());
+          }
+        });
 
     final Button downloadFhirResourceButton = findViewById(R.id.download_fhir_resource_button);
-    downloadFhirResourceButton.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        new DownloadFhirResource().execute(fhirResourceUrlInput.getText().toString());
-      }
-    });
+    downloadFhirResourceButton.setOnClickListener(
+        new View.OnClickListener() {
+          public void onClick(View v) {
+            new DownloadFhirResource().execute(fhirResourceUrlInput.getText().toString());
+          }
+        });
 
     final Button evaluateButton = findViewById(R.id.evaluate_button);
-    evaluateButton.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        new EvaluateAncLibrary().execute(
-            new String[]{libraryInput.getText().toString(), contextInput.getText().toString(),
-                expressionInput.getText().toString()});
-      }
-    });
-
+    evaluateButton.setOnClickListener(
+        new View.OnClickListener() {
+          public void onClick(View v) {
+            new EvaluateAncLibrary()
+                .execute(
+                    new String[] {
+                      libraryInput.getText().toString(),
+                      contextInput.getText().toString(),
+                      expressionInput.getText().toString()
+                    });
+          }
+        });
 
     // Gets FHIR Engine using Dagger component.
-    fhirEngine = DaggerFhirEngineComponent.builder()
-        .context(this).build().getFhirEngine();
+    fhirEngine = DaggerFhirEngineComponent.builder().context(this).build().getFhirEngine();
   }
 
   private class DownloadFhirResource extends AsyncTask<String, String, Void> {
@@ -113,9 +113,10 @@ public class MainActivity extends AppCompatActivity {
         FhirContext fhirContext = FhirContext.forR4();
         resource = (Resource) fhirContext.newJsonParser().parseResource(result);
         fhirEngine.save(resource);
-        Snackbar.make(cqlLibraryUrlInput,
-            "Loaded " + resource.getResourceType().name() + " with ID " + resource.getId(),
-            Snackbar.LENGTH_SHORT)
+        Snackbar.make(
+                cqlLibraryUrlInput,
+                "Loaded " + resource.getResourceType().name() + " with ID " + resource.getId(),
+                Snackbar.LENGTH_SHORT)
             .show();
       } catch (IOException e) {
         e.printStackTrace();
@@ -123,9 +124,14 @@ public class MainActivity extends AppCompatActivity {
       } catch (ResourceAlreadyExistsException e) {
         e.printStackTrace();
         if (resource != null) {
-          Snackbar.make(cqlLibraryUrlInput,
-              "The " + resource.getResourceType().name() + " with ID " + resource.getId() +
-                  " was already loaded...", Snackbar.LENGTH_SHORT)
+          Snackbar.make(
+                  cqlLibraryUrlInput,
+                  "The "
+                      + resource.getResourceType().name()
+                      + " with ID "
+                      + resource.getId()
+                      + " was already loaded...",
+                  Snackbar.LENGTH_SHORT)
               .show();
         }
       }
@@ -150,14 +156,12 @@ public class MainActivity extends AppCompatActivity {
             stringBuilder.append("null");
           } else if (List.class.isAssignableFrom(value.getClass())) {
             for (Object listItem : (List) value) {
-              stringBuilder
-                  .append(FhirContext.forR4().newJsonParser()
-                      .encodeResourceToString((Resource) listItem));
+              stringBuilder.append(
+                  FhirContext.forR4().newJsonParser().encodeResourceToString((Resource) listItem));
             }
           } else if (Resource.class.isAssignableFrom(value.getClass())) {
-            stringBuilder
-                .append(FhirContext.forR4().newJsonParser()
-                    .encodeResourceToString((Resource) value));
+            stringBuilder.append(
+                FhirContext.forR4().newJsonParser().encodeResourceToString((Resource) value));
           } else {
             stringBuilder.append(value.toString());
           }

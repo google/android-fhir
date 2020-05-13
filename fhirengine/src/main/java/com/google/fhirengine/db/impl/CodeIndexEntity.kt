@@ -16,7 +16,11 @@
 
 package com.google.fhirengine.db.impl
 
-import androidx.room.*
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import com.google.fhirengine.index.CodeIndex
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -42,10 +46,10 @@ import org.hl7.fhir.r4.model.ResourceType
         ]
 )
 internal data class CodeIndexEntity(
-        @PrimaryKey(autoGenerate = true)
-        val id: Long,
-        val resourceType: ResourceType,
-        @Embedded(prefix = "index_")
-        val index: CodeIndex,
-        val resourceId: String
+  @PrimaryKey(autoGenerate = true)
+  val id: Long,
+  val resourceType: ResourceType,
+  @Embedded(prefix = "index_")
+  val index: CodeIndex,
+  val resourceId: String
 )

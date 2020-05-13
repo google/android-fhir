@@ -18,12 +18,12 @@ package com.google.fhirengine.index
 
 /** A code index for a specific resource.  */
 internal data class CodeIndex(
-    /** The name of the code index, e.g. "code".  */
-    private val name: String,
-    /** The path of the code index, e.g. "Observation.code".  */
-    private val path: String,
-    /** The system of the code index, e.g. "http://openmrs.org/concepts".  */
-    private val system: String,
-    /** The value of the code index, e.g. "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA".  */
-    private val value: String
+  /** The name of the code index, e.g. "code".  */
+  val name: String,
+  /** The path of the code index, e.g. "Observation.code".  */
+   val path: String,
+  /** The system of the code index, e.g. "http://openmrs.org/concepts".  */
+   val system: String,
+  /** The value of the code index, e.g. "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA".  */
+   val value: String
 )
