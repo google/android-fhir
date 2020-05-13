@@ -113,7 +113,7 @@ internal abstract class Dao {
     abstract fun insertReferenceIndex(referenceIndexEntity: ReferenceIndexEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertReferenceIndex(referenceIndexEntity: ReferenceIndexEntity)
+    abstract fun insertCodeIndex(referenceIndexEntity: ReferenceCodeEntity)
 
     @Query("DELETE FROM ResourceEntity WHERE resourceId = :resourceId AND resourceType = :resourceType")
     abstract fun deleteResource(
