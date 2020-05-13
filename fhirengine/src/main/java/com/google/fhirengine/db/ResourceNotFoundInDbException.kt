@@ -14,24 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.db;
+package com.google.fhirengine.db
 
-/** Thrown to indicate that the resource already exists in the database. */
-public class ResourceAlreadyExistsInDbException extends Exception {
-  private String type;
-  private String id;
-
-  public ResourceAlreadyExistsInDbException(String type, String id, Throwable cause) {
-    super("Resource with type " + type + " and id " + id + " already exists!", cause);
-    this.type = type;
-    this.id = id;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public String getId() {
-    return id;
-  }
-}
+/** Exception thrown to indicate that the requested resource is not found in the database. */
+class ResourceNotFoundInDbException(
+    val type: String,
+    val id: String
+) : Exception("Resource not found with type " + type + " and id " + id + "!")
