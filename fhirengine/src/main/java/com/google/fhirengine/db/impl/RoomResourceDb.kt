@@ -30,7 +30,12 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 @Database(
-        entities = [ResourceEntity::class, StringIndexEntity::class, ReferenceIndexEntity::class],
+        entities = [
+            ResourceEntity::class,
+            StringIndexEntity::class,
+            ReferenceIndexEntity::class,
+            CodeIndexEntity::class
+        ],
         version = 1,
         exportSchema = false
 )
@@ -47,6 +52,7 @@ internal abstract class Dao {
     // the dao
     lateinit var fhirIndexer: FhirIndexer
     lateinit var iParser: IParser
+
     @Transaction
     open fun update(resource: Resource) {
         deleteResource(resource.id, resource.resourceType)
