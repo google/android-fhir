@@ -15,20 +15,201 @@
  limitations under the License.
 -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hello World!"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+                android:id="@+id/cql_title"
+                android:layout_width="157dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="16dp"
+                android:text="CQL Library"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+                android:id="@+id/cql_text_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="URL"
+                android:inputType="text"
+                app:layout_constraintEnd_toStartOf="@+id/load_cql_lib_button"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/cql_title"
+                app:layout_constraintTop_toBottomOf="@+id/cql_title" />
+
+        <Button
+                android:id="@+id/load_cql_lib_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:text="Download"
+                app:layout_constraintBottom_toTopOf="@+id/evaluate_button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/cql_text_input"
+                app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+                android:id="@+id/fhir_resource_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:text="FHIR Resource"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="@+id/cql_text_input"
+                app:layout_constraintTop_toBottomOf="@+id/cql_text_input" />
+
+        <EditText
+                android:id="@+id/fhir_resource_url_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="URL"
+                android:inputType="text"
+                app:layout_constraintEnd_toStartOf="@+id/download_fhir_resource_button"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/fhir_resource_title"
+                app:layout_constraintTop_toBottomOf="@+id/fhir_resource_title" />
+
+        <Button
+                android:id="@+id/download_fhir_resource_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Download"
+                app:layout_constraintBottom_toBottomOf="@+id/fhir_resource_url_input"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.948"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/fhir_resource_url_input"
+                app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+                android:id="@+id/evaluation_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="268dp"
+                android:layout_marginRight="268dp"
+                android:text="Expression"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+                android:textSize="24sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/fhir_resource_url_input"
+                app:layout_constraintTop_toBottomOf="@+id/fhir_resource_url_input" />
+
+        <Button
+                android:id="@+id/evaluate_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Evaluate"
+                app:layout_constraintBottom_toBottomOf="@+id/evaluation_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.921"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/evaluation_title"
+                app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+                android:id="@+id/library"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Library"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="@+id/evaluation_title"
+                app:layout_constraintTop_toBottomOf="@+id/evaluation_title" />
+
+        <EditText
+                android:id="@+id/library_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:text="ANCRecommendationA2"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="@+id/library"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/library"
+                app:layout_constraintTop_toTopOf="@+id/library" />
+
+        <TextView
+                android:id="@+id/context"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Context"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="@+id/library"
+                app:layout_constraintTop_toBottomOf="@+id/library" />
+
+        <EditText
+                android:id="@+id/context_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:text="Patient/mom"
+                app:layout_constraintBottom_toBottomOf="@+id/context"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/context"
+                app:layout_constraintTop_toTopOf="@+id/context" />
+
+        <TextView
+                android:id="@+id/expression"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Expression"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="@+id/context"
+                app:layout_constraintTop_toBottomOf="@+id/context" />
+
+        <EditText
+                android:id="@+id/expression_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:text="Has Anaemia"
+                app:layout_constraintBottom_toBottomOf="@+id/expression"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/expression"
+                app:layout_constraintTop_toTopOf="@+id/expression" />
+
+        <TextView
+                android:id="@+id/evaluate_result"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="8dp"
+                android:scrollbars="vertical"
+                android:text="Evaluation Result"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/evaluate_button"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="@+id/fhir_resource_url_input"
+                app:layout_constraintTop_toBottomOf="@+id/expression"
+                app:layout_constraintVertical_bias="1.0" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

@@ -115,15 +115,67 @@ internal abstract class Dao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertCodeIndex(codeIndexEntity: CodeIndexEntity)
 
-    @Query("DELETE FROM ResourceEntity WHERE resourceId = :resourceId AND resourceType = :resourceType")
+    @Query("""
+        DELETE FROM ResourceEntity
+        WHERE resourceId = :resourceId AND resourceType = :resourceType""")
     abstract fun deleteResource(
-        resourceId: String,
-        resourceType: ResourceType
+      resourceId: String,
+      resourceType: ResourceType
     )
 
-    @Query("SELECT serializedResource FROM ResourceEntity WHERE resourceId = :resourceId AND resourceType = :resourceType")
+    @Query("""
+        SELECT serializedResource
+        FROM ResourceEntity
+        WHERE resourceId = :resourceId AND resourceType = :resourceType""")
     abstract fun getResource(
-        resourceId: String,
-        resourceType: ResourceType
+      resourceId: String,
+      resourceType: ResourceType
     ): String?
+
+    @Query("""
+        SELECT ResourceEntity.serializedResource
+        FROM ResourceEntity 
+        JOIN ReferenceIndexEntity
+        ON ResourceEntity.resourceType = ReferenceIndexEntity.resourceType
+            AND ResourceEntity.resourceId = ReferenceIndexEntity.resourceId
+        WHERE ReferenceIndexEntity.resourceType = :resourceType
+            AND ReferenceIndexEntity.index_path = :indexPath
+            AND ReferenceIndexEntity.index_value = :indexValue""")
+    abstract fun getResourceByReferenceIndex(
+      resourceType: String,
+      indexPath: String,
+      indexValue: String
+    ): List<String>
+
+    @Query("""
+        SELECT ResourceEntity.serializedResource
+        FROM ResourceEntity
+        JOIN StringIndexEntity
+        ON ResourceEntity.resourceType = StringIndexEntity.resourceType
+            AND ResourceEntity.resourceId = StringIndexEntity.resourceId
+        WHERE StringIndexEntity.resourceType = :resourceType
+            AND StringIndexEntity.index_path = :indexPath
+            AND StringIndexEntity.index_value = :indexValue""")
+    abstract fun getResourceByStringIndex(
+      resourceType: String,
+      indexPath: String,
+      indexValue: String
+    ): List<String>
+
+    @Query("""
+        SELECT ResourceEntity.serializedResource
+        FROM ResourceEntity
+        JOIN CodeIndexEntity
+        ON ResourceEntity.resourceType = CodeIndexEntity.resourceType
+            AND ResourceEntity.resourceId = CodeIndexEntity.resourceId
+        WHERE CodeIndexEntity.resourceType = :resourceType
+            AND CodeIndexEntity.index_path = :indexPath
+            AND CodeIndexEntity.index_system = :indexSystem
+            AND CodeIndexEntity.index_value = :indexValue""")
+    abstract fun getResourceByCodeIndex(
+      resourceType: String,
+      indexPath: String,
+      indexSystem: String,
+      indexValue: String
+    ): List<String>
 }

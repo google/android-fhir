@@ -31,17 +31,28 @@ android {
 
 configurations {
     all {
+        exclude module: 'json'
         exclude module: 'xpp3'
+        exclude module: 'hamcrest-all'
+        exclude module: 'jaxb-impl'
+        exclude module: 'jaxb-core'
+        exclude module: 'jakarta.activation-api'
+        exclude module: 'javax.activation'
+        exclude module: 'jakarta.xml.bind-api'
+        // TODO: the following line can be removed from the next CQL engine release.
+        exclude  module: 'hapi-fhir-jpaserver-base'
     }
 }
 
 dependencies {
     api "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiFhirStructuresR4Version"
+    api "org.opencds.cqf:cql-engine:$cqlEngineVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "androidx.room:room-runtime:$roomVersion"
     implementation "com.google.dagger:dagger:$daggerVersion"
     implementation "com.google.guava:guava:$guavaVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    implementation "org.opencds.cqf:cql-engine-fhir:$cqlEngineVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
     testImplementation "androidx.test:core:$testVersion"
@@ -52,6 +63,7 @@ dependencies {
     testImplementation "com.google.truth:truth:$truthVersion"
     kaptTest "com.google.dagger:dagger-compiler:$daggerVersion"
 }
+
 repositories {
     mavenCentral()
 }

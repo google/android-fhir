@@ -28,21 +28,21 @@ import org.hl7.fhir.r4.model.ResourceType
  * email address.
  */
 internal data class ResourceIndices(
-    /** The resource type.  */
-    val resourceType: ResourceType,
-    /** The ID of the resource.  */
-    val id: String,
-    /** The string indices.  */
-    val stringIndices: List<StringIndex>,
-    /** The reference indices.  */
-    val referenceIndices: List<ReferenceIndex>,
-    /** The code indices.  */
-    val codeIndices: List<CodeIndex>
+  /** The resource type.  */
+  val resourceType: ResourceType,
+  /** The ID of the resource.  */
+  val id: String,
+  /** The string indices.  */
+  val stringIndices: List<StringIndex>,
+  /** The reference indices.  */
+  val referenceIndices: List<ReferenceIndex>,
+  /** The code indices.  */
+  val codeIndices: List<CodeIndex>
 ) {
 
     class Builder(
-        val resourceType: ResourceType,
-        val id: String
+      val resourceType: ResourceType,
+      val id: String
     ) {
         private val stringIndices = mutableListOf<StringIndex>()
         private val referenceIndices = mutableListOf<ReferenceIndex>()

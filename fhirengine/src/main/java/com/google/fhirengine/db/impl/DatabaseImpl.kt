@@ -32,9 +32,9 @@ import org.hl7.fhir.r4.model.Resource
  * See docs for [com.google.fhirengine.db.Database] for the API docs.
  */
 internal class DatabaseImpl @Inject constructor(
-    context: Context,
-    private val iParser: IParser,
-    fhirIndexer: FhirIndexer
+  context: Context,
+  private val iParser: IParser,
+  fhirIndexer: FhirIndexer
 ) : com.google.fhirengine.db.Database {
     val db = Room.databaseBuilder(context, RoomResourceDb::class.java, DATABASE_NAME)
             // TODO https://github.com/jingtang10/fhir-engine/issues/32
@@ -80,6 +80,47 @@ internal class DatabaseImpl @Inject constructor(
                 resourceId = id,
                 resourceType = type
         )
+    }
+
+    override fun <R : Resource?> searchByReference(
+      clazz: Class<R>,
+      reference: String,
+      value: String
+    ): List<R>? {
+        return dao.getResourceByReferenceIndex(
+                ResourceUtils.getResourceType(clazz).name, reference, value)
+                .map { iParser.parseResource(it) as R }
+    }
+
+    override fun <R : Resource?> searchByString(
+      clazz: Class<R>?,
+      string: String,
+      value: String
+    ): List<R> {
+        return dao.getResourceByStringIndex(ResourceUtils.getResourceType(clazz).name, string,
+                value).map { iParser.parseResource(it) as R }
+    }
+
+    override fun <R : Resource?> searchByCode(
+      clazz: Class<R>?,
+      code: String,
+      system: String,
+      value: String
+    ): List<R> {
+        return dao.getResourceByCodeIndex(ResourceUtils.getResourceType(clazz).name, code, system,
+                value).map { iParser.parseResource(it) as R }
+    }
+
+    override fun <R : Resource?> searchByReferenceAndCode(
+      clazz: Class<R>,
+      reference: String,
+      refvalue: String,
+      string: String,
+      system: String,
+      value: String
+    ): List<R>? {
+        val refs = searchByReference(clazz, reference, refvalue)?.map { it?.id }
+        return searchByCode(clazz, string, system, value).filter { refs!!.contains(it?.id) }
     }
 
     companion object {

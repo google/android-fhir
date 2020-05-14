@@ -46,10 +46,10 @@ import org.hl7.fhir.r4.model.ResourceType
         ]
 )
 internal data class ReferenceIndexEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long,
-    val resourceType: ResourceType,
-    @Embedded(prefix = "index_")
-    val index: ReferenceIndex,
-    val resourceId: String
+  @PrimaryKey(autoGenerate = true)
+  val id: Long,
+  val resourceType: ResourceType,
+  @Embedded(prefix = "index_")
+  val index: ReferenceIndex,
+  val resourceId: String
 )
