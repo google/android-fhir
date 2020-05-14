@@ -83,6 +83,6 @@ internal class DatabaseImpl @Inject constructor(
     }
 
     companion object {
-        val DATABASE_NAME = "ResourceDatabase"
+        private const val DATABASE_NAME = "ResourceDatabase"
     }
 }
