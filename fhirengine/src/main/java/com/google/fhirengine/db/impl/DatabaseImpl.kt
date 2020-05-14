@@ -36,7 +36,7 @@ internal class DatabaseImpl @Inject constructor(
   private val iParser: IParser,
   fhirIndexer: FhirIndexer
 ) : com.google.fhirengine.db.Database {
-    val db = Room.inMemoryDatabaseBuilder(context, RoomResourceDb::class.java)
+    val db = Room.databaseBuilder(context, RoomResourceDb::class.java, DATABASE_NAME)
             // TODO https://github.com/jingtang10/fhir-engine/issues/32
             //  don't allow main thread queries
             .allowMainThreadQueries()
@@ -121,5 +121,9 @@ internal class DatabaseImpl @Inject constructor(
     ): List<R>? {
         val refs = searchByReference(clazz, reference, refvalue)?.map { it?.id }
         return searchByCode(clazz, string, system, value).filter { refs!!.contains(it?.id) }
+    }
+
+    companion object {
+        private const val DATABASE_NAME = "ResourceDatabase"
     }
 }

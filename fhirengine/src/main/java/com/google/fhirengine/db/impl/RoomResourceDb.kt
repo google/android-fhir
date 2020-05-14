@@ -34,7 +34,8 @@ import org.hl7.fhir.r4.model.ResourceType
             ResourceEntity::class,
             StringIndexEntity::class,
             ReferenceIndexEntity::class,
-            CodeIndexEntity::class],
+            CodeIndexEntity::class
+        ],
         version = 1,
         exportSchema = false
 )
@@ -93,6 +94,13 @@ internal abstract class Dao {
                     )
             )
         }
+        index.codeIndices.forEach {
+            insertCodeIndex(CodeIndexEntity(
+                    id = 0,
+                    resourceType = entity.resourceType,
+                    index = it,
+                    resourceId = entity.resourceId))
+        }
     }
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
@@ -103,6 +111,9 @@ internal abstract class Dao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertReferenceIndex(referenceIndexEntity: ReferenceIndexEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insertCodeIndex(codeIndexEntity: CodeIndexEntity)
 
     @Query("""
         DELETE FROM ResourceEntity
