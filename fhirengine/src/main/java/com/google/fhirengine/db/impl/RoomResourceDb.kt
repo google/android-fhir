@@ -30,7 +30,12 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 @Database(
-        entities = [ResourceEntity::class, StringIndexEntity::class, ReferenceIndexEntity::class],
+        entities = [
+            ResourceEntity::class,
+            StringIndexEntity::class,
+            ReferenceIndexEntity::class,
+            CodeIndexEntity::class
+        ],
         version = 1,
         exportSchema = false
 )
@@ -47,6 +52,7 @@ internal abstract class Dao {
     // the dao
     lateinit var fhirIndexer: FhirIndexer
     lateinit var iParser: IParser
+
     @Transaction
     open fun update(resource: Resource) {
         deleteResource(resource.id, resource.resourceType)
@@ -88,6 +94,13 @@ internal abstract class Dao {
                     )
             )
         }
+        index.codeIndices.forEach {
+            insertCodeIndex(CodeIndexEntity(
+                    id = 0,
+                    resourceType = entity.resourceType,
+                    index = it,
+                    resourceId = entity.resourceId))
+        }
     }
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
@@ -98,6 +111,9 @@ internal abstract class Dao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertReferenceIndex(referenceIndexEntity: ReferenceIndexEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insertCodeIndex(codeIndexEntity: CodeIndexEntity)
 
     @Query("DELETE FROM ResourceEntity WHERE resourceId = :resourceId AND resourceType = :resourceType")
     abstract fun deleteResource(
