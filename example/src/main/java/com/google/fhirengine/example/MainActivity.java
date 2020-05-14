@@ -24,10 +24,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.parser.IParser;
+
 import com.google.android.material.snackbar.Snackbar;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.google.fhirengine.DaggerFhirEngineComponent;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.ResourceAlreadyExistsException;
+import com.google.fhirengine.example.api.HapiFhirService;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,38 +67,35 @@ public class MainActivity extends AppCompatActivity {
     expressionInput = findViewById(R.id.expression_input);
     evaluationResultTextView = findViewById(R.id.evaluate_result);
 
+    // Gets FHIR Engine using Dagger component.
+    fhirEngine = DaggerFhirEngineComponent.builder().context(this).build().getFhirEngine();
+
+    IParser parser = FhirContext.forR4().newJsonParser();
+    HapiFhirService service = HapiFhirService.Companion.create(parser);
+    MainActivityViewModel viewModel = new ViewModelProvider(this,
+        new MainActivityViewModelFactory(fhirEngine, service))
+        .get(MainActivityViewModel.class);
+    viewModel.requestPatients();
+
+
     final Button button = findViewById(R.id.load_cql_lib_button);
     button.setOnClickListener(
-        new View.OnClickListener() {
-          public void onClick(View v) {
-            new DownloadFhirResource().execute(cqlLibraryUrlInput.getText().toString());
-          }
-        });
+        v -> new DownloadFhirResource().execute(cqlLibraryUrlInput.getText().toString()));
 
     final Button downloadFhirResourceButton = findViewById(R.id.download_fhir_resource_button);
     downloadFhirResourceButton.setOnClickListener(
-        new View.OnClickListener() {
-          public void onClick(View v) {
-            new DownloadFhirResource().execute(fhirResourceUrlInput.getText().toString());
-          }
-        });
+        v -> new DownloadFhirResource().execute(fhirResourceUrlInput.getText().toString()));
 
     final Button evaluateButton = findViewById(R.id.evaluate_button);
     evaluateButton.setOnClickListener(
-        new View.OnClickListener() {
-          public void onClick(View v) {
-            new EvaluateAncLibrary()
-                .execute(
-                    new String[] {
-                      libraryInput.getText().toString(),
-                      contextInput.getText().toString(),
-                      expressionInput.getText().toString()
-                    });
-          }
-        });
+        v -> new EvaluateAncLibrary()
+            .execute(
+                new String[] {
+                  libraryInput.getText().toString(),
+                  contextInput.getText().toString(),
+                  expressionInput.getText().toString()
+                }));
 
-    // Gets FHIR Engine using Dagger component.
-    fhirEngine = DaggerFhirEngineComponent.builder().context(this).build().getFhirEngine();
   }
 
   private class DownloadFhirResource extends AsyncTask<String, String, Void> {

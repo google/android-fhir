@@ -19,6 +19,8 @@ package com.google.fhirengine.db;
 import java.util.List;
 import org.hl7.fhir.r4.model.Resource;
 
+import java.util.List;
+
 /** The interface for the FHIR resource database. */
 public interface Database {
   /**
@@ -28,6 +30,14 @@ public interface Database {
    * @throws ResourceAlreadyExistsInDbException if the resource already exists in the database
    */
   <R extends Resource> void insert(R resource) throws ResourceAlreadyExistsInDbException;
+
+  /**
+   * Inserts the {@code resources} into the FHIR resource database.
+   *
+   * @param <R> The resource type
+   * @throws ResourceAlreadyExistsInDbException if the resource already exists in the database
+   */
+  <R extends Resource> void insertAll(List<R> resources) throws ResourceAlreadyExistsInDbException;
 
   /**
    * Updates the {@code resource} in the FHIR resource database. If the resource does not already

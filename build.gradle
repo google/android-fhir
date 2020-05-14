@@ -49,6 +49,8 @@ ext {
     daggerVersion = '2.16'
     guavaVersion = '28.2-android'
     hapiFhirStructuresR4Version = '4.2.0'
+    okhttpLoggingInterceptorVersion = '4.0.0'
+    retrofitVersion = '2.7.2'
     roomVersion = '2.2.5'
 
     // testing

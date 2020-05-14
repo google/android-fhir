@@ -37,6 +37,8 @@ import org.opencds.cqf.cql.execution.EvaluationResult;
 import org.opencds.cqf.cql.execution.LibraryLoader;
 import org.opencds.cqf.cql.terminology.TerminologyProvider;
 
+import java.util.List;
+
 /** Implementation of {@link FhirEngine}. */
 public class FhirEngineImpl implements FhirEngine {
 
@@ -65,6 +67,15 @@ public class FhirEngineImpl implements FhirEngine {
     } catch (ResourceAlreadyExistsInDbException e) {
       throw new ResourceAlreadyExistsException(
           ResourceUtils.getResourceType(resource.getClass()).name(), resource.getId(), e);
+    }
+  }
+
+  @Override
+  public <R extends Resource> void saveAll(List<R> resources) throws ResourceAlreadyExistsException {
+    try {
+      database.insertAll(resources);
+    } catch (ResourceAlreadyExistsInDbException e) {
+      throw new ResourceAlreadyExistsException(e.getType(), e.getId(), e);
     }
   }
 
