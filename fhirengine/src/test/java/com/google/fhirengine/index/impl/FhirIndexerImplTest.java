@@ -18,6 +18,7 @@ package com.google.fhirengine.index.impl;
 
 import android.os.Build;
 import com.google.common.truth.Truth;
+import com.google.fhirengine.index.CodeIndex;
 import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
