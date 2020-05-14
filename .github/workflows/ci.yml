@@ -57,16 +57,17 @@ jobs:
           ${{ runner.os }}-gradlebuildcache-
 
     - name: Spotless check
+      if: matrix.api-level == 29  # don't spotless on older APIs
       run: ./gradlew spotlessCheck
 
     - name: Build with Gradle
+      if: matrix.api-level == 29 # don't run full build on older APIs
       run: ./gradlew build
     - name: Run Integration Tests
       uses: ReactiveCircus/android-emulator-runner@v2.8.0
       with:
         api-level: ${{ matrix.api-level }}
         arch: x86_64
-        profile: Pixel 3
         script: ./gradlew connectedCheck
       
     - name: Upload build reports
