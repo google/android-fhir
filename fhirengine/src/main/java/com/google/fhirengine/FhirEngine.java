@@ -16,10 +16,9 @@
 
 package com.google.fhirengine;
 
+import java.util.List;
 import org.hl7.fhir.r4.model.Resource;
 import org.opencds.cqf.cql.execution.EvaluationResult;
-
-import java.util.List;
 
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 public interface FhirEngine {

@@ -20,21 +20,31 @@ import ca.uhn.fhir.parser.IParser
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Resource
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 /**
  * hapi.fhir.org API communication via Retrofit
  */
 interface HapiFhirService {
 
-    @GET("Patient")
-    suspend fun getPatients(): Bundle
+    @GET("baseR4/Patient")
+    suspend fun getPatients(
+      @Query("address-country") country: String
+    ): Bundle
+
+    @GET("baseR4")
+    suspend fun getMorePages(
+      @Query("_getpages") pagesId: String,
+      @Query("_getpagesoffset") pagesOffset: Int,
+      @Query("_getpagescount") pagesCount: Int,
+      @Query("_bundleType") bundleType: String
+    ): Bundle
 
     companion object {
-        private const val BASE_URL = "https://hapi.fhir.org/baseR4/"
+        private const val BASE_URL = "https://hapi.fhir.org/"
 
         fun create(parser: IParser): HapiFhirService {
             val logger = HttpLoggingInterceptor()

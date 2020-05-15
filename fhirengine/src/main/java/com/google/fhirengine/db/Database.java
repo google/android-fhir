@@ -19,8 +19,6 @@ package com.google.fhirengine.db;
 import java.util.List;
 import org.hl7.fhir.r4.model.Resource;
 
-import java.util.List;
-
 /** The interface for the FHIR resource database. */
 public interface Database {
   /**

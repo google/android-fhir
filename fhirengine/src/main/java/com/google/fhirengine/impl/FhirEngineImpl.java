@@ -26,6 +26,7 @@ import com.google.fhirengine.resource.ResourceUtils;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
@@ -36,8 +37,6 @@ import org.opencds.cqf.cql.execution.CqlEngine;
 import org.opencds.cqf.cql.execution.EvaluationResult;
 import org.opencds.cqf.cql.execution.LibraryLoader;
 import org.opencds.cqf.cql.terminology.TerminologyProvider;
-
-import java.util.List;
 
 /** Implementation of {@link FhirEngine}. */
 public class FhirEngineImpl implements FhirEngine {
@@ -71,7 +70,8 @@ public class FhirEngineImpl implements FhirEngine {
   }
 
   @Override
-  public <R extends Resource> void saveAll(List<R> resources) throws ResourceAlreadyExistsException {
+  public <R extends Resource> void saveAll(List<R> resources)
+      throws ResourceAlreadyExistsException {
     try {
       database.insertAll(resources);
     } catch (ResourceAlreadyExistsInDbException e) {
