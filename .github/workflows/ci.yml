@@ -13,8 +13,11 @@ jobs:
    # Build will compile APK, test APK and run tests, lint, etc.
    build:
 
-    runs-on: ubuntu-latest
-   
+    runs-on: macos-latest # use mac build for emulator hardware accelerator
+    
+    strategy:
+      matrix:
+        api-level: [23, 29]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -54,10 +57,18 @@ jobs:
           ${{ runner.os }}-gradlebuildcache-
 
     - name: Spotless check
+      if: matrix.api-level == 29  # don't spotless on older APIs
       run: ./gradlew spotlessCheck
 
     - name: Build with Gradle
+      if: matrix.api-level == 29 # don't run full build on older APIs
       run: ./gradlew build
+    - name: Run Integration Tests
+      uses: ReactiveCircus/android-emulator-runner@v2.8.0
+      with:
+        api-level: ${{ matrix.api-level }}
+        arch: x86_64
+        script: ./gradlew connectedCheck
       
     - name: Upload build reports
       if: always()
@@ -69,12 +80,12 @@ jobs:
     - name: Copy test results
       if: always()
       run: |
-        mkdir -p junit
-        find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} junit/ \;
+        mkdir -p test-output
+        find . -type f -regex ".*[t|androidT]est-results/.*xml" -exec cp {} test-output/ \;
         
     - name: Upload test results
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        name: junit-results
-        path: junit
+        name: test-results
+        path: test-output
