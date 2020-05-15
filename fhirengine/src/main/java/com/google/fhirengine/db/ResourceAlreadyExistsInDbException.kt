@@ -22,6 +22,6 @@ class ResourceAlreadyExistsInDbException(
   val id: String,
   cause: Throwable
 ) : Exception(
-        "Resource with type " + type + " and id " + id + " already exists!",
+        "Resource with type $type and id $id already exists!",
         cause
 )
