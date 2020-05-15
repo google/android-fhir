@@ -86,14 +86,14 @@ internal class DatabaseImpl @Inject constructor(
       clazz: Class<R>,
       reference: String,
       value: String
-    ): List<R>? {
+    ): List<R> {
         return dao.getResourceByReferenceIndex(
                 ResourceUtils.getResourceType(clazz).name, reference, value)
                 .map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource?> searchByString(
-      clazz: Class<R>?,
+      clazz: Class<R>,
       string: String,
       value: String
     ): List<R> {
@@ -102,7 +102,7 @@ internal class DatabaseImpl @Inject constructor(
     }
 
     override fun <R : Resource?> searchByCode(
-      clazz: Class<R>?,
+      clazz: Class<R>,
       code: String,
       system: String,
       value: String
@@ -114,13 +114,13 @@ internal class DatabaseImpl @Inject constructor(
     override fun <R : Resource?> searchByReferenceAndCode(
       clazz: Class<R>,
       reference: String,
-      refvalue: String,
-      string: String,
-      system: String,
-      value: String
-    ): List<R>? {
-        val refs = searchByReference(clazz, reference, refvalue)?.map { it?.id }
-        return searchByCode(clazz, string, system, value).filter { refs!!.contains(it?.id) }
+      referenceValue: String,
+      code: String,
+      codeSystem: String,
+      codeValue: String
+    ): List<R> {
+        val refs = searchByReference(clazz, reference, referenceValue)?.map { it?.id }
+        return searchByCode(clazz, code, codeSystem, codeValue).filter { refs!!.contains(it?.id) }
     }
 
     companion object {
