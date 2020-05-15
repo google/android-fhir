@@ -3,6 +3,10 @@
 FHIR Engine is an Android library that manages FHIR resources natively on Android. It also supports
 the evaluation of CQL using [cql-engine](https://github.com/DBCG/cql_engine).
 
+## Usage
+
+Requires min SDK version 21 (Lollipop).
+
 ## Developement
 
 ### Requirements
