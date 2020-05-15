@@ -31,12 +31,27 @@ import org.hl7.fhir.r4.model.Resource
  * The implementation for the persistence layer using Room.
  * See docs for [com.google.fhirengine.db.Database] for the API docs.
  */
-internal class DatabaseImpl @Inject constructor(
+internal class DatabaseImpl(
   context: Context,
   private val iParser: IParser,
-  fhirIndexer: FhirIndexer
+  fhirIndexer: FhirIndexer,
+  inMemory: Boolean
 ) : com.google.fhirengine.db.Database {
-    val db = Room.databaseBuilder(context, RoomResourceDb::class.java, DATABASE_NAME)
+    @Inject constructor(
+      context: Context,
+      iParser: IParser,
+      fhirIndexer: FhirIndexer
+    ) : this(
+        context = context,
+        iParser = iParser,
+        fhirIndexer = fhirIndexer,
+        inMemory = false)
+    val builder = if (inMemory) {
+        Room.inMemoryDatabaseBuilder(context, RoomResourceDb::class.java)
+    } else {
+        Room.databaseBuilder(context, RoomResourceDb::class.java, DATABASE_NAME)
+    }
+    val db = builder
             // TODO https://github.com/jingtang10/fhir-engine/issues/32
             //  don't allow main thread queries
             .allowMainThreadQueries()
