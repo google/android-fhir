@@ -45,7 +45,9 @@ configurations {
 }
 
 dependencies {
-    api "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiFhirStructuresR4Version"
+    api ("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiFhirStructuresR4Version") {
+        exclude module:'junit'
+    }
     api "org.opencds.cqf:cql-engine:$cqlEngineVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "androidx.room:room-runtime:$roomVersion"
