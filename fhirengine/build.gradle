@@ -70,7 +70,7 @@ dependencies {
     testImplementation "junit:junit:$junitVersion"
     testImplementation "com.google.truth:truth:$truthVersion"
     kaptTest "com.google.dagger:dagger-compiler:$daggerVersion"
-    androidTestImplementation "androidx.test.ext:junit-ktx:1.1.1"
+    androidTestImplementation "androidx.test.ext:junit-ktx:$androidTestJunitVersion"
     androidTestImplementation "androidx.test:runner:$testVersion"
     androidTestImplementation "androidx.test:core:$testVersion"
     androidTestImplementation "junit:junit:$junitVersion"
