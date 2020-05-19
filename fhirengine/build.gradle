@@ -11,12 +11,18 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // Required when setting minSdkVersion to 20 or lower
         multiDexEnabled true
+        // need to specify this to prevent junit runner from going deep into our dependencies
+        testInstrumentationRunnerArguments = ['package': 'com.google.fhirengine']
     }
-
+    sourceSets {
+        // shared code between junit and instrumentation tests
+        androidTest.java.srcDirs += "src/test-common/java"
+        test.java.srcDirs += "src/test-common/java"
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -64,6 +70,12 @@ dependencies {
     testImplementation "junit:junit:$junitVersion"
     testImplementation "com.google.truth:truth:$truthVersion"
     kaptTest "com.google.dagger:dagger-compiler:$daggerVersion"
+    androidTestImplementation "androidx.test.ext:junit-ktx:$androidTestJunitVersion"
+    androidTestImplementation "androidx.test:runner:$testVersion"
+    androidTestImplementation "androidx.test:core:$testVersion"
+    androidTestImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "com.google.truth:truth:$truthVersion"
+    kaptAndroidTest "com.google.dagger:dagger-compiler:$daggerVersion"
 }
 
 repositories {

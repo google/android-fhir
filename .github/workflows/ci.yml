@@ -17,7 +17,7 @@ jobs:
     
     strategy:
       matrix:
-        api-level: [23, 29]
+        api-level: [24, 27, 29]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -68,14 +68,20 @@ jobs:
       with:
         api-level: ${{ matrix.api-level }}
         arch: x86_64
-        script: ./gradlew connectedCheck
+        script: ./gradlew connectedCheck --stacktrace
       
     - name: Upload build reports
       if: always()
       uses: actions/upload-artifact@v2
       with:
         name: build-reports
-        path: app/build/reports  
+        path: fhirengine/build/reports
+    - name: Upload build dir # this is good to diagnose issues
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-out
+        path: fhirengine/build
    
     - name: Copy test results
       if: always()

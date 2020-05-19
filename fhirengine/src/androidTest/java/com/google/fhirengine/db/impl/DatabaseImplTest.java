@@ -20,16 +20,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 import android.content.Context;
-import android.os.Build;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import ca.uhn.fhir.parser.IParser;
+import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
+import com.google.fhirengine.index.FhirIndexer;
 import com.google.fhirengine.index.impl.FhirIndexerModule;
 import com.google.fhirengine.resource.ResourceModule;
 import com.google.fhirengine.resource.TestingUtils;
 import dagger.BindsInstance;
 import dagger.Component;
+import dagger.Module;
+import dagger.Provides;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.hl7.fhir.r4.model.Enumerations;
@@ -39,12 +43,9 @@ import org.hl7.fhir.r4.model.ResourceType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 /** Unit tests for {@link DatabaseImpl}. */
-@RunWith(RobolectricTestRunner.class)
-@Config(sdk = Build.VERSION_CODES.P)
+@RunWith(AndroidJUnit4.class)
 public class DatabaseImplTest {
   private static final String TEST_PATIENT_1_ID = "test_patient_1";
   private static final Patient TEST_PATIENT_1;
@@ -66,10 +67,21 @@ public class DatabaseImplTest {
 
   @Inject IParser iParser;
   @Inject TestingUtils testingUtils;
-  @Inject DatabaseImpl database;
+  @Inject Database database;
+
+  @Module
+  public static class TestDatabaseModule {
+
+    /** Create custom database for test that uses an in-memory database */
+    @Provides
+    public static Database provideTestDatabase(
+        Context context, IParser iParser, FhirIndexer fhirIndexer) {
+      return new DatabaseImpl(context, iParser, fhirIndexer, true);
+    }
+  }
 
   @Singleton
-  @Component(modules = {DatabaseModule.class, FhirIndexerModule.class, ResourceModule.class})
+  @Component(modules = {TestDatabaseModule.class, FhirIndexerModule.class, ResourceModule.class})
   public interface TestComponent {
     void inject(DatabaseImplTest databaseImplTest);
 
