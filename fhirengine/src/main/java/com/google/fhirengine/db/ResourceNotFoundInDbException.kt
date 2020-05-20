@@ -20,4 +20,4 @@ package com.google.fhirengine.db
 class ResourceNotFoundInDbException(
   val type: String,
   val id: String
-) : Exception("Resource not found with type " + type + " and id " + id + "!")
+) : Exception("Resource not found with type $type and id $id!")
