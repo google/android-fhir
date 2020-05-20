@@ -82,7 +82,7 @@ internal class DatabaseImpl @Inject constructor(
         )
     }
 
-    override fun <R : Resource?> searchByReference(
+    override fun <R : Resource> searchByReference(
       clazz: Class<R>,
       reference: String,
       value: String
@@ -92,7 +92,7 @@ internal class DatabaseImpl @Inject constructor(
                 .map { iParser.parseResource(it) as R }
     }
 
-    override fun <R : Resource?> searchByString(
+    override fun <R : Resource> searchByString(
       clazz: Class<R>,
       string: String,
       value: String
@@ -101,7 +101,7 @@ internal class DatabaseImpl @Inject constructor(
                 value).map { iParser.parseResource(it) as R }
     }
 
-    override fun <R : Resource?> searchByCode(
+    override fun <R : Resource> searchByCode(
       clazz: Class<R>,
       code: String,
       system: String,
@@ -111,7 +111,7 @@ internal class DatabaseImpl @Inject constructor(
                 value).map { iParser.parseResource(it) as R }
     }
 
-    override fun <R : Resource?> searchByReferenceAndCode(
+    override fun <R : Resource> searchByReferenceAndCode(
       clazz: Class<R>,
       reference: String,
       referenceValue: String,
@@ -120,7 +120,7 @@ internal class DatabaseImpl @Inject constructor(
       codeValue: String
     ): List<R> {
         val refs = searchByReference(clazz, reference, referenceValue)?.map { it?.id }
-        return searchByCode(clazz, code, codeSystem, codeValue).filter { refs!!.contains(it?.id) }
+        return searchByCode(clazz, code, codeSystem, codeValue).filter { refs.contains(it?.id) }
     }
 
     companion object {
