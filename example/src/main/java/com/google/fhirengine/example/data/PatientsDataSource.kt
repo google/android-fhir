@@ -39,13 +39,11 @@ class PatientsDataSource(
             pagesId = bundle.id
             bundleType = bundle.type.display // ?? what's the right type here?
             totalResources = bundle.total
-
-            val resources = bundle.entry.map { it.resource } // patients
-            resourcesRetrieved = resources.size
+            resourcesRetrieved = bundle.entry.size
 
             return FhirLoadResult(
                     canLoadMore = totalResources > resourcesRetrieved,
-                    resources = resources
+                    resource = bundle
             )
         }
 
@@ -57,19 +55,18 @@ class PatientsDataSource(
                     pagesCount = PAGES_COUNT,
                     bundleType = bundleType!!
             )
-            val resources = bundle.entry.map { it.resource }
-            resourcesRetrieved += resources.size
+            resourcesRetrieved += bundle.entry.size
             pagesOffset += PAGES_COUNT
 
             return FhirLoadResult(
-                    canLoadMore = totalResources > resourcesRetrieved && resources.isNotEmpty(),
-                    resources = resources
+                    canLoadMore = totalResources > resourcesRetrieved && bundle.entry.isNotEmpty(),
+                    resource = bundle
             )
         }
 
         // case: totalResources == resourcesRetrieved
         // we finished loading
-        return FhirLoadResult(canLoadMore = false, resources = emptyList())
+        return FhirLoadResult(canLoadMore = false, resource = null)
     }
 
     companion object {

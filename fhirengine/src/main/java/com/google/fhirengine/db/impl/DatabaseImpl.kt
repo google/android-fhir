@@ -60,19 +60,6 @@ internal class DatabaseImpl @Inject constructor(
         }
     }
 
-    override fun <R : Resource> insertAll(resources: List<R>) {
-        try {
-            dao.insertAll(resources)
-        } catch (constraintException: SQLiteConstraintException) {
-            // todo handle this properly
-            throw ResourceAlreadyExistsInDbException(
-                    "",
-                    "",
-                    constraintException
-            )
-        }
-    }
-
     override fun <R : Resource> update(resource: R) {
         dao.update(resource)
     }

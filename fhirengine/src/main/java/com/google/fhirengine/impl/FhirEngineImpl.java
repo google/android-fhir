@@ -26,7 +26,6 @@ import com.google.fhirengine.resource.ResourceUtils;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
@@ -66,16 +65,6 @@ public class FhirEngineImpl implements FhirEngine {
     } catch (ResourceAlreadyExistsInDbException e) {
       throw new ResourceAlreadyExistsException(
           ResourceUtils.getResourceType(resource.getClass()).name(), resource.getId(), e);
-    }
-  }
-
-  @Override
-  public <R extends Resource> void saveAll(List<R> resources)
-      throws ResourceAlreadyExistsException {
-    try {
-      database.insertAll(resources);
-    } catch (ResourceAlreadyExistsInDbException e) {
-      throw new ResourceAlreadyExistsException(e.getType(), e.getId(), e);
     }
   }
 

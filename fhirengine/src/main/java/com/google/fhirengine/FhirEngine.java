@@ -16,7 +16,6 @@
 
 package com.google.fhirengine;
 
-import java.util.List;
 import org.hl7.fhir.r4.model.Resource;
 import org.opencds.cqf.cql.execution.EvaluationResult;
 
@@ -29,14 +28,6 @@ public interface FhirEngine {
    * @throws ResourceAlreadyExistsException if the resource already exists
    */
   <R extends Resource> void save(R resource) throws ResourceAlreadyExistsException;
-
-  /**
-   * Saves all FHIR {@code resource} in the local storage.
-   *
-   * @param <R> The resource type which should be a subtype of {@link Resource}.
-   * @throws ResourceAlreadyExistsException if any of the resources already exist
-   */
-  <R extends Resource> void saveAll(List<R> resources) throws ResourceAlreadyExistsException;
 
   /**
    * Updates a FHIR {@code resource} in the local storage.

@@ -103,11 +103,6 @@ internal abstract class Dao {
         }
     }
 
-    @Transaction
-    open fun insertAll(resources: List<Resource>) {
-        resources.forEach { insert(it) }
-    }
-
     @Insert(onConflict = OnConflictStrategy.ABORT)
     abstract fun insertResource(resource: ResourceEntity)
 

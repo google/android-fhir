@@ -24,10 +24,10 @@ class FhirSynchroniser(
 ) {
 
     suspend fun synchronise() {
-        var loadResult = FhirLoadResult(true, emptyList())
+        var loadResult = FhirLoadResult(true, null)
         while (loadResult.canLoadMore) {
             loadResult = dataSource.loadData()
-            fhirEngine.saveAll(loadResult.resources)
+            loadResult.resource?.let { fhirEngine.save(it) }
         }
     }
 }

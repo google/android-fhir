@@ -30,14 +30,6 @@ public interface Database {
   <R extends Resource> void insert(R resource) throws ResourceAlreadyExistsInDbException;
 
   /**
-   * Inserts the {@code resources} into the FHIR resource database.
-   *
-   * @param <R> The resource type
-   * @throws ResourceAlreadyExistsInDbException if the resource already exists in the database
-   */
-  <R extends Resource> void insertAll(List<R> resources) throws ResourceAlreadyExistsInDbException;
-
-  /**
    * Updates the {@code resource} in the FHIR resource database. If the resource does not already
    * exist, a new record will be created.
    *

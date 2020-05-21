@@ -20,7 +20,7 @@ import org.hl7.fhir.r4.model.Resource
 
 data class FhirLoadResult(
   val canLoadMore: Boolean,
-  val resources: List<Resource>
+  val resource: Resource?
 )
 
 interface FhirDataSource {
