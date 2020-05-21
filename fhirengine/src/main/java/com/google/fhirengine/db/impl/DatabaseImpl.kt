@@ -119,8 +119,8 @@ internal class DatabaseImpl @Inject constructor(
       codeSystem: String,
       codeValue: String
     ): List<R> {
-        val refs = searchByReference(clazz, reference, referenceValue)?.map { it?.id }
-        return searchByCode(clazz, code, codeSystem, codeValue).filter { refs.contains(it?.id) }
+        val refs = searchByReference(clazz, reference, referenceValue).map { it.id }
+        return searchByCode(clazz, code, codeSystem, codeValue).filter { refs.contains(it.id) }
     }
 
     companion object {
