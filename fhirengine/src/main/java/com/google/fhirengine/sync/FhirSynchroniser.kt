@@ -18,16 +18,20 @@ package com.google.fhirengine.sync
 
 import com.google.fhirengine.FhirEngine
 
+/**
+ * Class that helps synchronize the data source and save it in the local database
+ * TODO remove the FhirEngine dependency
+ */
 class FhirSynchroniser(
   private val dataSource: FhirDataSource,
   private val fhirEngine: FhirEngine
 ) {
 
     suspend fun synchronise() {
-        var loadResult = FhirLoadResult(true, null)
-        while (loadResult.canLoadMore) {
+        var loadResult: FhirLoadResult
+        do {
             loadResult = dataSource.loadData()
             loadResult.resource?.let { fhirEngine.save(it) }
-        }
+        } while (loadResult.canLoadMore)
     }
 }

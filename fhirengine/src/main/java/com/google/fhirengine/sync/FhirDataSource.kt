@@ -18,12 +18,28 @@ package com.google.fhirengine.sync
 
 import org.hl7.fhir.r4.model.Resource
 
+/**
+ * Result of a load request from [FhirDataSource.loadData]
+ */
 data class FhirLoadResult(
+  /**
+   * Flag signaling whether there is more data to be loaded.
+   */
   val canLoadMore: Boolean,
+  /**
+   * Loaded data
+   */
   val resource: Resource?
 )
 
+/**
+ * Interface for an abstraction of retrieving static data from a network source. The data can be
+ * retrieved in pages and each data retrieval is an expensive operation.
+ */
 interface FhirDataSource {
 
+    /**
+     * Implement this method to load remote data, which will then be stored in the database.
+     */
     suspend fun loadData(): FhirLoadResult
 }
