@@ -21,8 +21,10 @@ import androidx.room.Database
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.annotation.Transaction
 import com.google.fhirengine.index.FhirIndexer
@@ -178,4 +180,7 @@ internal abstract class Dao {
       indexSystem: String,
       indexValue: String
     ): List<String>
+
+    @RawQuery
+    abstract fun getResources(query: SupportSQLiteQuery): List<String>
 }

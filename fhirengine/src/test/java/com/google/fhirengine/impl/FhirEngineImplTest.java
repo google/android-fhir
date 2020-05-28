@@ -26,7 +26,6 @@ import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.ResourceAlreadyExistsException;
 import com.google.fhirengine.ResourceNotFoundException;
 import com.google.fhirengine.cql.CqlModule;
-import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.impl.DatabaseModule;
 import com.google.fhirengine.index.impl.FhirIndexerModule;
 import com.google.fhirengine.resource.ResourceModule;
