@@ -16,20 +16,20 @@
 
 package com.google.fhirengine.sync
 
-import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.Bundle
 
 /**
  * Result of a load request from [FhirDataSource.loadData]
  */
 data class FhirLoadResult(
-  /**
-   * Flag signaling whether there is more data to be loaded.
-   */
-  val canLoadMore: Boolean,
-  /**
-   * Loaded data
-   */
-  val resource: Resource?
+    /**
+     * Flag signaling whether there is more data to be loaded.
+     */
+    val canLoadMore: Boolean,
+    /**
+     * Loaded data
+     */
+    val resource: Bundle?
 )
 
 /**

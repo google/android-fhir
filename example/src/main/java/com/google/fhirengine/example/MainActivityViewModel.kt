@@ -21,21 +21,31 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.fhirengine.FhirEngine
 import com.google.fhirengine.example.api.HapiFhirService
-import com.google.fhirengine.example.data.PatientsDataSource
+import com.google.fhirengine.example.data.NetworkSearchParameter
+import com.google.fhirengine.example.data.ResourceDataSource
 import com.google.fhirengine.sync.FhirSynchroniser
 import kotlinx.coroutines.launch
+import org.hl7.fhir.r4.model.ResourceType
 
 class MainActivityViewModel(
-  private val fhirEngine: FhirEngine,
-  private val service: HapiFhirService
+    private val fhirEngine: FhirEngine,
+    private val service: HapiFhirService
 ) : ViewModel() {
 
     fun requestPatients() {
         viewModelScope.launch {
             // for now, ignore properly handling requests
             val synchroniser = FhirSynchroniser(
-                    PatientsDataSource(country = "United States", service = service),
-                    fhirEngine
+                ResourceDataSource(
+                    resourceType = ResourceType.Patient,
+                    searchParams = listOf(
+                        NetworkSearchParameter("address-country", "United States"),
+                        // sort descending by last updated time
+                        NetworkSearchParameter("_sort", "-_lastUpdated")
+//                        NetworkSearchParameter("_lastUpdated", "gt2019-06-05T02:52:37.425-04:00")
+                    ),
+                    service = service),
+                fhirEngine
             )
             synchroniser.synchronise()
         }
@@ -43,8 +53,8 @@ class MainActivityViewModel(
 }
 
 class MainActivityViewModelFactory(
-  private val fhirEngine: FhirEngine,
-  private val service: HapiFhirService
+    private val fhirEngine: FhirEngine,
+    private val service: HapiFhirService
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {

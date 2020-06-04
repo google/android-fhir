@@ -16,6 +16,7 @@
 
 package com.google.fhirengine.sync
 
+import android.util.Log
 import com.google.fhirengine.FhirEngine
 
 /**
@@ -23,15 +24,27 @@ import com.google.fhirengine.FhirEngine
  * TODO remove the FhirEngine dependency
  */
 class FhirSynchroniser(
-  private val dataSource: FhirDataSource,
-  private val fhirEngine: FhirEngine
+    private val dataSource: FhirDataSource,
+    private val fhirEngine: FhirEngine
 ) {
 
+    private var entriesDownloaded = 0
     suspend fun synchronise() {
         var loadResult: FhirLoadResult
         do {
             loadResult = dataSource.loadData()
-            loadResult.resource?.let { fhirEngine.save(it) }
+            loadResult.resource?.let { bundle ->
+                val total = bundle.total
+                entriesDownloaded += bundle.entry.size
+
+                val percentage = if (total == 0) {
+                    0
+                } else {
+                    entriesDownloaded * 100 / total
+                }
+                Log.d("FhirSynchroniser", "downloaded $percentage%: $entriesDownloaded out of $total")
+//            loadResult.resource?.let { fhirEngine.save(it) }
+            }
         } while (loadResult.canLoadMore)
     }
 }
