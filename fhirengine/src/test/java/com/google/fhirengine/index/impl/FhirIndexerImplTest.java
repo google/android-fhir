@@ -18,10 +18,10 @@ package com.google.fhirengine.index.impl;
 
 import android.os.Build;
 import com.google.common.truth.Truth;
-import com.google.fhirengine.index.CodeIndex;
 import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
+import com.google.fhirengine.index.TokenIndex;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.ContactPoint;
@@ -180,8 +180,9 @@ public class FhirIndexerImplTest {
   @Test
   public void index_observation_shouldIndexCode() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_OBSERVATION_1);
-    Truth.assertThat(resourceIndices.getCodeIndices())
-        .contains(new CodeIndex("code", "Observation.code", TEST_CODE_SYSTEM_1, TEST_CODE_VALUE_1));
+    Truth.assertThat(resourceIndices.getTokenIndices())
+        .contains(
+            new TokenIndex("code", "Observation.code", TEST_CODE_SYSTEM_1, TEST_CODE_VALUE_1));
   }
 
   @Test

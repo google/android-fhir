@@ -116,8 +116,8 @@ internal class DatabaseImpl(
       system: String,
       value: String
     ): List<R> {
-        return dao.getResourceByCodeIndex(ResourceUtils.getResourceType(clazz).name, code, system,
-            value).map { iParser.parseResource(it) as R }
+        return dao.getResourceByTokenIndex(ResourceUtils.getResourceType(clazz).name, code, system,
+                value).map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource> searchByReferenceAndCode(

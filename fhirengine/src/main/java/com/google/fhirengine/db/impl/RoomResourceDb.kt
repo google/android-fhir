@@ -33,14 +33,14 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 @Database(
-    entities = [
-        ResourceEntity::class,
-        StringIndexEntity::class,
-        ReferenceIndexEntity::class,
-        CodeIndexEntity::class
-    ],
-    version = 1,
-    exportSchema = false
+        entities = [
+            ResourceEntity::class,
+            StringIndexEntity::class,
+            ReferenceIndexEntity::class,
+            TokenIndexEntity::class
+        ],
+        version = 1,
+        exportSchema = false
 )
 @TypeConverters(
     DbTypeConverters::class
@@ -116,12 +116,12 @@ internal abstract class Dao {
                 )
             )
         }
-        index.codeIndices.forEach {
-            insertCodeIndex(CodeIndexEntity(
-                id = 0,
-                resourceType = resource.resourceType,
-                index = it,
-                resourceId = resource.resourceId))
+        index.tokenIndices.forEach {
+            insertTokenIndex(TokenIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId))
         }
     }
 
@@ -135,7 +135,7 @@ internal abstract class Dao {
     abstract fun insertReferenceIndex(referenceIndexEntity: ReferenceIndexEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertCodeIndex(codeIndexEntity: CodeIndexEntity)
+    abstract fun insertTokenIndex(tokenIndexEntity: TokenIndexEntity)
 
     @Query("""
         DELETE FROM ResourceEntity
@@ -187,14 +187,14 @@ internal abstract class Dao {
     @Query("""
         SELECT ResourceEntity.serializedResource
         FROM ResourceEntity
-        JOIN CodeIndexEntity
-        ON ResourceEntity.resourceType = CodeIndexEntity.resourceType
-            AND ResourceEntity.resourceId = CodeIndexEntity.resourceId
-        WHERE CodeIndexEntity.resourceType = :resourceType
-            AND CodeIndexEntity.index_path = :indexPath
-            AND CodeIndexEntity.index_system = :indexSystem
-            AND CodeIndexEntity.index_value = :indexValue""")
-    abstract fun getResourceByCodeIndex(
+        JOIN TokenIndexEntity
+        ON ResourceEntity.resourceType = TokenIndexEntity.resourceType
+            AND ResourceEntity.resourceId = TokenIndexEntity.resourceId
+        WHERE TokenIndexEntity.resourceType = :resourceType
+            AND TokenIndexEntity.index_path = :indexPath
+            AND TokenIndexEntity.index_system = :indexSystem
+            AND TokenIndexEntity.index_value = :indexValue""")
+    abstract fun getResourceByTokenIndex(
       resourceType: String,
       indexPath: String,
       indexSystem: String,

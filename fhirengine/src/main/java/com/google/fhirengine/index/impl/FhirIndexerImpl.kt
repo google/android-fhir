@@ -18,11 +18,11 @@ package com.google.fhirengine.index.impl
 
 import android.util.Log
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
-import com.google.fhirengine.index.CodeIndex
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.index.ReferenceIndex
 import com.google.fhirengine.index.ResourceIndices
 import com.google.fhirengine.index.StringIndex
+import com.google.fhirengine.index.TokenIndex
 import java.util.Locale
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -72,7 +72,7 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                         val system = code.system
                         val value = code.code
                         if (system?.isNotEmpty() == true && value?.isNotEmpty() == true) {
-                            indexBuilder.addCodeIndex(CodeIndex(
+                            indexBuilder.addCodeIndex(TokenIndex(
                                 name = searchParamDefinition.name,
                                 path = searchParamDefinition.path,
                                 system = system,
