@@ -31,6 +31,16 @@ interface Database {
     fun <R : Resource> insert(resource: R)
 
     /**
+     * Inserts a list of `resource`s into the FHIR resource database.
+     *
+     * @param <R> The resource type
+     * @throws ResourceAlreadyExistsInDbException if any of the resources already exists in the
+     * database
+     */
+    @Throws(ResourceAlreadyExistsInDbException::class)
+    fun <R : Resource> insertAll(resources: List<R>)
+
+    /**
      * Updates the `resource` in the FHIR resource database. If the resource does not already
      * exist, a new record will be created.
      *

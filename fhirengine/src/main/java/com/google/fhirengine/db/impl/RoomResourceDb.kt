@@ -28,21 +28,22 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.annotation.Transaction
 import com.google.fhirengine.index.FhirIndexer
+import com.google.fhirengine.index.ResourceIndices
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 @Database(
-        entities = [
-            ResourceEntity::class,
-            StringIndexEntity::class,
-            ReferenceIndexEntity::class,
-            CodeIndexEntity::class
-        ],
-        version = 1,
-        exportSchema = false
+    entities = [
+        ResourceEntity::class,
+        StringIndexEntity::class,
+        ReferenceIndexEntity::class,
+        CodeIndexEntity::class
+    ],
+    version = 1,
+    exportSchema = false
 )
 @TypeConverters(
-        DbTypeConverters::class
+    DbTypeConverters::class
 )
 internal abstract class RoomResourceDb : RoomDatabase() {
     abstract fun dao(): com.google.fhirengine.db.impl.Dao
@@ -64,13 +65,17 @@ internal abstract class Dao {
     @Transaction
     open fun insert(resource: Resource) {
         val entity = ResourceEntity(
-                id = 0,
-                resourceType = resource.resourceType,
-                resourceId = resource.id,
-                serializedResource = iParser.encodeResourceToString(resource)
+            id = 0,
+            resourceType = resource.resourceType,
+            resourceId = resource.id,
+            serializedResource = iParser.encodeResourceToString(resource)
         )
         insertResource(entity)
         val index = fhirIndexer.index(resource)
+        updateIndicesForResource(index, entity)
+    }
+
+    private fun updateIndicesForResource(index: ResourceIndices, resource: ResourceEntity) {
         // TODO Move StringIndices to persistable types
         //  https://github.com/jingtang10/fhir-engine/issues/31
         //  we can either use room-autovalue integration or go w/ embedded data classes.
@@ -78,30 +83,30 @@ internal abstract class Dao {
         //  https://github.com/jingtang10/fhir-engine/issues/33
         index.stringIndices.forEach {
             insertStringIndex(
-                    StringIndexEntity(
-                            id = 0,
-                            resourceType = entity.resourceType,
-                            index = it,
-                            resourceId = entity.resourceId
-                    )
+                StringIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId
+                )
             )
         }
         index.referenceIndices.forEach {
             insertReferenceIndex(
-                    ReferenceIndexEntity(
-                            id = 0,
-                            resourceType = entity.resourceType,
-                            index = it,
-                            resourceId = entity.resourceId
-                    )
+                ReferenceIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId
+                )
             )
         }
         index.codeIndices.forEach {
             insertCodeIndex(CodeIndexEntity(
-                    id = 0,
-                    resourceType = entity.resourceType,
-                    index = it,
-                    resourceId = entity.resourceId))
+                id = 0,
+                resourceType = resource.resourceType,
+                index = it,
+                resourceId = resource.resourceId))
         }
     }
 
