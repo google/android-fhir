@@ -19,24 +19,13 @@ package com.google.fhirengine.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
-import android.content.Context;
-import android.os.Build;
 import androidx.test.core.app.ApplicationProvider;
 import com.google.fhirengine.FhirEngine;
+import com.google.fhirengine.FhirServices;
 import com.google.fhirengine.ResourceNotFoundException;
-import com.google.fhirengine.cql.CqlModule;
-import com.google.fhirengine.db.Database;
-import com.google.fhirengine.db.impl.DatabaseModule;
-import com.google.fhirengine.index.impl.FhirIndexerModule;
-import com.google.fhirengine.resource.ResourceModule;
 import com.google.fhirengine.resource.TestingUtils;
-import com.google.fhirengine.search.impl.SearchModule;
-import dagger.BindsInstance;
-import dagger.Component;
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.ResourceType;
@@ -44,11 +33,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 /** Unit tests for {@link FhirEngineImpl}. */
 @RunWith(RobolectricTestRunner.class)
-@Config(sdk = Build.VERSION_CODES.P)
 public class FhirEngineImplTest {
   private static final String TEST_PATIENT_1_ID = "test_patient_1";
   private static final Patient TEST_PATIENT_1;
@@ -68,41 +55,15 @@ public class FhirEngineImplTest {
     TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE);
   }
 
-  @Inject FhirEngine fhirEngine;
+  FhirServices services =
+      FhirServices.builder(ApplicationProvider.getApplicationContext()).inMemory().build();
 
-  @Inject TestingUtils testingUtils;
+  FhirEngine fhirEngine = services.getFhirEngine();
 
-  @Singleton
-  @Component(
-      modules = {
-        FhirEngineModule.class,
-        CqlModule.class,
-        DatabaseModule.class,
-        FhirIndexerModule.class,
-        ResourceModule.class,
-        SearchModule.class
-      })
-  public interface TestComponent {
-
-    Database getDatabase();
-
-    void inject(FhirEngineImplTest fhirEngineImplTest);
-
-    @Component.Builder
-    interface Builder {
-      @BindsInstance
-      Builder withContext(Context context);
-
-      TestComponent build();
-    }
-  }
+  TestingUtils testingUtils = new TestingUtils(services.getParser());
 
   @Before
-  public void setUp() throws Exception {
-    DaggerFhirEngineImplTest_TestComponent.builder()
-        .withContext(ApplicationProvider.getApplicationContext())
-        .build()
-        .inject(this);
+  public void setUp() {
     fhirEngine.save(TEST_PATIENT_1);
   }
 

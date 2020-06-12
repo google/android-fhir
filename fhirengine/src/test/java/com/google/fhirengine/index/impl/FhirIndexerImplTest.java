@@ -22,10 +22,6 @@ import com.google.fhirengine.index.CodeIndex;
 import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
-import com.google.fhirengine.resource.ResourceModule;
-import dagger.Component;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.ContactPoint;
@@ -37,7 +33,6 @@ import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -157,18 +152,7 @@ public class FhirIndexerImplTest {
         new CodeableConcept().addCoding(new Coding().setSystem("").setCode("")));
   }
 
-  @Inject FhirIndexerImpl fhirIndexer;
-
-  @Singleton
-  @Component(modules = {FhirIndexerModule.class, ResourceModule.class})
-  public interface TestComponent {
-    void inject(com.google.fhirengine.index.impl.FhirIndexerImplTest fhirIndexerImplTest);
-  }
-
-  @Before
-  public void setUp() throws Exception {
-    DaggerFhirIndexerImplTest_TestComponent.builder().build().inject(this);
-  }
+  private FhirIndexerImpl fhirIndexer = new FhirIndexerImpl();
 
   @Test
   public void index_patient_shouldIndexGivenName() throws Exception {

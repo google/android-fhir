@@ -19,24 +19,14 @@ package com.google.fhirengine.db.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
-import android.content.Context;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import ca.uhn.fhir.parser.IParser;
+import com.google.fhirengine.FhirServices;
 import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
-import com.google.fhirengine.index.FhirIndexer;
-import com.google.fhirengine.index.impl.FhirIndexerModule;
-import com.google.fhirengine.resource.ResourceModule;
 import com.google.fhirengine.resource.TestingUtils;
-import dagger.BindsInstance;
-import dagger.Component;
-import dagger.Module;
-import dagger.Provides;
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Resource;
@@ -66,41 +56,13 @@ public class DatabaseImplTest {
     TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE);
   }
 
-  @Inject IParser iParser;
-  @Inject TestingUtils testingUtils;
-  @Inject Database database;
-
-  @Module
-  public static class TestDatabaseModule {
-
-    /** Create custom database for test that uses an in-memory database */
-    @Provides
-    public static Database provideTestDatabase(
-        Context context, IParser iParser, FhirIndexer fhirIndexer) {
-      return new DatabaseImpl(context, iParser, fhirIndexer, true);
-    }
-  }
-
-  @Singleton
-  @Component(modules = {TestDatabaseModule.class, FhirIndexerModule.class, ResourceModule.class})
-  public interface TestComponent {
-    void inject(DatabaseImplTest databaseImplTest);
-
-    @Component.Builder
-    interface Builder {
-      @BindsInstance
-      Builder withContext(Context context);
-
-      TestComponent build();
-    }
-  }
+  private FhirServices services =
+      FhirServices.builder(ApplicationProvider.getApplicationContext()).inMemory().build();
+  TestingUtils testingUtils = new TestingUtils(services.getParser());
+  Database database = services.getDatabase();
 
   @Before
   public void setUp() throws Exception {
-    DaggerDatabaseImplTest_TestComponent.builder()
-        .withContext(ApplicationProvider.getApplicationContext())
-        .build()
-        .inject(this);
     database.insert(TEST_PATIENT_1);
   }
 

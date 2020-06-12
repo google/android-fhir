@@ -19,11 +19,10 @@ package com.google.fhirengine.search.impl
 import com.google.fhirengine.db.Database
 import com.google.fhirengine.search.Search
 import com.google.fhirengine.search.criteria.FilterCriterion
-import javax.inject.Inject
 import org.hl7.fhir.r4.model.Resource
 
 /** Implementation of the [Search] interface. */
-class SearchImpl @Inject constructor(val database: Database) : Search {
+class SearchImpl constructor(val database: Database) : Search {
     override fun <R : Resource> of(clazz: Class<R>) = SearchSpecificationImpl(clazz)
 
     /** Implementation of the [Search.SearchSpecifications] interface. */

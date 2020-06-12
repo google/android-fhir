@@ -16,7 +16,7 @@
 
 package com.google.fhirengine.cql;
 
-import javax.inject.Inject;
+import com.google.fhirengine.db.Database;
 import org.opencds.cqf.cql.data.CompositeDataProvider;
 import org.opencds.cqf.cql.model.ModelResolver;
 import org.opencds.cqf.cql.retrieve.RetrieveProvider;
@@ -26,8 +26,15 @@ import org.opencds.cqf.cql.retrieve.RetrieveProvider;
  * the {@link org.opencds.cqf.cql.execution.CqlEngine} required data to complete CQL evaluation.
  */
 public class FhirEngineDataProvider extends CompositeDataProvider {
-  @Inject
   public FhirEngineDataProvider(ModelResolver modelResolver, RetrieveProvider retrieveProvider) {
     super(modelResolver, retrieveProvider);
+  }
+
+  // TODO internal after moving to kotlin
+  public static class Factory {
+    public static FhirEngineDataProvider create(Database database) {
+      return new FhirEngineDataProvider(
+          new AndroidR4FhirModelResolver(), new FhirEngineRetrieveProvider(database));
+    }
   }
 }

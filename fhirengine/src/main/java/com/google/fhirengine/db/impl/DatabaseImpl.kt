@@ -23,7 +23,6 @@ import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.resource.ResourceUtils
 import com.google.fhirengine.search.impl.ResourceQuery
-import javax.inject.Inject
 import org.hl7.fhir.r4.model.Resource
 
 /**
@@ -34,9 +33,8 @@ internal class DatabaseImpl(
   context: Context,
   private val iParser: IParser,
   fhirIndexer: FhirIndexer,
-  inMemory: Boolean
+  databaseName: String?
 ) : com.google.fhirengine.db.Database {
-    @Inject
     constructor(
       context: Context,
       iParser: IParser,
@@ -45,12 +43,11 @@ internal class DatabaseImpl(
         context = context,
         iParser = iParser,
         fhirIndexer = fhirIndexer,
-        inMemory = false)
-
-    val builder = if (inMemory) {
+        databaseName = DEFAULT_DATABASE_NAME)
+    val builder = if (databaseName == null) {
         Room.inMemoryDatabaseBuilder(context, RoomResourceDb::class.java)
     } else {
-        Room.databaseBuilder(context, RoomResourceDb::class.java, DATABASE_NAME)
+        Room.databaseBuilder(context, RoomResourceDb::class.java, databaseName)
     }
     val db = builder
         // TODO https://github.com/jingtang10/fhir-engine/issues/32
@@ -139,6 +136,6 @@ internal class DatabaseImpl(
             dao.getResources(query.getSupportSQLiteQuery()).map { iParser.parseResource(it) as R }
 
     companion object {
-        private const val DATABASE_NAME = "ResourceDatabase"
+        private const val DEFAULT_DATABASE_NAME = "ResourceDatabase"
     }
 }

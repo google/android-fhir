@@ -24,7 +24,6 @@ import com.google.fhirengine.index.ReferenceIndex
 import com.google.fhirengine.index.ResourceIndices
 import com.google.fhirengine.index.StringIndex
 import java.util.Locale
-import javax.inject.Inject
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Reference
@@ -32,7 +31,7 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
 
 /** Implementation of [FhirIndexer].  */
-internal class FhirIndexerImpl @Inject constructor() : FhirIndexer {
+internal class FhirIndexerImpl constructor() : FhirIndexer {
     override fun <R : Resource> index(resource: R): ResourceIndices {
         return extractIndexValues(resource)
     }

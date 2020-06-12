@@ -16,7 +16,6 @@
 
 package com.google.fhirengine.cql;
 
-import javax.inject.Inject;
 import org.opencds.cqf.cql.runtime.Code;
 import org.opencds.cqf.cql.terminology.CodeSystemInfo;
 import org.opencds.cqf.cql.terminology.TerminologyProvider;
@@ -25,7 +24,6 @@ import org.opencds.cqf.cql.terminology.ValueSetInfo;
 /** Fhir Engine's implementation of {@link TerminologyProvider}. */
 public class FhirEngineTerminologyProvider implements TerminologyProvider {
 
-  @Inject
   public FhirEngineTerminologyProvider() {}
 
   @Override

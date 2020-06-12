@@ -26,7 +26,6 @@ import androidx.lifecycle.ViewModelProvider;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.fhirengine.DaggerFhirEngineComponent;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.example.api.HapiFhirService;
 import java.io.BufferedReader;
@@ -62,8 +61,7 @@ public class MainActivity extends AppCompatActivity {
     expressionInput = findViewById(R.id.expression_input);
     evaluationResultTextView = findViewById(R.id.evaluate_result);
 
-    // Gets FHIR Engine using Dagger component.
-    fhirEngine = DaggerFhirEngineComponent.builder().context(this).build().getFhirEngine();
+    fhirEngine = FhirEngine.builder(this).inMemory().build();
 
     IParser parser = FhirContext.forR4().newJsonParser();
     HapiFhirService service = HapiFhirService.Companion.create(parser);
