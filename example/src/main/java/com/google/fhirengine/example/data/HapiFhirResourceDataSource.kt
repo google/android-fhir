@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.sync
+package com.google.fhirengine.example.data
 
+import com.google.fhirengine.example.api.HapiFhirService
+import com.google.fhirengine.sync.FhirDataSource
 import org.hl7.fhir.r4.model.Bundle
 
 /**
- * Interface for an abstraction of retrieving static data from a network source. The data can be
- * retrieved in pages and each data retrieval is an expensive operation.
+ * Implementation of the [FhirDataSource] that communicates with hapi fhir.
+ *
+ * If we would communicate with a server that needs authentication, then make sure that in
+ * [loadData] you first check whether you're authenticated, if not, trigger the authentication
  */
-abstract class FhirDataSource() {
+class HapiFhirResourceDataSource(
+  private val service: HapiFhirService
+) : FhirDataSource() {
 
-    /**
-     * Implement this method to load remote data based on a url [path].
-     * A service base url is of the form: `http{s}://server/{path}`
-     */
-    abstract suspend fun loadData(path: String): Bundle
+    override suspend fun loadData(path: String): Bundle {
+        return service.getResource(path)
+    }
 }

@@ -24,6 +24,7 @@ import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.resource.ResourceUtils
 import com.google.fhirengine.search.impl.ResourceQuery
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * The implementation for the persistence layer using Room.
@@ -81,6 +82,11 @@ internal class DatabaseImpl(
         )?.let {
             iParser.parseResource(clazz, it)
         } ?: throw ResourceNotFoundInDbException(type.name, id)
+    }
+
+    // TODO implement the last update date query
+    override fun lastUpdate(resourceType: ResourceType): String? {
+        return "2020-04-28T11:27:40.123+00:00"
     }
 
     override fun <R : Resource> delete(clazz: Class<R>, id: String) {

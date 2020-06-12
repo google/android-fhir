@@ -16,35 +16,42 @@
 
 package com.google.fhirengine.sync
 
-import android.util.Log
-import com.google.fhirengine.FhirEngine
+import com.google.fhirengine.db.Database
+import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.ResourceType
+
+sealed class Result {
+    object Success : Result()
+    data class Error(val exceptions: List<ResourceSyncException>) : Result()
+}
+
+data class ResourceSyncException(val resourceType: ResourceType, val exception: Exception)
 
 /**
  * Class that helps synchronize the data source and save it in the local database
- * TODO remove the FhirEngine dependency
  */
 class FhirSynchroniser(
-    private val dataSource: FhirDataSource,
-    private val fhirEngine: FhirEngine
+  private val syncConfiguration: SyncConfiguration,
+  private val database: Database
 ) {
+    fun sync(): Result = runBlocking {
+        val exceptions = mutableListOf<ResourceSyncException>()
+        syncConfiguration.syncData.forEach { syncData ->
+            val resourceSynchroniser = ResourceSynchroniser(
+                syncData,
+                syncConfiguration.dataSource,
+                database
+            )
 
-    private var entriesDownloaded = 0
-    suspend fun synchronise() {
-        var loadResult: FhirLoadResult
-        do {
-            loadResult = dataSource.loadData()
-            loadResult.resource?.let { bundle ->
-                val total = bundle.total
-                entriesDownloaded += bundle.entry.size
-
-                val percentage = if (total == 0) {
-                    0
-                } else {
-                    entriesDownloaded * 100 / total
-                }
-                Log.d("FhirSynchroniser", "downloaded $percentage%: $entriesDownloaded out of $total")
-//            loadResult.resource?.let { fhirEngine.save(it) }
+            val result = resourceSynchroniser.sync()
+            if (result is Result.Error) {
+                exceptions.addAll(result.exceptions)
             }
-        } while (loadResult.canLoadMore)
+        }
+        if (exceptions.isEmpty()) {
+            return@runBlocking Result.Success
+        } else {
+            return@runBlocking Result.Error(exceptions)
+        }
     }
 }

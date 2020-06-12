@@ -17,6 +17,8 @@
 package com.google.fhirengine
 
 import com.google.fhirengine.search.Search
+import com.google.fhirengine.sync.Result
+import com.google.fhirengine.sync.SyncConfiguration
 import org.hl7.fhir.r4.model.Resource
 import org.opencds.cqf.cql.execution.EvaluationResult
 
@@ -66,4 +68,9 @@ interface FhirEngine {
 
     /** Returns the entry point for [Search]. */
     fun search(): Search
+
+    /** TODO make this part of a builder *  */
+    fun setSyncConfiguration(syncConfiguration: SyncConfiguration?)
+
+    fun sync(): Result
 }

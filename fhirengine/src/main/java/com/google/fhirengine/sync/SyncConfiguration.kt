@@ -16,17 +16,20 @@
 
 package com.google.fhirengine.sync
 
-import org.hl7.fhir.r4.model.Bundle
+import androidx.work.Constraints
 
-/**
- * Interface for an abstraction of retrieving static data from a network source. The data can be
- * retrieved in pages and each data retrieval is an expensive operation.
- */
-abstract class FhirDataSource() {
+data class SyncConfiguration(
+  /**
+   *  Data that needs to be synchronised
+   */
+  val syncData: List<SyncData> = emptyList(),
+    // using WorkManager constraints here until we decide if we want to write our own
+  val syncConstraints: Constraints = Constraints.Builder().build(),
+  /**
+   *  true if the SDK needs to retry a failed sync attempt, false otherwise
+   *  If this is set to true, then the result of the sync will be reported after the retry.
+   */
+  val retry: Boolean = false,
 
-    /**
-     * Implement this method to load remote data based on a url [path].
-     * A service base url is of the form: `http{s}://server/{path}`
-     */
-    abstract suspend fun loadData(path: String): Bundle
-}
+  val dataSource: FhirDataSource
+)
