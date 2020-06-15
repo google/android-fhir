@@ -29,8 +29,8 @@ class OrFilterCriterion constructor(val left: FilterCriterion, val right: Filter
         val leftQuery = left.query(clazz)
         val rightQuery = right.query(clazz)
         return ResourceIdQuery(
-                leftQuery.query + " UNION " + rightQuery.query,
-                ListUtils.union(leftQuery.args, rightQuery.args))
+                "${leftQuery.query} UNION ${rightQuery.query}",
+                leftQuery.args + rightQuery.args)
     }
 }
 
