@@ -140,7 +140,7 @@ internal class DatabaseImpl(
     }
 
     override fun <R : Resource> search(query: ResourceQuery): List<R> =
-            dao.getResources(query!!.getSupportSQLiteQuery()).map { iParser.parseResource(it) as R }
+            dao.getResources(query.getSupportSQLiteQuery()).map { iParser.parseResource(it) as R }
 
     companion object {
         private const val DATABASE_NAME = "ResourceDatabase"
