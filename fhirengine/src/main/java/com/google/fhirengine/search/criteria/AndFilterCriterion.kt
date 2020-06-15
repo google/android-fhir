@@ -31,8 +31,8 @@ class AndFilterCriterion constructor(
         val leftQuery = left.query(clazz)
         val rightQuery = right.query(clazz)
         return ResourceIdQuery(
-                leftQuery.query + " INTERSECT " + rightQuery.query,
-                ListUtils.union(leftQuery.args, rightQuery.args))
+                "${leftQuery.query}  INTERSECT ${rightQuery.query}",
+                leftQuery.args + rightQuery.args)
     }
 }
 
