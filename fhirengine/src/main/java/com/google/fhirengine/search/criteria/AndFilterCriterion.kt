@@ -17,7 +17,6 @@
 package com.google.fhirengine.search.criteria
 
 import com.google.fhirengine.search.impl.ResourceIdQuery
-import org.apache.commons.collections.ListUtils
 import org.hl7.fhir.r4.model.Resource
 
 /**
