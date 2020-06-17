@@ -23,6 +23,7 @@ import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
 import com.google.fhirengine.resource.ResourceUtils;
+import com.google.fhirengine.search.Search;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,15 +42,18 @@ import org.opencds.cqf.cql.terminology.TerminologyProvider;
 public class FhirEngineImpl implements FhirEngine {
 
   private final Database database;
+  private final Search search;
   private final CqlEngine cqlEngine;
 
   @Inject
   public FhirEngineImpl(
       Database database,
+      Search search,
       LibraryLoader libraryLoader,
       Map<String, DataProvider> dataProviderMap,
       TerminologyProvider terminologyProvider) {
     this.database = database;
+    this.search = search;
     this.cqlEngine =
         new CqlEngine(
             libraryLoader,
@@ -98,5 +102,10 @@ public class FhirEngineImpl implements FhirEngine {
     Map<VersionedIdentifier, Set<String>> map = new HashMap<>();
     map.put(versionedIdentifier, expressions);
     return cqlEngine.evaluate(contextMap, null, map);
+  }
+
+  @Override
+  public Search search() {
+    return search;
   }
 }

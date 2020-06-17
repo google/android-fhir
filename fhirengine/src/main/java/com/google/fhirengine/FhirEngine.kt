@@ -16,6 +16,7 @@
 
 package com.google.fhirengine
 
+import com.google.fhirengine.search.Search
 import org.hl7.fhir.r4.model.Resource
 import org.opencds.cqf.cql.execution.EvaluationResult
 
@@ -55,4 +56,7 @@ interface FhirEngine {
 
     /** Returns the result of a CQL evaluation provided with the ID of the library.  */
     fun evaluateCql(libraryVersionId: String, context: String, expression: String): EvaluationResult
+
+    /** Returns the entry point for [Search]. */
+    fun search(): Search
 }

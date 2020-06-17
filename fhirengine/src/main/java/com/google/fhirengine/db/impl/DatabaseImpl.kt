@@ -24,6 +24,7 @@ import com.google.fhirengine.db.ResourceAlreadyExistsInDbException
 import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.resource.ResourceUtils
+import com.google.fhirengine.search.impl.ResourceQuery
 import javax.inject.Inject
 import org.hl7.fhir.r4.model.Resource
 
@@ -137,6 +138,9 @@ internal class DatabaseImpl(
         val refs = searchByReference(clazz, reference, referenceValue).map { it.id }
         return searchByCode(clazz, code, codeSystem, codeValue).filter { refs.contains(it.id) }
     }
+
+    override fun <R : Resource> search(query: ResourceQuery): List<R> =
+            dao.getResources(query.getSupportSQLiteQuery()).map { iParser.parseResource(it) as R }
 
     companion object {
         private const val DATABASE_NAME = "ResourceDatabase"

@@ -31,6 +31,7 @@ import com.google.fhirengine.db.impl.DatabaseModule;
 import com.google.fhirengine.index.impl.FhirIndexerModule;
 import com.google.fhirengine.resource.ResourceModule;
 import com.google.fhirengine.resource.TestingUtils;
+import com.google.fhirengine.search.impl.SearchModule;
 import dagger.BindsInstance;
 import dagger.Component;
 import javax.inject.Inject;
@@ -77,7 +78,8 @@ public class FhirEngineImplTest {
         CqlModule.class,
         DatabaseModule.class,
         FhirIndexerModule.class,
-        ResourceModule.class
+        ResourceModule.class,
+        SearchModule.class
       })
   public interface TestComponent {
 
