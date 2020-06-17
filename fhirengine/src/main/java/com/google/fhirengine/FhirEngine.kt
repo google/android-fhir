@@ -36,7 +36,7 @@ interface FhirEngine {
      *
      * @param <R> The resource type which should be a subtype of [Resource].
      */
-    fun <R : Resource?> saveAll(resources: List<R>?)
+    fun <R : Resource> saveAll(resources: List<R>)
 
     /**
      * Updates a FHIR `resource` in the local storage.
