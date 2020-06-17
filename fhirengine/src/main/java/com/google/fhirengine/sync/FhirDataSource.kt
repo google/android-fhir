@@ -22,11 +22,11 @@ import org.hl7.fhir.r4.model.Bundle
  * Interface for an abstraction of retrieving static data from a network source. The data can be
  * retrieved in pages and each data retrieval is an expensive operation.
  */
-abstract class FhirDataSource() {
+interface FhirDataSource {
 
     /**
      * Implement this method to load remote data based on a url [path].
      * A service base url is of the form: `http{s}://server/{path}`
      */
-    abstract suspend fun loadData(path: String): Bundle
+    suspend fun loadData(path: String): Bundle
 }

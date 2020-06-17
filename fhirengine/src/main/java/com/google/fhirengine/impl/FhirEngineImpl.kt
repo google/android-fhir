@@ -22,6 +22,9 @@ import com.google.fhirengine.db.Database
 import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.resource.ResourceUtils
 import com.google.fhirengine.search.Search
+import com.google.fhirengine.sync.FhirDataSource
+import com.google.fhirengine.sync.FhirSynchroniser
+import com.google.fhirengine.sync.SyncConfiguration
 import java.util.EnumSet
 import org.cqframework.cql.elm.execution.VersionedIdentifier
 import org.hl7.fhir.r4.model.Resource
@@ -39,6 +42,9 @@ class FhirEngineImpl constructor(
   dataProviderMap: Map<String, @JvmSuppressWildcards DataProvider>,
   terminologyProvider: TerminologyProvider
 ) : FhirEngine {
+    private var syncConfiguration: SyncConfiguration? = null
+    private var dataSource: FhirDataSource? = null
+
     private val cqlEngine: CqlEngine = CqlEngine(
         libraryLoader,
         dataProviderMap,
@@ -89,5 +95,17 @@ class FhirEngineImpl constructor(
 
     override fun search(): Search {
         return search
+    }
+
+    override fun setSyncConfiguration(syncConfiguration: SyncConfiguration) {
+        this.syncConfiguration = syncConfiguration
+    }
+
+    override fun setSyncDataSource(dataSource: FhirDataSource) {
+        this.dataSource = dataSource
+    }
+
+    override fun sync(): Result {
+        return FhirSynchroniser(syncConfiguration, dataSource, database).sync()
     }
 }

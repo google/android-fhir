@@ -16,6 +16,7 @@
 
 package com.google.fhirengine.example
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -34,19 +35,17 @@ class MainActivityViewModel(
 
     fun requestPatients() {
         viewModelScope.launch {
-
             val syncData = listOf(
                 SyncData(
                     resourceType = ResourceType.Patient,
                     params = mapOf("address-country" to "United States")
                 )
             )
-            val syncConfig = SyncConfiguration(
-                syncData = syncData,
-                dataSource = HapiFhirResourceDataSource(service)
-            )
+            val syncConfig = SyncConfiguration(syncData = syncData)
             fhirEngine.setSyncConfiguration(syncConfig)
-            fhirEngine.sync()
+            fhirEngine.setSyncDataSource(HapiFhirResourceDataSource(service))
+            val result = fhirEngine.sync()
+            Log.d("MainActivityViewModel", "sync result: $result")
         }
     }
 }

@@ -23,11 +23,13 @@ import org.hl7.fhir.r4.model.Bundle
 class ResourceSynchroniser(
   private val syncData: SyncData,
   private val dataSource: FhirDataSource,
-  private val database: Database
+  private val database: Database,
+  retry: Boolean
 ) {
     private var nextUrl: String? = getInitialUrl()
+    private var retrySync = retry
 
-    suspend fun sync(): Result {
+    suspend fun sync() {
         try {
             while (nextUrl != null) {
                 val bundle = dataSource.loadData(nextUrl!!)
@@ -37,10 +39,14 @@ class ResourceSynchroniser(
 //                    database.insertAll(resources)
                 }
             }
-            return Result.Success
         } catch (exception: IOException) {
-            // retry ?
-            return Result.Error(listOf(ResourceSyncException(syncData.resourceType, exception)))
+            if (retrySync) {
+                retrySync = false
+                sync()
+            } else {
+                // propagate the exception upstream
+                throw exception
+            }
         }
     }
 

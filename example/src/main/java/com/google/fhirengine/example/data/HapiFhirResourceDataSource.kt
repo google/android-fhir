@@ -22,13 +22,10 @@ import org.hl7.fhir.r4.model.Bundle
 
 /**
  * Implementation of the [FhirDataSource] that communicates with hapi fhir.
- *
- * If we would communicate with a server that needs authentication, then make sure that in
- * [loadData] you first check whether you're authenticated, if not, trigger the authentication
  */
 class HapiFhirResourceDataSource(
   private val service: HapiFhirService
-) : FhirDataSource() {
+) : FhirDataSource {
 
     override suspend fun loadData(path: String): Bundle {
         return service.getResource(path)

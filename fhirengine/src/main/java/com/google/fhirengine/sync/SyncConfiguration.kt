@@ -29,7 +29,5 @@ data class SyncConfiguration(
    *  true if the SDK needs to retry a failed sync attempt, false otherwise
    *  If this is set to true, then the result of the sync will be reported after the retry.
    */
-  val retry: Boolean = false,
-
-  val dataSource: FhirDataSource
+  val retry: Boolean = false
 )

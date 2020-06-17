@@ -32,6 +32,7 @@ data class ResourceSyncException(val resourceType: ResourceType, val exception: 
  */
 class FhirSynchroniser(
   private val syncConfiguration: SyncConfiguration,
+  private val dataSource: FhirDataSource,
   private val database: Database
 ) {
     fun sync(): Result = runBlocking {
@@ -39,13 +40,14 @@ class FhirSynchroniser(
         syncConfiguration.syncData.forEach { syncData ->
             val resourceSynchroniser = ResourceSynchroniser(
                 syncData,
-                syncConfiguration.dataSource,
-                database
+                dataSource,
+                database,
+                syncConfiguration.retry
             )
-
-            val result = resourceSynchroniser.sync()
-            if (result is Result.Error) {
-                exceptions.addAll(result.exceptions)
+            try {
+                resourceSynchroniser.sync()
+            } catch (exception: Exception) {
+                exceptions.add(ResourceSyncException(syncData.resourceType, exception))
             }
         }
         if (exceptions.isEmpty()) {
