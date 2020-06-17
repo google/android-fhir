@@ -21,6 +21,7 @@ import com.google.fhirengine.ResourceNotFoundException
 import com.google.fhirengine.db.Database
 import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.resource.ResourceUtils
+import com.google.fhirengine.search.Search
 import java.util.EnumSet
 import javax.inject.Inject
 import org.cqframework.cql.elm.execution.VersionedIdentifier
@@ -34,6 +35,7 @@ import org.opencds.cqf.cql.terminology.TerminologyProvider
 /** Implementation of [FhirEngine].  */
 class FhirEngineImpl @Inject constructor(
   private val database: Database,
+  private val search: Search,
   libraryLoader: LibraryLoader,
   dataProviderMap: Map<String, @JvmSuppressWildcards DataProvider>,
   terminologyProvider: TerminologyProvider
@@ -84,5 +86,9 @@ class FhirEngineImpl @Inject constructor(
         val map: MutableMap<VersionedIdentifier, Set<String>> = HashMap()
         map[versionedIdentifier] = expressions
         return cqlEngine.evaluate(contextMap, null, map)
+    }
+
+    override fun search(): Search {
+        return search
     }
 }

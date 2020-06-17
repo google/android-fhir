@@ -24,7 +24,6 @@ import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import ca.uhn.fhir.parser.IParser;
 import com.google.fhirengine.db.Database;
-import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
 import com.google.fhirengine.index.FhirIndexer;
 import com.google.fhirengine.index.impl.FhirIndexerModule;
@@ -34,6 +33,8 @@ import dagger.BindsInstance;
 import dagger.Component;
 import dagger.Module;
 import dagger.Provides;
+import java.util.ArrayList;
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.hl7.fhir.r4.model.Enumerations;
@@ -111,17 +112,15 @@ public class DatabaseImplTest {
   }
 
   @Test
-  public void insert_existingResource_shouldThrowResourceAlreadyExistsException() throws Exception {
-    ResourceAlreadyExistsInDbException resourceAlreadyExistsInDbException =
-        assertThrows(
-            ResourceAlreadyExistsInDbException.class, () -> database.insert(TEST_PATIENT_1));
-    assertEquals(
-        "Resource with type "
-            + TEST_PATIENT_1.getResourceType().name()
-            + " and id "
-            + TEST_PATIENT_1_ID
-            + " already exists!",
-        resourceAlreadyExistsInDbException.getMessage());
+  public void insertAll_shouldInsertResources() throws Exception {
+    List<Patient> patients = new ArrayList();
+    patients.add(TEST_PATIENT_1);
+    patients.add(TEST_PATIENT_2);
+    database.insertAll(patients);
+    testingUtils.assertResourceEquals(
+        TEST_PATIENT_1, database.select(Patient.class, TEST_PATIENT_1_ID));
+    testingUtils.assertResourceEquals(
+        TEST_PATIENT_2, database.select(Patient.class, TEST_PATIENT_2_ID));
   }
 
   @Test

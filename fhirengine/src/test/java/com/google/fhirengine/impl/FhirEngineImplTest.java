@@ -23,7 +23,6 @@ import android.content.Context;
 import android.os.Build;
 import androidx.test.core.app.ApplicationProvider;
 import com.google.fhirengine.FhirEngine;
-import com.google.fhirengine.ResourceAlreadyExistsException;
 import com.google.fhirengine.ResourceNotFoundException;
 import com.google.fhirengine.cql.CqlModule;
 import com.google.fhirengine.db.Database;
@@ -34,6 +33,8 @@ import com.google.fhirengine.resource.TestingUtils;
 import com.google.fhirengine.search.impl.SearchModule;
 import dagger.BindsInstance;
 import dagger.Component;
+import java.util.ArrayList;
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.hl7.fhir.r4.model.Enumerations;
@@ -45,7 +46,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-/** Unit tests for {@link DatabaseImpl}. */
+/** Unit tests for {@link FhirEngineImpl}. */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = Build.VERSION_CODES.P)
 public class FhirEngineImplTest {
@@ -113,16 +114,15 @@ public class FhirEngineImplTest {
   }
 
   @Test
-  public void save_existingResource_shouldThrowResourceAlreadyExistsException() throws Exception {
-    ResourceAlreadyExistsException resourceAlreadyExistsInDbException =
-        assertThrows(ResourceAlreadyExistsException.class, () -> fhirEngine.save(TEST_PATIENT_1));
-    assertEquals(
-        "Resource with type "
-            + ResourceType.Patient.name()
-            + " and id "
-            + TEST_PATIENT_1_ID
-            + " already exists!",
-        resourceAlreadyExistsInDbException.getMessage());
+  public void saveAll_shouldSaveResource() throws Exception {
+    List<Patient> patients = new ArrayList();
+    patients.add(TEST_PATIENT_1);
+    patients.add(TEST_PATIENT_2);
+    fhirEngine.saveAll(patients);
+    testingUtils.assertResourceEquals(
+        TEST_PATIENT_1, fhirEngine.load(Patient.class, TEST_PATIENT_1_ID));
+    testingUtils.assertResourceEquals(
+        TEST_PATIENT_2, fhirEngine.load(Patient.class, TEST_PATIENT_2_ID));
   }
 
   @Test
