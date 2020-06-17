@@ -34,9 +34,9 @@ import org.opencds.cqf.cql.terminology.TerminologyProvider
 /** Implementation of [FhirEngine].  */
 class FhirEngineImpl @Inject constructor(
   private val database: Database,
-  libraryLoader: LibraryLoader?,
-  dataProviderMap: Map<String?, DataProvider?>?,
-  terminologyProvider: TerminologyProvider?
+  libraryLoader: LibraryLoader,
+  dataProviderMap: Map<String, @JvmSuppressWildcards DataProvider>,
+  terminologyProvider: TerminologyProvider
 ) : FhirEngine {
     private val cqlEngine: CqlEngine = CqlEngine(
         libraryLoader,

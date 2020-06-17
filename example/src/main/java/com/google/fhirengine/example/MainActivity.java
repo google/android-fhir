@@ -28,7 +28,6 @@ import ca.uhn.fhir.parser.IParser;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.fhirengine.DaggerFhirEngineComponent;
 import com.google.fhirengine.FhirEngine;
-import com.google.fhirengine.ResourceAlreadyExistsException;
 import com.google.fhirengine.example.api.HapiFhirService;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -119,19 +118,6 @@ public class MainActivity extends AppCompatActivity {
       } catch (IOException e) {
         e.printStackTrace();
         Snackbar.make(cqlLibraryUrlInput, "Something went wrong...", Snackbar.LENGTH_SHORT).show();
-      } catch (ResourceAlreadyExistsException e) {
-        e.printStackTrace();
-        if (resource != null) {
-          Snackbar.make(
-                  cqlLibraryUrlInput,
-                  "The "
-                      + resource.getResourceType().name()
-                      + " with ID "
-                      + resource.getId()
-                      + " was already loaded...",
-                  Snackbar.LENGTH_SHORT)
-              .show();
-        }
       }
       return null;
     }
