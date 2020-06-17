@@ -24,6 +24,7 @@ import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.resource.ResourceUtils
 import com.google.fhirengine.search.impl.ResourceQuery
 import org.hl7.fhir.r4.model.Resource
+import java.math.BigDecimal
 
 /**
  * The implementation for the persistence layer using Room.
@@ -36,24 +37,25 @@ internal class DatabaseImpl(
   databaseName: String?
 ) : com.google.fhirengine.db.Database {
     constructor(
-      context: Context,
-      iParser: IParser,
-      fhirIndexer: FhirIndexer
+            context: Context,
+            iParser: IParser,
+            fhirIndexer: FhirIndexer
     ) : this(
-        context = context,
-        iParser = iParser,
-        fhirIndexer = fhirIndexer,
-        databaseName = DEFAULT_DATABASE_NAME)
+            context = context,
+            iParser = iParser,
+            fhirIndexer = fhirIndexer,
+            databaseName = DEFAULT_DATABASE_NAME)
+
     val builder = if (databaseName == null) {
         Room.inMemoryDatabaseBuilder(context, RoomResourceDb::class.java)
     } else {
         Room.databaseBuilder(context, RoomResourceDb::class.java, databaseName)
     }
     val db = builder
-        // TODO https://github.com/jingtang10/fhir-engine/issues/32
-        //  don't allow main thread queries
-        .allowMainThreadQueries()
-        .build()
+            // TODO https://github.com/jingtang10/fhir-engine/issues/32
+            //  don't allow main thread queries
+            .allowMainThreadQueries()
+            .build()
     val dao by lazy {
         db.dao().also {
             it.fhirIndexer = fhirIndexer
@@ -76,8 +78,8 @@ internal class DatabaseImpl(
     override fun <R : Resource> select(clazz: Class<R>, id: String): R {
         val type = ResourceUtils.getResourceType(clazz)
         return dao.getResource(
-            resourceId = id,
-            resourceType = type
+                resourceId = id,
+                resourceType = type
         )?.let {
             iParser.parseResource(clazz, it)
         } ?: throw ResourceNotFoundInDbException(type.name, id)
@@ -86,50 +88,62 @@ internal class DatabaseImpl(
     override fun <R : Resource> delete(clazz: Class<R>, id: String) {
         val type = ResourceUtils.getResourceType(clazz)
         dao.deleteResource(
-            resourceId = id,
-            resourceType = type
+                resourceId = id,
+                resourceType = type
         )
     }
 
     override fun <R : Resource> searchByReference(
-      clazz: Class<R>,
-      reference: String,
-      value: String
+            clazz: Class<R>,
+            reference: String,
+            value: String
     ): List<R> {
         return dao.getResourceByReferenceIndex(
-            ResourceUtils.getResourceType(clazz).name, reference, value)
-            .map { iParser.parseResource(it) as R }
+                ResourceUtils.getResourceType(clazz).name, reference, value)
+                .map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource> searchByString(
-      clazz: Class<R>,
-      string: String,
-      value: String
+            clazz: Class<R>,
+            string: String,
+            value: String
     ): List<R> {
         return dao.getResourceByStringIndex(ResourceUtils.getResourceType(clazz).name, string,
-            value).map { iParser.parseResource(it) as R }
+                value).map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource> searchByCode(
-      clazz: Class<R>,
-      code: String,
-      system: String,
-      value: String
+            clazz: Class<R>,
+            code: String,
+            system: String,
+            value: String
     ): List<R> {
         return dao.getResourceByTokenIndex(ResourceUtils.getResourceType(clazz).name, code, system,
                 value).map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource> searchByReferenceAndCode(
-      clazz: Class<R>,
-      reference: String,
-      referenceValue: String,
-      code: String,
-      codeSystem: String,
-      codeValue: String
+            clazz: Class<R>,
+            reference: String,
+            referenceValue: String,
+            code: String,
+            codeSystem: String,
+            codeValue: String
     ): List<R> {
         val refs = searchByReference(clazz, reference, referenceValue).map { it.id }
         return searchByCode(clazz, code, codeSystem, codeValue).filter { refs.contains(it.id) }
+    }
+
+    override fun <R : Resource> searchByQuantity(
+            clazz: Class<R>,
+            name: String,
+            path: String,
+            system: String,
+            value: BigDecimal,
+            unit: String
+    ): List<R> {
+        return dao.getResourceByQuantityIndex(ResourceUtils.getResourceType(clazz).name, name, path,
+                system, value, unit).map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource> search(query: ResourceQuery): List<R> =

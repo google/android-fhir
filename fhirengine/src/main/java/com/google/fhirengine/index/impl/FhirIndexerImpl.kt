@@ -19,16 +19,24 @@ package com.google.fhirengine.index.impl
 import android.util.Log
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
 import com.google.fhirengine.index.FhirIndexer
+import com.google.fhirengine.index.QuantityIndex
 import com.google.fhirengine.index.ReferenceIndex
 import com.google.fhirengine.index.ResourceIndices
 import com.google.fhirengine.index.StringIndex
 import com.google.fhirengine.index.TokenIndex
+import org.hl7.fhir.instance.model.api.IBaseDatatype
 import java.util.Locale
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Money
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Range
+import org.hl7.fhir.r4.model.Ratio
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
+import java.math.BigDecimal
+
 
 /** Implementation of [FhirIndexer].  */
 internal class FhirIndexerImpl constructor() : FhirIndexer {
@@ -81,6 +89,34 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                         }
                     }
                 }
+                SEARCH_PARAM_DEFINITION_TYPE_QUANTITY -> {
+                    resource.valuesForPath(searchParamDefinition).quantityValues().forEach { quantity ->
+
+                        val system: String
+                        val unit: String
+                        val value: BigDecimal
+
+                        if (quantity is Quantity) {
+                            system = quantity.system
+                            unit = quantity.unit
+                            value = quantity.value
+                        } else if (quantity is Money) {
+                            system = FHIR_CURRENCY_SYSTEM
+                            unit = quantity.currency
+                            value = quantity.value
+                        } else {
+                            throw IllegalArgumentException("$quantity is of unknown type ${quantity.javaClass.simpleName}")
+                        }
+
+                        indexBuilder.addQuantityIndex(QuantityIndex(
+                                name = searchParamDefinition.name,
+                                path = searchParamDefinition.path,
+                                system = system,
+                                unit = unit,
+                                value = value
+                        ))
+                    }
+                }
                 // TODO: Implement number, date, token, reference, composite, quantity, URI,
                 //  and special search parameter types.
             }
@@ -129,6 +165,22 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                 it.coding.asSequence()
             } else {
                 emptySequence()
+            }
+        }
+    }
+
+    /** Returns the quantity values for the list of `objects`.  */
+    private fun Sequence<Any>.quantityValues(): Sequence<IBaseDatatype> {
+        return flatMap {
+            when (it) {
+                is Money -> sequenceOf(it)
+                is Quantity -> sequenceOf(it)
+                is Range -> sequenceOf(it.low, it.high)
+                is Ratio -> sequenceOf(it.numerator, it.denominator)
+                // TODO: Find other FHIR datatypes types the "quantity" type maps to.
+                //  See: http://hl7.org/fhir/datatypes.html#quantity
+
+                else -> emptySequence()
             }
         }
     }
@@ -192,6 +244,12 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
         private const val SEARCH_PARAM_DEFINITION_TYPE_REFERENCE = "reference"
         /** The string representing the code search parameter type.  */
         private const val SEARCH_PARAM_DEFINITION_TYPE_CODE = "token"
+        /** The string representing the quantity search parameter type.  */
+        private const val SEARCH_PARAM_DEFINITION_TYPE_QUANTITY = "quantity"
+        /** The string for FHIR currency system */
+        // See: https://bit.ly/30YB3ML
+        // See: https://www.hl7.org/fhir/valueset-currencies.html
+        private const val FHIR_CURRENCY_SYSTEM = "urn:iso:std:iso:4217"
         /** Tag for logging.  */
         private const val TAG = "FhirIndexerImpl"
         private val DOT_NOTATION_REGEX = "^[a-zA-Z0-9.]+$".toRegex()

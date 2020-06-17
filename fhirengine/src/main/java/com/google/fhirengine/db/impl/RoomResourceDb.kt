@@ -31,13 +31,15 @@ import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.index.ResourceIndices
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import java.math.BigDecimal
 
 @Database(
         entities = [
             ResourceEntity::class,
             StringIndexEntity::class,
             ReferenceIndexEntity::class,
-            TokenIndexEntity::class
+            TokenIndexEntity::class,
+            QuantityIndexEntity::class
         ],
         version = 1,
         exportSchema = false
@@ -123,6 +125,13 @@ internal abstract class Dao {
                     index = it,
                     resourceId = resource.resourceId))
         }
+        index.quantityIndices.forEach {
+            insertQuantityIndex(QuantityIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId))
+        }
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -136,6 +145,9 @@ internal abstract class Dao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertTokenIndex(tokenIndexEntity: TokenIndexEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insertQuantityIndex(quantityIndexEntity: QuantityIndexEntity)
 
     @Query("""
         DELETE FROM ResourceEntity
@@ -199,6 +211,27 @@ internal abstract class Dao {
       indexPath: String,
       indexSystem: String,
       indexValue: String
+    ): List<String>
+
+    @Query("""
+        SELECT ResourceEntity.serializedResource
+        FROM ResourceEntity
+        JOIN QuantityIndexEntity
+        ON ResourceEntity.resourceType = QuantityIndexEntity.resourceType
+            AND ResourceEntity.resourceId = QuantityIndexEntity.resourceId
+        WHERE QuantityIndexEntity.resourceType = :resourceType
+            AND QuantityIndexEntity.index_name = :indexName
+            AND QuantityIndexEntity.index_path = :indexPath
+            AND QuantityIndexEntity.index_system = :indexSystem
+            AND QuantityIndexEntity.index_value = :indexValue
+            AND QuantityIndexEntity.index_unit = :indexUnit""")
+    abstract fun getResourceByQuantityIndex(
+            resourceType: String,
+            indexName: String,
+            indexPath: String,
+            indexSystem: String,
+            indexValue: BigDecimal,
+            indexUnit: String
     ): List<String>
 
     @RawQuery
