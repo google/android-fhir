@@ -29,16 +29,16 @@ import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.annotation.Transaction
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.index.ResourceIndices
+import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import java.math.BigDecimal
 
 @Database(
         entities = [
             ResourceEntity::class,
             StringIndexEntity::class,
             ReferenceIndexEntity::class,
-            TokenIndexEntity::class,
+            CodeIndexEntity::class,
             QuantityIndexEntity::class
         ],
         version = 1,
@@ -118,8 +118,8 @@ internal abstract class Dao {
                 )
             )
         }
-        index.tokenIndices.forEach {
-            insertTokenIndex(TokenIndexEntity(
+        index.codeIndices.forEach {
+            insertCodeIndex(CodeIndexEntity(
                     id = 0,
                     resourceType = resource.resourceType,
                     index = it,
@@ -144,7 +144,7 @@ internal abstract class Dao {
     abstract fun insertReferenceIndex(referenceIndexEntity: ReferenceIndexEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertTokenIndex(tokenIndexEntity: TokenIndexEntity)
+    abstract fun insertCodeIndex(codeIndexEntity: CodeIndexEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertQuantityIndex(quantityIndexEntity: QuantityIndexEntity)
@@ -199,14 +199,14 @@ internal abstract class Dao {
     @Query("""
         SELECT ResourceEntity.serializedResource
         FROM ResourceEntity
-        JOIN TokenIndexEntity
-        ON ResourceEntity.resourceType = TokenIndexEntity.resourceType
-            AND ResourceEntity.resourceId = TokenIndexEntity.resourceId
-        WHERE TokenIndexEntity.resourceType = :resourceType
-            AND TokenIndexEntity.index_path = :indexPath
-            AND TokenIndexEntity.index_system = :indexSystem
-            AND TokenIndexEntity.index_value = :indexValue""")
-    abstract fun getResourceByTokenIndex(
+        JOIN CodeIndexEntity
+        ON ResourceEntity.resourceType = CodeIndexEntity.resourceType
+            AND ResourceEntity.resourceId = CodeIndexEntity.resourceId
+        WHERE CodeIndexEntity.resourceType = :resourceType
+            AND CodeIndexEntity.index_path = :indexPath
+            AND CodeIndexEntity.index_system = :indexSystem
+            AND CodeIndexEntity.index_value = :indexValue""")
+    abstract fun getResourceByCodeIndex(
       resourceType: String,
       indexPath: String,
       indexSystem: String,
@@ -226,12 +226,12 @@ internal abstract class Dao {
             AND QuantityIndexEntity.index_value = :indexValue
             AND QuantityIndexEntity.index_unit = :indexUnit""")
     abstract fun getResourceByQuantityIndex(
-            resourceType: String,
-            indexName: String,
-            indexPath: String,
-            indexSystem: String,
-            indexValue: BigDecimal,
-            indexUnit: String
+      resourceType: String,
+      indexName: String,
+      indexPath: String,
+      indexSystem: String,
+      indexValue: BigDecimal,
+      indexUnit: String
     ): List<String>
 
     @RawQuery

@@ -17,7 +17,7 @@
 package com.google.fhirengine.index
 
 /** A code index for a specific resource.  */
-internal data class TokenIndex(
+internal data class CodeIndex(
   /** The name of the code index, e.g. "code".  */
   val name: String,
   /** The path of the code index, e.g. "Observation.code".  */

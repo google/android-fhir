@@ -18,14 +18,15 @@ package com.google.fhirengine.index.impl
 
 import android.util.Log
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
+import com.google.fhirengine.index.CodeIndex
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.index.QuantityIndex
 import com.google.fhirengine.index.ReferenceIndex
 import com.google.fhirengine.index.ResourceIndices
 import com.google.fhirengine.index.StringIndex
-import com.google.fhirengine.index.TokenIndex
-import org.hl7.fhir.instance.model.api.IBaseDatatype
+import java.math.BigDecimal
 import java.util.Locale
+import org.hl7.fhir.instance.model.api.IBaseDatatype
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Money
@@ -35,8 +36,6 @@ import org.hl7.fhir.r4.model.Ratio
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
-import java.math.BigDecimal
-
 
 /** Implementation of [FhirIndexer].  */
 internal class FhirIndexerImpl constructor() : FhirIndexer {
@@ -80,7 +79,7 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                         val system = code.system
                         val value = code.code
                         if (system?.isNotEmpty() == true && value?.isNotEmpty() == true) {
-                            indexBuilder.addCodeIndex(TokenIndex(
+                            indexBuilder.addCodeIndex(CodeIndex(
                                 name = searchParamDefinition.name,
                                 path = searchParamDefinition.path,
                                 system = system,
@@ -90,7 +89,9 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                     }
                 }
                 SEARCH_PARAM_DEFINITION_TYPE_QUANTITY -> {
-                    resource.valuesForPath(searchParamDefinition).quantityValues().forEach { quantity ->
+                    resource.valuesForPath(searchParamDefinition)
+                            .quantityValues()
+                            .forEach { quantity ->
 
                         val system: String
                         val unit: String
@@ -105,7 +106,8 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                             unit = quantity.currency
                             value = quantity.value
                         } else {
-                            throw IllegalArgumentException("$quantity is of unknown type ${quantity.javaClass.simpleName}")
+                            throw IllegalArgumentException(
+                                    "$quantity is of unknown type ${quantity.javaClass.simpleName}")
                         }
 
                         indexBuilder.addQuantityIndex(QuantityIndex(

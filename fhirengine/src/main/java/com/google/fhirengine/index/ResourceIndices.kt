@@ -37,7 +37,7 @@ internal data class ResourceIndices(
   /** The reference indices.  */
   val referenceIndices: List<ReferenceIndex>,
   /** The code indices.  */
-  val tokenIndices: List<TokenIndex>,
+  val codeIndices: List<CodeIndex>,
   /** The quantity indices. */
   val quantityIndices: List<QuantityIndex>
 ) {
@@ -48,7 +48,7 @@ internal data class ResourceIndices(
     ) {
         private val stringIndices = mutableListOf<StringIndex>()
         private val referenceIndices = mutableListOf<ReferenceIndex>()
-        private val codeIndices = mutableListOf<TokenIndex>()
+        private val codeIndices = mutableListOf<CodeIndex>()
         private val quantityIndices = mutableListOf<QuantityIndex>()
 
         fun addStringIndex(stringIndex: StringIndex) = this.also {
@@ -59,8 +59,8 @@ internal data class ResourceIndices(
             referenceIndices.add(referenceIndex)
         }
 
-        fun addCodeIndex(tokenIndex: TokenIndex) = this.also {
-            codeIndices.add(tokenIndex)
+        fun addCodeIndex(codeIndex: CodeIndex) = this.also {
+            codeIndices.add(codeIndex)
         }
 
         fun addQuantityIndex(quantityIndex: QuantityIndex) = this.also {
@@ -72,7 +72,7 @@ internal data class ResourceIndices(
                 id = id,
                 stringIndices = stringIndices.toList(),
                 referenceIndices = referenceIndices.toList(),
-                tokenIndices = codeIndices.toList(),
+                codeIndices = codeIndices.toList(),
                 quantityIndices = quantityIndices.toList()
         )
     }

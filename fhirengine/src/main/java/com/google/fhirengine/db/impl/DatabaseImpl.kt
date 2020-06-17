@@ -45,7 +45,6 @@ internal class DatabaseImpl(
             iParser = iParser,
             fhirIndexer = fhirIndexer,
             databaseName = DEFAULT_DATABASE_NAME)
-
     val builder = if (databaseName == null) {
         Room.inMemoryDatabaseBuilder(context, RoomResourceDb::class.java)
     } else {
@@ -118,7 +117,7 @@ internal class DatabaseImpl(
             system: String,
             value: String
     ): List<R> {
-        return dao.getResourceByTokenIndex(ResourceUtils.getResourceType(clazz).name, code, system,
+        return dao.getResourceByCodeIndex(ResourceUtils.getResourceType(clazz).name, code, system,
                 value).map { iParser.parseResource(it) as R }
     }
 
@@ -135,12 +134,12 @@ internal class DatabaseImpl(
     }
 
     override fun <R : Resource> searchByQuantity(
-            clazz: Class<R>,
-            name: String,
-            path: String,
-            system: String,
-            value: BigDecimal,
-            unit: String
+      clazz: Class<R>,
+      name: String,
+      path: String,
+      system: String,
+      value: BigDecimal,
+      unit: String
     ): List<R> {
         return dao.getResourceByQuantityIndex(ResourceUtils.getResourceType(clazz).name, name, path,
                 system, value, unit).map { iParser.parseResource(it) as R }

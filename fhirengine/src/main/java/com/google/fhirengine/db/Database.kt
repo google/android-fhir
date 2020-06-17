@@ -17,8 +17,8 @@
 package com.google.fhirengine.db
 
 import com.google.fhirengine.search.impl.ResourceQuery
-import org.hl7.fhir.r4.model.Resource
 import java.math.BigDecimal
+import org.hl7.fhir.r4.model.Resource
 
 /** The interface for the FHIR resource database.  */
 interface Database {

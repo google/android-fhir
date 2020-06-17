@@ -21,7 +21,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.google.fhirengine.index.TokenIndex
+import com.google.fhirengine.index.CodeIndex
 import org.hl7.fhir.r4.model.ResourceType
 
 @Entity(
@@ -45,11 +45,11 @@ import org.hl7.fhir.r4.model.ResourceType
             )
         ]
 )
-internal data class TokenIndexEntity(
+internal data class CodeIndexEntity(
   @PrimaryKey(autoGenerate = true)
-val id: Long,
+  val id: Long,
   val resourceType: ResourceType,
   @Embedded(prefix = "index_")
-val index: TokenIndex,
+  val index: CodeIndex,
   val resourceId: String
 )

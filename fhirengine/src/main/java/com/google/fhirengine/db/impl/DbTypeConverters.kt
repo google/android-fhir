@@ -17,8 +17,8 @@
 package com.google.fhirengine.db.impl
 
 import androidx.room.TypeConverter
-import org.hl7.fhir.r4.model.ResourceType
 import java.math.BigDecimal
+import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Type converters for Room to persist ResourceType as a string.
@@ -44,9 +44,9 @@ internal object DbTypeConverters {
 
     @JvmStatic
     @TypeConverter
-    fun bigDecimalToString(value: BigDecimal):String = value.toString()
+    fun bigDecimalToString(value: BigDecimal): String = value.toString()
 
     @JvmStatic
     @TypeConverter
-    fun stringToBigDecimal(value: String):BigDecimal = value.toBigDecimal()
+    fun stringToBigDecimal(value: String): BigDecimal = value.toBigDecimal()
 }
