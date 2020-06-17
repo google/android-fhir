@@ -17,10 +17,8 @@
 package com.google.fhirengine.db.impl
 
 import android.content.Context
-import android.database.sqlite.SQLiteConstraintException
 import androidx.room.Room
 import ca.uhn.fhir.parser.IParser
-import com.google.fhirengine.db.ResourceAlreadyExistsInDbException
 import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.resource.ResourceUtils
@@ -38,7 +36,8 @@ internal class DatabaseImpl(
   fhirIndexer: FhirIndexer,
   inMemory: Boolean
 ) : com.google.fhirengine.db.Database {
-    @Inject constructor(
+    @Inject
+    constructor(
       context: Context,
       iParser: IParser,
       fhirIndexer: FhirIndexer
@@ -47,16 +46,17 @@ internal class DatabaseImpl(
         iParser = iParser,
         fhirIndexer = fhirIndexer,
         inMemory = false)
+
     val builder = if (inMemory) {
         Room.inMemoryDatabaseBuilder(context, RoomResourceDb::class.java)
     } else {
         Room.databaseBuilder(context, RoomResourceDb::class.java, DATABASE_NAME)
     }
     val db = builder
-            // TODO https://github.com/jingtang10/fhir-engine/issues/32
-            //  don't allow main thread queries
-            .allowMainThreadQueries()
-            .build()
+        // TODO https://github.com/jingtang10/fhir-engine/issues/32
+        //  don't allow main thread queries
+        .allowMainThreadQueries()
+        .build()
     val dao by lazy {
         db.dao().also {
             it.fhirIndexer = fhirIndexer
@@ -65,29 +65,11 @@ internal class DatabaseImpl(
     }
 
     override fun <R : Resource> insert(resource: R) {
-        try {
-            dao.insert(resource)
-        } catch (constraintException: SQLiteConstraintException) {
-            throw ResourceAlreadyExistsInDbException(
-                    resource.resourceType.name,
-                    resource.id,
-                    constraintException
-            )
-        }
+        dao.insert(resource)
     }
 
     override fun <R : Resource> insertAll(resources: List<R>) {
-        resources.forEach { resource ->
-            try {
-                dao.insert(resource)
-            } catch (constraintException: SQLiteConstraintException) {
-                throw ResourceAlreadyExistsInDbException(
-                    resource.resourceType.name,
-                    resource.id,
-                    constraintException
-                )
-            }
-        }
+        dao.insertAll(resources)
     }
 
     override fun <R : Resource> update(resource: R) {
@@ -97,8 +79,8 @@ internal class DatabaseImpl(
     override fun <R : Resource> select(clazz: Class<R>, id: String): R {
         val type = ResourceUtils.getResourceType(clazz)
         return dao.getResource(
-                resourceId = id,
-                resourceType = type
+            resourceId = id,
+            resourceType = type
         )?.let {
             iParser.parseResource(clazz, it)
         } ?: throw ResourceNotFoundInDbException(type.name, id)
@@ -107,8 +89,8 @@ internal class DatabaseImpl(
     override fun <R : Resource> delete(clazz: Class<R>, id: String) {
         val type = ResourceUtils.getResourceType(clazz)
         dao.deleteResource(
-                resourceId = id,
-                resourceType = type
+            resourceId = id,
+            resourceType = type
         )
     }
 
@@ -118,8 +100,8 @@ internal class DatabaseImpl(
       value: String
     ): List<R> {
         return dao.getResourceByReferenceIndex(
-                ResourceUtils.getResourceType(clazz).name, reference, value)
-                .map { iParser.parseResource(it) as R }
+            ResourceUtils.getResourceType(clazz).name, reference, value)
+            .map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource> searchByString(
@@ -128,7 +110,7 @@ internal class DatabaseImpl(
       value: String
     ): List<R> {
         return dao.getResourceByStringIndex(ResourceUtils.getResourceType(clazz).name, string,
-                value).map { iParser.parseResource(it) as R }
+            value).map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource> searchByCode(
@@ -138,7 +120,7 @@ internal class DatabaseImpl(
       value: String
     ): List<R> {
         return dao.getResourceByCodeIndex(ResourceUtils.getResourceType(clazz).name, code, system,
-                value).map { iParser.parseResource(it) as R }
+            value).map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource> searchByReferenceAndCode(

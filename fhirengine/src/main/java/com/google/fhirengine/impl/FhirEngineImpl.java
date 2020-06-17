@@ -17,10 +17,8 @@
 package com.google.fhirengine.impl;
 
 import com.google.fhirengine.FhirEngine;
-import com.google.fhirengine.ResourceAlreadyExistsException;
 import com.google.fhirengine.ResourceNotFoundException;
 import com.google.fhirengine.db.Database;
-import com.google.fhirengine.db.ResourceAlreadyExistsInDbException;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
 import com.google.fhirengine.resource.ResourceUtils;
 import com.google.fhirengine.search.Search;
@@ -64,22 +62,13 @@ public class FhirEngineImpl implements FhirEngine {
   }
 
   @Override
-  public <R extends Resource> void save(R resource) throws ResourceAlreadyExistsException {
-    try {
-      database.insert(resource);
-    } catch (ResourceAlreadyExistsInDbException e) {
-      throw new ResourceAlreadyExistsException(
-          ResourceUtils.getResourceType(resource.getClass()).name(), resource.getId(), e);
-    }
+  public <R extends Resource> void save(R resource) {
+    database.insert(resource);
   }
 
   @Override
-  public <R extends Resource> void save(List<R> resources) throws ResourceAlreadyExistsException {
-    try {
-      database.insertAll(resources);
-    } catch (ResourceAlreadyExistsInDbException e) {
-      throw new ResourceAlreadyExistsException(e.getType(), e.getId(), e);
-    }
+  public <R extends Resource> void saveAll(List<R> resources) {
+    database.insertAll(resources);
   }
 
   @Override

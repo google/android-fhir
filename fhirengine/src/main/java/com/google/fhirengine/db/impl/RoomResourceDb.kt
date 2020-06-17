@@ -75,6 +75,21 @@ internal abstract class Dao {
         updateIndicesForResource(index, entity)
     }
 
+    @Transaction
+    open fun insertAll(resources: List<Resource>) {
+        resources.forEach { resource ->
+            val entity = ResourceEntity(
+                id = 0,
+                resourceType = resource.resourceType,
+                resourceId = resource.id,
+                serializedResource = iParser.encodeResourceToString(resource)
+            )
+            insertResource(entity)
+            val index = fhirIndexer.index(resource)
+            updateIndicesForResource(index, entity)
+        }
+    }
+
     private fun updateIndicesForResource(index: ResourceIndices, resource: ResourceEntity) {
         // TODO Move StringIndices to persistable types
         //  https://github.com/jingtang10/fhir-engine/issues/31
@@ -110,7 +125,7 @@ internal abstract class Dao {
         }
     }
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertResource(resource: ResourceEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
