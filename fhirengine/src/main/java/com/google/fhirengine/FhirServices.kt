@@ -28,7 +28,7 @@ import com.google.fhirengine.impl.FhirEngineImpl
 import com.google.fhirengine.index.impl.FhirIndexerImpl
 import com.google.fhirengine.search.impl.SearchImpl
 
-data class FhirServices(
+internal data class FhirServices(
   val fhirEngine: FhirEngine,
   val parser: IParser,
   val database: Database

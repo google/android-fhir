@@ -27,6 +27,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.fhirengine.FhirEngine;
+import com.google.fhirengine.FhirEngineBuilder;
 import com.google.fhirengine.example.api.HapiFhirService;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     expressionInput = findViewById(R.id.expression_input);
     evaluationResultTextView = findViewById(R.id.evaluate_result);
 
-    fhirEngine = FhirEngine.builder(this).inMemory().build();
+    fhirEngine = new FhirEngineBuilder(this).inMemory().build();
 
     IParser parser = FhirContext.forR4().newJsonParser();
     HapiFhirService service = HapiFhirService.Companion.create(parser);
