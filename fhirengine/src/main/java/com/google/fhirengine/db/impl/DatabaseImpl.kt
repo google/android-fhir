@@ -23,8 +23,8 @@ import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.resource.ResourceUtils
 import com.google.fhirengine.search.impl.ResourceQuery
-import org.hl7.fhir.r4.model.Resource
 import java.math.BigDecimal
+import org.hl7.fhir.r4.model.Resource
 
 /**
  * The implementation for the persistence layer using Room.
@@ -118,7 +118,7 @@ internal class DatabaseImpl(
             value: String
     ): List<R> {
         return dao.getResourceByCodeIndex(ResourceUtils.getResourceType(clazz).name, code, system,
-                value).map { iParser.parseResource(it) as R }
+            value).map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource> searchByReferenceAndCode(
