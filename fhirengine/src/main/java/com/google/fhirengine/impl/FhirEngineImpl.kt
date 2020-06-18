@@ -24,6 +24,7 @@ import com.google.fhirengine.resource.ResourceUtils
 import com.google.fhirengine.search.Search
 import com.google.fhirengine.sync.FhirDataSource
 import com.google.fhirengine.sync.FhirSynchroniser
+import com.google.fhirengine.sync.Result
 import com.google.fhirengine.sync.SyncConfiguration
 import java.util.EnumSet
 import org.cqframework.cql.elm.execution.VersionedIdentifier
@@ -106,6 +107,10 @@ class FhirEngineImpl constructor(
     }
 
     override fun sync(): Result {
-        return FhirSynchroniser(syncConfiguration, dataSource, database).sync()
+        val configuration = syncConfiguration
+        requireNotNull(configuration)
+        val source = dataSource
+        requireNotNull(source)
+        return FhirSynchroniser(configuration, source, database).sync()
     }
 }
