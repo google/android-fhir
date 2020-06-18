@@ -25,6 +25,7 @@ import com.google.fhirengine.index.QuantityIndex;
 import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
+import com.google.fhirengine.index.UriIndex;
 import java.math.BigDecimal;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -36,6 +37,7 @@ import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Invoice;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Questionnaire;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Substance;
 import org.junit.Assert;
@@ -267,17 +269,73 @@ public class FhirIndexerImplTest {
           + "  }\n"
           + "}";
 
+  public static final String URI_TEST_QUESTIONNAIRE =
+      "{\n"
+          + "  \"resourceType\": \"Questionnaire\",\n"
+          + "  \"id\": \"3141\",\n"
+          + "  \"text\": {\n"
+          + "    \"status\": \"generated\",\n"
+          + "    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">\\n      <pre>\\n            1.Comorbidity?\\n              1.1 Cardial Comorbidity\\n                1.1.1 Angina?\\n                1.1.2 MI?\\n              1.2 Vascular Comorbidity?\\n              ...\\n            Histopathology\\n              Abdominal\\n                pT category?\\n              ...\\n          </pre>\\n    </div>\"\n"
+          + "  },\n"
+          + "  \"url\": \"http://hl7.org/fhir/Questionnaire/3141\",\n"
+          + "  \"title\": \"Cancer Quality Forum Questionnaire 2012\",\n"
+          + "  \"status\": \"draft\",\n"
+          + "  \"subjectType\": [\n"
+          + "    \"Patient\"\n"
+          + "  ],\n"
+          + "  \"date\": \"2012-01\",\n"
+          + "  \"item\": [\n"
+          + "    {\n"
+          + "      \"linkId\": \"2\",\n"
+          + "      \"code\": [\n"
+          + "        {\n"
+          + "          \"system\": \"http://example.org/system/code/sections\",\n"
+          + "          \"code\": \"HISTOPATHOLOGY\"\n"
+          + "        }\n"
+          + "      ],\n"
+          + "      \"type\": \"group\",\n"
+          + "      \"item\": [\n"
+          + "        {\n"
+          + "          \"linkId\": \"2.1\",\n"
+          + "          \"code\": [\n"
+          + "            {\n"
+          + "              \"system\": \"http://example.org/system/code/sections\",\n"
+          + "              \"code\": \"ABDOMINAL\"\n"
+          + "            }\n"
+          + "          ],\n"
+          + "          \"type\": \"group\",\n"
+          + "          \"item\": [\n"
+          + "            {\n"
+          + "              \"linkId\": \"2.1.2\",\n"
+          + "              \"code\": [\n"
+          + "                {\n"
+          + "                  \"system\": \"http://example.org/system/code/questions\",\n"
+          + "                  \"code\": \"STADPT\",\n"
+          + "                  \"display\": \"pT category\"\n"
+          + "                }\n"
+          + "              ],\n"
+          + "              \"type\": \"choice\"\n"
+          + "            }\n"
+          + "          ]\n"
+          + "        }\n"
+          + "      ]\n"
+          + "    }\n"
+          + "  ]\n"
+          + "}";
+
   // See: https://www.hl7.org/fhir/valueset-currencies.html
   private static final String FHIR_CURRENCY_SYSTEM = "urn:iso:std:iso:4217";
 
   private Substance qtyTestSubstance;
   private Invoice qtyTestInvoice;
+  private Questionnaire uriTestQuestionnaire;
 
   @Before
   public void setUp() throws Exception {
     IParser iParser = FhirContext.forR4().newJsonParser();
     qtyTestSubstance = iParser.parseResource(Substance.class, QTY_TEST_SUBSTANCE_STR);
     qtyTestInvoice = iParser.parseResource(Invoice.class, QTY_TEST_INVOICE);
+    uriTestQuestionnaire = iParser.parseResource(Questionnaire.class, URI_TEST_QUESTIONNAIRE);
   }
 
   @Test
@@ -414,6 +472,14 @@ public class FhirIndexerImplTest {
                 "http://unitsofmeasure.org",
                 "mL",
                 new BigDecimal("100")));
+  }
+
+  @Test
+  public void index_questionnaire_shouldIndexUri() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(uriTestQuestionnaire);
+    Truth.assertThat(resourceIndices.getUriIndices())
+        .contains(
+            new UriIndex("url", "Questionnaire.url", "http://hl7.org/fhir/Questionnaire/3141"));
   }
 
   /* TODO: add tests for

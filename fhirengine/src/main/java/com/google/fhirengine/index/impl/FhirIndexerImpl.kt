@@ -24,6 +24,7 @@ import com.google.fhirengine.index.QuantityIndex
 import com.google.fhirengine.index.ReferenceIndex
 import com.google.fhirengine.index.ResourceIndices
 import com.google.fhirengine.index.StringIndex
+import com.google.fhirengine.index.UriIndex
 import java.math.BigDecimal
 import java.util.Locale
 import org.hl7.fhir.instance.model.api.IBaseDatatype
@@ -36,6 +37,7 @@ import org.hl7.fhir.r4.model.Ratio
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.UriType
 
 /** Implementation of [FhirIndexer].  */
 internal class FhirIndexerImpl constructor() : FhirIndexer {
@@ -119,7 +121,18 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                         ))
                     }
                 }
-                // TODO: Implement number, date, token, reference, composite, quantity, URI,
+                SEARCH_PARAM_DEFINITION_TYPE_URI -> {
+                    resource.valuesForPath(searchParamDefinition)
+                            .uriValues()
+                            .forEach { uri ->
+                                indexBuilder.addUriIndex(UriIndex(
+                                        name = searchParamDefinition.name,
+                                        path = searchParamDefinition.path,
+                                        uri = uri
+                                ))
+                            }
+                }
+                // TODO: Implement number, date, token, reference, composite
                 //  and special search parameter types.
             }
         }
@@ -187,6 +200,17 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
         }
     }
 
+    /** Returns the uri values for the list of `objects`.  */
+    private fun Sequence<Any>.uriValues(): Sequence<String> {
+        return flatMap {
+            when (it) {
+                is UriType -> sequenceOf(it.value)
+                is String -> sequenceOf(it)
+                else -> emptySequence()
+            }
+        }
+    }
+
     /** Returns the list of values corresponding to the `path` in the `resource`.  */
     private fun Resource.valuesForPath(definition: SearchParamDefinition): Sequence<Any> {
         val paths = definition.path.split(SEPARATOR_REGEX)
@@ -248,6 +272,8 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
         private const val SEARCH_PARAM_DEFINITION_TYPE_CODE = "token"
         /** The string representing the quantity search parameter type.  */
         private const val SEARCH_PARAM_DEFINITION_TYPE_QUANTITY = "quantity"
+        /** The string representing the uri search parameter type.  */
+        private const val SEARCH_PARAM_DEFINITION_TYPE_URI = "uri"
         /** The string for FHIR currency system */
         // See: https://bit.ly/30YB3ML
         // See: https://www.hl7.org/fhir/valueset-currencies.html

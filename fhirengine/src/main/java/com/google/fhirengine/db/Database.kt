@@ -133,5 +133,16 @@ interface Database {
       unit: String
     ): List<R>
 
+    /**
+     * Returns a [List] of [Resource]s that are of type `clazz` and have `uri` with `name`, `path`,
+     * and `uri`.
+     */
+    fun <R : Resource> searchByUri(
+      clazz: Class<R>,
+      name: String,
+      path: String,
+      uri: String
+    ): List<R>
+
     fun <R : Resource> search(searchIdQuery: ResourceQuery): List<R>
 }

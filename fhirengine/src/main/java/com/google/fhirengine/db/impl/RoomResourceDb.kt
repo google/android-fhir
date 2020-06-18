@@ -39,7 +39,8 @@ import org.hl7.fhir.r4.model.ResourceType
             StringIndexEntity::class,
             ReferenceIndexEntity::class,
             CodeIndexEntity::class,
-            QuantityIndexEntity::class
+            QuantityIndexEntity::class,
+            UriIndexEntity::class
         ],
         version = 1,
         exportSchema = false
@@ -132,6 +133,13 @@ internal abstract class Dao {
                     index = it,
                     resourceId = resource.resourceId))
         }
+        index.uriIndices.forEach {
+            insertUriIndex(UriIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId))
+        }
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -148,6 +156,9 @@ internal abstract class Dao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertQuantityIndex(quantityIndexEntity: QuantityIndexEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insertUriIndex(uriIndexEntity: UriIndexEntity)
 
     @Query("""
         DELETE FROM ResourceEntity
@@ -232,6 +243,23 @@ internal abstract class Dao {
       indexSystem: String,
       indexValue: BigDecimal,
       indexUnit: String
+    ): List<String>
+
+    @Query("""
+        SELECT ResourceEntity.serializedResource
+        FROM ResourceEntity
+        JOIN UriIndexEntity
+        ON ResourceEntity.resourceType = UriIndexEntity.resourceType
+            AND ResourceEntity.resourceId = UriIndexEntity.resourceId
+        WHERE UriIndexEntity.resourceType = :resourceType
+            AND UriIndexEntity.index_name = :indexName
+            AND UriIndexEntity.index_path = :indexPath
+            AND UriIndexEntity.index_uri = :indexUri""")
+    abstract fun getResourceByUriIndex(
+      resourceType: String,
+      indexName: String,
+      indexPath: String,
+      indexUri: String
     ): List<String>
 
     @RawQuery

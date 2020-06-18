@@ -145,6 +145,16 @@ internal class DatabaseImpl(
                 system, value, unit).map { iParser.parseResource(it) as R }
     }
 
+    override fun <R : Resource> searchByUri(
+      clazz: Class<R>,
+      name: String,
+      path: String,
+      uri: String
+    ): List<R> {
+        return dao.getResourceByUriIndex(ResourceUtils.getResourceType(clazz).name, name, path, uri)
+                .map { iParser.parseResource(it) as R }
+    }
+
     override fun <R : Resource> search(query: ResourceQuery): List<R> =
             dao.getResources(query.getSupportSQLiteQuery()).map { iParser.parseResource(it) as R }
 
