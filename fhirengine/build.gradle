@@ -60,6 +60,7 @@ dependencies {
     api "org.opencds.cqf:cql-engine:$cqlEngineVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "androidx.room:room-runtime:$roomVersion"
+    implementation "androidx.room:room-ktx:$roomVersion"
     api "androidx.work:work-runtime-ktx:$workManagerVersion"
     implementation "com.google.dagger:dagger:$daggerVersion"
     implementation "com.google.guava:guava:$guavaVersion"
@@ -69,7 +70,7 @@ dependencies {
 
     testImplementation "androidx.test:core:$testVersion"
     testImplementation "org.robolectric:robolectric:$roboelectricVersion"
-    testImplementation "androidx.lifecycle:lifecycle-livedata-core:$liveDataVersion"
+    testImplementation "androidx.lifecycle:lifecycle-livedata-core-ktx:$liveDataVersion"
     testImplementation "junit:junit:$junitVersion"
     testImplementation "com.google.truth:truth:$truthVersion"
     androidTestImplementation "androidx.test.ext:junit-ktx:$androidTestJunitVersion"

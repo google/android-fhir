@@ -33,7 +33,11 @@ class MainActivityViewModel(
   private val service: HapiFhirService
 ) : ViewModel() {
 
-    fun requestPatients() {
+    init {
+        requestPatients()
+    }
+
+    private fun requestPatients() {
         viewModelScope.launch {
             val syncData = listOf(
                 SyncData(

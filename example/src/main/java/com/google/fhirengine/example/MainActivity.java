@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
     MainActivityViewModel viewModel =
         new ViewModelProvider(this, new MainActivityViewModelFactory(fhirEngine, service))
             .get(MainActivityViewModel.class);
-    viewModel.requestPatients();
 
     final Button button = findViewById(R.id.load_cql_lib_button);
     button.setOnClickListener(

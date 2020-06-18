@@ -17,7 +17,11 @@
 package com.google.fhirengine.sync
 
 import com.google.fhirengine.db.Database
+import com.google.fhirengine.db.impl.SyncedResourceEntity
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import org.hl7.fhir.r4.model.Bundle
 
 class ResourceSynchroniser(
@@ -26,17 +30,16 @@ class ResourceSynchroniser(
   private val database: Database,
   retry: Boolean
 ) {
-    private var nextUrl: String? = getInitialUrl()
     private var retrySync = retry
 
     suspend fun sync() {
+        var nextUrl: String? = getInitialUrl()
         try {
             while (nextUrl != null) {
-                val bundle = dataSource.loadData(nextUrl!!)
+                val bundle = dataSource.loadData(nextUrl)
                 nextUrl = bundle.link.firstOrNull { component -> component.relation == "next" }?.url
                 if (bundle.type == Bundle.BundleType.SEARCHSET) {
-                    val resources = bundle.entry.map { it.resource }
-//                    database.insertAll(resources)
+                    saveSyncedResource(bundle)
                 }
             }
         } catch (exception: IOException) {
@@ -50,7 +53,7 @@ class ResourceSynchroniser(
         }
     }
 
-    private fun getInitialUrl(): String? {
+    private suspend fun getInitialUrl(): String? {
         val updatedSyncData = syncData
             .addSortParam()
             .addLastUpdateDate()
@@ -66,7 +69,7 @@ class ResourceSynchroniser(
         return SyncData(resourceType, newParams)
     }
 
-    private fun SyncData.addLastUpdateDate(): SyncData {
+    private suspend fun SyncData.addLastUpdateDate(): SyncData {
         val lastUpdate = database.lastUpdate(resourceType)
         if (lastUpdate == null) {
             return this
@@ -74,5 +77,21 @@ class ResourceSynchroniser(
         val newParams = params.toMutableMap()
         newParams[LAST_UPDATED_KEY] = "gt$lastUpdate"
         return SyncData(resourceType, newParams)
+    }
+
+    private suspend fun saveSyncedResource(bundle: Bundle) {
+        val resources = bundle.entry.map { it.resource }
+        if (resources.isNotEmpty()) {
+            val mostRecentResource = resources[resources.lastIndex]
+            database.insertSyncedResource(SyncedResourceEntity(
+                syncData.resourceType,
+                mostRecentResource.meta.lastUpdated.toTimeZoneString()))
+        }
+//                    database.insertAll(resources)
+    }
+
+    private fun Date.toTimeZoneString(): String {
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US)
+        return simpleDateFormat.format(this)
     }
 }

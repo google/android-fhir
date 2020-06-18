@@ -16,6 +16,7 @@
 
 package com.google.fhirengine.db
 
+import com.google.fhirengine.db.impl.SyncedResourceEntity
 import com.google.fhirengine.search.impl.ResourceQuery
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -57,9 +58,17 @@ interface Database {
 
     /**
      * Return the last update data of a resource based on the resource type.
-     * If no resource of [resourceType] is inserted, return `null`
+     * If no resource of [resourceType] is inserted, return `null`.
+     * @param resourceType The resource type
      */
-    fun lastUpdate(resourceType: ResourceType): String?
+    suspend fun lastUpdate(resourceType: ResourceType): String?
+
+    /**
+     * Insert a resource that was syncronised.
+     *
+     * @param syncedResourceEntity The synced resource
+     */
+    suspend fun insertSyncedResource(syncedResourceEntity: SyncedResourceEntity)
 
     /**
      * Deletes the FHIR resource of type `clazz` with `id`.
