@@ -22,13 +22,20 @@ import org.hl7.fhir.r4.model.Resource
 /** The interface for the FHIR resource database.  */
 interface Database {
     /**
-     * Inserts the `resource` into the FHIR resource database.
+     * Inserts the `resource` into the FHIR resource database. If the resource already
+     * exists, it will be overwritten
      *
      * @param <R> The resource type
-     * @throws ResourceAlreadyExistsInDbException if the resource already exists in the database
      */
-    @Throws(ResourceAlreadyExistsInDbException::class)
     fun <R : Resource> insert(resource: R)
+
+    /**
+     * Inserts a list of `resource`s into the FHIR resource database. If any of the resources
+     * already exists, it will be overwritten
+     *
+     * @param <R> The resource type
+     */
+    fun <R : Resource> insertAll(resources: List<R>)
 
     /**
      * Updates the `resource` in the FHIR resource database. If the resource does not already
