@@ -23,7 +23,6 @@ import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.resource.ResourceUtils
 import com.google.fhirengine.search.Search
 import java.util.EnumSet
-import javax.inject.Inject
 import org.cqframework.cql.elm.execution.VersionedIdentifier
 import org.hl7.fhir.r4.model.Resource
 import org.opencds.cqf.cql.data.DataProvider
@@ -33,7 +32,7 @@ import org.opencds.cqf.cql.execution.LibraryLoader
 import org.opencds.cqf.cql.terminology.TerminologyProvider
 
 /** Implementation of [FhirEngine].  */
-class FhirEngineImpl @Inject constructor(
+class FhirEngineImpl constructor(
   private val database: Database,
   private val search: Search,
   libraryLoader: LibraryLoader,

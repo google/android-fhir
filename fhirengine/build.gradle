@@ -57,25 +57,20 @@ dependencies {
     api "org.opencds.cqf:cql-engine:$cqlEngineVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "androidx.room:room-runtime:$roomVersion"
-    implementation "com.google.dagger:dagger:$daggerVersion"
     implementation "com.google.guava:guava:$guavaVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     implementation "org.opencds.cqf:cql-engine-fhir:$cqlEngineVersion"
-    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
     testImplementation "androidx.test:core:$testVersion"
     testImplementation "org.robolectric:robolectric:$roboelectricVersion"
-    testImplementation "com.google.dagger:dagger:$daggerVersion"
     testImplementation "androidx.lifecycle:lifecycle-livedata-core:2.2.0"
     testImplementation "junit:junit:$junitVersion"
     testImplementation "com.google.truth:truth:$truthVersion"
-    kaptTest "com.google.dagger:dagger-compiler:$daggerVersion"
     androidTestImplementation "androidx.test.ext:junit-ktx:$androidTestJunitVersion"
     androidTestImplementation "androidx.test:runner:$testVersion"
     androidTestImplementation "androidx.test:core:$testVersion"
     androidTestImplementation "junit:junit:$junitVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"
-    kaptAndroidTest "com.google.dagger:dagger-compiler:$daggerVersion"
 }
 
 repositories {

@@ -23,7 +23,6 @@ import com.google.fhirengine.resource.ResourceUtils;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import javax.inject.Inject;
 import org.opencds.cqf.cql.runtime.Code;
 import org.opencds.cqf.cql.runtime.Interval;
 
@@ -38,7 +37,6 @@ import org.opencds.cqf.cql.runtime.Interval;
 public class FhirEngineRetrieveProvider implements org.opencds.cqf.cql.retrieve.RetrieveProvider {
   private Database database;
 
-  @Inject
   public FhirEngineRetrieveProvider(Database database) {
     this.database = database;
   }

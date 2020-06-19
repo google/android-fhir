@@ -19,7 +19,6 @@ package com.google.fhirengine.cql;
 import ca.uhn.fhir.context.BaseRuntimeChildDefinition;
 import ca.uhn.fhir.context.RuntimeResourceDefinition;
 import java.util.List;
-import javax.inject.Inject;
 import org.hl7.fhir.instance.model.api.IBase;
 import org.opencds.cqf.cql.model.R4FhirModelResolver;
 
@@ -31,7 +30,6 @@ class AndroidR4FhirModelResolver extends R4FhirModelResolver {
    */
   public static final String NAMESPACE_URI_PREFIX = "{http://hl7.org/fhir}";
 
-  @Inject
   public AndroidR4FhirModelResolver() {
     super();
   }

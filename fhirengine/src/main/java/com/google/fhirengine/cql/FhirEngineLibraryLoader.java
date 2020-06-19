@@ -22,7 +22,6 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
 import org.cqframework.cql.elm.execution.Library;
 import org.cqframework.cql.elm.execution.VersionedIdentifier;
 import org.opencds.cqf.cql.execution.JsonCqlLibraryReader;
@@ -41,7 +40,6 @@ public class FhirEngineLibraryLoader implements LibraryLoader {
   /** Cached libraries. */
   Map<String, Library> libraryMap = new HashMap<>();
 
-  @Inject
   public FhirEngineLibraryLoader(Database database) {
     this.database = database;
   }
