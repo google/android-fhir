@@ -71,10 +71,14 @@ interface FhirEngine {
     fun search(): Search
 
     /** TODO make this part of a builder **/
-    fun setSyncConfiguration(syncConfiguration: SyncConfiguration)
+    fun setPeriodicSyncConfiguration(syncConfiguration: SyncConfiguration)
 
     /** TODO make this part of a builder **/
     fun setSyncDataSource(dataSource: FhirDataSource)
 
-    fun sync(): Result
+    fun sync(syncConfiguration: SyncConfiguration): Result
+
+    fun updatePeriodicSyncConfiguration(syncConfiguration: SyncConfiguration)
+
+    fun periodicSync(): Result
 }

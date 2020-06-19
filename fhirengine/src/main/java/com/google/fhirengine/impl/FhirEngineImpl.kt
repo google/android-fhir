@@ -23,7 +23,7 @@ import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.resource.ResourceUtils
 import com.google.fhirengine.search.Search
 import com.google.fhirengine.sync.FhirDataSource
-import com.google.fhirengine.sync.FhirSynchroniser
+import com.google.fhirengine.sync.FhirSynchronizer
 import com.google.fhirengine.sync.Result
 import com.google.fhirengine.sync.SyncConfiguration
 import java.util.EnumSet
@@ -98,7 +98,7 @@ class FhirEngineImpl constructor(
         return search
     }
 
-    override fun setSyncConfiguration(syncConfiguration: SyncConfiguration) {
+    override fun setPeriodicSyncConfiguration(syncConfiguration: SyncConfiguration) {
         this.syncConfiguration = syncConfiguration
     }
 
@@ -106,11 +106,21 @@ class FhirEngineImpl constructor(
         this.dataSource = dataSource
     }
 
-    override fun sync(): Result {
+    override fun sync(syncConfiguration: SyncConfiguration): Result {
+        val source = dataSource
+        requireNotNull(source)
+        return FhirSynchronizer(syncConfiguration, source, database).sync()
+    }
+
+    override fun updatePeriodicSyncConfiguration(configuration: SyncConfiguration) {
+        syncConfiguration = configuration
+    }
+
+    override fun periodicSync(): Result {
         val configuration = syncConfiguration
         requireNotNull(configuration)
         val source = dataSource
         requireNotNull(source)
-        return FhirSynchroniser(configuration, source, database).sync()
+        return FhirSynchronizer(configuration, source, database).sync()
     }
 }

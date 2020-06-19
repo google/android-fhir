@@ -46,9 +46,8 @@ class MainActivityViewModel(
                 )
             )
             val syncConfig = SyncConfiguration(syncData = syncData)
-            fhirEngine.setSyncConfiguration(syncConfig)
             fhirEngine.setSyncDataSource(HapiFhirResourceDataSource(service))
-            val result = fhirEngine.sync()
+            val result = fhirEngine.sync(syncConfig)
             Log.d("MainActivityViewModel", "sync result: $result")
         }
     }

@@ -30,7 +30,7 @@ data class ResourceSyncException(val resourceType: ResourceType, val exception: 
 /**
  * Class that helps synchronize the data source and save it in the local database
  */
-class FhirSynchroniser(
+class FhirSynchronizer(
   private val syncConfiguration: SyncConfiguration,
   private val dataSource: FhirDataSource,
   private val database: Database
@@ -38,7 +38,7 @@ class FhirSynchroniser(
     fun sync(): Result = runBlocking {
         val exceptions = mutableListOf<ResourceSyncException>()
         syncConfiguration.syncData.forEach { syncData ->
-            val resourceSynchroniser = ResourceSynchroniser(
+            val resourceSynchroniser = ResourceSynchronizer(
                 syncData,
                 dataSource,
                 database,

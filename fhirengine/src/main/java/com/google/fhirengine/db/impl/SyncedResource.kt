@@ -24,6 +24,10 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import org.hl7.fhir.r4.model.ResourceType
 
+/**
+ * Class that models a table that holds all resource types that were synced and the highest
+ * `_lastUpdate` value of each resource type.
+ */
 @Entity
 data class SyncedResourceEntity(
   /**

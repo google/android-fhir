@@ -18,12 +18,20 @@ package com.google.fhirengine.sync
 
 import androidx.work.Constraints
 
+/**
+ * Configuration for synchronization.
+ */
 data class SyncConfiguration(
   /**
    *  Data that needs to be synchronised
    */
   val syncData: List<SyncData> = emptyList(),
-    // using WorkManager constraints here until we decide if we want to write our own
+  /**
+   * Constraints that specify the requirements needed before the synchronisation is triggered.
+   * E.g. network type (Wifi, 3G etc), the device should be charging etc.
+   *
+   *  Using WorkManager constraints here until we decide if we want to write our own
+   */
   val syncConstraints: Constraints = Constraints.Builder().build(),
   /**
    *  true if the SDK needs to retry a failed sync attempt, false otherwise

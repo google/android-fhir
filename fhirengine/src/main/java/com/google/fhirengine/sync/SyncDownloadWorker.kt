@@ -33,7 +33,7 @@ class SyncDownloadWorker(
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
-        val result = fhirEngine.sync()
+        val result = fhirEngine.periodicSync()
         if (result is Success) {
             return Result.success()
         }

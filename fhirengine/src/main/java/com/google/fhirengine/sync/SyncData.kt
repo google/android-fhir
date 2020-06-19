@@ -35,9 +35,11 @@ fun SyncData.concatParams(): String {
 data class SyncData(
   val resourceType: ResourceType,
   val params: Map<String, String> = emptyMap()
-)
-
-const val SORT_KEY = "_sort"
-const val LAST_UPDATED_KEY = "_lastUpdated"
-const val ADDRESS_COUNTRY_KEY = "address-country"
-const val LAST_UPDATED_ASC_VALUE = "_lastUpdated"
+) {
+    companion object {
+        const val SORT_KEY = "_sort"
+        const val LAST_UPDATED_KEY = "_lastUpdated"
+        const val ADDRESS_COUNTRY_KEY = "address-country"
+        const val LAST_UPDATED_ASC_VALUE = "_lastUpdated"
+    }
+}

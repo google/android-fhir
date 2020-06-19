@@ -18,13 +18,19 @@ package com.google.fhirengine.sync
 
 import com.google.fhirengine.db.Database
 import com.google.fhirengine.db.impl.SyncedResourceEntity
+import com.google.fhirengine.sync.SyncData.Companion.LAST_UPDATED_ASC_VALUE
+import com.google.fhirengine.sync.SyncData.Companion.LAST_UPDATED_KEY
+import com.google.fhirengine.sync.SyncData.Companion.SORT_KEY
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import org.hl7.fhir.r4.model.Bundle
 
-class ResourceSynchroniser(
+/**
+ * Class that synchronises only one resource.
+ */
+class ResourceSynchronizer(
   private val syncData: SyncData,
   private val dataSource: FhirDataSource,
   private val database: Database,
@@ -87,7 +93,7 @@ class ResourceSynchroniser(
                 syncData.resourceType,
                 mostRecentResource.meta.lastUpdated.toTimeZoneString()))
         }
-//                    database.insertAll(resources)
+        database.insertAll(resources)
     }
 
     private fun Date.toTimeZoneString(): String {
