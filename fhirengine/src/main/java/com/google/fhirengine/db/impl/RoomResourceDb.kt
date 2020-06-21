@@ -41,17 +41,15 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 @Database(
-        entities = [
-            ResourceEntity::class,
-            StringIndexEntity::class,
-            ReferenceIndexEntity::class,
-            CodeIndexEntity::class,
-            QuantityIndexEntity::class,
-            UriIndexEntity::class,
-            SyncedResourceEntity::class
-        ],
-        version = 1,
-        exportSchema = false
+    entities = [
+        ResourceEntity::class,
+        StringIndexEntity::class,
+        ReferenceIndexEntity::class,
+        CodeIndexEntity::class,
+        DateIndexEntity::class
+    ],
+    version = 1,
+    exportSchema = false
 )
 @TypeConverters(
     DbTypeConverters::class
@@ -149,6 +147,13 @@ internal abstract class ResourceDao {
                     index = it,
                     resourceId = resource.resourceId))
         }
+        index.dateIndices.forEach {
+            insertDateIndex(DateIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId))
+        }
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -164,10 +169,7 @@ internal abstract class ResourceDao {
     abstract fun insertCodeIndex(codeIndexEntity: CodeIndexEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertQuantityIndex(quantityIndexEntity: QuantityIndexEntity)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertUriIndex(uriIndexEntity: UriIndexEntity)
+    abstract fun insertDateIndex(dateIndexEntity: DateIndexEntity)
 
     @Query("""
         DELETE FROM ResourceEntity
