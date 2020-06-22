@@ -34,7 +34,7 @@ import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Invoice;
+import org.hl7.fhir.r4.model.InstantType;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Questionnaire;
@@ -281,12 +281,82 @@ public class FhirIndexerImplTest {
           + "  }\n"
           + "}";
 
+  public static final String TEST_PATIENT_LASTUPDATED_INDEX =
+      "{\n"
+          + "  \"resourceType\": \"Patient\",\n"
+          + "  \"id\": \"mom\",\n"
+          + "  \"meta\": {\n"
+          + "    \"lastUpdated\": \"2012-05-29T23:45:32Z\"\n"
+          + "  },\n"
+          + "  \"text\": {\n"
+          + "    \"status\": \"generated\",\n"
+          + "    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\"><p><b>Generated Narrative with Details</b></p><p><b>id</b>: mom</p><p><b>meta</b>: </p><p><b>identifier</b>: Social Security number = 444222222</p><p><b>active</b>: true</p><p><b>name</b>: Eve Everywoman (OFFICIAL)</p><p><b>telecom</b>: ph: 555-555-2003(WORK)</p><p><b>gender</b>: female</p><p><b>birthDate</b>: 31/05/1973</p><p><b>address</b>: 2222 Home Street (HOME)</p><p><b>managingOrganization</b>: <a>Organization/hl7</a></p><h3>Links</h3><table><tr><td>-</td><td><b>Other</b></td><td><b>Type</b></td></tr><tr><td>*</td><td><a>RelatedPerson/newborn-mom</a></td><td>seealso</td></tr></table></div>\"\n"
+          + "  },\n"
+          + "  \"identifier\": [\n"
+          + "    {\n"
+          + "      \"type\": {\n"
+          + "        \"coding\": [\n"
+          + "          {\n"
+          + "            \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\n"
+          + "            \"code\": \"SS\"\n"
+          + "          }\n"
+          + "        ]\n"
+          + "      },\n"
+          + "      \"system\": \"http://hl7.org/fhir/sid/us-ssn\",\n"
+          + "      \"value\": \"444222222\"\n"
+          + "    }\n"
+          + "  ],\n"
+          + "  \"active\": true,\n"
+          + "  \"name\": [\n"
+          + "    {\n"
+          + "      \"use\": \"official\",\n"
+          + "      \"family\": \"Everywoman\",\n"
+          + "      \"given\": [\n"
+          + "        \"Eve\"\n"
+          + "      ]\n"
+          + "    }\n"
+          + "  ],\n"
+          + "  \"telecom\": [\n"
+          + "    {\n"
+          + "      \"system\": \"phone\",\n"
+          + "      \"value\": \"555-555-2003\",\n"
+          + "      \"use\": \"work\"\n"
+          + "    }\n"
+          + "  ],\n"
+          + "  \"gender\": \"female\",\n"
+          + "  \"birthDate\": \"1973-05-31\",\n"
+          + "  \"address\": [\n"
+          + "    {\n"
+          + "      \"use\": \"home\",\n"
+          + "      \"line\": [\n"
+          + "        \"2222 Home Street\"\n"
+          + "      ]\n"
+          + "    }\n"
+          + "  ],\n"
+          + "  \"managingOrganization\": {\n"
+          + "    \"reference\": \"Organization/hl7\"\n"
+          + "  },\n"
+          + "  \"link\": [\n"
+          + "    {\n"
+          + "      \"other\": {\n"
+          + "        \"reference\": \"RelatedPerson/newborn-mom\"\n"
+          + "      },\n"
+          + "      \"type\": \"seealso\"\n"
+          + "    }\n"
+          + "  ]\n"
+          + "}";
+
   private static Patient dateTestPatient;
+  private static Patient lastUpdatedTestPatient;
 
   @Before
   public void setUp() throws Exception {
     dateTestPatient =
         FhirContext.forR4().newJsonParser().parseResource(Patient.class, TEST_PATIENT_DATE_INDEX);
+    lastUpdatedTestPatient =
+        FhirContext.forR4()
+            .newJsonParser()
+            .parseResource(Patient.class, TEST_PATIENT_LASTUPDATED_INDEX);
   }
 
   @Test
@@ -397,13 +467,27 @@ public class FhirIndexerImplTest {
     ResourceIndices resourceIndices = fhirIndexer.index(dateTestPatient);
     DateType birthDateElement = dateTestPatient.getBirthDateElement();
     Truth.assertThat(resourceIndices.getDateIndices())
-        .containsExactly(
+        .contains(
             new DateIndex(
                 "birthdate",
                 "Patient.birthDate",
                 birthDateElement.getValue().getTime(),
                 birthDateElement.getValue().getTime(),
                 birthDateElement.getPrecision()));
+  }
+
+  @Test
+  public void index_patient_lastUpdated_shouldIndexLastUpdated() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(lastUpdatedTestPatient);
+    InstantType lastUpdatedElement = lastUpdatedTestPatient.getMeta().getLastUpdatedElement();
+    Truth.assertThat(resourceIndices.getDateIndices())
+        .contains(
+            new DateIndex(
+                "lastUpdated",
+                "Patient.meta.lastUpdated",
+                lastUpdatedElement.getValue().getTime(),
+                lastUpdatedElement.getValue().getTime(),
+                lastUpdatedElement.getPrecision()));
   }
 
   // TODO: improve the tests further.

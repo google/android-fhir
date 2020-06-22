@@ -106,6 +106,19 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                 //  and special search parameter types.
             }
         }
+        // For all resources,
+        // add 'last updated' timestamp to date index
+        if (resource.meta.hasLastUpdated()) {
+            val lastUpdatedElement = resource.meta.lastUpdatedElement
+            indexBuilder.addDateIndex(DateIndex(
+                    name = "lastUpdated",
+                    path = arrayOf(resource.fhirType(), "meta", "lastUpdated")
+                            .joinToString(separator = "."),
+                    tsHigh = lastUpdatedElement.value.time,
+                    tsLow = lastUpdatedElement.value.time,
+                    temporalPrecision = lastUpdatedElement.precision
+            ))
+        }
         return indexBuilder.build()
     }
 
