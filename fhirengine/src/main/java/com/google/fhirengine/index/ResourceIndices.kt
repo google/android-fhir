@@ -39,7 +39,9 @@ internal data class ResourceIndices(
   /** The code indices.  */
   val codeIndices: List<CodeIndex>,
   /** The date indices. */
-  val dateIndices: List<DateIndex>
+  val dateIndices: List<DateIndex>,
+  /** The number indices. */
+  val numberIndices: List<NumberIndex>
 
 ) {
 
@@ -51,6 +53,7 @@ internal data class ResourceIndices(
         private val referenceIndices = mutableListOf<ReferenceIndex>()
         private val codeIndices = mutableListOf<CodeIndex>()
         private val dateIndices = mutableListOf<DateIndex>()
+        private val numberIndices = mutableListOf<NumberIndex>()
 
         fun addStringIndex(stringIndex: StringIndex) = this.also {
             stringIndices.add(stringIndex)
@@ -68,13 +71,18 @@ internal data class ResourceIndices(
             dateIndices.add(dateIndex)
         }
 
+        fun addNumberIndex(numberIndex: NumberIndex) = this.also {
+            numberIndices.add(numberIndex)
+        }
+
         fun build() = ResourceIndices(
                 resourceType = resourceType,
                 id = id,
                 stringIndices = stringIndices.toList(),
                 referenceIndices = referenceIndices.toList(),
                 codeIndices = codeIndices.toList(),
-                dateIndices = dateIndices.toList()
+                dateIndices = dateIndices.toList(),
+                numberIndices = numberIndices.toList()
         )
     }
 }

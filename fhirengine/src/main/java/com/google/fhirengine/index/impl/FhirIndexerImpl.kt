@@ -21,11 +21,10 @@ import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
 import com.google.fhirengine.index.CodeIndex
 import com.google.fhirengine.index.DateIndex
 import com.google.fhirengine.index.FhirIndexer
-import com.google.fhirengine.index.QuantityIndex
+import com.google.fhirengine.index.NumberIndex
 import com.google.fhirengine.index.ReferenceIndex
 import com.google.fhirengine.index.ResourceIndices
 import com.google.fhirengine.index.StringIndex
-import com.google.fhirengine.index.UriIndex
 import java.math.BigDecimal
 import java.util.Locale
 import org.hl7.fhir.r4.model.BaseDateTimeType
@@ -101,8 +100,16 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                                 temporalPrecision = date.precision))
                     }
                 }
+                SEARCH_PARAM_DEFINITION_TYPE_NUMBER -> {
+                    resource.valuesForPath(searchParamDefinition).numberValues().forEach { number ->
+                        indexBuilder.addNumberIndex(NumberIndex(
+                                name = searchParamDefinition.name,
+                                path = searchParamDefinition.path,
+                                value = number))
+                    }
+                }
 
-                // TODO: Implement number, token, reference, composite, quantity, URI,
+                // TODO: Implement token, reference, composite, quantity, URI,
                 //  and special search parameter types.
             }
         }
@@ -178,6 +185,17 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
         }.filter { it.value != null }
     }
 
+    /** Returns the number values for a list of `objects`. */
+    private fun Sequence<Any>.numberValues(): Sequence<BigDecimal> {
+        return flatMap {
+            when {
+                it is Integer -> sequenceOf(it.toInt().toBigDecimal())
+                it is BigDecimal -> sequenceOf(it)
+                else -> emptySequence()
+            }
+        }.filterNotNull()
+    }
+
     /** Returns the list of values corresponding to the `path` in the `resource`.  */
     private fun Resource.valuesForPath(definition: SearchParamDefinition): Sequence<Any> {
         val paths = definition.path.split(SEPARATOR_REGEX)
@@ -242,24 +260,20 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
     companion object {
         /** The prefix of getter methods for retrieving field values.  */
         private const val GETTER_PREFIX = "get"
-
         /** The suffix of getter methods for retrieving a date 'Element'.  */
         private const val GETTER_SUFFIX_DATE = "Element"
-
         /** The regular expression for the separator  */
         private val SEPARATOR_REGEX = "\\.".toRegex()
-
         /** The string representing the string search parameter type.  */
         private const val SEARCH_PARAM_DEFINITION_TYPE_STRING = "string"
-
         /** The string representing the reference search parameter type.  */
         private const val SEARCH_PARAM_DEFINITION_TYPE_REFERENCE = "reference"
-
         /** The string representing the code search parameter type.  */
         private const val SEARCH_PARAM_DEFINITION_TYPE_CODE = "token"
-
         /** The string representing the date search parameter type. */
         private const val SEARCH_PARAM_DEFINITION_TYPE_DATE = "date"
+        /** The string representing the number search parameter type. */
+        private const val SEARCH_PARAM_DEFINITION_TYPE_NUMBER = "number"
 
         /** Tag for logging.  */
         private const val TAG = "FhirIndexerImpl"
