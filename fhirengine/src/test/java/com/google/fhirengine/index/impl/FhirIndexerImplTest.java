@@ -18,14 +18,16 @@ package com.google.fhirengine.index.impl;
 
 import android.os.Build;
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.parser.IParser;
 import com.google.common.truth.Truth;
 import com.google.fhirengine.index.CodeIndex;
 import com.google.fhirengine.index.DateIndex;
+import com.google.fhirengine.index.NumberIndex;
 import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
-import com.google.fhirengine.index.UriIndex;
 import java.math.BigDecimal;
+import org.hl7.fhir.r4.model.ChargeItem;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.ContactPoint;
@@ -35,6 +37,7 @@ import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.InstantType;
+import org.hl7.fhir.r4.model.MolecularSequence;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Questionnaire;
@@ -346,17 +349,186 @@ public class FhirIndexerImplTest {
           + "  ]\n"
           + "}";
 
+  public static final String TEST_CHARGE_ITEM_NUMBER_INDEX =
+      "{\n"
+          + "  \"resourceType\": \"ChargeItem\",\n"
+          + "  \"id\": \"example\",\n"
+          + "  \"text\": {\n"
+          + "    \"status\": \"generated\",\n"
+          + "    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">Example of ChargeItem Usage in Context of the German EBM Billing code system</div>\"\n"
+          + "  },\n"
+          + "  \"identifier\": [\n"
+          + "    {\n"
+          + "      \"system\": \"http://myHospital.org/ChargeItems\",\n"
+          + "      \"value\": \"654321\"\n"
+          + "    }\n"
+          + "  ],\n"
+          + "  \"definitionUri\": [\n"
+          + "    \"http://www.kbv.de/tools/ebm/html/01520_2904360860826220813632.html\"\n"
+          + "  ],\n"
+          + "  \"status\": \"billable\",\n"
+          + "  \"code\": {\n"
+          + "    \"coding\": [\n"
+          + "      {\n"
+          + "        \"code\": \"01510\",\n"
+          + "        \"display\": \"Zusatzpauschale für Beobachtung nach diagnostischer Koronarangiografie\"\n"
+          + "      }\n"
+          + "    ]\n"
+          + "  },\n"
+          + "  \"subject\": {\n"
+          + "    \"reference\": \"Patient/example\"\n"
+          + "  },\n"
+          + "  \"context\": {\n"
+          + "    \"reference\": \"Encounter/example\"\n"
+          + "  },\n"
+          + "  \"occurrencePeriod\": {\n"
+          + "    \"start\": \"2017-01-25T08:00:00+01:00\",\n"
+          + "    \"end\": \"2017-01-25T12:35:00+01:00\"\n"
+          + "  },\n"
+          + "  \"performer\": [\n"
+          + "    {\n"
+          + "      \"function\": {\n"
+          + "        \"coding\": [\n"
+          + "          {\n"
+          + "            \"system\": \"http://snomed.info/sct\",\n"
+          + "            \"code\": \"17561000\",\n"
+          + "            \"display\": \"Cardiologist\"\n"
+          + "          }\n"
+          + "        ]\n"
+          + "      },\n"
+          + "      \"actor\": {\n"
+          + "        \"reference\": \"Practitioner/example\"\n"
+          + "      }\n"
+          + "    },\n"
+          + "    {\n"
+          + "      \"function\": {\n"
+          + "        \"coding\": [\n"
+          + "          {\n"
+          + "            \"system\": \"http://snomed.info/sct\",\n"
+          + "            \"code\": \"224542009\",\n"
+          + "            \"display\": \"Coronary Care Nurse\"\n"
+          + "          }\n"
+          + "        ]\n"
+          + "      },\n"
+          + "      \"actor\": {\n"
+          + "        \"reference\": \"Practitioner/example\"\n"
+          + "      }\n"
+          + "    }\n"
+          + "  ],\n"
+          + "  \"performingOrganization\": {\n"
+          + "    \"identifier\": {\n"
+          + "      \"system\": \"http://myhospital/NamingSystem/departments\",\n"
+          + "      \"value\": \"CARD_INTERMEDIATE_CARE\"\n"
+          + "    }\n"
+          + "  },\n"
+          + "  \"requestingOrganization\": {\n"
+          + "    \"identifier\": {\n"
+          + "      \"system\": \"http://myhospital/NamingSystem/departments\",\n"
+          + "      \"value\": \"CARD_U1\"\n"
+          + "    }\n"
+          + "  },\n"
+          + "  \"quantity\": {\n"
+          + "    \"value\": 1\n"
+          + "  },\n"
+          + "  \"factorOverride\": 0.8,\n"
+          + "  \"priceOverride\": {\n"
+          + "    \"value\": 40,\n"
+          + "    \"currency\": \"EUR\"\n"
+          + "  },\n"
+          + "  \"overrideReason\": \"Patient is Cardiologist's golf buddy, so he gets a 20% discount!\",\n"
+          + "  \"enterer\": {\n"
+          + "    \"reference\": \"Practitioner/example\"\n"
+          + "  },\n"
+          + "  \"enteredDate\": \"2017-01-25T23:55:04+01:00\",\n"
+          + "  \"reason\": [\n"
+          + "    {\n"
+          + "      \"coding\": [\n"
+          + "        {\n"
+          + "          \"system\": \"http://hl7.org/fhir/sid/icd-10\",\n"
+          + "          \"code\": \"123456\",\n"
+          + "          \"display\": \"DIAG-1\"\n"
+          + "        }\n"
+          + "      ]\n"
+          + "    }\n"
+          + "  ],\n"
+          + "  \"service\": [\n"
+          + "    {\n"
+          + "      \"reference\": \"Procedure/example\"\n"
+          + "    }\n"
+          + "  ],\n"
+          + "  \"account\": [\n"
+          + "    {\n"
+          + "      \"reference\": \"Account/example\"\n"
+          + "    }\n"
+          + "  ],\n"
+          + "  \"note\": [\n"
+          + "    {\n"
+          + "      \"authorReference\": {\n"
+          + "        \"reference\": \"Practitioner/example\"\n"
+          + "      },\n"
+          + "      \"time\": \"2017-01-25T23:55:04+01:00\",\n"
+          + "      \"text\": \"The code is only applicable for periods longer than 4h\"\n"
+          + "    }\n"
+          + "  ]\n"
+          + "}";
+
+  public static final String TEST_MOLECULAR_SEQUENCE_NUMBER_INDEX =
+      "{\n"
+          + "  \"resourceType\": \"MolecularSequence\",\n"
+          + "  \"id\": \"example\",\n"
+          + "  \"text\": {\n"
+          + "    \"status\": \"generated\",\n"
+          + "    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\"><p><b>Generated Narrative with Details</b></p><p><b>id</b>: example</p><p><b>type</b>: dna</p><p><b>coordinateSystem</b>: 0</p><p><b>patient</b>: <a>Patient/example</a></p><h3>ReferenceSeqs</h3><table><tr><td>-</td><td><b>ReferenceSeqId</b></td><td><b>Strand</b></td><td><b>WindowStart</b></td><td><b>WindowEnd</b></td></tr><tr><td>*</td><td>NC_000009.11 <span>(Details : {http://www.ncbi.nlm.nih.gov/nuccore code 'NC_000009.11' = 'NC_000009.11)</span></td><td>watson</td><td>22125500</td><td>22125510</td></tr></table><h3>Variants</h3><table><tr><td>-</td><td><b>Start</b></td><td><b>End</b></td><td><b>ObservedAllele</b></td><td><b>ReferenceAllele</b></td></tr><tr><td>*</td><td>22125503</td><td>22125504</td><td>C</td><td>G</td></tr></table><h3>Repositories</h3><table><tr><td>-</td><td><b>Type</b></td><td><b>Url</b></td><td><b>Name</b></td><td><b>VariantsetId</b></td></tr><tr><td>*</td><td>openapi</td><td><a>http://grch37.rest.ensembl.org/ga4gh/variants/3:rs1333049?content-type=application/json</a></td><td>GA4GH API</td><td>3:rs1333049</td></tr></table></div>\"\n"
+          + "  },\n"
+          + "  \"type\": \"dna\",\n"
+          + "  \"coordinateSystem\": 0,\n"
+          + "  \"patient\": {\n"
+          + "    \"reference\": \"Patient/example\"\n"
+          + "  },\n"
+          + "  \"referenceSeq\": {\n"
+          + "    \"referenceSeqId\": {\n"
+          + "      \"coding\": [\n"
+          + "        {\n"
+          + "          \"system\": \"http://www.ncbi.nlm.nih.gov/nuccore\",\n"
+          + "          \"code\": \"NC_000009.11\"\n"
+          + "        }\n"
+          + "      ]\n"
+          + "    },\n"
+          + "    \"strand\": \"watson\",\n"
+          + "    \"windowStart\": 22125500,\n"
+          + "    \"windowEnd\": 22125510\n"
+          + "  },\n"
+          + "  \"variant\": [\n"
+          + "    {\n"
+          + "      \"start\": 22125503,\n"
+          + "      \"end\": 22125504,\n"
+          + "      \"observedAllele\": \"C\",\n"
+          + "      \"referenceAllele\": \"G\"\n"
+          + "    }\n"
+          + "  ],\n"
+          + "  \"repository\": [\n"
+          + "    {\n"
+          + "      \"type\": \"openapi\",\n"
+          + "      \"url\": \"http://grch37.rest.ensembl.org/ga4gh/variants/3:rs1333049?content-type=application/json\",\n"
+          + "      \"name\": \"GA4GH API\",\n"
+          + "      \"variantsetId\": \"3:rs1333049\"\n"
+          + "    }\n"
+          + "  ]\n"
+          + "}";
+
   private static Patient dateTestPatient;
   private static Patient lastUpdatedTestPatient;
+  private static ChargeItem numberTestChargeItem;
+  private static MolecularSequence numberTestMolecularSequence;
 
   @Before
   public void setUp() throws Exception {
-    dateTestPatient =
-        FhirContext.forR4().newJsonParser().parseResource(Patient.class, TEST_PATIENT_DATE_INDEX);
-    lastUpdatedTestPatient =
-        FhirContext.forR4()
-            .newJsonParser()
-            .parseResource(Patient.class, TEST_PATIENT_LASTUPDATED_INDEX);
+    IParser iParser = FhirContext.forR4().newJsonParser();
+    dateTestPatient = iParser.parseResource(Patient.class, TEST_PATIENT_DATE_INDEX);
+    lastUpdatedTestPatient = iParser.parseResource(Patient.class, TEST_PATIENT_LASTUPDATED_INDEX);
+    numberTestChargeItem = iParser.parseResource(ChargeItem.class, TEST_CHARGE_ITEM_NUMBER_INDEX);
+    numberTestMolecularSequence =
+        iParser.parseResource(MolecularSequence.class, TEST_MOLECULAR_SEQUENCE_NUMBER_INDEX);
   }
 
   @Test
@@ -488,6 +660,33 @@ public class FhirIndexerImplTest {
                 lastUpdatedElement.getValue().getTime(),
                 lastUpdatedElement.getValue().getTime(),
                 lastUpdatedElement.getPrecision()));
+  }
+
+  @Test
+  public void index_chargeItem_shouldIndexFactorOverride() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(numberTestChargeItem);
+    Truth.assertThat(resourceIndices.getNumberIndices())
+        .contains(
+            new NumberIndex("factor-override", "ChargeItem.factorOverride", new BigDecimal("0.8")));
+  }
+
+  @Test
+  public void index_chargeItem_shouldIndex() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(numberTestMolecularSequence);
+    Truth.assertThat(resourceIndices.getNumberIndices())
+        .containsAtLeast(
+            new NumberIndex(
+                "window-end",
+                "MolecularSequence.referenceSeq.windowEnd",
+                new BigDecimal("22125510")),
+            new NumberIndex(
+                "window-start",
+                "MolecularSequence.referenceSeq.windowStart",
+                new BigDecimal("22125500")),
+            new NumberIndex(
+                "variant-end", "MolecularSequence.variant.end", new BigDecimal("22125504")),
+            new NumberIndex(
+                "variant-start", "MolecularSequence.variant.start", new BigDecimal("22125503")));
   }
 
   // TODO: improve the tests further.

@@ -46,7 +46,8 @@ import org.hl7.fhir.r4.model.ResourceType
         StringIndexEntity::class,
         ReferenceIndexEntity::class,
         CodeIndexEntity::class,
-        DateIndexEntity::class
+        DateIndexEntity::class,
+        NumberIndexEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -154,6 +155,13 @@ internal abstract class ResourceDao {
                     index = it,
                     resourceId = resource.resourceId))
         }
+        index.numberIndices.forEach {
+            insertNumberIndex(NumberIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId))
+        }
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -170,6 +178,9 @@ internal abstract class ResourceDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertDateIndex(dateIndexEntity: DateIndexEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insertNumberIndex(numberIndexEntity: NumberIndexEntity)
 
     @Query("""
         DELETE FROM ResourceEntity
