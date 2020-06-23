@@ -177,6 +177,11 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
     /** Returns the Date values for a list of `objects`. */
     private fun Sequence<Any>.dateValues(): Sequence<BaseDateTimeType> {
         return flatMap {
+            /** BaseDateTimeType wraps around [java.util.Date] which is what we use to extract the
+             * timestamp. Some implementations return the timestamp in local (device) timezone.
+             * Additionally, time zones are likely to be missing from health data. Date indexing
+             * is a work in progress.
+             */
             if (it is BaseDateTimeType) {
                 sequenceOf(it)
             } else {

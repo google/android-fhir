@@ -671,7 +671,7 @@ public class FhirIndexerImplTest {
   }
 
   @Test
-  public void index_chargeItem_shouldIndex() throws Exception {
+  public void index_molecularSequence_shouldIndexWindowAndVariant() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(numberTestMolecularSequence);
     Truth.assertThat(resourceIndices.getNumberIndices())
         .containsAtLeast(
