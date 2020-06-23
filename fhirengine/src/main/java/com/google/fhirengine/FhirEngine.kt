@@ -17,7 +17,6 @@
 package com.google.fhirengine
 
 import com.google.fhirengine.search.Search
-import com.google.fhirengine.sync.FhirDataSource
 import com.google.fhirengine.sync.Result
 import com.google.fhirengine.sync.SyncConfiguration
 import org.hl7.fhir.r4.model.Resource
@@ -70,15 +69,7 @@ interface FhirEngine {
     /** Returns the entry point for [Search]. */
     fun search(): Search
 
-    /** TODO make this part of a builder **/
-    fun setPeriodicSyncConfiguration(syncConfiguration: SyncConfiguration)
-
-    /** TODO make this part of a builder **/
-    fun setSyncDataSource(dataSource: FhirDataSource)
-
     fun sync(syncConfiguration: SyncConfiguration): Result
-
-    fun updatePeriodicSyncConfiguration(syncConfiguration: SyncConfiguration)
 
     fun periodicSync(): Result
 }

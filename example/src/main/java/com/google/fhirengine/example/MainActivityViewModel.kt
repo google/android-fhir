@@ -22,7 +22,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.fhirengine.FhirEngine
 import com.google.fhirengine.example.api.HapiFhirService
-import com.google.fhirengine.example.data.HapiFhirResourceDataSource
 import com.google.fhirengine.sync.SyncConfiguration
 import com.google.fhirengine.sync.SyncData
 import kotlinx.coroutines.launch
@@ -46,7 +45,6 @@ class MainActivityViewModel(
                 )
             )
             val syncConfig = SyncConfiguration(syncData = syncData)
-            fhirEngine.setSyncDataSource(HapiFhirResourceDataSource(service))
             val result = fhirEngine.sync(syncConfig)
             Log.d("MainActivityViewModel", "sync result: $result")
         }

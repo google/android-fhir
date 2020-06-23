@@ -62,7 +62,6 @@ dependencies {
     implementation "androidx.room:room-runtime:$roomVersion"
     implementation "androidx.room:room-ktx:$roomVersion"
     api "androidx.work:work-runtime-ktx:$workManagerVersion"
-    implementation "com.google.dagger:dagger:$daggerVersion"
     implementation "com.google.guava:guava:$guavaVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     implementation "org.opencds.cqf:cql-engine-fhir:$cqlEngineVersion"

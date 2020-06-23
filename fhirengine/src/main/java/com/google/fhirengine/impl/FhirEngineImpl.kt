@@ -41,10 +41,10 @@ class FhirEngineImpl constructor(
   private val search: Search,
   libraryLoader: LibraryLoader,
   dataProviderMap: Map<String, @JvmSuppressWildcards DataProvider>,
-  terminologyProvider: TerminologyProvider
+  terminologyProvider: TerminologyProvider,
+  private val periodicSyncConfiguration: SyncConfiguration,
+  private val dataSource: FhirDataSource
 ) : FhirEngine {
-    private var syncConfiguration: SyncConfiguration? = null
-    private var dataSource: FhirDataSource? = null
 
     private val cqlEngine: CqlEngine = CqlEngine(
         libraryLoader,
@@ -98,29 +98,11 @@ class FhirEngineImpl constructor(
         return search
     }
 
-    override fun setPeriodicSyncConfiguration(syncConfiguration: SyncConfiguration) {
-        this.syncConfiguration = syncConfiguration
-    }
-
-    override fun setSyncDataSource(dataSource: FhirDataSource) {
-        this.dataSource = dataSource
-    }
-
     override fun sync(syncConfiguration: SyncConfiguration): Result {
-        val source = dataSource
-        requireNotNull(source)
-        return FhirSynchronizer(syncConfiguration, source, database).sync()
-    }
-
-    override fun updatePeriodicSyncConfiguration(configuration: SyncConfiguration) {
-        syncConfiguration = configuration
+        return FhirSynchronizer(syncConfiguration, dataSource, database).sync()
     }
 
     override fun periodicSync(): Result {
-        val configuration = syncConfiguration
-        requireNotNull(configuration)
-        val source = dataSource
-        requireNotNull(source)
-        return FhirSynchronizer(configuration, source, database).sync()
+        return FhirSynchronizer(periodicSyncConfiguration, dataSource, database).sync()
     }
 }
