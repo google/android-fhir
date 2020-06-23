@@ -17,8 +17,10 @@
 package com.google.fhirengine.search.impl
 
 import com.google.fhirengine.db.Database
+import com.google.fhirengine.resource.ResourceUtils
 import com.google.fhirengine.search.Search
-import com.google.fhirengine.search.criteria.FilterCriterion
+import com.google.fhirengine.search.filter.FilterCriterion
+import com.google.fhirengine.search.sort.SortCriterion
 import org.hl7.fhir.r4.model.Resource
 
 /** Implementation of the [Search] interface. */
@@ -27,15 +29,25 @@ class SearchImpl constructor(val database: Database) : Search {
 
     /** Implementation of the [Search.SearchSpecifications] interface. */
     inner class SearchSpecificationImpl<R : Resource>(
-      val clazz: Class<R>
+            val clazz: Class<R>
     ) : Search.SearchSpecifications {
         lateinit var filterCriterion: FilterCriterion
+        lateinit var sortCriterion: SortCriterion
+        var skip: Int? = null
+        var limit: Int? = null
 
         override fun filter(filterCriterion: FilterCriterion): Search.SearchSpecifications =
                 apply { this.filterCriterion = filterCriterion }
 
-        override fun <R : Resource> run(): List<R> {
-            return database.search(filterCriterion.query(clazz).getSearchResourceQuery(clazz))
-        }
+        override fun sort(sortCriterion: SortCriterion): Search.SearchSpecifications =
+                apply { this.sortCriterion = sortCriterion }
+
+        override fun skip(skip: Int): Search.SearchSpecifications = apply { this.skip = skip }
+
+        override fun limit(limit: Int): Search.SearchSpecifications = apply { this.limit = limit }
+
+        override fun <R : Resource> run(): List<R> = database.search(
+                SerializedResourceQuery(ResourceUtils.getResourceType(clazz),
+                        filterCriterion.query(clazz), sortCriterion, skip, limit))
     }
 }

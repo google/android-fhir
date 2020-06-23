@@ -16,7 +16,7 @@
 
 package com.google.fhirengine.db
 
-import com.google.fhirengine.search.impl.ResourceQuery
+import com.google.fhirengine.search.impl.Query
 import org.hl7.fhir.r4.model.Resource
 
 /** The interface for the FHIR resource database.  */
@@ -119,5 +119,5 @@ interface Database {
       codeValue: String
     ): List<R>
 
-    fun <R : Resource> search(searchIdQuery: ResourceQuery): List<R>
+    fun <R : Resource> search(query: Query): List<R>
 }

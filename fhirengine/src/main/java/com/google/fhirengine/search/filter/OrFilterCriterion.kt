@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.search.criteria
+package com.google.fhirengine.search.filter
 
 import com.google.fhirengine.search.impl.ResourceIdQuery
 import org.hl7.fhir.r4.model.Resource
 
-/** Interface to specify filtering criteria for search. */
-interface FilterCriterion {
-    fun and(filterCriterion: FilterCriterion): FilterCriterion =
-            and(this, filterCriterion)
-
-    fun or(filterCriterion: FilterCriterion): FilterCriterion =
-            or(this, filterCriterion)
-
-    /**
-     * Returns the [ResourceIdQuery] that will return the list of
-     */
-    fun <R : Resource> query(clazz: Class<R>): ResourceIdQuery
+/**
+ * [FilterCriterion] that is satisfied if any of the sub [FilterCriterion]s is satisfied.
+ */
+class OrFilterCriterion constructor(val left: FilterCriterion, val right: FilterCriterion) :
+        FilterCriterion {
+    override fun <R : Resource> query(clazz: Class<R>): ResourceIdQuery {
+        val leftQuery = left.query(clazz)
+        val rightQuery = right.query(clazz)
+        return ResourceIdQuery(
+                "${leftQuery.query} UNION ${rightQuery.query}",
+                leftQuery.args + rightQuery.args)
+    }
 }
+
+fun or(left: FilterCriterion, right: FilterCriterion) = OrFilterCriterion(left, right)
