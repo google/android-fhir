@@ -23,7 +23,6 @@ import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.resource.ResourceUtils
 import com.google.fhirengine.search.impl.ResourceQuery
-import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Resource
 
 /**
@@ -131,28 +130,6 @@ internal class DatabaseImpl(
     ): List<R> {
         val refs = searchByReference(clazz, reference, referenceValue).map { it.id }
         return searchByCode(clazz, code, codeSystem, codeValue).filter { refs.contains(it.id) }
-    }
-
-    override fun <R : Resource> searchByQuantity(
-      clazz: Class<R>,
-      name: String,
-      path: String,
-      system: String,
-      value: BigDecimal,
-      unit: String
-    ): List<R> {
-        return dao.getResourceByQuantityIndex(ResourceUtils.getResourceType(clazz).name, name, path,
-                system, value, unit).map { iParser.parseResource(it) as R }
-    }
-
-    override fun <R : Resource> searchByUri(
-      clazz: Class<R>,
-      name: String,
-      path: String,
-      uri: String
-    ): List<R> {
-        return dao.getResourceByUriIndex(ResourceUtils.getResourceType(clazz).name, name, path, uri)
-                .map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource> search(query: ResourceQuery): List<R> =

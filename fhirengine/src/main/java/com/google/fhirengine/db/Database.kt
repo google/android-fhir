@@ -17,7 +17,6 @@
 package com.google.fhirengine.db
 
 import com.google.fhirengine.search.impl.ResourceQuery
-import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Resource
 
 /** The interface for the FHIR resource database.  */
@@ -118,30 +117,6 @@ interface Database {
       code: String,
       codeSystem: String,
       codeValue: String
-    ): List<R>
-
-    /**
-     * Returns a [List] of [Resource]s that are of type `clazz` and have `quantity` with `name`, `path`,
-     * `system`, `value` and `unit`.
-     */
-    fun <R : Resource> searchByQuantity(
-      clazz: Class<R>,
-      name: String,
-      path: String,
-      system: String,
-      value: BigDecimal,
-      unit: String
-    ): List<R>
-
-    /**
-     * Returns a [List] of [Resource]s that are of type `clazz` and have `uri` with `name`, `path`,
-     * and `uri`.
-     */
-    fun <R : Resource> searchByUri(
-      clazz: Class<R>,
-      name: String,
-      path: String,
-      uri: String
     ): List<R>
 
     fun <R : Resource> search(searchIdQuery: ResourceQuery): List<R>
