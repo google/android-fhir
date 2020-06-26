@@ -40,20 +40,20 @@ internal class DatabaseImpl(
       iParser: IParser,
       fhirIndexer: FhirIndexer
     ) : this(
-        context = context,
-        iParser = iParser,
-        fhirIndexer = fhirIndexer,
-        databaseName = DEFAULT_DATABASE_NAME)
+            context = context,
+            iParser = iParser,
+            fhirIndexer = fhirIndexer,
+            databaseName = DEFAULT_DATABASE_NAME)
     val builder = if (databaseName == null) {
         Room.inMemoryDatabaseBuilder(context, RoomResourceDb::class.java)
     } else {
         Room.databaseBuilder(context, RoomResourceDb::class.java, databaseName)
     }
     val db = builder
-        // TODO https://github.com/jingtang10/fhir-engine/issues/32
-        //  don't allow main thread queries
-        .allowMainThreadQueries()
-        .build()
+            // TODO https://github.com/jingtang10/fhir-engine/issues/32
+            //  don't allow main thread queries
+            .allowMainThreadQueries()
+            .build()
     val dao by lazy {
         db.dao().also {
             it.fhirIndexer = fhirIndexer
@@ -76,8 +76,8 @@ internal class DatabaseImpl(
     override fun <R : Resource> select(clazz: Class<R>, id: String): R {
         val type = ResourceUtils.getResourceType(clazz)
         return dao.getResource(
-            resourceId = id,
-            resourceType = type
+                resourceId = id,
+                resourceType = type
         )?.let {
             iParser.parseResource(clazz, it)
         } ?: throw ResourceNotFoundInDbException(type.name, id)
@@ -86,8 +86,8 @@ internal class DatabaseImpl(
     override fun <R : Resource> delete(clazz: Class<R>, id: String) {
         val type = ResourceUtils.getResourceType(clazz)
         dao.deleteResource(
-            resourceId = id,
-            resourceType = type
+                resourceId = id,
+                resourceType = type
         )
     }
 
@@ -97,8 +97,8 @@ internal class DatabaseImpl(
       value: String
     ): List<R> {
         return dao.getResourceByReferenceIndex(
-            ResourceUtils.getResourceType(clazz).name, reference, value)
-            .map { iParser.parseResource(it) as R }
+                ResourceUtils.getResourceType(clazz).name, reference, value)
+                .map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource> searchByString(
@@ -107,7 +107,7 @@ internal class DatabaseImpl(
       value: String
     ): List<R> {
         return dao.getResourceByStringIndex(ResourceUtils.getResourceType(clazz).name, string,
-            value).map { iParser.parseResource(it) as R }
+                value).map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource> searchByCode(

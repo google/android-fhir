@@ -17,6 +17,7 @@
 package com.google.fhirengine.db.impl
 
 import androidx.room.TypeConverter
+import java.math.BigDecimal
 import org.hl7.fhir.r4.model.ResourceType
 
 /**
@@ -40,4 +41,12 @@ internal object DbTypeConverters {
     @TypeConverter
     fun stringToResourceType(data: String) = resourceTypeLookup[data]
             ?: throw IllegalArgumentException("invalid resource type: $data")
+
+    @JvmStatic
+    @TypeConverter
+    fun bigDecimalToString(value: BigDecimal): String = value.toString()
+
+    @JvmStatic
+    @TypeConverter
+    fun stringToBigDecimal(value: String): BigDecimal = value.toBigDecimal()
 }
