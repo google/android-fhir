@@ -38,6 +38,10 @@ internal data class ResourceIndices(
   val referenceIndices: List<ReferenceIndex>,
   /** The code indices.  */
   val codeIndices: List<CodeIndex>,
+  /** The quantity indices. */
+  val quantityIndices: List<QuantityIndex>,
+  /** The URI indices. */
+  val uriIndices: List<UriIndex>,
   /** The date indices. */
   val dateIndices: List<DateIndex>,
   /** The number indices. */
@@ -52,6 +56,8 @@ internal data class ResourceIndices(
         private val stringIndices = mutableListOf<StringIndex>()
         private val referenceIndices = mutableListOf<ReferenceIndex>()
         private val codeIndices = mutableListOf<CodeIndex>()
+        private val quantityIndices = mutableListOf<QuantityIndex>()
+        private val uriIndices = mutableListOf<UriIndex>()
         private val dateIndices = mutableListOf<DateIndex>()
         private val numberIndices = mutableListOf<NumberIndex>()
 
@@ -65,6 +71,14 @@ internal data class ResourceIndices(
 
         fun addCodeIndex(codeIndex: CodeIndex) = this.also {
             codeIndices.add(codeIndex)
+        }
+
+        fun addQuantityIndex(quantityIndex: QuantityIndex) = this.also {
+            quantityIndices.add(quantityIndex)
+        }
+
+        fun addUriIndex(uriIndex: UriIndex) = this.also {
+            uriIndices.add(uriIndex)
         }
 
         fun addDateIndex(dateIndex: DateIndex) = this.also {
@@ -81,6 +95,8 @@ internal data class ResourceIndices(
                 stringIndices = stringIndices.toList(),
                 referenceIndices = referenceIndices.toList(),
                 codeIndices = codeIndices.toList(),
+                quantityIndices = quantityIndices.toList(),
+                uriIndices = uriIndices.toList(),
                 dateIndices = dateIndices.toList(),
                 numberIndices = numberIndices.toList()
         )

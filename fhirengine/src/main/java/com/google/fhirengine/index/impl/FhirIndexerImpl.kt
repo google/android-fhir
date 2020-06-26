@@ -22,11 +22,14 @@ import com.google.fhirengine.index.CodeIndex
 import com.google.fhirengine.index.DateIndex
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.index.NumberIndex
+import com.google.fhirengine.index.QuantityIndex
 import com.google.fhirengine.index.ReferenceIndex
 import com.google.fhirengine.index.ResourceIndices
 import com.google.fhirengine.index.StringIndex
+import com.google.fhirengine.index.UriIndex
 import java.math.BigDecimal
 import java.util.Locale
+import org.hl7.fhir.instance.model.api.IBaseDatatype
 import org.hl7.fhir.r4.model.BaseDateTimeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -90,6 +93,48 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                         }
                     }
                 }
+                SEARCH_PARAM_DEFINITION_TYPE_QUANTITY -> {
+                    resource.valuesForPath(searchParamDefinition)
+                            .quantityValues()
+                            .forEach { quantity ->
+
+                        val system: String
+                        val unit: String
+                        val value: BigDecimal
+
+                        if (quantity is Quantity) {
+                            system = quantity.system
+                            unit = quantity.unit
+                            value = quantity.value
+                        } else if (quantity is Money) {
+                            system = FHIR_CURRENCY_SYSTEM
+                            unit = quantity.currency
+                            value = quantity.value
+                        } else {
+                            throw IllegalArgumentException(
+                                    "$quantity is of unknown type ${quantity.javaClass.simpleName}")
+                        }
+
+                        indexBuilder.addQuantityIndex(QuantityIndex(
+                                name = searchParamDefinition.name,
+                                path = searchParamDefinition.path,
+                                system = system,
+                                unit = unit,
+                                value = value
+                        ))
+                    }
+                }
+                SEARCH_PARAM_DEFINITION_TYPE_URI -> {
+                    resource.valuesForPath(searchParamDefinition)
+                            .uriValues()
+                            .forEach { uri ->
+                                indexBuilder.addUriIndex(UriIndex(
+                                        name = searchParamDefinition.name,
+                                        path = searchParamDefinition.path,
+                                        uri = uri
+                                ))
+                            }
+                }
                 SEARCH_PARAM_DEFINITION_TYPE_DATE -> {
                     resource.valuesForPath(searchParamDefinition).dateValues().forEach { date ->
                         indexBuilder.addDateIndex(DateIndex(
@@ -109,8 +154,7 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                     }
                 }
 
-                // TODO: Implement token, reference, composite, quantity, URI,
-                //  and special search parameter types.
+                // TODO: Implement token, composite and special search parameter types.
             }
         }
         // For all resources,
@@ -170,6 +214,33 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                 it.coding.asSequence()
             } else {
                 emptySequence()
+            }
+        }
+    }
+
+    /** Returns the quantity values for the list of `objects`.  */
+    private fun Sequence<Any>.quantityValues(): Sequence<IBaseDatatype> {
+        return flatMap {
+            when (it) {
+                is Money -> sequenceOf(it)
+                is Quantity -> sequenceOf(it)
+                is Range -> sequenceOf(it.low, it.high)
+                is Ratio -> sequenceOf(it.numerator, it.denominator)
+                // TODO: Find other FHIR datatypes types the "quantity" type maps to.
+                //  See: http://hl7.org/fhir/datatypes.html#quantity
+
+                else -> emptySequence()
+            }
+        }
+    }
+
+    /** Returns the uri values for the list of `objects`.  */
+    private fun Sequence<Any>.uriValues(): Sequence<String> {
+        return flatMap {
+            when (it) {
+                is UriType -> sequenceOf(it.value)
+                is String -> sequenceOf(it)
+                else -> emptySequence()
             }
         }
     }
@@ -275,10 +346,19 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
         private const val SEARCH_PARAM_DEFINITION_TYPE_REFERENCE = "reference"
         /** The string representing the code search parameter type.  */
         private const val SEARCH_PARAM_DEFINITION_TYPE_CODE = "token"
+        /** The string representing the quantity search parameter type.  */
+        private const val SEARCH_PARAM_DEFINITION_TYPE_QUANTITY = "quantity"
+        /** The string representing the uri search parameter type.  */
+        private const val SEARCH_PARAM_DEFINITION_TYPE_URI = "uri"
         /** The string representing the date search parameter type. */
         private const val SEARCH_PARAM_DEFINITION_TYPE_DATE = "date"
         /** The string representing the number search parameter type. */
         private const val SEARCH_PARAM_DEFINITION_TYPE_NUMBER = "number"
+
+        /** The string for FHIR currency system */
+        // See: https://bit.ly/30YB3ML
+        // See: https://www.hl7.org/fhir/valueset-currencies.html
+        private const val FHIR_CURRENCY_SYSTEM = "urn:iso:std:iso:4217"
 
         /** Tag for logging.  */
         private const val TAG = "FhirIndexerImpl"
