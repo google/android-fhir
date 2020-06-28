@@ -18,6 +18,7 @@ package com.google.fhirengine.db.impl
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
 import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.index.FhirIndexer
@@ -89,8 +90,13 @@ internal class DatabaseImpl(
         return syncedResourceDao.getLastUpdate(resourceType)
     }
 
-    override suspend fun insertSyncedResource(syncedResourceEntity: SyncedResourceEntity) {
+    @Transaction
+    override suspend fun insertSyncedResources(
+      syncedResourceEntity: SyncedResourceEntity,
+      resources: List<Resource>
+    ) {
         syncedResourceDao.insert(syncedResourceEntity)
+        insertAll(resources)
     }
 
     override fun <R : Resource> delete(clazz: Class<R>, id: String) {
@@ -117,9 +123,9 @@ internal class DatabaseImpl(
       value: String
     ): List<R> {
         return resourceDao.getResourceByStringIndex(
-            ResourceUtils.getResourceType(clazz).name,
-            string,
-                value
+            resourceType = ResourceUtils.getResourceType(clazz).name,
+            indexPath = string,
+            indexValue = value
         ).map { iParser.parseResource(it) as R }
     }
 
@@ -130,10 +136,10 @@ internal class DatabaseImpl(
       value: String
     ): List<R> {
         return resourceDao.getResourceByCodeIndex(
-            ResourceUtils.getResourceType(clazz).name,
-            code,
-            system,
-            value
+            resourceType = ResourceUtils.getResourceType(clazz).name,
+            indexPath = code,
+            indexSystem = system,
+            indexValue = value
         ).map { iParser.parseResource(it) as R }
     }
 
@@ -150,8 +156,7 @@ internal class DatabaseImpl(
     }
 
     override fun <R : Resource> search(query: ResourceQuery): List<R> =
-            resourceDao.getResources(
-                query.getSupportSQLiteQuery())
+            resourceDao.getResources(query.getSupportSQLiteQuery())
                 .map { iParser.parseResource(it) as R }
 
     companion object {

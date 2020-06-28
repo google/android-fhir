@@ -21,15 +21,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.fhirengine.FhirEngine
-import com.google.fhirengine.example.api.HapiFhirService
 import com.google.fhirengine.sync.SyncConfiguration
 import com.google.fhirengine.sync.SyncData
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.ResourceType
 
 class MainActivityViewModel(
-  private val fhirEngine: FhirEngine,
-  private val service: HapiFhirService
+  private val fhirEngine: FhirEngine
 ) : ViewModel() {
 
     init {
@@ -52,12 +50,11 @@ class MainActivityViewModel(
 }
 
 class MainActivityViewModelFactory(
-  private val fhirEngine: FhirEngine,
-  private val service: HapiFhirService
+  private val fhirEngine: FhirEngine
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {
-            return MainActivityViewModel(fhirEngine, service) as T
+            return MainActivityViewModel(fhirEngine) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

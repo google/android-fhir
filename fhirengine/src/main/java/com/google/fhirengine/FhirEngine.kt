@@ -69,7 +69,7 @@ interface FhirEngine {
     /** Returns the entry point for [Search]. */
     fun search(): Search
 
-    fun sync(syncConfiguration: SyncConfiguration): Result
+    suspend fun sync(syncConfiguration: SyncConfiguration): Result
 
-    fun periodicSync(): Result
+    suspend fun periodicSync(): Result
 }

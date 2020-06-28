@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     fhirEngine = new FhirEngineBuilder(configuration, dataSource, this).inMemory().build();
 
     MainActivityViewModel viewModel =
-        new ViewModelProvider(this, new MainActivityViewModelFactory(fhirEngine, service))
+        new ViewModelProvider(this, new MainActivityViewModelFactory(fhirEngine))
             .get(MainActivityViewModel.class);
 
     final Button button = findViewById(R.id.load_cql_lib_button);

@@ -98,11 +98,11 @@ class FhirEngineImpl constructor(
         return search
     }
 
-    override fun sync(syncConfiguration: SyncConfiguration): Result {
+    override suspend fun sync(syncConfiguration: SyncConfiguration): Result {
         return FhirSynchronizer(syncConfiguration, dataSource, database).sync()
     }
 
-    override fun periodicSync(): Result {
+    override suspend fun periodicSync(): Result {
         return FhirSynchronizer(periodicSyncConfiguration, dataSource, database).sync()
     }
 }

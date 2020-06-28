@@ -68,7 +68,10 @@ interface Database {
      *
      * @param syncedResourceEntity The synced resource
      */
-    suspend fun insertSyncedResource(syncedResourceEntity: SyncedResourceEntity)
+    suspend fun insertSyncedResources(
+      syncedResourceEntity: SyncedResourceEntity,
+      resources: List<Resource>
+    )
 
     /**
      * Deletes the FHIR resource of type `clazz` with `id`.

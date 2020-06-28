@@ -89,11 +89,12 @@ class ResourceSynchronizer(
         val resources = bundle.entry.map { it.resource }
         if (resources.isNotEmpty()) {
             val mostRecentResource = resources[resources.lastIndex]
-            database.insertSyncedResource(SyncedResourceEntity(
+            database.insertSyncedResources(SyncedResourceEntity(
                 syncData.resourceType,
-                mostRecentResource.meta.lastUpdated.toTimeZoneString()))
+                mostRecentResource.meta.lastUpdated.toTimeZoneString()),
+            resources
+            )
         }
-        database.insertAll(resources)
     }
 
     private fun Date.toTimeZoneString(): String {

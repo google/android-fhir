@@ -17,7 +17,6 @@
 package com.google.fhirengine.sync
 
 import com.google.fhirengine.db.Database
-import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
@@ -35,7 +34,7 @@ class FhirSynchronizer(
   private val dataSource: FhirDataSource,
   private val database: Database
 ) {
-    fun sync(): Result = runBlocking {
+    suspend fun sync(): Result {
         val exceptions = mutableListOf<ResourceSyncException>()
         syncConfiguration.syncData.forEach { syncData ->
             val resourceSynchroniser = ResourceSynchronizer(
@@ -51,9 +50,9 @@ class FhirSynchronizer(
             }
         }
         if (exceptions.isEmpty()) {
-            return@runBlocking Result.Success
+            return Result.Success
         } else {
-            return@runBlocking Result.Error(exceptions)
+            return Result.Error(exceptions)
         }
     }
 }
