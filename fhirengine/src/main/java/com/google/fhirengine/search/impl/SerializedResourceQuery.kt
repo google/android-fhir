@@ -18,15 +18,14 @@ package com.google.fhirengine.search.impl
 
 import com.google.fhirengine.search.sort.SortCriterion
 import org.hl7.fhir.r4.model.ResourceType
-import kotlin.text.StringBuilder
 
 /** Query that returns a list of serialized resources. */
 data class SerializedResourceQuery(
-        val resourceType: ResourceType,
-        val resourceIdQuery: ResourceIdQuery,
-        val sortCriterion: SortCriterion?,
-        val skip: Int?,
-        val limit: Int?
+  val resourceType: ResourceType,
+  val resourceIdQuery: ResourceIdQuery,
+  val sortCriterion: SortCriterion?,
+  val skip: Int?,
+  val limit: Int?
 ) : Query() {
     override fun getQueryString(): String = if (sortCriterion == null) {
         """

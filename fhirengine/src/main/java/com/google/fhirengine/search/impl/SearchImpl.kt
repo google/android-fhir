@@ -29,7 +29,7 @@ class SearchImpl constructor(val database: Database) : Search {
 
     /** Implementation of the [Search.SearchSpecifications] interface. */
     inner class SearchSpecificationImpl<R : Resource>(
-            val clazz: Class<R>
+      val clazz: Class<R>
     ) : Search.SearchSpecifications {
         lateinit var filterCriterion: FilterCriterion
         var sortCriterion: SortCriterion? = null
