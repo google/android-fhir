@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.fhirengine.example
 
 import android.content.Intent
@@ -14,9 +30,11 @@ import com.google.fhirengine.example.data.SamplePatients
  * UI Controller helper class to monitor Patient viewmodel and display list of patients, with
  * possibly patient details, on a two pane device.
  */
-class SampleItemRecyclerViewAdapter(private val parentActivity: SamplePatientListActivity,
-                                    viewModel: PatientListViewModel,
-                                    private val twoPane: Boolean) :
+class SampleItemRecyclerViewAdapter(
+  private val parentActivity: SamplePatientListActivity,
+  viewModel: PatientListViewModel,
+  private val twoPane: Boolean
+) :
         RecyclerView.Adapter<SampleItemRecyclerViewAdapter.ViewHolder>() {
 
     private val onClickListener: View.OnClickListener
@@ -44,7 +62,8 @@ class SampleItemRecyclerViewAdapter(private val parentActivity: SamplePatientLis
         }
 
         // Trigger value update in the view holder when underlying viewmodel changes.
-        viewModel.getPatients().observe(parentActivity, Observer<List<SamplePatients.PatientItem>> { patients ->
+        viewModel.getPatients().observe(
+                parentActivity, Observer<List<SamplePatients.PatientItem>> { patients ->
             patientValues = patients
         })
     }
