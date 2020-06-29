@@ -32,7 +32,7 @@ class SearchImpl constructor(val database: Database) : Search {
             val clazz: Class<R>
     ) : Search.SearchSpecifications {
         lateinit var filterCriterion: FilterCriterion
-        lateinit var sortCriterion: SortCriterion
+        var sortCriterion: SortCriterion? = null
         var skip: Int? = null
         var limit: Int? = null
 

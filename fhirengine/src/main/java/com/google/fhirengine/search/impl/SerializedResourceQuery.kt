@@ -24,7 +24,7 @@ import kotlin.text.StringBuilder
 data class SerializedResourceQuery(
         val resourceType: ResourceType,
         val resourceIdQuery: ResourceIdQuery,
-        val sortCriterion: SortCriterion,
+        val sortCriterion: SortCriterion?,
         val skip: Int?,
         val limit: Int?
 ) : Query() {
