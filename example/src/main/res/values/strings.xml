@@ -16,4 +16,6 @@
 
 <resources>
     <string name="app_name">FHIR Engine Example</string>
+    <string name="title_samplepatient_list">Registered Patients</string>
+    <string name="title_samplepatient_detail">SamplePatient Detail</string>
 </resources>
