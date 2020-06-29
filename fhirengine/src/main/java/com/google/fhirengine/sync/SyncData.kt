@@ -20,11 +20,9 @@ import java.net.URLEncoder
 import org.hl7.fhir.r4.model.ResourceType
 
 fun SyncData.concatParams(): String {
-    var result = ""
-    this.params.forEach { (key, value) ->
-        result += "$key=${URLEncoder.encode(value, "UTF-8")}&"
+    return this.params.entries.joinToString("&") { (key, value) ->
+        "$key=${URLEncoder.encode(value, "UTF-8")}"
     }
-    return result
 }
 
 /**
