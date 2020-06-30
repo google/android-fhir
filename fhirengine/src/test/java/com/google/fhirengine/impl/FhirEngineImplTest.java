@@ -20,10 +20,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 import androidx.test.core.app.ApplicationProvider;
+import androidx.work.Constraints;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.FhirServices;
 import com.google.fhirengine.ResourceNotFoundException;
 import com.google.fhirengine.resource.TestingUtils;
+import com.google.fhirengine.sync.FhirDataSource;
+import com.google.fhirengine.sync.SyncConfiguration;
+import com.google.fhirengine.sync.SyncData;
 import java.util.ArrayList;
 import java.util.List;
 import org.hl7.fhir.r4.model.Enumerations;
@@ -55,8 +59,15 @@ public class FhirEngineImplTest {
     TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE);
   }
 
+  private List<SyncData> syncData = new ArrayList<>();
+  private SyncConfiguration configuration =
+      new SyncConfiguration(syncData, new Constraints.Builder().build(), false);
+  private FhirDataSource dataSource = (path, $completion) -> null;
+
   FhirServices services =
-      FhirServices.builder(ApplicationProvider.getApplicationContext()).inMemory().build();
+      FhirServices.builder(configuration, dataSource, ApplicationProvider.getApplicationContext())
+          .inMemory()
+          .build();
 
   FhirEngine fhirEngine = services.getFhirEngine();
 

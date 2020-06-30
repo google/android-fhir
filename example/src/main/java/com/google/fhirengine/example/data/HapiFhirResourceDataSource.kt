@@ -14,24 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.sync
+package com.google.fhirengine.example.data
 
-import com.google.fhirengine.FhirEngine
+import com.google.fhirengine.example.api.HapiFhirService
+import com.google.fhirengine.sync.FhirDataSource
+import org.hl7.fhir.r4.model.Bundle
 
 /**
- * Class that helps synchronize the data source and save it in the local database
- * TODO remove the FhirEngine dependency
+ * Implementation of the [FhirDataSource] that communicates with hapi fhir.
  */
-class FhirSynchroniser(
-  private val dataSource: FhirDataSource,
-  private val fhirEngine: FhirEngine
-) {
+class HapiFhirResourceDataSource(
+  private val service: HapiFhirService
+) : FhirDataSource {
 
-    suspend fun synchronise() {
-        var loadResult: FhirLoadResult
-        do {
-            loadResult = dataSource.loadData()
-            loadResult.resource?.let { fhirEngine.save(it) }
-        } while (loadResult.canLoadMore)
+    override suspend fun loadData(path: String): Bundle {
+        return service.getResource(path)
     }
 }

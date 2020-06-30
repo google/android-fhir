@@ -40,7 +40,8 @@ import org.hl7.fhir.r4.model.ResourceType
             ReferenceIndexEntity::class,
             CodeIndexEntity::class,
             QuantityIndexEntity::class,
-            UriIndexEntity::class
+            UriIndexEntity::class,
+            SyncedResourceEntity::class
         ],
         version = 1,
         exportSchema = false
@@ -49,11 +50,12 @@ import org.hl7.fhir.r4.model.ResourceType
     DbTypeConverters::class
 )
 internal abstract class RoomResourceDb : RoomDatabase() {
-    abstract fun dao(): com.google.fhirengine.db.impl.Dao
+    abstract fun resourceDao(): ResourceDao
+    abstract fun syncedResourceDao(): SyncedResourceDao
 }
 
 @Dao
-internal abstract class Dao {
+internal abstract class ResourceDao {
     // this is ugly but there is no way to inject these right now in Room as it is the one creating
     // the dao
     lateinit var fhirIndexer: FhirIndexer

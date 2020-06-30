@@ -16,21 +16,7 @@
 
 package com.google.fhirengine.sync
 
-import org.hl7.fhir.r4.model.Resource
-
-/**
- * Result of a load request from [FhirDataSource.loadData]
- */
-data class FhirLoadResult(
-  /**
-   * Flag signaling whether there is more data to be loaded.
-   */
-  val canLoadMore: Boolean,
-  /**
-   * Loaded data
-   */
-  val resource: Resource?
-)
+import org.hl7.fhir.r4.model.Bundle
 
 /**
  * Interface for an abstraction of retrieving static data from a network source. The data can be
@@ -39,7 +25,8 @@ data class FhirLoadResult(
 interface FhirDataSource {
 
     /**
-     * Implement this method to load remote data, which will then be stored in the database.
+     * Implement this method to load remote data based on a url [path].
+     * A service base url is of the form: `http{s}://server/{path}`
      */
-    suspend fun loadData(): FhirLoadResult
+    suspend fun loadData(path: String): Bundle
 }

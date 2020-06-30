@@ -23,43 +23,33 @@ import org.hl7.fhir.r4.model.Bundle
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
-import retrofit2.http.Query
+import retrofit2.http.Url
 
 /**
  * hapi.fhir.org API communication via Retrofit
  */
 interface HapiFhirService {
 
-    @GET("baseR4/Patient")
-    suspend fun getPatients(
-      @Query("address-country") country: String
-    ): Bundle
-
-    @GET("baseR4")
-    suspend fun getMorePages(
-      @Query("_getpages") pagesId: String,
-      @Query("_getpagesoffset") pagesOffset: Int,
-      @Query("_getpagescount") pagesCount: Int,
-      @Query("_bundleType") bundleType: String
-    ): Bundle
+    @GET
+    suspend fun getResource(@Url url: String): Bundle
 
     companion object {
-        private const val BASE_URL = "https://hapi.fhir.org/"
+        const val BASE_URL = "https://hapi.fhir.org/baseR4/"
 
         fun create(parser: IParser): HapiFhirService {
             val logger = HttpLoggingInterceptor()
             logger.level = HttpLoggingInterceptor.Level.BODY
 
             val client = OkHttpClient.Builder()
-                    .addInterceptor(logger)
-                    .build()
+                .addInterceptor(logger)
+                .build()
             return Retrofit.Builder()
-                    .baseUrl(BASE_URL)
-                    .client(client)
-                    .addConverterFactory(FhirConverterFactory(parser))
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build()
-                    .create(HapiFhirService::class.java)
+                .baseUrl(BASE_URL)
+                .client(client)
+                .addConverterFactory(FhirConverterFactory(parser))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(HapiFhirService::class.java)
         }
     }
 }
