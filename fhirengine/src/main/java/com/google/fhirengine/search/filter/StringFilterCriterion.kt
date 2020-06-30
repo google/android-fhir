@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.search.criteria
+package com.google.fhirengine.search.filter
 
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
@@ -35,9 +35,9 @@ class StringFilteringCriterion constructor(
 ) : FilterCriterion {
     override fun <R : Resource> query(clazz: Class<R>): ResourceIdQuery {
         // TODO: implement different queries for different operators.
-        return ResourceIdQuery(
-                """SELECT resourceId FROM StringIndexEntity
-                          WHERE resourceType = ? AND index_name = ? AND index_value = ?""",
+        return ResourceIdQuery("""
+SELECT resourceId FROM StringIndexEntity
+WHERE resourceType = ? AND index_name = ? AND index_value = ?""",
                 listOf(clazz.simpleName, param.paramName, value))
     }
 }

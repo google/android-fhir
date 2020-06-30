@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.search.impl
+package com.google.fhirengine.search.sort
 
-import androidx.sqlite.db.SimpleSQLiteQuery
-import androidx.sqlite.db.SupportSQLiteQuery
-
-/** Query that returns a list of resources. */
-data class ResourceQuery(val query: String, val args: List<Any?>) {
-    fun getSupportSQLiteQuery(): SupportSQLiteQuery = SimpleSQLiteQuery(query, args.toTypedArray())
+/** Interface to specify filtering criteria for search. */
+interface SortCriterion {
+    val table: String
+    val param: String
+    val ascending: Boolean
 }

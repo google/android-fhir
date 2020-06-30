@@ -16,16 +16,8 @@
 
 package com.google.fhirengine.search.impl
 
-import com.google.fhirengine.resource.ResourceUtils
-import org.hl7.fhir.r4.model.Resource
-
 /** Query that returns a list of resource IDs. */
-data class ResourceIdQuery(val query: String, val args: List<Any?>) {
-    fun <R : Resource> getSearchResourceQuery(clazz: Class<R>): ResourceQuery {
-        val resourceQuery =
-                "SELECT serializedResource from ResourceEntity " +
-                        "WHERE resourceType = ? AND resourceId IN (" + query + ")"
-        return ResourceQuery(
-                resourceQuery, listOf(ResourceUtils.getResourceType(clazz).name) + args)
-    }
+data class ResourceIdQuery(val query: String, val args: List<Any?>) : Query() {
+    override fun getQueryString(): String = query
+    override fun getQueryArgs(): List<Any?> = args
 }

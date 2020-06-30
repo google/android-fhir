@@ -14,21 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.search.criteria
+package com.google.fhirengine.search.impl
 
-import com.google.fhirengine.search.impl.ResourceIdQuery
-import org.hl7.fhir.r4.model.Resource
+import androidx.sqlite.db.SimpleSQLiteQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 
-/** Interface to specify filtering criteria for search. */
-interface FilterCriterion {
-    fun and(filterCriterion: FilterCriterion): FilterCriterion =
-            and(this, filterCriterion)
-
-    fun or(filterCriterion: FilterCriterion): FilterCriterion =
-            or(this, filterCriterion)
-
-    /**
-     * Returns the [ResourceIdQuery] that will return the list of
-     */
-    fun <R : Resource> query(clazz: Class<R>): ResourceIdQuery
+/** Query that returns a list of resource IDs. */
+abstract class Query {
+    abstract fun getQueryString(): String
+    abstract fun getQueryArgs(): List<Any?>
+    fun getSupportSQLiteQuery(): SupportSQLiteQuery =
+            SimpleSQLiteQuery(getQueryString(), getQueryArgs().toTypedArray())
 }
