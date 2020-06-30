@@ -18,7 +18,6 @@ package com.google.fhirengine.db
 
 import com.google.fhirengine.db.impl.SyncedResourceEntity
 import com.google.fhirengine.search.impl.Query
-import com.google.fhirengine.search.impl.ResourceQuery
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
