@@ -23,20 +23,28 @@ import android.widget.EditText;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.work.Constraints;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.fhirengine.FhirEngine;
 import com.google.fhirengine.FhirEngineBuilder;
 import com.google.fhirengine.example.api.HapiFhirService;
+import com.google.fhirengine.example.data.HapiFhirResourceDataSource;
+import com.google.fhirengine.sync.FhirDataSource;
+import com.google.fhirengine.sync.SyncConfiguration;
+import com.google.fhirengine.sync.SyncData;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.ResourceType;
 import org.opencds.cqf.cql.execution.EvaluationResult;
 import org.opencds.cqf.cql.execution.LibraryResult;
 
@@ -62,14 +70,20 @@ public class MainActivity extends AppCompatActivity {
     expressionInput = findViewById(R.id.expression_input);
     evaluationResultTextView = findViewById(R.id.evaluate_result);
 
-    fhirEngine = new FhirEngineBuilder(this).inMemory().build();
-
     IParser parser = FhirContext.forR4().newJsonParser();
     HapiFhirService service = HapiFhirService.Companion.create(parser);
+    Map<String, String> params = new HashMap();
+    params.put("address-country", "United States");
+    List<SyncData> syncData = new ArrayList<>();
+    syncData.add(new SyncData(ResourceType.Patient, params));
+    SyncConfiguration configuration =
+        new SyncConfiguration(syncData, new Constraints.Builder().build(), false);
+    FhirDataSource dataSource = new HapiFhirResourceDataSource(service);
+    fhirEngine = new FhirEngineBuilder(configuration, dataSource, this).inMemory().build();
+
     MainActivityViewModel viewModel =
-        new ViewModelProvider(this, new MainActivityViewModelFactory(fhirEngine, service))
+        new ViewModelProvider(this, new MainActivityViewModelFactory(fhirEngine))
             .get(MainActivityViewModel.class);
-    viewModel.requestPatients();
 
     final Button button = findViewById(R.id.load_cql_lib_button);
     button.setOnClickListener(

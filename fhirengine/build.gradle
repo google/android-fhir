@@ -33,6 +33,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
 }
 
 configurations {
@@ -57,13 +60,16 @@ dependencies {
     api "org.opencds.cqf:cql-engine:$cqlEngineVersion"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "androidx.room:room-runtime:$roomVersion"
+    implementation "androidx.room:room-ktx:$roomVersion"
+    api "androidx.work:work-runtime-ktx:$workManagerVersion"
     implementation "com.google.guava:guava:$guavaVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     implementation "org.opencds.cqf:cql-engine-fhir:$cqlEngineVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
+
     testImplementation "androidx.test:core:$testVersion"
     testImplementation "org.robolectric:robolectric:$roboelectricVersion"
-    testImplementation "androidx.lifecycle:lifecycle-livedata-core:2.2.0"
+    testImplementation "androidx.lifecycle:lifecycle-livedata-core-ktx:$liveDataVersion"
     testImplementation "junit:junit:$junitVersion"
     testImplementation "com.google.truth:truth:$truthVersion"
     androidTestImplementation "androidx.test.ext:junit-ktx:$androidTestJunitVersion"
