@@ -84,7 +84,7 @@ class FhirEngineImpl constructor(
       expression: String
     ): EvaluationResult {
         val contextMap: MutableMap<String, Any> = HashMap()
-        val contextSplit = context.split("\\/").toTypedArray()
+        val contextSplit = context.split("/").toTypedArray()
         contextMap[contextSplit[0]] = contextSplit[1]
         val versionedIdentifier = VersionedIdentifier().withId(libraryVersionId)
         val expressions: MutableSet<String> = HashSet()
