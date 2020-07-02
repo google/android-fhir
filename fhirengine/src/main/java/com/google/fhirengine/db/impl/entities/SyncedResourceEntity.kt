@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.db.impl
+package com.google.fhirengine.db.impl.entities
 
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
 import org.hl7.fhir.r4.model.ResourceType
 
-@Entity(
-        indices = [
-            Index(
-                    value = ["resourceType", "resourceId"],
-                    unique = true
-            )
-        ]
-)
-internal data class ResourceEntity(
-  @PrimaryKey(autoGenerate = true)
-  val id: Long,
+/**
+ * Class that models a table that holds all resource types that were synced and the highest
+ * `_lastUpdate` value of each resource type.
+ */
+@Entity
+data class SyncedResourceEntity(
+  /**
+   * Resource synced
+   */
+  @PrimaryKey
   val resourceType: ResourceType,
-  val resourceId: String,
-  val serializedResource: String
+  /**
+   * The highest `_lastUpdate` value of the resources synced of a specific type
+   */
+  val lastUpdate: String
 )

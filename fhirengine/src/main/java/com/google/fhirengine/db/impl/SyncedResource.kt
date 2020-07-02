@@ -17,29 +17,11 @@
 package com.google.fhirengine.db.impl
 
 import androidx.room.Dao
-import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
-import androidx.room.PrimaryKey
 import androidx.room.Query
+import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
 import org.hl7.fhir.r4.model.ResourceType
-
-/**
- * Class that models a table that holds all resource types that were synced and the highest
- * `_lastUpdate` value of each resource type.
- */
-@Entity
-data class SyncedResourceEntity(
-  /**
-   * Resource synced
-   */
-  @PrimaryKey
-  val resourceType: ResourceType,
-  /**
-   * The highest `_lastUpdate` value of the resources synced of a specific type
-   */
-  val lastUpdate: String
-)
 
 @Dao
 interface SyncedResourceDao {
