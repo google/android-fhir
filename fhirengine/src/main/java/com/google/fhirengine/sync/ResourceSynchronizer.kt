@@ -17,7 +17,7 @@
 package com.google.fhirengine.sync
 
 import com.google.fhirengine.db.Database
-import com.google.fhirengine.db.impl.SyncedResourceEntity
+import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
 import com.google.fhirengine.sync.SyncData.Companion.LAST_UPDATED_ASC_VALUE
 import com.google.fhirengine.sync.SyncData.Companion.LAST_UPDATED_KEY
 import com.google.fhirengine.sync.SyncData.Companion.SORT_KEY

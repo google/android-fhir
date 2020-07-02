@@ -27,6 +27,13 @@ import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.annotation.Transaction
+import com.google.fhirengine.db.impl.entities.CodeIndexEntity
+import com.google.fhirengine.db.impl.entities.QuantityIndexEntity
+import com.google.fhirengine.db.impl.entities.ReferenceIndexEntity
+import com.google.fhirengine.db.impl.entities.ResourceEntity
+import com.google.fhirengine.db.impl.entities.StringIndexEntity
+import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
+import com.google.fhirengine.db.impl.entities.UriIndexEntity
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.index.ResourceIndices
 import java.math.BigDecimal

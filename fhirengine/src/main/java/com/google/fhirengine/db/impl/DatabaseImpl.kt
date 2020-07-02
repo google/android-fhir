@@ -21,6 +21,7 @@ import androidx.room.Room
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
 import com.google.fhirengine.db.ResourceNotFoundInDbException
+import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.resource.ResourceUtils
 import com.google.fhirengine.search.impl.Query

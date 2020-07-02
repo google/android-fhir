@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.db.impl
+package com.google.fhirengine.db.impl.entities
 
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.google.fhirengine.index.ReferenceIndex
+import com.google.fhirengine.index.StringIndex
 import org.hl7.fhir.r4.model.ResourceType
 
 @Entity(
@@ -45,11 +45,13 @@ import org.hl7.fhir.r4.model.ResourceType
             )
         ]
 )
-internal data class ReferenceIndexEntity(
+// TODO merge index entities if it makes sense
+// https://github.com/jingtang10/fhir-engine/issues/33
+internal data class StringIndexEntity(
   @PrimaryKey(autoGenerate = true)
   val id: Long,
   val resourceType: ResourceType,
   @Embedded(prefix = "index_")
-  val index: ReferenceIndex,
+  val index: StringIndex,
   val resourceId: String
 )
