@@ -37,3 +37,6 @@ Spotless maintains the license headers for Java and Kotlin files. Use
 ```
 addlicense -c "Google LLC" -l apache .
 ```
+
+## Build status
+Master: ![CI](https://github.com/google/android-fhir/workflows/CI/badge.svg)
