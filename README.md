@@ -11,8 +11,7 @@ Requires min SDK version 21 (Lollipop).
 
 ### Requirements
 
-Android Studio 4.0 is required for [Java 8 library desugaring]
-(https://developer.android.com/studio/preview/features#j8-desugar)
+Android Studio 4.0 is required for [Java 8 library desugaring](https://developer.android.com/studio/preview/features#j8-desugar)
 
 ### Spotless
 
@@ -40,3 +39,8 @@ addlicense -c "Google LLC" -l apache .
 
 ## Build status
 Master: ![CI](https://github.com/google/android-fhir/workflows/CI/badge.svg)
+
+
+## Disclaimer
+
+This is not an officially supported Google product.
