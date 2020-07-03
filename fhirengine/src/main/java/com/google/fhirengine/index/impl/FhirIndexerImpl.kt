@@ -222,13 +222,14 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
     private fun Sequence<Any>.quantityValues(): Sequence<IBaseDatatype> {
         return flatMap {
             when (it) {
-                is Money -> sequenceOf(it)
-                is Quantity -> sequenceOf(it)
-                is Range -> sequenceOf(it.low, it.high)
+                is Money -> sequenceOf(it).filter { it.hasCurrency() }
+                is Quantity -> sequenceOf(it).filter { it.hasSystem() && it.hasCode() }
+                is Range -> sequenceOf(it.low, it.high).filter { it.hasSystem() && it.hasCode() }
                 is Ratio -> sequenceOf(it.numerator, it.denominator)
+                        .filter { it.hasSystem() && it.hasCode() }
                 // TODO: Find other FHIR datatypes types the "quantity" type maps to.
                 //  See: http://hl7.org/fhir/datatypes.html#quantity
-
+                // TODO: Add tests for Range and Ratio types
                 else -> emptySequence()
             }
         }
