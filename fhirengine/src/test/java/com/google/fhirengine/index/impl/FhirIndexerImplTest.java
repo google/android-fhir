@@ -183,21 +183,19 @@ public class FhirIndexerImplTest {
   @Before
   public void setUp() throws Exception {
     TestingUtils testingUtils = new TestingUtils(FhirContext.forR4().newJsonParser());
-    final String SAMPLE_DATA = "/indexer_test_resources.json";
-    qtyTestSubstance =
-        testingUtils.readFromFile("QTY_TEST_SUBSTANCE_STR", Substance.class, SAMPLE_DATA);
-    qtyTestInvoice = testingUtils.readFromFile("QTY_TEST_INVOICE", Invoice.class, SAMPLE_DATA);
+    // TODO: Improve sample data reading. Current approach has a downside of failing all tests if
+    // one file name is mistyped.
+    qtyTestSubstance = testingUtils.readFromFile(Substance.class, "/quantity_test_substance.json");
+    qtyTestInvoice = testingUtils.readFromFile(Invoice.class, "/quantity_test_invoice.json");
     uriTestQuestionnaire =
-        testingUtils.readFromFile("URI_TEST_QUESTIONNAIRE", Questionnaire.class, SAMPLE_DATA);
-    dateTestPatient =
-        testingUtils.readFromFile("TEST_PATIENT_DATE_INDEX", Patient.class, SAMPLE_DATA);
+        testingUtils.readFromFile(Questionnaire.class, "/uri_test_questionnaire.json");
+    dateTestPatient = testingUtils.readFromFile(Patient.class, "/date_test_patient.json");
     lastUpdatedTestPatient =
-        testingUtils.readFromFile("TEST_PATIENT_LASTUPDATED_INDEX", Patient.class, SAMPLE_DATA);
+        testingUtils.readFromFile(Patient.class, "/lastupdated_ts_test_patient.json");
     numberTestChargeItem =
-        testingUtils.readFromFile("TEST_CHARGE_ITEM_NUMBER_INDEX", ChargeItem.class, SAMPLE_DATA);
+        testingUtils.readFromFile(ChargeItem.class, "/number_test_charge_item.json");
     numberTestMolecularSequence =
-        testingUtils.readFromFile(
-            "TEST_MOLECULAR_SEQUENCE_NUMBER_INDEX", MolecularSequence.class, SAMPLE_DATA);
+        testingUtils.readFromFile(MolecularSequence.class, "/number_test_molecular_sequence.json");
   }
 
   @Test

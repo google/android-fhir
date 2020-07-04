@@ -17,7 +17,6 @@
 package com.google.fhirengine.resource
 
 import ca.uhn.fhir.parser.IParser
-import java.io.BufferedReader
 import org.hl7.fhir.r4.model.Resource
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -31,20 +30,11 @@ class TestingUtils constructor(private val iParser: IParser) {
                 iParser.encodeResourceToString(actual))
     }
 
-    /** Reads a sample data file from the `sampledata` dir and returns a [Resource] stored under `key` */
-    fun <R : Resource> readFromFile(key: String, clazz: Class<R>, filename: String): R {
+    /** Reads a [Resource] from given file in the `sampledata` dir */
+    fun <R : Resource> readFromFile(clazz: Class<R>, filename: String): R {
         val inputStream = javaClass.getResourceAsStream(filename)
-        val reader = BufferedReader(inputStream!!.reader())
-        val content = StringBuilder()
-        reader.use {
-            var line = it.readLine()
-            while (line != null) {
-                content.append(line)
-                line = it.readLine()
-            }
-        }
-        val sampleData = JSONObject(content.toString())
-        val resourceJson = sampleData.getJSONObject(key)
+        val content = inputStream!!.bufferedReader(Charsets.UTF_8).readText()
+        val resourceJson = JSONObject(content)
         return iParser.parseResource(clazz, resourceJson.toString()) as R
     }
 }
