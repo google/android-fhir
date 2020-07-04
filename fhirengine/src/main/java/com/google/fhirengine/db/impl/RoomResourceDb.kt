@@ -28,6 +28,8 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.annotation.Transaction
 import com.google.fhirengine.db.impl.entities.CodeIndexEntity
+import com.google.fhirengine.db.impl.entities.DateIndexEntity
+import com.google.fhirengine.db.impl.entities.NumberIndexEntity
 import com.google.fhirengine.db.impl.entities.QuantityIndexEntity
 import com.google.fhirengine.db.impl.entities.ReferenceIndexEntity
 import com.google.fhirengine.db.impl.entities.ResourceEntity

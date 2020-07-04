@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.db.impl
+package com.google.fhirengine.db.impl.entities
 
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.google.fhirengine.index.DateIndex
+import com.google.fhirengine.index.NumberIndex
 import org.hl7.fhir.r4.model.ResourceType
 
 @Entity(
         indices = [
             Index(
-                    value = ["resourceType", "index_name", "index_tsHigh", "index_tsLow"]
+                    value = ["resourceType", "index_name", "index_value"]
             ),
             Index(
                     // keep this index for faster foreign lookup
@@ -43,12 +43,13 @@ import org.hl7.fhir.r4.model.ResourceType
                     onUpdate = ForeignKey.NO_ACTION,
                     deferred = true
             )
-        ])
-internal data class DateIndexEntity(
+        ]
+)
+internal data class NumberIndexEntity(
   @PrimaryKey(autoGenerate = true)
   val id: Long,
   val resourceType: ResourceType,
   @Embedded(prefix = "index_")
-  val index: DateIndex,
+  val index: NumberIndex,
   val resourceId: String
 )
