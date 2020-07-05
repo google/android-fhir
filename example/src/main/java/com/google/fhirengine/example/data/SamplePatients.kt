@@ -28,7 +28,7 @@ import org.hl7.fhir.r4.model.Patient
  */
 object SamplePatients {
     private val PATIENTS: MutableList<PatientItem> = ArrayList()
-    private val PATIENTS_MAP: MutableMap<String, PatientItem> = HashMap()
+    val PATIENTS_MAP: MutableMap<String, PatientItem> = HashMap()
 
     // The resource bundle with Patient objects.
     private lateinit var fhirBundle: Bundle
@@ -63,8 +63,9 @@ object SamplePatients {
         // Show nothing if no values available for gender and date of birth.
         val gender = if (patient.hasGenderElement()) patient.genderElement.valueAsString else ""
         val dob = if (patient.hasBirthDateElement()) patient.birthDateElement.valueAsString else ""
+        val html: String = if (patient.hasText()) patient.text.div.valueAsString else ""
 
-        return PatientItem(position.toString(), name, gender, dob)
+        return PatientItem(position.toString(), name, gender, dob, html)
     }
 
     /**
@@ -83,7 +84,7 @@ object SamplePatients {
     /**
      * The Patient's details for display purposes.
      */
-    data class PatientItem(val id: String, val name: String, val gender: String, val dob: String) {
+    data class PatientItem(val id: String, val name: String, val gender: String, val dob: String, val html: String) {
         override fun toString(): String = name
     }
 }

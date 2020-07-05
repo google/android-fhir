@@ -22,6 +22,8 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import com.google.fhirengine.example.data.SampleObservations
+import com.google.fhirengine.example.data.SamplePatients
 
 /**
  * An activity representing a single SamplePatient detail screen. This
@@ -43,6 +45,8 @@ class SamplePatientDetailActivity : AppCompatActivity() {
 
         // Show the Up button in the action bar.
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        val fhirObservations = SampleObservations.getObservationItems(getJsonStrForObservationData())
 
         // savedInstanceState is non-null when there is fragment state
         // saved from previous configurations of this activity
@@ -66,6 +70,18 @@ class SamplePatientDetailActivity : AppCompatActivity() {
             supportFragmentManager.beginTransaction()
                     .add(R.id.samplepatient_detail_container, fragment)
                     .commit()
+        }
+
+    }
+
+    /**
+     * Helper function to read observation asset file data as string.
+     */
+    private fun getJsonStrForObservationData(): String {
+        val observationJsonFilename = "sample_observations_bundle.json"
+
+        return this.applicationContext.assets.open(observationJsonFilename).bufferedReader().use {
+            it.readText()
         }
     }
 
