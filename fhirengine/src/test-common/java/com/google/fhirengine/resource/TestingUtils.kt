@@ -18,6 +18,7 @@ package com.google.fhirengine.resource
 
 import ca.uhn.fhir.parser.IParser
 import org.hl7.fhir.r4.model.Resource
+import org.json.JSONObject
 import org.junit.Assert.assertEquals
 
 /** Utilities for testing.  */
@@ -26,6 +27,14 @@ class TestingUtils constructor(private val iParser: IParser) {
     /** Asserts that the `expected` and the `actual` FHIR resources are equal.  */
     fun assertResourceEquals(expected: Resource?, actual: Resource?) {
         assertEquals(iParser.encodeResourceToString(expected),
-            iParser.encodeResourceToString(actual))
+                iParser.encodeResourceToString(actual))
+    }
+
+    /** Reads a [Resource] from given file in the `sampledata` dir */
+    fun <R : Resource> readFromFile(clazz: Class<R>, filename: String): R {
+        val inputStream = javaClass.getResourceAsStream(filename)
+        val content = inputStream!!.bufferedReader(Charsets.UTF_8).readText()
+        val resourceJson = JSONObject(content)
+        return iParser.parseResource(clazz, resourceJson.toString()) as R
     }
 }

@@ -22,6 +22,12 @@ android {
         // shared code between junit and instrumentation tests
         androidTest.java.srcDirs += "src/test-common/java"
         test.java.srcDirs += "src/test-common/java"
+        test {
+            resources.srcDirs += ['sampledata']
+        }
+        androidTest {
+            resources.srcDirs += ['sampledata']
+        }
     }
     buildTypes {
         release {

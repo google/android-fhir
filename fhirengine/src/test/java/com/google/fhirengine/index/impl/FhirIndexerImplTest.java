@@ -18,23 +18,29 @@ package com.google.fhirengine.index.impl;
 
 import android.os.Build;
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.parser.IParser;
 import com.google.common.truth.Truth;
 import com.google.fhirengine.index.CodeIndex;
+import com.google.fhirengine.index.DateIndex;
+import com.google.fhirengine.index.NumberIndex;
 import com.google.fhirengine.index.QuantityIndex;
 import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
 import com.google.fhirengine.index.StringIndex;
 import com.google.fhirengine.index.UriIndex;
+import com.google.fhirengine.resource.TestingUtils;
 import java.math.BigDecimal;
+import org.hl7.fhir.r4.model.ChargeItem;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.ContactPoint;
+import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.InstantType;
 import org.hl7.fhir.r4.model.Invoice;
+import org.hl7.fhir.r4.model.MolecularSequence;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Questionnaire;
@@ -163,179 +169,33 @@ public class FhirIndexerImplTest {
 
   private FhirIndexerImpl fhirIndexer = new FhirIndexerImpl();
 
-  public static final String QTY_TEST_SUBSTANCE_STR =
-      "{\n"
-          + "  \"resourceType\": \"Substance\",\n"
-          + "  \"id\": \"f204\",\n"
-          + "  \"text\": {\n"
-          + "    \"status\": \"generated\",\n"
-          + "    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\"><p><b>Generated Narrative with Details</b></p><p><b>id</b>: f204</p><p><b>identifier</b>: 15970</p><p><b>category</b>: Chemical <span>(Details : {http://terminology.hl7.org/CodeSystem/substance-category code 'chemical' = 'Chemical', given as 'Chemical'})</span></p><p><b>code</b>: Silver nitrate 20% solution (product) <span>(Details : {SNOMED CT code '333346007' = 'Silver nitrate 20% solution', given as 'Silver nitrate 20% solution (product)'})</span></p><p><b>description</b>: Solution for silver nitrate stain</p><h3>Instances</h3><table><tr><td>-</td><td><b>Identifier</b></td><td><b>Expiry</b></td><td><b>Quantity</b></td></tr><tr><td>*</td><td>AB94687</td><td>01/01/2018</td><td>100 mL<span> (Details: UCUM code mL = 'mL')</span></td></tr></table></div>\"\n"
-          + "  },\n"
-          + "  \"identifier\": [\n"
-          + "    {\n"
-          + "      \"system\": \"http://acme.org/identifiers/substances\",\n"
-          + "      \"value\": \"15970\"\n"
-          + "    }\n"
-          + "  ],\n"
-          + "  \"category\": [\n"
-          + "    {\n"
-          + "      \"coding\": [\n"
-          + "        {\n"
-          + "          \"system\": \"http://terminology.hl7.org/CodeSystem/substance-category\",\n"
-          + "          \"code\": \"chemical\",\n"
-          + "          \"display\": \"Chemical\"\n"
-          + "        }\n"
-          + "      ]\n"
-          + "    }\n"
-          + "  ],\n"
-          + "  \"code\": {\n"
-          + "    \"coding\": [\n"
-          + "      {\n"
-          + "        \"system\": \"http://snomed.info/sct\",\n"
-          + "        \"code\": \"333346007\",\n"
-          + "        \"display\": \"Silver nitrate 20% solution (product)\"\n"
-          + "      }\n"
-          + "    ]\n"
-          + "  },\n"
-          + "  \"description\": \"Solution for silver nitrate stain\",\n"
-          + "  \"instance\": [\n"
-          + "    {\n"
-          + "      \"identifier\": {\n"
-          + "        \"system\": \"http://acme.org/identifiers/substances/lot\",\n"
-          + "        \"value\": \"AB94687\"\n"
-          + "      },\n"
-          + "      \"expiry\": \"2018-01-01\",\n"
-          + "      \"quantity\": {\n"
-          + "        \"value\": 100,\n"
-          + "        \"unit\": \"mL\",\n"
-          + "        \"system\": \"http://unitsofmeasure.org\",\n"
-          + "        \"code\": \"mL\"\n"
-          + "      }\n"
-          + "    }\n"
-          + "  ]\n"
-          + "}";
-
-  public static final String QTY_TEST_INVOICE =
-      "{\n"
-          + "  \"resourceType\": \"Invoice\",\n"
-          + "  \"id\": \"example\",\n"
-          + "  \"text\": {\n"
-          + "    \"status\": \"generated\",\n"
-          + "    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">Example of Invoice</div>\"\n"
-          + "  },\n"
-          + "  \"identifier\": [\n"
-          + "    {\n"
-          + "      \"system\": \"http://myHospital.org/Invoices\",\n"
-          + "      \"value\": \"654321\"\n"
-          + "    }\n"
-          + "  ],\n"
-          + "  \"status\": \"issued\",\n"
-          + "  \"subject\": {\n"
-          + "    \"reference\": \"Patient/example\"\n"
-          + "  },\n"
-          + "  \"date\": \"2017-01-25T08:00:00+01:00\",\n"
-          + "  \"participant\": [\n"
-          + "    {\n"
-          + "      \"role\": {\n"
-          + "        \"coding\": [\n"
-          + "          {\n"
-          + "            \"system\": \"http://snomed.info/sct\",\n"
-          + "            \"code\": \"17561000\",\n"
-          + "            \"display\": \"Cardiologist\"\n"
-          + "          }\n"
-          + "        ]\n"
-          + "      },\n"
-          + "      \"actor\": {\n"
-          + "        \"reference\": \"Practitioner/example\"\n"
-          + "      }\n"
-          + "    }\n"
-          + "  ],\n"
-          + "  \"issuer\": {\n"
-          + "    \"identifier\": {\n"
-          + "      \"system\": \"http://myhospital/NamingSystem/departments\",\n"
-          + "      \"value\": \"CARD_INTERMEDIATE_CARE\"\n"
-          + "    }\n"
-          + "  },\n"
-          + "  \"account\": {\n"
-          + "    \"reference\": \"Account/example\"\n"
-          + "  },\n"
-          + "  \"totalNet\": {\n"
-          + "    \"value\": 40.22,\n"
-          + "    \"currency\": \"EUR\"\n"
-          + "  },\n"
-          + "  \"totalGross\": {\n"
-          + "    \"value\": 48,\n"
-          + "    \"currency\": \"EUR\"\n"
-          + "  }\n"
-          + "}";
-
-  public static final String URI_TEST_QUESTIONNAIRE =
-      "{\n"
-          + "  \"resourceType\": \"Questionnaire\",\n"
-          + "  \"id\": \"3141\",\n"
-          + "  \"text\": {\n"
-          + "    \"status\": \"generated\",\n"
-          + "    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">\\n      <pre>\\n            1.Comorbidity?\\n              1.1 Cardial Comorbidity\\n                1.1.1 Angina?\\n                1.1.2 MI?\\n              1.2 Vascular Comorbidity?\\n              ...\\n            Histopathology\\n              Abdominal\\n                pT category?\\n              ...\\n          </pre>\\n    </div>\"\n"
-          + "  },\n"
-          + "  \"url\": \"http://hl7.org/fhir/Questionnaire/3141\",\n"
-          + "  \"title\": \"Cancer Quality Forum Questionnaire 2012\",\n"
-          + "  \"status\": \"draft\",\n"
-          + "  \"subjectType\": [\n"
-          + "    \"Patient\"\n"
-          + "  ],\n"
-          + "  \"date\": \"2012-01\",\n"
-          + "  \"item\": [\n"
-          + "    {\n"
-          + "      \"linkId\": \"2\",\n"
-          + "      \"code\": [\n"
-          + "        {\n"
-          + "          \"system\": \"http://example.org/system/code/sections\",\n"
-          + "          \"code\": \"HISTOPATHOLOGY\"\n"
-          + "        }\n"
-          + "      ],\n"
-          + "      \"type\": \"group\",\n"
-          + "      \"item\": [\n"
-          + "        {\n"
-          + "          \"linkId\": \"2.1\",\n"
-          + "          \"code\": [\n"
-          + "            {\n"
-          + "              \"system\": \"http://example.org/system/code/sections\",\n"
-          + "              \"code\": \"ABDOMINAL\"\n"
-          + "            }\n"
-          + "          ],\n"
-          + "          \"type\": \"group\",\n"
-          + "          \"item\": [\n"
-          + "            {\n"
-          + "              \"linkId\": \"2.1.2\",\n"
-          + "              \"code\": [\n"
-          + "                {\n"
-          + "                  \"system\": \"http://example.org/system/code/questions\",\n"
-          + "                  \"code\": \"STADPT\",\n"
-          + "                  \"display\": \"pT category\"\n"
-          + "                }\n"
-          + "              ],\n"
-          + "              \"type\": \"choice\"\n"
-          + "            }\n"
-          + "          ]\n"
-          + "        }\n"
-          + "      ]\n"
-          + "    }\n"
-          + "  ]\n"
-          + "}";
-
   // See: https://www.hl7.org/fhir/valueset-currencies.html
   private static final String FHIR_CURRENCY_SYSTEM = "urn:iso:std:iso:4217";
 
   private Substance qtyTestSubstance;
   private Invoice qtyTestInvoice;
   private Questionnaire uriTestQuestionnaire;
+  private Patient dateTestPatient;
+  private Patient lastUpdatedTestPatient;
+  private ChargeItem numberTestChargeItem;
+  private MolecularSequence numberTestMolecularSequence;
 
   @Before
   public void setUp() throws Exception {
-    IParser iParser = FhirContext.forR4().newJsonParser();
-    qtyTestSubstance = iParser.parseResource(Substance.class, QTY_TEST_SUBSTANCE_STR);
-    qtyTestInvoice = iParser.parseResource(Invoice.class, QTY_TEST_INVOICE);
-    uriTestQuestionnaire = iParser.parseResource(Questionnaire.class, URI_TEST_QUESTIONNAIRE);
+    TestingUtils testingUtils = new TestingUtils(FhirContext.forR4().newJsonParser());
+    // TODO: Improve sample data reading. Current approach has a downside of failing all tests if
+    // one file name is mistyped.
+    qtyTestSubstance = testingUtils.readFromFile(Substance.class, "/quantity_test_substance.json");
+    qtyTestInvoice = testingUtils.readFromFile(Invoice.class, "/quantity_test_invoice.json");
+    uriTestQuestionnaire =
+        testingUtils.readFromFile(Questionnaire.class, "/uri_test_questionnaire.json");
+    dateTestPatient = testingUtils.readFromFile(Patient.class, "/date_test_patient.json");
+    lastUpdatedTestPatient =
+        testingUtils.readFromFile(Patient.class, "/lastupdated_ts_test_patient.json");
+    numberTestChargeItem =
+        testingUtils.readFromFile(ChargeItem.class, "/number_test_charge_item.json");
+    numberTestMolecularSequence =
+        testingUtils.readFromFile(MolecularSequence.class, "/number_test_molecular_sequence.json");
   }
 
   @Test
@@ -482,7 +342,59 @@ public class FhirIndexerImplTest {
             new UriIndex("url", "Questionnaire.url", "http://hl7.org/fhir/Questionnaire/3141"));
   }
 
-  /* TODO: add tests for
-   *     * QuantityIndex: Range, Ratio
-   */
+  @Test
+  public void index_patient_birthDate_shouldIndexBirthDate() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(dateTestPatient);
+    DateType birthDateElement = dateTestPatient.getBirthDateElement();
+    Truth.assertThat(resourceIndices.getDateIndices())
+        .contains(
+            new DateIndex(
+                "birthdate",
+                "Patient.birthDate",
+                birthDateElement.getValue().getTime(),
+                birthDateElement.getValue().getTime(),
+                birthDateElement.getPrecision()));
+  }
+
+  @Test
+  public void index_patient_lastUpdated_shouldIndexLastUpdated() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(lastUpdatedTestPatient);
+    InstantType lastUpdatedElement = lastUpdatedTestPatient.getMeta().getLastUpdatedElement();
+    Truth.assertThat(resourceIndices.getDateIndices())
+        .contains(
+            new DateIndex(
+                "lastUpdated",
+                "Patient.meta.lastUpdated",
+                lastUpdatedElement.getValue().getTime(),
+                lastUpdatedElement.getValue().getTime(),
+                lastUpdatedElement.getPrecision()));
+  }
+
+  @Test
+  public void index_chargeItem_shouldIndexFactorOverride() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(numberTestChargeItem);
+    Truth.assertThat(resourceIndices.getNumberIndices())
+        .contains(
+            new NumberIndex("factor-override", "ChargeItem.factorOverride", new BigDecimal("0.8")));
+  }
+
+  @Test
+  public void index_molecularSequence_shouldIndexWindowAndVariant() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(numberTestMolecularSequence);
+    Truth.assertThat(resourceIndices.getNumberIndices())
+        .containsAtLeast(
+            new NumberIndex(
+                "window-end",
+                "MolecularSequence.referenceSeq.windowEnd",
+                new BigDecimal("22125510")),
+            new NumberIndex(
+                "window-start",
+                "MolecularSequence.referenceSeq.windowStart",
+                new BigDecimal("22125500")),
+            new NumberIndex(
+                "variant-end", "MolecularSequence.variant.end", new BigDecimal("22125504")),
+            new NumberIndex(
+                "variant-start", "MolecularSequence.variant.start", new BigDecimal("22125503")));
+  }
+  // TODO: improve the tests further.
 }

@@ -17,7 +17,9 @@
 package com.google.fhirengine.db.impl
 
 import androidx.room.TypeConverter
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import java.math.BigDecimal
+import java.util.Calendar
 import org.hl7.fhir.r4.model.ResourceType
 
 /**
@@ -49,4 +51,23 @@ internal object DbTypeConverters {
     @JvmStatic
     @TypeConverter
     fun stringToBigDecimal(value: String): BigDecimal = value.toBigDecimal()
+
+    @JvmStatic
+    @TypeConverter
+    fun temporalPrecisionToInt(temporalPrecision: TemporalPrecisionEnum): Int =
+            temporalPrecision.calendarConstant
+
+    @JvmStatic
+    @TypeConverter
+    fun intToTemporalPrecision(intTp: Int): TemporalPrecisionEnum {
+        return when (intTp) {
+            Calendar.YEAR -> TemporalPrecisionEnum.YEAR
+            Calendar.MONTH -> TemporalPrecisionEnum.MONTH
+            Calendar.DATE -> TemporalPrecisionEnum.DAY
+            Calendar.MINUTE -> TemporalPrecisionEnum.MINUTE
+            Calendar.SECOND -> TemporalPrecisionEnum.SECOND
+            Calendar.MILLISECOND -> TemporalPrecisionEnum.MILLI
+            else -> throw IllegalArgumentException("Unknown TemporalPrecision int $intTp")
+        }
+    }
 }
