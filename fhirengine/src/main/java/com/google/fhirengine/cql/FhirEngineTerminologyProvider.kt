@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.fhirengine.cql
 
 import org.opencds.cqf.cql.runtime.Code
@@ -21,16 +22,10 @@ import org.opencds.cqf.cql.terminology.TerminologyProvider
 import org.opencds.cqf.cql.terminology.ValueSetInfo
 
 /** Fhir Engine's implementation of [TerminologyProvider].  */
-class FhirEngineTerminologyProvider : TerminologyProvider {
-  override fun `in`(code: Code, valueSet: ValueSetInfo): Boolean {
-    return false
-  }
+internal class FhirEngineTerminologyProvider : TerminologyProvider {
+  override fun `in`(code: Code, valueSet: ValueSetInfo): Boolean = false
 
-  override fun expand(valueSet: ValueSetInfo): Iterable<Code>? {
-    return null
-  }
+  override fun expand(valueSet: ValueSetInfo): Iterable<Code>? = null
 
-  override fun lookup(code: Code, codeSystem: CodeSystemInfo): Code? {
-    return null
-  }
+  override fun lookup(code: Code, codeSystem: CodeSystemInfo): Code? = null
 }

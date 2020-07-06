@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.fhirengine.cql
 
 import com.google.fhirengine.db.Database
@@ -24,17 +25,15 @@ import org.opencds.cqf.cql.retrieve.RetrieveProvider
  * FHIR Engine's implementation of a [org.opencds.cqf.cql.data.DataProvider] which provides
  * the [org.opencds.cqf.cql.execution.CqlEngine] required data to complete CQL evaluation.
  */
-class FhirEngineDataProvider internal constructor(
-  modelResolver: ModelResolver?,
-  retrieveProvider: RetrieveProvider?
+internal class FhirEngineDataProvider internal constructor(
+  modelResolver: ModelResolver,
+  retrieveProvider: RetrieveProvider
 ) : CompositeDataProvider(modelResolver, retrieveProvider) {
 
   internal object Factory {
-    internal fun create(database: Database): FhirEngineDataProvider {
-      return FhirEngineDataProvider(
-        AndroidR4FhirModelResolver(),
-        FhirEngineRetrieveProvider(database)
-      )
-    }
+    internal fun create(database: Database): FhirEngineDataProvider = FhirEngineDataProvider(
+      AndroidR4FhirModelResolver(),
+      FhirEngineRetrieveProvider(database)
+    )
   }
 }

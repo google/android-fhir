@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.fhirengine.cql
 
 import org.hl7.fhir.instance.model.api.IBase
@@ -40,9 +41,9 @@ internal class AndroidR4FhirModelResolver : R4FhirModelResolver() {
     val theValue = this.createInstance(contextType)
     val type = theValue.javaClass as Class<out IBase?>
     val children = resourceDefinition.children
-    return children.mapNotNull { child -> innerGetContextPath(child, type) }
+    return children.asSequence()
+      .mapNotNull { child -> innerGetContextPath(child, type) }
       .firstOrNull()
-
   }
 
   companion object {

@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.fhirengine.cql
 
-import android.text.TextUtils
-import com.google.common.collect.ImmutableList
 import com.google.fhirengine.db.Database
 import com.google.fhirengine.resource.ResourceUtils
 import org.opencds.cqf.cql.retrieve.RetrieveProvider
@@ -32,7 +31,7 @@ import org.opencds.cqf.cql.runtime.Interval
  * Note: must be used in conjunction with a [org.opencds.cqf.cql.model.ModelResolver] for
  * HAPI FHIR resources.
  */
-class FhirEngineRetrieveProvider(private val database: Database) : RetrieveProvider {
+internal class FhirEngineRetrieveProvider(private val database: Database) : RetrieveProvider {
   override fun retrieve(
     context: String,
     contextPath: String,
@@ -45,31 +44,27 @@ class FhirEngineRetrieveProvider(private val database: Database) : RetrieveProvi
     datePath: String,
     dateLowPath: String,
     dateHighPath: String,
-    dateRange: Interval): Iterable<Any> {
+    dateRange: Interval
+  ): Iterable<Any> {
     val codeList = codes.toList()
     return when (codeList.size) {
-      0 -> {
-        ImmutableList.copyOf(
-          database.searchByReference(
-            ResourceUtils.getResourceClass(dataType),
-            "$dataType.$contextPath",
-            if (TextUtils.isEmpty(contextValue as String)) "" else "$context/$contextValue"))
-      }
+      0 -> database.searchByReference(
+        ResourceUtils.getResourceClass(dataType),
+        "$dataType.$contextPath",
+        if ((contextValue as String).isEmpty()) "" else "$context/$contextValue"
+      )
       1 -> {
         val code = codeList[0]
-        ImmutableList.copyOf(
-          database.searchByReferenceAndCode(
-            ResourceUtils.getResourceClass(dataType),
-            "$dataType.$contextPath",
-            if (TextUtils.isEmpty(contextValue as String)) "" else "$context/$contextValue",
-            "$dataType.$codePath",
-            code.system,
-            code.code))
+        database.searchByReferenceAndCode(
+          ResourceUtils.getResourceClass(dataType),
+          "$dataType.$contextPath",
+          if ((contextValue as String).isEmpty()) "" else "$context/$contextValue",
+          "$dataType.$codePath",
+          code.system,
+          code.code
+        )
       }
-      else -> {
-        ImmutableList.of()
-      }
+      else -> emptyList()
     }
   }
-
 }
