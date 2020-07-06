@@ -36,7 +36,7 @@ class PatientListViewModel(jsonString: String) : ViewModel() {
 }
 
 class PatientListViewModelFactory(
-    private val jsonString: String
+  private val jsonString: String
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PatientListViewModel::class.java)) {

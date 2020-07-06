@@ -67,7 +67,6 @@ class SamplePatientListActivity : AppCompatActivity() {
             Observer<List<SamplePatients.PatientItem>> {
             adapter.submitList(it)
         })
-
     }
 
     /**

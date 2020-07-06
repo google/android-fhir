@@ -34,11 +34,15 @@ class SampleItemRecyclerViewAdapter(
 ) : ListAdapter<SamplePatients.PatientItem, PatientItemViewHolder>(PatientItemDiffCallback()) {
 
     class PatientItemDiffCallback : DiffUtil.ItemCallback<SamplePatients.PatientItem>() {
-        override fun areItemsTheSame(oldItem: SamplePatients.PatientItem,
-            newItem: SamplePatients.PatientItem): Boolean = oldItem == newItem
+        override fun areItemsTheSame(
+          oldItem: SamplePatients.PatientItem,
+          newItem: SamplePatients.PatientItem
+        ): Boolean = oldItem == newItem
 
-        override fun areContentsTheSame(oldItem: SamplePatients.PatientItem,
-            newItem: SamplePatients.PatientItem): Boolean = oldItem == newItem
+        override fun areContentsTheSame(
+          oldItem: SamplePatients.PatientItem,
+          newItem: SamplePatients.PatientItem
+        ): Boolean = oldItem == newItem
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientItemViewHolder {
