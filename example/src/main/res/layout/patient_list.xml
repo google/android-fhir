@@ -10,4 +10,4 @@
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context=".SamplePatientListActivity"
-    tools:listitem="@layout/patient_list_content" />
+    tools:listitem="@layout/patient_list_item" />

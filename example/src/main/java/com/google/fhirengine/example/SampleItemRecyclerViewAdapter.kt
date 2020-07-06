@@ -16,13 +16,12 @@
 
 package com.google.fhirengine.example
 
-import android.content.Intent
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.fhirengine.example.data.SamplePatients
 
@@ -31,68 +30,44 @@ import com.google.fhirengine.example.data.SamplePatients
  * possibly patient details, on a two pane device.
  */
 class SampleItemRecyclerViewAdapter(
-  private val parentActivity: SamplePatientListActivity,
-  viewModel: PatientListViewModel,
-  private val twoPane: Boolean
-) :
-        RecyclerView.Adapter<SampleItemRecyclerViewAdapter.ViewHolder>() {
+  private val itemOnClickListener: View.OnClickListener
+) : ListAdapter<SamplePatients.PatientItem, PatientItemViewHolder>(PatientItemDiffCallback()) {
 
-    private val onClickListener: View.OnClickListener
-    private lateinit var patientValues: List<SamplePatients.PatientItem>
+    class PatientItemDiffCallback : DiffUtil.ItemCallback<SamplePatients.PatientItem>() {
+        override fun areItemsTheSame(oldItem: SamplePatients.PatientItem,
+            newItem: SamplePatients.PatientItem): Boolean = oldItem == newItem
 
-    init {
-        onClickListener = View.OnClickListener { v ->
-            val item = v.tag as SamplePatients.PatientItem
-            if (twoPane) {
-                val fragment = SamplePatientDetailFragment().apply {
-                    arguments = Bundle().apply {
-                        putString(SamplePatientDetailFragment.ARG_ITEM_ID, item.id)
-                    }
-                }
-                parentActivity.supportFragmentManager
-                        .beginTransaction()
-                        .replace(R.id.samplepatient_detail_container, fragment)
-                        .commit()
-            } else {
-                val intent = Intent(v.context, SamplePatientDetailActivity::class.java).apply {
-                    putExtra(SamplePatientDetailFragment.ARG_ITEM_ID, item.id)
-                }
-                v.context.startActivity(intent)
-            }
-        }
-
-        // Trigger value update in the view holder when underlying viewmodel changes.
-        viewModel.getPatients().observe(
-                parentActivity, Observer<List<SamplePatients.PatientItem>> { patients ->
-            patientValues = patients
-        })
+        override fun areContentsTheSame(oldItem: SamplePatients.PatientItem,
+            newItem: SamplePatients.PatientItem): Boolean = oldItem == newItem
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientItemViewHolder {
         val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.patient_list_content, parent, false)
-        return ViewHolder(view)
+                .inflate(R.layout.patient_list_item, parent, false)
+        return PatientItemViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = patientValues[position]
-        holder.idView.text = item.id
-        holder.nameView.text = item.name
-        holder.genderView.text = item.gender
-        holder.dobView.text = item.dob
+    override fun onBindViewHolder(holder: PatientItemViewHolder, position: Int) {
+        val item = currentList[position]
+        holder.bindTo(item, itemOnClickListener)
+    }
+}
 
-        with(holder.itemView) {
-            tag = item
+class PatientItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    private val idView: TextView = itemView.findViewById(R.id.id_patient_number)
+    private val nameView: TextView = itemView.findViewById(R.id.name)
+    private val genderView: TextView = itemView.findViewById(R.id.gender)
+    private val dobView: TextView = itemView.findViewById(R.id.dob)
+
+    fun bindTo(patientItem: SamplePatients.PatientItem, onClickListener: View.OnClickListener) {
+        this.idView.text = patientItem.id
+        this.nameView.text = patientItem.name
+        this.genderView.text = patientItem.gender
+        this.dobView.text = patientItem.dob
+
+        with(this.itemView) {
+            tag = patientItem
             setOnClickListener(onClickListener)
         }
-    }
-
-    override fun getItemCount() = patientValues.size
-
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val idView: TextView = view.findViewById(R.id.id_text)
-        val nameView: TextView = view.findViewById(R.id.name)
-        val genderView: TextView = view.findViewById(R.id.gender)
-        val dobView: TextView = view.findViewById(R.id.dob)
     }
 }
