@@ -17,11 +17,11 @@
 package com.google.fhirengine.cql
 
 import com.google.fhirengine.db.Database
+import java.io.IOException
 import org.cqframework.cql.elm.execution.Library
 import org.cqframework.cql.elm.execution.VersionedIdentifier
 import org.opencds.cqf.cql.execution.JsonCqlLibraryReader
 import org.opencds.cqf.cql.execution.LibraryLoader
-import java.io.IOException
 
 /**
  * FHIR Engine's implementation of [LibraryLoader] that loads a CQL/ELM library for the [ ] to use.
