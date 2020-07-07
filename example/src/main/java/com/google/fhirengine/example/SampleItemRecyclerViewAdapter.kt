@@ -19,10 +19,8 @@ package com.google.fhirengine.example
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.google.fhirengine.example.data.SamplePatients
 
 /**
@@ -54,24 +52,5 @@ class SampleItemRecyclerViewAdapter(
     override fun onBindViewHolder(holder: PatientItemViewHolder, position: Int) {
         val item = currentList[position]
         holder.bindTo(item, itemOnClickListener)
-    }
-}
-
-class PatientItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    private val idView: TextView = itemView.findViewById(R.id.id_patient_number)
-    private val nameView: TextView = itemView.findViewById(R.id.name)
-    private val genderView: TextView = itemView.findViewById(R.id.gender)
-    private val dobView: TextView = itemView.findViewById(R.id.dob)
-
-    fun bindTo(patientItem: SamplePatients.PatientItem, onClickListener: View.OnClickListener) {
-        this.idView.text = patientItem.id
-        this.nameView.text = patientItem.name
-        this.genderView.text = patientItem.gender
-        this.dobView.text = patientItem.dob
-
-        with(this.itemView) {
-            tag = patientItem
-            setOnClickListener(onClickListener)
-        }
     }
 }
