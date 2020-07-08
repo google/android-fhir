@@ -28,7 +28,7 @@ import com.google.fhirengine.example.data.SamplePatients
  * possibly patient details, on a two pane device.
  */
 class SampleItemRecyclerViewAdapter(
-  private val itemOnClickListener: View.OnClickListener
+  private val onItemClicked: (View) -> Unit
 ) : ListAdapter<SamplePatients.PatientItem, PatientItemViewHolder>(PatientItemDiffCallback()) {
 
     class PatientItemDiffCallback : DiffUtil.ItemCallback<SamplePatients.PatientItem>() {
@@ -51,6 +51,6 @@ class SampleItemRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: PatientItemViewHolder, position: Int) {
         val item = currentList[position]
-        holder.bindTo(item, itemOnClickListener)
+        holder.bindTo(item, onItemClicked)
     }
 }

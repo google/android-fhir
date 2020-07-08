@@ -52,7 +52,7 @@ class SamplePatientListActivity : AppCompatActivity() {
         val recyclerView: RecyclerView = findViewById(R.id.samplepatient_list)
 
         // Click handler to help display the details about the patients from the list.
-        val onPatientItemClickHandler = View.OnClickListener { v ->
+        val onPatientItemClicked: (View) -> Unit = { v ->
             val item = v.tag as SamplePatients.PatientItem
             val intent = Intent(v.context, SamplePatientDetailActivity::class.java).apply {
                 putExtra(SamplePatientDetailFragment.ARG_ITEM_ID, item.id)
@@ -60,7 +60,7 @@ class SamplePatientListActivity : AppCompatActivity() {
             v.context.startActivity(intent)
         }
 
-        val adapter = SampleItemRecyclerViewAdapter(onPatientItemClickHandler)
+        val adapter = SampleItemRecyclerViewAdapter(onPatientItemClicked)
         recyclerView.adapter = adapter
 
         patientListViewModel.getPatients().observe(this,
