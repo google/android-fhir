@@ -27,9 +27,7 @@ import com.google.fhirengine.example.data.DummyDetailsContent
 
 /**
  * A fragment representing a single SamplePatient detail screen.
- * This fragment is either contained in a [SamplePatientListActivity]
- * in two-pane mode (on tablets) or a [SamplePatientDetailActivity]
- * on handsets.
+ * This fragment is either contained in a [SamplePatientDetailActivity].
  */
 class SamplePatientDetailFragment : Fragment() {
 
