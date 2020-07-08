@@ -20,37 +20,41 @@ import ca.uhn.fhir.context.FhirContext
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Patient
 
+private const val MAX_RESOURCE_COUNT = 20
+
 /**
  * Helper class for loading a list of sample Fhir Patient Resource objects.
  *
  * Parses and loads Patient data from the passed JSON String into items that could be used by
  * PatientListViewModel.
  */
-object SamplePatients {
-    private val PATIENTS: MutableList<PatientItem> = ArrayList()
-    val PATIENTS_MAP: MutableMap<String, PatientItem> = HashMap()
+class SamplePatients {
+    private val patients: MutableList<PatientItem> = ArrayList()
+    // Maps a patient position to PatientItem, used to display both the position and details.
+    private val patientsMap: MutableMap<String, PatientItem> = mutableMapOf()
 
     // The resource bundle with Patient objects.
-    private lateinit var fhirBundle: Bundle
+    private var fhirBundle: Bundle? = null
 
-    private const val MAX_RESOURCE_COUNT = 20
-
+    companion object {
+        val fhirJsonParser = FhirContext.forR4().newJsonParser()
+    }
     /**
      * Returns list of PatientItem objects based on patients from the json string.
      */
-    fun getPatientItems(jsonString: String): MutableList<PatientItem> {
-        val fhirContext = FhirContext.forR4()
-        fhirBundle = fhirContext.newJsonParser().parseResource(Bundle::class.java,
+    fun getPatientItems(jsonString: String): List<PatientItem> {
+        fhirBundle = fhirJsonParser.parseResource(Bundle::class.java,
                 jsonString) as Bundle
-        for (i in 1..fhirBundle.entry.size) {
-            addPatientItem(createPatientItem(i))
+        (1..fhirBundle!!.entry.size).forEach {
+            // The patient's position in the bundle is part of the PatientItem.
+            addPatientItem(createPatientItem(it))
         }
-        return PATIENTS
+        return patients
     }
 
     private fun addPatientItem(item: PatientItem) {
-        PATIENTS.add(item)
-        PATIENTS_MAP[item.id] = item
+        patients.add(item)
+        patientsMap[item.id] = item
     }
 
     /**
@@ -74,7 +78,7 @@ object SamplePatients {
     private fun getPatientDetails(position: Int): Patient {
         var patient = Patient()
         if (position <= MAX_RESOURCE_COUNT) {
-            patient = fhirBundle.entry[position - 1].resource as Patient
+            patient = fhirBundle!!.entry[position - 1].resource as Patient
         } else {
             patient.addName().family = "Fhir Patient $position"
         }

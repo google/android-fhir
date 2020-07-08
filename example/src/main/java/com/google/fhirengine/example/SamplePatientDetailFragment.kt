@@ -26,7 +26,6 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.fhirengine.example.data.SampleObservations
 import com.google.fhirengine.example.data.SamplePatients
-import com.google.fhirengine.example.dummy.DummyContent
 
 /**
  * A fragment representing a single SamplePatient detail screen.
@@ -39,7 +38,7 @@ class SamplePatientDetailFragment : Fragment() {
     /**
      * The dummy content this fragment is presenting.
      */
-    private var item: DummyContent.DummyItem? = null
+    //private var item: DummyContent.DummyItem? = null
     private var observation: SampleObservations.ObservationItem? = null
     private var observation1: SampleObservations.ObservationItem? = null
     private var observation2: SampleObservations.ObservationItem? = null
@@ -47,6 +46,7 @@ class SamplePatientDetailFragment : Fragment() {
     private var observation4: SampleObservations.ObservationItem? = null
     private var observation5: SampleObservations.ObservationItem? = null
     private var patient: SamplePatients.PatientItem? = null
+    // private var item: DummyDetailsContent.DummyItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +63,7 @@ class SamplePatientDetailFragment : Fragment() {
                 observation4 = SampleObservations.OBSERVATIONS_MAP["4"]
                 observation5 = SampleObservations.OBSERVATIONS_MAP["5"]
                 patient = SamplePatients.PATIENTS_MAP[it.getString(ARG_ITEM_ID)]
-                item = DummyContent.ITEM_MAP[it.getString(ARG_ITEM_ID)]
+                //item = DummyContent.ITEM_MAP[it.getString(ARG_ITEM_ID)]
 //                activity?.findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout)?.title = item
 //                        ?.content
                 activity?.findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout)?.title = patient
@@ -80,8 +80,8 @@ class SamplePatientDetailFragment : Fragment() {
         val rootView = inflater.inflate(R.layout.samplepatient_detail, container, false)
 
         // Show the dummy content as text in a TextView.
-        item?.let {
-            rootView.findViewById<TextView>(R.id.samplepatient_detail).text = it.details
+//        item?.let {
+//            rootView.findViewById<TextView>(R.id.samplepatient_detail).text = it.details
 //            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 //                rootView.findViewById<TextView>(R.id.samplepatient_detail).setText(Html.fromHtml("<h2>Title</h2><br><p>Description here</p>", Html.FROM_HTML_MODE_COMPACT))
 //                rootView.findViewById<TextView>(R.id.samplepatient_detail).setText(Html.fromHtml("<h2>Title</h2><br><p>Description here</p>", Html.FROM_HTML_MODE_COMPACT))
@@ -89,7 +89,7 @@ class SamplePatientDetailFragment : Fragment() {
 //            else {
 //                rootView.findViewById<TextView>(R.id.samplepatient_detail).setText(Html.fromHtml("<h2>Title</h2><br><p>Description here</p>"))
 //            }
-        }
+//        }
         patient?.let {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 rootView.findViewById<TextView>(R.id.samplepatient_detail).setText(Html.fromHtml(it.html, Html.FROM_HTML_MODE_LEGACY))

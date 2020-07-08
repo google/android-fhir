@@ -19,6 +19,7 @@ package com.google.fhirengine.example
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.google.fhirengine.example.data.SamplePatients
 
 /**
@@ -27,9 +28,20 @@ import com.google.fhirengine.example.data.SamplePatients
  */
 class PatientListViewModel(jsonString: String) : ViewModel() {
     private val patients: MutableLiveData<List<SamplePatients.PatientItem>> =
-        MutableLiveData(SamplePatients.getPatientItems(jsonString))
+        MutableLiveData(SamplePatients().getPatientItems(jsonString))
 
     fun getPatients(): LiveData<List<SamplePatients.PatientItem>> {
         return patients
+    }
+}
+
+class PatientListViewModelFactory(
+  private val jsonString: String
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(PatientListViewModel::class.java)) {
+            return PatientListViewModel(jsonString) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
