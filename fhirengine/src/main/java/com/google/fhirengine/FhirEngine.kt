@@ -69,7 +69,14 @@ interface FhirEngine {
     /** Returns the entry point for [Search]. */
     fun search(): Search
 
+    /**
+     * One time sync.
+     *
+     * @param syncConfiguration - configuration of data that needs to be synchronised
+     */
     suspend fun sync(syncConfiguration: SyncConfiguration): Result
 
     suspend fun periodicSync(): Result
+
+    fun enablePeriodicSync()
 }

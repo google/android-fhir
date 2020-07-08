@@ -68,7 +68,8 @@ internal data class FhirServices(
                 dataProviderMap = mapOf("http://hl7.org/fhir" to dataProvider),
                 terminologyProvider = FhirEngineTerminologyProvider(),
                 periodicSyncConfiguration = syncConfiguration,
-                dataSource = dataSource
+                dataSource = dataSource,
+                context = context
             )
             return FhirServices(
                 fhirEngine = engine,

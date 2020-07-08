@@ -16,7 +16,6 @@
 
 package com.google.fhirengine.example
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -43,8 +42,8 @@ class MainActivityViewModel(
                 )
             )
             val syncConfig = SyncConfiguration(syncData = syncData)
-            val result = fhirEngine.sync(syncConfig)
-            Log.d("MainActivityViewModel", "sync result: $result")
+//            val result = fhirEngine.sync(syncConfig)
+//            Log.d("MainActivityViewModel", "sync result: $result")
         }
     }
 }

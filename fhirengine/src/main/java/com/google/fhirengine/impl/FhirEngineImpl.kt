@@ -16,6 +16,9 @@
 
 package com.google.fhirengine.impl
 
+import android.content.Context
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.google.fhirengine.FhirEngine
 import com.google.fhirengine.ResourceNotFoundException
 import com.google.fhirengine.db.Database
@@ -26,6 +29,7 @@ import com.google.fhirengine.sync.FhirDataSource
 import com.google.fhirengine.sync.FhirSynchronizer
 import com.google.fhirengine.sync.Result
 import com.google.fhirengine.sync.SyncConfiguration
+import com.google.fhirengine.sync.SyncDownloadWorker
 import java.util.EnumSet
 import org.cqframework.cql.elm.execution.VersionedIdentifier
 import org.hl7.fhir.r4.model.Resource
@@ -43,7 +47,8 @@ class FhirEngineImpl constructor(
   dataProviderMap: Map<String, @JvmSuppressWildcards DataProvider>,
   terminologyProvider: TerminologyProvider,
   private val periodicSyncConfiguration: SyncConfiguration,
-  private val dataSource: FhirDataSource
+  private val dataSource: FhirDataSource,
+  private val context: Context
 ) : FhirEngine {
 
     private val cqlEngine: CqlEngine = CqlEngine(
@@ -103,6 +108,20 @@ class FhirEngineImpl constructor(
     }
 
     override suspend fun periodicSync(): Result {
-        return FhirSynchronizer(periodicSyncConfiguration, dataSource, database).sync()
+        val syncResult = FhirSynchronizer(periodicSyncConfiguration, dataSource, database).sync()
+        setupNextDownload()
+        return syncResult
+    }
+
+    override fun enablePeriodicSync() {
+        setupNextDownload()
+    }
+
+    private fun setupNextDownload() {
+        val downloadRequest = OneTimeWorkRequestBuilder<SyncDownloadWorker>()
+            .setConstraints(periodicSyncConfiguration.syncConstraints)
+            .build()
+
+        WorkManager.getInstance(context).enqueue(downloadRequest)
     }
 }
