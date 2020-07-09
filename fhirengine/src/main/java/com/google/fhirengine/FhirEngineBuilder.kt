@@ -40,7 +40,7 @@ class FhirEngineBuilder internal constructor(
     /**
      * Instructs the FhirEngine to use an in memory database which can be useful for tests.
      */
-    fun inMemory() = apply {
+    internal fun inMemory() = apply {
         services.inMemory()
     }
 
