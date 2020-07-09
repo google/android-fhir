@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     SyncConfiguration configuration =
         new SyncConfiguration(syncData, new Constraints.Builder().build(), false);
     FhirDataSource dataSource = new HapiFhirResourceDataSource(service);
-    fhirEngine = new FhirEngineBuilder(configuration, dataSource, this).inMemory().build();
+    fhirEngine = new FhirEngineBuilder(configuration, dataSource, this).build();
 
     MainActivityViewModel viewModel =
         new ViewModelProvider(this, new MainActivityViewModelFactory(fhirEngine))
