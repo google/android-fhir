@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.db.impl
+package com.google.fhirengine.db.impl.dao
 
 import androidx.room.Dao
 import androidx.room.Insert

@@ -48,9 +48,9 @@ internal class DatabaseImpl(
             fhirIndexer = fhirIndexer,
             databaseName = DEFAULT_DATABASE_NAME)
     val builder = if (databaseName == null) {
-        Room.inMemoryDatabaseBuilder(context, RoomResourceDb::class.java)
+        Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
     } else {
-        Room.databaseBuilder(context, RoomResourceDb::class.java, databaseName)
+        Room.databaseBuilder(context, ResourceDatabase::class.java, databaseName)
     }
     val db = builder
             // TODO https://github.com/jingtang10/fhir-engine/issues/32
