@@ -71,7 +71,7 @@ jobs:
         api-level: ${{ matrix.api-level }}
         arch: x86_64
         emulator-options: -memory 4096
-        script: ./gradlew connectedCheck --stacktrace --debug
+        script: ./gradlew connectedCheck --stacktrace
       
     - name: Upload build reports
       if: always()
