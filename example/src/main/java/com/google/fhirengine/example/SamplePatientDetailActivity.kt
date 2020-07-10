@@ -20,7 +20,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import com.google.fhirengine.example.data.SampleObservations
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.google.fhirengine.example.data.SamplePatients
 
 /**
  * An activity representing a single SamplePatient detail screen. This
@@ -29,6 +31,10 @@ import com.google.fhirengine.example.data.SampleObservations
  * in a [SamplePatientListActivity].
  */
 class SamplePatientDetailActivity : AppCompatActivity() {
+    var patients: List<SamplePatients.PatientItem>? = null
+    var observations: List<SamplePatients.ObservationItem>? = null
+    var patientsMap: Map<String, SamplePatients.PatientItem>? = null
+    var observationsMap: Map<String, SamplePatients.ObservationItem>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +44,39 @@ class SamplePatientDetailActivity : AppCompatActivity() {
         // Show the Up button in the action bar.
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val fhirObservations = SampleObservations.getObservationItems(getJsonStrForObservationData())
+        val jsonStringPatients = getJsonStrForPatientData()
+        val jsonStringObservations = getJsonStrForObservationData()
+        val fhirObservations = SamplePatients().getObservationItems(getJsonStrForObservationData())
+        // val jsonString = getJsonStrForPatientData()
+        val patientListViewModel = ViewModelProvider(this, PatientListViewModelFactory(
+            jsonStringPatients, jsonStringObservations))
+            .get(PatientListViewModel::class.java)
+
+        patientsMap = patientListViewModel.getPatientsMap()
+        observationsMap = patientListViewModel.getObservationsMap()
+
+        patientListViewModel.getPatients().observe(this,
+            Observer<List<SamplePatients.PatientItem>> {
+                patients = it
+                // adapter.submitList(it)
+            })
+
+        patientListViewModel.getObservations().observe(this,
+            Observer<List<SamplePatients.ObservationItem>> {
+                observations = it
+                //adapter.submitList(it)
+            })
+        // patientListViewModel.getPatientsMap().observe(this,
+        //     Observer<Map<String, SamplePatients.PatientItem>> {
+        //         patientsMap = it
+        //         // adapter.submitList(it)
+        //     })
+        //
+        // patientListViewModel.getObservationsMap().observe(this,
+        //     Observer<Map<String, SamplePatients.ObservationItem>> {
+        //         observationsMap = it
+        //         //adapter.submitList(it)
+        //     })
 
         // savedInstanceState is non-null when there is fragment state
         // saved from previous configurations of this activity
@@ -73,6 +111,17 @@ class SamplePatientDetailActivity : AppCompatActivity() {
         val observationJsonFilename = "sample_observations_bundle.json"
 
         return this.applicationContext.assets.open(observationJsonFilename).bufferedReader().use {
+            it.readText()
+        }
+    }
+
+    /**
+     * Helper function to read patient asset file data as string.
+     */
+    private fun getJsonStrForPatientData(): String {
+        val patientJsonFilename = "sample_patients_bundle.json"
+
+        return this.applicationContext.assets.open(patientJsonFilename).bufferedReader().use {
             it.readText()
         }
     }

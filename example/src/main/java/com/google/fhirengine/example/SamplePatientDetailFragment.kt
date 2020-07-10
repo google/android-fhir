@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.google.fhirengine.example.data.SampleObservations
 import com.google.fhirengine.example.data.SamplePatients
 
 /**
@@ -32,17 +31,26 @@ import com.google.fhirengine.example.data.SamplePatients
  * This fragment is either contained in a [SamplePatientDetailActivity].
  */
 class SamplePatientDetailFragment : Fragment() {
-
+    var parentActivity: SamplePatientDetailActivity? = null
+    var patients: List<SamplePatients.PatientItem>? = null
+    var observations: List<SamplePatients.ObservationItem>? = null
+    var patientsMap: Map<String, SamplePatients.PatientItem>? = null
+    var observationsMap: Map<String, SamplePatients.ObservationItem>? = null
     /**
      * The dummy content this fragment is presenting.
      */
     //private var item: DummyContent.DummyItem? = null
-    private var observation: SampleObservations.ObservationItem? = null
-    private var observation1: SampleObservations.ObservationItem? = null
-    private var observation2: SampleObservations.ObservationItem? = null
-    private var observation3: SampleObservations.ObservationItem? = null
-    private var observation4: SampleObservations.ObservationItem? = null
-    private var observation5: SampleObservations.ObservationItem? = null
+    private var observation: SamplePatients.ObservationItem? = null
+    private var observation1: SamplePatients.ObservationItem? = null
+    private var observation2: SamplePatients.ObservationItem? = null
+    private var observation3: SamplePatients.ObservationItem? = null
+    private var observation4: SamplePatients.ObservationItem? = null
+    private var observation5: SamplePatients.ObservationItem? = null
+    private var observation6: SamplePatients.ObservationItem? = null
+    private var observation7: SamplePatients.ObservationItem? = null
+    private var observation8: SamplePatients.ObservationItem? = null
+    private var observation9: SamplePatients.ObservationItem? = null
+    private var observation10: SamplePatients.ObservationItem? = null
     private var patient: SamplePatients.PatientItem? = null
     // private var item: DummyDetailsContent.DummyItem? = null
 
@@ -54,13 +62,42 @@ class SamplePatientDetailFragment : Fragment() {
                 // Load the dummy content specified by the fragment
                 // arguments. In a real-world scenario, use a Loader
                 // to load content from a content provider.
-                observation = SampleObservations.OBSERVATIONS_MAP[it.getString(ARG_ITEM_ID)]
-                observation1 = SampleObservations.OBSERVATIONS_MAP["1"]
-                observation2 = SampleObservations.OBSERVATIONS_MAP["2"]
-                observation3 = SampleObservations.OBSERVATIONS_MAP["3"]
-                observation4 = SampleObservations.OBSERVATIONS_MAP["4"]
-                observation5 = SampleObservations.OBSERVATIONS_MAP["5"]
-                patient = SamplePatients.PATIENTS_MAP[it.getString(ARG_ITEM_ID)]
+                parentActivity = activity as SamplePatientDetailActivity?
+                patients = parentActivity?.patients
+                observations = parentActivity?.observations
+                patientsMap = parentActivity?.patientsMap
+                observationsMap = parentActivity?.observationsMap
+
+                // observation = SamplePatients.OBSERVATIONS_MAP[it.getString(ARG_ITEM_ID)]
+                // observation1 = SamplePatients.OBSERVATIONS_MAP["1"]
+                // observation2 = SamplePatients.OBSERVATIONS_MAP["2"]
+                // observation3 = SamplePatients.OBSERVATIONS_MAP["3"]
+                // observation4 = SamplePatients.OBSERVATIONS_MAP["4"]
+                // observation5 = SamplePatients.OBSERVATIONS_MAP["5"]
+                // patient = SamplePatients.PATIENTS_MAP[it.getString(ARG_ITEM_ID)]
+
+                observation = observationsMap?.get(ARG_ITEM_ID)
+                // observation1 = observationsMap?.get("1")
+                // observation2 = observationsMap?.get("2")
+                // observation3 = observationsMap?.get("3")
+                // observation4 = observationsMap?.get("4")
+                // observation5 = observationsMap?.get("5")
+                // observation6 = observationsMap?.get("6")
+                // observation7 = observationsMap?.get("7")
+                // observation8 = observationsMap?.get("8")
+                // observation9 = observationsMap?.get("9")
+                // observation10 = observationsMap?.get("10")
+                observation1 = observationsMap?.get("11")
+                observation2 = observationsMap?.get("12")
+                observation3 = observationsMap?.get("13")
+                observation4 = observationsMap?.get("14")
+                observation5 = observationsMap?.get("15")
+                observation6 = observationsMap?.get("16")
+                observation7 = observationsMap?.get("17")
+                observation8 = observationsMap?.get("18")
+                observation9 = observationsMap?.get("19")
+                observation10 = observationsMap?.get("20")
+                patient = patientsMap?.get(it.getString(ARG_ITEM_ID))
                 //item = DummyContent.ITEM_MAP[it.getString(ARG_ITEM_ID)]
 //                activity?.findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout)?.title = item
 //                        ?.content
@@ -110,6 +147,21 @@ class SamplePatientDetailFragment : Fragment() {
         }
         observation5?.let {
             rootView.findViewById<TextView>(R.id.observation_detail5).text = "${it.code}: ${it.value}\nEffective: ${it.effective}"
+        }
+        observation6?.let {
+            rootView.findViewById<TextView>(R.id.observation_detail6).text = "${it.code}: ${it.value}\nEffective: ${it.effective}"
+        }
+        observation7?.let {
+            rootView.findViewById<TextView>(R.id.observation_detail7).text = "${it.code}: ${it.value}\nEffective: ${it.effective}"
+        }
+        observation8?.let {
+            rootView.findViewById<TextView>(R.id.observation_detail8).text = "${it.code}: ${it.value}\nEffective: ${it.effective}"
+        }
+        observation9?.let {
+            rootView.findViewById<TextView>(R.id.observation_detail9).text = "${it.code}: ${it.value}\nEffective: ${it.effective}"
+        }
+        observation10?.let {
+            rootView.findViewById<TextView>(R.id.observation_detail10).text = "${it.code}: ${it.value}\nEffective: ${it.effective}"
         }
 
         return rootView

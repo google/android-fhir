@@ -16,15 +16,21 @@
 
 package com.google.fhirengine.example
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import com.google.fhirengine.example.data.SamplePatients
 
 /**
@@ -46,8 +52,12 @@ class SamplePatientListActivity : AppCompatActivity() {
             startActivity(resLoadIntent)
         }
 
-        val jsonString = getJsonStrForPatientData()
-        val patientListViewModel = ViewModelProvider(this, PatientListViewModelFactory(jsonString))
+        // val jsonString = getJsonStrForPatientData()
+        val jsonStringPatients = getJsonStrForPatientData()
+        val jsonStringObservations = getJsonStrForObservationData()
+
+        val patientListViewModel = ViewModelProvider(this, PatientListViewModelFactory(
+            jsonStringPatients, jsonStringObservations))
             .get(PatientListViewModel::class.java)
         val recyclerView: RecyclerView = findViewById(R.id.samplepatient_list)
 
@@ -67,6 +77,62 @@ class SamplePatientListActivity : AppCompatActivity() {
             Observer<List<SamplePatients.PatientItem>> {
             adapter.submitList(it)
         })
+
+        patientListViewModel.getObservations().observe(this,
+            Observer<List<SamplePatients.ObservationItem>> {
+                //adapter.submitList(it)
+            })
+    }
+
+    // To suppress the warning. Seems to be an issue with androidx library.
+    // "MenuBuilder.setOptionalIconsVisible can only be called from within the same library group
+    // prefix (referenced groupId=androidx.appcompat with prefix androidx from groupId=fhir-engine"
+    @SuppressLint("RestrictedApi")
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflator: MenuInflater = menuInflater
+        inflator.inflate(R.menu.list_options_menu, menu)
+        // To ensure that icons show up in the overflow options menu. Icons go missing without this.
+        if (menu is MenuBuilder) {
+            menu.setOptionalIconsVisible(true)
+        }
+        // return super.onCreateOptionsMenu(menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val view: View = findViewById(R.id.app_bar)
+
+        // Handle item selection
+        return when (item.itemId) {
+            R.id.sync_resources -> {
+                sync_resources(view)
+                true
+            }
+            R.id.load_resource -> {
+                load_resources()
+                true
+            }
+            R.id.about -> {
+                showAbout(view)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun load_resources() {
+        val resLoadIntent = Intent(baseContext, MainActivity::class.java)
+        startActivity(resLoadIntent)
+    }
+
+    private fun showAbout(view: View) {
+        Snackbar.make(view, R.string.about_text, Snackbar.LENGTH_LONG)
+            .setAction("Action", null).show()
+    }
+
+    private fun sync_resources(view: View) {
+        Snackbar.make(view, "For finding more about Fhir Engine: go/afya", Snackbar.LENGTH_LONG)
+            .setAction("Action", null).show()
     }
 
     /**
@@ -79,4 +145,16 @@ class SamplePatientListActivity : AppCompatActivity() {
             it.readText()
         }
     }
+
+    /**
+     * Helper function to read observation asset file data as string.
+     */
+    private fun getJsonStrForObservationData(): String {
+        val observationJsonFilename = "sample_observations_bundle.json"
+
+        return this.applicationContext.assets.open(observationJsonFilename).bufferedReader().use {
+            it.readText()
+        }
+    }
+
 }

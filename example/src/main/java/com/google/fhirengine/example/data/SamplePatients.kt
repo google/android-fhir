@@ -18,6 +18,7 @@ package com.google.fhirengine.example.data
 
 import ca.uhn.fhir.context.FhirContext
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 
 private const val MAX_RESOURCE_COUNT = 20
@@ -30,8 +31,10 @@ private const val MAX_RESOURCE_COUNT = 20
  */
 class SamplePatients {
     private val patients: MutableList<PatientItem> = ArrayList()
+    private val observations: MutableList<ObservationItem> = ArrayList()
     // Maps a patient position to PatientItem, used to display both the position and details.
     private val patientsMap: MutableMap<String, PatientItem> = mutableMapOf()
+    private val observationsMap: MutableMap<String, ObservationItem> = mutableMapOf()
 
     // The resource bundle with Patient objects.
     private var fhirBundle: Bundle? = null
@@ -43,13 +46,18 @@ class SamplePatients {
      * Returns list of PatientItem objects based on patients from the json string.
      */
     fun getPatientItems(jsonString: String): List<PatientItem> {
-        fhirBundle = fhirJsonParser.parseResource(Bundle::class.java,
-                jsonString) as Bundle
+        fhirBundle = fhirJsonParser.parseResource(Bundle::class.java, jsonString) as Bundle
         (1..fhirBundle!!.entry.size).forEach {
             // The patient's position in the bundle is part of the PatientItem.
             addPatientItem(createPatientItem(it))
         }
         return patients
+    }
+    fun getPatientsMap(): Map<String, PatientItem> {
+        return patientsMap
+    }
+    fun getObservationsMap(): Map<String, ObservationItem> {
+        return observationsMap
     }
 
     private fun addPatientItem(item: PatientItem) {
@@ -90,5 +98,61 @@ class SamplePatients {
      */
     data class PatientItem(val id: String, val name: String, val gender: String, val dob: String, val html: String) {
         override fun toString(): String = name
+    }
+
+    /**
+     * Returns list of ObservationItem objects based on observations from the json string.
+     */
+    fun getObservationItems(jsonString: String): MutableList<ObservationItem> {
+        fhirBundle = fhirJsonParser.parseResource(Bundle::class.java, jsonString) as Bundle
+        (1..fhirBundle!!.entry.size).forEach {
+            addObservationItem(createObservationItem(it))
+        }
+        return observations
+    }
+
+    private fun addObservationItem(item: ObservationItem) {
+        observations.add(item)
+        observationsMap[item.id] = item
+    }
+
+    /**
+     * Creates ObservationItem objects with displayable values from the Fhir Observation objects.
+     */
+    private fun createObservationItem(position: Int): ObservationItem {
+        val observation: Observation = getObservationDetails(position)
+        val observationCode  = observation.code.text
+
+        // Show nothing if no values available for gender and date of birth.
+        val dateTimeStr = if (observation.hasEffectiveDateTimeType()) observation.effectiveDateTimeType.asStringValue() else "No effective DateTime"
+        var value = if (observation.hasValueQuantity()) observation.valueQuantity.value.toString() else "No ValueQuantity"
+        var valueUnit = if (observation.hasValueQuantity()) observation.valueQuantity.unit else ""
+        val valueStr = "$value $valueUnit"
+
+        return ObservationItem(
+            position.toString(),
+            observationCode,
+            dateTimeStr,
+            valueStr
+        )
+    }
+
+    /**
+     * Extracts observation details from the Fhir resources bundle.
+     */
+    private fun getObservationDetails(position: Int): Observation {
+        var observation = Observation()
+        if (position <= MAX_RESOURCE_COUNT) {
+            observation = fhirBundle!!.entry[position - 1].resource as Observation
+        } else {
+            observation.code.text = "Fhir Observation $position"
+        }
+        return observation
+    }
+    /**
+     * The Observation's details for display purposes.
+     */
+    data class ObservationItem(val id: String, val code: String, val effective: String, val value: String) {
+        override fun toString(): String = code
     }
 }

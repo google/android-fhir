@@ -15,22 +15,22 @@
  limitations under the License.
 -->
 
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:orientation="vertical">
 
-    <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.cardview.widget.CardView
         android:id="@+id/patient_info_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:padding="16dp">
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <TextView
         android:id="@+id/samplepatient_detail"
         style="?android:attr/textAppearanceLarge"
         android:layout_width="match_parent"
@@ -47,15 +47,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
+            <androidx.cardview.widget.CardView
                 android:id="@+id/patient_obv_card1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="2dp"
                 android:padding="16dp">
-                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:tools="http://schemas.android.com/tools"
+                <TextView
                     android:id="@+id/observation_detail1"
                     style="?android:attr/textAppearanceSmall"
                     android:layout_width="match_parent"
@@ -64,15 +62,13 @@
                     android:textIsSelectable="true"
                     android:text="This will show observations1."/>
             </androidx.cardview.widget.CardView>
-            <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
+            <androidx.cardview.widget.CardView
                 android:id="@+id/patient_obv_card2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="2dp"
                 android:padding="16dp">
-                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:tools="http://schemas.android.com/tools"
+                <TextView
                     android:id="@+id/observation_detail2"
                     style="?android:attr/textAppearanceSmall"
                     android:layout_width="match_parent"
@@ -81,15 +77,13 @@
                     android:textIsSelectable="true"
                     android:text="This will show observations2."/>
             </androidx.cardview.widget.CardView>
-            <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
+            <androidx.cardview.widget.CardView
                 android:id="@+id/patient_obv_card3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="2dp"
                 android:padding="16dp">
-                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:tools="http://schemas.android.com/tools"
+                <TextView
                     android:id="@+id/observation_detail3"
                     style="?android:attr/textAppearanceSmall"
                     android:layout_width="match_parent"
@@ -98,15 +92,13 @@
                     android:textIsSelectable="true"
                     android:text="This will show observations3."/>
             </androidx.cardview.widget.CardView>
-            <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
+            <androidx.cardview.widget.CardView
                 android:id="@+id/patient_obv_card4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="2dp"
                 android:padding="16dp">
-                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:tools="http://schemas.android.com/tools"
+                <TextView
                     android:id="@+id/observation_detail4"
                     style="?android:attr/textAppearanceSmall"
                     android:layout_width="match_parent"
@@ -115,15 +107,13 @@
                     android:textIsSelectable="true"
                     android:text="This will show observations4."/>
             </androidx.cardview.widget.CardView>
-            <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
+            <androidx.cardview.widget.CardView
                 android:id="@+id/patient_obv_card5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="2dp"
                 android:padding="16dp">
-                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:tools="http://schemas.android.com/tools"
+                <TextView
                     android:id="@+id/observation_detail5"
                     style="?android:attr/textAppearanceSmall"
                     android:layout_width="match_parent"
@@ -131,6 +121,81 @@
                     android:padding="16dp"
                     android:textIsSelectable="true"
                     android:text="This will show observations5."/>
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/patient_obv_card6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="2dp"
+                android:padding="16dp">
+                <TextView
+                    android:id="@+id/observation_detail6"
+                    style="?android:attr/textAppearanceSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:textIsSelectable="true"
+                    android:text="This will show observations6."/>
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/patient_obv_card7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="2dp"
+                android:padding="16dp">
+                <TextView
+                    android:id="@+id/observation_detail7"
+                    style="?android:attr/textAppearanceSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:textIsSelectable="true"
+                    android:text="This will show observations7."/>
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/patient_obv_card8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="2dp"
+                android:padding="16dp">
+                <TextView
+                    android:id="@+id/observation_detail8"
+                    style="?android:attr/textAppearanceSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:textIsSelectable="true"
+                    android:text="This will show observations8."/>
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/patient_obv_card9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="2dp"
+                android:padding="16dp">
+                <TextView
+                    android:id="@+id/observation_detail9"
+                    style="?android:attr/textAppearanceSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:textIsSelectable="true"
+                    android:text="This will show observations9."/>
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/patient_obv_card10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="2dp"
+                android:padding="16dp">
+                <TextView
+                    android:id="@+id/observation_detail10"
+                    style="?android:attr/textAppearanceSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:textIsSelectable="true"
+                    android:text="This will show observations10."/>
             </androidx.cardview.widget.CardView>
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.core.widget.NestedScrollView>
