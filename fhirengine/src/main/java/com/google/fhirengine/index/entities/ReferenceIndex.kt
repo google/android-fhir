@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.index
+package com.google.fhirengine.index.entities
 
-import java.math.BigDecimal
-
-/** A number index for a specific resource.  */
-internal data class NumberIndex(
-  /** The name of the number index, e.g. "".  */
+/**
+ * An index record for a reference value in a resource.
+ *
+ * See https://hl7.org/FHIR/search.html#reference.
+ */
+internal data class ReferenceIndex(
+  /** The name of the reference index, e.g. "subject". */
   val name: String,
-  /** The path of the number index, e.g. "".  */
+  /** The path of the reference index, e.g. "Observation.subject". */
   val path: String,
-  /** The value of the number index, e.g. "".  */
-  val value: BigDecimal
+  /** The value of the reference index, e.g. "Patient/123". */
+  val value: String
 )

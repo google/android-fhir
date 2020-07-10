@@ -19,14 +19,14 @@ package com.google.fhirengine.index.impl;
 import android.os.Build;
 import ca.uhn.fhir.context.FhirContext;
 import com.google.common.truth.Truth;
-import com.google.fhirengine.index.CodeIndex;
-import com.google.fhirengine.index.DateIndex;
-import com.google.fhirengine.index.NumberIndex;
-import com.google.fhirengine.index.QuantityIndex;
-import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
-import com.google.fhirengine.index.StringIndex;
-import com.google.fhirengine.index.UriIndex;
+import com.google.fhirengine.index.entities.DateIndex;
+import com.google.fhirengine.index.entities.NumberIndex;
+import com.google.fhirengine.index.entities.QuantityIndex;
+import com.google.fhirengine.index.entities.ReferenceIndex;
+import com.google.fhirengine.index.entities.StringIndex;
+import com.google.fhirengine.index.entities.TokenIndex;
+import com.google.fhirengine.index.entities.UriIndex;
 import com.google.fhirengine.resource.TestingUtils;
 import java.math.BigDecimal;
 import org.hl7.fhir.r4.model.ChargeItem;
@@ -224,8 +224,9 @@ public class FhirIndexerImplTest {
   @Test
   public void index_observation_shouldIndexCode() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_OBSERVATION_1);
-    Truth.assertThat(resourceIndices.getCodeIndices())
-        .contains(new CodeIndex("code", "Observation.code", TEST_CODE_SYSTEM_1, TEST_CODE_VALUE_1));
+    Truth.assertThat(resourceIndices.getTokenIndices())
+        .contains(
+            new TokenIndex("code", "Observation.code", TEST_CODE_SYSTEM_1, TEST_CODE_VALUE_1));
   }
 
   @Test

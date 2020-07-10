@@ -14,23 +14,28 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.index
+package com.google.fhirengine.index.entities
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 
-/** An index for dates in a resource.  */
+/**
+ * An index record for a date value in a resource.
+ *
+ * See https://hl7.org/FHIR/search.html#date.
+ */
 internal data class DateIndex(
-  /** The name of the code index, e.g. "birthdate".  */
+  /** The name of the date index, e.g. "birthdate". */
   val name: String,
-  /** The path of the code index, e.g. "Patient.birthdate".  */
+  /** The path of the date index, e.g. "Patient.birthdate". */
   val path: String,
   /** The high timestamp. */
   val tsHigh: Long,
   /** The low timestamp. */
   val tsLow: Long,
-  /** The smallest value we can unambiguously resolve the date to.
-   *  This is an indication to clients that any part of the timestamp smaller than the
-   *  [temporalPrecision] should be ignored.
+  /**
+   * The smallest value we can unambiguously resolve the date to.
+   * This is an indication to clients that any part of the timestamp smaller than the
+   * [temporalPrecision] should be ignored.
    */
   val temporalPrecision: TemporalPrecisionEnum
 )

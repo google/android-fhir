@@ -21,7 +21,6 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.google.fhirengine.db.impl.dao.ResourceDao
 import com.google.fhirengine.db.impl.dao.SyncedResourceDao
-import com.google.fhirengine.db.impl.entities.CodeIndexEntity
 import com.google.fhirengine.db.impl.entities.DateIndexEntity
 import com.google.fhirengine.db.impl.entities.NumberIndexEntity
 import com.google.fhirengine.db.impl.entities.QuantityIndexEntity
@@ -29,6 +28,7 @@ import com.google.fhirengine.db.impl.entities.ReferenceIndexEntity
 import com.google.fhirengine.db.impl.entities.ResourceEntity
 import com.google.fhirengine.db.impl.entities.StringIndexEntity
 import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
+import com.google.fhirengine.db.impl.entities.TokenIndexEntity
 import com.google.fhirengine.db.impl.entities.UriIndexEntity
 
 @Database(
@@ -36,7 +36,7 @@ import com.google.fhirengine.db.impl.entities.UriIndexEntity
             ResourceEntity::class,
             StringIndexEntity::class,
             ReferenceIndexEntity::class,
-            CodeIndexEntity::class,
+            TokenIndexEntity::class,
             QuantityIndexEntity::class,
             UriIndexEntity::class,
             DateIndexEntity::class,

@@ -18,15 +18,15 @@ package com.google.fhirengine.index.impl
 
 import android.util.Log
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
-import com.google.fhirengine.index.CodeIndex
-import com.google.fhirengine.index.DateIndex
 import com.google.fhirengine.index.FhirIndexer
-import com.google.fhirengine.index.NumberIndex
-import com.google.fhirengine.index.QuantityIndex
-import com.google.fhirengine.index.ReferenceIndex
 import com.google.fhirengine.index.ResourceIndices
-import com.google.fhirengine.index.StringIndex
-import com.google.fhirengine.index.UriIndex
+import com.google.fhirengine.index.entities.DateIndex
+import com.google.fhirengine.index.entities.NumberIndex
+import com.google.fhirengine.index.entities.QuantityIndex
+import com.google.fhirengine.index.entities.ReferenceIndex
+import com.google.fhirengine.index.entities.StringIndex
+import com.google.fhirengine.index.entities.TokenIndex
+import com.google.fhirengine.index.entities.UriIndex
 import java.math.BigDecimal
 import java.util.Locale
 import org.hl7.fhir.instance.model.api.IBaseDatatype
@@ -59,11 +59,12 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
             when (searchParamDefinition.type) {
                 SEARCH_PARAM_DEFINITION_TYPE_STRING -> {
                     resource.valuesForPath(searchParamDefinition).stringValues().forEach { value ->
-                        indexBuilder.addStringIndex(StringIndex(
-                                name = searchParamDefinition.name,
-                                path = searchParamDefinition.path,
-                                value = value
-                        ))
+                        indexBuilder.addStringIndex(
+                                StringIndex(
+                                        name = searchParamDefinition.name,
+                                        path = searchParamDefinition.path,
+                                        value = value
+                                ))
                     }
                 }
                 SEARCH_PARAM_DEFINITION_TYPE_REFERENCE -> {
@@ -71,11 +72,12 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                             .referenceValues()
                             .forEach { reference ->
                                 if (reference.reference?.isNotEmpty() == true) {
-                                    indexBuilder.addReferenceIndex(ReferenceIndex(
-                                            name = searchParamDefinition.name,
-                                            path = searchParamDefinition.path,
-                                            value = reference.reference
-                                    ))
+                                    indexBuilder.addReferenceIndex(
+                                            ReferenceIndex(
+                                                    name = searchParamDefinition.name,
+                                                    path = searchParamDefinition.path,
+                                                    value = reference.reference
+                                            ))
                                 }
                             }
                 }
@@ -84,12 +86,13 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                         val system = code.system
                         val value = code.code
                         if (system?.isNotEmpty() == true && value?.isNotEmpty() == true) {
-                            indexBuilder.addCodeIndex(CodeIndex(
-                                    name = searchParamDefinition.name,
-                                    path = searchParamDefinition.path,
-                                    system = system,
-                                    value = value
-                            ))
+                            indexBuilder.addCodeIndex(
+                                    TokenIndex(
+                                            name = searchParamDefinition.name,
+                                            path = searchParamDefinition.path,
+                                            system = system,
+                                            value = value
+                                    ))
                         }
                     }
                 }
@@ -115,42 +118,46 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                                     "$quantity is of unknown type ${quantity.javaClass.simpleName}")
                         }
 
-                        indexBuilder.addQuantityIndex(QuantityIndex(
-                                name = searchParamDefinition.name,
-                                path = searchParamDefinition.path,
-                                system = system,
-                                unit = unit,
-                                value = value
-                        ))
+                        indexBuilder.addQuantityIndex(
+                                QuantityIndex(
+                                        name = searchParamDefinition.name,
+                                        path = searchParamDefinition.path,
+                                        system = system,
+                                        unit = unit,
+                                        value = value
+                                ))
                     }
                 }
                 SEARCH_PARAM_DEFINITION_TYPE_URI -> {
                     resource.valuesForPath(searchParamDefinition)
                             .uriValues()
                             .forEach { uri ->
-                                indexBuilder.addUriIndex(UriIndex(
-                                        name = searchParamDefinition.name,
-                                        path = searchParamDefinition.path,
-                                        uri = uri
-                                ))
+                                indexBuilder.addUriIndex(
+                                        UriIndex(
+                                                name = searchParamDefinition.name,
+                                                path = searchParamDefinition.path,
+                                                uri = uri
+                                        ))
                             }
                 }
                 SEARCH_PARAM_DEFINITION_TYPE_DATE -> {
                     resource.valuesForPath(searchParamDefinition).dateValues().forEach { date ->
-                        indexBuilder.addDateIndex(DateIndex(
-                                name = searchParamDefinition.name,
-                                path = searchParamDefinition.path,
-                                tsHigh = date.value.time,
-                                tsLow = date.value.time,
-                                temporalPrecision = date.precision))
+                        indexBuilder.addDateIndex(
+                                DateIndex(
+                                        name = searchParamDefinition.name,
+                                        path = searchParamDefinition.path,
+                                        tsHigh = date.value.time,
+                                        tsLow = date.value.time,
+                                        temporalPrecision = date.precision))
                     }
                 }
                 SEARCH_PARAM_DEFINITION_TYPE_NUMBER -> {
                     resource.valuesForPath(searchParamDefinition).numberValues().forEach { number ->
-                        indexBuilder.addNumberIndex(NumberIndex(
-                                name = searchParamDefinition.name,
-                                path = searchParamDefinition.path,
-                                value = number))
+                        indexBuilder.addNumberIndex(
+                                NumberIndex(
+                                        name = searchParamDefinition.name,
+                                        path = searchParamDefinition.path,
+                                        value = number))
                     }
                 }
 
@@ -161,14 +168,15 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
         // add 'last updated' timestamp to date index
         if (resource.meta.hasLastUpdated()) {
             val lastUpdatedElement = resource.meta.lastUpdatedElement
-            indexBuilder.addDateIndex(DateIndex(
-                    name = "lastUpdated",
-                    path = arrayOf(resource.fhirType(), "meta", "lastUpdated")
-                            .joinToString(separator = "."),
-                    tsHigh = lastUpdatedElement.value.time,
-                    tsLow = lastUpdatedElement.value.time,
-                    temporalPrecision = lastUpdatedElement.precision
-            ))
+            indexBuilder.addDateIndex(
+                    DateIndex(
+                            name = "lastUpdated",
+                            path = arrayOf(resource.fhirType(), "meta", "lastUpdated")
+                                    .joinToString(separator = "."),
+                            tsHigh = lastUpdatedElement.value.time,
+                            tsLow = lastUpdatedElement.value.time,
+                            temporalPrecision = lastUpdatedElement.precision
+                    ))
         }
         return indexBuilder.build()
     }

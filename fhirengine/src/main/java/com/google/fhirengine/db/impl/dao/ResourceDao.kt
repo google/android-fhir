@@ -24,13 +24,13 @@ import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.annotation.Transaction
-import com.google.fhirengine.db.impl.entities.CodeIndexEntity
 import com.google.fhirengine.db.impl.entities.DateIndexEntity
 import com.google.fhirengine.db.impl.entities.NumberIndexEntity
 import com.google.fhirengine.db.impl.entities.QuantityIndexEntity
 import com.google.fhirengine.db.impl.entities.ReferenceIndexEntity
 import com.google.fhirengine.db.impl.entities.ResourceEntity
 import com.google.fhirengine.db.impl.entities.StringIndexEntity
+import com.google.fhirengine.db.impl.entities.TokenIndexEntity
 import com.google.fhirengine.db.impl.entities.UriIndexEntity
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.index.ResourceIndices
@@ -104,8 +104,8 @@ internal abstract class ResourceDao {
                     )
             )
         }
-        index.codeIndices.forEach {
-            insertCodeIndex(CodeIndexEntity(
+        index.tokenIndices.forEach {
+            insertCodeIndex(TokenIndexEntity(
                     id = 0,
                     resourceType = resource.resourceType,
                     index = it,
@@ -151,7 +151,7 @@ internal abstract class ResourceDao {
     abstract fun insertReferenceIndex(referenceIndexEntity: ReferenceIndexEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertCodeIndex(codeIndexEntity: CodeIndexEntity)
+    abstract fun insertCodeIndex(tokenIndexEntity: TokenIndexEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertQuantityIndex(quantityIndexEntity: QuantityIndexEntity)
@@ -215,13 +215,13 @@ internal abstract class ResourceDao {
     @Query("""
         SELECT ResourceEntity.serializedResource
         FROM ResourceEntity
-        JOIN CodeIndexEntity
-        ON ResourceEntity.resourceType = CodeIndexEntity.resourceType
-            AND ResourceEntity.resourceId = CodeIndexEntity.resourceId
-        WHERE CodeIndexEntity.resourceType = :resourceType
-            AND CodeIndexEntity.index_path = :indexPath
-            AND CodeIndexEntity.index_system = :indexSystem
-            AND CodeIndexEntity.index_value = :indexValue""")
+        JOIN TokenIndexEntity
+        ON ResourceEntity.resourceType = TokenIndexEntity.resourceType
+            AND ResourceEntity.resourceId = TokenIndexEntity.resourceId
+        WHERE TokenIndexEntity.resourceType = :resourceType
+            AND TokenIndexEntity.index_path = :indexPath
+            AND TokenIndexEntity.index_system = :indexSystem
+            AND TokenIndexEntity.index_value = :indexValue""")
     abstract fun getResourceByCodeIndex(
       resourceType: String,
       indexPath: String,
