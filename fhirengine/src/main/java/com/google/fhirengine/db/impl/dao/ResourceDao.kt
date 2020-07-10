@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.db.impl
+package com.google.fhirengine.db.impl.dao
 
 import androidx.room.Dao
-import androidx.room.Database
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.annotation.Transaction
@@ -34,35 +31,11 @@ import com.google.fhirengine.db.impl.entities.QuantityIndexEntity
 import com.google.fhirengine.db.impl.entities.ReferenceIndexEntity
 import com.google.fhirengine.db.impl.entities.ResourceEntity
 import com.google.fhirengine.db.impl.entities.StringIndexEntity
-import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
 import com.google.fhirengine.db.impl.entities.UriIndexEntity
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.index.ResourceIndices
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-
-@Database(
-        entities = [
-            ResourceEntity::class,
-            StringIndexEntity::class,
-            ReferenceIndexEntity::class,
-            CodeIndexEntity::class,
-            QuantityIndexEntity::class,
-            UriIndexEntity::class,
-            DateIndexEntity::class,
-            NumberIndexEntity::class,
-            SyncedResourceEntity::class
-        ],
-        version = 1,
-        exportSchema = false
-)
-@TypeConverters(
-    DbTypeConverters::class
-)
-internal abstract class RoomResourceDb : RoomDatabase() {
-    abstract fun resourceDao(): ResourceDao
-    abstract fun syncedResourceDao(): SyncedResourceDao
-}
 
 @Dao
 internal abstract class ResourceDao {
@@ -80,10 +53,10 @@ internal abstract class ResourceDao {
     @Transaction
     open fun insert(resource: Resource) {
         val entity = ResourceEntity(
-            id = 0,
-            resourceType = resource.resourceType,
-            resourceId = resource.id,
-            serializedResource = iParser.encodeResourceToString(resource)
+                id = 0,
+                resourceType = resource.resourceType,
+                resourceId = resource.id,
+                serializedResource = iParser.encodeResourceToString(resource)
         )
         insertResource(entity)
         val index = fhirIndexer.index(resource)
@@ -94,10 +67,10 @@ internal abstract class ResourceDao {
     open fun insertAll(resources: List<Resource>) {
         resources.forEach { resource ->
             val entity = ResourceEntity(
-                id = 0,
-                resourceType = resource.resourceType,
-                resourceId = resource.id,
-                serializedResource = iParser.encodeResourceToString(resource)
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    resourceId = resource.id,
+                    serializedResource = iParser.encodeResourceToString(resource)
             )
             insertResource(entity)
             val index = fhirIndexer.index(resource)
@@ -113,22 +86,22 @@ internal abstract class ResourceDao {
         //  https://github.com/jingtang10/fhir-engine/issues/33
         index.stringIndices.forEach {
             insertStringIndex(
-                StringIndexEntity(
-                    id = 0,
-                    resourceType = resource.resourceType,
-                    index = it,
-                    resourceId = resource.resourceId
-                )
+                    StringIndexEntity(
+                            id = 0,
+                            resourceType = resource.resourceType,
+                            index = it,
+                            resourceId = resource.resourceId
+                    )
             )
         }
         index.referenceIndices.forEach {
             insertReferenceIndex(
-                ReferenceIndexEntity(
-                    id = 0,
-                    resourceType = resource.resourceType,
-                    index = it,
-                    resourceId = resource.resourceId
-                )
+                    ReferenceIndexEntity(
+                            id = 0,
+                            resourceType = resource.resourceType,
+                            index = it,
+                            resourceId = resource.resourceId
+                    )
             )
         }
         index.codeIndices.forEach {
