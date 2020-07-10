@@ -17,6 +17,7 @@
 package com.google.fhirengine.impl
 
 import android.content.Context
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.fhirengine.FhirEngine
@@ -122,6 +123,12 @@ class FhirEngineImpl constructor(
             .setConstraints(periodicSyncConfiguration.syncConstraints)
             .build()
 
-        WorkManager.getInstance(context).enqueue(downloadRequest)
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            SyncDownloadWorker.NAME,
+            // If there is existing pending (uncompleted) work with the same unique name, do nothing.
+            // Otherwise, insert the newly-specified work.
+            ExistingWorkPolicy.KEEP,
+            downloadRequest
+        )
     }
 }

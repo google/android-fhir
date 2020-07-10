@@ -24,8 +24,6 @@ import androidx.work.WorkerParameters
 import com.google.fhirengine.FhirEngine
 import com.google.fhirengine.sync.Result.Success
 
-// TODO proper wiring of the worker
-//  https://github.com/google/android-fhir/issues/71
 class SyncDownloadWorker(
   appContext: Context,
   workerParams: WorkerParameters,
@@ -38,6 +36,10 @@ class SyncDownloadWorker(
             return Result.success()
         }
         return Result.failure()
+    }
+
+    companion object {
+        const val NAME = "sync_download"
     }
 }
 
