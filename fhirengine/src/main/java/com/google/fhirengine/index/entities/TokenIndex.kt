@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.index
+package com.google.fhirengine.index.entities
 
-/** A string index for a specific resource.  */
-internal data class StringIndex(
-  /** The name of the string index, e.g. "given".  */
+/**
+ * An index record for a token value in a resource.
+ *
+ * See https://hl7.org/FHIR/search.html#token.
+ */
+internal data class TokenIndex(
+  /** The name of the code index, e.g. "code". */
   val name: String,
-  /** The path of the string index, e.g. "Patient.name.given".  */
+  /** The path of the code index, e.g. "Observation.code". */
   val path: String,
-  /** The value of the string index, e.g. "Tom".  */
+  /** The system of the code index, e.g. "http://openmrs.org/concepts". */
+  val system: String,
+  /** The value of the code index, e.g. "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA". */
   val value: String
 )

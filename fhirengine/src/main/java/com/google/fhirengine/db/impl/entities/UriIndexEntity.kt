@@ -21,7 +21,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.google.fhirengine.index.UriIndex
+import com.google.fhirengine.index.entities.UriIndex
 import org.hl7.fhir.r4.model.ResourceType
 
 @Entity(
