@@ -16,17 +16,24 @@
 
 package com.google.fhirengine.sync
 
+import androidx.work.Constraints
+import kotlin.reflect.KClass
+
 /**
- * Configuration for synchronization.
+ * Configuration for period synchronisation
  */
-data class SyncConfiguration(
+class PeriodicSyncConfiguration(
+  val syncConfiguration: SyncConfiguration,
   /**
-   *  Data that needs to be synchronised
+   * Constraints that specify the requirements needed before the synchronisation is triggered.
+   * E.g. network type (Wifi, 3G etc), the device should be charging etc.
+   *
+   *  Using WorkManager constraints here until we decide if we want to write our own
    */
-  val syncData: List<SyncData> = emptyList(),
+  val syncConstraints: Constraints = Constraints.Builder().build(),
+
   /**
-   *  true if the SDK needs to retry a failed sync attempt, false otherwise
-   *  If this is set to true, then the result of the sync will be reported after the retry.
+   * Worker that will execute the periodic sync
    */
-  val retry: Boolean = false
+  val periodicSyncWorker: KClass<out PeriodicSyncWorker>
 )

@@ -18,7 +18,7 @@ package com.google.fhirengine.impl
 
 import android.content.Context
 import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.google.fhirengine.FhirEngine
 import com.google.fhirengine.ResourceNotFoundException
@@ -28,9 +28,10 @@ import com.google.fhirengine.resource.ResourceUtils
 import com.google.fhirengine.search.Search
 import com.google.fhirengine.sync.FhirDataSource
 import com.google.fhirengine.sync.FhirSynchronizer
+import com.google.fhirengine.sync.PeriodicSyncConfiguration
+import com.google.fhirengine.sync.PeriodicSyncWorker
 import com.google.fhirengine.sync.Result
 import com.google.fhirengine.sync.SyncConfiguration
-import com.google.fhirengine.sync.SyncDownloadWorker
 import java.util.EnumSet
 import org.cqframework.cql.elm.execution.VersionedIdentifier
 import org.hl7.fhir.r4.model.Resource
@@ -47,7 +48,7 @@ class FhirEngineImpl constructor(
   libraryLoader: LibraryLoader,
   dataProviderMap: Map<String, @JvmSuppressWildcards DataProvider>,
   terminologyProvider: TerminologyProvider,
-  private val periodicSyncConfiguration: SyncConfiguration,
+  private val periodicSyncConfiguration: PeriodicSyncConfiguration,
   private val dataSource: FhirDataSource,
   private val context: Context
 ) : FhirEngine {
@@ -109,7 +110,11 @@ class FhirEngineImpl constructor(
     }
 
     override suspend fun periodicSync(): Result {
-        val syncResult = FhirSynchronizer(periodicSyncConfiguration, dataSource, database).sync()
+        val syncResult = FhirSynchronizer(
+            periodicSyncConfiguration.syncConfiguration,
+            dataSource,
+            database
+        ).sync()
         setupNextDownload()
         return syncResult
     }
@@ -119,12 +124,13 @@ class FhirEngineImpl constructor(
     }
 
     private fun setupNextDownload() {
-        val downloadRequest = OneTimeWorkRequestBuilder<SyncDownloadWorker>()
+        val workerClass = periodicSyncConfiguration.periodicSyncWorker.java
+        val downloadRequest = OneTimeWorkRequest.Builder(workerClass)
             .setConstraints(periodicSyncConfiguration.syncConstraints)
             .build()
 
         WorkManager.getInstance(context).enqueueUniqueWork(
-            SyncDownloadWorker.NAME,
+            PeriodicSyncWorker.NAME,
             // If there is existing pending (uncompleted) work with the same unique name, do nothing.
             // Otherwise, insert the newly-specified work.
             ExistingWorkPolicy.KEEP,

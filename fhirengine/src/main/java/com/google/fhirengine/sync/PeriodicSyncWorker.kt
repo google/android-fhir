@@ -18,20 +18,22 @@ package com.google.fhirengine.sync
 
 import android.content.Context
 import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker
-import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.google.fhirengine.FhirEngine
 import com.google.fhirengine.sync.Result.Success
 
-class SyncDownloadWorker(
+/**
+ * Implement this class to support periodic work.
+ */
+abstract class PeriodicSyncWorker(
   appContext: Context,
-  workerParams: WorkerParameters,
-  private val fhirEngine: FhirEngine
+  workerParams: WorkerParameters
 ) : CoroutineWorker(appContext, workerParams) {
 
+    abstract fun getFhirEngine(): FhirEngine
+
     override suspend fun doWork(): Result {
-        val result = fhirEngine.periodicSync()
+        val result = getFhirEngine().periodicSync()
         if (result is Success) {
             return Result.success()
         }
@@ -40,25 +42,5 @@ class SyncDownloadWorker(
 
     companion object {
         const val NAME = "sync_download"
-    }
-}
-
-class SyncDownloadWorkerFactory(
-  private val fhirEngine: FhirEngine
-) : WorkerFactory() {
-
-    override fun createWorker(
-      appContext: Context,
-      workerClassName: String,
-      workerParameters: WorkerParameters
-    ): ListenableWorker? {
-
-        return when (workerClassName) {
-            SyncDownloadWorker::class.java.name ->
-                SyncDownloadWorker(appContext, workerParameters, fhirEngine)
-            else ->
-                // Return null, so that the base class can delegate to the default WorkerFactory.
-                null
-        }
     }
 }

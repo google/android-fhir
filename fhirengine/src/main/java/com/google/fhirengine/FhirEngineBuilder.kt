@@ -18,13 +18,13 @@ package com.google.fhirengine
 
 import android.content.Context
 import com.google.fhirengine.sync.FhirDataSource
-import com.google.fhirengine.sync.SyncConfiguration
+import com.google.fhirengine.sync.PeriodicSyncConfiguration
 
 /**
  * The builder for [FhirEngine] instance
  */
 class FhirEngineBuilder constructor(
-  syncConfiguration: SyncConfiguration,
+  syncConfiguration: PeriodicSyncConfiguration,
   dataSource: FhirDataSource,
   context: Context
 ) {
