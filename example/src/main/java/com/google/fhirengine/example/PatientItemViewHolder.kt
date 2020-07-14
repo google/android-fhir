@@ -35,15 +35,17 @@ class PatientItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
         R.id.dob
     )
 
-    fun bindTo(patientItem: SamplePatients.PatientItem, onItemClicked: (View) -> Unit) {
+    fun bindTo(
+      patientItem: SamplePatients.PatientItem,
+      onItemClicked: (SamplePatients.PatientItem) -> Unit
+    ) {
         this.idView.text = patientItem.id
         this.nameView.text = patientItem.name
         this.genderView.text = patientItem.gender
         this.dobView.text = patientItem.dob
 
         with(this.itemView) {
-            tag = patientItem
-            setOnClickListener { v -> onItemClicked(v) }
+            setOnClickListener { onItemClicked(patientItem) }
         }
     }
 }

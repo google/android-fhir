@@ -17,6 +17,7 @@
 package com.google.fhirengine.example.data
 
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.parser.IParser
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
@@ -31,45 +32,48 @@ private const val MAX_RESOURCE_COUNT = 20
  */
 class SamplePatients {
     private val patients: MutableList<PatientItem> = ArrayList()
+    // Maps a temporary patient display id to PatientItem, used to display patients both in list and
+    // details.
+    private val idsPatients: MutableMap<String, PatientItem> = mutableMapOf()
+
     private val observations: MutableList<ObservationItem> = ArrayList()
-    // Maps a patient position to PatientItem, used to display both the position and details.
-    private val patientsMap: MutableMap<String, PatientItem> = mutableMapOf()
     private val observationsMap: MutableMap<String, ObservationItem> = mutableMapOf()
 
     // The resource bundle with Patient objects.
     private var fhirBundle: Bundle? = null
 
     companion object {
-        val fhirJsonParser = FhirContext.forR4().newJsonParser()
+        val fhirJsonParser: IParser = FhirContext.forR4().newJsonParser()
     }
     /**
      * Returns list of PatientItem objects based on patients from the json string.
      */
     fun getPatientItems(jsonString: String): List<PatientItem> {
-        fhirBundle = fhirJsonParser.parseResource(Bundle::class.java, jsonString) as Bundle
-        (1..fhirBundle!!.entry.size).forEach {
-            // The patient's position in the bundle is part of the PatientItem.
-            addPatientItem(createPatientItem(it))
-        }
+        fhirBundle = fhirJsonParser.parseResource(Bundle::class.java,
+            jsonString) as Bundle
+
+        // Create a list of PatientItems from fhirPatients. The display index is 1 based.
+        fhirBundle?.entry?.take(MAX_RESOURCE_COUNT)?.mapIndexed { index, entry ->
+            createPatientItem(index + 1, entry.resource as Patient)
+        }?.let { patients.addAll(it) }
+
+        // Create the PatientItems Map from PatientItem List.
+        idsPatients.putAll(patients.associateBy { it.id })
+
         return patients
     }
+
     fun getPatientsMap(): Map<String, PatientItem> {
-        return patientsMap
+        return idsPatients
     }
     fun getObservationsMap(): Map<String, ObservationItem> {
         return observationsMap
     }
 
-    private fun addPatientItem(item: PatientItem) {
-        patients.add(item)
-        patientsMap[item.id] = item
-    }
-
     /**
      * Creates PatientItem objects with displayable values from the Fhir Patient objects.
      */
-    private fun createPatientItem(position: Int): PatientItem {
-        val patient: Patient = getPatientDetails(position)
+    private fun createPatientItem(position: Int, patient: Patient): PatientItem {
         val name = patient.name[0].nameAsSingleString
 
         // Show nothing if no values available for gender and date of birth.
@@ -78,19 +82,6 @@ class SamplePatients {
         val html: String = if (patient.hasText()) patient.text.div.valueAsString else ""
 
         return PatientItem(position.toString(), name, gender, dob, html)
-    }
-
-    /**
-     * Extracts patient details from the Fhir resources bundle.
-     */
-    private fun getPatientDetails(position: Int): Patient {
-        var patient = Patient()
-        if (position <= MAX_RESOURCE_COUNT) {
-            patient = fhirBundle!!.entry[position - 1].resource as Patient
-        } else {
-            patient.addName().family = "Fhir Patient $position"
-        }
-        return patient
     }
 
     /**
