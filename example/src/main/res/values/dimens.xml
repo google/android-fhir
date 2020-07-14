@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
  Copyright 2020 Google LLC
 
@@ -15,7 +16,10 @@
 -->
 
 <resources>
-    <string name="app_name">FHIR Engine Example</string>
-    <string name="title_samplepatient_list">Registered Patients</string>
-    <string name="title_samplepatient_detail">SamplePatient Detail</string>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="app_bar_height">200dp</dimen>
+    <dimen name="item_width">200dp</dimen>
+    <dimen name="large_text_margin">24dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+    <dimen name="small_text_margin">2dp</dimen>
 </resources>

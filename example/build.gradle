@@ -44,6 +44,8 @@ ext {
     okhttpLoggingInterceptorVersion = '4.0.0'
     lifecycleVersion = '2.2.0'
     retrofitVersion = '2.7.2'
+    recyclerviewVersion = '1.1.0'
+    legacySupportVersion = '1.0.0'
 }
 
 dependencies {
@@ -67,6 +69,8 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:retrofit-mock:$retrofitVersion"
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttpLoggingInterceptorVersion"
+    implementation "androidx.recyclerview:recyclerview:$recyclerviewVersion"
+    implementation "androidx.legacy:legacy-support-v4:$legacySupportVersion"
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
