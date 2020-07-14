@@ -16,6 +16,13 @@
 
 package com.google.fhirengine.index
 
+import com.google.fhirengine.index.entities.DateIndex
+import com.google.fhirengine.index.entities.NumberIndex
+import com.google.fhirengine.index.entities.QuantityIndex
+import com.google.fhirengine.index.entities.ReferenceIndex
+import com.google.fhirengine.index.entities.StringIndex
+import com.google.fhirengine.index.entities.TokenIndex
+import com.google.fhirengine.index.entities.UriIndex
 import org.hl7.fhir.r4.model.ResourceType
 
 /**
@@ -36,8 +43,17 @@ internal data class ResourceIndices(
   val stringIndices: List<StringIndex>,
   /** The reference indices.  */
   val referenceIndices: List<ReferenceIndex>,
-  /** The code indices.  */
-  val codeIndices: List<CodeIndex>
+  /** The token indices.  */
+  val tokenIndices: List<TokenIndex>,
+  /** The quantity indices. */
+  val quantityIndices: List<QuantityIndex>,
+  /** The URI indices. */
+  val uriIndices: List<UriIndex>,
+  /** The date indices. */
+  val dateIndices: List<DateIndex>,
+  /** The number indices. */
+  val numberIndices: List<NumberIndex>
+
 ) {
 
     class Builder(
@@ -46,7 +62,11 @@ internal data class ResourceIndices(
     ) {
         private val stringIndices = mutableListOf<StringIndex>()
         private val referenceIndices = mutableListOf<ReferenceIndex>()
-        private val codeIndices = mutableListOf<CodeIndex>()
+        private val tokenIndices = mutableListOf<TokenIndex>()
+        private val quantityIndices = mutableListOf<QuantityIndex>()
+        private val uriIndices = mutableListOf<UriIndex>()
+        private val dateIndices = mutableListOf<DateIndex>()
+        private val numberIndices = mutableListOf<NumberIndex>()
 
         fun addStringIndex(stringIndex: StringIndex) = this.also {
             stringIndices.add(stringIndex)
@@ -56,8 +76,24 @@ internal data class ResourceIndices(
             referenceIndices.add(referenceIndex)
         }
 
-        fun addCodeIndex(codeIndex: CodeIndex) = this.also {
-            codeIndices.add(codeIndex)
+        fun addCodeIndex(tokenIndex: TokenIndex) = this.also {
+            tokenIndices.add(tokenIndex)
+        }
+
+        fun addQuantityIndex(quantityIndex: QuantityIndex) = this.also {
+            quantityIndices.add(quantityIndex)
+        }
+
+        fun addUriIndex(uriIndex: UriIndex) = this.also {
+            uriIndices.add(uriIndex)
+        }
+
+        fun addDateIndex(dateIndex: DateIndex) = this.also {
+            dateIndices.add(dateIndex)
+        }
+
+        fun addNumberIndex(numberIndex: NumberIndex) = this.also {
+            numberIndices.add(numberIndex)
         }
 
         fun build() = ResourceIndices(
@@ -65,7 +101,11 @@ internal data class ResourceIndices(
                 id = id,
                 stringIndices = stringIndices.toList(),
                 referenceIndices = referenceIndices.toList(),
-                codeIndices = codeIndices.toList()
+                tokenIndices = tokenIndices.toList(),
+                quantityIndices = quantityIndices.toList(),
+                uriIndices = uriIndices.toList(),
+                dateIndices = dateIndices.toList(),
+                numberIndices = numberIndices.toList()
         )
     }
 }

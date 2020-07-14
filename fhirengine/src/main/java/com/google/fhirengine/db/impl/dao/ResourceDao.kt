@@ -14,43 +14,31 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.db.impl
+package com.google.fhirengine.db.impl.dao
 
 import androidx.room.Dao
-import androidx.room.Database
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.annotation.Transaction
+import com.google.fhirengine.db.impl.entities.DateIndexEntity
+import com.google.fhirengine.db.impl.entities.NumberIndexEntity
+import com.google.fhirengine.db.impl.entities.QuantityIndexEntity
+import com.google.fhirengine.db.impl.entities.ReferenceIndexEntity
+import com.google.fhirengine.db.impl.entities.ResourceEntity
+import com.google.fhirengine.db.impl.entities.StringIndexEntity
+import com.google.fhirengine.db.impl.entities.TokenIndexEntity
+import com.google.fhirengine.db.impl.entities.UriIndexEntity
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.index.ResourceIndices
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
-@Database(
-    entities = [
-        ResourceEntity::class,
-        StringIndexEntity::class,
-        ReferenceIndexEntity::class,
-        CodeIndexEntity::class
-    ],
-    version = 1,
-    exportSchema = false
-)
-@TypeConverters(
-    DbTypeConverters::class
-)
-internal abstract class RoomResourceDb : RoomDatabase() {
-    abstract fun dao(): com.google.fhirengine.db.impl.Dao
-}
-
 @Dao
-internal abstract class Dao {
+internal abstract class ResourceDao {
     // this is ugly but there is no way to inject these right now in Room as it is the one creating
     // the dao
     lateinit var fhirIndexer: FhirIndexer
@@ -65,10 +53,10 @@ internal abstract class Dao {
     @Transaction
     open fun insert(resource: Resource) {
         val entity = ResourceEntity(
-            id = 0,
-            resourceType = resource.resourceType,
-            resourceId = resource.id,
-            serializedResource = iParser.encodeResourceToString(resource)
+                id = 0,
+                resourceType = resource.resourceType,
+                resourceId = resource.id,
+                serializedResource = iParser.encodeResourceToString(resource)
         )
         insertResource(entity)
         val index = fhirIndexer.index(resource)
@@ -79,10 +67,10 @@ internal abstract class Dao {
     open fun insertAll(resources: List<Resource>) {
         resources.forEach { resource ->
             val entity = ResourceEntity(
-                id = 0,
-                resourceType = resource.resourceType,
-                resourceId = resource.id,
-                serializedResource = iParser.encodeResourceToString(resource)
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    resourceId = resource.id,
+                    serializedResource = iParser.encodeResourceToString(resource)
             )
             insertResource(entity)
             val index = fhirIndexer.index(resource)
@@ -98,30 +86,58 @@ internal abstract class Dao {
         //  https://github.com/jingtang10/fhir-engine/issues/33
         index.stringIndices.forEach {
             insertStringIndex(
-                StringIndexEntity(
-                    id = 0,
-                    resourceType = resource.resourceType,
-                    index = it,
-                    resourceId = resource.resourceId
-                )
+                    StringIndexEntity(
+                            id = 0,
+                            resourceType = resource.resourceType,
+                            index = it,
+                            resourceId = resource.resourceId
+                    )
             )
         }
         index.referenceIndices.forEach {
             insertReferenceIndex(
-                ReferenceIndexEntity(
+                    ReferenceIndexEntity(
+                            id = 0,
+                            resourceType = resource.resourceType,
+                            index = it,
+                            resourceId = resource.resourceId
+                    )
+            )
+        }
+        index.tokenIndices.forEach {
+            insertCodeIndex(TokenIndexEntity(
                     id = 0,
                     resourceType = resource.resourceType,
                     index = it,
-                    resourceId = resource.resourceId
-                )
-            )
+                    resourceId = resource.resourceId))
         }
-        index.codeIndices.forEach {
-            insertCodeIndex(CodeIndexEntity(
-                id = 0,
-                resourceType = resource.resourceType,
-                index = it,
-                resourceId = resource.resourceId))
+        index.quantityIndices.forEach {
+            insertQuantityIndex(QuantityIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId))
+        }
+        index.uriIndices.forEach {
+            insertUriIndex(UriIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId))
+        }
+        index.dateIndices.forEach {
+            insertDateIndex(DateIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId))
+        }
+        index.numberIndices.forEach {
+            insertNumberIndex(NumberIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId))
         }
     }
 
@@ -135,7 +151,19 @@ internal abstract class Dao {
     abstract fun insertReferenceIndex(referenceIndexEntity: ReferenceIndexEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertCodeIndex(codeIndexEntity: CodeIndexEntity)
+    abstract fun insertCodeIndex(tokenIndexEntity: TokenIndexEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insertQuantityIndex(quantityIndexEntity: QuantityIndexEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insertUriIndex(uriIndexEntity: UriIndexEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insertDateIndex(dateIndexEntity: DateIndexEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insertNumberIndex(numberIndexEntity: NumberIndexEntity)
 
     @Query("""
         DELETE FROM ResourceEntity
@@ -187,13 +215,13 @@ internal abstract class Dao {
     @Query("""
         SELECT ResourceEntity.serializedResource
         FROM ResourceEntity
-        JOIN CodeIndexEntity
-        ON ResourceEntity.resourceType = CodeIndexEntity.resourceType
-            AND ResourceEntity.resourceId = CodeIndexEntity.resourceId
-        WHERE CodeIndexEntity.resourceType = :resourceType
-            AND CodeIndexEntity.index_path = :indexPath
-            AND CodeIndexEntity.index_system = :indexSystem
-            AND CodeIndexEntity.index_value = :indexValue""")
+        JOIN TokenIndexEntity
+        ON ResourceEntity.resourceType = TokenIndexEntity.resourceType
+            AND ResourceEntity.resourceId = TokenIndexEntity.resourceId
+        WHERE TokenIndexEntity.resourceType = :resourceType
+            AND TokenIndexEntity.index_path = :indexPath
+            AND TokenIndexEntity.index_system = :indexSystem
+            AND TokenIndexEntity.index_value = :indexValue""")
     abstract fun getResourceByCodeIndex(
       resourceType: String,
       indexPath: String,

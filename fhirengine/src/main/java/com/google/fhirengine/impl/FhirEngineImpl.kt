@@ -22,6 +22,10 @@ import com.google.fhirengine.db.Database
 import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.resource.ResourceUtils
 import com.google.fhirengine.search.Search
+import com.google.fhirengine.sync.FhirDataSource
+import com.google.fhirengine.sync.FhirSynchronizer
+import com.google.fhirengine.sync.Result
+import com.google.fhirengine.sync.SyncConfiguration
 import java.util.EnumSet
 import org.cqframework.cql.elm.execution.VersionedIdentifier
 import org.hl7.fhir.r4.model.Resource
@@ -37,8 +41,11 @@ class FhirEngineImpl constructor(
   private val search: Search,
   libraryLoader: LibraryLoader,
   dataProviderMap: Map<String, @JvmSuppressWildcards DataProvider>,
-  terminologyProvider: TerminologyProvider
+  terminologyProvider: TerminologyProvider,
+  private val periodicSyncConfiguration: SyncConfiguration,
+  private val dataSource: FhirDataSource
 ) : FhirEngine {
+
     private val cqlEngine: CqlEngine = CqlEngine(
         libraryLoader,
         dataProviderMap,
@@ -77,7 +84,7 @@ class FhirEngineImpl constructor(
       expression: String
     ): EvaluationResult {
         val contextMap: MutableMap<String, Any> = HashMap()
-        val contextSplit = context.split("\\/").toTypedArray()
+        val contextSplit = context.split("/").toTypedArray()
         contextMap[contextSplit[0]] = contextSplit[1]
         val versionedIdentifier = VersionedIdentifier().withId(libraryVersionId)
         val expressions: MutableSet<String> = HashSet()
@@ -89,5 +96,13 @@ class FhirEngineImpl constructor(
 
     override fun search(): Search {
         return search
+    }
+
+    override suspend fun sync(syncConfiguration: SyncConfiguration): Result {
+        return FhirSynchronizer(syncConfiguration, dataSource, database).sync()
+    }
+
+    override suspend fun periodicSync(): Result {
+        return FhirSynchronizer(periodicSyncConfiguration, dataSource, database).sync()
     }
 }

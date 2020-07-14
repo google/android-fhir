@@ -16,7 +16,8 @@
 
 package com.google.fhirengine.search
 
-import com.google.fhirengine.search.criteria.FilterCriterion
+import com.google.fhirengine.search.filter.FilterCriterion
+import com.google.fhirengine.search.sort.SortCriterion
 import org.hl7.fhir.r4.model.Resource
 
 /**
@@ -28,7 +29,8 @@ import org.hl7.fhir.r4.model.Resource
  *   .of(...resource type...)        // Mandatory, must be the first function call, specify type
  *   .filter(...search criteria...)  // Optional, specify search criteria
  *   .sorted(...sorting criteria...) // Optional, specify sorting criteria
- *   .limit(...paging criteria...)   // Optional, specify number of resources to return
+ *   .skip(...number of results to skip...)     // Optional, specify number of resources to skip
+ *   .limit(...number of results to return...)  // Optional, specify number of resources to return
  *   .run();                         // Mandatory, must be the last function call
  * ```
  */
@@ -44,6 +46,19 @@ interface Search {
          * Returns a [SearchSpecifications] object with the [filterCriterion].
          */
         fun filter(filterCriterion: FilterCriterion): SearchSpecifications
+
+        /**
+         * Returns a [SearchSpecifications] object with the [sortCriterion].
+         */
+        fun sort(sortCriterion: SortCriterion): SearchSpecifications
+
+        /**
+         * Returns a [SearchSpecifications] object that only includes the first [limit] results.
+         */
+        fun limit(limit: Int): SearchSpecifications
+
+        /** Returns a [SearchSpecifications] object that skips the first [skip] results. */
+        fun skip(skip: Int): SearchSpecifications
 
         /** Runs a search with the [SearchSpecifications]. */
         fun <R : Resource> run(): List<R>

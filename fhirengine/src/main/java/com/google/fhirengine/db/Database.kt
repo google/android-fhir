@@ -16,8 +16,10 @@
 
 package com.google.fhirengine.db
 
-import com.google.fhirengine.search.impl.ResourceQuery
+import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
+import com.google.fhirengine.search.impl.Query
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 
 /** The interface for the FHIR resource database.  */
 interface Database {
@@ -53,6 +55,23 @@ interface Database {
      */
     @Throws(ResourceNotFoundInDbException::class)
     fun <R : Resource> select(clazz: Class<R>, id: String): R
+
+    /**
+     * Return the last update data of a resource based on the resource type.
+     * If no resource of [resourceType] is inserted, return `null`.
+     * @param resourceType The resource type
+     */
+    suspend fun lastUpdate(resourceType: ResourceType): String?
+
+    /**
+     * Insert a resource that was syncronised.
+     *
+     * @param syncedResourceEntity The synced resource
+     */
+    suspend fun insertSyncedResources(
+      syncedResourceEntity: SyncedResourceEntity,
+      resources: List<Resource>
+    )
 
     /**
      * Deletes the FHIR resource of type `clazz` with `id`.
@@ -119,5 +138,5 @@ interface Database {
       codeValue: String
     ): List<R>
 
-    fun <R : Resource> search(searchIdQuery: ResourceQuery): List<R>
+    fun <R : Resource> search(query: Query): List<R>
 }

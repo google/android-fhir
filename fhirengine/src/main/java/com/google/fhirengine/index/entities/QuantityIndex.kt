@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.sync
+package com.google.fhirengine.index.entities
 
-import org.hl7.fhir.r4.model.Bundle
+import java.math.BigDecimal
 
 /**
- * Interface for an abstraction of retrieving static data from a network source. The data can be
- * retrieved in pages and each data retrieval is an expensive operation.
+ * An index record for a quantity value in a resource.
+ *
+ * See https://hl7.org/FHIR/search.html#quantity.
  */
-interface FhirDataSource {
-
-    /**
-     * Implement this method to load remote data based on a url [path].
-     * A service base url is of the form: `http{s}://server/{path}`
-     */
-    suspend fun loadData(path: String): Bundle
-}
+internal data class QuantityIndex(
+  val name: String,
+  val path: String,
+  val system: String,
+  val unit: String,
+  val value: BigDecimal
+)

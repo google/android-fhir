@@ -14,14 +14,25 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.index
+package com.google.fhirengine.db.impl.entities
 
-/** A string index for a specific resource.  */
-internal data class StringIndex(
-  /** The name of the string index, e.g. "given".  */
-  val name: String,
-  /** The path of the string index, e.g. "Patient.name.given".  */
-  val path: String,
-  /** The value of the string index, e.g. "Tom".  */
-  val value: String
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import org.hl7.fhir.r4.model.ResourceType
+
+/**
+ * Class that models a table that holds all resource types that were synced and the highest
+ * `_lastUpdate` value of each resource type.
+ */
+@Entity
+data class SyncedResourceEntity(
+  /**
+   * Resource synced
+   */
+  @PrimaryKey
+  val resourceType: ResourceType,
+  /**
+   * The highest `_lastUpdate` value of the resources synced of a specific type
+   */
+  val lastUpdate: String
 )

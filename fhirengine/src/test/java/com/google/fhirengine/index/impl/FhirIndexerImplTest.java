@@ -17,22 +17,37 @@
 package com.google.fhirengine.index.impl;
 
 import android.os.Build;
+import ca.uhn.fhir.context.FhirContext;
 import com.google.common.truth.Truth;
-import com.google.fhirengine.index.CodeIndex;
-import com.google.fhirengine.index.ReferenceIndex;
 import com.google.fhirengine.index.ResourceIndices;
-import com.google.fhirengine.index.StringIndex;
+import com.google.fhirengine.index.entities.DateIndex;
+import com.google.fhirengine.index.entities.NumberIndex;
+import com.google.fhirengine.index.entities.QuantityIndex;
+import com.google.fhirengine.index.entities.ReferenceIndex;
+import com.google.fhirengine.index.entities.StringIndex;
+import com.google.fhirengine.index.entities.TokenIndex;
+import com.google.fhirengine.index.entities.UriIndex;
+import com.google.fhirengine.resource.TestingUtils;
+import java.math.BigDecimal;
+import org.hl7.fhir.r4.model.ChargeItem;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.ContactPoint;
+import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.InstantType;
+import org.hl7.fhir.r4.model.Invoice;
+import org.hl7.fhir.r4.model.MolecularSequence;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Questionnaire;
 import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Substance;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -154,6 +169,35 @@ public class FhirIndexerImplTest {
 
   private FhirIndexerImpl fhirIndexer = new FhirIndexerImpl();
 
+  // See: https://www.hl7.org/fhir/valueset-currencies.html
+  private static final String FHIR_CURRENCY_SYSTEM = "urn:iso:std:iso:4217";
+
+  private Substance qtyTestSubstance;
+  private Invoice qtyTestInvoice;
+  private Questionnaire uriTestQuestionnaire;
+  private Patient dateTestPatient;
+  private Patient lastUpdatedTestPatient;
+  private ChargeItem numberTestChargeItem;
+  private MolecularSequence numberTestMolecularSequence;
+
+  @Before
+  public void setUp() throws Exception {
+    TestingUtils testingUtils = new TestingUtils(FhirContext.forR4().newJsonParser());
+    // TODO: Improve sample data reading. Current approach has a downside of failing all tests if
+    // one file name is mistyped.
+    qtyTestSubstance = testingUtils.readFromFile(Substance.class, "/quantity_test_substance.json");
+    qtyTestInvoice = testingUtils.readFromFile(Invoice.class, "/quantity_test_invoice.json");
+    uriTestQuestionnaire =
+        testingUtils.readFromFile(Questionnaire.class, "/uri_test_questionnaire.json");
+    dateTestPatient = testingUtils.readFromFile(Patient.class, "/date_test_patient.json");
+    lastUpdatedTestPatient =
+        testingUtils.readFromFile(Patient.class, "/lastupdated_ts_test_patient.json");
+    numberTestChargeItem =
+        testingUtils.readFromFile(ChargeItem.class, "/number_test_charge_item.json");
+    numberTestMolecularSequence =
+        testingUtils.readFromFile(MolecularSequence.class, "/number_test_molecular_sequence.json");
+  }
+
   @Test
   public void index_patient_shouldIndexGivenName() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_PATIENT_1);
@@ -180,8 +224,9 @@ public class FhirIndexerImplTest {
   @Test
   public void index_observation_shouldIndexCode() throws Exception {
     ResourceIndices resourceIndices = fhirIndexer.index(TEST_OBSERVATION_1);
-    Truth.assertThat(resourceIndices.getCodeIndices())
-        .contains(new CodeIndex("code", "Observation.code", TEST_CODE_SYSTEM_1, TEST_CODE_VALUE_1));
+    Truth.assertThat(resourceIndices.getTokenIndices())
+        .contains(
+            new TokenIndex("code", "Observation.code", TEST_CODE_SYSTEM_1, TEST_CODE_VALUE_1));
   }
 
   @Test
@@ -257,5 +302,100 @@ public class FhirIndexerImplTest {
             .noneMatch(stringIndex -> stringIndex.getName().equals("code")));
   }
 
+  @Test
+  public void index_invoice_shouldIndexMoneyQuantity() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(qtyTestInvoice);
+    Truth.assertThat(resourceIndices.getQuantityIndices())
+        .containsAtLeast(
+            // Search parameter names flatten camel case so "totalGross" becomes "totalgross"
+            new QuantityIndex(
+                "totalgross",
+                "Invoice.totalGross",
+                FHIR_CURRENCY_SYSTEM,
+                "EUR",
+                new BigDecimal("48")),
+            new QuantityIndex(
+                "totalnet",
+                "Invoice.totalNet",
+                FHIR_CURRENCY_SYSTEM,
+                "EUR",
+                new BigDecimal("40.22")));
+  }
+
+  @Test
+  public void index_substance_shouldIndexQuantityQuantity() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(qtyTestSubstance);
+    Truth.assertThat(resourceIndices.getQuantityIndices())
+        .contains(
+            new QuantityIndex(
+                "quantity",
+                "Substance.instance.quantity",
+                "http://unitsofmeasure.org",
+                "mL",
+                new BigDecimal("100")));
+  }
+
+  @Test
+  public void index_questionnaire_shouldIndexUri() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(uriTestQuestionnaire);
+    Truth.assertThat(resourceIndices.getUriIndices())
+        .contains(
+            new UriIndex("url", "Questionnaire.url", "http://hl7.org/fhir/Questionnaire/3141"));
+  }
+
+  @Test
+  public void index_patient_birthDate_shouldIndexBirthDate() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(dateTestPatient);
+    DateType birthDateElement = dateTestPatient.getBirthDateElement();
+    Truth.assertThat(resourceIndices.getDateIndices())
+        .contains(
+            new DateIndex(
+                "birthdate",
+                "Patient.birthDate",
+                birthDateElement.getValue().getTime(),
+                birthDateElement.getValue().getTime(),
+                birthDateElement.getPrecision()));
+  }
+
+  @Test
+  public void index_patient_lastUpdated_shouldIndexLastUpdated() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(lastUpdatedTestPatient);
+    InstantType lastUpdatedElement = lastUpdatedTestPatient.getMeta().getLastUpdatedElement();
+    Truth.assertThat(resourceIndices.getDateIndices())
+        .contains(
+            new DateIndex(
+                "lastUpdated",
+                "Patient.meta.lastUpdated",
+                lastUpdatedElement.getValue().getTime(),
+                lastUpdatedElement.getValue().getTime(),
+                lastUpdatedElement.getPrecision()));
+  }
+
+  @Test
+  public void index_chargeItem_shouldIndexFactorOverride() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(numberTestChargeItem);
+    Truth.assertThat(resourceIndices.getNumberIndices())
+        .contains(
+            new NumberIndex("factor-override", "ChargeItem.factorOverride", new BigDecimal("0.8")));
+  }
+
+  @Test
+  public void index_molecularSequence_shouldIndexWindowAndVariant() throws Exception {
+    ResourceIndices resourceIndices = fhirIndexer.index(numberTestMolecularSequence);
+    Truth.assertThat(resourceIndices.getNumberIndices())
+        .containsAtLeast(
+            new NumberIndex(
+                "window-end",
+                "MolecularSequence.referenceSeq.windowEnd",
+                new BigDecimal("22125510")),
+            new NumberIndex(
+                "window-start",
+                "MolecularSequence.referenceSeq.windowStart",
+                new BigDecimal("22125500")),
+            new NumberIndex(
+                "variant-end", "MolecularSequence.variant.end", new BigDecimal("22125504")),
+            new NumberIndex(
+                "variant-start", "MolecularSequence.variant.start", new BigDecimal("22125503")));
+  }
   // TODO: improve the tests further.
 }

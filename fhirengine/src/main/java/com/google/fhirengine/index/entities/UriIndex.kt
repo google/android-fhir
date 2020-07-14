@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.search.impl
+package com.google.fhirengine.index.entities
 
-import androidx.sqlite.db.SimpleSQLiteQuery
-import androidx.sqlite.db.SupportSQLiteQuery
-
-/** Query that returns a list of resources. */
-data class ResourceQuery(val query: String, val args: List<Any?>) {
-    fun getSupportSQLiteQuery(): SupportSQLiteQuery = SimpleSQLiteQuery(query, args.toTypedArray())
-}
+/**
+ * An index record for a URI value in a resource.
+ *
+ * See https://hl7.org/FHIR/search.html#uri.
+ */
+internal data class UriIndex(
+  val name: String,
+  val path: String,
+  val uri: String
+)

@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.sync
-
-import com.google.fhirengine.FhirEngine
+package com.google.fhirengine.index.entities
 
 /**
- * Class that helps synchronize the data source and save it in the local database
- * TODO remove the FhirEngine dependency
+ * An index record for a string value in a resource.
+ *
+ * See https://hl7.org/FHIR/search.html#string.
  */
-class FhirSynchroniser(
-  private val dataSource: FhirDataSource,
-  private val fhirEngine: FhirEngine
-) {
-
-    suspend fun synchronise() {
-        var loadResult: FhirLoadResult
-        do {
-            loadResult = dataSource.loadData()
-            loadResult.resource?.let { fhirEngine.save(it) }
-        } while (loadResult.canLoadMore)
-    }
-}
+internal data class StringIndex(
+  /** The name of the string index, e.g. "given". */
+  val name: String,
+  /** The path of the string index, e.g. "Patient.name.given". */
+  val path: String,
+  /** The value of the string index, e.g. "Tom". */
+  val value: String
+)

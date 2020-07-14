@@ -11,8 +11,7 @@ Requires min SDK version 21 (Lollipop).
 
 ### Requirements
 
-Android Studio 4.0 is required for [Java 8 library desugaring]
-(https://developer.android.com/studio/preview/features#j8-desugar)
+Android Studio 4.0 is required for [Java 8 library desugaring](https://developer.android.com/studio/preview/features#j8-desugar)
 
 ### Spotless
 
@@ -37,3 +36,7 @@ Spotless maintains the license headers for Java and Kotlin files. Use
 ```
 addlicense -c "Google LLC" -l apache .
 ```
+
+## Disclaimer
+
+This is not an officially supported Google product.

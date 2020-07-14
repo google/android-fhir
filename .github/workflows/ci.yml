@@ -5,6 +5,8 @@ name: CI
 on:
   push:
     branches: [ master ]
+    tags:
+      run_ci*
   pull_request:
     branches: [ master ]
 
@@ -64,7 +66,7 @@ jobs:
       if: matrix.api-level == 29 # don't run full build on older APIs
       run: ./gradlew build
     - name: Run Integration Tests
-      uses: ReactiveCircus/android-emulator-runner@v2.8.0
+      uses: ReactiveCircus/android-emulator-runner@v2.11.0
       with:
         api-level: ${{ matrix.api-level }}
         arch: x86_64

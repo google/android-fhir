@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.sync
-
-import org.hl7.fhir.r4.model.Bundle
+package com.google.fhirengine.index.entities
 
 /**
- * Interface for an abstraction of retrieving static data from a network source. The data can be
- * retrieved in pages and each data retrieval is an expensive operation.
+ * An index record for a reference value in a resource.
+ *
+ * See https://hl7.org/FHIR/search.html#reference.
  */
-interface FhirDataSource {
-
-    /**
-     * Implement this method to load remote data based on a url [path].
-     * A service base url is of the form: `http{s}://server/{path}`
-     */
-    suspend fun loadData(path: String): Bundle
-}
+internal data class ReferenceIndex(
+  /** The name of the reference index, e.g. "subject". */
+  val name: String,
+  /** The path of the reference index, e.g. "Observation.subject". */
+  val path: String,
+  /** The value of the reference index, e.g. "Patient/123". */
+  val value: String
+)

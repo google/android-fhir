@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.search.criteria
+package com.google.fhirengine.db.impl.entities
 
-import com.google.fhirengine.search.impl.ResourceIdQuery
-import org.hl7.fhir.r4.model.Resource
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import org.hl7.fhir.r4.model.ResourceType
 
-/** Interface to specify filtering criteria for search. */
-interface FilterCriterion {
-    fun and(filterCriterion: FilterCriterion): FilterCriterion =
-            and(this, filterCriterion)
-
-    fun or(filterCriterion: FilterCriterion): FilterCriterion =
-            or(this, filterCriterion)
-
-    /**
-     * Returns the [ResourceIdQuery] that will return the list of
-     */
-    fun <R : Resource> query(clazz: Class<R>): ResourceIdQuery
-}
+@Entity(
+        indices = [
+            Index(
+                    value = ["resourceType", "resourceId"],
+                    unique = true
+            )
+        ]
+)
+internal data class ResourceEntity(
+  @PrimaryKey(autoGenerate = true)
+  val id: Long,
+  val resourceType: ResourceType,
+  val resourceId: String,
+  val serializedResource: String
+)

@@ -27,6 +27,8 @@ import com.google.fhirengine.db.impl.DatabaseImpl
 import com.google.fhirengine.impl.FhirEngineImpl
 import com.google.fhirengine.index.impl.FhirIndexerImpl
 import com.google.fhirengine.search.impl.SearchImpl
+import com.google.fhirengine.sync.FhirDataSource
+import com.google.fhirengine.sync.SyncConfiguration
 
 internal data class FhirServices(
   val fhirEngine: FhirEngine,
@@ -34,6 +36,8 @@ internal data class FhirServices(
   val database: Database
 ) {
     class Builder(
+      private val syncConfiguration: SyncConfiguration,
+      private val dataSource: FhirDataSource,
       private val context: Context
     ) {
         private var databaseName: String? = "fhirEngine"
@@ -62,7 +66,9 @@ internal data class FhirServices(
                 search = SearchImpl(db),
                 libraryLoader = FhirEngineLibraryLoader(db),
                 dataProviderMap = mapOf("http://hl7.org/fhir" to dataProvider),
-                terminologyProvider = FhirEngineTerminologyProvider()
+                terminologyProvider = FhirEngineTerminologyProvider(),
+                periodicSyncConfiguration = syncConfiguration,
+                dataSource = dataSource
             )
             return FhirServices(
                 fhirEngine = engine,
@@ -74,6 +80,10 @@ internal data class FhirServices(
 
     companion object {
         @JvmStatic
-        fun builder(context: Context) = Builder(context)
+        fun builder(
+          syncConfiguration: SyncConfiguration,
+          dataSource: FhirDataSource,
+          context: Context
+        ) = Builder(syncConfiguration, dataSource, context)
     }
 }

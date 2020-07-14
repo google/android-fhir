@@ -18,12 +18,15 @@ package com.google.fhirengine.db.impl
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
 import com.google.fhirengine.db.ResourceNotFoundInDbException
+import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.resource.ResourceUtils
-import com.google.fhirengine.search.impl.ResourceQuery
+import com.google.fhirengine.search.impl.Query
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * The implementation for the persistence layer using Room.
@@ -40,54 +43,68 @@ internal class DatabaseImpl(
       iParser: IParser,
       fhirIndexer: FhirIndexer
     ) : this(
-        context = context,
-        iParser = iParser,
-        fhirIndexer = fhirIndexer,
-        databaseName = DEFAULT_DATABASE_NAME)
+            context = context,
+            iParser = iParser,
+            fhirIndexer = fhirIndexer,
+            databaseName = DEFAULT_DATABASE_NAME)
     val builder = if (databaseName == null) {
-        Room.inMemoryDatabaseBuilder(context, RoomResourceDb::class.java)
+        Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
     } else {
-        Room.databaseBuilder(context, RoomResourceDb::class.java, databaseName)
+        Room.databaseBuilder(context, ResourceDatabase::class.java, databaseName)
     }
     val db = builder
-        // TODO https://github.com/jingtang10/fhir-engine/issues/32
-        //  don't allow main thread queries
-        .allowMainThreadQueries()
-        .build()
-    val dao by lazy {
-        db.dao().also {
+            // TODO https://github.com/jingtang10/fhir-engine/issues/32
+            //  don't allow main thread queries
+            .allowMainThreadQueries()
+            .build()
+    val resourceDao by lazy {
+        db.resourceDao().also {
             it.fhirIndexer = fhirIndexer
             it.iParser = iParser
         }
     }
+    val syncedResourceDao = db.syncedResourceDao()
 
     override fun <R : Resource> insert(resource: R) {
-        dao.insert(resource)
+        resourceDao.insert(resource)
     }
 
     override fun <R : Resource> insertAll(resources: List<R>) {
-        dao.insertAll(resources)
+        resourceDao.insertAll(resources)
     }
 
     override fun <R : Resource> update(resource: R) {
-        dao.update(resource)
+        resourceDao.update(resource)
     }
 
     override fun <R : Resource> select(clazz: Class<R>, id: String): R {
         val type = ResourceUtils.getResourceType(clazz)
-        return dao.getResource(
-            resourceId = id,
-            resourceType = type
+        return resourceDao.getResource(
+                resourceId = id,
+                resourceType = type
         )?.let {
             iParser.parseResource(clazz, it)
         } ?: throw ResourceNotFoundInDbException(type.name, id)
     }
 
+    override suspend fun lastUpdate(resourceType: ResourceType): String? {
+        return syncedResourceDao.getLastUpdate(resourceType)
+    }
+
+    @Transaction
+    override suspend fun insertSyncedResources(
+      syncedResourceEntity: SyncedResourceEntity,
+      resources: List<Resource>
+    ) {
+        syncedResourceDao.insert(syncedResourceEntity)
+        insertAll(resources)
+    }
+
     override fun <R : Resource> delete(clazz: Class<R>, id: String) {
         val type = ResourceUtils.getResourceType(clazz)
-        dao.deleteResource(
-            resourceId = id,
-            resourceType = type
+        resourceDao.deleteResource(
+                resourceId = id,
+                resourceType = type
         )
     }
 
@@ -96,9 +113,9 @@ internal class DatabaseImpl(
       reference: String,
       value: String
     ): List<R> {
-        return dao.getResourceByReferenceIndex(
-            ResourceUtils.getResourceType(clazz).name, reference, value)
-            .map { iParser.parseResource(it) as R }
+        return resourceDao.getResourceByReferenceIndex(
+                ResourceUtils.getResourceType(clazz).name, reference, value)
+                .map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource> searchByString(
@@ -106,8 +123,11 @@ internal class DatabaseImpl(
       string: String,
       value: String
     ): List<R> {
-        return dao.getResourceByStringIndex(ResourceUtils.getResourceType(clazz).name, string,
-            value).map { iParser.parseResource(it) as R }
+        return resourceDao.getResourceByStringIndex(
+            resourceType = ResourceUtils.getResourceType(clazz).name,
+            indexPath = string,
+            indexValue = value
+        ).map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource> searchByCode(
@@ -116,8 +136,12 @@ internal class DatabaseImpl(
       system: String,
       value: String
     ): List<R> {
-        return dao.getResourceByCodeIndex(ResourceUtils.getResourceType(clazz).name, code, system,
-            value).map { iParser.parseResource(it) as R }
+        return resourceDao.getResourceByCodeIndex(
+            resourceType = ResourceUtils.getResourceType(clazz).name,
+            indexPath = code,
+            indexSystem = system,
+            indexValue = value
+        ).map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource> searchByReferenceAndCode(
@@ -132,8 +156,9 @@ internal class DatabaseImpl(
         return searchByCode(clazz, code, codeSystem, codeValue).filter { refs.contains(it.id) }
     }
 
-    override fun <R : Resource> search(query: ResourceQuery): List<R> =
-            dao.getResources(query.getSupportSQLiteQuery()).map { iParser.parseResource(it) as R }
+    override fun <R : Resource> search(query: Query): List<R> =
+            resourceDao.getResources(query.getSupportSQLiteQuery())
+                .map { iParser.parseResource(it) as R }
 
     companion object {
         private const val DEFAULT_DATABASE_NAME = "ResourceDatabase"
