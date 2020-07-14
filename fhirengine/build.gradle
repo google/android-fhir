@@ -85,6 +85,14 @@ dependencies {
     androidTestImplementation "com.google.truth:truth:$truthVersion"
 }
 
+tasks.withType(Test) {
+    testLogging {
+        // to see the exceptions of failed tests in Github Actions console.
+        exceptionFormat = 'full'
+    }
+    maxHeapSize = "2g"
+}
+
 repositories {
     mavenCentral()
 }
