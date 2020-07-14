@@ -28,10 +28,10 @@ import com.google.fhirengine.example.data.SamplePatients
 
 /**
  * A fragment representing a single SamplePatient detail screen.
- * This fragment is either contained in a [SamplePatientDetailActivity].
+ * This fragment is either contained in a [PatientDetailActivity].
  */
-class SamplePatientDetailFragment : Fragment() {
-    var parentActivity: SamplePatientDetailActivity? = null
+class PatientDetailFragment : Fragment() {
+    var parentActivity: PatientDetailActivity? = null
     var patients: List<SamplePatients.PatientItem>? = null
     var observations: List<SamplePatients.ObservationItem>? = null
     var patientsMap: Map<String, SamplePatients.PatientItem>? = null
@@ -52,7 +52,6 @@ class SamplePatientDetailFragment : Fragment() {
     private var observation9: SamplePatients.ObservationItem? = null
     private var observation10: SamplePatients.ObservationItem? = null
     private var patient: SamplePatients.PatientItem? = null
-    // private var item: DummyDetailsContent.DummyItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +61,7 @@ class SamplePatientDetailFragment : Fragment() {
                 // Load the dummy content specified by the fragment
                 // arguments. In a real-world scenario, use a Loader
                 // to load content from a content provider.
-                parentActivity = activity as SamplePatientDetailActivity?
+                parentActivity = activity as PatientDetailActivity?
                 patients = parentActivity?.patients
                 observations = parentActivity?.observations
                 patientsMap = parentActivity?.patientsMap
@@ -112,17 +111,17 @@ class SamplePatientDetailFragment : Fragment() {
       container: ViewGroup?,
       savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.samplepatient_detail, container, false)
+        val rootView = inflater.inflate(R.layout.patient_detail, container, false)
 
         // Show the dummy content as text in a TextView.
 //        item?.let {
-//            rootView.findViewById<TextView>(R.id.samplepatient_detail).text = it.details
+//            rootView.findViewById<TextView>(R.id.patient_detail).text = it.details
 //            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-//                rootView.findViewById<TextView>(R.id.samplepatient_detail).setText(Html.fromHtml("<h2>Title</h2><br><p>Description here</p>", Html.FROM_HTML_MODE_COMPACT))
-//                rootView.findViewById<TextView>(R.id.samplepatient_detail).setText(Html.fromHtml("<h2>Title</h2><br><p>Description here</p>", Html.FROM_HTML_MODE_COMPACT))
+//                rootView.findViewById<TextView>(R.id.patient_detail).setText(Html.fromHtml("<h2>Title</h2><br><p>Description here</p>", Html.FROM_HTML_MODE_COMPACT))
+//                rootView.findViewById<TextView>(R.id.patient_detail).setText(Html.fromHtml("<h2>Title</h2><br><p>Description here</p>", Html.FROM_HTML_MODE_COMPACT))
 //            }
 //            else {
-//                rootView.findViewById<TextView>(R.id.samplepatient_detail).setText(Html.fromHtml("<h2>Title</h2><br><p>Description here</p>"))
+//                rootView.findViewById<TextView>(R.id.patient_detail).setText(Html.fromHtml("<h2>Title</h2><br><p>Description here</p>"))
 //            }
 //        }
         patient?.let {

@@ -16,8 +16,8 @@
 
 <resources>
     <string name="app_name">FHIR Engine Example</string>
-    <string name="title_samplepatient_list">Registered Patients</string>
-    <string name="title_samplepatient_detail">SamplePatient Detail</string>
+    <string name="title_patient_list">Registered Patients</string>
+    <string name="title_patient_detail">SamplePatient Detail</string>
     <string name="menu_about">About Fhir Engine</string>
     <string name="menu_load_resource">Load CQL Resources</string>
     <string name="menu_sync_resources">Sync Resources</string>

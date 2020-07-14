@@ -37,7 +37,7 @@
         android:layout_height="match_parent"
         android:padding="16dp"
         android:textIsSelectable="true"
-        tools:context=".SamplePatientDetailFragment" />
+        tools:context=".PatientDetailFragment" />
     </androidx.cardview.widget.CardView>
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"

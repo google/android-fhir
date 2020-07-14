@@ -36,7 +36,7 @@ import com.google.fhirengine.example.data.SamplePatients
 /**
  * An activity representing a list of Patients.
  */
-class SamplePatientListActivity : AppCompatActivity() {
+class PatientListActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,13 +64,13 @@ class SamplePatientListActivity : AppCompatActivity() {
         // Click handler to help display the details about the patients from the list.
         val onPatientItemClicked: (SamplePatients.PatientItem) -> Unit = { patientItem ->
             val intent = Intent(this.applicationContext,
-                SamplePatientDetailActivity::class.java).apply {
-                putExtra(SamplePatientDetailFragment.ARG_ITEM_ID, patientItem.id)
+                PatientDetailActivity::class.java).apply {
+                putExtra(PatientDetailFragment.ARG_ITEM_ID, patientItem.id)
             }
             this.startActivity(intent)
         }
 
-        val adapter = SampleItemRecyclerViewAdapter(onPatientItemClicked)
+        val adapter = PatientItemRecyclerViewAdapter(onPatientItemClicked)
         recyclerView.adapter = adapter
 
         patientListViewModel.getPatients().observe(this,

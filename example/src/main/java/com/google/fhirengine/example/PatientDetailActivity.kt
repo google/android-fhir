@@ -27,9 +27,9 @@ import com.google.fhirengine.example.data.SamplePatients
 /**
  * An activity representing a single SamplePatient detail screen. This activity is only used on
  * narrow width devices. On tablet-size devices, item details are presented side-by-side with a list
- * of items in a [SamplePatientListActivity].
+ * of items in a [PatientListActivity].
  */
-class SamplePatientDetailActivity : AppCompatActivity() {
+class PatientDetailActivity : AppCompatActivity() {
     var patients: List<SamplePatients.PatientItem>? = null
     var observations: List<SamplePatients.ObservationItem>? = null
     var patientsMap: Map<String, SamplePatients.PatientItem>? = null
@@ -37,7 +37,7 @@ class SamplePatientDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_samplepatient_detail)
+        setContentView(R.layout.activity_patient_detail)
         setSupportActionBar(findViewById(R.id.detail_toolbar))
 
         // Show the Up button in the action bar.
@@ -87,10 +87,10 @@ class SamplePatientDetailActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
-            val fragment = SamplePatientDetailFragment().apply {
+            val fragment = PatientDetailFragment().apply {
                 arguments = Bundle().apply {
-                    putString(SamplePatientDetailFragment.ARG_ITEM_ID,
-                            intent.getStringExtra(SamplePatientDetailFragment.ARG_ITEM_ID))
+                    putString(PatientDetailFragment.ARG_ITEM_ID,
+                            intent.getStringExtra(PatientDetailFragment.ARG_ITEM_ID))
                 }
             }
 
@@ -132,7 +132,7 @@ class SamplePatientDetailActivity : AppCompatActivity() {
                     //
                     // http://developer.android.com/design/patterns/navigation.html#up-vs-back
 
-                    navigateUpTo(Intent(this, SamplePatientListActivity::class.java))
+                    navigateUpTo(Intent(this, PatientListActivity::class.java))
 
                     true
                 }

@@ -25,5 +25,5 @@
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context=".SamplePatientListActivity"
+    tools:context=".PatientListActivity"
     tools:listitem="@layout/patient_list_item" />

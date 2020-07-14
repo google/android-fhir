@@ -23,7 +23,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.fhirengine.example.data.SamplePatients
 
 /**
- * The ViewModel helper class for SampleItemRecyclerViewAdapter, that is responsible for preparing
+ * The ViewModel helper class for PatientItemRecyclerViewAdapter, that is responsible for preparing
  * data for UI.
  */
 class PatientListViewModel(jsonStringPatients: String, jsonStringObservations: String) : ViewModel() {

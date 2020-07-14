@@ -26,7 +26,7 @@ import com.google.fhirengine.example.data.SamplePatients
  * UI Controller helper class to monitor Patient viewmodel and display list of patients, with
  * possibly patient details, on a two pane device.
  */
-class SampleItemRecyclerViewAdapter(
+class PatientItemRecyclerViewAdapter(
   private val onItemClicked: (SamplePatients.PatientItem) -> Unit
 ) : ListAdapter<SamplePatients.PatientItem, PatientItemViewHolder>(PatientItemDiffCallback()) {
 
