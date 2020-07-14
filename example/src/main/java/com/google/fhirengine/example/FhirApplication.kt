@@ -30,6 +30,7 @@ import com.google.fhirengine.sync.PeriodicSyncConfiguration
 import com.google.fhirengine.sync.SyncConfiguration
 import com.google.fhirengine.sync.SyncData
 import java.util.ArrayList
+import java.util.concurrent.TimeUnit
 import org.hl7.fhir.r4.model.ResourceType
 
 class FhirApplication : Application() {
@@ -45,14 +46,14 @@ class FhirApplication : Application() {
         syncData.add(SyncData(ResourceType.Patient, params))
         val configuration = SyncConfiguration(syncData, false)
         val periodicSyncConfiguration = PeriodicSyncConfiguration(
-            configuration,
-            Constraints.Builder().build(),
-            FhirPeriodicSyncWorker::class
-            )
+            syncConfiguration = configuration,
+            syncConstraints = Constraints.Builder().build(),
+            periodicSyncWorker = FhirPeriodicSyncWorker::class,
+            repeatInterval = 1,
+            repeatIntervalTimeUnit = TimeUnit.HOURS
+        )
         val dataSource: FhirDataSource = HapiFhirResourceDataSource(service)
-        return FhirEngineBuilder(periodicSyncConfiguration, dataSource, this).build().also {
-            it.enablePeriodicSync()
-        }
+        return FhirEngineBuilder(periodicSyncConfiguration, dataSource, this).build()
     }
 
     companion object {

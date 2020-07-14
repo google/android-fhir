@@ -17,6 +17,7 @@
 package com.google.fhirengine.sync
 
 import androidx.work.Constraints
+import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 
 /**
@@ -35,5 +36,15 @@ class PeriodicSyncConfiguration(
   /**
    * Worker that will execute the periodic sync
    */
-  val periodicSyncWorker: KClass<out PeriodicSyncWorker>
+  val periodicSyncWorker: KClass<out PeriodicSyncWorker>,
+
+  /**
+   * The interval at which the sync should be triggered in
+   */
+  val repeatInterval: Long,
+
+  /**
+   * The time unit for the repeat interval
+   */
+  val repeatIntervalTimeUnit: TimeUnit
 )

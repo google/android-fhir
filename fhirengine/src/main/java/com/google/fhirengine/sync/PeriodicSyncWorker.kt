@@ -33,6 +33,7 @@ abstract class PeriodicSyncWorker(
     abstract fun getFhirEngine(): FhirEngine
 
     override suspend fun doWork(): Result {
+        // TODO handle retry
         val result = getFhirEngine().periodicSync()
         if (result is Success) {
             return Result.success()

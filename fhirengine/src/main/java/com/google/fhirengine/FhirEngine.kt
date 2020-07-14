@@ -17,6 +17,7 @@
 package com.google.fhirengine
 
 import com.google.fhirengine.search.Search
+import com.google.fhirengine.sync.PeriodicSyncConfiguration
 import com.google.fhirengine.sync.Result
 import com.google.fhirengine.sync.SyncConfiguration
 import org.hl7.fhir.r4.model.Resource
@@ -78,5 +79,5 @@ interface FhirEngine {
 
     suspend fun periodicSync(): Result
 
-    fun enablePeriodicSync()
+    fun updatePeriodicSyncConfiguration(syncConfig: PeriodicSyncConfiguration)
 }

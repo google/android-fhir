@@ -48,10 +48,14 @@ class FhirEngineImpl constructor(
   libraryLoader: LibraryLoader,
   dataProviderMap: Map<String, @JvmSuppressWildcards DataProvider>,
   terminologyProvider: TerminologyProvider,
-  private val periodicSyncConfiguration: PeriodicSyncConfiguration,
+  private var periodicSyncConfiguration: PeriodicSyncConfiguration,
   private val dataSource: FhirDataSource,
   private val context: Context
 ) : FhirEngine {
+
+    init {
+        triggerInitialDownload()
+    }
 
     private val cqlEngine: CqlEngine = CqlEngine(
         libraryLoader,
@@ -119,7 +123,8 @@ class FhirEngineImpl constructor(
         return syncResult
     }
 
-    override fun enablePeriodicSync() {
+    override fun updatePeriodicSyncConfiguration(syncConfig: PeriodicSyncConfiguration) {
+        periodicSyncConfiguration = syncConfig
         setupNextDownload()
     }
 
@@ -127,12 +132,29 @@ class FhirEngineImpl constructor(
         val workerClass = periodicSyncConfiguration.periodicSyncWorker.java
         val downloadRequest = OneTimeWorkRequest.Builder(workerClass)
             .setConstraints(periodicSyncConfiguration.syncConstraints)
+            .setInitialDelay(
+                periodicSyncConfiguration.repeatInterval,
+                periodicSyncConfiguration.repeatIntervalTimeUnit
+            )
             .build()
 
         WorkManager.getInstance(context).enqueueUniqueWork(
             PeriodicSyncWorker.NAME,
             // If there is existing pending (uncompleted) work with the same unique name, do nothing.
             // Otherwise, insert the newly-specified work.
+            ExistingWorkPolicy.KEEP,
+            downloadRequest
+        )
+    }
+
+    private fun triggerInitialDownload() {
+        val workerClass = periodicSyncConfiguration.periodicSyncWorker.java
+        val downloadRequest = OneTimeWorkRequest.Builder(workerClass)
+            .setConstraints(periodicSyncConfiguration.syncConstraints)
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            PeriodicSyncWorker.NAME,
             ExistingWorkPolicy.KEEP,
             downloadRequest
         )
