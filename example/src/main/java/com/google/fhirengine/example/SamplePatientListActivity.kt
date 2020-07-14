@@ -18,7 +18,6 @@ package com.google.fhirengine.example
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
@@ -52,12 +51,12 @@ class SamplePatientListActivity : AppCompatActivity() {
         val recyclerView: RecyclerView = findViewById(R.id.samplepatient_list)
 
         // Click handler to help display the details about the patients from the list.
-        val onPatientItemClicked: (View) -> Unit = { v ->
-            val item = v.tag as SamplePatients.PatientItem
-            val intent = Intent(v.context, SamplePatientDetailActivity::class.java).apply {
-                putExtra(SamplePatientDetailFragment.ARG_ITEM_ID, item.id)
+        val onPatientItemClicked: (SamplePatients.PatientItem) -> Unit = { patientItem ->
+            val intent = Intent(this.applicationContext,
+                SamplePatientDetailActivity::class.java).apply {
+                putExtra(SamplePatientDetailFragment.ARG_ITEM_ID, patientItem.id)
             }
-            v.context.startActivity(intent)
+            this.startActivity(intent)
         }
 
         val adapter = SampleItemRecyclerViewAdapter(onPatientItemClicked)
@@ -75,7 +74,7 @@ class SamplePatientListActivity : AppCompatActivity() {
     private fun getJsonStrForPatientData(): String {
         val patientJsonFilename = "sample_patients_bundle.json"
 
-        return this.applicationContext.assets.open(patientJsonFilename).bufferedReader().use {
+        return assets.open(patientJsonFilename).bufferedReader().use {
             it.readText()
         }
     }

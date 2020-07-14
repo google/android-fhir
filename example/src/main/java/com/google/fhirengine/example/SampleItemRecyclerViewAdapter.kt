@@ -17,7 +17,6 @@
 package com.google.fhirengine.example
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -28,19 +27,19 @@ import com.google.fhirengine.example.data.SamplePatients
  * possibly patient details, on a two pane device.
  */
 class SampleItemRecyclerViewAdapter(
-  private val onItemClicked: (View) -> Unit
+  private val onItemClicked: (SamplePatients.PatientItem) -> Unit
 ) : ListAdapter<SamplePatients.PatientItem, PatientItemViewHolder>(PatientItemDiffCallback()) {
 
     class PatientItemDiffCallback : DiffUtil.ItemCallback<SamplePatients.PatientItem>() {
         override fun areItemsTheSame(
           oldItem: SamplePatients.PatientItem,
           newItem: SamplePatients.PatientItem
-        ): Boolean = oldItem == newItem
+        ): Boolean = oldItem.id == newItem.id
 
         override fun areContentsTheSame(
           oldItem: SamplePatients.PatientItem,
           newItem: SamplePatients.PatientItem
-        ): Boolean = oldItem == newItem
+        ): Boolean = oldItem.id == newItem.id
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientItemViewHolder {

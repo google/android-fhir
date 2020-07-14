@@ -30,8 +30,9 @@ private const val MAX_RESOURCE_COUNT = 20
  */
 class SamplePatients {
     private val patients: MutableList<PatientItem> = ArrayList()
-    // Maps a patient position to PatientItem, used to display both the position and details.
-    private val patients_map: MutableMap<String, PatientItem> = mutableMapOf()
+    // Maps a temporary patient display id to PatientItem, used to display patients both in list and
+    // details.
+    private val idsPatients: MutableMap<String, PatientItem> = mutableMapOf()
 
     // The resource bundle with Patient objects.
     private var fhirBundle: Bundle? = null
@@ -45,23 +46,22 @@ class SamplePatients {
     fun getPatientItems(jsonString: String): List<PatientItem> {
         fhirBundle = fhirJsonParser.parseResource(Bundle::class.java,
                 jsonString) as Bundle
-        (1..fhirBundle!!.entry.size).forEach {
-            // The patient's position in the bundle is part of the PatientItem.
-            addPatientItem(createPatientItem(it))
-        }
-        return patients
-    }
 
-    private fun addPatientItem(item: PatientItem) {
-        patients.add(item)
-        patients_map[item.id] = item
+        // Create a list of PatientItems from fhirPatients. The display index is 1 based.
+        fhirBundle?.entry?.take(MAX_RESOURCE_COUNT)?.mapIndexed { index, entry ->
+            createPatientItem(index + 1, entry.resource as Patient)
+        }?.let { patients.addAll(it) }
+
+        // Create the PatientItems Map from PatientItem List.
+        idsPatients.putAll(patients.associateBy { it.id })
+
+        return patients
     }
 
     /**
      * Creates PatientItem objects with displayable values from the Fhir Patient objects.
      */
-    private fun createPatientItem(position: Int): PatientItem {
-        val patient: Patient = getPatientDetails(position)
+    private fun createPatientItem(position: Int, patient: Patient): PatientItem {
         val name = patient.name[0].nameAsSingleString
 
         // Show nothing if no values available for gender and date of birth.
@@ -69,19 +69,6 @@ class SamplePatients {
         val dob = if (patient.hasBirthDateElement()) patient.birthDateElement.valueAsString else ""
 
         return PatientItem(position.toString(), name, gender, dob)
-    }
-
-    /**
-     * Extracts patient details from the Fhir resources bundle.
-     */
-    private fun getPatientDetails(position: Int): Patient {
-        var patient = Patient()
-        if (position <= MAX_RESOURCE_COUNT) {
-            patient = fhirBundle!!.entry[position - 1].resource as Patient
-        } else {
-            patient.addName().family = "Fhir Patient $position"
-        }
-        return patient
     }
 
     /**
