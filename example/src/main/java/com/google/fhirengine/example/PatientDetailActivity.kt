@@ -95,7 +95,7 @@ class PatientDetailActivity : AppCompatActivity() {
             }
 
             supportFragmentManager.beginTransaction()
-                    .add(R.id.samplepatient_detail_container, fragment)
+                    .add(R.id.patient_detail_container, fragment)
                     .commit()
         }
 
