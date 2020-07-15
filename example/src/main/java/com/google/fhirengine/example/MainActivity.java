@@ -70,16 +70,7 @@ public class MainActivity extends AppCompatActivity {
     expressionInput = findViewById(R.id.expression_input);
     evaluationResultTextView = findViewById(R.id.evaluate_result);
 
-    IParser parser = FhirContext.forR4().newJsonParser();
-    HapiFhirService service = HapiFhirService.Companion.create(parser);
-    Map<String, String> params = new HashMap();
-    params.put("address-country", "United States");
-    List<SyncData> syncData = new ArrayList<>();
-    syncData.add(new SyncData(ResourceType.Patient, params));
-    SyncConfiguration configuration =
-        new SyncConfiguration(syncData, new Constraints.Builder().build(), false);
-    FhirDataSource dataSource = new HapiFhirResourceDataSource(service);
-    fhirEngine = new FhirEngineBuilder(configuration, dataSource, this).build();
+    fhirEngine = FhirApplication.fhirEngine(this);
 
     MainActivityViewModel viewModel =
         new ViewModelProvider(this, new MainActivityViewModelFactory(fhirEngine))
