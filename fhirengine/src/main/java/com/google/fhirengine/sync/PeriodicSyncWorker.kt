@@ -17,6 +17,7 @@
 package com.google.fhirengine.sync
 
 import android.content.Context
+import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.fhirengine.FhirEngine
@@ -33,15 +34,12 @@ abstract class PeriodicSyncWorker(
     abstract fun getFhirEngine(): FhirEngine
 
     override suspend fun doWork(): Result {
+        Log.d("flo", "PeriodicSyncWorker doWork")
         // TODO handle retry
         val result = getFhirEngine().periodicSync()
         if (result is Success) {
             return Result.success()
         }
         return Result.failure()
-    }
-
-    companion object {
-        const val NAME = "sync_download"
     }
 }

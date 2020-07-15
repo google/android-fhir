@@ -48,12 +48,14 @@ class FhirApplication : Application() {
         val periodicSyncConfiguration = PeriodicSyncConfiguration(
             syncConfiguration = configuration,
             syncConstraints = Constraints.Builder().build(),
-            periodicSyncWorker = FhirPeriodicSyncWorker::class,
+            periodicSyncWorker = FhirPeriodicSyncWorker::class.java,
             repeatInterval = 1,
             repeatIntervalTimeUnit = TimeUnit.HOURS
         )
         val dataSource: FhirDataSource = HapiFhirResourceDataSource(service)
-        return FhirEngineBuilder(periodicSyncConfiguration, dataSource, this).build()
+        return FhirEngineBuilder(dataSource, this)
+            .periodicSyncConfiguration(periodicSyncConfiguration)
+            .build()
     }
 
     companion object {

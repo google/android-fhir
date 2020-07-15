@@ -36,11 +36,11 @@ internal data class FhirServices(
   val database: Database
 ) {
     class Builder(
-      private val periodicSyncConfiguration: PeriodicSyncConfiguration,
       private val dataSource: FhirDataSource,
       private val context: Context
     ) {
         private var databaseName: String? = "fhirEngine"
+        private var periodicSyncConfiguration: PeriodicSyncConfiguration? = null
 
         fun inMemory() = apply {
             databaseName = null
@@ -48,6 +48,10 @@ internal data class FhirServices(
 
         fun databaseName(name: String) = apply {
             databaseName = name
+        }
+
+        fun periodicSyncConfiguration(config: PeriodicSyncConfiguration) {
+            periodicSyncConfiguration = config
         }
 
         fun build(): FhirServices {
@@ -82,9 +86,8 @@ internal data class FhirServices(
     companion object {
         @JvmStatic
         fun builder(
-          periodicSyncConfiguration: PeriodicSyncConfiguration,
           dataSource: FhirDataSource,
           context: Context
-        ) = Builder(periodicSyncConfiguration, dataSource, context)
+        ) = Builder(dataSource, context)
     }
 }

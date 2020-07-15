@@ -17,6 +17,7 @@
 package com.google.fhirengine.impl
 
 import android.content.Context
+import android.util.Log
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
@@ -29,9 +30,9 @@ import com.google.fhirengine.search.Search
 import com.google.fhirengine.sync.FhirDataSource
 import com.google.fhirengine.sync.FhirSynchronizer
 import com.google.fhirengine.sync.PeriodicSyncConfiguration
-import com.google.fhirengine.sync.PeriodicSyncWorker
 import com.google.fhirengine.sync.Result
 import com.google.fhirengine.sync.SyncConfiguration
+import com.google.fhirengine.sync.SyncWorkers
 import java.util.EnumSet
 import org.cqframework.cql.elm.execution.VersionedIdentifier
 import org.hl7.fhir.r4.model.Resource
@@ -48,13 +49,15 @@ class FhirEngineImpl constructor(
   libraryLoader: LibraryLoader,
   dataProviderMap: Map<String, @JvmSuppressWildcards DataProvider>,
   terminologyProvider: TerminologyProvider,
-  private var periodicSyncConfiguration: PeriodicSyncConfiguration,
+  private var periodicSyncConfiguration: PeriodicSyncConfiguration?,
   private val dataSource: FhirDataSource,
   private val context: Context
 ) : FhirEngine {
 
     init {
-        triggerInitialDownload()
+        periodicSyncConfiguration?.let { config ->
+            triggerInitialDownload(config)
+        }
     }
 
     private val cqlEngine: CqlEngine = CqlEngine(
@@ -114,32 +117,34 @@ class FhirEngineImpl constructor(
     }
 
     override suspend fun periodicSync(): Result {
+        val syncConfig = periodicSyncConfiguration
+        ?: throw java.lang.UnsupportedOperationException("Periodic sync configuration was not set")
         val syncResult = FhirSynchronizer(
-            periodicSyncConfiguration.syncConfiguration,
+            syncConfig.syncConfiguration,
             dataSource,
             database
         ).sync()
-        setupNextDownload()
+        setupNextDownload(syncConfig)
         return syncResult
     }
 
     override fun updatePeriodicSyncConfiguration(syncConfig: PeriodicSyncConfiguration) {
         periodicSyncConfiguration = syncConfig
-        setupNextDownload()
+        setupNextDownload(syncConfig)
     }
 
-    private fun setupNextDownload() {
-        val workerClass = periodicSyncConfiguration.periodicSyncWorker.java
+    private fun setupNextDownload(syncConfig: PeriodicSyncConfiguration) {
+        val workerClass = syncConfig.periodicSyncWorker
         val downloadRequest = OneTimeWorkRequest.Builder(workerClass)
-            .setConstraints(periodicSyncConfiguration.syncConstraints)
+            .setConstraints(syncConfig.syncConstraints)
             .setInitialDelay(
-                periodicSyncConfiguration.repeatInterval,
-                periodicSyncConfiguration.repeatIntervalTimeUnit
+                syncConfig.repeatInterval,
+                syncConfig.repeatIntervalTimeUnit
             )
             .build()
 
         WorkManager.getInstance(context).enqueueUniqueWork(
-            PeriodicSyncWorker.NAME,
+            SyncWorkers.DOWNLOAD.workerName,
             // If there is existing pending (uncompleted) work with the same unique name, do nothing.
             // Otherwise, insert the newly-specified work.
             ExistingWorkPolicy.KEEP,
@@ -147,14 +152,15 @@ class FhirEngineImpl constructor(
         )
     }
 
-    private fun triggerInitialDownload() {
-        val workerClass = periodicSyncConfiguration.periodicSyncWorker.java
+    private fun triggerInitialDownload(syncConfig: PeriodicSyncConfiguration) {
+        Log.d("flo", "triggerInitialDownload")
+        val workerClass = syncConfig.periodicSyncWorker
         val downloadRequest = OneTimeWorkRequest.Builder(workerClass)
-            .setConstraints(periodicSyncConfiguration.syncConstraints)
+            .setConstraints(syncConfig.syncConstraints)
             .build()
 
         WorkManager.getInstance(context).enqueueUniqueWork(
-            PeriodicSyncWorker.NAME,
+            SyncWorkers.DOWNLOAD.workerName,
             ExistingWorkPolicy.KEEP,
             downloadRequest
         )
