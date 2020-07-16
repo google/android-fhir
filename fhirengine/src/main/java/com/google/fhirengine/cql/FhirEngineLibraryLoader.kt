@@ -17,11 +17,11 @@
 package com.google.fhirengine.cql
 
 import com.google.fhirengine.db.Database
-import java.io.IOException
 import org.cqframework.cql.elm.execution.Library
 import org.cqframework.cql.elm.execution.VersionedIdentifier
 import org.opencds.cqf.cql.execution.JsonCqlLibraryReader
 import org.opencds.cqf.cql.execution.LibraryLoader
+import java.io.IOException
 
 /**
  * FHIR Engine's implementation of [LibraryLoader] that loads a CQL/ELM library for the [ ] to use.
@@ -35,17 +35,13 @@ internal class FhirEngineLibraryLoader(private val database: Database) : Library
   override fun load(libraryIdentifier: VersionedIdentifier): Library {
     val matchedLibrary = libraryMap
       .asSequence()
-      .filter { it.key.contains(libraryIdentifier.id) }
+      .filter {
+        // TODO: Change this to an exact match once the libraries are correctly indexed by name
+        it.key.contains(libraryIdentifier.id)
+      }
       .map { it.value }
       .firstOrNull()
     if (matchedLibrary != null) return matchedLibrary
-//    for ((key, value) in _libraryMap) {
-//      // TODO: Change this to an exact match once the libraries are correctly indexed by their name
-//      //  instead of FHIR resource ID.
-//      if (key.contains(libraryIdentifier.id)) {
-//        return value
-//      }
-//    }
     val fhirLibrary = database.searchByString(
       org.hl7.fhir.r4.model.Library::class.java,
       LIBRARY_NAME_INDEX,
