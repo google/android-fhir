@@ -31,10 +31,10 @@ class SearchImpl constructor(val database: Database) : Search {
     inner class SearchSpecificationImpl<R : Resource>(
       val clazz: Class<R>
     ) : Search.SearchSpecifications {
-        lateinit var filterCriterion: FilterCriterion
+        var filterCriterion: FilterCriterion? = null
         var sortCriterion: SortCriterion? = null
-        var skip: Int? = null
         var limit: Int? = null
+        var skip: Int? = null
 
         override fun filter(filterCriterion: FilterCriterion): Search.SearchSpecifications =
                 apply { this.filterCriterion = filterCriterion }
@@ -42,12 +42,12 @@ class SearchImpl constructor(val database: Database) : Search {
         override fun sort(sortCriterion: SortCriterion): Search.SearchSpecifications =
                 apply { this.sortCriterion = sortCriterion }
 
-        override fun skip(skip: Int): Search.SearchSpecifications = apply { this.skip = skip }
-
         override fun limit(limit: Int): Search.SearchSpecifications = apply { this.limit = limit }
+
+        override fun skip(skip: Int): Search.SearchSpecifications = apply { this.skip = skip }
 
         override fun <R : Resource> run(): List<R> = database.search(
                 SerializedResourceQuery(ResourceUtils.getResourceType(clazz),
-                        filterCriterion.query(clazz), sortCriterion, skip, limit))
+                        filterCriterion?.query(clazz), sortCriterion, limit, skip))
     }
 }
