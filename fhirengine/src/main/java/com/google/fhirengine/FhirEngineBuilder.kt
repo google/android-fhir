@@ -23,7 +23,7 @@ import com.google.fhirengine.sync.SyncConfiguration
 /**
  * The builder for [FhirEngine] instance
  */
-class FhirEngineBuilder internal constructor(
+class FhirEngineBuilder constructor(
   syncConfiguration: SyncConfiguration,
   dataSource: FhirDataSource,
   context: Context
