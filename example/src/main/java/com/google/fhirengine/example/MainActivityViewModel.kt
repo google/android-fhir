@@ -20,10 +20,15 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.fhirengine.FhirEngine
+import com.google.fhirengine.search.filter.string
 import com.google.fhirengine.sync.SyncConfiguration
 import com.google.fhirengine.sync.SyncData
 import kotlinx.coroutines.launch
+import org.hl7.fhir.r4.model.Observation
+import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 class MainActivityViewModel(
@@ -39,12 +44,32 @@ class MainActivityViewModel(
             val syncData = listOf(
                 SyncData(
                     resourceType = ResourceType.Patient,
-                    params = mapOf("address-country" to "United States")
+                    //params = mapOf("address-country" to "United States")
+                    params = mapOf("address-city" to "NAIROBI")
+                    // params = mapOf("identifier" to "d7db5ce4-8baf-41d7-81e8-3f706b3295e3",
+                    //     "_revinclude" to "Observation:subject")
                 )
             )
             val syncConfig = SyncConfiguration(syncData = syncData)
             val result = fhirEngine.sync(syncConfig)
             Log.d("MainActivityViewModel", "sync result: $result")
+
+            // var results: List<Resource> = fhirEngine.search()
+            //     .of(Patient::class.java)
+            //     .filter(
+            //         string(Patient.ADDRESS_CITY, ParamPrefixEnum.EQUAL, "NAIROBI")
+            //     )
+            //     .run()
+            //
+            // results = fhirEngine.search()
+            //     .of(Observation::class.java)
+            //     .filter(
+            //         string(Observation.SUBJECT, ParamPrefixEnum.EQUAL, "Patient/1393673")
+            //             .and(string(Observation.INCLUDE_SUBJECT.value, ParamPrefixEnum.EQUAL))
+            //     )
+            //     .run()
+            //
+            // Log.d("MainActivityViewModel", "search results: ${results.joinToString(" ")}")
         }
     }
 }

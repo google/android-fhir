@@ -32,7 +32,8 @@ data class SerializedResourceQuery(
         SELECT serializedResource 
         FROM ResourceEntity
         WHERE resourceType = ? AND resourceId IN (${resourceIdQuery.query})
-        ${limit?.let { "LIMIT $it${skip?.let { " OFFSET $it" }}" }}"""
+        ${limit?.let { "LIMIT $it${skip?.let { " OFFSET $it" } ?: "" }" } ?: "" }"""
+        //${limit?.let { "LIMIT $it${skip?.let { " OFFSET $it" }}" }}"""
     } else {
         """
         SELECT serializedResource 
@@ -45,7 +46,8 @@ data class SerializedResourceQuery(
         } else {
             "DESC"
         }}
-        ${limit?.let { "LIMIT $it${skip?.let { " OFFSET $it" }}" }}"""
+        ${limit?.let { "LIMIT $it${skip?.let { " OFFSET $it" } ?: "" }" } ?: "" }"""
+        // ${limit?.let { "LIMIT $it${skip?.let { " OFFSET $it" }}" }}"""
     }.trimIndent()
 
     override fun getQueryArgs(): List<Any?> =

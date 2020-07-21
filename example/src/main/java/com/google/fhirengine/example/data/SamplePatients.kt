@@ -43,6 +43,8 @@ class SamplePatients {
     private var fhirBundle: Bundle? = null
 
     companion object {
+        val tag = "SamplePatient"
+        //val foo = FhirContext.forR4().
         val fhirJsonParser: IParser = FhirContext.forR4().newJsonParser()
     }
     /**
@@ -80,14 +82,16 @@ class SamplePatients {
         val gender = if (patient.hasGenderElement()) patient.genderElement.valueAsString else ""
         val dob = if (patient.hasBirthDateElement()) patient.birthDateElement.valueAsString else ""
         val html: String = if (patient.hasText()) patient.text.div.valueAsString else ""
+        val phone: String = if (patient.hasTelecom()) patient.telecom[0].value else ""
 
-        return PatientItem(position.toString(), name, gender, dob, html)
+        return PatientItem(position.toString(), name, gender, dob, html, phone)
     }
 
     /**
      * The Patient's details for display purposes.
      */
-    data class PatientItem(val id: String, val name: String, val gender: String, val dob: String, val html: String) {
+    data class PatientItem(val id: String, val name: String, val gender: String, val dob: String,
+        val html: String, val phone: String) {
         override fun toString(): String = name
     }
 

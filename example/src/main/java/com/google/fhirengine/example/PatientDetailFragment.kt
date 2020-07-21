@@ -127,6 +127,9 @@ class PatientDetailFragment : Fragment() {
         patient?.let {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 rootView.findViewById<TextView>(R.id.samplepatient_detail).setText(Html.fromHtml(it.html, Html.FROM_HTML_MODE_LEGACY))
+                rootView.findViewById<TextView>(R.id.name).text = it.name
+                rootView.findViewById<TextView>(R.id.dob).text = it.dob
+                rootView.findViewById<TextView>(R.id.gender).text = it.phone
             }
             else {
                 rootView.findViewById<TextView>(R.id.samplepatient_detail).setText(Html.fromHtml("<h2>Title</h2><br><p>Description here</p>"))

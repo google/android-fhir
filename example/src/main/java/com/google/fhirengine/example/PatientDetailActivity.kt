@@ -116,7 +116,7 @@ class PatientDetailActivity : AppCompatActivity() {
      * Helper function to read patient asset file data as string.
      */
     private fun getJsonStrForPatientData(): String {
-        val patientJsonFilename = "sample_patients_bundle.json"
+        val patientJsonFilename = "new_sample_patients_bundle.json"
 
         return this.applicationContext.assets.open(patientJsonFilename).bufferedReader().use {
             it.readText()
