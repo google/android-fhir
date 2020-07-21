@@ -31,10 +31,10 @@ class SearchImpl constructor(val database: Database) : Search {
     inner class SearchSpecificationImpl<R : Resource>(
       val clazz: Class<R>
     ) : Search.SearchSpecifications {
-        var filterCriterion: FilterCriterion? = null
-        var sortCriterion: SortCriterion? = null
-        var limit: Int? = null
-        var skip: Int? = null
+        private var filterCriterion: FilterCriterion? = null
+        private var sortCriterion: SortCriterion? = null
+        private var limit: Int? = null
+        private var skip: Int? = null
 
         override fun filter(filterCriterion: FilterCriterion): Search.SearchSpecifications =
                 apply { this.filterCriterion = filterCriterion }
