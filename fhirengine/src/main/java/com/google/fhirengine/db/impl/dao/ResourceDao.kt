@@ -52,92 +52,13 @@ internal abstract class ResourceDao {
 
     @Transaction
     open fun insert(resource: Resource) {
-        val entity = ResourceEntity(
-                id = 0,
-                resourceType = resource.resourceType,
-                resourceId = resource.id,
-                serializedResource = iParser.encodeResourceToString(resource)
-        )
-        insertResource(entity)
-        val index = fhirIndexer.index(resource)
-        updateIndicesForResource(index, entity)
+        insertResource(resource)
     }
 
     @Transaction
     open fun insertAll(resources: List<Resource>) {
         resources.forEach { resource ->
-            val entity = ResourceEntity(
-                    id = 0,
-                    resourceType = resource.resourceType,
-                    resourceId = resource.id,
-                    serializedResource = iParser.encodeResourceToString(resource)
-            )
-            insertResource(entity)
-            val index = fhirIndexer.index(resource)
-            updateIndicesForResource(index, entity)
-        }
-    }
-
-    private fun updateIndicesForResource(index: ResourceIndices, resource: ResourceEntity) {
-        // TODO Move StringIndices to persistable types
-        //  https://github.com/jingtang10/fhir-engine/issues/31
-        //  we can either use room-autovalue integration or go w/ embedded data classes.
-        //  we may also want to merge them:
-        //  https://github.com/jingtang10/fhir-engine/issues/33
-        index.stringIndices.forEach {
-            insertStringIndex(
-                    StringIndexEntity(
-                            id = 0,
-                            resourceType = resource.resourceType,
-                            index = it,
-                            resourceId = resource.resourceId
-                    )
-            )
-        }
-        index.referenceIndices.forEach {
-            insertReferenceIndex(
-                    ReferenceIndexEntity(
-                            id = 0,
-                            resourceType = resource.resourceType,
-                            index = it,
-                            resourceId = resource.resourceId
-                    )
-            )
-        }
-        index.tokenIndices.forEach {
-            insertCodeIndex(TokenIndexEntity(
-                    id = 0,
-                    resourceType = resource.resourceType,
-                    index = it,
-                    resourceId = resource.resourceId))
-        }
-        index.quantityIndices.forEach {
-            insertQuantityIndex(QuantityIndexEntity(
-                    id = 0,
-                    resourceType = resource.resourceType,
-                    index = it,
-                    resourceId = resource.resourceId))
-        }
-        index.uriIndices.forEach {
-            insertUriIndex(UriIndexEntity(
-                    id = 0,
-                    resourceType = resource.resourceType,
-                    index = it,
-                    resourceId = resource.resourceId))
-        }
-        index.dateIndices.forEach {
-            insertDateIndex(DateIndexEntity(
-                    id = 0,
-                    resourceType = resource.resourceType,
-                    index = it,
-                    resourceId = resource.resourceId))
-        }
-        index.numberIndices.forEach {
-            insertNumberIndex(NumberIndexEntity(
-                    id = 0,
-                    resourceType = resource.resourceType,
-                    index = it,
-                    resourceId = resource.resourceId))
+            insertResource(resource)
         }
     }
 
@@ -231,4 +152,79 @@ internal abstract class ResourceDao {
 
     @RawQuery
     abstract fun getResources(query: SupportSQLiteQuery): List<String>
+
+    private fun insertResource(resource: Resource) {
+        val entity = ResourceEntity(
+                id = 0,
+                resourceType = resource.resourceType,
+                resourceId = resource.id,
+                serializedResource = iParser.encodeResourceToString(resource)
+        )
+        insertResource(entity)
+        val index = fhirIndexer.index(resource)
+        updateIndicesForResource(index, entity)
+    }
+
+    private fun updateIndicesForResource(index: ResourceIndices, resource: ResourceEntity) {
+        // TODO Move StringIndices to persistable types
+        //  https://github.com/jingtang10/fhir-engine/issues/31
+        //  we can either use room-autovalue integration or go w/ embedded data classes.
+        //  we may also want to merge them:
+        //  https://github.com/jingtang10/fhir-engine/issues/33
+        index.stringIndices.forEach {
+            insertStringIndex(
+                    StringIndexEntity(
+                            id = 0,
+                            resourceType = resource.resourceType,
+                            index = it,
+                            resourceId = resource.resourceId
+                    )
+            )
+        }
+        index.referenceIndices.forEach {
+            insertReferenceIndex(
+                    ReferenceIndexEntity(
+                            id = 0,
+                            resourceType = resource.resourceType,
+                            index = it,
+                            resourceId = resource.resourceId
+                    )
+            )
+        }
+        index.tokenIndices.forEach {
+            insertCodeIndex(TokenIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId))
+        }
+        index.quantityIndices.forEach {
+            insertQuantityIndex(QuantityIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId))
+        }
+        index.uriIndices.forEach {
+            insertUriIndex(UriIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId))
+        }
+        index.dateIndices.forEach {
+            insertDateIndex(DateIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId))
+        }
+        index.numberIndices.forEach {
+            insertNumberIndex(NumberIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId))
+        }
+    }
 }
