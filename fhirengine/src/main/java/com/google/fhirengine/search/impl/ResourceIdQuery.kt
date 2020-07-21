@@ -17,7 +17,7 @@
 package com.google.fhirengine.search.impl
 
 /** Query that returns a list of resource IDs. */
-data class ResourceIdQuery(val query: String, val args: List<Any?>) : Query() {
+data class ResourceIdQuery(val query: String, val args: List<Any>) : Query() {
     override fun getQueryString(): String = query
-    override fun getQueryArgs(): List<Any?> = args
+    override fun getQueryArgs(): List<Any> = args
 }

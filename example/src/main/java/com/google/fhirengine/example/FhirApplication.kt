@@ -27,8 +27,8 @@ import com.google.fhirengine.example.data.HapiFhirResourceDataSource
 import com.google.fhirengine.sync.FhirDataSource
 import com.google.fhirengine.sync.SyncConfiguration
 import com.google.fhirengine.sync.SyncData
-import org.hl7.fhir.r4.model.ResourceType
 import java.util.ArrayList
+import org.hl7.fhir.r4.model.ResourceType
 
 class FhirApplication : Application() {
 
