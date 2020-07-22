@@ -17,7 +17,7 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.google.fhirengine.example">
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:name=".FhirApplication"
         android:allowBackup="true"
@@ -26,16 +26,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".PatientListActivity"
-            android:label="@string/title_patient_list"
-            android:theme="@style/AppTheme.NoActionBar">
+        <activity android:name=".QuestionnaireActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".PatientListActivity"
+            android:label="@string/title_patient_list"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".PatientDetailActivity"
             android:label="@string/title_patient_detail"
@@ -47,5 +48,4 @@
         </activity>
         <activity android:name=".CqlLoadActivity"></activity>
     </application>
-
 </manifest>
