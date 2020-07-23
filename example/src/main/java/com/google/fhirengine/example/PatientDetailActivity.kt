@@ -22,6 +22,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.fhirengine.FhirEngine
 import com.google.fhirengine.example.data.SamplePatients
 
 /**
@@ -34,6 +35,7 @@ class PatientDetailActivity : AppCompatActivity() {
     var observations: List<SamplePatients.ObservationItem>? = null
     var patientsMap: Map<String, SamplePatients.PatientItem>? = null
     var observationsMap: Map<String, SamplePatients.ObservationItem>? = null
+    var fhirEngine: FhirEngine? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,18 +45,24 @@ class PatientDetailActivity : AppCompatActivity() {
         // Show the Up button in the action bar.
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        fhirEngine = FhirApplication.fhirEngine(this)
         val jsonStringPatients = getJsonStrForPatientData()
         val jsonStringObservations = getJsonStrForObservationData()
         val fhirObservations = SamplePatients().getObservationItems(getJsonStrForObservationData())
         // val jsonString = getJsonStrForPatientData()
         val patientListViewModel = ViewModelProvider(this, PatientListViewModelFactory(
-            jsonStringPatients, jsonStringObservations))
+            jsonStringPatients, jsonStringObservations, fhirEngine!!))
             .get(PatientListViewModel::class.java)
 
         patientsMap = patientListViewModel.getPatientsMap()
         observationsMap = patientListViewModel.getObservationsMap()
 
-        patientListViewModel.getPatients().observe(this,
+        // patientListViewModel.getPatients().observe(this,
+        //     Observer<List<SamplePatients.PatientItem>> {
+        //         patients = it
+        //         // adapter.submitList(it)
+        //     })
+        patientListViewModel.getSearchedPatients()?.observe(this,
             Observer<List<SamplePatients.PatientItem>> {
                 patients = it
                 // adapter.submitList(it)
@@ -116,7 +124,7 @@ class PatientDetailActivity : AppCompatActivity() {
      * Helper function to read patient asset file data as string.
      */
     private fun getJsonStrForPatientData(): String {
-        val patientJsonFilename = "new_sample_patients_bundle.json"
+        val patientJsonFilename = "sample_patients_bundle.json"
 
         return this.applicationContext.assets.open(patientJsonFilename).bufferedReader().use {
             it.readText()

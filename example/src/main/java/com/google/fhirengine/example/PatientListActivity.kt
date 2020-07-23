@@ -31,12 +31,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import com.google.fhirengine.FhirEngine
 import com.google.fhirengine.example.data.SamplePatients
 
 /**
  * An activity representing a list of Patients.
  */
 class PatientListActivity : AppCompatActivity() {
+    var fhirEngine: FhirEngine? = null
+    var patientListViewModel: PatientListViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,12 +55,14 @@ class PatientListActivity : AppCompatActivity() {
             startActivity(resLoadIntent)
         }
 
+        fhirEngine = FhirApplication.fhirEngine(this)
         // val jsonString = getJsonStrForPatientData()
         val jsonStringPatients = getJsonStrForPatientData()
         val jsonStringObservations = getJsonStrForObservationData()
 
-        val patientListViewModel = ViewModelProvider(this, PatientListViewModelFactory(
-            jsonStringPatients, jsonStringObservations))
+        patientListViewModel = ViewModelProvider(this, PatientListViewModelFactory(
+            jsonStringPatients, jsonStringObservations, fhirEngine!!
+        ))
             .get(PatientListViewModel::class.java)
         val recyclerView: RecyclerView = findViewById(R.id.samplepatient_list)
 
@@ -73,12 +78,16 @@ class PatientListActivity : AppCompatActivity() {
         val adapter = PatientItemRecyclerViewAdapter(onPatientItemClicked)
         recyclerView.adapter = adapter
 
-        patientListViewModel.getPatients().observe(this,
+        // patientListViewModel.getPatients().observe(this,
+        //     Observer<List<SamplePatients.PatientItem>> {
+        //     adapter.submitList(it)
+        // })
+        patientListViewModel!!.getSearchedPatients()?.observe(this,
             Observer<List<SamplePatients.PatientItem>> {
-            adapter.submitList(it)
-        })
+                adapter.submitList(it)
+            })
 
-        patientListViewModel.getObservations().observe(this,
+        patientListViewModel!!.getObservations().observe(this,
             Observer<List<SamplePatients.ObservationItem>> {
                 //adapter.submitList(it)
             })
@@ -131,15 +140,17 @@ class PatientListActivity : AppCompatActivity() {
     }
 
     private fun sync_resources(view: View) {
-        Snackbar.make(view, "For finding more about Fhir Engine: go/afya", Snackbar.LENGTH_LONG)
+        Snackbar.make(view, "Getting Patients List", Snackbar.LENGTH_LONG)
             .setAction("Action", null).show()
+        patientListViewModel!!.searchPatients()
+
     }
 
     /**
      * Helper function to read patient asset file data as string.
      */
     private fun getJsonStrForPatientData(): String {
-        val patientJsonFilename = "new_sample_patients_bundle.json"
+        val patientJsonFilename = "sample_patients_bundle.json"
 
         return assets.open(patientJsonFilename).bufferedReader().use {
             it.readText()

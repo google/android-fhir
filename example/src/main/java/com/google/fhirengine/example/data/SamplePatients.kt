@@ -65,6 +65,19 @@ class SamplePatients {
         return patients
     }
 
+    fun getPatientItems(fhirPatients: List<Patient>): List<PatientItem> {
+
+        // Create a list of PatientItems from fhirPatients. The display index is 1 based.
+        fhirPatients.take(MAX_RESOURCE_COUNT)?.mapIndexed { index, fhirPatient ->
+            createPatientItem(index + 1, fhirPatient as Patient)
+        }?.let { patients.addAll(it) }
+
+        // Create the PatientItems Map from PatientItem List.
+        idsPatients.putAll(patients.associateBy { it.id })
+
+        return patients
+    }
+
     fun getPatientsMap(): Map<String, PatientItem> {
         return idsPatients
     }

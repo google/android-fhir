@@ -44,22 +44,22 @@ class MainActivityViewModel(
             val syncData = listOf(
                 SyncData(
                     resourceType = ResourceType.Patient,
-                    //params = mapOf("address-country" to "United States")
                     params = mapOf("address-city" to "NAIROBI")
-                    // params = mapOf("identifier" to "d7db5ce4-8baf-41d7-81e8-3f706b3295e3",
                     //     "_revinclude" to "Observation:subject")
                 )
             )
+            // params = mapOf("identifier" to "d7db5ce4-8baf-41d7-81e8-3f706b3295e3",
+
             val syncConfig = SyncConfiguration(syncData = syncData)
             val result = fhirEngine.sync(syncConfig)
             Log.d("MainActivityViewModel", "sync result: $result")
 
-            // var results: List<Resource> = fhirEngine.search()
-            //     .of(Patient::class.java)
-            //     .filter(
-            //         string(Patient.ADDRESS_CITY, ParamPrefixEnum.EQUAL, "NAIROBI")
-            //     )
-            //     .run()
+            var results: List<Resource> = fhirEngine.search()
+                .of(Patient::class.java)
+                .filter(
+                    string(Patient.ADDRESS_CITY, ParamPrefixEnum.EQUAL, "NAIROBI")
+                )
+                .run()
             //
             // results = fhirEngine.search()
             //     .of(Observation::class.java)
@@ -69,7 +69,7 @@ class MainActivityViewModel(
             //     )
             //     .run()
             //
-            // Log.d("MainActivityViewModel", "search results: ${results.joinToString(" ")}")
+            Log.d("MainActivityViewModel", "search results: ${results.joinToString(" ")}")
         }
     }
 }
