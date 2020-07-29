@@ -17,7 +17,6 @@
 package com.google.fhirengine.impl
 
 import android.content.Context
-import android.util.Log
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
@@ -153,7 +152,6 @@ class FhirEngineImpl constructor(
     }
 
     private fun triggerInitialDownload(syncConfig: PeriodicSyncConfiguration) {
-        Log.d("flo", "triggerInitialDownload")
         val workerClass = syncConfig.periodicSyncWorker
         val downloadRequest = OneTimeWorkRequest.Builder(workerClass)
             .setConstraints(syncConfig.syncConstraints)

@@ -50,7 +50,7 @@ internal data class FhirServices(
             databaseName = name
         }
 
-        fun periodicSyncConfiguration(config: PeriodicSyncConfiguration) {
+        fun periodicSyncConfiguration(config: PeriodicSyncConfiguration) = apply {
             periodicSyncConfiguration = config
         }
 

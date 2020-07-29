@@ -27,8 +27,6 @@ class PeriodicSyncConfiguration(
   /**
    * Constraints that specify the requirements needed before the synchronisation is triggered.
    * E.g. network type (Wifi, 3G etc), the device should be charging etc.
-   *
-   *  Using WorkManager constraints here until we decide if we want to write our own
    */
   val syncConstraints: Constraints = Constraints.Builder().build(),
 
