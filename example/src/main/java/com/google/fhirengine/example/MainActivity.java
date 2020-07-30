@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
     evaluationResultTextView = findViewById(R.id.evaluate_result);
 
     fhirEngine = FhirApplication.fhirEngine(this);
-
     MainActivityViewModel viewModel =
         new ViewModelProvider(this, new MainActivityViewModelFactory(fhirEngine))
             .get(MainActivityViewModel.class);

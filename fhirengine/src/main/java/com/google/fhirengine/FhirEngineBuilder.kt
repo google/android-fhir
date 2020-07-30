@@ -18,17 +18,16 @@ package com.google.fhirengine
 
 import android.content.Context
 import com.google.fhirengine.sync.FhirDataSource
-import com.google.fhirengine.sync.SyncConfiguration
+import com.google.fhirengine.sync.PeriodicSyncConfiguration
 
 /**
  * The builder for [FhirEngine] instance
  */
 class FhirEngineBuilder constructor(
-  syncConfiguration: SyncConfiguration,
   dataSource: FhirDataSource,
   context: Context
 ) {
-    private val services = FhirServices.builder(syncConfiguration, dataSource, context)
+    private val services = FhirServices.builder(dataSource, context)
 
     /**
      * Sets the database file name for the FhirEngine to use.
@@ -42,6 +41,13 @@ class FhirEngineBuilder constructor(
      */
     internal fun inMemory() = apply {
         services.inMemory()
+    }
+
+    /**
+     * Configures the FhirEngine periodic sync.
+     */
+    fun periodicSyncConfiguration(config: PeriodicSyncConfiguration) = apply {
+        services.periodicSyncConfiguration(config)
     }
 
     /**

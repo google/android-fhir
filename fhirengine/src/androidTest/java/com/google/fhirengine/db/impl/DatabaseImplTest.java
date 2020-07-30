@@ -21,14 +21,11 @@ import static org.junit.Assert.assertThrows;
 
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.work.Constraints;
 import com.google.fhirengine.FhirServices;
 import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
 import com.google.fhirengine.resource.TestingUtils;
 import com.google.fhirengine.sync.FhirDataSource;
-import com.google.fhirengine.sync.SyncConfiguration;
-import com.google.fhirengine.sync.SyncData;
 import java.util.ArrayList;
 import java.util.List;
 import org.hl7.fhir.r4.model.Enumerations;
@@ -60,13 +57,10 @@ public class DatabaseImplTest {
     TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE);
   }
 
-  private List<SyncData> syncData = new ArrayList<>();
-  private SyncConfiguration configuration =
-      new SyncConfiguration(syncData, new Constraints.Builder().build(), false);
   private FhirDataSource dataSource = (path, $completion) -> null;
 
   private FhirServices services =
-      FhirServices.builder(configuration, dataSource, ApplicationProvider.getApplicationContext())
+      FhirServices.builder(dataSource, ApplicationProvider.getApplicationContext())
           .inMemory()
           .build();
   TestingUtils testingUtils = new TestingUtils(services.getParser());

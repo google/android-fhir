@@ -23,11 +23,15 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.fhirengine.FhirEngine
 import com.google.fhirengine.FhirEngineBuilder
 import com.google.fhirengine.example.api.HapiFhirService.Companion.create
+import com.google.fhirengine.example.data.FhirPeriodicSyncWorker
 import com.google.fhirengine.example.data.HapiFhirResourceDataSource
 import com.google.fhirengine.sync.FhirDataSource
+import com.google.fhirengine.sync.PeriodicSyncConfiguration
+import com.google.fhirengine.sync.RepeatInterval
 import com.google.fhirengine.sync.SyncConfiguration
 import com.google.fhirengine.sync.SyncData
 import java.util.ArrayList
+import java.util.concurrent.TimeUnit
 import org.hl7.fhir.r4.model.ResourceType
 
 class FhirApplication : Application() {
@@ -41,9 +45,20 @@ class FhirApplication : Application() {
         val params = mutableMapOf("address-country" to "United States")
         val syncData: MutableList<SyncData> = ArrayList()
         syncData.add(SyncData(ResourceType.Patient, params))
-        val configuration = SyncConfiguration(syncData, Constraints.Builder().build(), false)
+        val configuration = SyncConfiguration(syncData, false)
+        val periodicSyncConfiguration = PeriodicSyncConfiguration(
+            syncConfiguration = configuration,
+            syncConstraints = Constraints.Builder().build(),
+            periodicSyncWorker = FhirPeriodicSyncWorker::class.java,
+            repeat = RepeatInterval(
+                interval = 1,
+            timeUnit = TimeUnit.HOURS
+            )
+        )
         val dataSource: FhirDataSource = HapiFhirResourceDataSource(service)
-        return FhirEngineBuilder(configuration, dataSource, this).build()
+        return FhirEngineBuilder(dataSource, this)
+            .periodicSyncConfiguration(periodicSyncConfiguration)
+            .build()
     }
 
     companion object {

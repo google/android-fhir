@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.example
+package com.google.fhirengine.example.data
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import android.content.Context
+import androidx.work.WorkerParameters
 import com.google.fhirengine.FhirEngine
+import com.google.fhirengine.example.FhirApplication
+import com.google.fhirengine.sync.PeriodicSyncWorker
 
-class MainActivityViewModel(
-  private val fhirEngine: FhirEngine
-) : ViewModel()
+class FhirPeriodicSyncWorker(
+  appContext: Context,
+  workerParams: WorkerParameters
+) : PeriodicSyncWorker(appContext, workerParams) {
 
-class MainActivityViewModelFactory(
-  private val fhirEngine: FhirEngine
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {
-            return MainActivityViewModel(fhirEngine) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
+    override fun getFhirEngine(): FhirEngine {
+        return FhirApplication.fhirEngine(applicationContext)
     }
 }
