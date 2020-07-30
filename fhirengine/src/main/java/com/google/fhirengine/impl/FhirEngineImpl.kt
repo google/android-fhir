@@ -31,7 +31,7 @@ import com.google.fhirengine.sync.FhirSynchronizer
 import com.google.fhirengine.sync.PeriodicSyncConfiguration
 import com.google.fhirengine.sync.Result
 import com.google.fhirengine.sync.SyncConfiguration
-import com.google.fhirengine.sync.SyncWorkers
+import com.google.fhirengine.sync.SyncWorkType
 import java.util.EnumSet
 import org.cqframework.cql.elm.execution.VersionedIdentifier
 import org.hl7.fhir.r4.model.Resource
@@ -133,32 +133,31 @@ class FhirEngineImpl constructor(
     }
 
     private fun setupNextDownload(syncConfig: PeriodicSyncConfiguration) {
-        val workerClass = syncConfig.periodicSyncWorker
-        val downloadRequest = OneTimeWorkRequest.Builder(workerClass)
-            .setConstraints(syncConfig.syncConstraints)
-            .setInitialDelay(
-                syncConfig.repeatInterval,
-                syncConfig.repeatIntervalTimeUnit
-            )
-            .build()
-
-        WorkManager.getInstance(context).enqueueUniqueWork(
-            SyncWorkers.DOWNLOAD.workerName,
-            // If there is existing pending (uncompleted) work with the same unique name, do nothing.
-            // Otherwise, insert the newly-specified work.
-            ExistingWorkPolicy.KEEP,
-            downloadRequest
-        )
+        setupDownload(syncConfig = syncConfig, withInitialDelay = true)
     }
 
     private fun triggerInitialDownload(syncConfig: PeriodicSyncConfiguration) {
+        setupDownload(syncConfig = syncConfig, withInitialDelay = false)
+    }
+
+    private fun setupDownload(syncConfig: PeriodicSyncConfiguration, withInitialDelay: Boolean) {
         val workerClass = syncConfig.periodicSyncWorker
-        val downloadRequest = OneTimeWorkRequest.Builder(workerClass)
-            .setConstraints(syncConfig.syncConstraints)
-            .build()
+        val downloadRequest = if (withInitialDelay) {
+            OneTimeWorkRequest.Builder(workerClass)
+                .setConstraints(syncConfig.syncConstraints)
+                .setInitialDelay(
+                    syncConfig.repeat.interval,
+                    syncConfig.repeat.timeUnit
+                )
+                .build()
+        } else {
+            OneTimeWorkRequest.Builder(workerClass)
+                .setConstraints(syncConfig.syncConstraints)
+                .build()
+        }
 
         WorkManager.getInstance(context).enqueueUniqueWork(
-            SyncWorkers.DOWNLOAD.workerName,
+            SyncWorkType.DOWNLOAD.workerName,
             ExistingWorkPolicy.KEEP,
             downloadRequest
         )

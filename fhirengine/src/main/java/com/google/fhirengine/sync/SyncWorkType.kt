@@ -19,7 +19,7 @@ package com.google.fhirengine.sync
 /**
  * Defines different types of synchronisation workers: download and upload
  */
-internal enum class SyncWorkers(val workerName: String) {
+internal enum class SyncWorkType(val workerName: String) {
     DOWNLOAD("download"),
     UPLOAD("upload")
 }

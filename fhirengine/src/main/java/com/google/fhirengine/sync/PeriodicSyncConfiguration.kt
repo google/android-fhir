@@ -38,10 +38,17 @@ class PeriodicSyncConfiguration(
   /**
    * The interval at which the sync should be triggered in
    */
-  val repeatInterval: Long,
+  val repeat: RepeatInterval
+)
+
+data class RepeatInterval(
+  /**
+ * The interval at which the sync should be triggered in
+ */
+val interval: Long,
 
   /**
-   * The time unit for the repeat interval
-   */
-  val repeatIntervalTimeUnit: TimeUnit
+ * The time unit for the repeat interval
+ */
+val timeUnit: TimeUnit
 )

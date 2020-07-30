@@ -23,7 +23,7 @@ import com.google.fhirengine.FhirEngine
 import com.google.fhirengine.sync.Result.Success
 
 /**
- * Implement this class to support periodic work.
+ * A WorkManager Worker that handles periodic sync.
  */
 abstract class PeriodicSyncWorker(
   appContext: Context,
