@@ -24,18 +24,19 @@ import androidx.recyclerview.widget.ListAdapter
 /**
  * UI Controller helper class to display list of observations.
  */
-class ObservationItemRecyclerViewAdapter() : ListAdapter<PatientListViewModel.ObservationItem, ObservationItemViewHolder>(ObservationItemDiffCallback
-    ()) {
+class ObservationItemRecyclerViewAdapter() : ListAdapter<PatientListViewModel.ObservationItem,
+    ObservationItemViewHolder>(ObservationItemDiffCallback()) {
 
-    class ObservationItemDiffCallback : DiffUtil.ItemCallback<PatientListViewModel.ObservationItem>() {
+    class ObservationItemDiffCallback :
+        DiffUtil.ItemCallback<PatientListViewModel.ObservationItem>() {
         override fun areItemsTheSame(
-            oldItem: PatientListViewModel.ObservationItem,
-            newItem: PatientListViewModel.ObservationItem
+          oldItem: PatientListViewModel.ObservationItem,
+          newItem: PatientListViewModel.ObservationItem
         ): Boolean = oldItem.id == newItem.id
 
         override fun areContentsTheSame(
-            oldItem: PatientListViewModel.ObservationItem,
-            newItem: PatientListViewModel.ObservationItem
+          oldItem: PatientListViewModel.ObservationItem,
+          newItem: PatientListViewModel.ObservationItem
         ): Boolean = oldItem.id == newItem.id
     }
 

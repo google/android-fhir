@@ -20,9 +20,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import com.google.fhirengine.FhirEngine
 
 /**
  * An activity representing a single Patient detail screen.
@@ -51,7 +48,6 @@ class PatientDetailActivity : AppCompatActivity() {
                     .add(R.id.patient_detail_container, fragment)
                     .commit()
         }
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem) =

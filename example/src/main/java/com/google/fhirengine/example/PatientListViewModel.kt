@@ -100,22 +100,33 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     /**
      * The Patient's details for display purposes.
      */
-    data class PatientItem(val id: String, val name: String, val gender: String, val dob: String,
-        val html: String, val phone: String) {
+    data class PatientItem(
+      val id: String,
+      val name: String,
+      val gender: String,
+      val dob: String,
+      val html: String,
+      val phone: String
+    ) {
         override fun toString(): String = name
     }
 
     /**
      * The Observation's details for display purposes.
      */
-    data class ObservationItem(val id: String, val code: String, val effective: String, val value: String) {
+    data class ObservationItem(
+      val id: String,
+      val code: String,
+      val effective: String,
+      val value: String
+    ) {
         override fun toString(): String = code
     }
 }
 
 class PatientListViewModelFactory(
-    private val application: Application,
-    private val fhirEngine: FhirEngine
+  private val application: Application,
+  private val fhirEngine: FhirEngine
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PatientListViewModel::class.java)) {

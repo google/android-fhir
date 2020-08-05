@@ -77,7 +77,8 @@ class SamplePatients {
     /**
      * Creates PatientItem objects with displayable values from the Fhir Patient objects.
      */
-    private fun createPatientItem(position: Int, patient: Patient): PatientListViewModel.PatientItem {
+    private fun createPatientItem(position: Int, patient: Patient):
+        PatientListViewModel.PatientItem {
         val name = patient.name[0].nameAsSingleString
 
         // Show nothing if no values available for gender and date of birth.
@@ -113,13 +114,16 @@ class SamplePatients {
     /**
      * Creates ObservationItem objects with displayable values from the Fhir Observation objects.
      */
-    private fun createObservationItem(position: Int, observation: Observation): PatientListViewModel.ObservationItem {
-        //val observation: Observation = getObservationDetails(position)
-        val observationCode  = observation.code.text
+    private fun createObservationItem(position: Int, observation: Observation):
+        PatientListViewModel.ObservationItem {
+        // val observation: Observation = getObservationDetails(position)
+        val observationCode = observation.code.text
 
         // Show nothing if no values available for gender and date of birth.
-        val dateTimeStr = if (observation.hasEffectiveDateTimeType()) observation.effectiveDateTimeType.asStringValue() else "No effective DateTime"
-        val value = if (observation.hasValueQuantity()) observation.valueQuantity.value.toString() else "No ValueQuantity"
+        val dateTimeStr = if (observation.hasEffectiveDateTimeType())
+            observation.effectiveDateTimeType.asStringValue() else "No effective DateTime"
+        val value = if (observation.hasValueQuantity())
+            observation.valueQuantity.value.toString() else "No ValueQuantity"
         val valueUnit = if (observation.hasValueQuantity()) observation.valueQuantity.unit else ""
         val valueStr = "$value $valueUnit"
 

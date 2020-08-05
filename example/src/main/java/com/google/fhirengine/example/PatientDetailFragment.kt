@@ -62,7 +62,7 @@ class PatientDetailFragment : Fragment() {
         viewModel.getSearchedPatients()?.observe(viewLifecycleOwner,
             Observer<List<PatientListViewModel.PatientItem>> {
                 patients = it
-                //adapter.submitList(it)
+                // adapter.submitList(it)
             }
         )
         viewModel.getObservations().observe(viewLifecycleOwner,
@@ -74,20 +74,21 @@ class PatientDetailFragment : Fragment() {
         arguments?.let {
             if (it.containsKey(ARG_ITEM_ID)) {
                 patient = viewModel.getPatientItem(it.getString(ARG_ITEM_ID))
-                activity?.findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout)?.title = patient
-                    ?.name
+                activity?.findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout)?.title =
+                    patient?.name
             }
         }
 
         patient?.let {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                rootView.findViewById<TextView>(R.id.patient_detail).setText(Html.fromHtml(it.html, Html.FROM_HTML_MODE_LEGACY))
+                rootView.findViewById<TextView>(R.id.patient_detail).setText(Html.fromHtml(it.html,
+                    Html.FROM_HTML_MODE_LEGACY))
                 rootView.findViewById<TextView>(R.id.name).text = it.name
                 rootView.findViewById<TextView>(R.id.dob).text = it.dob
                 rootView.findViewById<TextView>(R.id.gender).text = it.phone
-            }
-            else {
-                rootView.findViewById<TextView>(R.id.patient_detail).setText(Html.fromHtml("<h2>Title</h2><br><p>Description here</p>"))
+            } else {
+                rootView.findViewById<TextView>(R.id.patient_detail).setText(Html.fromHtml(
+                    "<h2>Title</h2><br><p>Description here</p>"))
             }
         }
 

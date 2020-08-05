@@ -84,7 +84,7 @@ class PatientListActivity : AppCompatActivity() {
 
         patientListViewModel!!.getObservations().observe(this,
             Observer<List<PatientListViewModel.ObservationItem>> {
-                //adapter.submitList(it)
+                // adapter.submitList(it)
             })
     }
 
@@ -138,7 +138,6 @@ class PatientListActivity : AppCompatActivity() {
         Snackbar.make(view, "Getting Patients List", Snackbar.LENGTH_LONG)
             .setAction("Action", null).show()
         patientListViewModel!!.searchPatients()
-
     }
 
     /**
@@ -162,5 +161,4 @@ class PatientListActivity : AppCompatActivity() {
             it.readText()
         }
     }
-
 }

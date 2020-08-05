@@ -26,6 +26,8 @@ class ObservationItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
     )
 
     fun bindTo(observationItem: PatientListViewModel.ObservationItem) {
-        this.observationTextView.text = "${observationItem.code}: ${observationItem.value}\nEffective: ${observationItem.effective}"
+        this.observationTextView.text =
+            "${observationItem.code}: ${observationItem.value}\n" +
+                "Effective: ${observationItem.effective}"
     }
 }
