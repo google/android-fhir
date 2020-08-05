@@ -22,32 +22,31 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
 /**
- * UI Controller helper class to monitor Patient viewmodel and display list of patients.
+ * UI Controller helper class to display list of observations.
  */
-class PatientItemRecyclerViewAdapter(
-  private val onItemClicked: (PatientListViewModel.PatientItem) -> Unit
-) : ListAdapter<PatientListViewModel.PatientItem, PatientItemViewHolder>(PatientItemDiffCallback()) {
+class ObservationItemRecyclerViewAdapter() : ListAdapter<PatientListViewModel.ObservationItem, ObservationItemViewHolder>(ObservationItemDiffCallback
+    ()) {
 
-    class PatientItemDiffCallback : DiffUtil.ItemCallback<PatientListViewModel.PatientItem>() {
+    class ObservationItemDiffCallback : DiffUtil.ItemCallback<PatientListViewModel.ObservationItem>() {
         override fun areItemsTheSame(
-          oldItem: PatientListViewModel.PatientItem,
-          newItem: PatientListViewModel.PatientItem
+            oldItem: PatientListViewModel.ObservationItem,
+            newItem: PatientListViewModel.ObservationItem
         ): Boolean = oldItem.id == newItem.id
 
         override fun areContentsTheSame(
-          oldItem: PatientListViewModel.PatientItem,
-          newItem: PatientListViewModel.PatientItem
+            oldItem: PatientListViewModel.ObservationItem,
+            newItem: PatientListViewModel.ObservationItem
         ): Boolean = oldItem.id == newItem.id
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientItemViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ObservationItemViewHolder {
         val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.patient_list_item, parent, false)
-        return PatientItemViewHolder(view)
+            .inflate(R.layout.observation_list_item, parent, false)
+        return ObservationItemViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: PatientItemViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ObservationItemViewHolder, position: Int) {
         val item = currentList[position]
-        holder.bindTo(item, onItemClicked)
+        holder.bindTo(item)
     }
 }

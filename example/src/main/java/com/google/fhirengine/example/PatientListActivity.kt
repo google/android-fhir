@@ -32,7 +32,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.fhirengine.FhirEngine
-import com.google.fhirengine.example.data.SamplePatients
 
 /**
  * An activity representing a list of Patients.
@@ -51,7 +50,7 @@ class PatientListActivity : AppCompatActivity() {
 
         // Launch the old Fhir and CQL resources loading screen.
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
-            val resLoadIntent = Intent(baseContext, MainActivity::class.java)
+            val resLoadIntent = Intent(baseContext, CqlLoadActivity::class.java)
             startActivity(resLoadIntent)
         }
 
@@ -61,13 +60,13 @@ class PatientListActivity : AppCompatActivity() {
         val jsonStringObservations = getJsonStrForObservationData()
 
         patientListViewModel = ViewModelProvider(this, PatientListViewModelFactory(
-            jsonStringPatients, jsonStringObservations, fhirEngine!!
+            this.application, fhirEngine!!
         ))
             .get(PatientListViewModel::class.java)
-        val recyclerView: RecyclerView = findViewById(R.id.samplepatient_list)
+        val recyclerView: RecyclerView = findViewById(R.id.patient_list)
 
         // Click handler to help display the details about the patients from the list.
-        val onPatientItemClicked: (SamplePatients.PatientItem) -> Unit = { patientItem ->
+        val onPatientItemClicked: (PatientListViewModel.PatientItem) -> Unit = { patientItem ->
             val intent = Intent(this.applicationContext,
                 PatientDetailActivity::class.java).apply {
                 putExtra(PatientDetailFragment.ARG_ITEM_ID, patientItem.id)
@@ -78,17 +77,13 @@ class PatientListActivity : AppCompatActivity() {
         val adapter = PatientItemRecyclerViewAdapter(onPatientItemClicked)
         recyclerView.adapter = adapter
 
-        // patientListViewModel.getPatients().observe(this,
-        //     Observer<List<SamplePatients.PatientItem>> {
-        //     adapter.submitList(it)
-        // })
         patientListViewModel!!.getSearchedPatients()?.observe(this,
-            Observer<List<SamplePatients.PatientItem>> {
+            Observer<List<PatientListViewModel.PatientItem>> {
                 adapter.submitList(it)
             })
 
         patientListViewModel!!.getObservations().observe(this,
-            Observer<List<SamplePatients.ObservationItem>> {
+            Observer<List<PatientListViewModel.ObservationItem>> {
                 //adapter.submitList(it)
             })
     }
@@ -130,7 +125,7 @@ class PatientListActivity : AppCompatActivity() {
     }
 
     private fun load_resources() {
-        val resLoadIntent = Intent(baseContext, MainActivity::class.java)
+        val resLoadIntent = Intent(baseContext, CqlLoadActivity::class.java)
         startActivity(resLoadIntent)
     }
 

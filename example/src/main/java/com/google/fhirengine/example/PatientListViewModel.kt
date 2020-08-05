@@ -16,90 +16,110 @@
 
 package com.google.fhirengine.example
 
+import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.fhirengine.FhirEngine
 import com.google.fhirengine.example.data.SamplePatients
 import com.google.fhirengine.search.filter.string
-import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.Resource
+
+private const val PATIENTS_JSON_FILENAME = "sample_patients_bundle.json"
+private const val OBSERVATIONS_JSON_FILENAME = "sample_observations_bundle.json"
 
 /**
  * The ViewModel helper class for PatientItemRecyclerViewAdapter, that is responsible for preparing
  * data for UI.
  */
-class PatientListViewModel(jsonStringPatients: String, jsonStringObservations: String, private val fhirEngine: FhirEngine) :
-    ViewModel() {
+class PatientListViewModel(application: Application, private val fhirEngine: FhirEngine) :
+    AndroidViewModel(application) {
 
-    init {
-        searchPatients()
-    }
+    // Make sample Fhir Patients and Observations available, in case needed for demo.
+    private val jsonStringPatients = getAssetFileAsString(PATIENTS_JSON_FILENAME)
+    private val jsonStringObservations = getAssetFileAsString(OBSERVATIONS_JSON_FILENAME)
 
     private val samplePatients = SamplePatients()
-    // private val patients: MutableLiveData<List<SamplePatients.PatientItem>> =
-    //    MutableLiveData(samplePatients.getPatientItems(jsonStringPatients))
-    private val observations: MutableLiveData<List<SamplePatients.ObservationItem>> =
-        MutableLiveData(samplePatients.getObservationItems(jsonStringObservations))
-    private val patientsMap: MutableLiveData<Map<String, SamplePatients.PatientItem>> =
-        MutableLiveData(samplePatients.getPatientsMap())
-    private val observationsMap: MutableLiveData<Map<String, SamplePatients.ObservationItem>> =
-        MutableLiveData(samplePatients.getObservationsMap())
-    private val patientsMap1: Map<String, SamplePatients.PatientItem> =
-        samplePatients.getPatientsMap()
-    private val observationsMap1: Map<String, SamplePatients.ObservationItem> =
-        samplePatients.getObservationsMap()
-    private var patientResults: List<Patient>? = null
-    private var searchedPatients: MutableLiveData<List<SamplePatients.PatientItem>>? = null
-    //    MutableLiveData(samplePatients.getPatientItems(jsonStringPatients))
 
-    // fun getPatients(): LiveData<List<SamplePatients.PatientItem>> {
-    //     return patients
-    // }
-    fun getSearchedPatients(): LiveData<List<SamplePatients.PatientItem>>? {
-        searchedPatients = MutableLiveData(samplePatients.getPatientItems(patientResults!!))
-        return searchedPatients
+    private val observations: List<ObservationItem> =
+        samplePatients.getObservationItems(jsonStringObservations)
+    private val liveObservations: MutableLiveData<List<ObservationItem>> =
+        MutableLiveData(observations)
+
+    private var patientResults: List<Patient>? = getSearchResults()
+    private var searchedPatients = samplePatients.getPatientItems(patientResults!!)
+    private var liveSearchedPatients: MutableLiveData<List<PatientItem>>? = null
+
+    fun getSearchedPatients(): LiveData<List<PatientItem>>? {
+        searchedPatients = samplePatients.getPatientItems(patientResults!!)
+        liveSearchedPatients = MutableLiveData(searchedPatients)
+        return liveSearchedPatients
     }
 
-
-    fun getObservations(): LiveData<List<SamplePatients.ObservationItem>> {
-        return observations
-    }
-    fun getPatientsMap(): Map<String, SamplePatients.PatientItem> {
-        return patientsMap1
+    fun getPatientItem(id: String?): PatientItem? {
+        return searchedPatients.associateBy { it.id }[id]
     }
 
-    fun getObservationsMap(): Map<String, SamplePatients.ObservationItem> {
-        return observationsMap1
+    fun getObservations(): LiveData<List<ObservationItem>> {
+        return liveObservations
+    }
+    fun getPatientsMap(): Map<String, PatientItem> {
+        return searchedPatients.associateBy { it.id }
     }
 
-    fun searchPatients () {
- //       viewModelScope.launch {
-            patientResults = fhirEngine.search()
+    fun getObservationsMap(): Map<String, ObservationItem> {
+        return observations.associateBy { it.id }
+    }
+
+    fun getSearchResults(): List<Patient> {
+            val searchResults: List<Patient> = fhirEngine.search()
                 .of(Patient::class.java)
                 .filter(
                     string(Patient.ADDRESS_CITY, ParamPrefixEnum.EQUAL, "NAIROBI")
                 )
                 .run()
-            Log.d("PatientListViewModel", "search results: ${patientResults!!.joinToString(" ")}")
-            //searchedPatients = MutableLiveData(samplePatients.getPatientItems(patientResults!!))
-//        }
+            Log.d("PatientListViewModel", "search results: ${searchResults.joinToString(" ")}")
+            return searchResults
+    }
+
+    fun searchPatients() {
+        patientResults = getSearchResults()
+    }
+
+    private fun getAssetFileAsString(filename: String): String {
+        return this.getApplication<Application>().applicationContext
+            .assets.open(filename).bufferedReader().use {
+                it.readText()
+            }
+    }
+
+    /**
+     * The Patient's details for display purposes.
+     */
+    data class PatientItem(val id: String, val name: String, val gender: String, val dob: String,
+        val html: String, val phone: String) {
+        override fun toString(): String = name
+    }
+
+    /**
+     * The Observation's details for display purposes.
+     */
+    data class ObservationItem(val id: String, val code: String, val effective: String, val value: String) {
+        override fun toString(): String = code
     }
 }
 
 class PatientListViewModelFactory(
-  private val jsonStringPatients: String,
-  private val jsonStringObservations: String,
+    private val application: Application,
     private val fhirEngine: FhirEngine
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PatientListViewModel::class.java)) {
-            return PatientListViewModel(jsonStringPatients, jsonStringObservations, fhirEngine) as T
+            return PatientListViewModel(application, fhirEngine) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

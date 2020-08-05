@@ -47,7 +47,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.google.fhirengine.example.PatientListActivity" />
         </activity>
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".CqlLoadActivity"></activity>
     </application>
 
 </manifest>

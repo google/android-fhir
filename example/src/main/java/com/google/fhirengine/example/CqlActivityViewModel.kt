@@ -26,12 +26,11 @@ import com.google.fhirengine.search.filter.string
 import com.google.fhirengine.sync.SyncConfiguration
 import com.google.fhirengine.sync.SyncData
 import kotlinx.coroutines.launch
-import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
-class MainActivityViewModel(
+class CqlActivityViewModel(
   private val fhirEngine: FhirEngine
 ) : ViewModel() {
 
@@ -43,43 +42,36 @@ class MainActivityViewModel(
         viewModelScope.launch {
             val syncData = listOf(
                 SyncData(
+                    // For the purpose of demo, sync patients that live in Nairobi.
                     resourceType = ResourceType.Patient,
+                    // add "_revinclude" to "Observation:subject" to return Observations for
+                    // the patients.
                     params = mapOf("address-city" to "NAIROBI")
-                    //     "_revinclude" to "Observation:subject")
                 )
             )
-            // params = mapOf("identifier" to "d7db5ce4-8baf-41d7-81e8-3f706b3295e3",
 
             val syncConfig = SyncConfiguration(syncData = syncData)
             val result = fhirEngine.sync(syncConfig)
-            Log.d("MainActivityViewModel", "sync result: $result")
+            Log.d("CqlActivityViewModel", "sync result: $result")
 
-            var results: List<Resource> = fhirEngine.search()
+            // a test search to check if we received any patients.
+            val searchResults: List<Resource> = fhirEngine.search()
                 .of(Patient::class.java)
                 .filter(
                     string(Patient.ADDRESS_CITY, ParamPrefixEnum.EQUAL, "NAIROBI")
                 )
                 .run()
-            //
-            // results = fhirEngine.search()
-            //     .of(Observation::class.java)
-            //     .filter(
-            //         string(Observation.SUBJECT, ParamPrefixEnum.EQUAL, "Patient/1393673")
-            //             .and(string(Observation.INCLUDE_SUBJECT.value, ParamPrefixEnum.EQUAL))
-            //     )
-            //     .run()
-            //
-            Log.d("MainActivityViewModel", "search results: ${results.joinToString(" ")}")
+            Log.d("CqlActivityViewModel", "search results: ${searchResults.joinToString(" ")}")
         }
     }
 }
 
-class MainActivityViewModelFactory(
+class CqlLoadActivityViewModelFactory(
   private val fhirEngine: FhirEngine
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {
-            return MainActivityViewModel(fhirEngine) as T
+        if (modelClass.isAssignableFrom(CqlActivityViewModel::class.java)) {
+            return CqlActivityViewModel(fhirEngine) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
