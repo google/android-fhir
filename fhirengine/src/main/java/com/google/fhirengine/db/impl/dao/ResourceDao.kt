@@ -24,7 +24,10 @@ import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.annotation.Transaction
+import com.google.fhirengine.Util.toTimeZoneString
+import com.google.fhirengine.db.InvalidLocalChangeException
 import com.google.fhirengine.db.impl.entities.DateIndexEntity
+import com.google.fhirengine.db.impl.entities.LocalChange
 import com.google.fhirengine.db.impl.entities.NumberIndexEntity
 import com.google.fhirengine.db.impl.entities.QuantityIndexEntity
 import com.google.fhirengine.db.impl.entities.ReferenceIndexEntity
@@ -34,6 +37,8 @@ import com.google.fhirengine.db.impl.entities.TokenIndexEntity
 import com.google.fhirengine.db.impl.entities.UriIndexEntity
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.index.ResourceIndices
+import com.google.fhirengine.sync.model.Update.Type
+import java.util.Date
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -85,6 +90,9 @@ internal abstract class ResourceDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertNumberIndex(numberIndexEntity: NumberIndexEntity)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract fun insertLocalChange(localChange: LocalChange)
 
     @Query("""
         DELETE FROM ResourceEntity
@@ -154,15 +162,54 @@ internal abstract class ResourceDao {
     abstract fun getResources(query: SupportSQLiteQuery): List<String>
 
     private fun insertResource(resource: Resource) {
-        val entity = ResourceEntity(
-                id = 0,
-                resourceType = resource.resourceType,
+        val localChanges = allLocalChanges(
                 resourceId = resource.id,
-                serializedResource = iParser.encodeResourceToString(resource)
-        )
-        insertResource(entity)
-        val index = fhirIndexer.index(resource)
-        updateIndicesForResource(index, entity)
+                resourceType = resource.resourceType.name)
+        val timestamp = Date().toTimeZoneString()
+        val resourceType = resource.resourceType
+        val resourceId = resource.id
+        val resourceString = iParser.encodeResourceToString(resource)
+
+        // There will be no prior LocalChange if it's the first time we're storing this resource.
+        if (localChanges.isEmpty()) {
+            val entity = ResourceEntity(
+                    id = 0,
+                    resourceType = resourceType,
+                    resourceId = resourceId,
+                    serializedResource = resourceString,
+                    lastUpdatedLocally = timestamp
+            )
+            insertResource(entity)
+            val index = fhirIndexer.index(resource)
+            updateIndicesForResource(index, entity)
+        } else {
+            val topChange = localChanges.last()
+
+            // Can't add another INSERT on top of an INSERT or UPDATE
+            if (topChange.type !in arrayOf(Type.INSERT, Type.UPDATE)) {
+                if (topChange.type.equals(Type.DELETE)) {
+                    // Update the last changed timestamp in the resource table
+                    updateLocalChangeTimestamp(
+                            resourceId = resourceId,
+                            resourceType = resourceType,
+                            ts = timestamp
+                    )
+                    // Insert this change in the local changes table
+                    insertLocalChange(
+                            LocalChange(
+                                    id = 0,
+                                    resourceType = resourceType,
+                                    resourceId = resourceId,
+                                    timestamp = timestamp,
+                                    type = Type.INSERT,
+                                    diff = resourceString
+                            )
+                    )
+                }
+            } else {
+                throw InvalidLocalChangeException("Can not add INSERT on top of $topChange.type")
+            }
+        }
     }
 
     private fun updateIndicesForResource(index: ResourceIndices, resource: ResourceEntity) {
@@ -227,4 +274,23 @@ internal abstract class ResourceDao {
                     resourceId = resource.resourceId))
         }
     }
+
+    @Query("""
+        SELECT *
+        FROM LocalChange
+        WHERE LocalChange.resourceId = (:resourceId)
+        AND LocalChange.resourceType  = (:resourceType)
+        ORDER BY LocalChange.timestamp ASC""")
+    abstract fun allLocalChanges(resourceId: String, resourceType: String): List<LocalChange>
+
+    @Query("""
+        UPDATE ResourceEntity
+        SET lastUpdatedLocally = :ts
+        WHERE resourceType = :resourceType
+        AND resourceId = :resourceId""")
+    abstract fun updateLocalChangeTimestamp(
+      resourceId: String,
+      resourceType: ResourceType,
+      ts: String
+    )
 }

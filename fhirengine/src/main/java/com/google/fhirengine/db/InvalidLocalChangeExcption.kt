@@ -14,20 +14,6 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.sync.model
+package com.google.fhirengine.db
 
-/**
- * Result of squashing local changes of a resource for sync with a remote server.
- */
-data class Update(val payload: String, val type: Type) {
-
-    enum class Type(val value: Int) {
-        INSERT(1), // create a new resource. payload is the entire resource json.
-        UPDATE(2), // patch. payload is the json patch.
-        DELETE(3); // delete. payload is empty string.
-
-        companion object {
-            fun from(input: Int): Type = values().first { it.value == input }
-        }
-    }
-}
+class InvalidLocalChangeException(message: String?) : Exception(message)
