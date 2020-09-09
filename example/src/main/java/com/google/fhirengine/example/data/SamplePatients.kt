@@ -32,7 +32,7 @@ private const val MAX_RESOURCE_COUNT = 20
  * PatientListViewModel.
  */
 class SamplePatients {
-    private val patients: MutableList<PatientListViewModel.PatientItem> = ArrayList()
+    private val patients: MutableList<PatientListViewModel.PatientItem> = mutableListOf()
     private val observations: MutableList<PatientListViewModel.ObservationItem> = ArrayList()
 
     // The resource bundle with Patient objects.
@@ -59,6 +59,7 @@ class SamplePatients {
 
     fun getPatientItems(fhirPatients: List<Patient>): List<PatientListViewModel.PatientItem> {
 
+        patients.clear()
         // Create a list of PatientItems from fhirPatients. The display index is 1 based.
         fhirPatients.take(MAX_RESOURCE_COUNT)?.mapIndexed { index, fhirPatient ->
             createPatientItem(index + 1, fhirPatient)
@@ -119,7 +120,7 @@ class SamplePatients {
         // val observation: Observation = getObservationDetails(position)
         val observationCode = observation.code.text
 
-        // Show nothing if no values available for gender and date of birth.
+        // Show nothing if no values available for datetime and value quantity.
         val dateTimeStr = if (observation.hasEffectiveDateTimeType())
             observation.effectiveDateTimeType.asStringValue() else "No effective DateTime"
         val value = if (observation.hasValueQuantity())

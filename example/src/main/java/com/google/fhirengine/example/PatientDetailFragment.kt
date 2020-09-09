@@ -35,10 +35,6 @@ import com.google.fhirengine.FhirEngine
  */
 class PatientDetailFragment : Fragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -50,49 +46,52 @@ class PatientDetailFragment : Fragment() {
         val adapter = ObservationItemRecyclerViewAdapter()
         recyclerView.adapter = adapter
 
-        var patients: List<PatientListViewModel.PatientItem>? = null
-        var observations: List<PatientListViewModel.ObservationItem>? = null
-        val fhirEngine: FhirEngine = FhirApplication.fhirEngine(activity!!.applicationContext)
+        val fhirEngine: FhirEngine = FhirApplication.fhirEngine(requireContext())
         var patient: PatientListViewModel.PatientItem? = null
 
         val viewModel: PatientListViewModel = ViewModelProvider(this, PatientListViewModelFactory(
-            this.activity!!.application, fhirEngine
+            this.requireActivity().application, fhirEngine
         ))
             .get(PatientListViewModel::class.java)
         viewModel.getSearchedPatients()?.observe(viewLifecycleOwner,
             Observer<List<PatientListViewModel.PatientItem>> {
-                patients = it
                 // adapter.submitList(it)
             }
         )
         viewModel.getObservations().observe(viewLifecycleOwner,
             Observer<List<PatientListViewModel.ObservationItem>> {
-                observations = it
                 adapter.submitList(it)
             })
 
         arguments?.let {
             if (it.containsKey(ARG_ITEM_ID)) {
-                patient = viewModel.getPatientItem(it.getString(ARG_ITEM_ID))
+                patient = it.getString(ARG_ITEM_ID)?.let { it1 -> viewModel.getPatientItem(it1) }
                 activity?.findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout)?.title =
                     patient?.name
             }
         }
 
-        patient?.let {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                rootView.findViewById<TextView>(R.id.patient_detail).setText(Html.fromHtml(it.html,
-                    Html.FROM_HTML_MODE_LEGACY))
-                rootView.findViewById<TextView>(R.id.name).text = it.name
-                rootView.findViewById<TextView>(R.id.dob).text = it.dob
-                rootView.findViewById<TextView>(R.id.gender).text = it.phone
-            } else {
-                rootView.findViewById<TextView>(R.id.patient_detail).setText(Html.fromHtml(
-                    "<h2>Title</h2><br><p>Description here</p>"))
-            }
-        }
+        setupPatientData(rootView, patient)
 
         return rootView
+    }
+
+    private fun setupPatientData(view: View, patient: PatientListViewModel.PatientItem?) {
+        if (patient != null) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                view.findViewById<TextView>(R.id.patient_detail).text = Html.fromHtml(
+                    patient.html,
+                    Html.FROM_HTML_MODE_LEGACY
+                )
+                view.findViewById<TextView>(R.id.name).text = patient.name
+                view.findViewById<TextView>(R.id.dob).text = patient.dob
+                view.findViewById<TextView>(R.id.gender).text = patient.phone
+            } else {
+                view.findViewById<TextView>(R.id.patient_detail).text = Html.fromHtml(
+                    "<h2>Title</h2><br><p>Description here</p>"
+                )
+            }
+        }
     }
 
     companion object {

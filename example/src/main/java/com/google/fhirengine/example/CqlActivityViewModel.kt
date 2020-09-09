@@ -53,15 +53,6 @@ class CqlActivityViewModel(
             val syncConfig = SyncConfiguration(syncData = syncData)
             val result = fhirEngine.sync(syncConfig)
             Log.d("CqlActivityViewModel", "sync result: $result")
-
-            // a test search to check if we received any patients.
-            val searchResults: List<Resource> = fhirEngine.search()
-                .of(Patient::class.java)
-                .filter(
-                    string(Patient.ADDRESS_CITY, ParamPrefixEnum.EQUAL, "NAIROBI")
-                )
-                .run()
-            Log.d("CqlActivityViewModel", "search results: ${searchResults.joinToString(" ")}")
         }
     }
 }

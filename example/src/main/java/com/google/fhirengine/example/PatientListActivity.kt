@@ -19,6 +19,7 @@ package com.google.fhirengine.example
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -37,11 +38,12 @@ import com.google.fhirengine.FhirEngine
  * An activity representing a list of Patients.
  */
 class PatientListActivity : AppCompatActivity() {
-    var fhirEngine: FhirEngine? = null
-    var patientListViewModel: PatientListViewModel? = null
+    private lateinit var fhirEngine: FhirEngine
+    private lateinit var patientListViewModel: PatientListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("PatientListActivity", "onCreate() called")
         setContentView(R.layout.activity_patient_list)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -55,37 +57,37 @@ class PatientListActivity : AppCompatActivity() {
         }
 
         fhirEngine = FhirApplication.fhirEngine(this)
-        // val jsonString = getJsonStrForPatientData()
         val jsonStringPatients = getJsonStrForPatientData()
         val jsonStringObservations = getJsonStrForObservationData()
 
         patientListViewModel = ViewModelProvider(this, PatientListViewModelFactory(
-            this.application, fhirEngine!!
+            this.application, fhirEngine
         ))
             .get(PatientListViewModel::class.java)
         val recyclerView: RecyclerView = findViewById(R.id.patient_list)
 
-        // Click handler to help display the details about the patients from the list.
-        val onPatientItemClicked: (PatientListViewModel.PatientItem) -> Unit = { patientItem ->
-            val intent = Intent(this.applicationContext,
-                PatientDetailActivity::class.java).apply {
-                putExtra(PatientDetailFragment.ARG_ITEM_ID, patientItem.id)
-            }
-            this.startActivity(intent)
-        }
-
-        val adapter = PatientItemRecyclerViewAdapter(onPatientItemClicked)
+        val adapter = PatientItemRecyclerViewAdapter(this::onPatientItemClicked)
         recyclerView.adapter = adapter
 
-        patientListViewModel!!.getSearchedPatients()?.observe(this,
+        patientListViewModel.getSearchedPatients().observe(this,
             Observer<List<PatientListViewModel.PatientItem>> {
+                Log.d("PatientListActivity", "Submitting ${it.count()} patient records")
                 adapter.submitList(it)
             })
 
-        patientListViewModel!!.getObservations().observe(this,
+        patientListViewModel.getObservations().observe(this,
             Observer<List<PatientListViewModel.ObservationItem>> {
                 // adapter.submitList(it)
             })
+    }
+
+    // Click handler to help display the details about the patients from the list.
+    private fun onPatientItemClicked(patientItem: PatientListViewModel.PatientItem): Unit {
+        val intent = Intent(this.applicationContext,
+            PatientDetailActivity::class.java).apply {
+            putExtra(PatientDetailFragment.ARG_ITEM_ID, patientItem.id)
+        }
+        this.startActivity(intent)
     }
 
     // To suppress the warning. Seems to be an issue with androidx library.
@@ -93,13 +95,12 @@ class PatientListActivity : AppCompatActivity() {
     // prefix (referenced groupId=androidx.appcompat with prefix androidx from groupId=fhir-engine"
     @SuppressLint("RestrictedApi")
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val inflator: MenuInflater = menuInflater
-        inflator.inflate(R.menu.list_options_menu, menu)
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.list_options_menu, menu)
         // To ensure that icons show up in the overflow options menu. Icons go missing without this.
         if (menu is MenuBuilder) {
             menu.setOptionalIconsVisible(true)
         }
-        // return super.onCreateOptionsMenu(menu)
         return true
     }
 
@@ -109,11 +110,11 @@ class PatientListActivity : AppCompatActivity() {
         // Handle item selection
         return when (item.itemId) {
             R.id.sync_resources -> {
-                sync_resources(view)
+                syncResources(view)
                 true
             }
             R.id.load_resource -> {
-                load_resources()
+                loadResources()
                 true
             }
             R.id.about -> {
@@ -124,7 +125,7 @@ class PatientListActivity : AppCompatActivity() {
         }
     }
 
-    private fun load_resources() {
+    private fun loadResources() {
         val resLoadIntent = Intent(baseContext, CqlLoadActivity::class.java)
         startActivity(resLoadIntent)
     }
@@ -134,10 +135,10 @@ class PatientListActivity : AppCompatActivity() {
             .setAction("Action", null).show()
     }
 
-    private fun sync_resources(view: View) {
+    private fun syncResources(view: View) {
         Snackbar.make(view, "Getting Patients List", Snackbar.LENGTH_LONG)
             .setAction("Action", null).show()
-        patientListViewModel!!.searchPatients()
+        patientListViewModel.searchPatients()
     }
 
     /**
