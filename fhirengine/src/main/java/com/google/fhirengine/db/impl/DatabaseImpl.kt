@@ -25,6 +25,7 @@ import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.resource.ResourceUtils
 import com.google.fhirengine.search.impl.Query
+import com.google.fhirengine.sync.model.Update
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -162,5 +163,171 @@ internal class DatabaseImpl(
 
     companion object {
         private const val DEFAULT_DATABASE_NAME = "ResourceDatabase"
+    }
+
+    /**
+     * Get a list of all updates
+     */
+    override fun getUpdates(): List<Update> {
+        val TEST_INSERT = "{\n" +
+                "  \"resourceType\": \"Patient\",\n" +
+                "  \"id\": \"animal\",\n" +
+                "  \"text\": {\n" +
+                "    \"status\": \"generated\",\n" +
+                "    \"div\": \"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\"></div>\"\n" +
+                "  },\n" +
+                "  \"extension\": [\n" +
+                "    {\n" +
+                "      \"url\": \"http://hl7.org/fhir/StructureDefinition/patient-animal\",\n" +
+                "      \"extension\": [\n" +
+                "        {\n" +
+                "          \"url\": \"species\",\n" +
+                "          \"valueCodeableConcept\": {\n" +
+                "            \"coding\": [\n" +
+                "              {\n" +
+                "                \"system\": \"http://hl7.org/fhir/animal-species\",\n" +
+                "                \"code\": \"canislf\",\n" +
+                "                \"display\": \"Dog\"\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"url\": \"breed\",\n" +
+                "          \"valueCodeableConcept\": {\n" +
+                "            \"coding\": [\n" +
+                "              {\n" +
+                "                \"system\": \"http://snomed.info/sct\",\n" +
+                "                \"code\": \"58108001\",\n" +
+                "                \"display\": \"Golden retriever\"\n" +
+                "              },\n" +
+                "              {\n" +
+                "                \"system\": \"http://example.org/fhir/CodeSystem/animal-breed\",\n" +
+                "                \"code\": \"gret\",\n" +
+                "                \"display\": \"Golden Retriever\"\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"url\": \"genderStatus\",\n" +
+                "          \"valueCodeableConcept\": {\n" +
+                "            \"coding\": [\n" +
+                "              {\n" +
+                "                \"system\": \"http://hl7.org/fhir/animal-genderstatus\",\n" +
+                "                \"code\": \"neutered\"\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"identifier\": [\n" +
+                "    {\n" +
+                "      \"type\": {\n" +
+                "        \"text\": \"Dog Tag\"\n" +
+                "      },\n" +
+                "      \"system\": \"http://www.maroondah.vic.gov.au/AnimalRegFees.aspx\",\n" +
+                "      \"value\": \"1234123\",\n" +
+                "      \"period\": {\n" +
+                "        \"start\": \"2010-05-31\"\n" +
+                "      },\n" +
+                "      \"assigner\": {\n" +
+                "        \"display\": \"Maroondah City Council\"\n" +
+                "      }\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"active\": true,\n" +
+                "  \"name\": [\n" +
+                "    {\n" +
+                "      \"use\": \"usual\",\n" +
+                "      \"given\": [\n" +
+                "        \"Kenzi\"\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"gender\": \"female\",\n" +
+                "  \"birthDate\": \"2010-03-23\",\n" +
+                "  \"contact\": [\n" +
+                "    {\n" +
+                "      \"relationship\": [\n" +
+                "        {\n" +
+                "          \"coding\": [\n" +
+                "            {\n" +
+                "              \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0131\",\n" +
+                "              \"code\": \"C\"\n" +
+                "            }\n" +
+                "          ]\n" +
+                "        }\n" +
+                "      ],\n" +
+                "      \"name\": {\n" +
+                "        \"family\": \"Chalmers\",\n" +
+                "        \"given\": [\n" +
+                "          \"Peter\",\n" +
+                "          \"James\"\n" +
+                "        ]\n" +
+                "      },\n" +
+                "      \"telecom\": [\n" +
+                "        {\n" +
+                "          \"system\": \"phone\",\n" +
+                "          \"value\": \"(03) 5555 6473\",\n" +
+                "          \"use\": \"work\"\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"managingOrganization\": {\n" +
+                "    \"display\": \"Pete's Vetinary Services\"\n" +
+                "  }\n" +
+                "}"
+        val TEST_UPDATE = "[\n" +
+                " {\n" +
+                "  \"op\": \"replace\",\n" +
+                "  \"path\": \"/contact/0/name/family\",\n" +
+                "  \"value\": \"Rogers\"\n" +
+                " },\n" +
+                " {\n" +
+                "  \"op\": \"replace\",\n" +
+                "  \"path\": \"/name/0/given/0\",\n" +
+                "  \"value\": \"Binny\"\n" +
+                " },\n" +
+                " {\n" +
+                "  \"op\": \"replace\",\n" +
+                "  \"path\": \"/extension/0/extension/1/valueCodeableConcept/coding/1/display\",\n" +
+                "  \"value\": \"Labrador Retriever\"\n" +
+                " },\n" +
+                " {\n" +
+                "  \"op\": \"replace\",\n" +
+                "  \"path\": \"/extension/0/extension/1/valueCodeableConcept/coding/1/code\",\n" +
+                "  \"value\": \"lbret\"\n" +
+                " },\n" +
+                " {\n" +
+                "  \"op\": \"replace\",\n" +
+                "  \"path\": \"/extension/0/extension/1/valueCodeableConcept/coding/0/display\",\n" +
+                "  \"value\": \"Labrador retriever\"\n" +
+                " },\n" +
+                " {\n" +
+                "  \"op\": \"replace\",\n" +
+                "  \"path\": \"/extension/0/extension/1/valueCodeableConcept/coding/0/code\",\n" +
+                "  \"value\": \"62137007\"\n" +
+                " }\n" +
+                "]"
+        return listOf(
+                Update("Patient", "animal", TEST_INSERT, Update.Type.INSERT),
+                Update("Patient", "animal", TEST_UPDATE, Update.Type.UPDATE),
+                Update("Patient", "animal", "", Update.Type.DELETE)
+        )
+    }
+
+    /**
+     * Delete local changes for resource with given id and type. Call this after
+     * a successful sync with server to apply the squashed change locally and
+     * remove all local changes.
+     *
+     * This effectively marks a resource as synced with the remote server.
+     */
+    override fun deleteLocalChanges(resourceId: String, resourceType: String) {
+        TODO("Not yet implemented")
     }
 }

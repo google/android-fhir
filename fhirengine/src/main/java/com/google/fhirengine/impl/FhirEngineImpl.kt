@@ -32,7 +32,6 @@ import com.google.fhirengine.sync.PeriodicSyncConfiguration
 import com.google.fhirengine.sync.Result
 import com.google.fhirengine.sync.SyncConfiguration
 import com.google.fhirengine.sync.SyncWorkType
-import com.google.fhirengine.sync.model.Update
 import java.util.EnumSet
 import org.cqframework.cql.elm.execution.VersionedIdentifier
 import org.hl7.fhir.r4.model.Resource
@@ -162,20 +161,5 @@ class FhirEngineImpl constructor(
             ExistingWorkPolicy.KEEP,
             downloadRequest
         )
-    }
-
-    /**
-     * Get a list of all updates
-     */
-    override fun getAllLocalUpdates(): List<Update> {
-        TODO("Not yet implemented")
-    }
-
-    /**
-     * Delete local changes for resource with given id and type. Call this after a successful sync
-     * with server to effectively mark a resource as synced.
-     */
-    override fun deleteLocalChanges(resourceId: String, resourceType: String) {
-        TODO("Not yet implemented")
     }
 }

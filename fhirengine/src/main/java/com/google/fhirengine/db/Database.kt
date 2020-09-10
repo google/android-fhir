@@ -18,6 +18,7 @@ package com.google.fhirengine.db
 
 import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
 import com.google.fhirengine.search.impl.Query
+import com.google.fhirengine.sync.model.Update
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -139,4 +140,20 @@ interface Database {
     ): List<R>
 
     fun <R : Resource> search(query: Query): List<R>
+
+    // the sync api will use to upload changes to the server
+    // set the state column in the local change table to locked?
+    /**
+     * Get a list of all updates
+     */
+    fun getUpdates(): List<Update>
+
+    /**
+     * Delete local changes for resource with given id and type. Call this after
+     * a successful sync with server to apply the squashed change locally and
+     * remove all local changes.
+     *
+     * This effectively marks a resource as synced with the remote server.
+     */
+    fun deleteLocalChanges(resourceId: String, resourceType: String)
 }
