@@ -40,3 +40,5 @@ addlicense -c "Google LLC" -l apache .
 ## Disclaimer
 
 This is not an officially supported Google product.
+
+This product is not intended to be a medical device.
