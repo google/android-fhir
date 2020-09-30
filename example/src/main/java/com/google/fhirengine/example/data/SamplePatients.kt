@@ -68,13 +68,6 @@ class SamplePatients {
         return patients
     }
 
-    // fun getPatientsMap(): Map<String, PatientListViewModel.PatientItem> {
-    //     return idsPatients
-    // }
-    // fun getObservationsMap(): Map<String, PatientListViewModel.ObservationItem> {
-    //     return observationsMap
-    // }
-
     /**
      * Creates PatientItem objects with displayable values from the Fhir Patient objects.
      */

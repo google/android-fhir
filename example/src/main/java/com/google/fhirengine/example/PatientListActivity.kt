@@ -57,13 +57,10 @@ class PatientListActivity : AppCompatActivity() {
         }
 
         fhirEngine = FhirApplication.fhirEngine(this)
-        val jsonStringPatients = getJsonStrForPatientData()
-        val jsonStringObservations = getJsonStrForObservationData()
 
         patientListViewModel = ViewModelProvider(this, PatientListViewModelFactory(
             this.application, fhirEngine
-        ))
-            .get(PatientListViewModel::class.java)
+        )).get(PatientListViewModel::class.java)
         val recyclerView: RecyclerView = findViewById(R.id.patient_list)
 
         val adapter = PatientItemRecyclerViewAdapter(this::onPatientItemClicked)

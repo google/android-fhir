@@ -39,22 +39,19 @@ private const val OBSERVATIONS_JSON_FILENAME = "sample_observations_bundle.json"
 class PatientListViewModel(application: Application, private val fhirEngine: FhirEngine) :
     AndroidViewModel(application) {
 
-    init {
-        Log.d("PatientListViewModel", "init")
-    }
     // Make sample Fhir Patients and Observations available, in case needed for demo.
     private val jsonStringPatients = getAssetFileAsString(PATIENTS_JSON_FILENAME)
     private val jsonStringObservations = getAssetFileAsString(OBSERVATIONS_JSON_FILENAME)
 
     private val samplePatients = SamplePatients()
 
-    private val observations: List<ObservationItem> =
-        samplePatients.getObservationItems(jsonStringObservations)
-    private val liveObservations = MutableLiveData(observations)
+    private val observations = samplePatients.getObservationItems(jsonStringObservations)
+    private val liveObservations: MutableLiveData<List<ObservationItem>> =
+        MutableLiveData(observations)
 
     private var patientResults: List<Patient> = getSearchResults()
     private var searchedPatients = samplePatients.getPatientItems(patientResults)
-    private var liveSearchedPatients: MutableLiveData<List<PatientItem>> = MutableLiveData()
+    private val liveSearchedPatients: MutableLiveData<List<PatientItem>> = MutableLiveData()
 
     fun getSearchedPatients(): LiveData<List<PatientItem>> {
         searchedPatients = samplePatients.getPatientItems(patientResults)
@@ -83,9 +80,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     private fun getSearchResults(): List<Patient> {
         val searchResults: List<Patient> = fhirEngine.search()
             .of(Patient::class.java)
-            .filter(
-                string(Patient.ADDRESS_CITY, ParamPrefixEnum.EQUAL, "NAIROBI")
-            )
+            .filter(string(Patient.ADDRESS_CITY, ParamPrefixEnum.EQUAL, "NAIROBI"))
             .run()
         Log.d("PatientListViewModel", "${searchResults.count()} search results: " +
             "${searchResults.joinToString(" ")}")

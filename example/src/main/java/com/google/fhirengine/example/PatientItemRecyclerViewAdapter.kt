@@ -26,9 +26,9 @@ import androidx.recyclerview.widget.ListAdapter
  */
 class PatientItemRecyclerViewAdapter(
   private val onItemClicked: (PatientListViewModel.PatientItem) -> Unit
-) :
-    ListAdapter<PatientListViewModel.PatientItem, PatientItemViewHolder>
-        (PatientItemDiffCallback()) {
+) : ListAdapter<PatientListViewModel.PatientItem, PatientItemViewHolder>(
+    PatientItemDiffCallback()
+) {
 
     class PatientItemDiffCallback : DiffUtil.ItemCallback<PatientListViewModel.PatientItem>() {
         override fun areItemsTheSame(

@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.ListAdapter
 /**
  * UI Controller helper class to display list of observations.
  */
-class ObservationItemRecyclerViewAdapter() :
+class ObservationItemRecyclerViewAdapter :
 ListAdapter<PatientListViewModel.ObservationItem, ObservationItemViewHolder>(
     ObservationItemDiffCallback()
 ) {

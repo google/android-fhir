@@ -43,8 +43,6 @@ class PatientItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
         this.genderView.text = patientItem.gender
         this.dobView.text = patientItem.dob
 
-        with(this.itemView) {
-            setOnClickListener { onItemClicked(patientItem) }
-        }
+        this.itemView.setOnClickListener { onItemClicked(patientItem) }
     }
 }

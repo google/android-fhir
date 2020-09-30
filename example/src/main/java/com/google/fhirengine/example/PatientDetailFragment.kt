@@ -17,11 +17,11 @@
 package com.google.fhirengine.example
 
 import android.os.Bundle
-import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -53,11 +53,7 @@ class PatientDetailFragment : Fragment() {
             this.requireActivity().application, fhirEngine
         ))
             .get(PatientListViewModel::class.java)
-        viewModel.getSearchedPatients()?.observe(viewLifecycleOwner,
-            Observer<List<PatientListViewModel.PatientItem>> {
-                // adapter.submitList(it)
-            }
-        )
+
         viewModel.getObservations().observe(viewLifecycleOwner,
             Observer<List<PatientListViewModel.ObservationItem>> {
                 adapter.submitList(it)
@@ -65,7 +61,9 @@ class PatientDetailFragment : Fragment() {
 
         arguments?.let {
             if (it.containsKey(ARG_ITEM_ID)) {
-                patient = it.getString(ARG_ITEM_ID)?.let { it1 -> viewModel.getPatientItem(it1) }
+                patient = it.getString(ARG_ITEM_ID)?.let {
+                        patient_index -> viewModel.getPatientItem(patient_index)
+                }
                 activity?.findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout)?.title =
                     patient?.name
             }
@@ -78,27 +76,21 @@ class PatientDetailFragment : Fragment() {
 
     private fun setupPatientData(view: View, patient: PatientListViewModel.PatientItem?) {
         if (patient != null) {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                view.findViewById<TextView>(R.id.patient_detail).text = Html.fromHtml(
-                    patient.html,
-                    Html.FROM_HTML_MODE_LEGACY
-                )
-                view.findViewById<TextView>(R.id.name).text = patient.name
-                view.findViewById<TextView>(R.id.dob).text = patient.dob
-                view.findViewById<TextView>(R.id.gender).text = patient.phone
-            } else {
-                view.findViewById<TextView>(R.id.patient_detail).text = Html.fromHtml(
-                    "<h2>Title</h2><br><p>Description here</p>"
-                )
-            }
+            view.findViewById<TextView>(R.id.patient_detail).text = HtmlCompat.fromHtml(
+                patient.html,
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+            )
+            view.findViewById<TextView>(R.id.name).text = patient.name
+            view.findViewById<TextView>(R.id.dob).text = patient.dob
+            view.findViewById<TextView>(R.id.gender).text = patient.phone
         }
     }
 
     companion object {
         /**
-         * The fragment argument representing the item ID that this fragment
+         * The fragment argument representing the patient item ID that this fragment
          * represents.
          */
-        const val ARG_ITEM_ID = "item_id"
+        const val ARG_ITEM_ID = "patient_item_id"
     }
 }
