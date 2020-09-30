@@ -16,6 +16,10 @@
 
 package com.google.fhirengine.impl
 
+import android.content.Context
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.google.fhirengine.FhirEngine
 import com.google.fhirengine.ResourceNotFoundException
 import com.google.fhirengine.db.Database
@@ -24,8 +28,10 @@ import com.google.fhirengine.resource.ResourceUtils
 import com.google.fhirengine.search.Search
 import com.google.fhirengine.sync.FhirDataSource
 import com.google.fhirengine.sync.FhirSynchronizer
+import com.google.fhirengine.sync.PeriodicSyncConfiguration
 import com.google.fhirengine.sync.Result
 import com.google.fhirengine.sync.SyncConfiguration
+import com.google.fhirengine.sync.SyncWorkType
 import java.util.EnumSet
 import org.cqframework.cql.elm.execution.VersionedIdentifier
 import org.hl7.fhir.r4.model.Resource
@@ -42,9 +48,16 @@ class FhirEngineImpl constructor(
   libraryLoader: LibraryLoader,
   dataProviderMap: Map<String, @JvmSuppressWildcards DataProvider>,
   terminologyProvider: TerminologyProvider,
-  private val periodicSyncConfiguration: SyncConfiguration,
-  private val dataSource: FhirDataSource
+  private var periodicSyncConfiguration: PeriodicSyncConfiguration?,
+  private val dataSource: FhirDataSource,
+  private val context: Context
 ) : FhirEngine {
+
+    init {
+        periodicSyncConfiguration?.let { config ->
+            triggerInitialDownload(config)
+        }
+    }
 
     private val cqlEngine: CqlEngine = CqlEngine(
         libraryLoader,
@@ -103,6 +116,50 @@ class FhirEngineImpl constructor(
     }
 
     override suspend fun periodicSync(): Result {
-        return FhirSynchronizer(periodicSyncConfiguration, dataSource, database).sync()
+        val syncConfig = periodicSyncConfiguration
+        ?: throw java.lang.UnsupportedOperationException("Periodic sync configuration was not set")
+        val syncResult = FhirSynchronizer(
+            syncConfig.syncConfiguration,
+            dataSource,
+            database
+        ).sync()
+        setupNextDownload(syncConfig)
+        return syncResult
+    }
+
+    override fun updatePeriodicSyncConfiguration(syncConfig: PeriodicSyncConfiguration) {
+        periodicSyncConfiguration = syncConfig
+        setupNextDownload(syncConfig)
+    }
+
+    private fun setupNextDownload(syncConfig: PeriodicSyncConfiguration) {
+        setupDownload(syncConfig = syncConfig, withInitialDelay = true)
+    }
+
+    private fun triggerInitialDownload(syncConfig: PeriodicSyncConfiguration) {
+        setupDownload(syncConfig = syncConfig, withInitialDelay = false)
+    }
+
+    private fun setupDownload(syncConfig: PeriodicSyncConfiguration, withInitialDelay: Boolean) {
+        val workerClass = syncConfig.periodicSyncWorker
+        val downloadRequest = if (withInitialDelay) {
+            OneTimeWorkRequest.Builder(workerClass)
+                .setConstraints(syncConfig.syncConstraints)
+                .setInitialDelay(
+                    syncConfig.repeat.interval,
+                    syncConfig.repeat.timeUnit
+                )
+                .build()
+        } else {
+            OneTimeWorkRequest.Builder(workerClass)
+                .setConstraints(syncConfig.syncConstraints)
+                .build()
+        }
+
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            SyncWorkType.DOWNLOAD.workerName,
+            ExistingWorkPolicy.KEEP,
+            downloadRequest
+        )
     }
 }

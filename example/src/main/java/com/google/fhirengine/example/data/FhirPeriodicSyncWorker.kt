@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.sync
+package com.google.fhirengine.example.data
 
-/**
- * Configuration for synchronization.
- */
-data class SyncConfiguration(
-  /**
-   *  Data that needs to be synchronised
-   */
-  val syncData: List<SyncData> = emptyList(),
-  /**
-   *  true if the SDK needs to retry a failed sync attempt, false otherwise
-   *  If this is set to true, then the result of the sync will be reported after the retry.
-   */
-  val retry: Boolean = false
-)
+import android.content.Context
+import androidx.work.WorkerParameters
+import com.google.fhirengine.FhirEngine
+import com.google.fhirengine.example.FhirApplication
+import com.google.fhirengine.sync.PeriodicSyncWorker
+
+class FhirPeriodicSyncWorker(
+  appContext: Context,
+  workerParams: WorkerParameters
+) : PeriodicSyncWorker(appContext, workerParams) {
+
+    override fun getFhirEngine(): FhirEngine {
+        return FhirApplication.fhirEngine(applicationContext)
+    }
+}

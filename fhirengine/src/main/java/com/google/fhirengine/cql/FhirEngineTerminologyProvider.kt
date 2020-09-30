@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine.sync
+package com.google.fhirengine.cql
 
-/**
- * Configuration for synchronization.
- */
-data class SyncConfiguration(
-  /**
-   *  Data that needs to be synchronised
-   */
-  val syncData: List<SyncData> = emptyList(),
-  /**
-   *  true if the SDK needs to retry a failed sync attempt, false otherwise
-   *  If this is set to true, then the result of the sync will be reported after the retry.
-   */
-  val retry: Boolean = false
-)
+import org.opencds.cqf.cql.runtime.Code
+import org.opencds.cqf.cql.terminology.CodeSystemInfo
+import org.opencds.cqf.cql.terminology.TerminologyProvider
+import org.opencds.cqf.cql.terminology.ValueSetInfo
+
+/** Fhir Engine's implementation of [TerminologyProvider].  */
+internal class FhirEngineTerminologyProvider : TerminologyProvider {
+  override fun `in`(code: Code, valueSet: ValueSetInfo): Boolean = false
+
+  override fun expand(valueSet: ValueSetInfo): Iterable<Code>? = null
+
+  override fun lookup(code: Code, codeSystem: CodeSystemInfo): Code? = null
+}

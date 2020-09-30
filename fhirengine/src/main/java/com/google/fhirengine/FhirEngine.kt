@@ -17,6 +17,7 @@
 package com.google.fhirengine
 
 import com.google.fhirengine.search.Search
+import com.google.fhirengine.sync.PeriodicSyncConfiguration
 import com.google.fhirengine.sync.Result
 import com.google.fhirengine.sync.SyncConfiguration
 import org.hl7.fhir.r4.model.Resource
@@ -69,7 +70,14 @@ interface FhirEngine {
     /** Returns the entry point for [Search]. */
     fun search(): Search
 
+    /**
+     * One time sync.
+     *
+     * @param syncConfiguration - configuration of data that needs to be synchronised
+     */
     suspend fun sync(syncConfiguration: SyncConfiguration): Result
 
     suspend fun periodicSync(): Result
+
+    fun updatePeriodicSyncConfiguration(syncConfig: PeriodicSyncConfiguration)
 }

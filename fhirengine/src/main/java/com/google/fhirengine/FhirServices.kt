@@ -28,7 +28,7 @@ import com.google.fhirengine.impl.FhirEngineImpl
 import com.google.fhirengine.index.impl.FhirIndexerImpl
 import com.google.fhirengine.search.impl.SearchImpl
 import com.google.fhirengine.sync.FhirDataSource
-import com.google.fhirengine.sync.SyncConfiguration
+import com.google.fhirengine.sync.PeriodicSyncConfiguration
 
 internal data class FhirServices(
   val fhirEngine: FhirEngine,
@@ -36,11 +36,11 @@ internal data class FhirServices(
   val database: Database
 ) {
     class Builder(
-      private val syncConfiguration: SyncConfiguration,
       private val dataSource: FhirDataSource,
       private val context: Context
     ) {
         private var databaseName: String? = "fhirEngine"
+        private var periodicSyncConfiguration: PeriodicSyncConfiguration? = null
 
         fun inMemory() = apply {
             databaseName = null
@@ -48,6 +48,10 @@ internal data class FhirServices(
 
         fun databaseName(name: String) = apply {
             databaseName = name
+        }
+
+        fun periodicSyncConfiguration(config: PeriodicSyncConfiguration) = apply {
+            periodicSyncConfiguration = config
         }
 
         fun build(): FhirServices {
@@ -67,8 +71,9 @@ internal data class FhirServices(
                 libraryLoader = FhirEngineLibraryLoader(db),
                 dataProviderMap = mapOf("http://hl7.org/fhir" to dataProvider),
                 terminologyProvider = FhirEngineTerminologyProvider(),
-                periodicSyncConfiguration = syncConfiguration,
-                dataSource = dataSource
+                periodicSyncConfiguration = periodicSyncConfiguration,
+                dataSource = dataSource,
+                context = context
             )
             return FhirServices(
                 fhirEngine = engine,
@@ -81,9 +86,8 @@ internal data class FhirServices(
     companion object {
         @JvmStatic
         fun builder(
-          syncConfiguration: SyncConfiguration,
           dataSource: FhirDataSource,
           context: Context
-        ) = Builder(syncConfiguration, dataSource, context)
+        ) = Builder(dataSource, context)
     }
 }

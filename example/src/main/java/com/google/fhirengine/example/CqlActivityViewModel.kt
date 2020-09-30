@@ -20,14 +20,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.fhirengine.FhirEngine
-import com.google.fhirengine.search.filter.string
 import com.google.fhirengine.sync.SyncConfiguration
 import com.google.fhirengine.sync.SyncData
 import kotlinx.coroutines.launch
-import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 class CqlActivityViewModel(
