@@ -27,8 +27,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".SamplePatientListActivity"
-            android:label="@string/title_samplepatient_list"
+            android:name=".PatientListActivity"
+            android:label="@string/title_patient_list"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,15 +37,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SamplePatientDetailActivity"
-            android:label="@string/title_samplepatient_detail"
-            android:parentActivityName=".SamplePatientListActivity"
+            android:name=".PatientDetailActivity"
+            android:label="@string/title_patient_detail"
+            android:parentActivityName=".PatientListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.google.fhirengine.example.SamplePatientListActivity" />
+                android:value="com.google.fhirengine.example.PatientListActivity" />
         </activity>
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".CqlLoadActivity"></activity>
     </application>
 
 </manifest>

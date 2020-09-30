@@ -17,7 +17,10 @@
 package com.google.fhirengine.example.data
 
 import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.parser.IParser
+import com.google.fhirengine.example.PatientListViewModel
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 
 private const val MAX_RESOURCE_COUNT = 20
@@ -29,31 +32,38 @@ private const val MAX_RESOURCE_COUNT = 20
  * PatientListViewModel.
  */
 class SamplePatients {
-    private val patients: MutableList<PatientItem> = ArrayList()
-    // Maps a temporary patient display id to PatientItem, used to display patients both in list and
-    // details.
-    private val idsPatients: MutableMap<String, PatientItem> = mutableMapOf()
+    private val patients: MutableList<PatientListViewModel.PatientItem> = mutableListOf()
+    private val observations: MutableList<PatientListViewModel.ObservationItem> = ArrayList()
 
     // The resource bundle with Patient objects.
     private var fhirBundle: Bundle? = null
 
     companion object {
-        val fhirJsonParser = FhirContext.forR4().newJsonParser()
+        val tag = "SamplePatient"
+
+        val fhirJsonParser: IParser = FhirContext.forR4().newJsonParser()
     }
     /**
      * Returns list of PatientItem objects based on patients from the json string.
      */
-    fun getPatientItems(jsonString: String): List<PatientItem> {
-        fhirBundle = fhirJsonParser.parseResource(Bundle::class.java,
-                jsonString) as Bundle
+    fun getPatientItems(jsonString: String): List<PatientListViewModel.PatientItem> {
+        fhirBundle = fhirJsonParser.parseResource(Bundle::class.java, jsonString) as Bundle
 
         // Create a list of PatientItems from fhirPatients. The display index is 1 based.
         fhirBundle?.entry?.take(MAX_RESOURCE_COUNT)?.mapIndexed { index, entry ->
             createPatientItem(index + 1, entry.resource as Patient)
         }?.let { patients.addAll(it) }
 
-        // Create the PatientItems Map from PatientItem List.
-        idsPatients.putAll(patients.associateBy { it.id })
+        return patients
+    }
+
+    fun getPatientItems(fhirPatients: List<Patient>): List<PatientListViewModel.PatientItem> {
+
+        patients.clear()
+        // Create a list of PatientItems from fhirPatients. The display index is 1 based.
+        fhirPatients.take(MAX_RESOURCE_COUNT)?.mapIndexed { index, fhirPatient ->
+            createPatientItem(index + 1, fhirPatient)
+        }?.let { patients.addAll(it) }
 
         return patients
     }
@@ -61,20 +71,61 @@ class SamplePatients {
     /**
      * Creates PatientItem objects with displayable values from the Fhir Patient objects.
      */
-    private fun createPatientItem(position: Int, patient: Patient): PatientItem {
+    private fun createPatientItem(position: Int, patient: Patient):
+        PatientListViewModel.PatientItem {
         val name = patient.name[0].nameAsSingleString
 
         // Show nothing if no values available for gender and date of birth.
         val gender = if (patient.hasGenderElement()) patient.genderElement.valueAsString else ""
         val dob = if (patient.hasBirthDateElement()) patient.birthDateElement.valueAsString else ""
+        val html: String = if (patient.hasText()) patient.text.div.valueAsString else ""
+        val phone: String = if (patient.hasTelecom()) patient.telecom[0].value else ""
 
-        return PatientItem(position.toString(), name, gender, dob)
+        return PatientListViewModel.PatientItem(
+            position.toString(),
+            name,
+            gender,
+            dob,
+            html,
+            phone
+        )
     }
 
     /**
-     * The Patient's details for display purposes.
+     * Returns list of ObservationItem objects based on observations from the json string.
      */
-    data class PatientItem(val id: String, val name: String, val gender: String, val dob: String) {
-        override fun toString(): String = name
+    fun getObservationItems(jsonString: String): MutableList<PatientListViewModel.ObservationItem> {
+        fhirBundle = fhirJsonParser.parseResource(Bundle::class.java, jsonString) as Bundle
+
+        // Create a list of ObservationItems from fhirObservations. The display index is 1 based.
+        fhirBundle?.entry?.take(MAX_RESOURCE_COUNT)?.mapIndexed { index, entry ->
+            createObservationItem(index + 1, entry.resource as Observation)
+        }?.let { observations.addAll(it) }
+
+        return observations
+    }
+
+    /**
+     * Creates ObservationItem objects with displayable values from the Fhir Observation objects.
+     */
+    private fun createObservationItem(position: Int, observation: Observation):
+        PatientListViewModel.ObservationItem {
+        // val observation: Observation = getObservationDetails(position)
+        val observationCode = observation.code.text
+
+        // Show nothing if no values available for datetime and value quantity.
+        val dateTimeStr = if (observation.hasEffectiveDateTimeType())
+            observation.effectiveDateTimeType.asStringValue() else "No effective DateTime"
+        val value = if (observation.hasValueQuantity())
+            observation.valueQuantity.value.toString() else "No ValueQuantity"
+        val valueUnit = if (observation.hasValueQuantity()) observation.valueQuantity.unit else ""
+        val valueStr = "$value $valueUnit"
+
+        return PatientListViewModel.ObservationItem(
+            position.toString(),
+            observationCode,
+            dateTimeStr,
+            valueStr
+        )
     }
 }

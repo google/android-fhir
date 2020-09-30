@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:theme="@android:style/Theme.NoTitleBar">
+    <item
+        android:id="@+id/sync_resources"
+        app:showAsAction="always"
+        android:icon="@android:drawable/stat_notify_sync"
+        android:title="@string/menu_sync_resources"
+        />
+    <item
+        android:id="@+id/load_resource"
+        app:showAsAction="withText"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="@string/menu_load_resource"
+        />
+    <item android:id="@+id/about"
+        app:showAsAction="withText"
+        android:icon="@android:drawable/ic_menu_help"
+        android:title="@string/menu_about"
+        />
+</menu>

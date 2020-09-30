@@ -20,25 +20,25 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.google.fhirengine.example.data.SamplePatients
 
 /**
- * UI Controller helper class to monitor Patient viewmodel and display list of patients, with
- * possibly patient details, on a two pane device.
+ * UI Controller helper class to monitor Patient viewmodel and display list of patients.
  */
-class SampleItemRecyclerViewAdapter(
-  private val onItemClicked: (SamplePatients.PatientItem) -> Unit
-) : ListAdapter<SamplePatients.PatientItem, PatientItemViewHolder>(PatientItemDiffCallback()) {
+class PatientItemRecyclerViewAdapter(
+  private val onItemClicked: (PatientListViewModel.PatientItem) -> Unit
+) : ListAdapter<PatientListViewModel.PatientItem, PatientItemViewHolder>(
+    PatientItemDiffCallback()
+) {
 
-    class PatientItemDiffCallback : DiffUtil.ItemCallback<SamplePatients.PatientItem>() {
+    class PatientItemDiffCallback : DiffUtil.ItemCallback<PatientListViewModel.PatientItem>() {
         override fun areItemsTheSame(
-          oldItem: SamplePatients.PatientItem,
-          newItem: SamplePatients.PatientItem
+          oldItem: PatientListViewModel.PatientItem,
+          newItem: PatientListViewModel.PatientItem
         ): Boolean = oldItem.id == newItem.id
 
         override fun areContentsTheSame(
-          oldItem: SamplePatients.PatientItem,
-          newItem: SamplePatients.PatientItem
+          oldItem: PatientListViewModel.PatientItem,
+          newItem: PatientListViewModel.PatientItem
         ): Boolean = oldItem.id == newItem.id
     }
 

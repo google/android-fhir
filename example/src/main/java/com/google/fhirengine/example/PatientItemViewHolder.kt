@@ -19,7 +19,6 @@ package com.google.fhirengine.example
 import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.fhirengine.example.data.SamplePatients
 
 class PatientItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val idView: TextView = itemView.findViewById(
@@ -36,16 +35,14 @@ class PatientItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
     )
 
     fun bindTo(
-      patientItem: SamplePatients.PatientItem,
-      onItemClicked: (SamplePatients.PatientItem) -> Unit
+      patientItem: PatientListViewModel.PatientItem,
+      onItemClicked: (PatientListViewModel.PatientItem) -> Unit
     ) {
         this.idView.text = patientItem.id
         this.nameView.text = patientItem.name
         this.genderView.text = patientItem.gender
         this.dobView.text = patientItem.dob
 
-        with(this.itemView) {
-            setOnClickListener { onItemClicked(patientItem) }
-        }
+        this.itemView.setOnClickListener { onItemClicked(patientItem) }
     }
 }

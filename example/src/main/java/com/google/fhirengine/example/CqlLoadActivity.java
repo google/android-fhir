@@ -37,7 +37,7 @@ import org.hl7.fhir.r4.model.Resource;
 import org.opencds.cqf.cql.execution.EvaluationResult;
 import org.opencds.cqf.cql.execution.LibraryResult;
 
-public class MainActivity extends AppCompatActivity {
+public class CqlLoadActivity extends AppCompatActivity {
   FhirEngine fhirEngine;
   EditText cqlLibraryUrlInput;
   EditText fhirResourceUrlInput;
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
+    setContentView(R.layout.activity_cql_load);
 
     cqlLibraryUrlInput = findViewById(R.id.cql_text_input);
     fhirResourceUrlInput = findViewById(R.id.fhir_resource_url_input);
@@ -60,9 +60,10 @@ public class MainActivity extends AppCompatActivity {
     evaluationResultTextView = findViewById(R.id.evaluate_result);
 
     fhirEngine = FhirApplication.fhirEngine(this);
-    MainActivityViewModel viewModel =
-        new ViewModelProvider(this, new MainActivityViewModelFactory(fhirEngine))
-            .get(MainActivityViewModel.class);
+
+    CqlActivityViewModel viewModel =
+        new ViewModelProvider(this, new CqlLoadActivityViewModelFactory(fhirEngine))
+            .get(CqlActivityViewModel.class);
 
     final Button button = findViewById(R.id.load_cql_lib_button);
     button.setOnClickListener(

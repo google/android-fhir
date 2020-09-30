@@ -16,21 +16,18 @@
 
 package com.google.fhirengine.example
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.google.fhirengine.FhirEngine
+import android.view.View
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 
-class MainActivityViewModel(
-  private val fhirEngine: FhirEngine
-) : ViewModel()
+class ObservationItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    private val observationTextView: TextView = itemView.findViewById(
+        R.id.observation_detail
+    )
 
-class MainActivityViewModelFactory(
-  private val fhirEngine: FhirEngine
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {
-            return MainActivityViewModel(fhirEngine) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
+    fun bindTo(observationItem: PatientListViewModel.ObservationItem) {
+        this.observationTextView.text =
+            itemView.resources.getString(R.string.observation_brief_text, observationItem.code,
+                observationItem.value, observationItem.effective)
     }
 }
