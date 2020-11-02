@@ -42,6 +42,11 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
+
+    packagingOptions {
+        exclude 'META-INF/ASL-2.0.txt'
+        exclude 'META-INF/LGPL-3.0.txt'
+    }
 }
 
 configurations {
@@ -72,6 +77,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     implementation "org.opencds.cqf:cql-engine-fhir:$cqlEngineVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
+    implementation(group: "com.github.java-json-tools", name: "json-patch", version: "1.13");
 
     testImplementation "androidx.test:core:$testVersion"
     testImplementation "org.robolectric:robolectric:$roboelectricVersion"

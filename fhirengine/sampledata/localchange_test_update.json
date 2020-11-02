@@ -1,0 +1,32 @@
+[
+ {
+  "op": "replace",
+  "path": "/contact/0/name/family",
+  "value": "Rogers"
+ },
+ {
+  "op": "replace",
+  "path": "/name/0/given/0",
+  "value": "Binny"
+ },
+ {
+  "op": "replace",
+  "path": "/extension/0/extension/1/valueCodeableConcept/coding/1/display",
+  "value": "Labrador Retriever"
+ },
+ {
+  "op": "replace",
+  "path": "/extension/0/extension/1/valueCodeableConcept/coding/1/code",
+  "value": "lbret"
+ },
+ {
+  "op": "replace",
+  "path": "/extension/0/extension/1/valueCodeableConcept/coding/0/display",
+  "value": "Labrador retriever"
+ },
+ {
+  "op": "replace",
+  "path": "/extension/0/extension/1/valueCodeableConcept/coding/0/code",
+  "value": "62137007"
+ }
+]
