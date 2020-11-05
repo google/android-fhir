@@ -79,7 +79,7 @@ class PatientListActivity : AppCompatActivity() {
     }
 
     // Click handler to help display the details about the patients from the list.
-    private fun onPatientItemClicked(patientItem: PatientListViewModel.PatientItem): Unit {
+    private fun onPatientItemClicked(patientItem: PatientListViewModel.PatientItem) {
         val intent = Intent(this.applicationContext,
             PatientDetailActivity::class.java).apply {
             putExtra(PatientDetailFragment.ARG_ITEM_ID, patientItem.id)
