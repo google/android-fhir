@@ -1,7 +1,9 @@
-# fhir-engine
+# Android FHIR SDK (WIP)
 
-FHIR Engine is an Android library that manages FHIR resources natively on Android. It also supports
-the evaluation of CQL using [cql-engine](https://github.com/DBCG/cql_engine).
+Android FHIR SDK is an Android library that manages FHIR resources natively on Android. It also
+supports the evaluation of CQL using [cql-engine](https://github.com/DBCG/cql_engine).
+
+**This is a prototype for developer preview and is NOT production-ready.**
 
 ## Usage
 
