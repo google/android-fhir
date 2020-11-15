@@ -53,6 +53,7 @@ ext {
     retrofitVersion = '2.7.2'
     roomVersion = '2.2.5'
     workManagerVersion = '2.3.4'
+    jsonToolsVersion = '1.13'
 
     // testing
     junitVersion = '4.13'
