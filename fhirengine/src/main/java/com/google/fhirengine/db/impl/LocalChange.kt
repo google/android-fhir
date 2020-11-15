@@ -44,13 +44,13 @@ import org.hl7.fhir.r4.model.ResourceType
         ]
 )
 internal data class LocalChange(
-        @PrimaryKey(autoGenerate = true)
-        val id: Long = 0,
-        val resourceType: ResourceType,
-        val resourceId: String,
-        val timestamp: String = "",
-        val type: Type,
-        val diff: String
+  @PrimaryKey(autoGenerate = true)
+  val id: Long = 0,
+  val resourceType: ResourceType,
+  val resourceId: String,
+  val timestamp: String = "",
+  val type: Type,
+  val diff: String
 ) {
     enum class Type(val value: Int) {
         INSERT(1), // create a new resource. payload is the entire resource json.

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.fhirengine.db.impl.dao
 
 import android.util.Log
@@ -13,9 +29,8 @@ import com.github.fge.jsonpatch.diff.JsonDiff
 import com.google.fhirengine.db.impl.entities.LocalChange
 import com.google.fhirengine.db.impl.entities.LocalChange.Type
 import com.google.fhirengine.toTimeZoneString
-import org.hl7.fhir.r4.model.Resource
 import java.util.Date
-
+import org.hl7.fhir.r4.model.Resource
 
 @Dao
 internal abstract class LocalChangeDao {
@@ -29,22 +44,26 @@ internal abstract class LocalChangeDao {
         val resourceId = resource.id
         val resourceType = resource.resourceType
         val localChanges = getLocalChanges(
-                resourceId = resourceId,
-                resourceType = resourceType.name)
+            resourceId = resourceId,
+            resourceType = resourceType.name
+        )
         val timestamp = Date().toTimeZoneString()
         val resourceString = iParser.encodeResourceToString(resource)
 
-        if (localChanges.isEmpty()
-                || localChanges.last().type == Type.DELETE) {
+        if (localChanges.isEmpty() ||
+            localChanges.last().type == Type.DELETE
+        ) {
             // Insert this change in the local changes table
-            addLocalChange(LocalChange(
+            addLocalChange(
+                LocalChange(
                     id = 0,
                     resourceType = resourceType,
                     resourceId = resourceId,
                     timestamp = timestamp,
                     type = LocalChange.Type.INSERT,
                     diff = resourceString
-            ))
+                )
+            )
         } else {
             // Can't add an INSERT on top of an INSERT or UPDATE
             throw InvalidLocalChangeException("Can not INSERT on top of $localChanges.last().type")
@@ -55,30 +74,34 @@ internal abstract class LocalChangeDao {
         val resourceId = resource.id
         val resourceType = resource.resourceType
         val localChanges = getLocalChanges(
-                resourceId = resourceId,
-                resourceType = resourceType.name)
+            resourceId = resourceId,
+            resourceType = resourceType.name
+        )
         val timestamp = Date().toTimeZoneString()
 
-        if (localChanges.isEmpty()
-                || localChanges.last().type in arrayOf(Type.UPDATE, Type.INSERT)) {
+        if (localChanges.isEmpty() ||
+            localChanges.last().type in arrayOf(Type.UPDATE, Type.INSERT)
+        ) {
             // squash all changes to get the resource to diff against
             val squashedLocalChanges = squash(localChanges)
 
             if (squashedLocalChanges.type.equals(Type.DELETE))
-                throw InvalidLocalChangeException("Unexpected DELETE when squashing $resourceType.name/$resourceId. UPDATE failed")
+                throw InvalidLocalChangeException(
+                    "Unexpected DELETE when squashing $resourceType.name/$resourceId.UPDATE failed")
 
             val squashedResource = iParser.parseResource(squashedLocalChanges.diff) as Resource
 
             // insert the diff as an update
-            addLocalChange(LocalChange(
+            addLocalChange(
+                LocalChange(
                     id = 0,
                     resourceType = resourceType,
                     resourceId = resourceId,
                     timestamp = timestamp,
                     type = Type.UPDATE,
                     diff = diff(squashedResource, resource)
-            ))
-
+                )
+            )
         } else {
             throw InvalidLocalChangeException("Can not UPDATE on top of $localChanges.type")
         }
@@ -87,25 +110,30 @@ internal abstract class LocalChangeDao {
     private fun deleteLocalChange(resource: Resource) {
         val resourceId = resource.id
         val localChanges = getLocalChanges(
-                resourceId = resourceId,
-                resourceType = resource.resourceType.name)
+            resourceId = resourceId,
+            resourceType = resource.resourceType.name
+        )
 
         if (localChanges.isEmpty())
-            throw InvalidLocalChangeException("Can not DELETE non-existent resource $resource.resourceType.name/$resourceId")
+            throw InvalidLocalChangeException(
+                "Can not DELETE non-existent resource $resource.resourceType.name/$resourceId"
+            )
 
         val timestamp = Date().toTimeZoneString()
         val resourceType = resource.resourceType
         val topChange = localChanges.last()
 
         if (topChange.type in arrayOf(Type.UPDATE, Type.INSERT)) {
-            addLocalChange(LocalChange(
+            addLocalChange(
+                LocalChange(
                     id = 0,
                     resourceType = resourceType,
                     resourceId = resourceId,
                     timestamp = timestamp,
                     type = Type.DELETE,
                     diff = ""
-            ))
+                )
+            )
         } else {
             throw InvalidLocalChangeException("Can not DELETE on top of $topChange.type")
         }
@@ -123,25 +151,25 @@ internal abstract class LocalChangeDao {
 
         return when (last.type) {
             Type.DELETE -> LocalChange(
-                    resourceId = last.resourceId,
-                    resourceType = last.resourceType,
-                    type = Type.DELETE,
-                    diff = ""
+                resourceId = last.resourceId,
+                resourceType = last.resourceType,
+                type = Type.DELETE,
+                diff = ""
             )
             Type.INSERT -> LocalChange(
-                    resourceId = last.resourceId,
-                    resourceType = last.resourceType,
-                    type = Type.INSERT,
-                    diff = last.diff
+                resourceId = last.resourceId,
+                resourceType = last.resourceType,
+                type = Type.INSERT,
+                diff = last.diff
             )
             Type.UPDATE -> {
                 // assertion $first.type == INSERT
                 val first = squash(localChanges.dropLast(1))
                 LocalChange(
-                        resourceId = last.resourceId,
-                        resourceType = last.resourceType,
-                        type = Type.INSERT,
-                        diff = applyPatch(first.diff, last.diff)
+                    resourceId = last.resourceId,
+                    resourceType = last.resourceType,
+                    type = Type.INSERT,
+                    diff = applyPatch(first.diff, last.diff)
                 )
             }
         }
@@ -157,29 +185,39 @@ internal abstract class LocalChangeDao {
     private fun diff(source: Resource, target: Resource): String {
         val objectMapper = ObjectMapper()
         val sourceJson = objectMapper.readValue(
-                iParser.encodeResourceToString(source),
-                JsonNode::class.java)
+            iParser.encodeResourceToString(source),
+            JsonNode::class.java
+        )
         val targetJson = objectMapper.readValue(
-                iParser.encodeResourceToString(target),
-                JsonNode::class.java)
-        val jsonDiff = JsonDiff.asJson(sourceJson, targetJson);
-        if (jsonDiff.size() == 0) Log.w("ResourceDao", "Trying to UPDATE resource ${target.resourceType}/${target.id} with no changes")
+            iParser.encodeResourceToString(target),
+            JsonNode::class.java
+        )
+        val jsonDiff = JsonDiff.asJson(sourceJson, targetJson)
+        if (jsonDiff.size() == 0)
+            Log.w(
+                "ResourceDao",
+                "Trying to UPDATE resource ${target.resourceType}/${target.id} with no changes"
+            )
         return jsonDiff.toString()
     }
 
-    @Query("""
+    @Query(
+        """
         SELECT *
         FROM LocalChange
         WHERE LocalChange.resourceId = (:resourceId)
         AND LocalChange.resourceType  = (:resourceType)
-        ORDER BY LocalChange.timestamp ASC""")
+        ORDER BY LocalChange.timestamp ASC"""
+    )
     abstract fun getLocalChanges(resourceId: String, resourceType: String): List<LocalChange>
 
-    @Query("""
+    @Query(
+        """
         DELETE FROM LocalChange
         WHERE LocalChange.resourceId = (:resourceId)
         AND LocalChange.resourceType  = (:resourceType)
-    """)
+    """
+    )
     abstract fun discardLocalChanges(resourceId: String, resourceType: String)
 
     class InvalidLocalChangeException(message: String?) : Exception(message)
