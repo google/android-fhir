@@ -20,6 +20,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Utility function to add timestamps to database rows, e.g. last local update timestamp.
+ */
 fun Date.toTimeZoneString(): String {
     val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US)
     return simpleDateFormat.format(this)

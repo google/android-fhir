@@ -25,10 +25,29 @@ import org.hl7.fhir.r4.model.ResourceType
  * When a local change to a resource happens, the lastUpdated timestamp in
  * [ResourceEntity] is updated and the diff itself is inserted in this table.
  * The value of the diff depends upon the type of change and can be:
- * * The empty string (DELETE),
- * * The full resource in JSON form (INSERT)
- * * A RFC 6902 JSON patch (UPDATE).
- *
+ * * DELETE: The empty string, "".
+ * * INSERT: The full resource in JSON form, e.g.
+ * {
+ *      "resourceType": "Patient",
+ *      "id": "animal",
+ *      "name": [
+ *              {
+ *               "use": "usual",
+ *               "given": [
+ *               "Kenzi"
+ *              ]
+ *              }
+ *        ],
+ *      ...
+ * }
+ * * UPDATE: A RFC 6902 JSON patch. e.g. a patch that changes the given name of a patient:
+ * [
+ *      {
+ *      "op": "replace",
+ *      "path": "/name/0/given/0",
+ *      "value": "Binny"
+ *      }
+ * ]
  *  For resource that is fully synced with server this table should be empty.
  */
 @Entity(

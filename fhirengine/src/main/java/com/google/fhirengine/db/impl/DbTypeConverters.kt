@@ -72,13 +72,11 @@ internal object DbTypeConverters {
         }
     }
 
-    @JvmStatic
     @TypeConverter
     fun localChangeTypeToInt(updateType: LocalChange.Type): Int {
         return updateType.value
     }
 
-    @JvmStatic
     @TypeConverter
     fun intToLocalChangeType(value: Int): LocalChange.Type {
         return LocalChange.Type.from(value)

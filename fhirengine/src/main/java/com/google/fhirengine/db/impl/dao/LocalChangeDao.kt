@@ -32,6 +32,14 @@ import com.google.fhirengine.toTimeZoneString
 import java.util.Date
 import org.hl7.fhir.r4.model.Resource
 
+/**
+ * Dao for local changes made to a resource. One row in LocalChangeEntity corresponds to one change
+ * e.g. an INSERT or UPDATE. The UPDATES (diffs) are stored as RFC 6902 JSON patches.
+ * When a ResourceEntity is read, all corresponding LocalChanges are 'squashed' to create a
+ * final representation of the resource.
+ *
+ * Can be potentially used for implementing resource editing with undo/redo.
+ */
 @Dao
 internal abstract class LocalChangeDao {
 
@@ -139,7 +147,17 @@ internal abstract class LocalChangeDao {
         }
     }
 
-    fun squash(localChanges: List<LocalChange>, forSync: Boolean = false): LocalChange {
+    /**
+     * Merges all local changes in to a single local change representing the current state of the
+     * resource.
+     *
+     * Algo:
+     * 1. Read the latest change, if it's a DELETE or INSERT then we are done as that's the
+     * latest representation of the resource.
+     * 2. If it's an UPDATE then squash the rest of the list recursively. Merge the result of the
+     * squash using [applyPatch].
+     */
+    private fun squash(localChanges: List<LocalChange>, forSync: Boolean = false): LocalChange {
         val last = localChanges.last()
 
         // Special case to handle remote-created resource which was
