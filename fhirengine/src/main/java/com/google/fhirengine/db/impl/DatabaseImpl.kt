@@ -21,6 +21,8 @@ import androidx.room.Room
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
 import com.google.fhirengine.db.ResourceNotFoundInDbException
+import com.google.fhirengine.db.impl.dao.LocalChangeDao
+import com.google.fhirengine.db.impl.entities.LocalChange
 import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.resource.ResourceUtils
@@ -64,26 +66,42 @@ internal class DatabaseImpl(
         }
     }
     val syncedResourceDao = db.syncedResourceDao()
+    val localChangeDao by lazy {
+        db.localChangeDao().also {
+            it.iParser = iParser
+        }
+    }
 
     override fun <R : Resource> insert(resource: R) {
         resourceDao.insert(resource)
+        localChangeDao.addInsert(resource)
     }
 
     override fun <R : Resource> insertAll(resources: List<R>) {
         resourceDao.insertAll(resources)
+        localChangeDao.addInsertAll(resources)
     }
 
     override fun <R : Resource> update(resource: R) {
         resourceDao.update(resource)
+        localChangeDao.addUpdate(resource)
     }
 
     override fun <R : Resource> select(clazz: Class<R>, id: String): R {
         val type = ResourceUtils.getResourceType(clazz)
-        return resourceDao.getResource(
-                resourceId = id,
-                resourceType = type
-        )?.let {
-            iParser.parseResource(clazz, it)
+
+        return localChangeDao.getLocalChanges(id, type.name).let {
+            if (it.isEmpty()) {
+                throw ResourceNotFoundInDbException(type.name, id)
+            }
+            val squash = localChangeDao.squash(it)
+            if (squash.type == LocalChange.Type.DELETE)
+                throw ResourceNotFoundInDbException(type.name, id)
+            else if (squash.type == LocalChange.Type.UPDATE) {
+                throw LocalChangeDao.InvalidLocalChangeException(
+                    "Unexpected UPDATE after squashing ${type.name}/$id")
+            }
+            iParser.parseResource(clazz, squash.diff)
         } ?: throw ResourceNotFoundInDbException(type.name, id)
     }
 
@@ -98,14 +116,12 @@ internal class DatabaseImpl(
     ) {
         syncedResourceDao.insert(syncedResourceEntity)
         insertAll(resources)
+        localChangeDao.addInsertAll(resources)
     }
 
     override fun <R : Resource> delete(clazz: Class<R>, id: String) {
         val type = ResourceUtils.getResourceType(clazz)
-        resourceDao.deleteResource(
-                resourceId = id,
-                resourceType = type
-        )
+        localChangeDao.addDelete(id, type)
     }
 
     override fun <R : Resource> searchByReference(

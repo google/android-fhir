@@ -21,6 +21,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -31,6 +32,7 @@ import com.google.fhirengine.db.impl.entities.LocalChange.Type
 import com.google.fhirengine.toTimeZoneString
 import java.util.Date
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Dao for local changes made to a resource. One row in LocalChangeEntity corresponds to one change
@@ -48,7 +50,14 @@ internal abstract class LocalChangeDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     abstract fun addLocalChange(localChange: LocalChange)
 
-    private fun addLocalInsert(resource: Resource) {
+    @Transaction
+    open fun addInsertAll(resources: List<Resource>) {
+        resources.forEach { resource ->
+            addInsert(resource)
+        }
+    }
+
+    fun addInsert(resource: Resource) {
         val resourceId = resource.id
         val resourceType = resource.resourceType
         val localChanges = getLocalChanges(
@@ -65,10 +74,10 @@ internal abstract class LocalChangeDao {
             addLocalChange(
                 LocalChange(
                     id = 0,
-                    resourceType = resourceType,
+                    resourceType = resourceType.name,
                     resourceId = resourceId,
                     timestamp = timestamp,
-                    type = LocalChange.Type.INSERT,
+                    type = Type.INSERT,
                     diff = resourceString
                 )
             )
@@ -78,7 +87,7 @@ internal abstract class LocalChangeDao {
         }
     }
 
-    private fun addLocalUpdate(resource: Resource) {
+    fun addUpdate(resource: Resource) {
         val resourceId = resource.id
         val resourceType = resource.resourceType
         val localChanges = getLocalChanges(
@@ -87,15 +96,16 @@ internal abstract class LocalChangeDao {
         )
         val timestamp = Date().toTimeZoneString()
 
-        if (localChanges.isEmpty() ||
-            localChanges.last().type in arrayOf(Type.UPDATE, Type.INSERT)
-        ) {
+        if (localChanges.isEmpty()) {
+            // TODO retrieve from resource dao???
+        } else if (localChanges.last().type in arrayOf(Type.UPDATE, Type.INSERT)) {
             // squash all changes to get the resource to diff against
             val squashedLocalChanges = squash(localChanges)
 
             if (squashedLocalChanges.type.equals(Type.DELETE))
                 throw InvalidLocalChangeException(
-                    "Unexpected DELETE when squashing $resourceType.name/$resourceId.UPDATE failed")
+                    "Unexpected DELETE when squashing $resourceType.name/$resourceId.UPDATE failed"
+                )
 
             val squashedResource = iParser.parseResource(squashedLocalChanges.diff) as Resource
 
@@ -103,7 +113,7 @@ internal abstract class LocalChangeDao {
             addLocalChange(
                 LocalChange(
                     id = 0,
-                    resourceType = resourceType,
+                    resourceType = resourceType.name,
                     resourceId = resourceId,
                     timestamp = timestamp,
                     type = Type.UPDATE,
@@ -115,27 +125,25 @@ internal abstract class LocalChangeDao {
         }
     }
 
-    private fun deleteLocalChange(resource: Resource) {
-        val resourceId = resource.id
+    fun addDelete(resourceId: String, resourceType: ResourceType) {
         val localChanges = getLocalChanges(
             resourceId = resourceId,
-            resourceType = resource.resourceType.name
+            resourceType = resourceType.name
         )
 
         if (localChanges.isEmpty())
             throw InvalidLocalChangeException(
-                "Can not DELETE non-existent resource $resource.resourceType.name/$resourceId"
+                "Can not DELETE non-existent resource $resourceType/$resourceId"
             )
 
         val timestamp = Date().toTimeZoneString()
-        val resourceType = resource.resourceType
         val topChange = localChanges.last()
 
         if (topChange.type in arrayOf(Type.UPDATE, Type.INSERT)) {
             addLocalChange(
                 LocalChange(
                     id = 0,
-                    resourceType = resourceType,
+                    resourceType = resourceType.name,
                     resourceId = resourceId,
                     timestamp = timestamp,
                     type = Type.DELETE,
@@ -157,7 +165,8 @@ internal abstract class LocalChangeDao {
      * 2. If it's an UPDATE then squash the rest of the list recursively. Merge the result of the
      * squash using [applyPatch].
      */
-    private fun squash(localChanges: List<LocalChange>, forSync: Boolean = false): LocalChange {
+    fun squash(localChanges: List<LocalChange>): LocalChange {
+
         val last = localChanges.last()
 
         // Special case to handle remote-created resource which was
@@ -181,8 +190,15 @@ internal abstract class LocalChangeDao {
                 diff = last.diff
             )
             Type.UPDATE -> {
-                // assertion $first.type == INSERT
                 val first = squash(localChanges.dropLast(1))
+
+                // assertion $first.type == INSERT
+                if (first.type != Type.INSERT) {
+                    throw InvalidLocalChangeException(
+                        "Expected INSERT at head of local changes. Found ${first.type} instead."
+                    )
+                }
+
                 LocalChange(
                     resourceId = last.resourceId,
                     resourceType = last.resourceType,
@@ -228,6 +244,14 @@ internal abstract class LocalChangeDao {
         ORDER BY LocalChange.timestamp ASC"""
     )
     abstract fun getLocalChanges(resourceId: String, resourceType: String): List<LocalChange>
+
+    @Query(
+        """
+        SELECT *
+        FROM LocalChange
+        ORDER BY LocalChange.timestamp ASC"""
+    )
+    abstract fun getAllLocalChanges(): List<LocalChange>
 
     @Query(
         """

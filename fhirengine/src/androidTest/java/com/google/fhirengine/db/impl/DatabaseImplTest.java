@@ -24,6 +24,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.google.fhirengine.FhirServices;
 import com.google.fhirengine.db.Database;
 import com.google.fhirengine.db.ResourceNotFoundInDbException;
+import com.google.fhirengine.db.impl.dao.LocalChangeDao.InvalidLocalChangeException;
 import com.google.fhirengine.resource.TestingUtils;
 import com.google.fhirengine.sync.FhirDataSource;
 import java.util.ArrayList;
@@ -72,7 +73,14 @@ public class DatabaseImplTest {
   }
 
   @Test
-  public void insert_shouldInsertResource() throws Exception {
+  public void insert_existentResource_shouldThrowInvalidLocalChangeException() throws Exception {
+    InvalidLocalChangeException invalidLocalChangeException =
+        assertThrows(InvalidLocalChangeException.class, () -> database.insert(TEST_PATIENT_1));
+    assertEquals("Can not INSERT on top of INSERT", invalidLocalChangeException.getMessage());
+  }
+
+  @Test
+  public void insert_nonExistentResource_shouldInsertResource() throws Exception {
     database.insert(TEST_PATIENT_2);
     testingUtils.assertResourceEquals(
         TEST_PATIENT_2, database.select(Patient.class, TEST_PATIENT_2_ID));
@@ -80,7 +88,7 @@ public class DatabaseImplTest {
 
   @Test
   public void insertAll_shouldInsertResources() throws Exception {
-    List<Patient> patients = new ArrayList();
+    List<Patient> patients = new ArrayList<>();
     patients.add(TEST_PATIENT_1);
     patients.add(TEST_PATIENT_2);
     database.insertAll(patients);
@@ -91,7 +99,7 @@ public class DatabaseImplTest {
   }
 
   @Test
-  public void update_nonexistentResource_shouldUpdateResource() throws Exception {
+  public void update_existentResource_shouldUpdateResource() throws Exception {
     Patient patient = new Patient();
     patient.setId(TEST_PATIENT_1_ID);
     patient.setGender(Enumerations.AdministrativeGender.FEMALE);
@@ -100,7 +108,7 @@ public class DatabaseImplTest {
   }
 
   @Test
-  public void update_existingResource_shouldInsertResource() throws Exception {
+  public void update_nonExistentResource_shouldInsertResource() throws Exception {
     database.update(TEST_PATIENT_2);
     testingUtils.assertResourceEquals(
         TEST_PATIENT_2, database.select(Patient.class, TEST_PATIENT_2_ID));
@@ -117,7 +125,7 @@ public class DatabaseImplTest {
   }
 
   @Test
-  public void select_nonexistentResource_shouldThrowResourceNotFondException() throws Exception {
+  public void select_nonExistentResource_shouldThrowResourceNotFoundException() throws Exception {
     ResourceNotFoundInDbException resourceNotFoundInDbException =
         assertThrows(
             ResourceNotFoundInDbException.class,
@@ -130,8 +138,37 @@ public class DatabaseImplTest {
   }
 
   @Test
-  public void select_shouldReturnResource() throws Exception {
+  public void select_existentResource_shouldReturnResource() throws Exception {
     testingUtils.assertResourceEquals(
         TEST_PATIENT_1, database.select(Patient.class, TEST_PATIENT_1_ID));
+  }
+
+  @Test
+  public void delete_existentResource_shouldDeleteResource() throws Exception {
+    testingUtils.assertResourceEquals(
+        TEST_PATIENT_1, database.select(Patient.class, TEST_PATIENT_1_ID));
+    database.delete(Patient.class, TEST_PATIENT_1_ID);
+    ResourceNotFoundInDbException resourceNotFoundInDbException =
+        assertThrows(
+            ResourceNotFoundInDbException.class,
+            () -> database.select(Patient.class, TEST_PATIENT_1_ID));
+    assertEquals(
+        "Resource not found with type "
+            + ResourceType.Patient.name()
+            + " and id "
+            + TEST_PATIENT_1_ID
+            + "!",
+        resourceNotFoundInDbException.getMessage());
+  }
+
+  @Test
+  public void delete_nonExistentResource_shouldThrowInvalidLocalChangeException() throws Exception {
+    InvalidLocalChangeException invalidLocalChangeException =
+        assertThrows(
+            InvalidLocalChangeException.class,
+            () -> database.delete(Patient.class, "non_existent_id"));
+    assertEquals(
+        "Can not DELETE non-existent resource Patient/non_existent_id",
+        invalidLocalChangeException.getMessage());
   }
 }

@@ -46,8 +46,7 @@ internal abstract class ResourceDao {
 
     @Transaction
     open fun update(resource: Resource) {
-        deleteResource(resource.id, resource.resourceType)
-        insert(resource)
+        // TODO : update timestamp
     }
 
     @Transaction

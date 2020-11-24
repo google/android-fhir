@@ -19,7 +19,6 @@ package com.google.fhirengine.db.impl.entities
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * When a local change to a resource happens, the lastUpdated timestamp in
@@ -65,7 +64,7 @@ import org.hl7.fhir.r4.model.ResourceType
 internal data class LocalChange(
   @PrimaryKey(autoGenerate = true)
   val id: Long = 0,
-  val resourceType: ResourceType,
+  val resourceType: String,
   val resourceId: String,
   val timestamp: String = "",
   val type: Type,
