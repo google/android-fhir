@@ -24,7 +24,7 @@ import com.google.fhirengine.FhirEngine
 import com.google.fhirengine.ResourceNotFoundException
 import com.google.fhirengine.db.Database
 import com.google.fhirengine.db.ResourceNotFoundInDbException
-import com.google.fhirengine.resource.ResourceUtils
+import com.google.fhirengine.resource.getResourceType
 import com.google.fhirengine.search.Search
 import com.google.fhirengine.sync.FhirDataSource
 import com.google.fhirengine.sync.FhirSynchronizer
@@ -32,7 +32,15 @@ import com.google.fhirengine.sync.PeriodicSyncConfiguration
 import com.google.fhirengine.sync.Result
 import com.google.fhirengine.sync.SyncConfiguration
 import com.google.fhirengine.sync.SyncWorkType
-import java.util.EnumSet
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
+import kotlin.collections.List
+import kotlin.collections.Map
+import kotlin.collections.MutableMap
+import kotlin.collections.MutableSet
+import kotlin.collections.Set
+import kotlin.collections.set
+import kotlin.collections.toTypedArray
 import org.cqframework.cql.elm.execution.VersionedIdentifier
 import org.hl7.fhir.r4.model.Resource
 import org.opencds.cqf.cql.data.DataProvider
@@ -83,7 +91,7 @@ class FhirEngineImpl constructor(
         return try {
             database.select(clazz, id)
         } catch (e: ResourceNotFoundInDbException) {
-            throw ResourceNotFoundException(ResourceUtils.getResourceType(clazz).name, id, e)
+            throw ResourceNotFoundException(getResourceType(clazz).name, id, e)
         }
     }
 

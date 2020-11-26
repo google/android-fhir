@@ -14,24 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.fhirengine;
+package com.google.fhirengine
 
-/** Thrown to indicate that the resource already exists. */
-public class ResourceAlreadyExistsException extends Exception {
-  private String type;
-  private String id;
-
-  public ResourceAlreadyExistsException(String type, String id, Throwable cause) {
-    super("Resource with type " + type + " and id " + id + " already exists!", cause);
-    this.type = type;
-    this.id = id;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public String getId() {
-    return id;
-  }
-}
+/** Thrown to indicate that the requested resource is not found. */
+class ResourceNotFoundException(
+  val type: String,
+  val id: String,
+  cause: Throwable
+) : Exception("Resource not found with type $type and id $id!", cause)

@@ -17,7 +17,7 @@
 package com.google.fhirengine.cql
 
 import com.google.fhirengine.db.Database
-import com.google.fhirengine.resource.ResourceUtils
+import com.google.fhirengine.resource.getResourceClass
 import org.opencds.cqf.cql.retrieve.RetrieveProvider
 import org.opencds.cqf.cql.runtime.Code
 import org.opencds.cqf.cql.runtime.Interval
@@ -49,14 +49,14 @@ internal class FhirEngineRetrieveProvider(private val database: Database) : Retr
     val codeList = codes.toList()
     return when (codeList.size) {
       0 -> database.searchByReference(
-        clazz = ResourceUtils.getResourceClass(dataType),
+        clazz = getResourceClass(dataType),
         reference = "$dataType.$contextPath",
         value = if ((contextValue as String).isEmpty()) "" else "$context/$contextValue"
       )
       1 -> {
         val code = codeList[0]
         database.searchByReferenceAndCode(
-          clazz = ResourceUtils.getResourceClass(dataType),
+          clazz = getResourceClass(dataType),
           reference = "$dataType.$contextPath",
           referenceValue = if ((contextValue as String).isEmpty()) "" else "$context/$contextValue",
           code = "$dataType.$codePath",
