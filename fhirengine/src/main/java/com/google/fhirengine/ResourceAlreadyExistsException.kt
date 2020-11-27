@@ -18,7 +18,7 @@ package com.google.fhirengine
 
 /** Thrown to indicate that the resource already exists. */
 class ResourceAlreadyExistsException(
-  val type: String,
-  val id: String,
+  type: String,
+  id: String,
   cause: Throwable
 ) : Exception("Resource with type $type and id $id already exists!", cause)
