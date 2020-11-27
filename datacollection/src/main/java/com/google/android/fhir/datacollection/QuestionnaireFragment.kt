@@ -1,4 +1,4 @@
-package com.google.fhirengine.ui
+package com.google.android.fhir.datacollection
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
@@ -13,7 +13,6 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.google.fhirengine.R
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -22,7 +21,9 @@ import org.hl7.fhir.r4.model.StringType
 class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment() {
 
     companion object {
-        fun newInstance(questionnaire: Questionnaire) = QuestionnaireFragment(questionnaire)
+        fun newInstance(questionnaire: Questionnaire) =
+            QuestionnaireFragment(
+                questionnaire)
     }
 
     private lateinit var viewModel: QuestionnaireViewModel
