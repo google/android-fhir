@@ -20,7 +20,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import ca.uhn.fhir.context.FhirContext
-import com.google.fhirengine.ui.QuestionnaireFragment
+import com.google.android.fhir.datacollection.QuestionnaireFragment
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -113,12 +113,14 @@ class QuestionnaireActivity : AppCompatActivity() {
         // modifications to the questionnaire
         questionnaire.title = "My questionnaire"
 
-        val fragment = QuestionnaireFragment(questionnaire)
+        val fragment =
+            com.google.android.fhir.datacollection.QuestionnaireFragment(
+                questionnaire)
         supportFragmentManager.beginTransaction()
                 .add(R.id.container, fragment)
                 .commit()
         fragment.setOnQuestionnaireSubmittedListener(object :
-                QuestionnaireFragment.OnQuestionnaireSubmittedListener {
+                com.google.android.fhir.datacollection.QuestionnaireFragment.OnQuestionnaireSubmittedListener {
             override fun onSubmitted(questionnaireResponse: QuestionnaireResponse) {
                 val parser = FhirContext.forR4().newJsonParser()
                 resultTextView?.text = parser.encodeResourceToString(questionnaireResponse)
