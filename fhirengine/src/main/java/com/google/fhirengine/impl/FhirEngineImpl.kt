@@ -32,15 +32,10 @@ import com.google.fhirengine.sync.PeriodicSyncConfiguration
 import com.google.fhirengine.sync.Result
 import com.google.fhirengine.sync.SyncConfiguration
 import com.google.fhirengine.sync.SyncWorkType
+import java.util.EnumSet
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
-import kotlin.collections.List
-import kotlin.collections.Map
-import kotlin.collections.MutableMap
-import kotlin.collections.MutableSet
-import kotlin.collections.Set
 import kotlin.collections.set
-import kotlin.collections.toTypedArray
 import org.cqframework.cql.elm.execution.VersionedIdentifier
 import org.hl7.fhir.r4.model.Resource
 import org.opencds.cqf.cql.data.DataProvider
