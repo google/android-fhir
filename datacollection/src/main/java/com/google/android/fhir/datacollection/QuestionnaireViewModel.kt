@@ -2,19 +2,35 @@ package com.google.android.fhir.datacollection
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
+import java.util.Objects
 
 class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
-    val map = mutableMapOf<String, QuestionnaireResponse.QuestionnaireResponseItemComponent>()
-
-    val questionnaireResponse = QuestionnaireResponse()
+    private val responseItemMap =
+        mutableMapOf<String, QuestionnaireResponse.QuestionnaireResponseItemComponent>()
+    internal val questionnaireResponse = QuestionnaireResponse()
 
     init {
-        questionnaire.item.forEach({
+        questionnaire.item.forEach {
             createQuestionnaireResponseItemComponent(it, questionnaireResponse.item)
-        })
+        }
+    }
+
+    fun setAnswer(linkId: String, answer: Boolean) {
+        responseItemMap[linkId]?.answer = listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .setValue(BooleanType(answer))
+        )
+    }
+
+    fun setAnswer(linkId: String, answer: String) {
+        responseItemMap[linkId]?.answer = listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .setValue(StringType(answer))
+        )
     }
 
     private fun createQuestionnaireResponseItemComponent(
@@ -27,7 +43,8 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
                         StringType(questionnaireItemComponent.linkId))
                 questionnaireResponseItemComponent.text = questionnaireItemComponent.text
                 questionnaireResponseItemComponentList.add(questionnaireResponseItemComponent)
-                map[questionnaireItemComponent.linkId] = questionnaireResponseItemComponent
+                responseItemMap[questionnaireItemComponent.linkId] =
+                    questionnaireResponseItemComponent
             }
             Questionnaire.QuestionnaireItemType.STRING -> {
                 val questionnaireResponseItemComponent =
@@ -35,7 +52,8 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
                         StringType(questionnaireItemComponent.linkId))
                 questionnaireResponseItemComponent.text = questionnaireItemComponent.text
                 questionnaireResponseItemComponentList.add(questionnaireResponseItemComponent)
-                map[questionnaireItemComponent.linkId] = questionnaireResponseItemComponent
+                responseItemMap[questionnaireItemComponent.linkId] =
+                    questionnaireResponseItemComponent
             }
             Questionnaire.QuestionnaireItemType.GROUP -> {
                 val questionnaireResponseItemComponent =
@@ -48,7 +66,13 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
                         questionnaireResponseItemComponent.item)
                 }
                 questionnaireResponseItemComponentList.add(questionnaireResponseItemComponent)
-                map[questionnaireItemComponent.linkId] = questionnaireResponseItemComponent
+                responseItemMap[questionnaireItemComponent.linkId] =
+                    questionnaireResponseItemComponent
+            }
+            else -> {
+                throw IllegalArgumentException(
+                    "Unsupported item type ${questionnaireItemComponent.type}"
+                )
             }
         }
     }

@@ -26,7 +26,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 class QuestionnaireActivity : AppCompatActivity() {
 
-    var resultTextView: TextView? = null
+    lateinit var resultTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +75,7 @@ class QuestionnaireActivity : AppCompatActivity() {
                     {
                       "linkId": "2.2",
                       "text": "What is your date of birth?",
-                      "type": "date"
+                      "type": "string"
                     },
                     {
                       "linkId": "2.3",
@@ -113,14 +113,12 @@ class QuestionnaireActivity : AppCompatActivity() {
         // modifications to the questionnaire
         questionnaire.title = "My questionnaire"
 
-        val fragment =
-            com.google.android.fhir.datacollection.QuestionnaireFragment(
-                questionnaire)
+        val fragment = QuestionnaireFragment(questionnaire)
         supportFragmentManager.beginTransaction()
-                .add(R.id.container, fragment)
-                .commit()
+            .add(R.id.container, fragment)
+            .commit()
         fragment.setOnQuestionnaireSubmittedListener(object :
-                com.google.android.fhir.datacollection.QuestionnaireFragment.OnQuestionnaireSubmittedListener {
+            QuestionnaireFragment.OnQuestionnaireSubmittedListener {
             override fun onSubmitted(questionnaireResponse: QuestionnaireResponse) {
                 val parser = FhirContext.forR4().newJsonParser()
                 resultTextView?.text = parser.encodeResourceToString(questionnaireResponse)
