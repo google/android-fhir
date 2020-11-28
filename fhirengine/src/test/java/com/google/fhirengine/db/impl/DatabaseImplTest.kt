@@ -49,54 +49,53 @@ class DatabaseImplTest {
 
     @Before
     fun setUp() {
-        database.insert(
-            TEST_PATIENT_1)
+        database.insert(TEST_PATIENT_1)
     }
 
     @Test
     fun insert_shouldInsertResource() {
-        database.insert(
-            TEST_PATIENT_2)
+        database.insert(TEST_PATIENT_2)
         testingUtils.assertResourceEquals(
-            TEST_PATIENT_2, database.select(Patient::class.java,
-            TEST_PATIENT_2_ID))
+            TEST_PATIENT_2,
+            database.select(Patient::class.java, TEST_PATIENT_2_ID)
+        )
     }
 
     @Test
     fun insertAll_shouldInsertResources() {
         val patients = ArrayList<Patient>()
-        patients.add(
-            TEST_PATIENT_1)
-        patients.add(
-            TEST_PATIENT_2)
+        patients.add(TEST_PATIENT_1)
+        patients.add(TEST_PATIENT_2)
         database.insertAll(patients)
         testingUtils.assertResourceEquals(
-            TEST_PATIENT_1, database.select(Patient::class.java,
-            TEST_PATIENT_1_ID))
+            TEST_PATIENT_1,
+            database.select(Patient::class.java, TEST_PATIENT_1_ID)
+        )
         testingUtils.assertResourceEquals(
-            TEST_PATIENT_2, database.select(Patient::class.java,
-            TEST_PATIENT_2_ID))
+            TEST_PATIENT_2,
+            database.select(Patient::class.java, TEST_PATIENT_2_ID)
+        )
     }
 
     @Test
-    fun update_nonexistentResource_shouldUpdateResource() {
+    fun update_existentResource_shouldUpdateResource() {
         val patient = Patient()
-        patient.setId(
-            TEST_PATIENT_1_ID)
+        patient.setId(TEST_PATIENT_1_ID)
         patient.setGender(Enumerations.AdministrativeGender.FEMALE)
         database.update(patient)
-        testingUtils.assertResourceEquals(patient,
-            database.select(Patient::class.java,
-                TEST_PATIENT_1_ID))
+        testingUtils.assertResourceEquals(
+            patient,
+            database.select(Patient::class.java, TEST_PATIENT_1_ID)
+        )
     }
 
     @Test
-    fun update_existingResource_shouldInsertResource() {
-        database.update(
-            TEST_PATIENT_2)
+    fun update_nonExistingResource_shouldInsertResource() {
+        database.update(TEST_PATIENT_2)
         testingUtils.assertResourceEquals(
-            TEST_PATIENT_2, database.select(Patient::class.java,
-            TEST_PATIENT_2_ID))
+            TEST_PATIENT_2,
+            database.select(Patient::class.java, TEST_PATIENT_2_ID)
+        )
     }
 
     @Test
@@ -104,10 +103,12 @@ class DatabaseImplTest {
         val illegalArgumentException =
             assertThrows(
                 IllegalArgumentException::class.java,
-                { database.select(Resource::class.java, "resource_id") })
+                { database.select(Resource::class.java, "resource_id") }
+            )
         assertEquals(
             "Cannot resolve resource type for " + Resource::class.java.name,
-            illegalArgumentException.message)
+            illegalArgumentException.message
+        )
     }
 
     @Test
@@ -115,19 +116,22 @@ class DatabaseImplTest {
         val resourceNotFoundInDbException =
             assertThrows(
                 ResourceNotFoundInDbException::class.java,
-                { database.select(Patient::class.java, "nonexistent_patient") })
+                { database.select(Patient::class.java, "nonexistent_patient") }
+            )
         assertEquals(
             "Resource not found with type " +
                 ResourceType.Patient.name +
                 " and id nonexistent_patient!",
-            resourceNotFoundInDbException.message)
+            resourceNotFoundInDbException.message
+        )
     }
 
     @Test
     fun select_shouldReturnResource() {
         testingUtils.assertResourceEquals(
-            TEST_PATIENT_1, database.select(Patient::class.java,
-            TEST_PATIENT_1_ID))
+            TEST_PATIENT_1,
+            database.select(Patient::class.java, TEST_PATIENT_1_ID)
+        )
     }
 
     private companion object {
@@ -135,8 +139,7 @@ class DatabaseImplTest {
         val TEST_PATIENT_1 = Patient()
 
         init {
-            TEST_PATIENT_1.setId(
-                TEST_PATIENT_1_ID)
+            TEST_PATIENT_1.setId(TEST_PATIENT_1_ID)
             TEST_PATIENT_1.setGender(Enumerations.AdministrativeGender.MALE)
         }
 
@@ -144,8 +147,7 @@ class DatabaseImplTest {
         val TEST_PATIENT_2 = Patient()
 
         init {
-            TEST_PATIENT_2.setId(
-                TEST_PATIENT_2_ID)
+            TEST_PATIENT_2.setId(TEST_PATIENT_2_ID)
             TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE)
         }
     }
