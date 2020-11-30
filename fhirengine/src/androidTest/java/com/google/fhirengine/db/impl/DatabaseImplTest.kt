@@ -17,6 +17,7 @@
 package com.google.fhirengine.db.impl
 
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.fhirengine.FhirServices
 import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.resource.TestingUtils
@@ -31,9 +32,15 @@ import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+/**
+ * Integration tests for [DatabaseImpl]. There are written as integration tests as officially
+ * recommend because:
+ * * Different versions of android are shipped with different versions of SQLite. Integration tests
+ * allow for better coverage on them.
+ * * Robolectric's SQLite implementation does not match Android, e.g.: https://github.com/robolectric/robolectric/blob/master/shadows/framework/src/main/java/org/robolectric/shadows/ShadowSQLiteConnection.java#L97
+ */
+@RunWith(AndroidJUnit4::class)
 class DatabaseImplTest {
     private val dataSource = object : FhirDataSource {
         override suspend fun loadData(path: String): Bundle {
