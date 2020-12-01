@@ -92,8 +92,8 @@ class FhirEngineImpl constructor(
         }
     }
 
-    override fun <R : Resource> remove(clazz: Class<R>, id: String): R {
-        throw UnsupportedOperationException("Not implemented yet!")
+    override fun <R : Resource> remove(clazz: Class<R>, id: String) {
+        database.delete(clazz, id)
     }
 
     override fun evaluateCql(

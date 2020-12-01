@@ -16,6 +16,7 @@
 
 package com.google.fhirengine.impl;
 
+import static com.google.fhirengine.db.impl.dao.LocalChangeDao.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
@@ -82,6 +83,13 @@ public class FhirEngineImplTest {
   }
 
   @Test
+  public void save_existentResource_shouldThrowInvalidLocalChangeException() throws Exception {
+    InvalidLocalChangeException invalidLocalChangeException =
+        assertThrows(InvalidLocalChangeException.class, () -> fhirEngine.save(TEST_PATIENT_1));
+    assertEquals("Can not INSERT on top of INSERT", invalidLocalChangeException.getMessage());
+  }
+
+  @Test
   public void save_shouldSaveResource() throws Exception {
     fhirEngine.save(TEST_PATIENT_2);
     testingUtils.assertResourceEquals(
@@ -101,7 +109,16 @@ public class FhirEngineImplTest {
   }
 
   @Test
-  public void update_nonexistentResource_shouldThrowResourceNotFoundException() throws Exception {
+  public void update_shouldUpdateResource() throws Exception {
+    Patient patient = new Patient();
+    patient.setId(TEST_PATIENT_1_ID);
+    patient.setGender(Enumerations.AdministrativeGender.FEMALE);
+    fhirEngine.update(patient);
+    testingUtils.assertResourceEquals(patient, fhirEngine.load(Patient.class, TEST_PATIENT_1_ID));
+  }
+
+  @Test
+  public void update_nonExistentResource_shouldThrowResourceNotFoundException() throws Exception {
     ResourceNotFoundException resourceNotFoundInDbException =
         assertThrows(ResourceNotFoundException.class, () -> fhirEngine.update(TEST_PATIENT_2));
     assertEquals(
@@ -114,16 +131,13 @@ public class FhirEngineImplTest {
   }
 
   @Test
-  public void update_shouldUpdateResource() throws Exception {
-    Patient patient = new Patient();
-    patient.setId(TEST_PATIENT_1_ID);
-    patient.setGender(Enumerations.AdministrativeGender.FEMALE);
-    fhirEngine.update(patient);
-    testingUtils.assertResourceEquals(patient, fhirEngine.load(Patient.class, TEST_PATIENT_1_ID));
+  public void load_shouldReturnResource() throws Exception {
+    testingUtils.assertResourceEquals(
+        TEST_PATIENT_1, fhirEngine.load(Patient.class, TEST_PATIENT_1_ID));
   }
 
   @Test
-  public void load_nonexistentResource_shouldThrowResourceNotFoundException() throws Exception {
+  public void load_nonExistentResource_shouldThrowResourceNotFoundException() throws Exception {
     ResourceNotFoundException resourceNotFoundInDbException =
         assertThrows(
             ResourceNotFoundException.class,
@@ -136,8 +150,31 @@ public class FhirEngineImplTest {
   }
 
   @Test
-  public void load_shouldReturnResource() throws Exception {
+  public void delete_existentResource_shouldDeleteResource() throws Exception {
     testingUtils.assertResourceEquals(
         TEST_PATIENT_1, fhirEngine.load(Patient.class, TEST_PATIENT_1_ID));
+    fhirEngine.remove(Patient.class, TEST_PATIENT_1_ID);
+    ResourceNotFoundException resourceNotFoundException =
+        assertThrows(
+            ResourceNotFoundException.class,
+            () -> fhirEngine.load(Patient.class, TEST_PATIENT_1_ID));
+    assertEquals(
+        "Resource not found with type "
+            + ResourceType.Patient.name()
+            + " and id "
+            + TEST_PATIENT_1_ID
+            + "!",
+        resourceNotFoundException.getMessage());
+  }
+
+  @Test
+  public void delete_nonExistentResource_shouldThrowInvalidLocalChangeException() throws Exception {
+    InvalidLocalChangeException invalidLocalChangeException =
+        assertThrows(
+            InvalidLocalChangeException.class,
+            () -> fhirEngine.remove(Patient.class, "non_existent_id"));
+    assertEquals(
+        "Can not DELETE non-existent resource Patient/non_existent_id",
+        invalidLocalChangeException.getMessage());
   }
 }
