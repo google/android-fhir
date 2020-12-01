@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.JsonPatch
 import com.github.fge.jsonpatch.diff.JsonDiff
+import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.db.impl.entities.LocalChange
 import com.google.fhirengine.db.impl.entities.LocalChange.Type
 import com.google.fhirengine.toTimeZoneString
@@ -67,9 +68,7 @@ internal abstract class LocalChangeDao {
         val timestamp = Date().toTimeZoneString()
         val resourceString = iParser.encodeResourceToString(resource)
 
-        if (localChanges.isEmpty() ||
-            localChanges.last().type == Type.DELETE
-        ) {
+        if (localChanges.isEmpty() || localChanges.last().type == Type.DELETE) {
             // Insert this change in the local changes table
             addLocalChange(
                 LocalChange(
@@ -83,7 +82,8 @@ internal abstract class LocalChangeDao {
             )
         } else {
             // Can't add an INSERT on top of an INSERT or UPDATE
-            throw InvalidLocalChangeException("Can not INSERT on top of $localChanges.last().type")
+            val lastType = localChanges.last().type
+            throw InvalidLocalChangeException("Can not INSERT on top of $lastType")
         }
     }
 
@@ -96,32 +96,36 @@ internal abstract class LocalChangeDao {
         )
         val timestamp = Date().toTimeZoneString()
 
-        if (localChanges.isEmpty()) {
-            // TODO retrieve from resource dao???
-        } else if (localChanges.last().type in arrayOf(Type.UPDATE, Type.INSERT)) {
-            // squash all changes to get the resource to diff against
-            val squashedLocalChanges = squash(localChanges)
+        when {
+            localChanges.isEmpty() -> {
+                throw ResourceNotFoundInDbException(resourceType.name, resourceId)
+            }
+            localChanges.last().type in arrayOf(Type.UPDATE, Type.INSERT) -> {
+                // squash all changes to get the resource to diff against
+                val squashedLocalChanges = squash(localChanges)
 
-            if (squashedLocalChanges.type.equals(Type.DELETE))
-                throw InvalidLocalChangeException(
-                    "Unexpected DELETE when squashing $resourceType.name/$resourceId.UPDATE failed"
+                if (squashedLocalChanges.type.equals(Type.DELETE))
+                    throw InvalidLocalChangeException(
+                        "Unexpected DELETE when squashing $resourceType/$resourceId. UPDATE failed"
+                    )
+
+                val squashedResource = iParser.parseResource(squashedLocalChanges.diff) as Resource
+
+                // insert the diff as an update
+                addLocalChange(
+                    LocalChange(
+                        id = 0,
+                        resourceType = resourceType.name,
+                        resourceId = resourceId,
+                        timestamp = timestamp,
+                        type = Type.UPDATE,
+                        diff = diff(squashedResource, resource)
+                    )
                 )
-
-            val squashedResource = iParser.parseResource(squashedLocalChanges.diff) as Resource
-
-            // insert the diff as an update
-            addLocalChange(
-                LocalChange(
-                    id = 0,
-                    resourceType = resourceType.name,
-                    resourceId = resourceId,
-                    timestamp = timestamp,
-                    type = Type.UPDATE,
-                    diff = diff(squashedResource, resource)
-                )
-            )
-        } else {
-            throw InvalidLocalChangeException("Can not UPDATE on top of $localChanges.type")
+            }
+            else -> {
+                throw InvalidLocalChangeException("Can not UPDATE on top of $localChanges.type")
+            }
         }
     }
 
@@ -131,27 +135,28 @@ internal abstract class LocalChangeDao {
             resourceType = resourceType.name
         )
 
-        if (localChanges.isEmpty())
-            throw InvalidLocalChangeException(
+        val timestamp = Date().toTimeZoneString()
+
+        when {
+            localChanges.isEmpty() -> throw InvalidLocalChangeException(
                 "Can not DELETE non-existent resource $resourceType/$resourceId"
             )
-
-        val timestamp = Date().toTimeZoneString()
-        val topChange = localChanges.last()
-
-        if (topChange.type in arrayOf(Type.UPDATE, Type.INSERT)) {
-            addLocalChange(
-                LocalChange(
-                    id = 0,
-                    resourceType = resourceType.name,
-                    resourceId = resourceId,
-                    timestamp = timestamp,
-                    type = Type.DELETE,
-                    diff = ""
+            localChanges.last().type in arrayOf(Type.UPDATE, Type.INSERT) -> {
+                addLocalChange(
+                    LocalChange(
+                        id = 0,
+                        resourceType = resourceType.name,
+                        resourceId = resourceId,
+                        timestamp = timestamp,
+                        type = Type.DELETE,
+                        diff = ""
+                    )
                 )
-            )
-        } else {
-            throw InvalidLocalChangeException("Can not DELETE on top of $topChange.type")
+            }
+            else -> {
+                val lastType = localChanges.last().type
+                throw InvalidLocalChangeException("Can not DELETE on top of $lastType")
+            }
         }
     }
 
@@ -164,18 +169,14 @@ internal abstract class LocalChangeDao {
      * latest representation of the resource.
      * 2. If it's an UPDATE then squash the rest of the list recursively. Merge the result of the
      * squash using [applyPatch].
+     *
+     * @throws InvalidLocalChangeException when no INSERT is found in the list.
      */
     fun squash(localChanges: List<LocalChange>): LocalChange {
+        if (localChanges.isEmpty())
+            throw InvalidLocalChangeException("Could not find INSERT in local changes.")
 
         val last = localChanges.last()
-
-        // Special case to handle remote-created resource which was
-        // updated locally
-        if (localChanges.size == 1 && last.type == Type.UPDATE) {
-            // TODO retrieve resource from ResourceEntity and
-            //  return as INSERT for local changes
-        }
-
         return when (last.type) {
             Type.DELETE -> LocalChange(
                 resourceId = last.resourceId,

@@ -61,7 +61,7 @@ internal abstract class ResourceDao {
         }
     }
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun insertResource(resource: ResourceEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

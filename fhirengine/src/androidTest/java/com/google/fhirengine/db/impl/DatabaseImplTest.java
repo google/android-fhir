@@ -58,6 +58,15 @@ public class DatabaseImplTest {
     TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE);
   }
 
+  private static final String TEST_PATIENT_3_ID = "test_patient_3";
+  private static final Patient TEST_PATIENT_3;
+
+  static {
+    TEST_PATIENT_3 = new Patient();
+    TEST_PATIENT_3.setId(TEST_PATIENT_3_ID);
+    TEST_PATIENT_3.setGender(Enumerations.AdministrativeGender.OTHER);
+  }
+
   private FhirDataSource dataSource = (path, $completion) -> null;
 
   private FhirServices services =
@@ -89,13 +98,13 @@ public class DatabaseImplTest {
   @Test
   public void insertAll_shouldInsertResources() throws Exception {
     List<Patient> patients = new ArrayList<>();
-    patients.add(TEST_PATIENT_1);
     patients.add(TEST_PATIENT_2);
+    patients.add(TEST_PATIENT_3);
     database.insertAll(patients);
     testingUtils.assertResourceEquals(
-        TEST_PATIENT_1, database.select(Patient.class, TEST_PATIENT_1_ID));
-    testingUtils.assertResourceEquals(
         TEST_PATIENT_2, database.select(Patient.class, TEST_PATIENT_2_ID));
+    testingUtils.assertResourceEquals(
+        TEST_PATIENT_3, database.select(Patient.class, TEST_PATIENT_3_ID));
   }
 
   @Test
@@ -108,20 +117,22 @@ public class DatabaseImplTest {
   }
 
   @Test
-  public void update_nonExistentResource_shouldInsertResource() throws Exception {
-    database.update(TEST_PATIENT_2);
-    testingUtils.assertResourceEquals(
-        TEST_PATIENT_2, database.select(Patient.class, TEST_PATIENT_2_ID));
+  public void update_nonExistentResource_shouldThrowResourceNotFoundException() throws Exception {
+    ResourceNotFoundInDbException resourceNotFoundInDbException =
+        assertThrows(ResourceNotFoundInDbException.class, () -> database.update(TEST_PATIENT_2));
+    assertEquals(
+        "Resource not found with type "
+            + ResourceType.Patient.name()
+            + " and id "
+            + TEST_PATIENT_2_ID
+            + "!",
+        resourceNotFoundInDbException.getMessage());
   }
 
   @Test
-  public void select_invalidResourceType_shouldThrowIllegalArgumentException() throws Exception {
-    IllegalArgumentException illegalArgumentException =
-        assertThrows(
-            IllegalArgumentException.class, () -> database.select(Resource.class, "resource_id"));
-    assertEquals(
-        "Cannot resolve resource type for " + Resource.class.getName(),
-        illegalArgumentException.getMessage());
+  public void select_existentResource_shouldReturnResource() throws Exception {
+    testingUtils.assertResourceEquals(
+        TEST_PATIENT_1, database.select(Patient.class, TEST_PATIENT_1_ID));
   }
 
   @Test
@@ -138,9 +149,13 @@ public class DatabaseImplTest {
   }
 
   @Test
-  public void select_existentResource_shouldReturnResource() throws Exception {
-    testingUtils.assertResourceEquals(
-        TEST_PATIENT_1, database.select(Patient.class, TEST_PATIENT_1_ID));
+  public void select_invalidResourceType_shouldThrowIllegalArgumentException() throws Exception {
+    IllegalArgumentException illegalArgumentException =
+        assertThrows(
+            IllegalArgumentException.class, () -> database.select(Resource.class, "resource_id"));
+    assertEquals(
+        "Cannot resolve resource type for " + Resource.class.getName(),
+        illegalArgumentException.getMessage());
   }
 
   @Test
