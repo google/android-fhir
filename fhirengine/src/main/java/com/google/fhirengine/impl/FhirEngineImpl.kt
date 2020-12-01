@@ -74,8 +74,13 @@ class FhirEngineImpl constructor(
         database.insertAll(resources)
     }
 
+    @Throws(ResourceNotFoundException::class)
     override fun <R : Resource> update(resource: R) {
-        database.update(resource)
+        try {
+            database.update(resource)
+        } catch (e: ResourceNotFoundInDbException) {
+            throw ResourceNotFoundException(resource.resourceType.name, resource.id, e)
+        }
     }
 
     @Throws(ResourceNotFoundException::class)

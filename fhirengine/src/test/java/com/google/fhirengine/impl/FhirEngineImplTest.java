@@ -56,6 +56,15 @@ public class FhirEngineImplTest {
     TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE);
   }
 
+  private static final String TEST_PATIENT_3_ID = "test_patient_3";
+  private static final Patient TEST_PATIENT_3;
+
+  static {
+    TEST_PATIENT_3 = new Patient();
+    TEST_PATIENT_3.setId(TEST_PATIENT_3_ID);
+    TEST_PATIENT_3.setGender(Enumerations.AdministrativeGender.OTHER);
+  }
+
   private FhirDataSource dataSource = (path, $completion) -> null;
 
   FhirServices services =
@@ -81,21 +90,27 @@ public class FhirEngineImplTest {
 
   @Test
   public void saveAll_shouldSaveResource() throws Exception {
-    List<Patient> patients = new ArrayList();
-    patients.add(TEST_PATIENT_1);
+    List<Patient> patients = new ArrayList<>();
     patients.add(TEST_PATIENT_2);
+    patients.add(TEST_PATIENT_3);
     fhirEngine.saveAll(patients);
     testingUtils.assertResourceEquals(
-        TEST_PATIENT_1, fhirEngine.load(Patient.class, TEST_PATIENT_1_ID));
-    testingUtils.assertResourceEquals(
         TEST_PATIENT_2, fhirEngine.load(Patient.class, TEST_PATIENT_2_ID));
+    testingUtils.assertResourceEquals(
+        TEST_PATIENT_3, fhirEngine.load(Patient.class, TEST_PATIENT_3_ID));
   }
 
   @Test
-  public void update_nonexistentResource_shouldInsertResource() throws Exception {
-    fhirEngine.update(TEST_PATIENT_2);
-    testingUtils.assertResourceEquals(
-        TEST_PATIENT_2, fhirEngine.load(Patient.class, TEST_PATIENT_2_ID));
+  public void update_nonexistentResource_shouldThrowResourceNotFoundException() throws Exception {
+    ResourceNotFoundException resourceNotFoundInDbException =
+        assertThrows(ResourceNotFoundException.class, () -> fhirEngine.update(TEST_PATIENT_2));
+    assertEquals(
+        "Resource not found with type "
+            + ResourceType.Patient.name()
+            + " and id "
+            + TEST_PATIENT_2_ID
+            + "!",
+        resourceNotFoundInDbException.getMessage());
   }
 
   @Test
@@ -108,7 +123,7 @@ public class FhirEngineImplTest {
   }
 
   @Test
-  public void load_nonexistentResource_shouldThrowResourceNotFondException() throws Exception {
+  public void load_nonexistentResource_shouldThrowResourceNotFoundException() throws Exception {
     ResourceNotFoundException resourceNotFoundInDbException =
         assertThrows(
             ResourceNotFoundException.class,
