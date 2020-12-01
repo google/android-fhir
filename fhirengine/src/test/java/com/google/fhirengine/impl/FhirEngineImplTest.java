@@ -150,7 +150,7 @@ public class FhirEngineImplTest {
   }
 
   @Test
-  public void delete_existentResource_shouldDeleteResource() throws Exception {
+  public void remove_existentResource_shouldDeleteResource() throws Exception {
     testingUtils.assertResourceEquals(
         TEST_PATIENT_1, fhirEngine.load(Patient.class, TEST_PATIENT_1_ID));
     fhirEngine.remove(Patient.class, TEST_PATIENT_1_ID);
@@ -168,7 +168,7 @@ public class FhirEngineImplTest {
   }
 
   @Test
-  public void delete_nonExistentResource_shouldThrowInvalidLocalChangeException() throws Exception {
+  public void remove_nonExistentResource_shouldThrowInvalidLocalChangeException() throws Exception {
     InvalidLocalChangeException invalidLocalChangeException =
         assertThrows(
             InvalidLocalChangeException.class,
@@ -176,5 +176,79 @@ public class FhirEngineImplTest {
     assertEquals(
         "Can not DELETE non-existent resource Patient/non_existent_id",
         invalidLocalChangeException.getMessage());
+  }
+
+  @Test
+  public void update_twice_ShouldUpdateResource() throws Exception {
+    Patient patient = new Patient();
+    patient.setId(TEST_PATIENT_1_ID);
+    patient.setGender(Enumerations.AdministrativeGender.FEMALE);
+    fhirEngine.update(patient);
+    patient.setGender(Enumerations.AdministrativeGender.MALE);
+    fhirEngine.update(patient);
+    testingUtils.assertResourceEquals(patient, fhirEngine.load(Patient.class, TEST_PATIENT_1_ID));
+  }
+
+  @Test
+  public void remove_updated_ShouldRemoveResource() throws Exception {
+    Patient patient = new Patient();
+    patient.setId(TEST_PATIENT_1_ID);
+    patient.setGender(Enumerations.AdministrativeGender.FEMALE);
+    fhirEngine.update(patient);
+    fhirEngine.remove(Patient.class, TEST_PATIENT_1_ID);
+    ResourceNotFoundException resourceNotFoundException =
+        assertThrows(
+            ResourceNotFoundException.class,
+            () -> fhirEngine.load(Patient.class, TEST_PATIENT_1_ID));
+    assertEquals(
+        "Resource not found with type "
+            + ResourceType.Patient.name()
+            + " and id "
+            + TEST_PATIENT_1_ID
+            + "!",
+        resourceNotFoundException.getMessage());
+  }
+
+  @Test
+  public void save_saveRemovedResource_ShouldSaveResource() throws Exception {
+    fhirEngine.remove(Patient.class, TEST_PATIENT_1_ID);
+    Patient patient = new Patient();
+    patient.setId(TEST_PATIENT_1_ID);
+    patient.setGender(Enumerations.AdministrativeGender.FEMALE);
+    fhirEngine.save(patient);
+    testingUtils.assertResourceEquals(patient, fhirEngine.load(Patient.class, TEST_PATIENT_1_ID));
+  }
+
+  @Test
+  public void update_updateReinsertedResource_ShouldUpdateResource() throws Exception {
+    fhirEngine.remove(Patient.class, TEST_PATIENT_1_ID);
+    Patient patient = new Patient();
+    patient.setId(TEST_PATIENT_1_ID);
+    patient.setGender(Enumerations.AdministrativeGender.OTHER);
+    fhirEngine.save(patient);
+    patient.setGender(Enumerations.AdministrativeGender.UNKNOWN);
+    fhirEngine.update(patient);
+    testingUtils.assertResourceEquals(patient, fhirEngine.load(Patient.class, TEST_PATIENT_1_ID));
+  }
+
+  @Test
+  public void remove_removeReinsertedResource_ShouldRemoveResource() throws Exception {
+    fhirEngine.remove(Patient.class, TEST_PATIENT_1_ID);
+    Patient patient = new Patient();
+    patient.setId(TEST_PATIENT_1_ID);
+    patient.setGender(Enumerations.AdministrativeGender.OTHER);
+    fhirEngine.save(patient);
+    fhirEngine.remove(Patient.class, TEST_PATIENT_1_ID);
+    ResourceNotFoundException resourceNotFoundException =
+        assertThrows(
+            ResourceNotFoundException.class,
+            () -> fhirEngine.load(Patient.class, TEST_PATIENT_1_ID));
+    assertEquals(
+        "Resource not found with type "
+            + ResourceType.Patient.name()
+            + " and id "
+            + TEST_PATIENT_1_ID
+            + "!",
+        resourceNotFoundException.getMessage());
   }
 }
