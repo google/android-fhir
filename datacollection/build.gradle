@@ -42,7 +42,11 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.2.0'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
+    implementation project(path: ':fhirengine')
+    testImplementation "androidx.test:core:$testVersion"
+    testImplementation "com.google.truth:truth:$truthVersion"
     testImplementation 'junit:junit:4.+'
+    testImplementation "org.robolectric:robolectric:$roboelectricVersion"
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }

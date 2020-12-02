@@ -12,6 +12,9 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
     private val responseItemMap =
         mutableMapOf<String, QuestionnaireResponse.QuestionnaireResponseItemComponent>()
     internal val questionnaireResponse = QuestionnaireResponse()
+    init {
+        questionnaireResponse.id = questionnaire.id
+    }
 
     init {
         questionnaire.item.forEach {
@@ -35,7 +38,8 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
 
     private fun createQuestionnaireResponseItemComponent(
         questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent,
-        questionnaireResponseItemComponentList: MutableList<QuestionnaireResponse.QuestionnaireResponseItemComponent>) {
+        questionnaireResponseItemComponentList:
+        MutableList<QuestionnaireResponse.QuestionnaireResponseItemComponent>) {
         when (questionnaireItemComponent.type) {
             Questionnaire.QuestionnaireItemType.BOOLEAN -> {
                 val questionnaireResponseItemComponent =
