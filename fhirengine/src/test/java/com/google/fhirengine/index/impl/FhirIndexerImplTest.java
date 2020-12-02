@@ -230,8 +230,8 @@ public class FhirIndexerImplTest {
   }
 
   @Test
-  public void index_null_shouldThrowIllegalArgumentException() throws Exception {
-    Assert.assertThrows(IllegalArgumentException.class, () -> fhirIndexer.index(null));
+  public void index_null_shouldThrowNullPointerException() throws Exception {
+    Assert.assertThrows(NullPointerException.class, () -> fhirIndexer.index(null));
   }
 
   @Test
