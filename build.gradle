@@ -55,10 +55,10 @@ ext {
     workManagerVersion = '2.3.4'
 
     // testing
-    junitVersion = '4.13'
+    junitVersion = '4.13.1'
     roboelectricVersion = '4.3.1'
-    testVersion = '1.2.0'
+    testVersion = '1.3.0'
     truthVersion = '1.0.1'
-    androidTestJunitVersion = '1.1.1'
+    androidTestJunitVersion = '1.1.2'
 
 }
