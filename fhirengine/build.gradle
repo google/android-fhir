@@ -59,6 +59,10 @@ configurations {
     }
 }
 
+tasks.withType(Test) {
+    maxHeapSize = '256m'
+}
+
 dependencies {
     api ("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiFhirStructuresR4Version") {
         exclude module:'junit'

@@ -70,7 +70,7 @@ jobs:
       with:
         api-level: ${{ matrix.api-level }}
         arch: x86_64
-        script: ./gradlew connectedCheck --stacktrace
+        script: ./gradlew connectedCheck
       
     - name: Upload build reports
       if: always()
