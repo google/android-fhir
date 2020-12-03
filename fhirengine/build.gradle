@@ -15,12 +15,8 @@ android {
 
         // Required when setting minSdkVersion to 20 or lower
         multiDexEnabled true
-        // Need to specify 'package' to prevent junit runner from going deep into our dependencies.
-        // 'clearPackageData' makes the Android Test Orchestrator run its
-        // "pm clear" command after each test invocation. This command ensures
-        // that the app's state is completely cleared between tests.
-        testInstrumentationRunnerArguments = ['package'         : 'com.google.fhirengine',
-                                              'clearPackageData': 'true']
+        // need to specify this to prevent junit runner from going deep into our dependencies
+        testInstrumentationRunnerArguments = ['package': 'com.google.fhirengine']
     }
     sourceSets {
         // shared code between junit and instrumentation tests
@@ -45,9 +41,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }
-    testOptions {
-        execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
 }
 
@@ -90,8 +83,6 @@ dependencies {
     androidTestImplementation "androidx.test:core:$testVersion"
     androidTestImplementation "junit:junit:$junitVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"
-
-    androidTestUtil "androidx.test:orchestrator:$testVersion"
 }
 
 repositories {
