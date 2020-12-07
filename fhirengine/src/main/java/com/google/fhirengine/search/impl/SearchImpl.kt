@@ -17,7 +17,7 @@
 package com.google.fhirengine.search.impl
 
 import com.google.fhirengine.db.Database
-import com.google.fhirengine.resource.ResourceUtils
+import com.google.fhirengine.resource.getResourceType
 import com.google.fhirengine.search.Search
 import com.google.fhirengine.search.filter.FilterCriterion
 import com.google.fhirengine.search.sort.SortCriterion
@@ -47,7 +47,7 @@ class SearchImpl constructor(val database: Database) : Search {
         override fun skip(skip: Int): Search.SearchSpecifications = apply { this.skip = skip }
 
         override fun <R : Resource> run(): List<R> = database.search(
-                SerializedResourceQuery(ResourceUtils.getResourceType(clazz),
+                SerializedResourceQuery(getResourceType(clazz),
                         filterCriterion?.query(clazz), sortCriterion, limit, skip))
     }
 }

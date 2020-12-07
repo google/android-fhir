@@ -23,7 +23,7 @@ import ca.uhn.fhir.parser.IParser
 import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
 import com.google.fhirengine.index.FhirIndexer
-import com.google.fhirengine.resource.ResourceUtils
+import com.google.fhirengine.resource.getResourceType
 import com.google.fhirengine.search.impl.Query
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -43,20 +43,21 @@ internal class DatabaseImpl(
       iParser: IParser,
       fhirIndexer: FhirIndexer
     ) : this(
-            context = context,
-            iParser = iParser,
-            fhirIndexer = fhirIndexer,
-            databaseName = DEFAULT_DATABASE_NAME)
+        context = context,
+        iParser = iParser,
+        fhirIndexer = fhirIndexer,
+        databaseName = DEFAULT_DATABASE_NAME)
+
     val builder = if (databaseName == null) {
         Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
     } else {
         Room.databaseBuilder(context, ResourceDatabase::class.java, databaseName)
     }
     val db = builder
-            // TODO https://github.com/jingtang10/fhir-engine/issues/32
-            //  don't allow main thread queries
-            .allowMainThreadQueries()
-            .build()
+        // TODO https://github.com/jingtang10/fhir-engine/issues/32
+        //  don't allow main thread queries
+        .allowMainThreadQueries()
+        .build()
     val resourceDao by lazy {
         db.resourceDao().also {
             it.fhirIndexer = fhirIndexer
@@ -78,10 +79,10 @@ internal class DatabaseImpl(
     }
 
     override fun <R : Resource> select(clazz: Class<R>, id: String): R {
-        val type = ResourceUtils.getResourceType(clazz)
+        val type = getResourceType(clazz)
         return resourceDao.getResource(
-                resourceId = id,
-                resourceType = type
+            resourceId = id,
+            resourceType = type
         )?.let {
             iParser.parseResource(clazz, it)
         } ?: throw ResourceNotFoundInDbException(type.name, id)
@@ -101,10 +102,10 @@ internal class DatabaseImpl(
     }
 
     override fun <R : Resource> delete(clazz: Class<R>, id: String) {
-        val type = ResourceUtils.getResourceType(clazz)
+        val type = getResourceType(clazz)
         resourceDao.deleteResource(
-                resourceId = id,
-                resourceType = type
+            resourceId = id,
+            resourceType = type
         )
     }
 
@@ -114,8 +115,8 @@ internal class DatabaseImpl(
       value: String
     ): List<R> {
         return resourceDao.getResourceByReferenceIndex(
-                ResourceUtils.getResourceType(clazz).name, reference, value)
-                .map { iParser.parseResource(it) as R }
+            getResourceType(clazz).name, reference, value)
+            .map { iParser.parseResource(it) as R }
     }
 
     override fun <R : Resource> searchByString(
@@ -124,7 +125,7 @@ internal class DatabaseImpl(
       value: String
     ): List<R> {
         return resourceDao.getResourceByStringIndex(
-            resourceType = ResourceUtils.getResourceType(clazz).name,
+            resourceType = getResourceType(clazz).name,
             indexPath = string,
             indexValue = value
         ).map { iParser.parseResource(it) as R }
@@ -137,7 +138,7 @@ internal class DatabaseImpl(
       value: String
     ): List<R> {
         return resourceDao.getResourceByCodeIndex(
-            resourceType = ResourceUtils.getResourceType(clazz).name,
+            resourceType = getResourceType(clazz).name,
             indexPath = code,
             indexSystem = system,
             indexValue = value
@@ -157,8 +158,8 @@ internal class DatabaseImpl(
     }
 
     override fun <R : Resource> search(query: Query): List<R> =
-            resourceDao.getResources(query.getSupportSQLiteQuery())
-                .map { iParser.parseResource(it) as R }
+        resourceDao.getResources(query.getSupportSQLiteQuery())
+            .map { iParser.parseResource(it) as R }
 
     companion object {
         private const val DEFAULT_DATABASE_NAME = "ResourceDatabase"
