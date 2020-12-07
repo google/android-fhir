@@ -158,22 +158,4 @@ class DatabaseImplTest {
             TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE)
         }
     }
-
-    private companion object {
-        const val TEST_PATIENT_1_ID = "test_patient_1"
-        val TEST_PATIENT_1 = Patient()
-
-        init {
-            TEST_PATIENT_1.setId(TEST_PATIENT_1_ID)
-            TEST_PATIENT_1.setGender(Enumerations.AdministrativeGender.MALE)
-        }
-
-        const val TEST_PATIENT_2_ID = "test_patient_2"
-        val TEST_PATIENT_2 = Patient()
-
-        init {
-            TEST_PATIENT_2.setId(TEST_PATIENT_2_ID)
-            TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE)
-        }
-    }
 }
