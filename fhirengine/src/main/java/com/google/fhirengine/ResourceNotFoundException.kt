@@ -18,7 +18,7 @@ package com.google.fhirengine
 
 /** Thrown to indicate that the requested resource is not found. */
 class ResourceNotFoundException(
-  type: String,
-  id: String,
+  val type: String,
+  val id: String,
   cause: Throwable
 ) : Exception("Resource not found with type $type and id $id!", cause)
