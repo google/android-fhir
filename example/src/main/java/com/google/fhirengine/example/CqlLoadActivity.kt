@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.fhirengine.example
 
 import android.os.AsyncTask
@@ -27,13 +28,13 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.android.material.snackbar.Snackbar
 import com.google.fhirengine.FhirEngine
 import com.google.fhirengine.example.FhirApplication.Companion.fhirEngine
-import org.hl7.fhir.r4.model.Resource
-import org.opencds.cqf.cql.execution.EvaluationResult
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.URL
+import org.hl7.fhir.r4.model.Resource
+import org.opencds.cqf.cql.execution.EvaluationResult
 
 class CqlLoadActivity : AppCompatActivity() {
     lateinit var fhirEngine: FhirEngine
