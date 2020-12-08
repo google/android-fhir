@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.datacollection
 
 import android.os.Bundle
@@ -15,6 +31,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.utils.FHIRPathEngine
+import java.util.Locale
 
 class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment() {
     private lateinit var viewModel: QuestionnaireViewModel
@@ -28,9 +46,9 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.questionnaire_fragment, container, false)
         view.findViewById<TextView>(R.id.title).text = viewModel.questionnaire.title
@@ -43,14 +61,14 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
         view.findViewById<Button>(R.id.submit).setOnClickListener {
             onQuestionnaireSubmittedListener?.onSubmitted(viewModel.questionnaireResponse)
         }
-
         return view
     }
 
     private fun generateAndAttachQuestion(
-        questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent,
-        viewGroup: ViewGroup
+      questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent,
+      viewGroup: ViewGroup
     ) {
+        Locale.getDefault().language
         val linkId = questionnaireItemComponent.linkId
         when (questionnaireItemComponent.type) {
             Questionnaire.QuestionnaireItemType.BOOLEAN -> {
@@ -94,7 +112,7 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
     }
 
     fun setOnQuestionnaireSubmittedListener(
-        onQuestionnaireSubmittedListener: OnQuestionnaireSubmittedListener
+      onQuestionnaireSubmittedListener: OnQuestionnaireSubmittedListener
     ) {
         this.onQuestionnaireSubmittedListener = onQuestionnaireSubmittedListener
     }
