@@ -1,3 +1,3 @@
-include ':datacollection'
+include ':datacapture'
 include ':example'
 include ':fhirengine'
