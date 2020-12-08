@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacollection
+package com.google.android.fhir.datacapture
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

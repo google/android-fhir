@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.fhir.datacollection
+package com.google.android.fhir.datacapture
 
 import android.os.Build
 import ca.uhn.fhir.context.FhirContext
