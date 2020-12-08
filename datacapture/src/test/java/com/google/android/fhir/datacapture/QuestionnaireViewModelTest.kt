@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture
 
 import android.os.Build
 import ca.uhn.fhir.context.FhirContext
-import com.google.android.fhir.datacollection.QuestionnaireViewModel
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Questionnaire

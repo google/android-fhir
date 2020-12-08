@@ -20,7 +20,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import ca.uhn.fhir.context.FhirContext
-import com.google.android.fhir.datacollection.QuestionnaireFragment
+import com.google.android.fhir.datacapture.QuestionnaireFragment
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
