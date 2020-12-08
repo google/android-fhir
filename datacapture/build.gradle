@@ -32,6 +32,12 @@ android {
     }
 }
 
+configurations {
+    all {
+        exclude module: 'xpp3'
+    }
+}
+
 dependencies {
     api ("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiFhirStructuresR4Version") {
         exclude module:'junit'
