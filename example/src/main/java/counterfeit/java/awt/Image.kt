@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package java.awt.datatransfer;
+package java.awt
 
-public interface Transferable {}
+class Image
