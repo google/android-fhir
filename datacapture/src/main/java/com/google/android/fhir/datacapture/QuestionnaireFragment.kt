@@ -67,7 +67,6 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
       questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent,
       viewGroup: ViewGroup
     ) {
-        Locale.getDefault().language
         val linkId = questionnaireItemComponent.linkId
         when (questionnaireItemComponent.type) {
             Questionnaire.QuestionnaireItemType.BOOLEAN -> {
