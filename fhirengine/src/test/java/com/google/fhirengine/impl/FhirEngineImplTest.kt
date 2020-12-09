@@ -53,7 +53,6 @@ class FhirEngineImplTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun save_shouldSaveResource() {
         fhirEngine.save(TEST_PATIENT_2)
         testingUtils.assertResourceEquals(
@@ -63,7 +62,6 @@ class FhirEngineImplTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun saveAll_shouldSaveResource() {
         val patients = listOf(TEST_PATIENT_1, TEST_PATIENT_2)
         fhirEngine.saveAll(patients)
@@ -78,7 +76,6 @@ class FhirEngineImplTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun update_nonexistentResource_shouldInsertResource() {
         fhirEngine.update(TEST_PATIENT_2)
         testingUtils.assertResourceEquals(
@@ -88,7 +85,6 @@ class FhirEngineImplTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun update_shouldUpdateResource() {
         val patient = Patient()
         patient.id = TEST_PATIENT_1_ID
@@ -101,7 +97,6 @@ class FhirEngineImplTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun load_nonexistentResource_shouldThrowResourceNotFondException() {
         val resourceNotFoundInDbException =
             assertThrows(ResourceNotFoundException::class.java) {
@@ -116,7 +111,6 @@ class FhirEngineImplTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun load_shouldReturnResource() {
         testingUtils.assertResourceEquals(
             TEST_PATIENT_1,
