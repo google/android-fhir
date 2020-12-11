@@ -1,20 +1,11 @@
+
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+apply from: "$rootProject.projectDir/common.gradle"
 
 android {
-    compileSdkVersion 29
-
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        // Required when setting minSdkVersion to 20 or lower
-        multiDexEnabled true
         // need to specify this to prevent junit runner from going deep into our dependencies
         testInstrumentationRunnerArguments = ['package': 'com.google.fhirengine']
     }
@@ -35,13 +26,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }
 }
 
 configurations {
@@ -55,7 +39,7 @@ configurations {
         exclude module: 'javax.activation'
         exclude module: 'jakarta.xml.bind-api'
         // TODO: the following line can be removed from the next CQL engine release.
-        exclude  module: 'hapi-fhir-jpaserver-base'
+        exclude module: 'hapi-fhir-jpaserver-base'
     }
 }
 
