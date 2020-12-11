@@ -84,7 +84,3 @@ dependencies {
     androidTestImplementation "junit:junit:$junitVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"
 }
-
-repositories {
-    mavenCentral()
-}
