@@ -28,21 +28,16 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import java.util.Locale
+import androidx.fragment.app.activityViewModels
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment() {
-    private lateinit var viewModel: QuestionnaireViewModel
+    private val viewModel: QuestionnaireViewModel by activityViewModels {
+        QuestionnaireViewModelFactory(questionnaire)
+    }
 
     internal var onQuestionnaireSubmittedListener: OnQuestionnaireSubmittedListener? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this, QuestionnaireViewModelFactory(questionnaire))
-            .get(QuestionnaireViewModel::class.java)
-    }
 
     override fun onCreateView(
       inflater: LayoutInflater,
