@@ -4,7 +4,6 @@ import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
@@ -30,7 +29,7 @@ private class QuestionnaireItemEditTextViewHolder(itemView: View,
     override fun bind(questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent) {
         textView.text = questionnaireItemComponent.text
         editText.doAfterTextChanged { editable: Editable? ->
-            viewModel.setAnswer(questionnaireItemComponent.linkId, editable.toString())
+            viewModel.recordAnswer(questionnaireItemComponent.linkId, editable.toString())
         }
     }
 }

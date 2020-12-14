@@ -23,7 +23,7 @@ private class QuestionnaireItemCheckBoxViewHolder(itemView: View, viewModel: Que
     override fun bind(questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent) {
         checkBox.text = questionnaireItemComponent.text
         checkBox.setOnClickListener {
-            viewModel.setAnswer(questionnaireItemComponent.linkId, checkBox.isChecked)
+            viewModel.recordAnswer(questionnaireItemComponent.linkId, checkBox.isChecked)
         }
     }
 }

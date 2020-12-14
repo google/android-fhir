@@ -73,7 +73,7 @@ class QuestionnaireViewModelTest {
         item.type = Questionnaire.QuestionnaireItemType.BOOLEAN
         questionnaire.addItem(item)
         val viewModel = QuestionnaireViewModel(questionnaire)
-        viewModel.setAnswer("a-link-id", true)
+        viewModel.recordAnswer("a-link-id", true)
         assertResourceEquals(
             viewModel.questionnaireResponse,
             QuestionnaireResponse().apply {
@@ -117,7 +117,7 @@ class QuestionnaireViewModelTest {
         item.type = Questionnaire.QuestionnaireItemType.STRING
         questionnaire.addItem(item)
         val viewModel = QuestionnaireViewModel(questionnaire)
-        viewModel.setAnswer("a-link-id", "John")
+        viewModel.recordAnswer("a-link-id", "John")
         assertResourceEquals(
             viewModel.questionnaireResponse,
             QuestionnaireResponse().apply {
