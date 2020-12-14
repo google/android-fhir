@@ -39,21 +39,24 @@ configurations {
 }
 
 dependencies {
-    api ("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiFhirStructuresR4Version") {
-        exclude module:'junit'
+    api (deps.hapi_r4) {
+        exclude module: 'junit'
     }
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    implementation 'androidx.core:core-ktx:1.2.0'
-    implementation "androidx.fragment:fragment-ktx:$fragment_version"
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.2.1'
+
+    implementation deps.appcompat
+    implementation deps.core
+    implementation deps.fragment
+    implementation deps.kotlin.stdlib
+    implementation deps.lifecycle.livedata_ktx
+    implementation deps.lifecycle.viewmodel_ktx
+    implementation deps.material
     implementation project(path: ':fhirengine')
-    testImplementation "androidx.test:core:$testVersion"
-    testImplementation "com.google.truth:truth:$truthVersion"
-    testImplementation 'junit:junit:4.+'
-    testImplementation "org.robolectric:robolectric:$roboelectricVersion"
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    testImplementation deps.astl.core
+    testImplementation deps.junit
+    testImplementation deps.robolectric
+    testImplementation deps.truth
+
+    androidTestImplementation deps.atsl.ext_junit
+    androidTestImplementation deps.atsl.espresso
 }
