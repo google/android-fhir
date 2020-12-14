@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.example.datacapturegallery
+package com.google.android.fhir.datacapture.gallery
 
 import android.os.Bundle
 import android.widget.TextView
