@@ -29,6 +29,7 @@ import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.RecyclerView
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -40,17 +41,17 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
     internal var onQuestionnaireSubmittedListener: OnQuestionnaireSubmittedListener? = null
 
     override fun onCreateView(
-      inflater: LayoutInflater,
-      container: ViewGroup?,
-      savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.questionnaire_fragment, container, false)
         view.findViewById<TextView>(R.id.title).text = viewModel.questionnaire.title
-        val item = view.findViewById<LinearLayout>(R.id.item)
 
-        viewModel.questionnaire.item.forEach {
-            generateAndAttachQuestion(it, item)
-        }
+        val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
+        val adapter = QuestionnaireItemAdapter(viewModel)
+        recyclerView.adapter = adapter
+        adapter.submitList(flatten(viewModel.questionnaire.item))
 
         view.findViewById<Button>(R.id.submit).setOnClickListener {
             onQuestionnaireSubmittedListener?.onSubmitted(viewModel.questionnaireResponse)
@@ -58,54 +59,22 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
         return view
     }
 
-    private fun generateAndAttachQuestion(
-      questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent,
-      viewGroup: ViewGroup
-    ) {
-        val linkId = questionnaireItemComponent.linkId
-        when (questionnaireItemComponent.type) {
-            Questionnaire.QuestionnaireItemType.BOOLEAN -> {
-                val checkBox = CheckBox(this.context)
-                checkBox.text = questionnaireItemComponent.text
-                viewGroup.addView(checkBox)
-                checkBox.setOnClickListener {
-                    viewModel.setAnswer(linkId, checkBox.isChecked)
-                }
-            }
-            Questionnaire.QuestionnaireItemType.STRING -> {
-                val questionText = TextView(context)
-                questionText.text = questionnaireItemComponent.text
-                viewGroup.addView(questionText)
-                val input = EditText(context)
-                viewGroup.addView(input)
-                input.doAfterTextChanged { editable: Editable? ->
-                    viewModel.setAnswer(linkId, editable.toString())
-                }
-            }
-            Questionnaire.QuestionnaireItemType.GROUP -> {
-                val linearLayout = LinearLayout(context)
-                linearLayout.layoutParams =
-                    LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT)
-                linearLayout.orientation = LinearLayout.VERTICAL
-                val title = TextView(context)
-                title.text = questionnaireItemComponent.text
-                linearLayout.addView(title)
-                questionnaireItemComponent.item.forEach {
-                    generateAndAttachQuestion(it, linearLayout)
-                }
-                viewGroup.addView(linearLayout)
-            }
-            else -> {
-                throw IllegalArgumentException(
-                    "Unsupported item type ${questionnaireItemComponent.type}"
-                )
+    private fun flatten(
+        items: List<Questionnaire.QuestionnaireItemComponent>
+    ): List<Questionnaire.QuestionnaireItemComponent> {
+        val flattened = mutableListOf<Questionnaire.QuestionnaireItemComponent>()
+        items.forEach { item ->
+            if (item.type == Questionnaire.QuestionnaireItemType.GROUP) {
+                flattened.addAll(flatten(item.item))
+            } else {
+                flattened.add(item)
             }
         }
+        return flattened
     }
 
     fun setOnQuestionnaireSubmittedListener(
-      onQuestionnaireSubmittedListener: OnQuestionnaireSubmittedListener
+        onQuestionnaireSubmittedListener: OnQuestionnaireSubmittedListener
     ) {
         this.onQuestionnaireSubmittedListener = onQuestionnaireSubmittedListener
     }
