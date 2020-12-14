@@ -14,13 +14,13 @@
 
 package com.example.datacapturegallery
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentResultListener
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 class MainActivity : AppCompatActivity() {
     lateinit var resultTextView: TextView
@@ -111,17 +111,18 @@ class MainActivity : AppCompatActivity() {
         questionnaire.title = "My questionnaire"
 
         val fragment = QuestionnaireFragment(questionnaire)
-
+        supportFragmentManager.setFragmentResultListener(
+            QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
+            this,
+            object : FragmentResultListener {
+                override fun onFragmentResult(requestKey: String, result: Bundle) {
+                    // Do something with
+                    // result.getString(QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)
+                }
+            }
+        )
         supportFragmentManager.beginTransaction()
             .add(R.id.container, fragment)
             .commit()
-        fragment.setOnQuestionnaireSubmittedListener(object :
-            QuestionnaireFragment.OnQuestionnaireSubmittedListener {
-            override fun onSubmitted(questionnaireResponse: QuestionnaireResponse) {
-                val parser = FhirContext.forR4().newJsonParser()
-                resultTextView?.text = parser.encodeResourceToString(questionnaireResponse)
-            }
-        }
-        )
     }
 }

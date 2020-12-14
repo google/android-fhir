@@ -17,28 +17,23 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Bundle
-import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.widget.doAfterTextChanged
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
 import androidx.recyclerview.widget.RecyclerView
+import ca.uhn.fhir.context.FhirContext
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment() {
     private val viewModel: QuestionnaireViewModel by activityViewModels {
         QuestionnaireViewModelFactory(questionnaire)
     }
-
-    internal var onQuestionnaireSubmittedListener: OnQuestionnaireSubmittedListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,7 +49,12 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
         adapter.submitList(flatten(viewModel.questionnaire.item))
 
         view.findViewById<Button>(R.id.submit).setOnClickListener {
-            onQuestionnaireSubmittedListener?.onSubmitted(viewModel.questionnaireResponse)
+            val serializedResponse = FhirContext.forR4().newJsonParser()
+                .encodeResourceToString(viewModel.questionnaireResponse)
+            setFragmentResult(
+                QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
+                bundleOf(QUESTIONNAIRE_RESPONSE_BUNDLE_KEY to serializedResponse)
+            )
         }
         return view
     }
@@ -73,13 +73,8 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
         return flattened
     }
 
-    fun setOnQuestionnaireSubmittedListener(
-        onQuestionnaireSubmittedListener: OnQuestionnaireSubmittedListener
-    ) {
-        this.onQuestionnaireSubmittedListener = onQuestionnaireSubmittedListener
-    }
-
-    interface OnQuestionnaireSubmittedListener {
-        fun onSubmitted(questionnaireResponse: QuestionnaireResponse)
+    companion object {
+        const val QUESTIONNAIRE_RESPONSE_REQUEST_KEY = "questionnaire-response-request-key"
+        const val QUESTIONNAIRE_RESPONSE_BUNDLE_KEY = "questionnaire-response-bundle-key"
     }
 }

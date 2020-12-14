@@ -35,6 +35,7 @@ android {
 dependencies {
     implementation deps.appcompat
     implementation deps.core
+    implementation deps.fragment
     implementation deps.kotlin
     implementation deps.material
     implementation project(path: ':datacapture')
