@@ -28,7 +28,7 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
         mutableMapOf<String, QuestionnaireResponse.QuestionnaireResponseItemComponent>()
     internal val questionnaireResponse = QuestionnaireResponse()
     init {
-        questionnaireResponse.id = questionnaire.id
+        questionnaireResponse.questionnaire = questionnaire.id
     }
 
     init {
