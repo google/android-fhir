@@ -116,8 +116,12 @@ class MainActivity : AppCompatActivity() {
             this,
             object : FragmentResultListener {
                 override fun onFragmentResult(requestKey: String, result: Bundle) {
-                    // Do something with
-                    // result.getString(QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)
+                    val dialogFragment = QuestionnaireResponseDialogFragment(
+                        result.getString(QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)!!)
+                    dialogFragment.show(
+                        supportFragmentManager,
+                        QuestionnaireResponseDialogFragment.TAG
+                    )
                 }
             }
         )
