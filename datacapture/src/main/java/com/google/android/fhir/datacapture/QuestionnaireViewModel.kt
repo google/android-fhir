@@ -59,7 +59,8 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
     /**
      * Records an answer of [String] type to the question with [linkId]. This will overwrite any
      * previous answer to the same question.
-     */    fun recordAnswer(linkId: String, answer: String) {
+     */
+    fun recordAnswer(linkId: String, answer: String) {
         responseItemMap[linkId]?.answer = listOf(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(
                 StringType(answer)

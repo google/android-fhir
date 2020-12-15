@@ -4,6 +4,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
@@ -17,8 +18,9 @@ class QuestionnaireItemAdapter(
 ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
         val viewHolder = when (WidgetType.fromInt(viewType)) {
-            WidgetType.CHECK_BOX -> QuestionnaireItemCheckBoxViewHolderFactory
             WidgetType.GROUP -> QuestionnaireItemGroupViewHolderFactory
+            WidgetType.CHECK_BOX -> QuestionnaireItemCheckBoxViewHolderFactory
+            WidgetType.DATE -> QuestionnaireItemDatePickerViewHolderFactory
             WidgetType.EDIT_TEXT -> QuestionnaireItemEditTextViewHolderFactory
         }
         return viewHolder.create(parent, viewModel)
@@ -29,9 +31,10 @@ class QuestionnaireItemAdapter(
     }
 
     override fun getItemViewType(position: Int) = when (val type = currentList[position].type) {
-        Questionnaire.QuestionnaireItemType.BOOLEAN -> WidgetType.CHECK_BOX
-        Questionnaire.QuestionnaireItemType.STRING -> WidgetType.EDIT_TEXT
         Questionnaire.QuestionnaireItemType.GROUP -> WidgetType.GROUP
+        Questionnaire.QuestionnaireItemType.BOOLEAN -> WidgetType.CHECK_BOX
+        Questionnaire.QuestionnaireItemType.DATE -> WidgetType.DATE
+        Questionnaire.QuestionnaireItemType.STRING -> WidgetType.EDIT_TEXT
         else -> throw NotImplementedError("Question type ${type} not supported.")
     }.value
 }

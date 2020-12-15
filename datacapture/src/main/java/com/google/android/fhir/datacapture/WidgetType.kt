@@ -1,9 +1,10 @@
 package com.google.android.fhir.datacapture
 
 enum class WidgetType (val value: Int) {
-    CHECK_BOX(1),
-    EDIT_TEXT(2),
-    GROUP(3);
+    GROUP(1),
+    CHECK_BOX(2),
+    DATE(3),
+    EDIT_TEXT(4);
 
     companion object {
         private val VALUES = values()

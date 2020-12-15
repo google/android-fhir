@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
                     {
                       "linkId": "2.2",
                       "text": "What is your date of birth?",
-                      "type": "string"
+                      "type": "date"
                     },
                     {
                       "linkId": "2.3",
