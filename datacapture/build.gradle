@@ -52,7 +52,7 @@ dependencies {
     implementation deps.material
     implementation project(path: ':fhirengine')
 
-    testImplementation deps.astl.core
+    testImplementation deps.atsl.core
     testImplementation deps.junit
     testImplementation deps.robolectric
     testImplementation deps.truth
