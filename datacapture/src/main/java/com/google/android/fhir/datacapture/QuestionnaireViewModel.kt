@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
@@ -55,7 +56,7 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
             )
         )
     }
-    
+
     /**
      * Records an answer of [String] type to the question with [linkId]. This will overwrite any
      * previous answer to the same question.
@@ -69,6 +70,18 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
     }
 
     /**
+     * Records an answer of [DateType] to the question with [linkId]. This will overwrite any
+     * previous answer to the same question.
+     */
+    fun recordAnswer(linkId: String, year: Int, month: Int, dayOfMonth: Int) {
+        responseItemMap[linkId]?.answer = listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(
+                DateType(year, month, dayOfMonth)
+            )
+        )
+    }
+
+    /**
      * Creates a [QuestionnaireResponse.QuestionnaireResponseItemComponent] from the provided
      * [Questionnaire.QuestionnaireItemComponent] and adds it to the [responseItemMap] to be used
      * for receiving answers.
@@ -77,7 +90,7 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
      * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
      */
     private fun createQuestionnaireResponseItemComponent(
-        questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
+      questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
     ): QuestionnaireResponse.QuestionnaireResponseItemComponent {
         val questionnaireResponseItemComponent =
             QuestionnaireResponse.QuestionnaireResponseItemComponent(
@@ -92,7 +105,7 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
 }
 
 class QuestionnaireViewModelFactory(
-    private val questionnaire: Questionnaire
+  private val questionnaire: Questionnaire
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(QuestionnaireViewModel::class.java)) {

@@ -36,9 +36,9 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.questionnaire_fragment, container, false)
         view.findViewById<TextView>(R.id.title).text = viewModel.questionnaire.title
@@ -60,7 +60,7 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
     }
 
     private fun flatten(
-        items: List<Questionnaire.QuestionnaireItemComponent>
+      items: List<Questionnaire.QuestionnaireItemComponent>
     ): List<Questionnaire.QuestionnaireItemComponent> {
         val flattened = mutableListOf<Questionnaire.QuestionnaireItemComponent>()
         items.forEach { item ->
