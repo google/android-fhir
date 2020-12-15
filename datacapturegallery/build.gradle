@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "30.0.2"
+    compileSdkVersion sdk_versions.compile_sdk
+    buildToolsVersion build_tool_version
 
     defaultConfig {
         applicationId "com.example.datacapturegallery"
-        minSdkVersion 21
-        targetSdkVersion 29
+        minSdkVersion sdk_versions.min_sdk
+        targetSdkVersion sdk_versions.target_sdk
         versionCode 1
         versionName "1.0"
 

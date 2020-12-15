@@ -8,6 +8,9 @@ sdk_versions.min_sdk = 21
 sdk_versions.target_sdk = 29
 ext.sdk_versions = sdk_versions
 
+def build_tool_version = '30.0.2'
+ext.build_tool_version = build_tool_version
+
 def versions = [:]
 versions.android_gradle_plugin = '4.0.1'
 versions.android_gradle_plugin = '4.0.1'
