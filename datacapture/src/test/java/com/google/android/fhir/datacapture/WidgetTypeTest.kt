@@ -13,7 +13,7 @@ import org.robolectric.annotation.Config
 class WidgetTypeTest {
 
     @Test
-    fun numberOfSupportedTypes() {
+    fun size_shouldReturnNumberOfSupportedWidgetTypes() {
         assertThat(WidgetType.values().size).isEqualTo(4)
     }
 

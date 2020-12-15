@@ -20,6 +20,7 @@ import android.os.Build
 import ca.uhn.fhir.context.FhirContext
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Resource
@@ -29,7 +30,6 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/** Unit tests for {@link FhirIndexerImpl}. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class QuestionnaireViewModelTest {
@@ -45,7 +45,7 @@ class QuestionnaireViewModelTest {
     }
 
     @Test
-    fun questionnaireResponse_booleanQuestion_shouldCopyQuestion() {
+    fun questionnaireResponse_shouldCopyQuestion() {
         val questionnaire = Questionnaire()
         val item = Questionnaire.QuestionnaireItemComponent()
         item.linkId = "a-link-id"
@@ -64,7 +64,34 @@ class QuestionnaireViewModelTest {
     }
 
     @Test
-    fun questionnaireResponse_booleanQuestion_setAnswer_shouldSetAnswer() {
+    fun questionnaireResponse_group_shouldCopyQuestionnaireStructure() {
+        val questionnaire = Questionnaire()
+        val group = Questionnaire.QuestionnaireItemComponent()
+        group.linkId = "a-link-id"
+        group.text = "Basic questions"
+        group.type = Questionnaire.QuestionnaireItemType.GROUP
+        questionnaire.addItem(group)
+        val item = Questionnaire.QuestionnaireItemComponent()
+        item.linkId = "another-link-id"
+        item.text = "Name?"
+        item.type = Questionnaire.QuestionnaireItemType.STRING
+        group.item.add(item)
+        val viewModel = QuestionnaireViewModel(questionnaire)
+        assertResourceEquals(
+            viewModel.questionnaireResponse,
+            QuestionnaireResponse().apply {
+                val group = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                group.linkId = "a-link-id"
+                addItem(group)
+                val item = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                item.linkId = "another-link-id"
+                group.item.add(item)
+            }
+        )
+    }
+
+    @Test
+    fun questionnaireResponse_booleanQuestion_recordAnswer_shouldRecordAnswer() {
         val questionnaire = Questionnaire()
         val item = Questionnaire.QuestionnaireItemComponent()
         item.linkId = "a-link-id"
@@ -87,26 +114,30 @@ class QuestionnaireViewModelTest {
     }
 
     @Test
-    fun questionnaireResponse_stringQuestion_shouldCopyQuestion() {
+    fun questionnaireResponse_dateQuestion_recordAnswer_shouldRecordAnswer() {
         val questionnaire = Questionnaire()
         val item = Questionnaire.QuestionnaireItemComponent()
         item.linkId = "a-link-id"
         item.text = "Name?"
-        item.type = Questionnaire.QuestionnaireItemType.STRING
+        item.type = Questionnaire.QuestionnaireItemType.DATE
         questionnaire.addItem(item)
         val viewModel = QuestionnaireViewModel(questionnaire)
+        viewModel.recordAnswer("a-link-id", 2020,1,1)
         assertResourceEquals(
             viewModel.questionnaireResponse,
             QuestionnaireResponse().apply {
                 val item = QuestionnaireResponse.QuestionnaireResponseItemComponent()
                 item.linkId = "a-link-id"
+                val answer = QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                answer.value = DateType(2020, 1, 1)
+                item.answer = listOf(answer)
                 addItem(item)
             }
         )
     }
 
     @Test
-    fun questionnaireResponse_stringQuestion_setAnswer_shouldSetAnswer() {
+    fun questionnaireResponse_stringQuestion_recordAnswer_shouldRecordAnswer() {
         val questionnaire = Questionnaire()
         val item = Questionnaire.QuestionnaireItemComponent()
         item.linkId = "a-link-id"
