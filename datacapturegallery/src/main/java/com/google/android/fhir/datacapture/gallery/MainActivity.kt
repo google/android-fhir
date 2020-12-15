@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture.gallery
 
 import android.os.Bundle
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentResultListener
 import ca.uhn.fhir.context.FhirContext
@@ -25,12 +24,10 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment
 import org.hl7.fhir.r4.model.Questionnaire
 
 class MainActivity : AppCompatActivity() {
-    lateinit var resultTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        resultTextView = findViewById(R.id.response)
 
         // Example taken from https://www.hl7.org/fhir/questionnaire-example-f201-lifelines.json.html
         val jsonParser = FhirContext.forR4().newJsonParser()
