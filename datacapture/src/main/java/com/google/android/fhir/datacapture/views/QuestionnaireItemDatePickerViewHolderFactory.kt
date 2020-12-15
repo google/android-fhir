@@ -26,8 +26,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.QuestionnaireViewModel
 import com.google.android.fhir.datacapture.R
-import org.hl7.fhir.r4.model.Questionnaire
 import java.util.Calendar
+import org.hl7.fhir.r4.model.Questionnaire
 
 object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolderFactory {
     override fun create(parent: ViewGroup, viewModel: QuestionnaireViewModel):
@@ -39,8 +39,8 @@ object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolde
 }
 
 private class QuestionnaireItemDatePickerViewHolder(
-    itemView: View,
-    viewModel: QuestionnaireViewModel
+  itemView: View,
+  viewModel: QuestionnaireViewModel
 ) :
     QuestionnaireItemViewHolder(itemView, viewModel) {
     private val textView = itemView.findViewById<TextView>(R.id.text)
