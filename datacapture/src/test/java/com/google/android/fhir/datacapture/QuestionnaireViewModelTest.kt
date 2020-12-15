@@ -40,7 +40,7 @@ class QuestionnaireViewModelTest {
         val viewModel = QuestionnaireViewModel(questionnaire)
         assertResourceEquals(
             viewModel.questionnaireResponse,
-            QuestionnaireResponse().apply { id = "a-questionnaire" }
+                QuestionnaireResponse().apply { this.questionnaire = "a-questionnaire" }
         )
     }
 
@@ -58,7 +58,6 @@ class QuestionnaireViewModelTest {
             QuestionnaireResponse().apply {
                 val item = QuestionnaireResponse.QuestionnaireResponseItemComponent()
                 item.linkId = "a-link-id"
-                item.text = "Yes or no?"
                 addItem(item)
             }
         )
@@ -81,7 +80,6 @@ class QuestionnaireViewModelTest {
                 item.linkId = "a-link-id"
                 val answer = QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
                 answer.value = BooleanType(true)
-                item.text = "Yes or no?"
                 item.answer = listOf(answer)
                 addItem(item)
             }
@@ -102,7 +100,6 @@ class QuestionnaireViewModelTest {
             QuestionnaireResponse().apply {
                 val item = QuestionnaireResponse.QuestionnaireResponseItemComponent()
                 item.linkId = "a-link-id"
-                item.text = "Name?"
                 addItem(item)
             }
         )
@@ -125,7 +122,6 @@ class QuestionnaireViewModelTest {
                 item.linkId = "a-link-id"
                 val answer = QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
                 answer.value = StringType("John")
-                item.text = "Name?"
                 item.answer = listOf(answer)
                 addItem(item)
             }
