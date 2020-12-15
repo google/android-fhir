@@ -3,20 +3,18 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 29
-
+    compileSdkVersion sdk_versions.compile_sdk
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 29
+        minSdkVersion sdk_versions.min_sdk
+        targetSdkVersion sdk_versions.target_sdk
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        // Required when setting minSdkVersion to 20 or lower
-        multiDexEnabled true
         // need to specify this to prevent junit runner from going deep into our dependencies
         testInstrumentationRunnerArguments = ['package': 'com.google.fhirengine']
+        // Required when setting minSdkVersion to 20 or lower
+        // See https://developer.android.com/studio/write/java8-support
+        multiDexEnabled true
     }
     sourceSets {
         // shared code between junit and instrumentation tests
@@ -36,9 +34,12 @@ android {
         }
     }
     compileOptions {
+        // Sets Java compatibility to Java 8
+        // See https://developer.android.com/studio/write/java8-support
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    // See https://developer.android.com/studio/write/java8-support
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
@@ -55,36 +56,34 @@ configurations {
         exclude module: 'javax.activation'
         exclude module: 'jakarta.xml.bind-api'
         // TODO: the following line can be removed from the next CQL engine release.
-        exclude  module: 'hapi-fhir-jpaserver-base'
+        exclude module: 'hapi-fhir-jpaserver-base'
     }
 }
 
 dependencies {
-    api ("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:$hapiFhirStructuresR4Version") {
-        exclude module:'junit'
+    androidTestImplementation deps.atsl.core
+    androidTestImplementation deps.atsl.ext_junit_ktx
+    androidTestImplementation deps.atsl.runner
+    androidTestImplementation deps.junit
+    androidTestImplementation deps.truth
+
+    api deps.cql_engine.core
+    api (deps.hapi_r4) {
+        exclude module: 'junit'
     }
-    api "org.opencds.cqf:cql-engine:$cqlEngineVersion"
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "androidx.room:room-runtime:$roomVersion"
-    implementation "androidx.room:room-ktx:$roomVersion"
-    api "androidx.work:work-runtime-ktx:$workManagerVersion"
-    implementation "com.google.guava:guava:$guavaVersion"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-    implementation "org.opencds.cqf:cql-engine-fhir:$cqlEngineVersion"
-    kapt "androidx.room:room-compiler:$roomVersion"
 
-    testImplementation "androidx.test:core:$testVersion"
-    testImplementation "org.robolectric:robolectric:$roboelectricVersion"
-    testImplementation "androidx.lifecycle:lifecycle-livedata-core-ktx:$liveDataVersion"
-    testImplementation "junit:junit:$junitVersion"
-    testImplementation "com.google.truth:truth:$truthVersion"
-    androidTestImplementation "androidx.test.ext:junit-ktx:$androidTestJunitVersion"
-    androidTestImplementation "androidx.test:runner:$testVersion"
-    androidTestImplementation "androidx.test:core:$testVersion"
-    androidTestImplementation "junit:junit:$junitVersion"
-    androidTestImplementation "com.google.truth:truth:$truthVersion"
-}
+    implementation deps.cql_engine.fhir
+    implementation deps.guava
+    implementation deps.kotlin.stdlib
+    implementation deps.room.ktx
+    implementation deps.room.runtime
+    implementation deps.work.runtime
 
-repositories {
-    mavenCentral()
+    kapt deps.room.compiler
+
+    testImplementation deps.atsl.core
+    testImplementation deps.junit
+    testImplementation deps.lifecycle.livedata_core_ktx
+    testImplementation deps.robolectric
+    testImplementation deps.truth
 }
