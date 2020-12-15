@@ -122,7 +122,7 @@ class QuestionnaireViewModelTest {
         item.type = Questionnaire.QuestionnaireItemType.DATE
         questionnaire.addItem(item)
         val viewModel = QuestionnaireViewModel(questionnaire)
-        viewModel.recordAnswer("a-link-id", 2020,1,1)
+        viewModel.recordAnswer("a-link-id", 2020, 1, 1)
         assertResourceEquals(
             viewModel.questionnaireResponse,
             QuestionnaireResponse().apply {
