@@ -32,12 +32,16 @@ class QuestionnaireItemAdapter(
 ) : ListAdapter<QuestionnaireItemComponent, QuestionnaireItemViewHolder>(
     QuestionDiffCallback
 ) {
+    /**
+     * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
+     * [QuestionnaireItemComponent].
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
-        val viewHolder = when (WidgetType.fromInt(viewType)) {
-            WidgetType.GROUP -> QuestionnaireItemGroupViewHolderFactory
-            WidgetType.CHECK_BOX -> QuestionnaireItemCheckBoxViewHolderFactory
-            WidgetType.DATE -> QuestionnaireItemDatePickerViewHolderFactory
-            WidgetType.EDIT_TEXT -> QuestionnaireItemEditTextViewHolderFactory
+        val viewHolder = when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
+            QuestionnaireItemViewHolderType.GROUP -> QuestionnaireItemGroupViewHolderFactory
+            QuestionnaireItemViewHolderType.CHECK_BOX -> QuestionnaireItemCheckBoxViewHolderFactory
+            QuestionnaireItemViewHolderType.DATE -> QuestionnaireItemDatePickerViewHolderFactory
+            QuestionnaireItemViewHolderType.EDIT_TEXT -> QuestionnaireItemEditTextViewHolderFactory
         }
         return viewHolder.create(parent, viewModel)
     }
@@ -46,11 +50,18 @@ class QuestionnaireItemAdapter(
         holder.bind(getItem(position))
     }
 
+    /**
+     * Returns the integer value of the [QuestionnaireItemViewHolderType] that will be used to
+     * render the [QuestionnaireItemComponent]. This is determined by a combination of the data type
+     * of the question and any additional Questionnaire Item UI Control Codes
+     * (http://hl7.org/fhir/R4/valueset-questionnaire-item-control.html) used in the
+     * itemControl extension (http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html).
+     */
     override fun getItemViewType(position: Int) = when (val type = currentList[position].type) {
-        Questionnaire.QuestionnaireItemType.GROUP -> WidgetType.GROUP
-        Questionnaire.QuestionnaireItemType.BOOLEAN -> WidgetType.CHECK_BOX
-        Questionnaire.QuestionnaireItemType.DATE -> WidgetType.DATE
-        Questionnaire.QuestionnaireItemType.STRING -> WidgetType.EDIT_TEXT
+        Questionnaire.QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP
+        Questionnaire.QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
+        Questionnaire.QuestionnaireItemType.DATE -> QuestionnaireItemViewHolderType.DATE
+        Questionnaire.QuestionnaireItemType.STRING -> QuestionnaireItemViewHolderType.EDIT_TEXT
         else -> throw NotImplementedError("Question type $type not supported.")
     }.value
 }

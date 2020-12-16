@@ -23,20 +23,18 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/** Unit tests for {@link FhirIndexerImpl}. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class WidgetTypeTest {
-
+class QuestionnaireItemViewHolderTypeTest {
     @Test
-    fun size_shouldReturnNumberOfSupportedWidgetTypes() {
-        assertThat(WidgetType.values().size).isEqualTo(4)
+    fun size_shouldReturnNumberOfQuestionnaireViewHolderTypes() {
+        assertThat(QuestionnaireItemViewHolderType.values().size).isEqualTo(4)
     }
 
     @Test
-    fun fromInt_shouldReturnTheWidgetType() {
-        WidgetType.values().forEach {
-            assertThat(WidgetType.fromInt(it.value)).isEqualTo(it)
+    fun fromInt_shouldReturnQuestionnaireViewHolderType() {
+        QuestionnaireItemViewHolderType.values().forEach {
+            assertThat(QuestionnaireItemViewHolderType.fromInt(it.value)).isEqualTo(it)
         }
     }
 }

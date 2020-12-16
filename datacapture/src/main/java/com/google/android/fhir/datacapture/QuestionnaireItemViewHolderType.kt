@@ -16,7 +16,15 @@
 
 package com.google.android.fhir.datacapture
 
-enum class WidgetType(val value: Int) {
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
+
+/**
+ * Questionnaire item view holder types supported by default by the data capture library.
+ *
+ * This is used in [QuestionnaireItemAdapter] to determine how each [QuestionnaireItemComponent] is
+ * rendered.
+ */
+enum class QuestionnaireItemViewHolderType(val value: Int) {
     GROUP(1),
     CHECK_BOX(2),
     DATE(3),
