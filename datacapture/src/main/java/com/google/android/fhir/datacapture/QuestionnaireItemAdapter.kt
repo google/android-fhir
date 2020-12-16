@@ -40,7 +40,8 @@ class QuestionnaireItemAdapter(
         val viewHolder = when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
             QuestionnaireItemViewHolderType.GROUP -> QuestionnaireItemGroupViewHolderFactory
             QuestionnaireItemViewHolderType.CHECK_BOX -> QuestionnaireItemCheckBoxViewHolderFactory
-            QuestionnaireItemViewHolderType.DATE -> QuestionnaireItemDatePickerViewHolderFactory
+            QuestionnaireItemViewHolderType.DATE_PICKER ->
+                QuestionnaireItemDatePickerViewHolderFactory
             QuestionnaireItemViewHolderType.EDIT_TEXT -> QuestionnaireItemEditTextViewHolderFactory
         }
         return viewHolder.create(parent, viewModel)
@@ -60,7 +61,7 @@ class QuestionnaireItemAdapter(
     override fun getItemViewType(position: Int) = when (val type = currentList[position].type) {
         Questionnaire.QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP
         Questionnaire.QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
-        Questionnaire.QuestionnaireItemType.DATE -> QuestionnaireItemViewHolderType.DATE
+        Questionnaire.QuestionnaireItemType.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
         Questionnaire.QuestionnaireItemType.STRING -> QuestionnaireItemViewHolderType.EDIT_TEXT
         else -> throw NotImplementedError("Question type $type not supported.")
     }.value

@@ -27,7 +27,7 @@ import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 enum class QuestionnaireItemViewHolderType(val value: Int) {
     GROUP(1),
     CHECK_BOX(2),
-    DATE(3),
+    DATE_PICKER(3),
     EDIT_TEXT(4);
 
     companion object {
