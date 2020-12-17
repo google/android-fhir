@@ -70,11 +70,11 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
  * Returns the flattened list of [QuestionnaireItemComponent]s as they should be presented in the
  * [RecyclerView].
  */
-fun List<QuestionnaireItemComponent>.flatten(): List<QuestionnaireItemComponent> = map {
+fun List<QuestionnaireItemComponent>.flatten(): List<QuestionnaireItemComponent> = flatMap {
     if (it.type == Questionnaire.QuestionnaireItemType.GROUP) {
         // Include the parent item in the result in case we need to render the group header.
         listOf(it) + it.item.flatten()
     } else {
         listOf(it)
     }
-}.flatten()
+}
