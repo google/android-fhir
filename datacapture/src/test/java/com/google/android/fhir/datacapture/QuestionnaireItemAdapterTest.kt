@@ -27,7 +27,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class QuestionnaireItemAdapterTest {
-
     private val questionnaireItemAdapter =
         QuestionnaireItemAdapter(QuestionnaireViewModel(Questionnaire()))
 
@@ -67,13 +66,5 @@ class QuestionnaireItemAdapterTest {
         )
     }
 
-    //    TODO: add this test once upgraded to JUnit5
-    //    @Test
-    //    fun getItemViewType_unsupported_shouldThrowNotImplementedError() {
-    //        questionnaireItemAdapter.submitList(listOf(Questionnaire.QuestionnaireItemComponent()
-    //            .apply { type = Questionnaire.QuestionnaireItemType.ATTACHMENT }))
-    //        assertThrows(NotImplementedError::class) {
-    //            questionnaireItemAdapter.getItemViewType(0)
-    //        }
-    //    }
+    // TODO: test errors thrown for unsupported types
 }
