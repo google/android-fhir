@@ -20,30 +20,35 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
-import com.google.android.fhir.datacapture.QuestionnaireViewModel
+import com.google.android.fhir.datacapture.QuestionnaireResponseRecorder
 import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.Questionnaire
 
 object QuestionnaireItemCheckBoxViewHolderFactory : QuestionnaireItemViewHolderFactory {
-    override fun create(parent: ViewGroup, viewModel: QuestionnaireViewModel):
-        QuestionnaireItemViewHolder {
+    override fun create(
+      parent: ViewGroup,
+      questionnaireResponseRecorder: QuestionnaireResponseRecorder
+    ): QuestionnaireItemViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.questionnaire_item_check_box_view, parent, false)
-        return QuestionnaireItemCheckBoxViewHolder(view, viewModel)
+        return QuestionnaireItemCheckBoxViewHolder(view, questionnaireResponseRecorder)
     }
 }
 
 private class QuestionnaireItemCheckBoxViewHolder(
   itemView: View,
-  viewModel: QuestionnaireViewModel
+  questionnaireResponseRecorder: QuestionnaireResponseRecorder
 ) :
-    QuestionnaireItemViewHolder(itemView, viewModel) {
+    QuestionnaireItemViewHolder(itemView, questionnaireResponseRecorder) {
     private val checkBox = itemView.findViewById<CheckBox>(R.id.check_box)
 
     override fun bind(questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent) {
         checkBox.text = questionnaireItemComponent.text
         checkBox.setOnClickListener {
-            viewModel.recordAnswer(questionnaireItemComponent.linkId, checkBox.isChecked)
+            questionnaireResponseRecorder.recordAnswer(
+                questionnaireItemComponent.linkId,
+                checkBox.isChecked
+            )
         }
     }
 }

@@ -24,25 +24,27 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentResultListener
-import com.google.android.fhir.datacapture.QuestionnaireViewModel
+import com.google.android.fhir.datacapture.QuestionnaireResponseRecorder
 import com.google.android.fhir.datacapture.R
 import java.util.Calendar
 import org.hl7.fhir.r4.model.Questionnaire
 
 object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolderFactory {
-    override fun create(parent: ViewGroup, viewModel: QuestionnaireViewModel):
-        QuestionnaireItemViewHolder {
+    override fun create(
+      parent: ViewGroup,
+      questionnaireResponseRecorder: QuestionnaireResponseRecorder
+    ): QuestionnaireItemViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.questionnaire_item_date_picker_view, parent, false)
-        return QuestionnaireItemDatePickerViewHolder(view, viewModel)
+        return QuestionnaireItemDatePickerViewHolder(view, questionnaireResponseRecorder)
     }
 }
 
 private class QuestionnaireItemDatePickerViewHolder(
   itemView: View,
-  viewModel: QuestionnaireViewModel
+  questionnaireResponseRecorder: QuestionnaireResponseRecorder
 ) :
-    QuestionnaireItemViewHolder(itemView, viewModel) {
+    QuestionnaireItemViewHolder(itemView, questionnaireResponseRecorder) {
     private val textView = itemView.findViewById<TextView>(R.id.text)
     private val input = itemView.findViewById<TextView>(R.id.input)
     private val button = itemView.findViewById<TextView>(R.id.button)
@@ -73,7 +75,7 @@ private class QuestionnaireItemDatePickerViewHolder(
                             java.text.DateFormat.getDateInstance().format(date)
                         }
 
-                        viewModel.recordAnswer(
+                        questionnaireResponseRecorder.recordAnswer(
                             questionnaireItemComponent.linkId,
                             year,
                             month,

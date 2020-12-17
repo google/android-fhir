@@ -24,7 +24,9 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
-class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
+class QuestionnaireViewModel(
+  val questionnaire: Questionnaire
+) : ViewModel(), QuestionnaireResponseRecorder {
     /**
      * A map from [QuestionnaireResponse.QuestionnaireResponseItemComponent.linkId] to
      * [QuestionnaireResponse.QuestionnaireResponseItemComponent] for quick access to record
@@ -45,11 +47,7 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
         }
     }
 
-    /**
-     * Records an answer of [Boolean] type to the question with [linkId]. This will overwrite any
-     * previous answer to the same question.
-     */
-    fun recordAnswer(linkId: String, answer: Boolean) {
+    override fun recordAnswer(linkId: String, answer: Boolean) {
         responseItemMap[linkId]?.answer = listOf(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(
                 BooleanType(answer)
@@ -57,11 +55,7 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
         )
     }
 
-    /**
-     * Records an answer of [String] type to the question with [linkId]. This will overwrite any
-     * previous answer to the same question.
-     */
-    fun recordAnswer(linkId: String, answer: String) {
+    override fun recordAnswer(linkId: String, answer: String) {
         responseItemMap[linkId]?.answer = listOf(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(
                 StringType(answer)
@@ -69,11 +63,7 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
         )
     }
 
-    /**
-     * Records an answer of [DateType] to the question with [linkId]. This will overwrite any
-     * previous answer to the same question.
-     */
-    fun recordAnswer(linkId: String, year: Int, month: Int, dayOfMonth: Int) {
+    override fun recordAnswer(linkId: String, year: Int, month: Int, dayOfMonth: Int) {
         responseItemMap[linkId]?.answer = listOf(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(
                 DateType(year, month, dayOfMonth)

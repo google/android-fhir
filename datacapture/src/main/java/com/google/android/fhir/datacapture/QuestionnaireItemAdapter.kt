@@ -28,7 +28,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 
 class QuestionnaireItemAdapter(
-  val viewModel: QuestionnaireViewModel
+  val questionnaireResponseRecorder: QuestionnaireResponseRecorder
 ) : ListAdapter<QuestionnaireItemComponent, QuestionnaireItemViewHolder>(
     QuestionDiffCallback
 ) {
@@ -44,7 +44,7 @@ class QuestionnaireItemAdapter(
                 QuestionnaireItemDatePickerViewHolderFactory
             QuestionnaireItemViewHolderType.EDIT_TEXT -> QuestionnaireItemEditTextViewHolderFactory
         }
-        return viewHolder.create(parent, viewModel)
+        return viewHolder.create(parent, questionnaireResponseRecorder)
     }
 
     override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
