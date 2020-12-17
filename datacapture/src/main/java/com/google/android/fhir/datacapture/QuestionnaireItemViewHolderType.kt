@@ -25,13 +25,13 @@ import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
  * rendered.
  */
 enum class QuestionnaireItemViewHolderType(val value: Int) {
-    GROUP(1),
-    CHECK_BOX(2),
-    DATE_PICKER(3),
-    EDIT_TEXT(4);
+    GROUP(0),
+    CHECK_BOX(1),
+    DATE_PICKER(2),
+    EDIT_TEXT(3);
 
     companion object {
         private val VALUES = values()
-        fun fromInt(value: Int) = VALUES.first { it.value == value }
+        fun fromInt(value: Int) = VALUES[value]
     }
 }
