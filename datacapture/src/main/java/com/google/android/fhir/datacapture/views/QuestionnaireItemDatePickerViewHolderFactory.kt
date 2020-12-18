@@ -43,9 +43,7 @@ private class QuestionnaireItemDatePickerViewHolder(
     private val textView = itemView.findViewById<TextView>(R.id.text)
     private val input = itemView.findViewById<TextView>(R.id.input)
     private val button = itemView.findViewById<TextView>(R.id.button)
-
-    override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        textView.text = questionnaireItemViewItem.questionnaireItemComponent.text
+    init {
         button.setOnClickListener {
             // TODO: find a more robust way to do this.
             val context = itemView.context as AppCompatActivity
@@ -80,5 +78,12 @@ private class QuestionnaireItemDatePickerViewHolder(
                 }
             )
         }
+    }
+
+    private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+
+    override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        this.questionnaireItemViewItem = questionnaireItemViewItem
+        textView.text = questionnaireItemViewItem.questionnaireItemComponent.text
     }
 }

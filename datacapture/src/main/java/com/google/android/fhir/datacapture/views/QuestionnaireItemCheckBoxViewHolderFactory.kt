@@ -33,12 +33,10 @@ object QuestionnaireItemCheckBoxViewHolderFactory : QuestionnaireItemViewHolderF
 }
 
 private class QuestionnaireItemCheckBoxViewHolder(
-  itemView: View
+    itemView: View
 ) : QuestionnaireItemViewHolder(itemView) {
     private val checkBox = itemView.findViewById<CheckBox>(R.id.check_box)
-
-    override fun bind(questionnaireItemComponent: QuestionnaireItemViewItem) {
-        checkBox.text = questionnaireItemComponent.questionnaireItemComponent.text
+    init {
         checkBox.setOnClickListener {
             questionnaireItemComponent.questionnaireResponseItemComponent.answer = listOf(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -46,5 +44,12 @@ private class QuestionnaireItemCheckBoxViewHolder(
                 }
             )
         }
+    }
+
+    private lateinit var questionnaireItemComponent: QuestionnaireItemViewItem
+
+    override fun bind(questionnaireItemComponent: QuestionnaireItemViewItem) {
+        this.questionnaireItemComponent = questionnaireItemComponent
+        checkBox.text = questionnaireItemComponent.questionnaireItemComponent.text
     }
 }
