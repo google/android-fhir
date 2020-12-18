@@ -35,7 +35,7 @@ private class QuestionnaireItemGroupViewHolder(
 ) : QuestionnaireItemViewHolder(itemView) {
     private val groupHeader = itemView.findViewById<TextView>(R.id.group_header)
 
-    override fun bind(questionnaireItemComponent: QuestionnaireItemViewItem) {
-        groupHeader.text = questionnaireItemComponent.questionnaireItemComponent.text
+    override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        groupHeader.text = questionnaireItemViewItem.questionnaireItemComponent.text
     }
 }

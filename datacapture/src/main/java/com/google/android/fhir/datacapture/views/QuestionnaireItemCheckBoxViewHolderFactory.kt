@@ -38,7 +38,7 @@ private class QuestionnaireItemCheckBoxViewHolder(
     private val checkBox = itemView.findViewById<CheckBox>(R.id.check_box)
     init {
         checkBox.setOnClickListener {
-            questionnaireItemComponent.questionnaireResponseItemComponent.answer = listOf(
+            questionnaireItemViewItem.questionnaireResponseItemComponent.answer = listOf(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                     value = BooleanType(checkBox.isChecked)
                 }
@@ -46,10 +46,10 @@ private class QuestionnaireItemCheckBoxViewHolder(
         }
     }
 
-    private lateinit var questionnaireItemComponent: QuestionnaireItemViewItem
+    private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
-    override fun bind(questionnaireItemComponent: QuestionnaireItemViewItem) {
-        this.questionnaireItemComponent = questionnaireItemComponent
-        checkBox.text = questionnaireItemComponent.questionnaireItemComponent.text
+    override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        this.questionnaireItemViewItem = questionnaireItemViewItem
+        checkBox.text = questionnaireItemViewItem.questionnaireItemComponent.text
     }
 }

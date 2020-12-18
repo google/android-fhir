@@ -42,7 +42,7 @@ class QuestionnaireItemEditTextViewHolder(
     private val editText = itemView.findViewById<EditText>(R.id.input)
     init {
         editText.doAfterTextChanged { editable: Editable? ->
-            questionnaireItemComponent.questionnaireResponseItemComponent.answer = listOf(
+            questionnaireItemViewItem.questionnaireResponseItemComponent.answer = listOf(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                     value = StringType(editable.toString())
                 }
@@ -50,10 +50,10 @@ class QuestionnaireItemEditTextViewHolder(
         }
     }
 
-    private lateinit var questionnaireItemComponent: QuestionnaireItemViewItem
+    private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
-    override fun bind(questionnaireItemComponent: QuestionnaireItemViewItem) {
-        this.questionnaireItemComponent = questionnaireItemComponent
-        textView.text = questionnaireItemComponent.questionnaireItemComponent.text
+    override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        this.questionnaireItemViewItem = questionnaireItemViewItem
+        textView.text = questionnaireItemViewItem.questionnaireItemComponent.text
     }
 }
