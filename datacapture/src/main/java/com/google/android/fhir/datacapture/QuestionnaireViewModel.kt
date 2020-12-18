@@ -18,79 +18,62 @@ package com.google.android.fhir.datacapture
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import org.hl7.fhir.r4.model.BooleanType
-import org.hl7.fhir.r4.model.DateType
+import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.StringType
 
-class QuestionnaireViewModel(
-  val questionnaire: Questionnaire
-) : ViewModel(), QuestionnaireResponseRecorder {
-    /**
-     * A map from [QuestionnaireResponse.QuestionnaireResponseItemComponent.linkId] to
-     * [QuestionnaireResponse.QuestionnaireResponseItemComponent] for quick access to record
-     * answers.
-     */
-    private val responseItemMap =
-        mutableMapOf<String, QuestionnaireResponse.QuestionnaireResponseItemComponent>()
-
+class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
     /** The current questionnaire response as questions are being answered. */
     internal val questionnaireResponse = QuestionnaireResponse()
+
+    /** The list of [QuestionnaireItemViewItem] to be used for the [RecyclerView]. */
+    internal val questionnaireItemViewItemList = mutableListOf<QuestionnaireItemViewItem>()
 
     init {
         questionnaireResponse.questionnaire = questionnaire.id
         // Retain the hierarchy and order of items within the questionnaire as specified in the
         // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
         questionnaire.item.forEach {
-            questionnaireResponse.item.add(createQuestionnaireResponseItemComponent(it))
+            questionnaireResponse.item.add(it.createQuestionnaireResponseItem())
         }
-    }
-
-    override fun recordAnswer(linkId: String, answer: Boolean) {
-        responseItemMap[linkId]?.answer = listOf(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(
-                BooleanType(answer)
-            )
-        )
-    }
-
-    override fun recordAnswer(linkId: String, answer: String) {
-        responseItemMap[linkId]?.answer = listOf(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(
-                StringType(answer)
-            )
-        )
-    }
-
-    override fun recordAnswer(linkId: String, year: Int, month: Int, dayOfMonth: Int) {
-        responseItemMap[linkId]?.answer = listOf(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(
-                DateType(year, month, dayOfMonth)
-            )
+        populateQuestionnaireItemViewItemList(
+            questionnaireItemViewItemList,
+            questionnaire.item,
+            questionnaireResponse.item
         )
     }
 
     /**
-     * Creates a [QuestionnaireResponse.QuestionnaireResponseItemComponent] from the provided
-     * [Questionnaire.QuestionnaireItemComponent] and adds it to the [responseItemMap] to be used
-     * for receiving answers.
+     * Traverse (DFS) through the list of questionnaire items and the list of questionnaire response
+     * items and populate [questionnaireItemViewItemList] with matching pairs of questionnaire item
+     * and questionnaire response item.
      *
-     * The hierarchy and order of child items will be retained as specified in the standard. See
-     * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
+     * The traverse is carried out in the two lists in tandem. The two lists should be structurally
+     * identical.
      */
-    private fun createQuestionnaireResponseItemComponent(
-      questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
-    ): QuestionnaireResponse.QuestionnaireResponseItemComponent {
-        val questionnaireResponseItemComponent =
-            QuestionnaireResponse.QuestionnaireResponseItemComponent(
-                StringType(questionnaireItemComponent.linkId))
-        responseItemMap[questionnaireItemComponent.linkId] = questionnaireResponseItemComponent
-        questionnaireItemComponent.item.forEach {
-            questionnaireResponseItemComponent.item.add(
-                createQuestionnaireResponseItemComponent(it))
+    private fun populateQuestionnaireItemViewItemList(
+      questionnaireItemViewItemList: MutableList<QuestionnaireItemViewItem>,
+      questionnaireItemList: List<QuestionnaireItemComponent>,
+      questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>
+    ) {
+        val questionnaireItemListIterator = questionnaireItemList.iterator()
+        val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
+        while (questionnaireItemListIterator.hasNext() &&
+            questionnaireResponseItemListIterator.hasNext()) {
+            val questionnaireItem = questionnaireItemListIterator.next()
+            val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
+            questionnaireItemViewItemList.add(
+                QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem)
+            )
+            populateQuestionnaireItemViewItemList(
+                questionnaireItemViewItemList,
+                questionnaireItem.item,
+                questionnaireResponseItem.item
+            )
         }
-        return questionnaireResponseItemComponent
     }
 }
 
@@ -102,5 +85,21 @@ class QuestionnaireViewModelFactory(
             return QuestionnaireViewModel(questionnaire) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
+/**
+ * Creates a [QuestionnaireResponse.QuestionnaireResponseItemComponent] from the provided
+ * [Questionnaire.QuestionnaireItemComponent].
+ *
+ * The hierarchy and order of child items will be retained as specified in the standard. See
+ * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
+ */
+private fun QuestionnaireItemComponent.createQuestionnaireResponseItem():
+    QuestionnaireResponse.QuestionnaireResponseItemComponent {
+    return QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType(linkId)).apply {
+        this@createQuestionnaireResponseItem.item.forEach {
+            this.item.add(it.createQuestionnaireResponseItem())
+        }
     }
 }

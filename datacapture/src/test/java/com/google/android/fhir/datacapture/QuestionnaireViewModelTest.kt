@@ -19,12 +19,9 @@ package com.google.android.fhir.datacapture
 import android.os.Build
 import ca.uhn.fhir.context.FhirContext
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.BooleanType
-import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.StringType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -40,7 +37,7 @@ class QuestionnaireViewModelTest {
         val viewModel = QuestionnaireViewModel(questionnaire)
         assertResourceEquals(
             viewModel.questionnaireResponse,
-                QuestionnaireResponse().apply { this.questionnaire = "a-questionnaire" }
+            QuestionnaireResponse().apply { this.questionnaire = "a-questionnaire" }
         )
     }
 
@@ -91,71 +88,48 @@ class QuestionnaireViewModelTest {
     }
 
     @Test
-    fun questionnaireResponse_booleanQuestion_recordAnswer_shouldRecordAnswer() {
+    fun questionnaireItemViewItemList_shouldGenerateQuestionnaireItemViewItemList() {
         val questionnaire = Questionnaire()
+        val group = Questionnaire.QuestionnaireItemComponent()
+        group.linkId = "a-link-id"
+        group.text = "Basic questions"
+        group.type = Questionnaire.QuestionnaireItemType.GROUP
+        questionnaire.addItem(group)
         val item = Questionnaire.QuestionnaireItemComponent()
-        item.linkId = "a-link-id"
-        item.text = "Yes or no?"
-        item.type = Questionnaire.QuestionnaireItemType.BOOLEAN
-        questionnaire.addItem(item)
-        val viewModel = QuestionnaireViewModel(questionnaire)
-        viewModel.recordAnswer("a-link-id", true)
-        assertResourceEquals(
-            viewModel.questionnaireResponse,
-            QuestionnaireResponse().apply {
-                val item = QuestionnaireResponse.QuestionnaireResponseItemComponent()
-                item.linkId = "a-link-id"
-                val answer = QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                answer.value = BooleanType(true)
-                item.answer = listOf(answer)
-                addItem(item)
-            }
-        )
-    }
-
-    @Test
-    fun questionnaireResponse_dateQuestion_recordAnswer_shouldRecordAnswer() {
-        val questionnaire = Questionnaire()
-        val item = Questionnaire.QuestionnaireItemComponent()
-        item.linkId = "a-link-id"
-        item.text = "Name?"
-        item.type = Questionnaire.QuestionnaireItemType.DATE
-        questionnaire.addItem(item)
-        val viewModel = QuestionnaireViewModel(questionnaire)
-        viewModel.recordAnswer("a-link-id", 2020, 1, 1)
-        assertResourceEquals(
-            viewModel.questionnaireResponse,
-            QuestionnaireResponse().apply {
-                val item = QuestionnaireResponse.QuestionnaireResponseItemComponent()
-                item.linkId = "a-link-id"
-                val answer = QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                answer.value = DateType(2020, 1, 1)
-                item.answer = listOf(answer)
-                addItem(item)
-            }
-        )
-    }
-
-    @Test
-    fun questionnaireResponse_stringQuestion_recordAnswer_shouldRecordAnswer() {
-        val questionnaire = Questionnaire()
-        val item = Questionnaire.QuestionnaireItemComponent()
-        item.linkId = "a-link-id"
+        item.linkId = "another-link-id"
         item.text = "Name?"
         item.type = Questionnaire.QuestionnaireItemType.STRING
-        questionnaire.addItem(item)
+        group.item.add(item)
         val viewModel = QuestionnaireViewModel(questionnaire)
-        viewModel.recordAnswer("a-link-id", "John")
-        assertResourceEquals(
-            viewModel.questionnaireResponse,
-            QuestionnaireResponse().apply {
-                val item = QuestionnaireResponse.QuestionnaireResponseItemComponent()
-                item.linkId = "a-link-id"
-                val answer = QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                answer.value = StringType("John")
-                item.answer = listOf(answer)
-                addItem(item)
-            }
+        val questionnaireItemViewItemList = viewModel.questionnaireItemViewItemList
+        assertThat(questionnaireItemViewItemList.size).isEqualTo(2)
+        val firstQuestionnaireItemViewItem = questionnaireItemViewItemList[0]
+        assertThat(firstQuestionnaireItemViewItem.questionnaireItemComponent.linkId).isEqualTo(
+            "a-link-id"
+        )
+        assertThat(firstQuestionnaireItemViewItem.questionnaireItemComponent.text).isEqualTo(
+            "Basic questions"
+        )
+        assertThat(firstQuestionnaireItemViewItem.questionnaireItemComponent.type).isEqualTo(
+            Questionnaire.QuestionnaireItemType.GROUP
+        )
+        assertThat(firstQuestionnaireItemViewItem.questionnaireResponseItemComponent.linkId)
+            .isEqualTo(
+            "a-link-id"
+            )
+        val secondQuestionnaireItemViewItem = questionnaireItemViewItemList[1]
+        assertThat(secondQuestionnaireItemViewItem.questionnaireItemComponent.linkId).isEqualTo(
+            "another-link-id"
+        )
+        assertThat(secondQuestionnaireItemViewItem.questionnaireItemComponent.text).isEqualTo(
+            "Name?"
+        )
+        assertThat(secondQuestionnaireItemViewItem.questionnaireItemComponent.type).isEqualTo(
+            Questionnaire.QuestionnaireItemType.STRING
+        )
+        assertThat(secondQuestionnaireItemViewItem.questionnaireResponseItemComponent.linkId)
+            .isEqualTo(
+            "another-link-id"
         )
     }
 

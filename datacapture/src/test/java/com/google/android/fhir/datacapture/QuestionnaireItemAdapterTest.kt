@@ -17,8 +17,10 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Build
+import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -27,13 +29,19 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class QuestionnaireItemAdapterTest {
-    private val questionnaireItemAdapter =
-        QuestionnaireItemAdapter(QuestionnaireViewModel(Questionnaire()))
-
     @Test
     fun getItemViewType_groupItemType_shouldReturnGroupViewHolderType() {
-        questionnaireItemAdapter.submitList(listOf(Questionnaire.QuestionnaireItemComponent()
-            .apply { type = Questionnaire.QuestionnaireItemType.GROUP }))
+        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+            listOf(
+                QuestionnaireItemViewItem(
+                    Questionnaire.QuestionnaireItemComponent().apply
+                    {
+                        type = Questionnaire.QuestionnaireItemType.GROUP
+                    },
+                    QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                )
+            )
+        )
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.GROUP.value
         )
@@ -41,8 +49,17 @@ class QuestionnaireItemAdapterTest {
 
     @Test
     fun getItemViewType_booleanItemType_shouldReturnBooleanViewHolderType() {
-        questionnaireItemAdapter.submitList(listOf(Questionnaire.QuestionnaireItemComponent()
-            .apply { type = Questionnaire.QuestionnaireItemType.BOOLEAN }))
+        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+            listOf(
+                QuestionnaireItemViewItem(
+                    Questionnaire.QuestionnaireItemComponent().apply
+                    {
+                        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                    },
+                    QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                )
+            )
+        )
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.CHECK_BOX.value
         )
@@ -50,8 +67,17 @@ class QuestionnaireItemAdapterTest {
 
     @Test
     fun getItemViewType_dateItemType_shouldReturnDatePickerViewHolderType() {
-        questionnaireItemAdapter.submitList(listOf(Questionnaire.QuestionnaireItemComponent()
-            .apply { type = Questionnaire.QuestionnaireItemType.DATE }))
+        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+            listOf(
+                QuestionnaireItemViewItem(
+                    Questionnaire.QuestionnaireItemComponent().apply
+                    {
+                        type = Questionnaire.QuestionnaireItemType.DATE
+                    },
+                    QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                )
+            )
+        )
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.DATE_PICKER.value
         )
@@ -59,8 +85,17 @@ class QuestionnaireItemAdapterTest {
 
     @Test
     fun getItemViewType_stringItemType_shouldReturnEditTextViewHolderType() {
-        questionnaireItemAdapter.submitList(listOf(Questionnaire.QuestionnaireItemComponent()
-            .apply { type = Questionnaire.QuestionnaireItemType.STRING }))
+        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+            listOf(
+                QuestionnaireItemViewItem(
+                    Questionnaire.QuestionnaireItemComponent().apply
+                    {
+                        type = Questionnaire.QuestionnaireItemType.STRING
+                    },
+                    QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                )
+            )
+        )
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.EDIT_TEXT.value
         )

@@ -20,34 +20,30 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
-import com.google.android.fhir.datacapture.QuestionnaireResponseRecorder
 import com.google.android.fhir.datacapture.R
-import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 object QuestionnaireItemCheckBoxViewHolderFactory : QuestionnaireItemViewHolderFactory {
-    override fun create(
-      parent: ViewGroup,
-      questionnaireResponseRecorder: QuestionnaireResponseRecorder
-    ): QuestionnaireItemViewHolder {
+    override fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.questionnaire_item_check_box_view, parent, false)
-        return QuestionnaireItemCheckBoxViewHolder(view, questionnaireResponseRecorder)
+        return QuestionnaireItemCheckBoxViewHolder(view)
     }
 }
 
 private class QuestionnaireItemCheckBoxViewHolder(
-  itemView: View,
-  questionnaireResponseRecorder: QuestionnaireResponseRecorder
-) :
-    QuestionnaireItemViewHolder(itemView, questionnaireResponseRecorder) {
+  itemView: View
+) : QuestionnaireItemViewHolder(itemView) {
     private val checkBox = itemView.findViewById<CheckBox>(R.id.check_box)
 
-    override fun bind(questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent) {
-        checkBox.text = questionnaireItemComponent.text
+    override fun bind(questionnaireItemComponent: QuestionnaireItemViewItem) {
+        checkBox.text = questionnaireItemComponent.questionnaireItemComponent.text
         checkBox.setOnClickListener {
-            questionnaireResponseRecorder.recordAnswer(
-                questionnaireItemComponent.linkId,
-                checkBox.isChecked
+            questionnaireItemComponent.questionnaireResponseItemComponent.answer = listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = BooleanType(checkBox.isChecked)
+                }
             )
         }
     }

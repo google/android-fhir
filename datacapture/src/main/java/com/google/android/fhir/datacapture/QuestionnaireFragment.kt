@@ -29,7 +29,6 @@ import androidx.fragment.app.setFragmentResult
 import androidx.recyclerview.widget.RecyclerView
 import ca.uhn.fhir.context.FhirContext
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 
 class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment() {
     private val viewModel: QuestionnaireViewModel by activityViewModels {
@@ -45,9 +44,8 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
         view.findViewById<TextView>(R.id.title).text = viewModel.questionnaire.title
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-        val adapter = QuestionnaireItemAdapter(viewModel)
+        val adapter = QuestionnaireItemAdapter(viewModel.questionnaireItemViewItemList)
         recyclerView.adapter = adapter
-        adapter.submitList(viewModel.questionnaire.item.flatten())
 
         view.findViewById<Button>(R.id.submit).setOnClickListener {
             val serializedResponse = FhirContext.forR4().newJsonParser()
@@ -63,18 +61,5 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
     companion object {
         const val QUESTIONNAIRE_RESPONSE_REQUEST_KEY = "questionnaire-response-request-key"
         const val QUESTIONNAIRE_RESPONSE_BUNDLE_KEY = "questionnaire-response-bundle-key"
-    }
-}
-
-/**
- * Returns the flattened list of [QuestionnaireItemComponent]s as they should be presented in the
- * [RecyclerView].
- */
-fun List<QuestionnaireItemComponent>.flatten(): List<QuestionnaireItemComponent> = flatMap {
-    if (it.type == Questionnaire.QuestionnaireItemType.GROUP) {
-        // Include the parent item in the result in case we need to render the group header.
-        listOf(it) + it.item.flatten()
-    } else {
-        listOf(it)
     }
 }

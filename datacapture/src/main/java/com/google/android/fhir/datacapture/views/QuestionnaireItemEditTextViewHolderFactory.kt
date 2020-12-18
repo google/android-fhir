@@ -23,35 +23,31 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
-import com.google.android.fhir.datacapture.QuestionnaireResponseRecorder
 import com.google.android.fhir.datacapture.R
-import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 
 object QuestionnaireItemEditTextViewHolderFactory : QuestionnaireItemViewHolderFactory {
-    override fun create(
-      parent: ViewGroup,
-      questionnaireResponseRecorder: QuestionnaireResponseRecorder
-    ): QuestionnaireItemViewHolder {
+    override fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.questionnaire_item_edit_text_view, parent, false)
-        return QuestionnaireItemEditTextViewHolder(view, questionnaireResponseRecorder)
+        return QuestionnaireItemEditTextViewHolder(view)
     }
 }
 
-private class QuestionnaireItemEditTextViewHolder(
-  itemView: View,
-  questionnaireResponseRecorder: QuestionnaireResponseRecorder
-) :
-    QuestionnaireItemViewHolder(itemView, questionnaireResponseRecorder) {
+class QuestionnaireItemEditTextViewHolder(
+  itemView: View
+) : QuestionnaireItemViewHolder(itemView) {
     private val textView = itemView.findViewById<TextView>(R.id.text)
     private val editText = itemView.findViewById<EditText>(R.id.input)
 
-    override fun bind(questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent) {
-        textView.text = questionnaireItemComponent.text
+    override fun bind(questionnaireItemComponent: QuestionnaireItemViewItem) {
+        textView.text = questionnaireItemComponent.questionnaireItemComponent.text
         editText.doAfterTextChanged { editable: Editable? ->
-            questionnaireResponseRecorder.recordAnswer(
-                questionnaireItemComponent.linkId,
-                editable.toString()
+            questionnaireItemComponent.questionnaireResponseItemComponent.answer = listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = StringType(editable.toString())
+                }
             )
         }
     }

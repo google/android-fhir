@@ -24,33 +24,28 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentResultListener
-import com.google.android.fhir.datacapture.QuestionnaireResponseRecorder
 import com.google.android.fhir.datacapture.R
 import java.util.Calendar
-import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolderFactory {
-    override fun create(
-      parent: ViewGroup,
-      questionnaireResponseRecorder: QuestionnaireResponseRecorder
-    ): QuestionnaireItemViewHolder {
+    override fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.questionnaire_item_date_picker_view, parent, false)
-        return QuestionnaireItemDatePickerViewHolder(view, questionnaireResponseRecorder)
+        return QuestionnaireItemDatePickerViewHolder(view)
     }
 }
 
 private class QuestionnaireItemDatePickerViewHolder(
-  itemView: View,
-  questionnaireResponseRecorder: QuestionnaireResponseRecorder
-) :
-    QuestionnaireItemViewHolder(itemView, questionnaireResponseRecorder) {
+  itemView: View
+) : QuestionnaireItemViewHolder(itemView) {
     private val textView = itemView.findViewById<TextView>(R.id.text)
     private val input = itemView.findViewById<TextView>(R.id.input)
     private val button = itemView.findViewById<TextView>(R.id.button)
 
-    override fun bind(questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent) {
-        textView.text = questionnaireItemComponent.text
+    override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        textView.text = questionnaireItemViewItem.questionnaireItemComponent.text
         button.setOnClickListener {
             // TODO: find a more robust way to do this.
             val context = itemView.context as AppCompatActivity
@@ -74,13 +69,13 @@ private class QuestionnaireItemDatePickerViewHolder(
                         } else {
                             java.text.DateFormat.getDateInstance().format(date)
                         }
-
-                        questionnaireResponseRecorder.recordAnswer(
-                            questionnaireItemComponent.linkId,
-                            year,
-                            month,
-                            dayOfMonth
-                        )
+                        questionnaireItemViewItem.questionnaireResponseItemComponent.answer =
+                            listOf(
+                                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                                    .apply {
+                                        value = DateType(year, month, dayOfMonth)
+                                    }
+                            )
                     }
                 }
             )

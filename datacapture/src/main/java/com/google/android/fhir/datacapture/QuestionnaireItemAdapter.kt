@@ -17,21 +17,19 @@
 package com.google.android.fhir.datacapture
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
+import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 
 class QuestionnaireItemAdapter(
-  val questionnaireResponseRecorder: QuestionnaireResponseRecorder
-) : ListAdapter<QuestionnaireItemComponent, QuestionnaireItemViewHolder>(
-    QuestionDiffCallback
-) {
+  private val questionnaireItemViewItemList: List<QuestionnaireItemViewItem>
+) : RecyclerView.Adapter<QuestionnaireItemViewHolder>() {
     /**
      * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
      * [QuestionnaireItemComponent].
@@ -44,11 +42,11 @@ class QuestionnaireItemAdapter(
                 QuestionnaireItemDatePickerViewHolderFactory
             QuestionnaireItemViewHolderType.EDIT_TEXT -> QuestionnaireItemEditTextViewHolderFactory
         }
-        return viewHolder.create(parent, questionnaireResponseRecorder)
+        return viewHolder.create(parent)
     }
 
     override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(questionnaireItemViewItemList[position])
     }
 
     /**
@@ -58,23 +56,14 @@ class QuestionnaireItemAdapter(
      * (http://hl7.org/fhir/R4/valueset-questionnaire-item-control.html) used in the
      * itemControl extension (http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html).
      */
-    override fun getItemViewType(position: Int) = when (val type = currentList[position].type) {
-        Questionnaire.QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP
-        Questionnaire.QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
-        Questionnaire.QuestionnaireItemType.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
-        Questionnaire.QuestionnaireItemType.STRING -> QuestionnaireItemViewHolderType.EDIT_TEXT
-        else -> throw NotImplementedError("Question type $type not supported.")
-    }.value
-}
+    override fun getItemViewType(position: Int) =
+        when (val type = questionnaireItemViewItemList[position].questionnaireItemComponent.type) {
+            Questionnaire.QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP
+            Questionnaire.QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
+            Questionnaire.QuestionnaireItemType.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
+            Questionnaire.QuestionnaireItemType.STRING -> QuestionnaireItemViewHolderType.EDIT_TEXT
+            else -> throw NotImplementedError("Question type $type not supported.")
+        }.value
 
-private object QuestionDiffCallback : DiffUtil.ItemCallback<QuestionnaireItemComponent>() {
-    override fun areItemsTheSame(
-      oldItem: QuestionnaireItemComponent,
-      newItem: QuestionnaireItemComponent
-    ) = oldItem.linkId.contentEquals(newItem.linkId)
-
-    override fun areContentsTheSame(
-      oldItem: QuestionnaireItemComponent,
-      newItem: QuestionnaireItemComponent
-    ) = oldItem.equalsDeep(newItem)
+    override fun getItemCount() = questionnaireItemViewItemList.size
 }
