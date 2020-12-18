@@ -33,7 +33,7 @@ object QuestionnaireItemCheckBoxViewHolderFactory : QuestionnaireItemViewHolderF
 }
 
 private class QuestionnaireItemCheckBoxViewHolder(
-    itemView: View
+  itemView: View
 ) : QuestionnaireItemViewHolder(itemView) {
     private val checkBox = itemView.findViewById<CheckBox>(R.id.check_box)
     init {

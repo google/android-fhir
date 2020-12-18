@@ -50,7 +50,7 @@ class QuestionnaireItemEditTextViewHolder(
         }
     }
 
-    private  lateinit var questionnaireItemComponent: QuestionnaireItemViewItem
+    private lateinit var questionnaireItemComponent: QuestionnaireItemViewItem
 
     override fun bind(questionnaireItemComponent: QuestionnaireItemViewItem) {
         this.questionnaireItemComponent = questionnaireItemComponent
