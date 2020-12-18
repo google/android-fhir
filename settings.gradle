@@ -1,3 +1,4 @@
 include ':datacapture'
+include ':datacapturegallery'
 include ':example'
 include ':fhirengine'
