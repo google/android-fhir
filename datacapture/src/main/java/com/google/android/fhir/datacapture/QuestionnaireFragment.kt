@@ -39,8 +39,9 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
       inflater: LayoutInflater,
       container: ViewGroup?,
       savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.questionnaire_fragment, container, false)
+    ) = inflater.inflate(R.layout.questionnaire_fragment, container, false)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         view.findViewById<TextView>(R.id.title).text = viewModel.questionnaire.title
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
@@ -55,7 +56,6 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
                 bundleOf(QUESTIONNAIRE_RESPONSE_BUNDLE_KEY to serializedResponse)
             )
         }
-        return view
     }
 
     companion object {
