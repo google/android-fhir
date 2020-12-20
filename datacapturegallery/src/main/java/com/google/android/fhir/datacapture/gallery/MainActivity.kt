@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity() {
         // modifications to the questionnaire
         questionnaire.title = "My questionnaire"
 
-        val fragment = QuestionnaireFragment(questionnaire)
+        val fragment = QuestionnaireFragment(questionnaire, CustomViewPicker)
         supportFragmentManager.setFragmentResultListener(
             QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
             this,

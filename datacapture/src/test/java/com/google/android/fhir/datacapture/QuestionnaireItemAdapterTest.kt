@@ -40,7 +40,8 @@ class QuestionnaireItemAdapterTest {
                     },
                     QuestionnaireResponse.QuestionnaireResponseItemComponent()
                 )
-            )
+            ),
+            mapper
         )
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.GROUP.value
@@ -58,7 +59,8 @@ class QuestionnaireItemAdapterTest {
                     },
                     QuestionnaireResponse.QuestionnaireResponseItemComponent()
                 )
-            )
+            ),
+            mapper
         )
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.CHECK_BOX.value
@@ -76,7 +78,8 @@ class QuestionnaireItemAdapterTest {
                     },
                     QuestionnaireResponse.QuestionnaireResponseItemComponent()
                 )
-            )
+            ),
+            mapper
         )
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.DATE_PICKER.value
@@ -94,7 +97,8 @@ class QuestionnaireItemAdapterTest {
                     },
                     QuestionnaireResponse.QuestionnaireResponseItemComponent()
                 )
-            )
+            ),
+            mapper
         )
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.EDIT_TEXT.value

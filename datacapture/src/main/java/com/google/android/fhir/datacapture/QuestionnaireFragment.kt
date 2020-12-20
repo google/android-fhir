@@ -30,7 +30,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ca.uhn.fhir.context.FhirContext
 import org.hl7.fhir.r4.model.Questionnaire
 
-class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment() {
+class QuestionnaireFragment(private val questionnaire: Questionnaire, private val mapper: ViewPicker) : Fragment() {
     private val viewModel: QuestionnaireViewModel by activityViewModels {
         QuestionnaireViewModelFactory(questionnaire)
     }
@@ -45,7 +45,7 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
         view.findViewById<TextView>(R.id.title).text = viewModel.questionnaire.title
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-        val adapter = QuestionnaireItemAdapter(viewModel.questionnaireItemViewItemList)
+        val adapter = QuestionnaireItemAdapter(viewModel.questionnaireItemViewItemList, mapper)
         recyclerView.adapter = adapter
 
         view.findViewById<Button>(R.id.submit).setOnClickListener {
