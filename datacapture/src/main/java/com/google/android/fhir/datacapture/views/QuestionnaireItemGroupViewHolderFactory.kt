@@ -28,7 +28,7 @@ object QuestionnaireItemGroupViewHolderFactory : QuestionnaireItemViewHolderFact
       private lateinit var groupHeader: TextView
 
       override fun init(itemView: View) {
-        groupHeader = itemView.findViewById<TextView>(R.id.group_header)
+        groupHeader = itemView.findViewById(R.id.group_header)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {

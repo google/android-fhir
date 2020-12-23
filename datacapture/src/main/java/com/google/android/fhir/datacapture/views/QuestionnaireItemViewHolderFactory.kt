@@ -28,7 +28,7 @@ import androidx.recyclerview.widget.RecyclerView
  * @param resId the layout resource for the view
  */
 abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId: Int) {
-  fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
+  internal fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
     return QuestionnaireItemViewHolder(
       LayoutInflater.from(parent.context).inflate(resId, parent, false),
       getQuestionnaireItemViewHolderDelegate()
@@ -47,9 +47,9 @@ abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId: Int) {
  *
  * This is used by [QuestionnaireItemAdapter] to initialize views and bind items in [RecyclerView].
  */
-class QuestionnaireItemViewHolder(
+internal class QuestionnaireItemViewHolder(
   itemView: View,
-  val delegate: QuestionnaireItemViewHolderDelegate
+  private val delegate: QuestionnaireItemViewHolderDelegate
 ) : RecyclerView.ViewHolder(itemView) {
   init {
     delegate.init(itemView)

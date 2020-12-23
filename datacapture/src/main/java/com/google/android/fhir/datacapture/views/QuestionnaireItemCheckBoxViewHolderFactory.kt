@@ -31,7 +31,7 @@ object QuestionnaireItemCheckBoxViewHolderFactory : QuestionnaireItemViewHolderF
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        checkBox = itemView.findViewById<CheckBox>(R.id.check_box)
+        checkBox = itemView.findViewById(R.id.check_box)
         checkBox.setOnClickListener {
           questionnaireItemViewItem.questionnaireResponseItemComponent.answer = listOf(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {

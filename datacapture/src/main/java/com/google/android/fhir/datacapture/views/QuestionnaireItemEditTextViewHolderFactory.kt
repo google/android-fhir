@@ -34,7 +34,7 @@ object QuestionnaireItemEditTextViewHolderFactory : QuestionnaireItemViewHolderF
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        textView = itemView.findViewById<TextView>(R.id.text)
+        textView = itemView.findViewById(R.id.text)
         itemView.findViewById<EditText>(R.id.input)
           .doAfterTextChanged { editable: Editable? ->
             questionnaireItemViewItem.questionnaireResponseItemComponent.answer =

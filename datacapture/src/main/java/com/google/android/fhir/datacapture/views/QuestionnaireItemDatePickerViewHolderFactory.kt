@@ -36,7 +36,7 @@ object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolde
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        textView = itemView.findViewById<TextView>(R.id.text)
+        textView = itemView.findViewById(R.id.text)
         val input = itemView.findViewById<TextView>(R.id.input)
         val button = itemView.findViewById<TextView>(R.id.button)
         button.setOnClickListener {
