@@ -30,11 +30,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Example taken from https://www.hl7.org/fhir/questionnaire-example-f201-lifelines.json.html
+        val jsonResource = assets.open("hl7-fhir-examples-f201.json").bufferedReader()
+            .use { it.readText() }
         val jsonParser = FhirContext.forR4().newJsonParser()
-        val jsonResource = assets.open("hl7-fhir-examples-f201.json").bufferedReader().use { it.readText() }
-        val questionnaire: Questionnaire = jsonParser.parseResource(Questionnaire::class.java, jsonResource)
+        val questionnaire = jsonParser.parseResource(Questionnaire::class.java, jsonResource)
 
-        // modifications to the questionnaire
+        // Modifications to the questionnaire
         questionnaire.title = "My questionnaire"
 
         val fragment = QuestionnaireFragment(questionnaire)
