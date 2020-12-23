@@ -31,80 +31,8 @@ class MainActivity : AppCompatActivity() {
 
         // Example taken from https://www.hl7.org/fhir/questionnaire-example-f201-lifelines.json.html
         val jsonParser = FhirContext.forR4().newJsonParser()
-        val questionnaire: Questionnaire = jsonParser.parseResource(Questionnaire::class.java, """
-            {
-              "resourceType": "Questionnaire",
-              "id": "f201",
-              "text": {
-                "status": "generated",
-                "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n      <pre>Lifelines Questionnaire 1 part 1\n  1. Do you have allergies?\n  2. General Questions:\n    2.a) What is your gender?\n    2.b) What is your date of birth?\n    2.c) What is your country of birth?\n    2.d) What is your marital status?\n    3. Intoxications:\n      3.a) Do you smoke?\n      3.b) Do you drink alcohol?</pre>\n    </div>"
-              },
-              "url": "http://hl7.org/fhir/Questionnaire/f201",
-              "status": "active",
-              "subjectType": [
-                "Patient"
-              ],
-              "date": "2010",
-              "code": [
-                {
-                  "system": "http://example.org/system/code/lifelines/nl",
-                  "code": "VL 1-1, 18-65_1.2.2",
-                  "display": "Lifelines Questionnaire 1 part 1"
-                }
-              ],
-              "item": [
-                {
-                  "linkId": "1",
-                  "text": "Do you have allergies?",
-                  "type": "boolean"
-                },
-                {
-                  "linkId": "2",
-                  "text": "General questions",
-                  "type": "group",
-                  "item": [
-                    {
-                      "linkId": "2.1",
-                      "text": "What is your gender?",
-                      "type": "string"
-                    },
-                    {
-                      "linkId": "2.2",
-                      "text": "What is your date of birth?",
-                      "type": "date"
-                    },
-                    {
-                      "linkId": "2.3",
-                      "text": "What is your country of birth?",
-                      "type": "string"
-                    },
-                    {
-                      "linkId": "2.4",
-                      "text": "What is your marital status?",
-                      "type": "string"
-                    }
-                  ]
-                },
-                {
-                  "linkId": "3",
-                  "text": "Intoxications",
-                  "type": "group",
-                  "item": [
-                    {
-                      "linkId": "3.1",
-                      "text": "Do you smoke?",
-                      "type": "boolean"
-                    },
-                    {
-                      "linkId": "3.2",
-                      "text": "Do you drink alchohol?",
-                      "type": "boolean"
-                    }
-                  ]
-                }
-              ]
-            }
-        """.trimIndent())
+        val jsonResource = assets.open("hl7-fhir-examples-f201.json").bufferedReader().use { it.readText() }
+        val questionnaire: Questionnaire = jsonParser.parseResource(Questionnaire::class.java, jsonResource)
 
         // modifications to the questionnaire
         questionnaire.title = "My questionnaire"
@@ -116,7 +44,8 @@ class MainActivity : AppCompatActivity() {
             object : FragmentResultListener {
                 override fun onFragmentResult(requestKey: String, result: Bundle) {
                     val dialogFragment = QuestionnaireResponseDialogFragment(
-                        result.getString(QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)!!)
+                        result.getString(QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)!!
+                    )
                     dialogFragment.show(
                         supportFragmentManager,
                         QuestionnaireResponseDialogFragment.TAG
