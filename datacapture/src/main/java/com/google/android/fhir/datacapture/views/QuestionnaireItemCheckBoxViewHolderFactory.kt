@@ -16,40 +16,34 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.CheckBox
 import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-object QuestionnaireItemCheckBoxViewHolderFactory : QuestionnaireItemViewHolderFactory {
-    override fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.questionnaire_item_check_box_view, parent, false)
-        return QuestionnaireItemCheckBoxViewHolder(view)
-    }
-}
+object QuestionnaireItemCheckBoxViewHolderFactory : QuestionnaireItemViewHolderFactory(
+  R.layout.questionnaire_item_check_box_view
+) {
+  override fun getQuestionnaireItemViewHolderDelegate() =
+    object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var checkBox: CheckBox
+      private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
-private class QuestionnaireItemCheckBoxViewHolder(
-  itemView: View
-) : QuestionnaireItemViewHolder(itemView) {
-    private val checkBox = itemView.findViewById<CheckBox>(R.id.check_box)
-    init {
+      override fun init(itemView: View) {
+        checkBox = itemView.findViewById<CheckBox>(R.id.check_box)
         checkBox.setOnClickListener {
-            questionnaireItemViewItem.questionnaireResponseItemComponent.answer = listOf(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = BooleanType(checkBox.isChecked)
-                }
-            )
+          questionnaireItemViewItem.questionnaireResponseItemComponent.answer = listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = BooleanType(checkBox.isChecked)
+            }
+          )
         }
-    }
+      }
 
-    private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-
-    override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
         checkBox.text = questionnaireItemViewItem.questionnaireItemComponent.text
+      }
     }
 }

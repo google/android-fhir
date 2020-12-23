@@ -16,15 +16,68 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 
-interface QuestionnaireItemViewHolderFactory {
-    fun create(parent: ViewGroup): QuestionnaireItemViewHolder
+/**
+ * Factory for [QuestionnaireItemViewHolder].
+ *
+ * @param resId the layout resource for the view
+ */
+abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId: Int) {
+  fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
+    return QuestionnaireItemViewHolder(
+      LayoutInflater.from(parent.context).inflate(resId, parent, false),
+      getQuestionnaireItemViewHolderDelegate()
+    )
+  }
+
+  /**
+   * Returns a [QuestionnaireItemViewHolderDelegate] that handles the initialization of views and
+   * binding of items in [RecyclerView].
+   */
+  abstract fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate
 }
 
-/** The [RecyclerView.ViewHolder] for [QuestionnaireItemViewItem]. */
-abstract class QuestionnaireItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    abstract fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem)
+/**
+ * The [RecyclerView.ViewHolder] for [QuestionnaireItemViewItem].
+ *
+ * This is used by [QuestionnaireItemAdapter] to initialize views and bind items in [RecyclerView].
+ */
+class QuestionnaireItemViewHolder(
+  itemView: View,
+  val delegate: QuestionnaireItemViewHolderDelegate
+) : RecyclerView.ViewHolder(itemView) {
+  init {
+    delegate.init(itemView)
+  }
+
+  fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+    delegate.bind(questionnaireItemViewItem)
+  }
+}
+
+/**
+ * Delegate for [QuestionnaireItemViewHolder].
+ *
+ * This interface provides an abstraction of the operations that need to be implemented for a type
+ * of view in the questionnaire.
+ *
+ * There is a 1:1 relationship between this and
+ * [QuestionnaireItemViewHolder]. In other words, there is a unique
+ * [QuestionnaireItemViewHolderDelegate] for each [QuestionnaireItemViewHolder]. This is critical
+ * for the correctness of the recycler view.
+ */
+interface QuestionnaireItemViewHolderDelegate {
+  /**
+   * Initializes the view in [QuestionnaireItemViewHolder]. Any listeners to record user input
+   * should be set in this function.
+   */
+  fun init(itemView: View)
+
+  /** Binds a [QuestionnaireItemViewItem] to the view. */
+  fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem)
 }
