@@ -83,7 +83,6 @@ dependencies {
 
     testImplementation deps.atsl.core
     testImplementation deps.junit
-    testImplementation deps.lifecycle.livedata_core_ktx
     testImplementation deps.robolectric
     testImplementation deps.truth
 }

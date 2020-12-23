@@ -1,0 +1,61 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+}
+
+android {
+    compileSdkVersion sdk_versions.compile_sdk
+    buildToolsVersion build_tool_version
+
+    defaultConfig {
+        minSdkVersion sdk_versions.min_sdk
+        targetSdkVersion sdk_versions.target_sdk
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+configurations {
+    all {
+        exclude module: 'xpp3'
+    }
+}
+
+dependencies {
+    api (deps.hapi_r4) {
+        exclude module: 'junit'
+    }
+
+    implementation deps.appcompat
+    implementation deps.core
+    implementation deps.fragment
+    implementation deps.kotlin.stdlib
+    implementation deps.lifecycle.livedata_ktx
+    implementation deps.lifecycle.viewmodel_ktx
+    implementation deps.material
+    implementation project(path: ':fhirengine')
+
+    testImplementation deps.atsl.core
+    testImplementation deps.junit
+    testImplementation deps.robolectric
+    testImplementation deps.truth
+
+    androidTestImplementation deps.atsl.ext_junit
+    androidTestImplementation deps.atsl.espresso
+}
