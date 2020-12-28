@@ -44,6 +44,13 @@ object QuestionnaireItemCheckBoxViewHolderFactory : QuestionnaireItemViewHolderF
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
         checkBox.text = questionnaireItemViewItem.questionnaireItemComponent.text
+        questionnaireItemViewItem.questionnaireResponseItemComponent.answer.also {
+          if (it.size == 1 && it[0].hasValueBooleanType()) {
+            checkBox.isChecked = it[0].valueBooleanType.value
+          } else {
+            checkBox.isChecked = false
+          }
+        }
       }
     }
 }
