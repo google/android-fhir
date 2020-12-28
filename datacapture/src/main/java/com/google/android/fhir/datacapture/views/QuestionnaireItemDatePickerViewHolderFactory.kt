@@ -31,79 +31,80 @@ import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolderFactory {
-    override fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.questionnaire_item_date_picker_view, parent, false)
-        return QuestionnaireItemDatePickerViewHolder(view)
-    }
+  override fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
+    val view = LayoutInflater.from(parent.context)
+      .inflate(R.layout.questionnaire_item_date_picker_view, parent, false)
+    return QuestionnaireItemDatePickerViewHolder(view)
+  }
 }
 
 private class QuestionnaireItemDatePickerViewHolder(
   itemView: View
 ) : QuestionnaireItemViewHolder(itemView) {
-    private val textView = itemView.findViewById<TextView>(R.id.text)
-    private val input = itemView.findViewById<TextView>(R.id.input)
-    private val button = itemView.findViewById<TextView>(R.id.button)
-    init {
-        button.setOnClickListener {
-            // TODO: find a more robust way to do this as it is not guaranteed that the activity is
-            // an AppCompatActivity.
-            val context = itemView.context as AppCompatActivity
-            DatePickerFragment().show(context.supportFragmentManager, DatePickerFragment.TAG)
-            context.supportFragmentManager.setFragmentResultListener(
-                DatePickerFragment.RESULT_REQUEST_KEY,
-                context,
-                object : FragmentResultListener {
-                    @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
-                    override fun onFragmentResult(requestKey: String, result: Bundle) {
-                        val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
-                        val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
-                        val dayOfMonth =
-                          result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
-                        input.text = LocalDate.of(
-                          year,
-                          // month values are 1-12 in java.time but 0-11 in DateType (FHIR)
-                          month + 1,
-                          dayOfMonth
-                        ).format(LOCAL_DATE_FORMATTER)
+  private val textView = itemView.findViewById<TextView>(R.id.text)
+  private val input = itemView.findViewById<TextView>(R.id.input)
+  private val button = itemView.findViewById<TextView>(R.id.button)
 
-                        questionnaireItemViewItem.questionnaireResponseItemComponent.answer =
-                            listOf(
-                                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                                    .apply {
-                                        value = DateType(year, month, dayOfMonth)
-                                    }
-                            )
-                    }
-                }
-            )
-        }
-    }
+  init {
+    button.setOnClickListener {
+      // TODO: find a more robust way to do this as it is not guaranteed that the activity is
+      // an AppCompatActivity.
+      val context = itemView.context as AppCompatActivity
+      DatePickerFragment().show(context.supportFragmentManager, DatePickerFragment.TAG)
+      context.supportFragmentManager.setFragmentResultListener(
+        DatePickerFragment.RESULT_REQUEST_KEY,
+        context,
+        object : FragmentResultListener {
+            @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
+            override fun onFragmentResult(requestKey: String, result: Bundle) {
+                val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
+                val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
+                val dayOfMonth =
+                  result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
+                input.text = LocalDate.of(
+                  year,
+                  // month values are 1-12 in java.time but 0-11 in DateType (FHIR)
+                  month + 1,
+                  dayOfMonth
+                ).format(LOCAL_DATE_FORMATTER)
 
-    private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-
-    @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
-    override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        this.questionnaireItemViewItem = questionnaireItemViewItem
-        textView.text = questionnaireItemViewItem.questionnaireItemComponent.text
-        questionnaireItemViewItem.questionnaireResponseItemComponent.answer.also {
-            if (it.size == 1 && it[0].hasValueDateType()) {
-                input.text = it[0].valueDateType.let { date ->
-                    LocalDate.of(
-                      date.year,
-                      // month values are 1-12 in java.time but 0-11 in DateType (FHIR)
-                      date.month + 1,
-                      date.day
-                    )
-                }.format(LOCAL_DATE_FORMATTER)
-            } else {
-                input.text = ""
+                questionnaireItemViewItem.questionnaireResponseItemComponent.answer =
+                  listOf(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                      .apply {
+                          value = DateType(year, month, dayOfMonth)
+                      }
+                  )
             }
         }
+      )
     }
+  }
 
-    private companion object {
-        @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
-        val LOCAL_DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE
+  private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+
+  @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
+  override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+    this.questionnaireItemViewItem = questionnaireItemViewItem
+    textView.text = questionnaireItemViewItem.questionnaireItemComponent.text
+    questionnaireItemViewItem.questionnaireResponseItemComponent.answer.also {
+      if (it.size == 1 && it[0].hasValueDateType()) {
+        input.text = it[0].valueDateType.let { date ->
+          LocalDate.of(
+            date.year,
+            // month values are 1-12 in java.time but 0-11 in DateType (FHIR)
+            date.month + 1,
+            date.day
+          )
+        }.format(LOCAL_DATE_FORMATTER)
+      } else {
+        input.text = ""
+      }
     }
+  }
+
+  private companion object {
+    @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
+    val LOCAL_DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE
+  }
 }
