@@ -31,10 +31,12 @@ object QuestionnaireItemEditTextViewHolderFactory : QuestionnaireItemViewHolderF
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var textView: TextView
+      private lateinit var editText: EditText
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         textView = itemView.findViewById(R.id.text)
+        editText = itemView.findViewById(R.id.input)
         itemView.findViewById<EditText>(R.id.input)
           .doAfterTextChanged { editable: Editable? ->
             questionnaireItemViewItem.questionnaireResponseItemComponent.answer =
@@ -50,6 +52,13 @@ object QuestionnaireItemEditTextViewHolderFactory : QuestionnaireItemViewHolderF
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
         textView.text = questionnaireItemViewItem.questionnaireItemComponent.text
+        questionnaireItemViewItem.questionnaireResponseItemComponent.answer.also {
+          if (it.size == 1 && it[0].hasValueStringType()) {
+            editText.setText(it[0].valueStringType.value)
+          } else {
+            editText.setText("")
+          }
+        }
       }
     }
 }
