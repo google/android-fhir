@@ -27,4 +27,7 @@ interface QuestionnaireItemViewHolderFactory {
 /** The [RecyclerView.ViewHolder] for [QuestionnaireItemViewItem]. */
 abstract class QuestionnaireItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     abstract fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem)
+    open fun setOnClickOfSubmitButton(onButtonClickListener: View.OnClickListener){
+        //Implemented by QuestionnaireSubmitButtonViewHolder
+    }
 }
