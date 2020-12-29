@@ -44,6 +44,8 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
             questionnaire.item,
             questionnaireResponse.item
         )
+
+        questionnaireItemViewItemList.add(QuestionnaireItemViewItem(QuestionnaireItemComponent(),QuestionnaireResponseItemComponent()))
     }
 
     /**
