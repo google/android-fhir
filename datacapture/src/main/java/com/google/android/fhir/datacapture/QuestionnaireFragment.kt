@@ -17,23 +17,29 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.core.os.bundleOf
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import ca.uhn.fhir.context.FhirContext
+import com.google.android.fhir.datacapture.views.QuestionnaireItemSubmitButtonViewHolder
 import org.hl7.fhir.r4.model.Questionnaire
 
 class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment() {
     private val viewModel: QuestionnaireViewModel by activityViewModels {
         QuestionnaireViewModelFactory(questionnaire)
     }
+    private lateinit var recyclerView:RecyclerView
+
 
     override fun onCreateView(
       inflater: LayoutInflater,
@@ -44,19 +50,31 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         view.findViewById<TextView>(R.id.title).text = viewModel.questionnaire.title
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-        val adapter = QuestionnaireItemAdapter(viewModel.questionnaireItemViewItemList)
-        recyclerView.adapter = adapter
 
-        view.findViewById<Button>(R.id.submit).setOnClickListener {
+
+        recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
+
+        val adapter = QuestionnaireItemAdapter(viewModel.questionnaireItemViewItemList, View.OnClickListener {
             val serializedResponse = FhirContext.forR4().newJsonParser()
-                .encodeResourceToString(viewModel.questionnaireResponse)
+                    .encodeResourceToString(viewModel.questionnaireResponse)
             setFragmentResult(
-                QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
-                bundleOf(QUESTIONNAIRE_RESPONSE_BUNDLE_KEY to serializedResponse)
+                    QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
+                    bundleOf(QUESTIONNAIRE_RESPONSE_BUNDLE_KEY to serializedResponse)
             )
-        }
+        })
+        recyclerView.adapter = adapter
+//        view.findViewById<Button>(R.id.submit).setOnClickListener {
+//            val serializedResponse = FhirContext.forR4().newJsonParser()
+//                .encodeResourceToString(viewModel.questionnaireResponse)
+//            setFragmentResult(
+//                QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
+//                bundleOf(QUESTIONNAIRE_RESPONSE_BUNDLE_KEY to serializedResponse)
+//            )
+//        }
     }
+
+
+
 
     companion object {
         const val QUESTIONNAIRE_RESPONSE_REQUEST_KEY = "questionnaire-response-request-key"
