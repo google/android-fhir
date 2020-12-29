@@ -16,19 +16,17 @@
 
 package com.google.android.fhir.datacapture
 
+import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.datacapture.views.*
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 
+
 class QuestionnaireItemAdapter(
-  private val questionnaireItemViewItemList: List<QuestionnaireItemViewItem>
+        private val questionnaireItemViewItemList: List<QuestionnaireItemViewItem>,private val onButtonClickListener: View.OnClickListener
 ) : RecyclerView.Adapter<QuestionnaireItemViewHolder>() {
     /**
      * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
@@ -41,11 +39,13 @@ class QuestionnaireItemAdapter(
             QuestionnaireItemViewHolderType.DATE_PICKER ->
                 QuestionnaireItemDatePickerViewHolderFactory
             QuestionnaireItemViewHolderType.EDIT_TEXT -> QuestionnaireItemEditTextViewHolderFactory
+            QuestionnaireItemViewHolderType.VIEW_FOOTER -> QuestionnaireItemSubmitButtonViewHolderFactory
         }
         return viewHolder.create(parent)
     }
 
     override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
+        if(position == questionnaireItemViewItemList.size-1) holder.setOnClickOfSubmitButton(onButtonClickListener)
         holder.bind(questionnaireItemViewItemList[position])
     }
 
@@ -56,14 +56,21 @@ class QuestionnaireItemAdapter(
      * (http://hl7.org/fhir/R4/valueset-questionnaire-item-control.html) used in the
      * itemControl extension (http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html).
      */
-    override fun getItemViewType(position: Int) =
-        when (val type = questionnaireItemViewItemList[position].questionnaireItemComponent.type) {
-            Questionnaire.QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP
-            Questionnaire.QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
-            Questionnaire.QuestionnaireItemType.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
-            Questionnaire.QuestionnaireItemType.STRING -> QuestionnaireItemViewHolderType.EDIT_TEXT
-            else -> throw NotImplementedError("Question type $type not supported.")
-        }.value
+    override fun getItemViewType(position: Int): Int {
+        if(position == questionnaireItemViewItemList.size-1) return QuestionnaireItemViewHolderType.VIEW_FOOTER.value
+        else {
+            return when (val type = questionnaireItemViewItemList[position].questionnaireItemComponent.type) {
+                Questionnaire.QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP
+                Questionnaire.QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
+                Questionnaire.QuestionnaireItemType.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
+                Questionnaire.QuestionnaireItemType.STRING -> QuestionnaireItemViewHolderType.EDIT_TEXT
+                else -> throw NotImplementedError("Question type $type not supported.")
+            }.value
+        }
+    }
+
 
     override fun getItemCount() = questionnaireItemViewItemList.size
+
+
 }
