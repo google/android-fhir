@@ -23,6 +23,11 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComp
 /**
  * Item for [QuestionnaireItemViewHolder] in [RecyclerView] containing [QuestionnaireItemComponent]
  * (the question) and [QuestionnaireResponseItemComponent] (the answer).
+ *
+ * [QuestionnaireItemComponent] (the question) and [QuestionnaireResponseItemComponent] (the answer)
+ * are used to create the right type of view (e.g. a CheckBox for a yes/no question) and populate
+ * the view with the right information (e.g text for the CheckBox and initial yes/no answer for the
+ * CheckBox).
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItemComponent: QuestionnaireItemComponent,
