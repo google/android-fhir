@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views
 
 import androidx.recyclerview.widget.RecyclerView
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 
 /**
@@ -27,4 +28,10 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComp
 data class QuestionnaireItemViewItem(
   val questionnaireItemComponent: QuestionnaireItemComponent,
   val questionnaireResponseItemComponent: QuestionnaireResponseItemComponent
-)
+) {
+  var singleAnswerOrNull
+    get() = questionnaireResponseItemComponent.answer.singleOrNull()
+    set(value) {
+      questionnaireResponseItemComponent.answer = listOf(value)
+    }
+}

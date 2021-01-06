@@ -63,13 +63,12 @@ object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolde
                   dayOfMonth
                 ).format(LOCAL_DATE_FORMATTER)
 
-                questionnaireItemViewItem.questionnaireResponseItemComponent.answer =
-                  listOf(
-                    QuestionnaireResponseItemAnswerComponent()
-                      .apply {
-                        value = DateType(year, month, dayOfMonth)
-                      }
-                  )
+                questionnaireItemViewItem.singleAnswerOrNull =
+                  QuestionnaireResponseItemAnswerComponent()
+                    .apply {
+                      value = DateType(year, month, dayOfMonth)
+                    }
+
               }
             }
           )
@@ -80,20 +79,14 @@ object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolde
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
         textView.text = questionnaireItemViewItem.questionnaireItemComponent.text
-        questionnaireItemViewItem.questionnaireResponseItemComponent.answer.also {
-          if (it.size == 1 && it[0].hasValueDateType()) {
-            input.text = it[0].valueDateType.let { date ->
-              LocalDate.of(
-                date.year,
-                // month values are 1-12 in java.time but 0-11 in DateType (FHIR)
-                date.month + 1,
-                date.day
-              )
-            }.format(LOCAL_DATE_FORMATTER)
-          } else {
-            input.text = ""
-          }
-        }
+        input.text = questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.let {
+          LocalDate.of(
+            it.year,
+            // month values are 1-12 in java.time but 0-11 in DateType (FHIR)
+            it.month + 1,
+            it.day
+          )
+        }?.format(LOCAL_DATE_FORMATTER) ?: ""
       }
     }
 

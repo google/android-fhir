@@ -39,26 +39,21 @@ object QuestionnaireItemEditTextViewHolderFactory : QuestionnaireItemViewHolderF
         editText = itemView.findViewById(R.id.input)
         itemView.findViewById<EditText>(R.id.input)
           .doAfterTextChanged { editable: Editable? ->
-            questionnaireItemViewItem.questionnaireResponseItemComponent.answer =
-              listOf(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .apply {
-                    value = StringType(editable.toString())
-                  }
-              )
+            questionnaireItemViewItem.singleAnswerOrNull =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .apply {
+                  value = StringType(editable.toString())
+                }
+
           }
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
         textView.text = questionnaireItemViewItem.questionnaireItemComponent.text
-        questionnaireItemViewItem.questionnaireResponseItemComponent.answer.also {
-          if (it.size == 1 && it[0].hasValueStringType()) {
-            editText.setText(it[0].valueStringType.value)
-          } else {
-            editText.setText("")
-          }
-        }
+        editText.setText(
+          questionnaireItemViewItem.singleAnswerOrNull?.valueStringType?.value ?: ""
+        )
       }
     }
 }
