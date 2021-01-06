@@ -16,26 +16,23 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 
-object QuestionnaireItemGroupViewHolderFactory : QuestionnaireItemViewHolderFactory {
-    override fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.questionnaire_item_group_header_view, parent, false)
-        return QuestionnaireItemGroupViewHolder(view)
-    }
-}
+object QuestionnaireItemGroupViewHolderFactory : QuestionnaireItemViewHolderFactory(
+  R.layout.questionnaire_item_group_header_view
+) {
+  override fun getQuestionnaireItemViewHolderDelegate() =
+    object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var groupHeader: TextView
 
-private class QuestionnaireItemGroupViewHolder(
-  itemView: View
-) : QuestionnaireItemViewHolder(itemView) {
-    private val groupHeader = itemView.findViewById<TextView>(R.id.group_header)
+      override fun init(itemView: View) {
+        groupHeader = itemView.findViewById(R.id.group_header)
+      }
 
-    override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         groupHeader.text = questionnaireItemViewItem.questionnaireItemComponent.text
+      }
     }
 }

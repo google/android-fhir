@@ -27,7 +27,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 
-class QuestionnaireItemAdapter(
+internal class QuestionnaireItemAdapter(
   private val questionnaireItemViewItemList: List<QuestionnaireItemViewItem>
 ) : RecyclerView.Adapter<QuestionnaireItemViewHolder>() {
     /**
