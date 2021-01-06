@@ -24,14 +24,14 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import ca.uhn.fhir.context.FhirContext
 import org.hl7.fhir.r4.model.Questionnaire
 
 class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment() {
-    private val viewModel: QuestionnaireViewModel by activityViewModels {
+    private val viewModel: QuestionnaireViewModel by viewModels {
         QuestionnaireViewModelFactory(questionnaire)
     }
 
