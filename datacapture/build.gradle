@@ -14,6 +14,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // Need to specify this to prevent junit runner from going deep into our dependencies
+        testInstrumentationRunnerArguments = ['package': 'com.google.android.fhir.datacapture']
     }
 
     buildTypes {
@@ -23,10 +25,16 @@ android {
         }
     }
     compileOptions {
+        // Flag to enable support for the new language APIs
+        // See https://developer.android.com/studio/write/java8-support
+        coreLibraryDesugaringEnabled true
+        // Sets Java compatibility to Java 8
+        // See https://developer.android.com/studio/write/java8-support
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
+        // See https://developer.android.com/studio/write/java8-support
         jvmTarget = '1.8'
     }
 }
@@ -38,25 +46,27 @@ configurations {
 }
 
 dependencies {
+    androidTestImplementation deps.atsl.ext_junit_ktx
+    androidTestImplementation deps.atsl.rules
+    androidTestImplementation deps.atsl.runner
+    androidTestImplementation deps.truth
+
     api (deps.hapi_r4) {
         exclude module: 'junit'
     }
+
+    coreLibraryDesugaring deps.desugar
 
     implementation deps.appcompat
     implementation deps.constraint_layout
     implementation deps.core
     implementation deps.fragment
     implementation deps.kotlin.stdlib
-    implementation deps.lifecycle.livedata_ktx
     implementation deps.lifecycle.viewmodel_ktx
     implementation deps.material
-    implementation project(path: ':fhirengine')
 
     testImplementation deps.atsl.core
     testImplementation deps.junit
     testImplementation deps.robolectric
     testImplementation deps.truth
-
-    androidTestImplementation deps.atsl.ext_junit
-    androidTestImplementation deps.atsl.espresso
 }
