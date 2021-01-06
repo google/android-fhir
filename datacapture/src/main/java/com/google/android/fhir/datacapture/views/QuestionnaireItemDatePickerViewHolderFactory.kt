@@ -68,7 +68,6 @@ object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolde
                     .apply {
                       value = DateType(year, month, dayOfMonth)
                     }
-
               }
             }
           )

@@ -44,7 +44,6 @@ object QuestionnaireItemEditTextViewHolderFactory : QuestionnaireItemViewHolderF
                 .apply {
                   value = StringType(editable.toString())
                 }
-
           }
       }
 

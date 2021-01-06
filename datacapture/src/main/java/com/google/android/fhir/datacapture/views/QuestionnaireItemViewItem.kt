@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.views
 
 import androidx.recyclerview.widget.RecyclerView
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 
 /**
