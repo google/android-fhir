@@ -27,4 +27,14 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComp
 data class QuestionnaireItemViewItem(
   val questionnaireItemComponent: QuestionnaireItemComponent,
   val questionnaireResponseItemComponent: QuestionnaireResponseItemComponent
-)
+) {
+  /**
+   * The single answer to the [QuestionnaireItemComponent], or `null` if there is none or more than
+   * one answer.
+   */
+  var singleAnswerOrNull
+    get() = questionnaireResponseItemComponent.answer.singleOrNull()
+    set(value) {
+      questionnaireResponseItemComponent.answer = listOf(value)
+    }
+}

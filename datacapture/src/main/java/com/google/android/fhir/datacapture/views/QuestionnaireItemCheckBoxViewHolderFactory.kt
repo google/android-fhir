@@ -33,17 +33,18 @@ object QuestionnaireItemCheckBoxViewHolderFactory : QuestionnaireItemViewHolderF
       override fun init(itemView: View) {
         checkBox = itemView.findViewById(R.id.check_box)
         checkBox.setOnClickListener {
-          questionnaireItemViewItem.questionnaireResponseItemComponent.answer = listOf(
+          questionnaireItemViewItem.singleAnswerOrNull =
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(checkBox.isChecked)
             }
-          )
         }
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
         checkBox.text = questionnaireItemViewItem.questionnaireItemComponent.text
+        checkBox.isChecked =
+          questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.booleanValue() ?: false
       }
     }
 }
