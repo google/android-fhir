@@ -28,6 +28,10 @@ data class QuestionnaireItemViewItem(
   val questionnaireItemComponent: QuestionnaireItemComponent,
   val questionnaireResponseItemComponent: QuestionnaireResponseItemComponent
 ) {
+  /**
+   * The single answer to the [QuestionnaireItemComponent], or `null` if there is none or more than
+   * one answer.
+   */
   var singleAnswerOrNull
     get() = questionnaireResponseItemComponent.answer.singleOrNull()
     set(value) {
