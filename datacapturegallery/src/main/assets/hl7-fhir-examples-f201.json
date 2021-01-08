@@ -70,7 +70,6 @@
           "linkId": "3.3",
           "text": "How many drinks per day?",
           "type": "integer"
-
         }
       ]
     }
