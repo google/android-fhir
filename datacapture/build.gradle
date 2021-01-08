@@ -43,6 +43,7 @@ dependencies {
     }
 
     implementation deps.appcompat
+    implementation deps.constraint_layout
     implementation deps.core
     implementation deps.fragment
     implementation deps.kotlin.stdlib
