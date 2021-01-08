@@ -18,10 +18,10 @@ package com.google.android.fhir.datacapture.views
 
 import android.text.Editable
 import android.view.View
-import android.widget.EditText
-import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
@@ -30,27 +30,26 @@ object QuestionnaireItemEditTextViewHolderFactory : QuestionnaireItemViewHolderF
 ) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var textView: TextView
-      private lateinit var editText: EditText
+      private lateinit var textInputLayout: TextInputLayout
+      private lateinit var textInputEditText: TextInputEditText
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        textView = itemView.findViewById(R.id.text)
-        editText = itemView.findViewById(R.id.input)
-        itemView.findViewById<EditText>(R.id.input)
-          .doAfterTextChanged { editable: Editable? ->
-            questionnaireItemViewItem.singleAnswerOrNull =
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                .apply {
-                  value = StringType(editable.toString())
-                }
-          }
+        textInputLayout = itemView.findViewById(R.id.textInputLayout)
+        textInputEditText = itemView.findViewById(R.id.textInputEditText)
+        textInputEditText.doAfterTextChanged { editable: Editable? ->
+          questionnaireItemViewItem.singleAnswerOrNull =
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .apply {
+                value = StringType(editable.toString())
+              }
+        }
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
-        textView.text = questionnaireItemViewItem.questionnaireItemComponent.text
-        editText.setText(
+        textInputLayout.hint = questionnaireItemViewItem.questionnaireItemComponent.text
+        textInputEditText.setText(
           questionnaireItemViewItem.singleAnswerOrNull?.valueStringType?.value ?: ""
         )
       }
