@@ -22,6 +22,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
@@ -42,7 +43,7 @@ object QuestionnaireItemIntegerViewHolderFactory : QuestionnaireItemViewHolderFa
             questionnaireItemViewItem.singleAnswerOrNull =
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
                 .apply {
-                  value = StringType(editable.toString())
+                  value = if (editable.toString()!="") IntegerType(Integer.parseInt(editable.toString())) else StringType(editable.toString())
                 }
           }
       }
@@ -50,13 +51,9 @@ object QuestionnaireItemIntegerViewHolderFactory : QuestionnaireItemViewHolderFa
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
         textView.text = questionnaireItemViewItem.questionnaireItemComponent.text
-        if(questionnaireItemViewItem.singleAnswerOrNull?.valueIntegerType?.value==null){
-            editText.setText("")
-        }else{
-            editText.setText(
-                    (questionnaireItemViewItem.singleAnswerOrNull!!.valueIntegerType.value)
-            )
-        }
+
+        if(questionnaireItemViewItem.singleAnswerOrNull?.valueIntegerType?.value==null) editText.setText("") else editText.setText((questionnaireItemViewItem.singleAnswerOrNull!!.valueIntegerType.value))
+
 
       }
     }
