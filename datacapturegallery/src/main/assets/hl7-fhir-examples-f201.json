@@ -65,6 +65,12 @@
           "linkId": "3.2",
           "text": "Do you drink alchohol?",
           "type": "boolean"
+        },
+        {
+          "linkId": "3.3",
+          "text": "How many drinks per day?",
+          "type": "integer"
+
         }
       ]
     }
