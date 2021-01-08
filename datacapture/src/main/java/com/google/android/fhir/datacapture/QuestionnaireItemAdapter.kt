@@ -18,12 +18,8 @@ package com.google.android.fhir.datacapture
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.*
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 
@@ -41,6 +37,8 @@ internal class QuestionnaireItemAdapter(
             QuestionnaireItemViewHolderType.DATE_PICKER ->
                 QuestionnaireItemDatePickerViewHolderFactory
             QuestionnaireItemViewHolderType.EDIT_TEXT -> QuestionnaireItemEditTextViewHolderFactory
+            QuestionnaireItemViewHolderType.INTEGER -> QuestionnaireItemIntegerViewHolderFactory
+
         }
         return viewHolder.create(parent)
     }
@@ -62,6 +60,8 @@ internal class QuestionnaireItemAdapter(
             Questionnaire.QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
             Questionnaire.QuestionnaireItemType.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
             Questionnaire.QuestionnaireItemType.STRING -> QuestionnaireItemViewHolderType.EDIT_TEXT
+            Questionnaire.QuestionnaireItemType.INTEGER -> QuestionnaireItemViewHolderType.INTEGER
+
             else -> throw NotImplementedError("Question type $type not supported.")
         }.value
 
