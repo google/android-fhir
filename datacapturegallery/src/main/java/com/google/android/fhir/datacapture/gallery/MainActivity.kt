@@ -18,52 +18,21 @@ package com.google.android.fhir.datacapture.gallery
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
-import androidx.fragment.app.FragmentResultListener
-import ca.uhn.fhir.context.FhirContext
-import com.google.android.fhir.datacapture.QuestionnaireFragment
-import org.hl7.fhir.r4.model.Questionnaire
+import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : AppCompatActivity() {
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
+    val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
+    recyclerView.adapter = QuestionnaireListAdapter(
+      listOf(
         // Example taken from https://www.hl7.org/fhir/questionnaire-example-f201-lifelines.json.html
-        val questionnaireJson = assets.open("hl7-fhir-examples-f201.json").bufferedReader()
-            .use { it.readText() }
-        val jsonParser = FhirContext.forR4().newJsonParser()
-        val questionnaire = jsonParser.parseResource(Questionnaire::class.java, questionnaireJson)
-
-        // Modifications to the questionnaire
-        questionnaire.title = "My questionnaire"
-        supportFragmentManager.setFragmentResultListener(
-            QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
-            this,
-            object : FragmentResultListener {
-                override fun onFragmentResult(requestKey: String, result: Bundle) {
-                    val dialogFragment = QuestionnaireResponseDialogFragment()
-                    dialogFragment.arguments = bundleOf(
-                      QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to
-                        result.getString(QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)
-                    )
-                    dialogFragment.show(
-                        supportFragmentManager,
-                        QuestionnaireResponseDialogFragment.TAG
-                    )
-                }
-            }
-        )
-        // Only add the fragment once, when the activity is first created.
-        if (savedInstanceState == null) {
-            val fragment = QuestionnaireFragment()
-            fragment.arguments = bundleOf(
-              QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to questionnaireJson
-            )
-            supportFragmentManager.beginTransaction()
-                .add(R.id.container, fragment)
-                .commit()
-        }
-    }
+        QuestionnaireListItem("HL7 example",
+          "Real-world lifelines questionnaire",
+          "hl7-fhir-examples-f201.json")
+      )
+    )
+  }
 }
