@@ -19,10 +19,12 @@ package com.google.android.fhir.datacapture.views
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import org.hl7.fhir.r4.model.DateType
@@ -33,18 +35,22 @@ object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolde
 ) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var textView: TextView
-      private lateinit var input: TextView
+      private lateinit var textInputLayout: TextInputLayout
+      private lateinit var textInputEditText: TextInputEditText
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
-        textView = itemView.findViewById(R.id.text)
-        input = itemView.findViewById(R.id.input)
-        val button = itemView.findViewById<TextView>(R.id.button)
-        button.setOnClickListener {
+        textInputLayout = itemView.findViewById(R.id.textInputLayout)
+        textInputEditText = itemView.findViewById(R.id.textInputEditText)
+        // Disable direct text input to only allow input from the date picker dialog
+        textInputEditText.keyListener = null
+        textInputEditText.setOnFocusChangeListener { view: View, hasFocus: Boolean ->
+          // Do not show the date picker dialog when losing focus.
+          if (!hasFocus) return@setOnFocusChangeListener
+
           // TODO: find a more robust way to do this as it is not guaranteed that the activity is
           // an AppCompatActivity.
-          val context = itemView.context as AppCompatActivity
+          val context = (itemView.context as ContextThemeWrapper).baseContext as AppCompatActivity
           DatePickerFragment().show(context.supportFragmentManager, DatePickerFragment.TAG)
           context.supportFragmentManager.setFragmentResultListener(
             DatePickerFragment.RESULT_REQUEST_KEY,
@@ -56,12 +62,14 @@ object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolde
                 val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
                 val dayOfMonth =
                   result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
-                input.text = LocalDate.of(
-                  year,
-                  // month values are 1-12 in java.time but 0-11 in DateType (FHIR)
-                  month + 1,
-                  dayOfMonth
-                ).format(LOCAL_DATE_FORMATTER)
+                textInputEditText.setText(
+                  LocalDate.of(
+                    year,
+                    // month values are 1-12 in java.time but 0-11 in DateType (FHIR)
+                    month + 1,
+                    dayOfMonth
+                  ).format(LOCAL_DATE_FORMATTER)
+                )
 
                 questionnaireItemViewItem.singleAnswerOrNull =
                   QuestionnaireResponseItemAnswerComponent()
@@ -77,15 +85,17 @@ object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolde
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
-        textView.text = questionnaireItemViewItem.questionnaireItemComponent.text
-        input.text = questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.let {
-          LocalDate.of(
-            it.year,
-            // month values are 1-12 in java.time but 0-11 in DateType (FHIR)
-            it.month + 1,
-            it.day
-          )
-        }?.format(LOCAL_DATE_FORMATTER) ?: ""
+        textInputLayout.hint = questionnaireItemViewItem.questionnaireItemComponent.text
+        textInputEditText.setText(
+          questionnaireItemViewItem.singleAnswerOrNull?.valueDateType?.let {
+            LocalDate.of(
+              it.year,
+              // month values are 1-12 in java.time but 0-11 in DateType (FHIR)
+              it.month + 1,
+              it.day
+            )
+          }?.format(LOCAL_DATE_FORMATTER) ?: ""
+        )
       }
     }
 
