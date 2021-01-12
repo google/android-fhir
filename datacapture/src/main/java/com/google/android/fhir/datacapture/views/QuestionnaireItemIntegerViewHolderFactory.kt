@@ -17,44 +17,49 @@
 package com.google.android.fhir.datacapture.views
 
 import android.text.Editable
+import android.text.InputType
 import android.view.View
-import android.widget.EditText
-import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
 
 object QuestionnaireItemIntegerViewHolderFactory : QuestionnaireItemViewHolderFactory(
-  R.layout.questionnaire_item_integer_view
+        R.layout.questionnaire_item_edit_text_view
 ) {
-  override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var textView: TextView
-      private lateinit var editText: EditText
-      private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+    override fun getQuestionnaireItemViewHolderDelegate() =
+        object : QuestionnaireItemViewHolderDelegate {
+            private lateinit var textInputLayout: TextInputLayout
+            private lateinit var textInputEditText: TextInputEditText
+            private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
-      override fun init(itemView: View) {
-        textView = itemView.findViewById(R.id.text)
-        editText = itemView.findViewById(R.id.input)
-        itemView.findViewById<EditText>(R.id.input)
-          .doAfterTextChanged { editable: Editable? ->
-            questionnaireItemViewItem.singleAnswerOrNull =
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                .apply {
-                  value = if (editable.toString()!="") IntegerType(Integer.parseInt(editable.toString())) else StringType(editable.toString())
+            override fun init(itemView: View) {
+                textInputLayout = itemView.findViewById(R.id.textInputLayout)
+                textInputEditText = itemView.findViewById(R.id.textInputEditText)
+                textInputEditText.setRawInputType(InputType.TYPE_CLASS_NUMBER)
+                textInputEditText.doAfterTextChanged { editable: Editable? ->
+                    questionnaireItemViewItem.singleAnswerOrNull =
+                            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                                    .apply {
+                                        if (editable.toString() != "") {
+                                            value = IntegerType(
+                                                    Integer.parseInt(editable.toString()))
+                                        }
+                                    }
                 }
-          }
-      }
+            }
 
-      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        this.questionnaireItemViewItem = questionnaireItemViewItem
-        textView.text = questionnaireItemViewItem.questionnaireItemComponent.text
-
-        if(questionnaireItemViewItem.singleAnswerOrNull?.valueIntegerType?.value==null) editText.setText("") else editText.setText((questionnaireItemViewItem.singleAnswerOrNull!!.valueIntegerType.value))
-
-
-      }
-    }
+            override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+                this.questionnaireItemViewItem = questionnaireItemViewItem
+                textInputLayout.hint = questionnaireItemViewItem.questionnaireItemComponent.text
+                if (questionnaireItemViewItem
+                                .singleAnswerOrNull?.valueIntegerType?.value.toString() != "null") {
+                    textInputEditText.setText(
+                            questionnaireItemViewItem.singleAnswerOrNull!!.valueIntegerType.value
+                    )
+                }
+            }
+        }
 }
