@@ -14,7 +14,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
 <resources>
     <dimen name="item_margin_horizontal">16dp</dimen>
     <dimen name="item_margin_vertical">8dp</dimen>
