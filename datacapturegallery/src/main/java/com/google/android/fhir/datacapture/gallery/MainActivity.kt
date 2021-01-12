@@ -18,44 +18,25 @@ package com.google.android.fhir.datacapture.gallery
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentResultListener
-import ca.uhn.fhir.context.FhirContext
-import com.google.android.fhir.datacapture.QuestionnaireFragment
-import org.hl7.fhir.r4.model.Questionnaire
+import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : AppCompatActivity() {
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
+    val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
+    recyclerView.adapter = QuestionnaireListAdapter(
+      listOf(
         // Example taken from https://www.hl7.org/fhir/questionnaire-example-f201-lifelines.json.html
-        val jsonResource = assets.open("hl7-fhir-examples-f201.json").bufferedReader()
-            .use { it.readText() }
-        val jsonParser = FhirContext.forR4().newJsonParser()
-        val questionnaire = jsonParser.parseResource(Questionnaire::class.java, jsonResource)
-
-        // Modifications to the questionnaire
-        questionnaire.title = "My questionnaire"
-
-        val fragment = QuestionnaireFragment(questionnaire)
-        supportFragmentManager.setFragmentResultListener(
-            QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
-            this,
-            object : FragmentResultListener {
-                override fun onFragmentResult(requestKey: String, result: Bundle) {
-                    val dialogFragment = QuestionnaireResponseDialogFragment(
-                        result.getString(QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)!!
-                    )
-                    dialogFragment.show(
-                        supportFragmentManager,
-                        QuestionnaireResponseDialogFragment.TAG
-                    )
-                }
-            }
-        )
-        supportFragmentManager.beginTransaction()
-            .add(R.id.container, fragment)
-            .commit()
-    }
+        QuestionnaireListItem("HL7 example",
+          "Real-world lifelines questionnaire",
+          "hl7-fhir-examples-f201.json"),
+          // https://www.hl7.org/fhir/questionnaire-example-bluebook.html
+          QuestionnaireListItem("Sample questionnaire to test integer type",
+        "Sample questionnaire to test integer type",
+        "sample-questionnaire-integer-type.json")
+      )
+    )
+  }
 }
