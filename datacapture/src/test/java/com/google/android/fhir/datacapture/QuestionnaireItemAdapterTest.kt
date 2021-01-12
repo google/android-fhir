@@ -114,7 +114,7 @@ class QuestionnaireItemAdapterTest {
                 )
         )
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
-                QuestionnaireItemViewHolderType.INTEGER.value
+                QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER.value
         )
     }
     // TODO: test errors thrown for unsupported types
