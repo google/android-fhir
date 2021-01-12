@@ -1,0 +1,14 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "sample",
+  "title": "Sample to test integer view",
+  "status": "draft",
+  "publisher": "IPRD group",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "How old are you ?",
+      "type": "integer"
+    }
+  ]
+}
