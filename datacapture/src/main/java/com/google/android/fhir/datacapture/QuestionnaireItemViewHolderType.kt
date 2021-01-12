@@ -29,7 +29,7 @@ enum class QuestionnaireItemViewHolderType(val value: Int) {
     CHECK_BOX(1),
     DATE_PICKER(2),
     EDIT_TEXT(3),
-    INTEGER(4);
+    EDIT_TEXT_INTEGER(4);
 
     companion object {
         private val VALUES = values()
