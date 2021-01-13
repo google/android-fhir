@@ -101,5 +101,23 @@ class QuestionnaireItemAdapterTest {
         )
     }
 
+    @Test
+    fun getItemViewType_integerItemType_shouldReturnIntegerEditTextViewHolderType() {
+        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+            listOf(
+                QuestionnaireItemViewItem(
+                    Questionnaire.QuestionnaireItemComponent().apply
+                    {
+                        type = Questionnaire.QuestionnaireItemType.INTEGER
+                    },
+                    QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                )
+            )
+        )
+        assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
+            QuestionnaireItemViewHolderType.INTEGER_EDIT_TEXT.value
+        )
+    }
+
     // TODO: test errors thrown for unsupported types
 }
