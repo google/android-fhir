@@ -37,8 +37,6 @@ class MainActivity : AppCompatActivity() {
 
         // Modifications to the questionnaire
         questionnaire.title = "My questionnaire"
-
-        val fragment = QuestionnaireFragment(questionnaire)
         supportFragmentManager.setFragmentResultListener(
             QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
             this,
@@ -54,8 +52,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         )
-        supportFragmentManager.beginTransaction()
-            .add(R.id.container, fragment)
-            .commit()
+        /* On configuration change savedInstanceState is not null, we create/add the fragment only
+        when the activity is first created */
+        if (savedInstanceState == null) {
+            val fragment = QuestionnaireFragment.newInstance(questionnaire)
+            supportFragmentManager.beginTransaction()
+                .add(R.id.container, fragment)
+                .commit()
+        }
     }
 }
