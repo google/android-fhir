@@ -65,17 +65,26 @@ internal class DatabaseImpl(
         }
     }
     val syncedResourceDao = db.syncedResourceDao()
+    val localChangeDao by lazy {
+        db.localChangeDao().also {
+            it.iParser = iParser
+        }
+    }
 
     override fun <R : Resource> insert(resource: R) {
         resourceDao.insert(resource)
+        localChangeDao.addInsert(resource)
     }
 
     override fun <R : Resource> insertAll(resources: List<R>) {
         resourceDao.insertAll(resources)
+        // TODO: impl insertAll in LocalChangeDao
     }
 
     override fun <R : Resource> update(resource: R) {
+        val oldResource = select(resource.javaClass, resource.id)
         resourceDao.update(resource)
+        localChangeDao.addUpdate(oldResource, resource)
     }
 
     override fun <R : Resource> select(clazz: Class<R>, id: String): R {
@@ -107,6 +116,7 @@ internal class DatabaseImpl(
             resourceId = id,
             resourceType = type
         )
+        localChangeDao.addDelete(resourceId = id, resourceType = type)
     }
 
     override fun <R : Resource> searchByReference(

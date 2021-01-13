@@ -19,9 +19,11 @@ package com.google.fhirengine.db.impl
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.google.fhirengine.db.impl.dao.LocalChangeDao
 import com.google.fhirengine.db.impl.dao.ResourceDao
 import com.google.fhirengine.db.impl.dao.SyncedResourceDao
 import com.google.fhirengine.db.impl.entities.DateIndexEntity
+import com.google.fhirengine.db.impl.entities.LocalChange
 import com.google.fhirengine.db.impl.entities.NumberIndexEntity
 import com.google.fhirengine.db.impl.entities.QuantityIndexEntity
 import com.google.fhirengine.db.impl.entities.ReferenceIndexEntity
@@ -32,19 +34,20 @@ import com.google.fhirengine.db.impl.entities.TokenIndexEntity
 import com.google.fhirengine.db.impl.entities.UriIndexEntity
 
 @Database(
-    entities = [
-        ResourceEntity::class,
-        StringIndexEntity::class,
-        ReferenceIndexEntity::class,
-        TokenIndexEntity::class,
-        QuantityIndexEntity::class,
-        UriIndexEntity::class,
-        DateIndexEntity::class,
-        NumberIndexEntity::class,
-        SyncedResourceEntity::class
-    ],
-    version = 1,
-    exportSchema = false
+        entities = [
+            ResourceEntity::class,
+            StringIndexEntity::class,
+            ReferenceIndexEntity::class,
+            TokenIndexEntity::class,
+            QuantityIndexEntity::class,
+            UriIndexEntity::class,
+            DateIndexEntity::class,
+            NumberIndexEntity::class,
+            SyncedResourceEntity::class,
+            LocalChange::class,
+        ],
+        version = 1,
+        exportSchema = false
 )
 @TypeConverters(
     DbTypeConverters::class
@@ -52,4 +55,5 @@ import com.google.fhirengine.db.impl.entities.UriIndexEntity
 internal abstract class ResourceDatabase : RoomDatabase() {
     abstract fun resourceDao(): ResourceDao
     abstract fun syncedResourceDao(): SyncedResourceDao
+    abstract fun localChangeDao(): LocalChangeDao
 }
