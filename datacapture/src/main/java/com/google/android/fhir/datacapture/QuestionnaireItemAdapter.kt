@@ -22,7 +22,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHo
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemIntegerEditTextViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextIntegerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire
@@ -42,8 +42,8 @@ internal class QuestionnaireItemAdapter(
             QuestionnaireItemViewHolderType.DATE_PICKER ->
                 QuestionnaireItemDatePickerViewHolderFactory
             QuestionnaireItemViewHolderType.EDIT_TEXT -> QuestionnaireItemEditTextViewHolderFactory
-            QuestionnaireItemViewHolderType.INTEGER_EDIT_TEXT ->
-                QuestionnaireItemIntegerEditTextViewHolderFactory
+            QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER ->
+                QuestionnaireItemEditTextIntegerViewHolderFactory
         }
         return viewHolder.create(parent)
     }
@@ -66,7 +66,7 @@ internal class QuestionnaireItemAdapter(
           Questionnaire.QuestionnaireItemType.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
           Questionnaire.QuestionnaireItemType.STRING -> QuestionnaireItemViewHolderType.EDIT_TEXT
           Questionnaire.QuestionnaireItemType.INTEGER ->
-              QuestionnaireItemViewHolderType.INTEGER_EDIT_TEXT
+              QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
           else -> throw NotImplementedError("Question type $type not supported.")
       }.value
 

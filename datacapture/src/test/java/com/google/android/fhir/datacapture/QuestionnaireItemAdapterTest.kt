@@ -102,7 +102,7 @@ class QuestionnaireItemAdapterTest {
     }
 
     @Test
-    fun getItemViewType_integerItemType_shouldReturnIntegerEditTextViewHolderType() {
+    fun getItemViewType_integerItemType_shouldReturnEditTextIntegerViewHolderType() {
         val questionnaireItemAdapter = QuestionnaireItemAdapter(
             listOf(
                 QuestionnaireItemViewItem(
@@ -115,7 +115,7 @@ class QuestionnaireItemAdapterTest {
             )
         )
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
-            QuestionnaireItemViewHolderType.INTEGER_EDIT_TEXT.value
+            QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER.value
         )
     }
 
