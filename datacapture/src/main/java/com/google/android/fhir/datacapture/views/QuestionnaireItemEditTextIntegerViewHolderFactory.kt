@@ -25,7 +25,6 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
 
 object QuestionnaireItemEditTextIntegerViewHolderFactory : QuestionnaireItemViewHolderFactory(
   R.layout.questionnaire_item_edit_text_view
@@ -39,7 +38,8 @@ object QuestionnaireItemEditTextIntegerViewHolderFactory : QuestionnaireItemView
           override fun init(itemView: View) {
               textInputLayout = itemView.findViewById(R.id.textInputLayout)
               textInputEditText = itemView.findViewById(R.id.textInputEditText)
-              textInputEditText.setRawInputType(InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED)
+              textInputEditText.setRawInputType(InputType.TYPE_CLASS_NUMBER or
+                InputType.TYPE_NUMBER_FLAG_SIGNED)
               textInputEditText.doAfterTextChanged { editable: Editable? ->
                   questionnaireItemViewItem.singleAnswerOrNull =
                     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
