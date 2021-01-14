@@ -18,19 +18,29 @@ package com.google.android.fhir.datacapture.views
 
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
-  private val parent = FrameLayout(InstrumentationRegistry.getInstrumentation().context)
-  private val viewHolder = QuestionnaireItemGroupViewHolderFactory.create(parent)
+  private lateinit var context : ContextThemeWrapper
+  private lateinit var parent : FrameLayout
+  private lateinit var viewHolder : QuestionnaireItemViewHolder
+
+  @Before
+  fun setUp() {
+    context = ContextThemeWrapper(InstrumentationRegistry.getInstrumentation().getTargetContext(), R.style.Theme_MaterialComponents)
+    parent = FrameLayout(context)
+    viewHolder = QuestionnaireItemGroupViewHolderFactory.create(parent)
+  }
 
   @Test
   fun shouldSetTextViewText() {
