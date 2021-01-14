@@ -31,13 +31,14 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
-  private lateinit var context : ContextThemeWrapper
-  private lateinit var parent : FrameLayout
-  private lateinit var viewHolder : QuestionnaireItemViewHolder
+  private lateinit var context: ContextThemeWrapper
+  private lateinit var parent: FrameLayout
+  private lateinit var viewHolder: QuestionnaireItemViewHolder
 
   @Before
   fun setUp() {
-    context = ContextThemeWrapper(InstrumentationRegistry.getInstrumentation().getTargetContext(), R.style.Theme_MaterialComponents)
+    context = ContextThemeWrapper(InstrumentationRegistry.getInstrumentation().getTargetContext(),
+      R.style.Theme_MaterialComponents)
     parent = FrameLayout(context)
     viewHolder = QuestionnaireItemGroupViewHolderFactory.create(parent)
   }

@@ -16,9 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -35,17 +33,17 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemEditTextViewHolderFactoryInstrumentedTest {
-  private lateinit var context : ContextThemeWrapper
-  private lateinit var parent : FrameLayout
-  private lateinit var viewHolder : QuestionnaireItemViewHolder
+  private lateinit var context: ContextThemeWrapper
+  private lateinit var parent: FrameLayout
+  private lateinit var viewHolder: QuestionnaireItemViewHolder
 
   @Before
   fun setUp() {
-    context = ContextThemeWrapper(InstrumentationRegistry.getInstrumentation().getTargetContext(), R.style.Theme_MaterialComponents)
+    context = ContextThemeWrapper(InstrumentationRegistry.getInstrumentation().getTargetContext(),
+      R.style.Theme_MaterialComponents)
     parent = FrameLayout(context)
     viewHolder = QuestionnaireItemEditTextViewHolderFactory.create(parent)
   }
-
 
   @Test
   fun shouldSetTextViewText() {
@@ -57,7 +55,8 @@ class QuestionnaireItemEditTextViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ))
 
-    assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).hint).isEqualTo("Question?")
+    assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).hint)
+      .isEqualTo("Question?")
   }
 
   @Test
@@ -65,9 +64,7 @@ class QuestionnaireItemEditTextViewHolderFactoryInstrumentedTest {
   fun shouldSetInputText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          text = "Question?"
-        },
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           answer = listOf(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
@@ -77,9 +74,8 @@ class QuestionnaireItemEditTextViewHolderFactoryInstrumentedTest {
         }
       ))
 
-    assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).text.toString()).isEqualTo(
-      "Answer"
-    )
+    assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText)
+      .text.toString()).isEqualTo("Answer")
   }
 
   @Test
