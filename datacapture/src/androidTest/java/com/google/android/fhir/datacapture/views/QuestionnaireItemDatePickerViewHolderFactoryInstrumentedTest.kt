@@ -40,7 +40,8 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
 
   @Before
   fun setUp() {
-    context = ContextThemeWrapper(InstrumentationRegistry.getInstrumentation().getTargetContext(),
+    context = ContextThemeWrapper(
+      InstrumentationRegistry.getInstrumentation().getTargetContext(),
       R.style.Theme_MaterialComponents)
     parent = FrameLayout(context)
     viewHolder = QuestionnaireItemDatePickerViewHolderFactory.create(parent)
