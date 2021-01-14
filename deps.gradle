@@ -12,12 +12,11 @@ def build_tool_version = '30.0.2'
 ext.build_tool_version = build_tool_version
 
 def versions = [:]
-versions.android_gradle_plugin = '4.0.1'
-versions.android_gradle_plugin = '4.0.1'
+versions.android_gradle_plugin = '4.2.0-beta02'
 versions.appcompat = '1.1.0'
 versions.atsl_core = '1.2.0'
-versions.atsl_expresso = '3.2.0'
-versions.atsl_junit = '1.1.1'
+versions.atsl_expresso = '3.3.0'
+versions.atsl_junit = '1.1.2'
 versions.atsl_rules = '1.1.0'
 versions.atsl_runner = '1.1.0'
 versions.constraint_layout = '1.1.3'

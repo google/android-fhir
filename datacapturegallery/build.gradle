@@ -8,7 +8,7 @@ android {
     buildToolsVersion build_tool_version
 
     defaultConfig {
-        applicationId "com.example.datacapturegallery"
+        applicationId "com.google.android.fhir.datacapture.gallery"
         minSdkVersion sdk_versions.min_sdk
         targetSdkVersion sdk_versions.target_sdk
         versionCode 1
