@@ -39,7 +39,8 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
   fun setUp() {
     context = ContextThemeWrapper(
       InstrumentationRegistry.getInstrumentation().getTargetContext(),
-      R.style.Theme_MaterialComponents)
+      R.style.Theme_MaterialComponents
+    )
     parent = FrameLayout(context)
     viewHolder = QuestionnaireItemGroupViewHolderFactory.create(parent)
   }
