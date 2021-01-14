@@ -23,10 +23,10 @@ import com.google.fhirengine.sync.SyncData.Companion.LAST_UPDATED_ASC_VALUE
 import com.google.fhirengine.sync.SyncData.Companion.LAST_UPDATED_KEY
 import com.google.fhirengine.sync.SyncData.Companion.SORT_KEY
 import java.io.IOException
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import org.hl7.fhir.r4.model.Bundle
-import java.time.format.DateTimeFormatter
 
 /**
  * Class that synchronises only one resource.
