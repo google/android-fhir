@@ -32,21 +32,19 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
-  private lateinit var context : ContextThemeWrapper
-  private lateinit var parent : FrameLayout
-  private lateinit var viewHolder : QuestionnaireItemViewHolder
+  private lateinit var context: ContextThemeWrapper
+  private lateinit var parent: FrameLayout
+  private lateinit var viewHolder: QuestionnaireItemViewHolder
 
   @Before
   fun setUp() {
-    context = ContextThemeWrapper(InstrumentationRegistry.getInstrumentation().getTargetContext(), R.style.Theme_MaterialComponents)
+    context = ContextThemeWrapper(InstrumentationRegistry.getInstrumentation().getTargetContext(),
+      R.style.Theme_MaterialComponents)
     parent = FrameLayout(context)
     viewHolder = QuestionnaireItemDatePickerViewHolderFactory.create(parent)
   }
-
-
 
   @Test
   fun shouldSetTextViewText() {
@@ -58,9 +56,8 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ))
 
-    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).hint).isEqualTo(
-      "Question?"
-    )
+    assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).hint)
+      .isEqualTo("Question?")
   }
 
   @Test
@@ -74,9 +71,8 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ))
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString()).isEqualTo(
-      ""
-    )
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString())
+      .isEqualTo("")
   }
 
   @Test
@@ -96,6 +92,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
         }
       ))
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString()).isEqualTo("2020-01-01")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString())
+      .isEqualTo("2020-01-01")
   }
 }
