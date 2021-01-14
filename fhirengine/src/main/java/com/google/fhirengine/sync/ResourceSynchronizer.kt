@@ -16,16 +16,17 @@
 
 package com.google.fhirengine.sync
 
+import android.annotation.SuppressLint
 import com.google.fhirengine.db.Database
 import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
 import com.google.fhirengine.sync.SyncData.Companion.LAST_UPDATED_ASC_VALUE
 import com.google.fhirengine.sync.SyncData.Companion.LAST_UPDATED_KEY
 import com.google.fhirengine.sync.SyncData.Companion.SORT_KEY
 import java.io.IOException
-import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import org.hl7.fhir.r4.model.Bundle
+import java.time.format.DateTimeFormatter
 
 /**
  * Class that synchronises only one resource.
@@ -97,8 +98,12 @@ class ResourceSynchronizer(
         }
     }
 
+    @SuppressLint("NewApi") // Use Java8 APIs with desugaring
     private fun Date.toTimeZoneString(): String {
-        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US)
-        return simpleDateFormat.format(this)
+        val simpleDateFormat = DateTimeFormatter.ofPattern(
+            "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+            Locale.US
+        )
+        return simpleDateFormat.format(this.toInstant())
     }
 }
