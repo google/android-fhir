@@ -19,21 +19,33 @@ package com.google.android.fhir.datacapture.views
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.material.textfield.TextInputEditText
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemEditTextViewHolderFactoryInstrumentedTest {
-  private val parent = FrameLayout(InstrumentationRegistry.getInstrumentation().context)
-  private val viewHolder = QuestionnaireItemEditTextViewHolderFactory.create(parent)
+  private lateinit var context : ContextThemeWrapper
+  private lateinit var parent : FrameLayout
+  private lateinit var viewHolder : QuestionnaireItemViewHolder
+
+  @Before
+  fun setUp() {
+    context = ContextThemeWrapper(InstrumentationRegistry.getInstrumentation().getTargetContext(), R.style.Theme_MaterialComponents)
+    parent = FrameLayout(context)
+    viewHolder = QuestionnaireItemEditTextViewHolderFactory.create(parent)
+  }
+
 
   @Test
   fun shouldSetTextViewText() {
@@ -45,7 +57,7 @@ class QuestionnaireItemEditTextViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ))
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text).text).isEqualTo("Question?")
+    assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).hint).isEqualTo("Question?")
   }
 
   @Test
@@ -65,7 +77,7 @@ class QuestionnaireItemEditTextViewHolderFactoryInstrumentedTest {
         }
       ))
 
-    assertThat(viewHolder.itemView.findViewById<EditText>(R.id.input).text.toString()).isEqualTo(
+    assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).text.toString()).isEqualTo(
       "Answer"
     )
   }
@@ -78,7 +90,7 @@ class QuestionnaireItemEditTextViewHolderFactoryInstrumentedTest {
       QuestionnaireResponse.QuestionnaireResponseItemComponent()
     )
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<EditText>(R.id.input).setText("Answer")
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("Answer")
 
     val answer = questionnaireItemViewItem.questionnaireResponseItemComponent.answer
     assertThat(answer.size).isEqualTo(1)
