@@ -23,9 +23,14 @@ import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 
 class QuestionnaireActivity : AppCompatActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_questionnaire)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_questionnaire)
+        
+        supportActionBar!!.apply {
+            title = intent.getStringExtra(QUESTIONNAIRE_TITLE_KEY)
+            setDisplayHomeAsUpEnabled(true)
+        }
 
     val questionnaireJson = assets
       .open(intent.getStringExtra(QUESTIONNAIRE_FILE_PATH_KEY)!!)
@@ -60,9 +65,8 @@ class QuestionnaireActivity : AppCompatActivity() {
           .commit()
     }
   }
-
-  companion object {
-    const val QUESTIONNAIRE_TITLE_KEY = "questionnaire-title-key"
-    const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
-  }
+    companion object {
+        const val QUESTIONNAIRE_TITLE_KEY = "questionnaire-title-key"
+        const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
+    }
 }
