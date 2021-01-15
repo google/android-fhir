@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.gallery
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentResultListener
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.QuestionnaireFragment
@@ -30,10 +31,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Example taken from https://www.hl7.org/fhir/questionnaire-example-f201-lifelines.json.html
-        val jsonResource = assets.open("hl7-fhir-examples-f201.json").bufferedReader()
+        val questionnaireJson = assets.open("hl7-fhir-examples-f201.json").bufferedReader()
             .use { it.readText() }
         val jsonParser = FhirContext.forR4().newJsonParser()
-        val questionnaire = jsonParser.parseResource(Questionnaire::class.java, jsonResource)
+        val questionnaire = jsonParser.parseResource(Questionnaire::class.java, questionnaireJson)
 
         // Modifications to the questionnaire
         questionnaire.title = "My questionnaire"
@@ -42,9 +43,8 @@ class MainActivity : AppCompatActivity() {
             this,
             object : FragmentResultListener {
                 override fun onFragmentResult(requestKey: String, result: Bundle) {
-                    val dialogFragment = QuestionnaireResponseDialogFragment(
-                        result.getString(QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)!!
-                    )
+                    val dialogFragment = QuestionnaireResponseDialogFragment()
+                    dialogFragment.arguments = bundleOf(Pair("contents",result.getString(QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)))
                     dialogFragment.show(
                         supportFragmentManager,
                         QuestionnaireResponseDialogFragment.TAG
@@ -52,10 +52,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         )
-        /* On configuration change savedInstanceState is not null, we create/add the fragment only
-        when the activity is first created */
+        // Only add the fragment once, when the activity is first created.
         if (savedInstanceState == null) {
-            val fragment = QuestionnaireFragment.newInstance(questionnaire)
+            val fragment = QuestionnaireFragment()
+            fragment.arguments = bundleOf(Pair("questionnaire", questionnaire))
             supportFragmentManager.beginTransaction()
                 .add(R.id.container, fragment)
                 .commit()
