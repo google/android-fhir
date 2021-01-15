@@ -44,8 +44,10 @@ class MainActivity : AppCompatActivity() {
             object : FragmentResultListener {
                 override fun onFragmentResult(requestKey: String, result: Bundle) {
                     val dialogFragment = QuestionnaireResponseDialogFragment()
-                    dialogFragment.arguments = bundleOf(Pair("contents", result.getString
-                    (QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)))
+                    dialogFragment.arguments = bundleOf(
+                      QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to
+                        result.getString(QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)
+                    )
                     dialogFragment.show(
                         supportFragmentManager,
                         QuestionnaireResponseDialogFragment.TAG
@@ -56,7 +58,9 @@ class MainActivity : AppCompatActivity() {
         // Only add the fragment once, when the activity is first created.
         if (savedInstanceState == null) {
             val fragment = QuestionnaireFragment()
-            fragment.arguments = bundleOf(Pair("questionnaire", questionnaire))
+            fragment.arguments = bundleOf(
+              QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to questionnaire
+            )
             supportFragmentManager.beginTransaction()
                 .add(R.id.container, fragment)
                 .commit()
