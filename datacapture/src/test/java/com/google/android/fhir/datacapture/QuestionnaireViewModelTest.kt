@@ -17,11 +17,13 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Build
+import androidx.lifecycle.SavedStateHandle
 import ca.uhn.fhir.context.FhirContext
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Resource
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -30,11 +32,18 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class QuestionnaireViewModelTest {
+    private lateinit var state: SavedStateHandle
+    @Before
+    fun setUp() {
+        state = SavedStateHandle()
+    }
+
     @Test
     fun questionnaireResponse_shouldCopyQuestionnaireId() {
         val questionnaire = Questionnaire()
         questionnaire.id = "a-questionnaire"
-        val viewModel = QuestionnaireViewModel(questionnaire)
+        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, questionnaire)
+        val viewModel = QuestionnaireViewModel(state)
         assertResourceEquals(
             viewModel.questionnaireResponse,
             QuestionnaireResponse().apply { this.questionnaire = "a-questionnaire" }
@@ -49,7 +58,8 @@ class QuestionnaireViewModelTest {
         item.text = "Yes or no?"
         item.type = Questionnaire.QuestionnaireItemType.BOOLEAN
         questionnaire.addItem(item)
-        val viewModel = QuestionnaireViewModel(questionnaire)
+        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, questionnaire)
+        val viewModel = QuestionnaireViewModel(state)
         assertResourceEquals(
             viewModel.questionnaireResponse,
             QuestionnaireResponse().apply {
@@ -73,7 +83,8 @@ class QuestionnaireViewModelTest {
         item.text = "Name?"
         item.type = Questionnaire.QuestionnaireItemType.STRING
         group.item.add(item)
-        val viewModel = QuestionnaireViewModel(questionnaire)
+        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, questionnaire)
+        val viewModel = QuestionnaireViewModel(state)
         assertResourceEquals(
             viewModel.questionnaireResponse,
             QuestionnaireResponse().apply {
@@ -100,7 +111,8 @@ class QuestionnaireViewModelTest {
         item.text = "Name?"
         item.type = Questionnaire.QuestionnaireItemType.STRING
         group.item.add(item)
-        val viewModel = QuestionnaireViewModel(questionnaire)
+        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, questionnaire)
+        val viewModel = QuestionnaireViewModel(state)
         val questionnaireItemViewItemList = viewModel.questionnaireItemViewItemList
         assertThat(questionnaireItemViewItemList.size).isEqualTo(2)
         val firstQuestionnaireItemViewItem = questionnaireItemViewItemList[0]
