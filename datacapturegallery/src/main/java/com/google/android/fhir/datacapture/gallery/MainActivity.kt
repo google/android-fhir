@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             val fragment = QuestionnaireFragment()
             fragment.arguments = bundleOf(
-              QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to questionnaire
+              QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to questionnaireJson
             )
             supportFragmentManager.beginTransaction()
                 .add(R.id.container, fragment)

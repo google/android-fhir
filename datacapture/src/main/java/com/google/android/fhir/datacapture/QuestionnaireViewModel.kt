@@ -21,6 +21,7 @@ import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
+import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
@@ -39,7 +40,9 @@ class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     internal val questionnaireItemViewItemList = mutableListOf<QuestionnaireItemViewItem>()
 
     init {
-        questionnaire = state.get<Questionnaire>(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE)!!
+        val jsonParser = FhirContext.forR4().newJsonParser()
+        val questionnaireJson = state.get<String>(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE)!!
+        questionnaire = jsonParser.parseResource(Questionnaire::class.java, questionnaireJson)
         questionnaireResponse.questionnaire = questionnaire.id
         // Retain the hierarchy and order of items within the questionnaire as specified in the
         // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
