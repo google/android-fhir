@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,17 +28,17 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import ca.uhn.fhir.context.FhirContext
-import org.hl7.fhir.r4.model.Questionnaire
+import java.lang.IllegalStateException
 
 class QuestionnaireFragment() : Fragment() {
 
-    private lateinit var questionnaire: Questionnaire
+    private val viewModel: QuestionnaireViewModel by viewModels {
+        QuestionnaireViewModelFactory(this, requireArguments())
+    }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        val jsonParser = FhirContext.forR4().newJsonParser()
-        questionnaire = jsonParser.parseResource(Questionnaire::class.java,
-          arguments?.getString("questionnaireJson"))
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (arguments == null) throw IllegalStateException("Pass arg \'questionnaire\' to fragment")
     }
 
     override fun onCreateView(
@@ -50,9 +49,6 @@ class QuestionnaireFragment() : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        val viewModel: QuestionnaireViewModel by viewModels {
-            QuestionnaireViewModelFactory(questionnaire)
-        }
         view.findViewById<TextView>(R.id.title).text = viewModel.questionnaire.title
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
@@ -72,12 +68,5 @@ class QuestionnaireFragment() : Fragment() {
     companion object {
         const val QUESTIONNAIRE_RESPONSE_REQUEST_KEY = "questionnaire-response-request-key"
         const val QUESTIONNAIRE_RESPONSE_BUNDLE_KEY = "questionnaire-response-bundle-key"
-        @JvmStatic
-        fun newInstance(questionnaire: Questionnaire) = QuestionnaireFragment().apply {
-            arguments = Bundle().apply {
-                putString("questionnaireJson", FhirContext.forR4().newJsonParser()
-                  .encodeResourceToString(questionnaire))
-            }
-        }
     }
 }
