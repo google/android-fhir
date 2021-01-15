@@ -39,8 +39,7 @@ class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     internal val questionnaireItemViewItemList = mutableListOf<QuestionnaireItemViewItem>()
 
     init {
-
-        questionnaire = state.get<Questionnaire>("questionnaire")!!
+        questionnaire = state.get<Questionnaire>(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE)!!
         questionnaireResponse.questionnaire = questionnaire.id
         // Retain the hierarchy and order of items within the questionnaire as specified in the
         // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
