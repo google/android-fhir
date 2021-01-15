@@ -19,18 +19,18 @@ package com.google.android.fhir.datacapture.gallery
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
-import ca.uhn.fhir.context.FhirContext
-import org.hl7.fhir.r4.model.Questionnaire
 
 class QuestionnaireViewModel(application: Application, private val state: SavedStateHandle) :
     AndroidViewModel(application) {
-    val questionnaire: Questionnaire
+    var questionnaireJson: String? = null
+    val questionnaire: String
         get() {
-            val jsonResource = getApplication<Application>().assets
-                .open(state[QuestionnaireActivity.QUESTIONNAIRE_FILE_PATH_KEY]!!)
-                .bufferedReader()
-                .use { it.readText() }
-            val jsonParser = FhirContext.forR4().newJsonParser()
-            return jsonParser.parseResource(Questionnaire::class.java, jsonResource)
+            if (questionnaireJson == null) {
+                questionnaireJson = getApplication<Application>().assets
+                    .open(state[QuestionnaireActivity.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+                    .bufferedReader()
+                    .use { it.readText() }
+            }
+            return questionnaireJson!!
         }
 }

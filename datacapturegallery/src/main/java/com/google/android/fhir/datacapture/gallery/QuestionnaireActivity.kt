@@ -35,16 +35,11 @@ class QuestionnaireActivity : AppCompatActivity() {
             setDisplayHomeAsUpEnabled(true)
         }
 
-        val questionnaireJson = assets
-            .open(intent.getStringExtra(QUESTIONNAIRE_FILE_PATH_KEY)!!)
-            .bufferedReader()
-            .use { it.readText() }
-
         // Only add the fragment once, when the activity is first created.
         if (savedInstanceState == null) {
             val fragment = QuestionnaireFragment()
             fragment.arguments = bundleOf(
-                QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to questionnaireJson
+                QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire
             )
             supportFragmentManager.setFragmentResultListener(
                 QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
