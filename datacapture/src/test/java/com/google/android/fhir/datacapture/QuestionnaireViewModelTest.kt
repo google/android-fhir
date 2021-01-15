@@ -41,12 +41,15 @@ class QuestionnaireViewModelTest {
     @Test
     fun questionnaireResponse_shouldCopyQuestionnaireId() {
         val questionnaire = Questionnaire()
-        questionnaire.id = "a-questionnaire"
-        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, questionnaire)
+        //TODO: if id = a-questionnaire, the json parser sets questionnaire.id.myCoercedValue =
+        // "Questionnaire/a-questionniare" when decoding which results in the test failing
+        questionnaire.id = "Questionnaire/a-questionnaire"
+        val serializedQuestionniare = parser.encodeResourceToString(questionnaire)
+        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
         val viewModel = QuestionnaireViewModel(state)
         assertResourceEquals(
             viewModel.questionnaireResponse,
-            QuestionnaireResponse().apply { this.questionnaire = "a-questionnaire" }
+            QuestionnaireResponse().apply { this.questionnaire = "Questionnaire/a-questionnaire" }
         )
     }
 
@@ -58,7 +61,8 @@ class QuestionnaireViewModelTest {
         item.text = "Yes or no?"
         item.type = Questionnaire.QuestionnaireItemType.BOOLEAN
         questionnaire.addItem(item)
-        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, questionnaire)
+        val serializedQuestionniare = parser.encodeResourceToString(questionnaire)
+        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
         val viewModel = QuestionnaireViewModel(state)
         assertResourceEquals(
             viewModel.questionnaireResponse,
@@ -83,7 +87,8 @@ class QuestionnaireViewModelTest {
         item.text = "Name?"
         item.type = Questionnaire.QuestionnaireItemType.STRING
         group.item.add(item)
-        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, questionnaire)
+        val serializedQuestionniare = parser.encodeResourceToString(questionnaire)
+        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
         val viewModel = QuestionnaireViewModel(state)
         assertResourceEquals(
             viewModel.questionnaireResponse,
@@ -111,7 +116,8 @@ class QuestionnaireViewModelTest {
         item.text = "Name?"
         item.type = Questionnaire.QuestionnaireItemType.STRING
         group.item.add(item)
-        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, questionnaire)
+        val serializedQuestionniare = parser.encodeResourceToString(questionnaire)
+        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
         val viewModel = QuestionnaireViewModel(state)
         val questionnaireItemViewItemList = viewModel.questionnaireItemViewItemList
         assertThat(questionnaireItemViewItemList.size).isEqualTo(2)
