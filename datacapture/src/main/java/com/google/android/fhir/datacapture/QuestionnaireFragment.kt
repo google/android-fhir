@@ -28,11 +28,10 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import ca.uhn.fhir.context.FhirContext
-import org.hl7.fhir.r4.model.Questionnaire
 
-class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment() {
+class QuestionnaireFragment() : Fragment() {
     private val viewModel: QuestionnaireViewModel by viewModels {
-        QuestionnaireViewModelFactory(questionnaire)
+        QuestionnaireViewModelFactory(this, requireArguments())
     }
 
     override fun onCreateView(
@@ -61,5 +60,6 @@ class QuestionnaireFragment(private val questionnaire: Questionnaire) : Fragment
     companion object {
         const val QUESTIONNAIRE_RESPONSE_REQUEST_KEY = "questionnaire-response-request-key"
         const val QUESTIONNAIRE_RESPONSE_BUNDLE_KEY = "questionnaire-response-bundle-key"
+        const val BUNDLE_KEY_QUESTIONNAIRE = "questionnaire"
     }
 }
