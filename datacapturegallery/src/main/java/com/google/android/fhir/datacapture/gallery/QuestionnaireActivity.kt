@@ -20,7 +20,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
-import androidx.fragment.app.FragmentResultListener
+import androidx.fragment.app.commit
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 
 class QuestionnaireActivity : AppCompatActivity() {
@@ -35,37 +35,39 @@ class QuestionnaireActivity : AppCompatActivity() {
             setDisplayHomeAsUpEnabled(true)
         }
 
-    val questionnaireJson = assets
-      .open(intent.getStringExtra(QUESTIONNAIRE_FILE_PATH_KEY)!!)
-      .bufferedReader()
-      .use { it.readText() }
+        val questionnaireJson = assets
+            .open(intent.getStringExtra(QUESTIONNAIRE_FILE_PATH_KEY)!!)
+            .bufferedReader()
+            .use { it.readText() }
 
-    // Only add the fragment once, when the activity is first created.
-    if (savedInstanceState == null) {
-      val fragment = QuestionnaireFragment()
-      fragment.arguments = bundleOf(
-          QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to questionnaireJson
-      )
-      supportFragmentManager.setFragmentResultListener(
-          QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
-          this,
-          { requestKey, result ->
-              val dialogFragment = QuestionnaireResponseDialogFragment()
-              dialogFragment.arguments = bundleOf(
-                  QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to
-                      result.getString(QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)
-              )
-              dialogFragment.show(
-                  supportFragmentManager,
-                  QuestionnaireResponseDialogFragment.TAG
-              )
-          }
-      )
-      supportFragmentManager.beginTransaction()
-          .add(R.id.container, fragment)
-          .commit()
+        // Only add the fragment once, when the activity is first created.
+        if (savedInstanceState == null) {
+            val fragment = QuestionnaireFragment()
+            fragment.arguments = bundleOf(
+                QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to questionnaireJson
+            )
+            supportFragmentManager.setFragmentResultListener(
+                QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
+                this,
+                { requestKey, result ->
+                    val dialogFragment = QuestionnaireResponseDialogFragment()
+                    dialogFragment.arguments = bundleOf(
+                        QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to
+                            result.getString(
+                                QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)
+                    )
+                    dialogFragment.show(
+                        supportFragmentManager,
+                        QuestionnaireResponseDialogFragment.TAG
+                    )
+                }
+            )
+            supportFragmentManager.commit {
+                add(R.id.container, fragment)
+            }
+        }
     }
-  }
+
     companion object {
         const val QUESTIONNAIRE_TITLE_KEY = "questionnaire-title-key"
         const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
