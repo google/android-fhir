@@ -16,8 +16,11 @@
 
 package com.google.android.fhir.datacapture
 
+import android.os.Bundle
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.savedstate.SavedStateRegistryOwner
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
@@ -25,7 +28,10 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.StringType
 
-class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
+class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
+    /** The current questionnaire as questions are being answered. */
+    internal var questionnaire: Questionnaire
+
     /** The current questionnaire response as questions are being answered. */
     internal val questionnaireResponse = QuestionnaireResponse()
 
@@ -33,6 +39,8 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
     internal val questionnaireItemViewItemList = mutableListOf<QuestionnaireItemViewItem>()
 
     init {
+
+        questionnaire = state.get<Questionnaire>("questionnaire")!!
         questionnaireResponse.questionnaire = questionnaire.id
         // Retain the hierarchy and order of items within the questionnaire as specified in the
         // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
@@ -78,11 +86,16 @@ class QuestionnaireViewModel(val questionnaire: Questionnaire) : ViewModel() {
 }
 
 class QuestionnaireViewModelFactory(
-  private val questionnaire: Questionnaire
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+  owner: SavedStateRegistryOwner,
+  defaultArgs: Bundle?
+) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
+    override fun <T : ViewModel?> create(
+      key: String,
+      modelClass: Class<T>,
+      handle: SavedStateHandle
+    ): T {
         if (modelClass.isAssignableFrom(QuestionnaireViewModel::class.java)) {
-            return QuestionnaireViewModel(questionnaire) as T
+            return QuestionnaireViewModel(handle) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
