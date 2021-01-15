@@ -23,8 +23,9 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 
 class QuestionnaireResponseDialogFragment() : DialogFragment() {
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val contents = requireArguments().getString("contents")
+        val contents = requireArguments().getString(BUNDLE_KEY_CONTENTS)
         return activity?.let {
             val view = requireActivity().layoutInflater.inflate(
                 R.layout.questionnaire_response_dialog_contents,
@@ -40,5 +41,6 @@ class QuestionnaireResponseDialogFragment() : DialogFragment() {
 
     companion object {
         const val TAG = "questionnaire-response-dialog-fragment"
+        const val BUNDLE_KEY_CONTENTS = "contents"
     }
 }
