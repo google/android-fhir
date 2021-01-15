@@ -17,16 +17,19 @@
 package com.google.android.fhir.datacapture.gallery
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 
 class QuestionnaireActivity : AppCompatActivity() {
+    private val viewModel: QuestionnaireViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_questionnaire)
-        
+
         supportActionBar!!.apply {
             title = intent.getStringExtra(QUESTIONNAIRE_TITLE_KEY)
             setDisplayHomeAsUpEnabled(true)
@@ -46,8 +49,7 @@ class QuestionnaireActivity : AppCompatActivity() {
       supportFragmentManager.setFragmentResultListener(
           QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
           this,
-          object : FragmentResultListener {
-            override fun onFragmentResult(requestKey: String, result: Bundle) {
+          { requestKey, result ->
               val dialogFragment = QuestionnaireResponseDialogFragment()
               dialogFragment.arguments = bundleOf(
                   QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to
@@ -57,7 +59,6 @@ class QuestionnaireActivity : AppCompatActivity() {
                   supportFragmentManager,
                   QuestionnaireResponseDialogFragment.TAG
               )
-            }
           }
       )
       supportFragmentManager.beginTransaction()
@@ -70,3 +71,4 @@ class QuestionnaireActivity : AppCompatActivity() {
         const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
     }
 }
+
