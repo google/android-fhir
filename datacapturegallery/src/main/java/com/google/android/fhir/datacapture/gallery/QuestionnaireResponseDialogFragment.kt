@@ -22,8 +22,9 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 
-class QuestionnaireResponseDialogFragment(val contents: String) : DialogFragment() {
+class QuestionnaireResponseDialogFragment() : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val contents = requireArguments().getString("contents")
         return activity?.let {
             val view = requireActivity().layoutInflater.inflate(
                 R.layout.questionnaire_response_dialog_contents,
