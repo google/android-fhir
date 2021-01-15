@@ -41,7 +41,7 @@ class QuestionnaireViewModelTest {
     @Test
     fun questionnaireResponse_shouldCopyQuestionnaireId() {
         val questionnaire = Questionnaire()
-        //TODO: if id = a-questionnaire, the json parser sets questionnaire.id.myCoercedValue =
+        // TODO: if id = a-questionnaire, the json parser sets questionnaire.id.myCoercedValue =
         // "Questionnaire/a-questionniare" when decoding which results in the test failing
         questionnaire.id = "Questionnaire/a-questionnaire"
         val serializedQuestionniare = parser.encodeResourceToString(questionnaire)
