@@ -28,17 +28,10 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import ca.uhn.fhir.context.FhirContext
-import java.lang.IllegalStateException
 
 class QuestionnaireFragment() : Fragment() {
-
     private val viewModel: QuestionnaireViewModel by viewModels {
         QuestionnaireViewModelFactory(this, requireArguments())
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (arguments == null) throw IllegalStateException("Pass arg \'questionnaire\' to fragment")
     }
 
     override fun onCreateView(
@@ -48,7 +41,6 @@ class QuestionnaireFragment() : Fragment() {
     ) = inflater.inflate(R.layout.questionnaire_fragment, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
         view.findViewById<TextView>(R.id.title).text = viewModel.questionnaire.title
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
@@ -68,5 +60,6 @@ class QuestionnaireFragment() : Fragment() {
     companion object {
         const val QUESTIONNAIRE_RESPONSE_REQUEST_KEY = "questionnaire-response-request-key"
         const val QUESTIONNAIRE_RESPONSE_BUNDLE_KEY = "questionnaire-response-bundle-key"
+        const val BUNDLE_KEY_QUESTIONNAIRE = "questionnaire"
     }
 }
