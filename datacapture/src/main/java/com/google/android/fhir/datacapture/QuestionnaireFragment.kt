@@ -29,10 +29,8 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import ca.uhn.fhir.context.FhirContext
 
-class QuestionnaireFragment() : Fragment() {
-    private val viewModel: QuestionnaireViewModel by viewModels {
-        QuestionnaireViewModelFactory(this, requireArguments())
-    }
+class QuestionnaireFragment : Fragment() {
+    private val viewModel: QuestionnaireViewModel by viewModels()
 
     override fun onCreateView(
       inflater: LayoutInflater,

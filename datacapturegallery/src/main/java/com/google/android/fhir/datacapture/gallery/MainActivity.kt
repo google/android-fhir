@@ -21,18 +21,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : AppCompatActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-    val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
-    recyclerView.adapter = QuestionnaireListAdapter(
-      listOf(
-        // Example taken from https://www.hl7.org/fhir/questionnaire-example-f201-lifelines.json.html
-        QuestionnaireListItem("HL7 example",
-          "Real-world lifelines questionnaire",
-          "hl7-fhir-examples-f201.json")
-      )
-    )
-  }
+        val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
+        recyclerView.adapter = QuestionnaireListAdapter(
+            listOf(
+                // Example taken from https://www.hl7.org/fhir/questionnaire-example-f201-lifelines.json.html
+                QuestionnaireListItem("HL7 example",
+                    "Real-world lifelines questionnaire",
+                    "hl7-fhir-examples-f201.json")
+            )
+        )
+    }
 }
