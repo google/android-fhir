@@ -44,7 +44,8 @@ class MainActivity : AppCompatActivity() {
             object : FragmentResultListener {
                 override fun onFragmentResult(requestKey: String, result: Bundle) {
                     val dialogFragment = QuestionnaireResponseDialogFragment()
-                    dialogFragment.arguments = bundleOf(Pair("contents",result.getString(QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)))
+                    dialogFragment.arguments = bundleOf(Pair("contents", result.getString
+                    (QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)))
                     dialogFragment.show(
                         supportFragmentManager,
                         QuestionnaireResponseDialogFragment.TAG
