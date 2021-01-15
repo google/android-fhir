@@ -71,4 +71,3 @@ class QuestionnaireActivity : AppCompatActivity() {
         const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
     }
 }
-
