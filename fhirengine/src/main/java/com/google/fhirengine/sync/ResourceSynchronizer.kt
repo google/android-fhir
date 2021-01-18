@@ -23,6 +23,7 @@ import com.google.fhirengine.sync.SyncData.Companion.LAST_UPDATED_ASC_VALUE
 import com.google.fhirengine.sync.SyncData.Companion.LAST_UPDATED_KEY
 import com.google.fhirengine.sync.SyncData.Companion.SORT_KEY
 import java.io.IOException
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
@@ -103,7 +104,7 @@ class ResourceSynchronizer(
         val simpleDateFormat = DateTimeFormatter.ofPattern(
             "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
             Locale.US
-        )
+        ).withZone(ZoneId.systemDefault())
         return simpleDateFormat.format(this.toInstant())
     }
 }
