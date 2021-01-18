@@ -16,11 +16,8 @@
 
 package com.google.android.fhir.datacapture
 
-import android.os.Bundle
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.savedstate.SavedStateRegistryOwner
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire
@@ -41,7 +38,7 @@ class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
     init {
         val jsonParser = FhirContext.forR4().newJsonParser()
-        val questionnaireJson = state.get<String>(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE)!!
+        val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
         questionnaire = jsonParser.parseResource(Questionnaire::class.java, questionnaireJson)
         questionnaireResponse.questionnaire = questionnaire.id
         // Retain the hierarchy and order of items within the questionnaire as specified in the
@@ -84,22 +81,6 @@ class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
                 questionnaireResponseItem.item
             )
         }
-    }
-}
-
-class QuestionnaireViewModelFactory(
-  owner: SavedStateRegistryOwner,
-  defaultArgs: Bundle?
-) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
-    override fun <T : ViewModel?> create(
-      key: String,
-      modelClass: Class<T>,
-      handle: SavedStateHandle
-    ): T {
-        if (modelClass.isAssignableFrom(QuestionnaireViewModel::class.java)) {
-            return QuestionnaireViewModel(handle) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
 

@@ -21,7 +21,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
@@ -29,10 +28,8 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import ca.uhn.fhir.context.FhirContext
 
-class QuestionnaireFragment() : Fragment() {
-    private val viewModel: QuestionnaireViewModel by viewModels {
-        QuestionnaireViewModelFactory(this, requireArguments())
-    }
+class QuestionnaireFragment : Fragment() {
+    private val viewModel: QuestionnaireViewModel by viewModels()
 
     override fun onCreateView(
       inflater: LayoutInflater,
@@ -41,8 +38,6 @@ class QuestionnaireFragment() : Fragment() {
     ) = inflater.inflate(R.layout.questionnaire_fragment, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        view.findViewById<TextView>(R.id.title).text = viewModel.questionnaire.title
-
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
         val adapter = QuestionnaireItemAdapter(viewModel.questionnaireItemViewItemList)
         recyclerView.adapter = adapter

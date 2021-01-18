@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- Copyright 2020 Google LLC
+ Copyright 2021 Google LLC
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -16,22 +16,26 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="com.google.android.fhir.datacapture.QuestionnaireFragment"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
+    <TextView
+            android:id="@+id/questionnaire_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layoutManager="LinearLayoutManager"/>
+            android:alpha="0.87"
+            android:maxLines="1"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            android:textColor="?colorOnSurface" />
 
-    <Button
-            android:id="@+id/submit"
-            android:layout_width="wrap_content"
+    <TextView
+            android:id="@+id/questionnaire_description"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Submit"/>
+            android:alpha="0.38"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="?colorOnSurface" />
 </LinearLayout>
