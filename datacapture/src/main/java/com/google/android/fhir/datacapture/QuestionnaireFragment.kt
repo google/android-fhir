@@ -33,9 +33,9 @@ class QuestionnaireFragment : Fragment() {
     private val viewModel: QuestionnaireViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
     ): View {
         val typedArray = container!!.context.obtainStyledAttributes(R.styleable.QuestionnaireTheme)
         val themeId = typedArray.getResourceId(
