@@ -22,7 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.core.content.withStyledAttributes
+import androidx.core.content.res.use
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
@@ -38,18 +38,17 @@ class QuestionnaireFragment : Fragment() {
       container: ViewGroup?,
       savedInstanceState: Bundle?
     ): View {
-        container!!.context.withStyledAttributes(null, R.styleable.QuestionnaireTheme) {
-            val themeId = getResourceId(
+        container!!.context.obtainStyledAttributes(R.styleable.QuestionnaireTheme).use {
+            val themeId = it.getResourceId(
                 // Use the custom questionnaire theme if it is specified
                 R.styleable.QuestionnaireTheme_questionnaire_theme,
                 // Otherwise, use the default questionnaire theme
                 R.style.Theme_Questionnaire
             )
-            return@onCreateView inflater
+            return inflater
                 .cloneInContext(ContextThemeWrapper(activity, themeId))
                 .inflate(R.layout.questionnaire_fragment, container, false)
         }
-        throw IllegalStateException("Unable to create questionnaire fragment.")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
