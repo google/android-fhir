@@ -16,14 +16,21 @@
 
 package com.google.fhirengine
 
+import android.annotation.SuppressLint
 import java.text.SimpleDateFormat
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
 /**
  * Utility function to add timestamps to database rows, e.g. last local update timestamp.
  */
+@SuppressLint("NewApi")
 fun Date.toTimeZoneString(): String {
-    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US)
-    return simpleDateFormat.format(this)
+    val simpleDateFormat = DateTimeFormatter.ofPattern(
+            "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+            Locale.US
+    ).withZone(ZoneId.systemDefault())
+    return simpleDateFormat.format(this.toInstant())
 }

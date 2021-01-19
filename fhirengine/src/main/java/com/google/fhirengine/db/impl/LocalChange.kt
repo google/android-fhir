@@ -61,7 +61,7 @@ import androidx.room.PrimaryKey
             )
         ]
 )
-internal data class LocalChange(
+data class LocalChange(
   @PrimaryKey(autoGenerate = true)
   val id: Long = 0,
   val resourceType: String,

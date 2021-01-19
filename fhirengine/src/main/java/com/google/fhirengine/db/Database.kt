@@ -16,6 +16,7 @@
 
 package com.google.fhirengine.db
 
+import com.google.fhirengine.db.impl.entities.LocalChange
 import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
 import com.google.fhirengine.search.impl.Query
 import org.hl7.fhir.r4.model.Resource
@@ -139,4 +140,15 @@ interface Database {
     ): List<R>
 
     fun <R : Resource> search(query: Query): List<R>
+
+    /**
+     * Retrieves all [LocalChange]s for a given [Resource]. The [LocalChange]s are in a form
+     * which can be synced. Multiple UPDATE type changes are squashed into a single [LocalChange].
+     */
+    fun <R : Resource> getLocalChanges(clazz: Class<R>, id: String): List<LocalChange>
+
+    /**
+     * Remove the [LocalChange]s with given ids. Call this after a successful sync.
+     */
+    fun <R : Resource> deleteUpdates(clazz: Class<R>, id: String)
 }

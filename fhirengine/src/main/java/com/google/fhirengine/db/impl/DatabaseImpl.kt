@@ -21,6 +21,7 @@ import androidx.room.Room
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
 import com.google.fhirengine.db.ResourceNotFoundInDbException
+import com.google.fhirengine.db.impl.entities.LocalChange
 import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
 import com.google.fhirengine.index.FhirIndexer
 import com.google.fhirengine.resource.getResourceType
@@ -65,10 +66,8 @@ internal class DatabaseImpl(
         }
     }
     val syncedResourceDao = db.syncedResourceDao()
-    val localChangeDao by lazy {
-        db.localChangeDao().also {
-            it.iParser = iParser
-        }
+    val localChangeDao = db.localChangeDao().also {
+        it.iParser = iParser
     }
 
     override fun <R : Resource> insert(resource: R) {
@@ -170,6 +169,16 @@ internal class DatabaseImpl(
     override fun <R : Resource> search(query: Query): List<R> =
         resourceDao.getResources(query.getSupportSQLiteQuery())
             .map { iParser.parseResource(it) as R }
+
+    override fun <R : Resource> getLocalChanges(clazz: Class<R>, id: String): List<LocalChange> {
+        val type = getResourceType(clazz).name
+        return listOf(localChangeDao.squash(localChangeDao.getLocalChanges(id, type)))
+    }
+
+    override fun <R : Resource> deleteUpdates(clazz: Class<R>, id: String) {
+        val type = getResourceType(clazz).name
+        localChangeDao.discardLocalChanges(id, type)
+    }
 
     companion object {
         private const val DEFAULT_DATABASE_NAME = "ResourceDatabase"

@@ -62,7 +62,7 @@ interface FhirEngine {
      *
      * @param <R> The resource type which should be a subtype of [Resource].
      */
-    fun <R : Resource> remove(clazz: Class<R>, id: String): R
+    fun <R : Resource> remove(clazz: Class<R>, id: String)
 
     /** Returns the result of a CQL evaluation provided with the ID of the library.  */
     fun evaluateCql(libraryVersionId: String, context: String, expression: String): EvaluationResult

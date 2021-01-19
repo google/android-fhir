@@ -95,7 +95,7 @@ internal abstract class LocalChangeDao {
         )
         val timestamp = Date().toTimeZoneString()
 
-        if (localChanges.last().type == Type.DELETE) {
+        if (localChanges.isNotEmpty() && localChanges.last().type == Type.DELETE) {
             throw InvalidLocalChangeException(
                 "Unexpected DELETE when updating $resourceType/$resourceId. UPDATE failed."
             )
