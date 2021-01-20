@@ -123,8 +123,8 @@ class DatabaseImplTest {
     }
 
     @Test
-    fun select_nonexistentResource_shouldThrowResourceNotFondException() {
-        val resourceNotFoundInDbException =
+    fun select_nonexistentResource_shouldThrowResourceNotFoundException() {
+        val resourceNotFoundException =
             assertThrows(
                 ResourceNotFoundInDbException::class.java,
                 { database.select(Patient::class.java, "nonexistent_patient") }
@@ -133,7 +133,7 @@ class DatabaseImplTest {
             "Resource not found with type " +
                 ResourceType.Patient.name +
                 " and id nonexistent_patient!",
-            resourceNotFoundInDbException.message
+            resourceNotFoundException.message
         )
     }
 

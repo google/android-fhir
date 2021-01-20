@@ -46,11 +46,18 @@ internal abstract class ResourceDao {
 
     @Transaction
     open fun update(resource: Resource) {
-        updateResource(
-            resource.id,
-            resource.resourceType,
-            iParser.encodeResourceToString(resource)
+        updateResource(resource.id,
+                resource.resourceType,
+                iParser.encodeResourceToString(resource)
         )
+        val entity = ResourceEntity(
+                id = 0,
+                resourceType = resource.resourceType,
+                resourceId = resource.id,
+                serializedResource = iParser.encodeResourceToString(resource)
+        )
+        val index = fhirIndexer.index(resource)
+        updateIndicesForResource(index, entity)
     }
 
     @Transaction

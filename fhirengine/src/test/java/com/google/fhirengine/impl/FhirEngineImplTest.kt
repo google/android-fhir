@@ -17,8 +17,10 @@
 package com.google.fhirengine.impl
 
 import androidx.test.core.app.ApplicationProvider
+import com.google.common.truth.Truth
 import com.google.fhirengine.FhirServices.Companion.builder
 import com.google.fhirengine.ResourceNotFoundException
+import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.resource.TestingUtils
 import com.google.fhirengine.sync.FhirDataSource
 import org.hl7.fhir.r4.model.Bundle
@@ -76,12 +78,17 @@ class FhirEngineImplTest {
     }
 
     @Test
-    fun update_nonexistentResource_shouldInsertResource() {
+    fun update_nonexistentResource_shouldNotInsertResource() {
         fhirEngine.update(TEST_PATIENT_2)
-        testingUtils.assertResourceEquals(
-            TEST_PATIENT_2,
-            fhirEngine.load(Patient::class.java, TEST_PATIENT_2_ID)
-        )
+        val resourceNotFoundException = assertThrows(ResourceNotFoundException::class.java,
+                { fhirEngine.load(Patient::class.java, TEST_PATIENT_2_ID) })
+        Truth.assertThat(resourceNotFoundException.message)
+                .isEqualTo("Resource not found with type " +
+                        TEST_PATIENT_2.resourceType.name +
+                        " and id " +
+                        TEST_PATIENT_2_ID +
+                        "!"
+                )
     }
 
     @Test
@@ -97,7 +104,7 @@ class FhirEngineImplTest {
     }
 
     @Test
-    fun load_nonexistentResource_shouldThrowResourceNotFondException() {
+    fun load_nonexistentResource_shouldThrowResourceNotFoundException() {
         val resourceNotFoundInDbException =
             assertThrows(ResourceNotFoundException::class.java) {
                 fhirEngine.load(Patient::class.java, "nonexistent_patient")
