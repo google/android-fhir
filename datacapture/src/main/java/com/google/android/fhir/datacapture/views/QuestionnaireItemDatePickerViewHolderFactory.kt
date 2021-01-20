@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -48,15 +49,11 @@ object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolde
           // Do not show the date picker dialog when losing focus.
           if (!hasFocus) return@setOnFocusChangeListener
 
-          // TODO: find a more robust way to do this as it is not guaranteed that the activity is
-          // an AppCompatActivity.
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment and again
           // in TextInputEditText during layout inflation. As a result, it is necessary to
           // access the base context twice to retrieve the application object from the view's
           // context.
-          val context =
-            ((itemView.context as ContextThemeWrapper).baseContext as ContextThemeWrapper)
-              .baseContext as AppCompatActivity
+          val context = itemView.context.tryUnwrapContext()!!
           DatePickerFragment().show(context.supportFragmentManager, DatePickerFragment.TAG)
           context.supportFragmentManager.setFragmentResultListener(
             DatePickerFragment.RESULT_REQUEST_KEY,
@@ -107,4 +104,26 @@ object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolde
 
   @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
   val LOCAL_DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE
+}
+
+/**
+ * Returns the [AppCompatActivity] if there exists one wrapped inside [ContextThemeWrapper]s, or
+ * `null` otherwise.
+ *
+ * This function is inspired by the function with the same name in `AppCompateDelegateImpl`. See
+ * https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:appcompat/appcompat/src/main/java/androidx/appcompat/app/AppCompatDelegateImpl.java;l=1615
+ *
+ * TODO: find a more robust way to do this as it is not guaranteed that the activity is
+ * an AppCompatActivity.
+ */
+private fun Context.tryUnwrapContext(): AppCompatActivity? {
+    var context = this
+    while (context != null) {
+        when (context) {
+            is AppCompatActivity -> return context
+            is ContextThemeWrapper -> context = context.baseContext
+            else -> return null
+        }
+    }
+    return null
 }
