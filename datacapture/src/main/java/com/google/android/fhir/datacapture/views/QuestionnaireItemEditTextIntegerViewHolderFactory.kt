@@ -54,7 +54,7 @@ object QuestionnaireItemEditTextIntegerViewHolderFactory : QuestionnaireItemView
               textInputLayout.hint = questionnaireItemViewItem.questionnaireItemComponent.text
               questionnaireItemViewItem.singleAnswerOrNull?.valueIntegerType?.let {
                   textInputEditText.setText(
-                    it.value
+                    it.value.toString()
                   )
               }
           }
