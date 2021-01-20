@@ -114,10 +114,6 @@ class PatientListActivity : AppCompatActivity() {
                 loadResources()
                 true
             }
-            R.id.about -> {
-                showAbout(view)
-                true
-            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -125,11 +121,6 @@ class PatientListActivity : AppCompatActivity() {
     private fun loadResources() {
         val resLoadIntent = Intent(baseContext, CqlLoadActivity::class.java)
         startActivity(resLoadIntent)
-    }
-
-    private fun showAbout(view: View) {
-        Snackbar.make(view, R.string.about_text, Snackbar.LENGTH_LONG)
-            .setAction("Action", null).show()
     }
 
     private fun syncResources(view: View) {

@@ -30,9 +30,4 @@
         android:icon="@android:drawable/ic_menu_add"
         android:title="@string/menu_load_resource"
         />
-    <item android:id="@+id/about"
-        app:showAsAction="withText"
-        android:icon="@android:drawable/ic_menu_help"
-        android:title="@string/menu_about"
-        />
 </menu>
