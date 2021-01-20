@@ -100,14 +100,13 @@ class DatabaseImplTest {
     @Test
     fun update_nonExistingResource_shouldNotInsertResource() {
         database.update(TEST_PATIENT_2)
-        val resourceNotFoundInDbException = assertThrows(ResourceNotFoundInDbException::class.java,
-                { database.select(Patient::class.java, TEST_PATIENT_2_ID) })
-        Truth.assertThat(resourceNotFoundInDbException.message)
-                .isEqualTo("Resource not found with type " +
-                        TEST_PATIENT_2.resourceType.name +
-                        " and id " +
-                        TEST_PATIENT_2_ID +
-                        "!")
+        val resourceNotFoundInDbException = assertThrows(
+            ResourceNotFoundInDbException::class.java,
+            { database.select(Patient::class.java, TEST_PATIENT_2_ID) }
+        )
+        Truth.assertThat(resourceNotFoundInDbException.message).isEqualTo(
+            "Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id ${TEST_PATIENT_2_ID}!"
+        )
     }
 
     @Test

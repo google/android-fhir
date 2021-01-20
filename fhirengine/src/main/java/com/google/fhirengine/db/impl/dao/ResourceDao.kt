@@ -46,9 +46,11 @@ internal abstract class ResourceDao {
 
     @Transaction
     open fun update(resource: Resource) {
-        updateResource(resource.id,
-                resource.resourceType,
-                iParser.encodeResourceToString(resource))
+        updateResource(
+            resource.id,
+            resource.resourceType,
+            iParser.encodeResourceToString(resource)
+        )
     }
 
     @Transaction
