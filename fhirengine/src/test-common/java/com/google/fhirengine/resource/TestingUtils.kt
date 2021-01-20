@@ -17,17 +17,17 @@
 package com.google.fhirengine.resource
 
 import ca.uhn.fhir.parser.IParser
+import com.google.common.truth.Truth
 import org.hl7.fhir.r4.model.Resource
 import org.json.JSONObject
-import org.junit.Assert.assertEquals
 
 /** Utilities for testing.  */
 class TestingUtils constructor(private val iParser: IParser) {
 
     /** Asserts that the `expected` and the `actual` FHIR resources are equal.  */
     fun assertResourceEquals(expected: Resource?, actual: Resource?) {
-        assertEquals(iParser.encodeResourceToString(expected),
-                iParser.encodeResourceToString(actual))
+        Truth.assertThat(iParser.encodeResourceToString(actual)).isEqualTo(
+                iParser.encodeResourceToString(expected))
     }
 
     /** Reads a [Resource] from given file in the `sampledata` dir */

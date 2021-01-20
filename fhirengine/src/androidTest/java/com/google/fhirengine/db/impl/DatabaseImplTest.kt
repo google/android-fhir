@@ -18,6 +18,7 @@ package com.google.fhirengine.db.impl
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth
 import com.google.fhirengine.FhirServices
 import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.resource.TestingUtils
@@ -97,12 +98,16 @@ class DatabaseImplTest {
     }
 
     @Test
-    fun update_nonExistingResource_shouldInsertResource() {
+    fun update_nonExistingResource_shouldNotInsertResource() {
         database.update(TEST_PATIENT_2)
-        testingUtils.assertResourceEquals(
-            TEST_PATIENT_2,
-            database.select(Patient::class.java, TEST_PATIENT_2_ID)
-        )
+        val resourceNotFoundInDbException = assertThrows(ResourceNotFoundInDbException::class.java,
+                { database.select(Patient::class.java, TEST_PATIENT_2_ID) })
+        Truth.assertThat(resourceNotFoundInDbException.message)
+                .isEqualTo("Resource not found with type " +
+                        TEST_PATIENT_2.resourceType.name +
+                        " and id " +
+                        TEST_PATIENT_2_ID +
+                        "!")
     }
 
     @Test
