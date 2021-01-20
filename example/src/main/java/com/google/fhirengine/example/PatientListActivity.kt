@@ -69,7 +69,7 @@ class PatientListActivity : AppCompatActivity() {
         patientListViewModel.getSearchedPatients().observe(this,
             Observer<List<PatientListViewModel.PatientItem>> {
                 Log.d("PatientListActivity", "Submitting ${it.count()} patient records")
-                adapter.submitList(it?.toMutableList())
+                adapter.submitList(it)
             })
 
         patientListViewModel.getObservations().observe(this,
