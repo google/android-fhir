@@ -30,8 +30,8 @@ import androidx.recyclerview.widget.RecyclerView
 abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId: Int) {
   internal fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
     return QuestionnaireItemViewHolder(
-      LayoutInflater.from(parent.context).inflate(resId, parent, false),
-      getQuestionnaireItemViewHolderDelegate()
+        LayoutInflater.from(parent.context).inflate(resId, parent, false),
+        getQuestionnaireItemViewHolderDelegate()
     )
   }
 

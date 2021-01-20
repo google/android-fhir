@@ -38,7 +38,7 @@ class QuestionnaireFragment : Fragment() {
       container: ViewGroup?,
       savedInstanceState: Bundle?
     ): View {
-        container!!.context.obtainStyledAttributes(R.styleable.QuestionnaireTheme).use {
+        inflater.context.obtainStyledAttributes(R.styleable.QuestionnaireTheme).use {
             val themeId = it.getResourceId(
                 // Use the custom questionnaire theme if it is specified
                 R.styleable.QuestionnaireTheme_questionnaire_theme,
@@ -46,7 +46,7 @@ class QuestionnaireFragment : Fragment() {
                 R.style.Theme_Questionnaire
             )
             return inflater
-                .cloneInContext(ContextThemeWrapper(activity, themeId))
+                .cloneInContext(ContextThemeWrapper(inflater.context, themeId))
                 .inflate(R.layout.questionnaire_fragment, container, false)
         }
     }
