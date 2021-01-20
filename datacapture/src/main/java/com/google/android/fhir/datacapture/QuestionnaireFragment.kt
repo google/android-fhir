@@ -21,6 +21,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.content.res.use
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
@@ -35,7 +37,19 @@ class QuestionnaireFragment : Fragment() {
       inflater: LayoutInflater,
       container: ViewGroup?,
       savedInstanceState: Bundle?
-    ) = inflater.inflate(R.layout.questionnaire_fragment, container, false)
+    ): View {
+        inflater.context.obtainStyledAttributes(R.styleable.QuestionnaireTheme).use {
+            val themeId = it.getResourceId(
+                // Use the custom questionnaire theme if it is specified
+                R.styleable.QuestionnaireTheme_questionnaire_theme,
+                // Otherwise, use the default questionnaire theme
+                R.style.Theme_Questionnaire
+            )
+            return inflater
+                .cloneInContext(ContextThemeWrapper(inflater.context, themeId))
+                .inflate(R.layout.questionnaire_fragment, container, false)
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)

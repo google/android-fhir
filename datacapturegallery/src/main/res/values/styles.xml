@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- The custom theme for the questionnaires in this application. -->
+    <style name="Theme.MyQuestionnaire" parent="Theme.Questionnaire">
+        <item name="groupHeaderTextAppearance">@style/TextAppearance.MaterialComponents.Subtitle2
+        </item>
+    </style>
+</resources>
