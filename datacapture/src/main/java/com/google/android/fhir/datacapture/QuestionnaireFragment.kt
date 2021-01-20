@@ -21,7 +21,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
@@ -39,20 +38,20 @@ class QuestionnaireFragment : Fragment() {
     ) = inflater.inflate(R.layout.questionnaire_fragment, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        view.findViewById<TextView>(R.id.title).text = viewModel.questionnaire.title
-
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
         val adapter = QuestionnaireItemAdapter(viewModel.questionnaireItemViewItemList)
         recyclerView.adapter = adapter
+    }
 
-        view.findViewById<Button>(R.id.submit).setOnClickListener {
-            val serializedResponse = FhirContext.forR4().newJsonParser()
-                .encodeResourceToString(viewModel.questionnaireResponse)
-            setFragmentResult(
-                QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
-                bundleOf(QUESTIONNAIRE_RESPONSE_BUNDLE_KEY to serializedResponse)
-            )
-        }
+    // Returns the current questionnaireResponse
+    fun returnQuestionnaireResponse() {
+        val serializedResponse = FhirContext.forR4().newJsonParser()
+          .encodeResourceToString(viewModel.questionnaireResponse)
+        setFragmentResult(
+          QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
+          bundleOf(QUESTIONNAIRE_RESPONSE_BUNDLE_KEY to
+            serializedResponse)
+        )
     }
 
     companion object {
