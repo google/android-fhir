@@ -17,14 +17,18 @@
 package com.google.android.fhir.datacapture.gallery
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 
+
 class QuestionnaireActivity : AppCompatActivity() {
     private val viewModel: QuestionnaireViewModel by viewModels()
+    private lateinit var questionnaireFragment: QuestionnaireFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,30 +41,42 @@ class QuestionnaireActivity : AppCompatActivity() {
 
         // Only add the fragment once, when the activity is first created.
         if (savedInstanceState == null) {
-            val fragment = QuestionnaireFragment()
-            fragment.arguments = bundleOf(
-                QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire
+            questionnaireFragment = QuestionnaireFragment()
+            questionnaireFragment.arguments = bundleOf(
+              QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire
             )
             supportFragmentManager.setFragmentResultListener(
-                QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
-                this,
-                { requestKey, result ->
-                    val dialogFragment = QuestionnaireResponseDialogFragment()
-                    dialogFragment.arguments = bundleOf(
-                        QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to
-                            result.getString(
-                                QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)
-                    )
-                    dialogFragment.show(
-                        supportFragmentManager,
-                        QuestionnaireResponseDialogFragment.TAG
-                    )
-                }
+              QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
+              this,
+              { requestKey, result ->
+                  val dialogFragment = QuestionnaireResponseDialogFragment()
+                  dialogFragment.arguments = bundleOf(
+                    QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to
+                      result.getString(
+                        QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)
+                  )
+                  dialogFragment.show(
+                    supportFragmentManager,
+                    QuestionnaireResponseDialogFragment.TAG
+                  )
+              }
             )
             supportFragmentManager.commit {
-                add(R.id.container, fragment)
+                add(R.id.container, questionnaireFragment)
             }
         }
+    }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.top_bar_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id: Int = item.getItemId()
+        return if (id == R.id.action_submit) {
+            questionnaireFragment.returnQuestionnaireResult()
+            true
+        } else super.onOptionsItemSelected(item)
     }
 
     companion object {
