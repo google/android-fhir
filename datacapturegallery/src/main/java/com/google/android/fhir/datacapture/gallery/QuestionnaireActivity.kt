@@ -25,7 +25,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 
-
 class QuestionnaireActivity : AppCompatActivity() {
     private val viewModel: QuestionnaireViewModel by viewModels()
     private lateinit var questionnaireFragment: QuestionnaireFragment

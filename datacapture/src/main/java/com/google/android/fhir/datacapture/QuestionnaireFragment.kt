@@ -42,8 +42,8 @@ class QuestionnaireFragment : Fragment() {
         recyclerView.adapter = adapter
     }
 
-    //Returns the current questionnaire response to parent
-    fun returnQuestionnaireResult(){
+    // Returns the current questionnaire response to parent
+    fun returnQuestionnaireResult() {
         val serializedResponse = FhirContext.forR4().newJsonParser()
           .encodeResourceToString(viewModel.questionnaireResponse)
         setFragmentResult(
