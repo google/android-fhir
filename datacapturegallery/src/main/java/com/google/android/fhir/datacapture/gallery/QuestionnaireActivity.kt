@@ -23,11 +23,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
+import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 class QuestionnaireActivity : AppCompatActivity() {
     private val viewModel: QuestionnaireViewModel by viewModels()
-    private lateinit var questionnaireFragment: QuestionnaireFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,28 +41,13 @@ class QuestionnaireActivity : AppCompatActivity() {
 
         // Only add the fragment once, when the activity is first created.
         if (savedInstanceState == null) {
-            questionnaireFragment = QuestionnaireFragment()
-            questionnaireFragment.arguments = bundleOf(
+            val fragment = QuestionnaireFragment()
+            fragment.arguments = bundleOf(
               QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire
             )
-            supportFragmentManager.setFragmentResultListener(
-              QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
-              this,
-              { requestKey, result ->
-                  val dialogFragment = QuestionnaireResponseDialogFragment()
-                  dialogFragment.arguments = bundleOf(
-                    QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to
-                      result.getString(
-                        QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)
-                  )
-                  dialogFragment.show(
-                    supportFragmentManager,
-                    QuestionnaireResponseDialogFragment.TAG
-                  )
-              }
-            )
+
             supportFragmentManager.commit {
-                add(R.id.container, questionnaireFragment)
+                add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG)
             }
         }
     }
@@ -73,13 +59,30 @@ class QuestionnaireActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id: Int = item.getItemId()
         return if (id == R.id.action_submit) {
-            questionnaireFragment.returnQuestionnaireResult()
+            val questionnaireResponse = (supportFragmentManager.findFragmentByTag
+            (QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment).getQuestionnaireResponse()
+            displayQuestionnaireResponse(questionnaireResponse)
             true
         } else super.onOptionsItemSelected(item)
+    }
+
+    // Display Quesitonnaire response as a dialog
+    fun displayQuestionnaireResponse(questionnaireResponse: QuestionnaireResponse) {
+        val questionnaireResponseJson = FhirContext.forR4().newJsonParser()
+          .encodeResourceToString(questionnaireResponse)
+        val dialogFragment = QuestionnaireResponseDialogFragment()
+        dialogFragment.arguments = bundleOf(
+          QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to questionnaireResponseJson
+        )
+        dialogFragment.show(
+          supportFragmentManager,
+          QuestionnaireResponseDialogFragment.TAG
+        )
     }
 
     companion object {
         const val QUESTIONNAIRE_TITLE_KEY = "questionnaire-title-key"
         const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
+        const val QUESTIONNAIRE_FRAGMENT_TAG = "questionannire-fragment-tag"
     }
 }
