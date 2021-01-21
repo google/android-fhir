@@ -16,5 +16,5 @@
 
 <resources>
     <string name="app_name">Data Capture Gallery</string>
-    <string name="submit">Submit</string>
+    <string name="submit_button_text">Submit</string>
 </resources>

@@ -9,7 +9,7 @@
     <item
         android:id="@+id/action_submit"
         android:orderInCategory="300"
-        android:title="@string/submit"
+        android:title="@string/submit_button_text"
         app:showAsAction="ifRoom" />
 
 </menu>
