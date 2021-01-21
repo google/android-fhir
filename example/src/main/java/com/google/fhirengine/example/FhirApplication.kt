@@ -42,7 +42,7 @@ class FhirApplication : Application() {
     private fun constructFhirEngine(): FhirEngine {
         val parser = FhirContext.forR4().newJsonParser()
         val service = create(parser)
-        val params = mutableMapOf("address-country" to "United States")
+        val params = mutableMapOf("address-city" to "NAIROBI")
         val syncData: MutableList<SyncData> = ArrayList()
         syncData.add(SyncData(ResourceType.Patient, params))
         val configuration = SyncConfiguration(syncData, false)

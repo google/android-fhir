@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The default theme applied to the questionnaire rendered using QuestionnaireFragment. In
+         order to override the style attributes defined in this theme, extend this theme, override
+         the style attributes and set questionnaire_theme to the ID of the extended theme.
+
+         For example, to override the groupHeaderTextAppearance attribute, define a new theme called
+         Theme.MyQuestionnaire with the override attribute:
+
+            <style name="Theme.MyQuestionnaire" parent="Theme.Questionnaire">
+                <item name="groupHeaderTextAppearance">@style/TextAppearance.MaterialComponents.Subtitle1</item>
+            </style>
+
+         and apply the new theme to the questionnaire by setting the questionnaire_theme attribute
+         to the ID of the new theme:
+
+            <item name="questionnaire_theme">@style/Theme.MyQuestionnaire</item>
+
+         in the theme of your application, activity, fragment or view that contains the
+         QuestionnaireFragment. -->
+    <style name="Theme.Questionnaire" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="groupHeaderTextAppearance">@style/TextAppearance.MaterialComponents.Headline6
+        </item>
+    </style>
+</resources>

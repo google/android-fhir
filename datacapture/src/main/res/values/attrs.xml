@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="groupHeaderTextAppearance" format="reference" />
+
+    <declare-styleable name="QuestionnaireTheme">
+        <!-- The ID of the theme to be applied to the questionnaire. The referenced theme must
+             extend Theme.Questionnaire. If unspecified, Theme.Questionnaire will be used. -->
+        <attr name="questionnaire_theme" format="reference" />
+    </declare-styleable>
+</resources>

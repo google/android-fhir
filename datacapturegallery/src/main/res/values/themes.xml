@@ -27,6 +27,7 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+        <!-- Customize theme for questionnaires in this application. -->
+        <item name="questionnaire_theme">@style/Theme.MyQuestionnaire</item>
     </style>
 </resources>
