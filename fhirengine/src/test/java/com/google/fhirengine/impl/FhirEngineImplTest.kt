@@ -20,14 +20,12 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth
 import com.google.fhirengine.FhirServices.Companion.builder
 import com.google.fhirengine.ResourceNotFoundException
-import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.resource.TestingUtils
 import com.google.fhirengine.sync.FhirDataSource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
-import org.junit.Assert
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
@@ -80,15 +78,13 @@ class FhirEngineImplTest {
     @Test
     fun update_nonexistentResource_shouldNotInsertResource() {
         fhirEngine.update(TEST_PATIENT_2)
-        val resourceNotFoundException = assertThrows(ResourceNotFoundException::class.java,
-                { fhirEngine.load(Patient::class.java, TEST_PATIENT_2_ID) })
+        val resourceNotFoundException = assertThrows(ResourceNotFoundException::class.java) {
+            fhirEngine.load(Patient::class.java, TEST_PATIENT_2_ID)
+        }
+        /* ktlint-disable max-line-length */
         Truth.assertThat(resourceNotFoundException.message)
-                .isEqualTo("Resource not found with type " +
-                        TEST_PATIENT_2.resourceType.name +
-                        " and id " +
-                        TEST_PATIENT_2_ID +
-                        "!"
-                )
+            .isEqualTo("Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!")
+        /* ktlint-enable max_line_length */
     }
 
     @Test
@@ -105,16 +101,13 @@ class FhirEngineImplTest {
 
     @Test
     fun load_nonexistentResource_shouldThrowResourceNotFoundException() {
-        val resourceNotFoundInDbException =
-            assertThrows(ResourceNotFoundException::class.java) {
-                fhirEngine.load(Patient::class.java, "nonexistent_patient")
-            }
-        Assert.assertEquals(
-            "Resource not found with type " +
-                ResourceType.Patient.name +
-                " and id nonexistent_patient!",
-            resourceNotFoundInDbException.message
-        )
+        val resourceNotFoundException = assertThrows(ResourceNotFoundException::class.java) {
+            fhirEngine.load(Patient::class.java, "nonexistent_patient")
+        }
+        Truth.assertThat(resourceNotFoundException.message)
+            /* ktlint-disable max-line-length */
+            .isEqualTo("Resource not found with type ${ResourceType.Patient.name} and id nonexistent_patient!")
+            /* ktlint-enable max-line-length */
     }
 
     @Test

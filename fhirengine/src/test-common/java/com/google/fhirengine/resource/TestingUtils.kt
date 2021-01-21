@@ -27,7 +27,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     /** Asserts that the `expected` and the `actual` FHIR resources are equal.  */
     fun assertResourceEquals(expected: Resource?, actual: Resource?) {
         Truth.assertThat(iParser.encodeResourceToString(actual))
-                .isEqualTo(iParser.encodeResourceToString(expected))
+            .isEqualTo(iParser.encodeResourceToString(expected))
     }
 
     /** Reads a [Resource] from given file in the `sampledata` dir */
