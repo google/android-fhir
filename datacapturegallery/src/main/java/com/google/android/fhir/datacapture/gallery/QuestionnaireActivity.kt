@@ -57,13 +57,16 @@ class QuestionnaireActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id: Int = item.getItemId()
-        return if (id == R.id.action_submit) {
-            val questionnaireResponse = (supportFragmentManager.findFragmentByTag
-            (QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment).getQuestionnaireResponse()
-            displayQuestionnaireResponse(questionnaireResponse)
-            true
-        } else super.onOptionsItemSelected(item)
+        return when (item.getItemId()) {
+            R.id.action_submit -> {
+                val questionnaireFragment = supportFragmentManager.findFragmentByTag(
+                    QUESTIONNAIRE_FRAGMENT_TAG
+                ) as QuestionnaireFragment
+                displayQuestionnaireResponse(questionnaireFragment.getQuestionnaireResponse())
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     // Display Quesitonnaire response as a dialog
