@@ -40,6 +40,6 @@ data class QuestionnaireItemViewItem(
   var singleAnswerOrNull
     get() = questionnaireResponseItemComponent.answer.singleOrNull()
     set(value) {
-      questionnaireResponseItemComponent.answer = listOf(value)
+      questionnaireResponseItemComponent.answer = value?.let { listOf(value) }
     }
 }

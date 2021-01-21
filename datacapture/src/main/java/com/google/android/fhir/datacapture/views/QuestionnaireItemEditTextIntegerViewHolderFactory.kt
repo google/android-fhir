@@ -41,11 +41,14 @@ object QuestionnaireItemEditTextIntegerViewHolderFactory : QuestionnaireItemView
               textInputEditText.setRawInputType(InputType.TYPE_CLASS_NUMBER or
                 InputType.TYPE_NUMBER_FLAG_SIGNED)
               textInputEditText.doAfterTextChanged { editable: Editable? ->
-                  questionnaireItemViewItem.singleAnswerOrNull =
-                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                      .apply {
-                          value = editable.toString().toIntOrNull()?.let { IntegerType(it) }
+                  editable.toString().toIntOrNull()?.let {
+                      questionnaireItemViewItem.singleAnswerOrNull = QuestionnaireResponse
+                      .QuestionnaireResponseItemAnswerComponent().apply {
+                          value = IntegerType(it)
                       }
+                  } ?: run {
+                      questionnaireItemViewItem.singleAnswerOrNull = null
+                  }
               }
           }
 
