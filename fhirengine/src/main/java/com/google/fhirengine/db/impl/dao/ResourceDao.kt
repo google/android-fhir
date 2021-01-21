@@ -46,8 +46,18 @@ internal abstract class ResourceDao {
 
     @Transaction
     open fun update(resource: Resource) {
-        deleteResource(resource.id, resource.resourceType)
-        insert(resource)
+        updateResource(resource.id,
+                resource.resourceType,
+                iParser.encodeResourceToString(resource)
+        )
+        val entity = ResourceEntity(
+                id = 0,
+                resourceType = resource.resourceType,
+                resourceId = resource.id,
+                serializedResource = iParser.encodeResourceToString(resource)
+        )
+        val index = fhirIndexer.index(resource)
+        updateIndicesForResource(index, entity)
     }
 
     @Transaction
@@ -85,6 +95,18 @@ internal abstract class ResourceDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertNumberIndex(numberIndexEntity: NumberIndexEntity)
+
+    @Query("""
+        UPDATE ResourceEntity
+        SET serializedResource = :serializedResource
+        WHERE resourceId = :resourceId
+        AND resourceType = :resourceType
+        """)
+    abstract fun updateResource(
+      resourceId: String,
+      resourceType: ResourceType,
+      serializedResource: String
+    )
 
     @Query("""
         DELETE FROM ResourceEntity

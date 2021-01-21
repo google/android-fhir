@@ -18,6 +18,7 @@ package com.google.fhirengine.db.impl
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth
 import com.google.fhirengine.FhirServices
 import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.resource.TestingUtils
@@ -97,11 +98,16 @@ class DatabaseImplTest {
     }
 
     @Test
-    fun update_nonExistingResource_shouldInsertResource() {
+    fun update_nonExistingResource_shouldNotInsertResource() {
         database.update(TEST_PATIENT_2)
-        testingUtils.assertResourceEquals(
-            TEST_PATIENT_2,
-            database.select(Patient::class.java, TEST_PATIENT_2_ID)
+        val resourceNotFoundInDbException = assertThrows(
+            ResourceNotFoundInDbException::class.java,
+            { database.select(Patient::class.java, TEST_PATIENT_2_ID) }
+        )
+        Truth.assertThat(resourceNotFoundInDbException.message).isEqualTo(
+            /* ktlint-disable max-line-length */
+            "Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!"
+            /* ktlint-enable max-line-length */
         )
     }
 
@@ -119,17 +125,15 @@ class DatabaseImplTest {
     }
 
     @Test
-    fun select_nonexistentResource_shouldThrowResourceNotFondException() {
-        val resourceNotFoundInDbException =
+    fun select_nonexistentResource_shouldThrowResourceNotFoundException() {
+        val resourceNotFoundException =
             assertThrows(
                 ResourceNotFoundInDbException::class.java,
                 { database.select(Patient::class.java, "nonexistent_patient") }
             )
         assertEquals(
-            "Resource not found with type " +
-                ResourceType.Patient.name +
-                " and id nonexistent_patient!",
-            resourceNotFoundInDbException.message
+            "Resource not found with type ${ResourceType.Patient.name} and id nonexistent_patient!",
+            resourceNotFoundException.message
         )
     }
 
