@@ -24,74 +24,80 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
+import com.google.fhir.r4.core.Questionnaire
+import com.google.fhir.r4.core.QuestionnaireResponse
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemEditTextViewHolderFactoryInstrumentedTest {
-  private lateinit var context: ContextThemeWrapper
-  private lateinit var parent: FrameLayout
-  private lateinit var viewHolder: QuestionnaireItemViewHolder
+    private lateinit var context: ContextThemeWrapper
+    private lateinit var parent: FrameLayout
+    private lateinit var viewHolder: QuestionnaireItemViewHolder
 
-  @Before
-  fun setUp() {
-    context = ContextThemeWrapper(
-      InstrumentationRegistry.getInstrumentation().getTargetContext(),
-      R.style.Theme_MaterialComponents
-    )
-    parent = FrameLayout(context)
-    viewHolder = QuestionnaireItemEditTextViewHolderFactory.create(parent)
-  }
+    @Before
+    fun setUp() {
+        context = ContextThemeWrapper(
+            InstrumentationRegistry.getInstrumentation().getTargetContext(),
+            R.style.Theme_MaterialComponents
+        )
+        parent = FrameLayout(context)
+        viewHolder = QuestionnaireItemEditTextViewHolderFactory.create(parent)
+    }
 
-  @Test
-  fun shouldSetTextViewText() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          text = "Question?"
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ))
+    @Test
+    fun shouldSetTextViewText() {
+        viewHolder.bind(
+            QuestionnaireItemViewItem(
+                Questionnaire.Item.newBuilder().apply {
+                    text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
+                }.build(),
+                QuestionnaireResponse.Item.newBuilder()
+            )
+        )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).hint)
-      .isEqualTo("Question?")
-  }
+        assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).hint)
+            .isEqualTo("Question?")
+    }
 
-  @Test
-  @UiThreadTest
-  fun shouldSetInputText() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          answer = listOf(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = StringType("Answer")
-            }
-          )
-        }
-      ))
+    @Test
+    @UiThreadTest
+    fun shouldSetInputText() {
+        viewHolder.bind(
+            QuestionnaireItemViewItem(
+                Questionnaire.Item.newBuilder().apply {
+                    text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
+                }.build(),
+                QuestionnaireResponse.Item.newBuilder().addAnswer(
+                    QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                        value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                            .setStringValue(
+                                com.google.fhir.r4.core.String.newBuilder().setValue("Answer"))
+                            .build()
+                    }
+                )
+            )
+        )
 
-    assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText)
-      .text.toString()).isEqualTo("Answer")
-  }
+        assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText)
+            .text.toString()).isEqualTo("Answer")
+    }
 
-  @Test
-  @UiThreadTest
-  fun shouldSetQuestionnaireResponseItemComponentAnswer() {
-    val questionnaireItemViewItem = QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent(),
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    )
-    viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("Answer")
+    @Test
+    @UiThreadTest
+    fun shouldSetQuestionnaireResponseItemComponentAnswer() {
+        val questionnaireItemViewItem = QuestionnaireItemViewItem(
+            Questionnaire.Item.getDefaultInstance(),
+            QuestionnaireResponse.Item.newBuilder()
+        )
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItemComponent.answer
-    assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueStringType.valueAsString).isEqualTo("Answer")
-  }
+        viewHolder.bind(questionnaireItemViewItem)
+        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText)
+            .setText("Answer")
+
+        val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerBuilderList
+        assertThat(answer.size).isEqualTo(1)
+        assertThat(answer[0].value.stringValue.value).isEqualTo("Answer")
+    }
 }

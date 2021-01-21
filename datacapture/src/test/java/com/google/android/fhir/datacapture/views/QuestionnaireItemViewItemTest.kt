@@ -18,9 +18,9 @@ package com.google.android.fhir.datacapture.views
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.BooleanType
-import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
+import com.google.fhir.r4.core.Boolean
+import com.google.fhir.r4.core.Questionnaire
+import com.google.fhir.r4.core.QuestionnaireResponse
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -29,51 +29,61 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class QuestionnaireItemViewItemTest {
-  @Test
-  fun singleAnswerOrNull_noAnswer_shouldReturnNull() {
-    val questionnaireItemViewItem = QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent(),
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    )
-    assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
-  }
-
-  @Test
-  fun singleAnswerOrNull_singleAnswer_shouldReturnSingleAnswer() {
-    val questionnaireItemViewItem = QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent(),
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        answer = listOf(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = BooleanType(true)
-          }
+    @Test
+    fun singleAnswerOrNull_noAnswer_shouldReturnNull() {
+        val questionnaireItemViewItem = QuestionnaireItemViewItem(
+            Questionnaire.Item.getDefaultInstance(),
+            QuestionnaireResponse.Item.newBuilder()
         )
-      }
-    )
-    assertThat(
-      questionnaireItemViewItem.singleAnswerOrNull!!.equalsDeep(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          value = BooleanType(true)
-        }
-      )
-    ).isTrue()
-  }
+        assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
+    }
 
-  @Test
-  fun singleAnswerOrNull_multipleAnswers_shouldReturnNull() {
-    val questionnaireItemViewItem = QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent(),
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        answer = listOf(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = BooleanType(true)
-          },
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = BooleanType(true)
-          }
+    @Test
+    fun singleAnswerOrNull_singleAnswer_shouldReturnSingleAnswer() {
+        val questionnaireItemViewItem = QuestionnaireItemViewItem(
+            Questionnaire.Item.getDefaultInstance(),
+            QuestionnaireResponse.Item.newBuilder().apply {
+                addAnswer(
+                    QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                        value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                            .setBoolean(Boolean.newBuilder().setValue(true))
+                            .build()
+                    }
+                )
+            }
         )
-      }
-    )
-    assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
-  }
+        assertThat(
+            questionnaireItemViewItem.singleAnswerOrNull!!.equals(
+                QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                    value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                        .setBoolean(Boolean.newBuilder().setValue(true))
+                        .build()
+                }
+            )
+        ).isTrue()
+    }
+
+    @Test
+    fun singleAnswerOrNull_multipleAnswers_shouldReturnNull() {
+        val questionnaireItemViewItem = QuestionnaireItemViewItem(
+            Questionnaire.Item.getDefaultInstance(),
+            QuestionnaireResponse.Item.newBuilder().apply {
+                addAnswer(
+                    QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                        value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                            .setBoolean(Boolean.newBuilder().setValue(true))
+                            .build()
+                    }
+                )
+                addAnswer(
+                    QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                        value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                            .setBoolean(Boolean.newBuilder().setValue(true))
+                            .build()
+                    }
+                )
+            }
+        )
+        assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
+    }
 }

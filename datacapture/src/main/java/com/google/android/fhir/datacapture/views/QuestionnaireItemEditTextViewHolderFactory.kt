@@ -22,36 +22,40 @@ import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
+import com.google.fhir.r4.core.QuestionnaireResponse
 
 object QuestionnaireItemEditTextViewHolderFactory : QuestionnaireItemViewHolderFactory(
-  R.layout.questionnaire_item_edit_text_view
+    R.layout.questionnaire_item_edit_text_view
 ) {
-  override fun getQuestionnaireItemViewHolderDelegate() =
-    object : QuestionnaireItemViewHolderDelegate {
-      private lateinit var textInputLayout: TextInputLayout
-      private lateinit var textInputEditText: TextInputEditText
-      private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+    override fun getQuestionnaireItemViewHolderDelegate() =
+        object : QuestionnaireItemViewHolderDelegate {
+            private lateinit var textInputLayout: TextInputLayout
+            private lateinit var textInputEditText: TextInputEditText
+            private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
-      override fun init(itemView: View) {
-        textInputLayout = itemView.findViewById(R.id.textInputLayout)
-        textInputEditText = itemView.findViewById(R.id.textInputEditText)
-        textInputEditText.doAfterTextChanged { editable: Editable? ->
-          questionnaireItemViewItem.singleAnswerOrNull =
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .apply {
-                value = StringType(editable.toString())
-              }
+            override fun init(itemView: View) {
+                textInputLayout = itemView.findViewById(R.id.textInputLayout)
+                textInputEditText = itemView.findViewById(R.id.textInputEditText)
+                textInputEditText.doAfterTextChanged { editable: Editable? ->
+                    questionnaireItemViewItem.singleAnswerOrNull =
+                        QuestionnaireResponse.Item.Answer.newBuilder()
+                            .apply {
+                                value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                                    .setStringValue(
+                                        com.google.fhir.r4.core.String.newBuilder()
+                                            .setValue(editable.toString()).build()
+                                    ).build()
+                            }
+                }
+            }
+
+            override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+                this.questionnaireItemViewItem = questionnaireItemViewItem
+                textInputLayout.hint =
+                    questionnaireItemViewItem.questionnaireItem.text.value
+                textInputEditText.setText(
+                    questionnaireItemViewItem.singleAnswerOrNull?.value?.stringValue?.value ?: ""
+                )
+            }
         }
-      }
-
-      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        this.questionnaireItemViewItem = questionnaireItemViewItem
-        textInputLayout.hint = questionnaireItemViewItem.questionnaireItemComponent.text
-        textInputEditText.setText(
-          questionnaireItemViewItem.singleAnswerOrNull?.valueStringType?.value ?: ""
-        )
-      }
-    }
 }

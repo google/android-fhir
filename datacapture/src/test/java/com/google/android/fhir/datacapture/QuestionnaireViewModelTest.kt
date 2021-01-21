@@ -48,7 +48,7 @@ class QuestionnaireViewModelTest {
         state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
         val viewModel = QuestionnaireViewModel(state)
         assertResourceEquals(
-            viewModel.questionnaireResponse,
+            viewModel.questionnaireResponseBuilder,
             QuestionnaireResponse().apply { this.questionnaire = "Questionnaire/a-questionnaire" }
         )
     }
@@ -65,7 +65,7 @@ class QuestionnaireViewModelTest {
         state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
         val viewModel = QuestionnaireViewModel(state)
         assertResourceEquals(
-            viewModel.questionnaireResponse,
+            viewModel.questionnaireResponseBuilder,
             QuestionnaireResponse().apply {
                 val item = QuestionnaireResponse.QuestionnaireResponseItemComponent()
                 item.linkId = "a-link-id"
@@ -91,7 +91,7 @@ class QuestionnaireViewModelTest {
         state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
         val viewModel = QuestionnaireViewModel(state)
         assertResourceEquals(
-            viewModel.questionnaireResponse,
+            viewModel.questionnaireResponseBuilder,
             QuestionnaireResponse().apply {
                 val group = QuestionnaireResponse.QuestionnaireResponseItemComponent()
                 group.linkId = "a-link-id"
@@ -122,30 +122,30 @@ class QuestionnaireViewModelTest {
         val questionnaireItemViewItemList = viewModel.questionnaireItemViewItemList
         assertThat(questionnaireItemViewItemList.size).isEqualTo(2)
         val firstQuestionnaireItemViewItem = questionnaireItemViewItemList[0]
-        assertThat(firstQuestionnaireItemViewItem.questionnaireItemComponent.linkId).isEqualTo(
+        assertThat(firstQuestionnaireItemViewItem.questionnaireItem.linkId).isEqualTo(
             "a-link-id"
         )
-        assertThat(firstQuestionnaireItemViewItem.questionnaireItemComponent.text).isEqualTo(
+        assertThat(firstQuestionnaireItemViewItem.questionnaireItem.text).isEqualTo(
             "Basic questions"
         )
-        assertThat(firstQuestionnaireItemViewItem.questionnaireItemComponent.type).isEqualTo(
+        assertThat(firstQuestionnaireItemViewItem.questionnaireItem.type).isEqualTo(
             Questionnaire.QuestionnaireItemType.GROUP
         )
-        assertThat(firstQuestionnaireItemViewItem.questionnaireResponseItemComponent.linkId)
+        assertThat(firstQuestionnaireItemViewItem.questionnaireResponseItemBuilder.linkId)
             .isEqualTo(
             "a-link-id"
             )
         val secondQuestionnaireItemViewItem = questionnaireItemViewItemList[1]
-        assertThat(secondQuestionnaireItemViewItem.questionnaireItemComponent.linkId).isEqualTo(
+        assertThat(secondQuestionnaireItemViewItem.questionnaireItem.linkId).isEqualTo(
             "another-link-id"
         )
-        assertThat(secondQuestionnaireItemViewItem.questionnaireItemComponent.text).isEqualTo(
+        assertThat(secondQuestionnaireItemViewItem.questionnaireItem.text).isEqualTo(
             "Name?"
         )
-        assertThat(secondQuestionnaireItemViewItem.questionnaireItemComponent.type).isEqualTo(
+        assertThat(secondQuestionnaireItemViewItem.questionnaireItem.type).isEqualTo(
             Questionnaire.QuestionnaireItemType.STRING
         )
-        assertThat(secondQuestionnaireItemViewItem.questionnaireResponseItemComponent.linkId)
+        assertThat(secondQuestionnaireItemViewItem.questionnaireResponseItemBuilder.linkId)
             .isEqualTo(
             "another-link-id"
         )

@@ -23,40 +23,42 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
+import com.google.fhir.r4.core.Questionnaire
+import com.google.fhir.r4.core.QuestionnaireResponse
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
-  private lateinit var context: ContextThemeWrapper
-  private lateinit var parent: FrameLayout
-  private lateinit var viewHolder: QuestionnaireItemViewHolder
+    private lateinit var context: ContextThemeWrapper
+    private lateinit var parent: FrameLayout
+    private lateinit var viewHolder: QuestionnaireItemViewHolder
 
-  @Before
-  fun setUp() {
-    context = ContextThemeWrapper(
-      InstrumentationRegistry.getInstrumentation().getTargetContext(),
-      R.style.Theme_MaterialComponents
-    )
-    parent = FrameLayout(context)
-    viewHolder = QuestionnaireItemGroupViewHolderFactory.create(parent)
-  }
+    @Before
+    fun setUp() {
+        context = ContextThemeWrapper(
+            InstrumentationRegistry.getInstrumentation().getTargetContext(),
+            R.style.Theme_MaterialComponents
+        )
+        parent = FrameLayout(context)
+        viewHolder = QuestionnaireItemGroupViewHolderFactory.create(parent)
+    }
 
-  @Test
-  fun shouldSetTextViewText() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          text = "Group header"
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ))
+    @Test
+    fun shouldSetTextViewText() {
+        viewHolder.bind(
+            QuestionnaireItemViewItem(
+                Questionnaire.Item.newBuilder().apply {
+                    text =
+                        com.google.fhir.r4.core.String.newBuilder().setValue("Group header").build()
+                }.build(),
+                QuestionnaireResponse.Item.newBuilder()
+            )
+        )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).text).isEqualTo(
-      "Group header"
-    )
-  }
+        assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).text).isEqualTo(
+            "Group header"
+        )
+    }
 }

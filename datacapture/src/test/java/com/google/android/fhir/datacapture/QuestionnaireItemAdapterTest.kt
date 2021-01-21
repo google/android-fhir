@@ -19,8 +19,9 @@ package com.google.android.fhir.datacapture
 import android.os.Build
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
+import com.google.fhir.r4.core.Questionnaire
+import com.google.fhir.r4.core.QuestionnaireItemTypeCode
+import com.google.fhir.r4.core.QuestionnaireResponse
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -34,10 +35,11 @@ class QuestionnaireItemAdapterTest {
         val questionnaireItemAdapter = QuestionnaireItemAdapter(
             listOf(
                 QuestionnaireItemViewItem(
-                    Questionnaire.QuestionnaireItemComponent().apply
+                    Questionnaire.Item.newBuilder().apply
                     {
-                        type = Questionnaire.QuestionnaireItemType.GROUP
-                    },
+                        type = Questionnaire.Item.TypeCode.newBuilder().setValue(
+                            QuestionnaireItemTypeCode.Value.GROUP).build()
+                    }.build(),
                     QuestionnaireResponse.QuestionnaireResponseItemComponent()
                 )
             )
