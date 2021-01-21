@@ -17,11 +17,15 @@
 package com.google.android.fhir.datacapture.gallery
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
+import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 class QuestionnaireActivity : AppCompatActivity() {
     private val viewModel: QuestionnaireViewModel by viewModels()
@@ -39,32 +43,49 @@ class QuestionnaireActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             val fragment = QuestionnaireFragment()
             fragment.arguments = bundleOf(
-                QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire
+              QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire
             )
-            supportFragmentManager.setFragmentResultListener(
-                QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_REQUEST_KEY,
-                this,
-                { requestKey, result ->
-                    val dialogFragment = QuestionnaireResponseDialogFragment()
-                    dialogFragment.arguments = bundleOf(
-                        QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to
-                            result.getString(
-                                QuestionnaireFragment.QUESTIONNAIRE_RESPONSE_BUNDLE_KEY)
-                    )
-                    dialogFragment.show(
-                        supportFragmentManager,
-                        QuestionnaireResponseDialogFragment.TAG
-                    )
-                }
-            )
+
             supportFragmentManager.commit {
-                add(R.id.container, fragment)
+                add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG)
             }
         }
+    }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.top_bar_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.getItemId()) {
+            R.id.action_submit -> {
+                val questionnaireFragment = supportFragmentManager.findFragmentByTag(
+                    QUESTIONNAIRE_FRAGMENT_TAG
+                ) as QuestionnaireFragment
+                displayQuestionnaireResponse(questionnaireFragment.getQuestionnaireResponse())
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    // Display Quesitonnaire response as a dialog
+    fun displayQuestionnaireResponse(questionnaireResponse: QuestionnaireResponse) {
+        val questionnaireResponseJson = FhirContext.forR4().newJsonParser()
+          .encodeResourceToString(questionnaireResponse)
+        val dialogFragment = QuestionnaireResponseDialogFragment()
+        dialogFragment.arguments = bundleOf(
+          QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to questionnaireResponseJson
+        )
+        dialogFragment.show(
+          supportFragmentManager,
+          QuestionnaireResponseDialogFragment.TAG
+        )
     }
 
     companion object {
         const val QUESTIONNAIRE_TITLE_KEY = "questionnaire-title-key"
         const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
+        const val QUESTIONNAIRE_FRAGMENT_TAG = "questionannire-fragment-tag"
     }
 }
