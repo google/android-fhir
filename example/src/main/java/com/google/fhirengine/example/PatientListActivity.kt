@@ -69,7 +69,10 @@ class PatientListActivity : AppCompatActivity() {
         patientListViewModel.getSearchedPatients().observe(this,
             Observer<List<PatientListViewModel.PatientItem>> {
                 Log.d("PatientListActivity", "Submitting ${it.count()} patient records")
-                adapter.submitList(it)
+                // the MutableLiveData (list of PatientItems) has changed.
+                // submit a copy of the list, otherwise adapter still thinks it's same unchanged
+                // list.
+                adapter.submitList(it?.toMutableList())
             })
 
         patientListViewModel.getObservations().observe(this,
