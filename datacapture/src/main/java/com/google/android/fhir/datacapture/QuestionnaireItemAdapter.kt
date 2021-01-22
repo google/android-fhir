@@ -25,8 +25,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextViewHo
 import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
+import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 
 internal class QuestionnaireItemAdapter(
   private val questionnaireItemViewItemList: List<QuestionnaireItemViewItem>
@@ -60,15 +59,15 @@ internal class QuestionnaireItemAdapter(
      * itemControl extension (http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html).
      */
     override fun getItemViewType(position: Int) =
-      when (val type = questionnaireItemViewItemList[position].questionnaireItemComponent.type) {
-          Questionnaire.QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP
-          Questionnaire.QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
-          Questionnaire.QuestionnaireItemType.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
-          Questionnaire.QuestionnaireItemType.STRING -> QuestionnaireItemViewHolderType.EDIT_TEXT
-          Questionnaire.QuestionnaireItemType.INTEGER ->
-              QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
-          else -> throw NotImplementedError("Question type $type not supported.")
-      }.value
+        when (val type = questionnaireItemViewItemList[position].questionnaireItem.type.value) {
+            QuestionnaireItemTypeCode.Value.GROUP -> QuestionnaireItemViewHolderType.GROUP
+            QuestionnaireItemTypeCode.Value.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
+            QuestionnaireItemTypeCode.Value.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
+            QuestionnaireItemTypeCode.Value.STRING -> QuestionnaireItemViewHolderType.EDIT_TEXT
+            QuestionnaireItemTypeCode.Value.INTEGER ->
+                QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
+            else -> throw NotImplementedError("Question type $type not supported.")
+        }.value
 
     override fun getItemCount() = questionnaireItemViewItemList.size
 }

@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.datacapture
 
-import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
-
 /**
  * Questionnaire item view holder types supported by default by the data capture library.
  *

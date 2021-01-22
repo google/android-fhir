@@ -23,9 +23,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
-import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.QuestionnaireFragment
-import org.hl7.fhir.r4.model.QuestionnaireResponse
+import com.google.fhir.common.JsonFormat
+import com.google.fhir.r4.core.QuestionnaireResponse
 
 class QuestionnaireActivity : AppCompatActivity() {
     private val viewModel: QuestionnaireViewModel by viewModels()
@@ -43,7 +43,7 @@ class QuestionnaireActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             val fragment = QuestionnaireFragment()
             fragment.arguments = bundleOf(
-              QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire
+                QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire
             )
 
             supportFragmentManager.commit {
@@ -51,6 +51,7 @@ class QuestionnaireActivity : AppCompatActivity() {
             }
         }
     }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.top_bar_menu, menu)
         return true
@@ -62,7 +63,8 @@ class QuestionnaireActivity : AppCompatActivity() {
                 val questionnaireFragment = supportFragmentManager.findFragmentByTag(
                     QUESTIONNAIRE_FRAGMENT_TAG
                 ) as QuestionnaireFragment
-                displayQuestionnaireResponse(questionnaireFragment.getQuestionnaireResponse())
+                displayQuestionnaireResponse(
+                    questionnaireFragment.getQuestionnaireResponseBuilder().build())
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -71,15 +73,14 @@ class QuestionnaireActivity : AppCompatActivity() {
 
     // Display Quesitonnaire response as a dialog
     fun displayQuestionnaireResponse(questionnaireResponse: QuestionnaireResponse) {
-        val questionnaireResponseJson = FhirContext.forR4().newJsonParser()
-          .encodeResourceToString(questionnaireResponse)
+        val questionnaireResponseJson = JsonFormat.getPrinter().print(questionnaireResponse)
         val dialogFragment = QuestionnaireResponseDialogFragment()
         dialogFragment.arguments = bundleOf(
-          QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to questionnaireResponseJson
+            QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to questionnaireResponseJson
         )
         dialogFragment.show(
-          supportFragmentManager,
-          QuestionnaireResponseDialogFragment.TAG
+            supportFragmentManager,
+            QuestionnaireResponseDialogFragment.TAG
         )
     }
 

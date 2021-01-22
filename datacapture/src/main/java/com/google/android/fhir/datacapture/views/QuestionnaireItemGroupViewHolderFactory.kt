@@ -32,7 +32,7 @@ object QuestionnaireItemGroupViewHolderFactory : QuestionnaireItemViewHolderFact
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        groupHeader.text = questionnaireItemViewItem.questionnaireItemComponent.text
+        groupHeader.text = questionnaireItemViewItem.questionnaireItem.text.value
       }
     }
 }

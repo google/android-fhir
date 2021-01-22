@@ -18,38 +18,37 @@ package com.google.android.fhir.datacapture
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
-import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
-import org.hl7.fhir.r4.model.StringType
+import com.google.fhir.common.JsonFormat
+import com.google.fhir.r4.core.Canonical
+import com.google.fhir.r4.core.Questionnaire
+import com.google.fhir.r4.core.QuestionnaireResponse
 
 class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     /** The current questionnaire as questions are being answered. */
     internal var questionnaire: Questionnaire
 
     /** The current questionnaire response as questions are being answered. */
-    internal val questionnaireResponse = QuestionnaireResponse()
+    internal val questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
 
     /** The list of [QuestionnaireItemViewItem] to be used for the [RecyclerView]. */
     internal val questionnaireItemViewItemList = mutableListOf<QuestionnaireItemViewItem>()
 
     init {
-        val jsonParser = FhirContext.forR4().newJsonParser()
         val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
-        questionnaire = jsonParser.parseResource(Questionnaire::class.java, questionnaireJson)
-        questionnaireResponse.questionnaire = questionnaire.id
+        val builder = Questionnaire.newBuilder()
+        questionnaire = JsonFormat.getParser().merge(questionnaireJson, builder).build()
+        questionnaireResponseBuilder.questionnaire =
+            Canonical.newBuilder().setValue(questionnaire.id.value).build()
         // Retain the hierarchy and order of items within the questionnaire as specified in the
         // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
-        questionnaire.item.forEach {
-            questionnaireResponse.item.add(it.createQuestionnaireResponseItem())
+        questionnaire.itemList.forEach {
+            questionnaireResponseBuilder.addItem(it.createQuestionnaireResponseItem())
         }
         populateQuestionnaireItemViewItemList(
             questionnaireItemViewItemList,
-            questionnaire.item,
-            questionnaireResponse.item
+            questionnaire.itemList,
+            questionnaireResponseBuilder.itemBuilderList
         )
     }
 
@@ -63,8 +62,8 @@ class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
      */
     private fun populateQuestionnaireItemViewItemList(
       questionnaireItemViewItemList: MutableList<QuestionnaireItemViewItem>,
-      questionnaireItemList: List<QuestionnaireItemComponent>,
-      questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>
+      questionnaireItemList: List<Questionnaire.Item>,
+      questionnaireResponseItemList: List<QuestionnaireResponse.Item.Builder>
     ) {
         val questionnaireItemListIterator = questionnaireItemList.iterator()
         val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
@@ -77,8 +76,8 @@ class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
             )
             populateQuestionnaireItemViewItemList(
                 questionnaireItemViewItemList,
-                questionnaireItem.item,
-                questionnaireResponseItem.item
+                questionnaireItem.itemList,
+                questionnaireResponseItem.itemBuilderList
             )
         }
     }
@@ -91,11 +90,13 @@ class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
  * The hierarchy and order of child items will be retained as specified in the standard. See
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
-private fun QuestionnaireItemComponent.createQuestionnaireResponseItem():
-    QuestionnaireResponse.QuestionnaireResponseItemComponent {
-    return QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType(linkId)).apply {
-        this@createQuestionnaireResponseItem.item.forEach {
-            this.item.add(it.createQuestionnaireResponseItem())
+private fun Questionnaire.Item.createQuestionnaireResponseItem():
+    QuestionnaireResponse.Item.Builder {
+    return QuestionnaireResponse.Item.newBuilder().apply {
+        linkId = com.google.fhir.r4.core.String.newBuilder()
+            .setValue(this@createQuestionnaireResponseItem.linkId.value).build()
+        this@createQuestionnaireResponseItem.itemList.forEach {
+            this.addItem(it.createQuestionnaireResponseItem())
         }
     }
 }

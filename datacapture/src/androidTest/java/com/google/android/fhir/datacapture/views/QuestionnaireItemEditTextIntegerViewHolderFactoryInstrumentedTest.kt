@@ -24,9 +24,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.IntegerType
-import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
+import com.google.fhir.r4.core.Integer
+import com.google.fhir.r4.core.Questionnaire
+import com.google.fhir.r4.core.QuestionnaireResponse
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,10 +51,10 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryInstrumentedTest {
   fun shouldSetTextViewText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          text = "Question?"
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+          Questionnaire.Item.newBuilder().apply {
+            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
+          }.build(),
+          QuestionnaireResponse.Item.newBuilder()
       ))
 
     assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).hint)
@@ -66,14 +66,16 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryInstrumentedTest {
   fun shouldSetInputText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          answer = listOf(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = IntegerType(5)
-            }
+          Questionnaire.Item.newBuilder().apply {
+            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
+          }.build(),
+          QuestionnaireResponse.Item.newBuilder().addAnswer(
+              QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                    .setInteger(Integer.newBuilder().setValue(5))
+                    .build()
+              }
           )
-        }
       ))
 
     assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText)
@@ -84,28 +86,28 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldSetQuestionnaireResponseItemComponentAnswer() {
     val questionnaireItemViewItem = QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent(),
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        Questionnaire.Item.newBuilder().build(),
+        QuestionnaireResponse.Item.newBuilder()
     )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("10")
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItemComponent.answer
+    val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerList
     assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].valueIntegerType.value).isEqualTo(10)
+    assertThat(answer[0].value.integer.value).isEqualTo(10)
   }
 
   @Test
   @UiThreadTest
   fun shouldSetQuestionnaireResponseItemComponentAnswertoEmpty() {
     val questionnaireItemViewItem = QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent(),
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        Questionnaire.Item.newBuilder().build(),
+        QuestionnaireResponse.Item.newBuilder()
     )
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("")
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItemComponent.answer
+    val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerList
     assertThat(answer.size).isEqualTo(0)
   }
 
@@ -113,8 +115,8 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldSetInputTextToEmpty() {
     val questionnaireItemViewItem = QuestionnaireItemViewItem(
-      Questionnaire.QuestionnaireItemComponent(),
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        Questionnaire.Item.newBuilder().build(),
+        QuestionnaireResponse.Item.newBuilder()
     )
     viewHolder.bind(questionnaireItemViewItem)
     val inputText = viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText)

@@ -17,8 +17,8 @@
 package com.google.android.fhir.datacapture.views
 
 import androidx.recyclerview.widget.RecyclerView
-import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
-import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
+import com.google.fhir.r4.core.Questionnaire
+import com.google.fhir.r4.core.QuestionnaireResponse
 
 /**
  * Item for [QuestionnaireItemViewHolder] in [RecyclerView] containing [QuestionnaireItemComponent]
@@ -30,16 +30,19 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComp
  * CheckBox).
  */
 data class QuestionnaireItemViewItem(
-  val questionnaireItemComponent: QuestionnaireItemComponent,
-  val questionnaireResponseItemComponent: QuestionnaireResponseItemComponent
+  val questionnaireItem: Questionnaire.Item,
+  val questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder
 ) {
-  /**
-   * The single answer to the [QuestionnaireItemComponent], or `null` if there is none or more than
-   * one answer.
-   */
-  var singleAnswerOrNull
-    get() = questionnaireResponseItemComponent.answer.singleOrNull()
-    set(value) {
-      questionnaireResponseItemComponent.answer = value?.let { listOf(value) }
-    }
+    /**
+     * The single answer to the [QuestionnaireItemComponent], or `null` if there is none or more than
+     * one answer.
+     */
+    var singleAnswerOrNull
+        get() = questionnaireResponseItemBuilder.answerBuilderList.singleOrNull()
+        set(value) {
+            questionnaireResponseItemBuilder.clearAnswer()
+            value?.let {
+                questionnaireResponseItemBuilder.addAnswer(it)
+            }
+        }
 }
