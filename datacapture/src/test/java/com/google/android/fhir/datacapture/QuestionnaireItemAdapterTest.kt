@@ -115,11 +115,13 @@ class QuestionnaireItemAdapterTest {
         val questionnaireItemAdapter = QuestionnaireItemAdapter(
             listOf(
                 QuestionnaireItemViewItem(
-                    Questionnaire.QuestionnaireItemComponent().apply
-                    {
-                        type = Questionnaire.QuestionnaireItemType.INTEGER
-                    },
-                    QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                    Questionnaire.Item.newBuilder()
+                        .setType(
+                            Questionnaire.Item.TypeCode.newBuilder()
+                                .setValue(QuestionnaireItemTypeCode.Value.INTEGER)
+                        )
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
                 )
             )
         )
