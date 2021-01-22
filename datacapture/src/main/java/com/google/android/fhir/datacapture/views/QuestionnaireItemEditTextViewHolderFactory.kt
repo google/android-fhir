@@ -38,14 +38,20 @@ object QuestionnaireItemEditTextViewHolderFactory : QuestionnaireItemViewHolderF
                 textInputEditText = itemView.findViewById(R.id.textInputEditText)
                 textInputEditText.doAfterTextChanged { editable: Editable? ->
                     questionnaireItemViewItem.singleAnswerOrNull =
-                        QuestionnaireResponse.Item.Answer.newBuilder()
-                            .apply {
-                                value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                                    .setStringValue(
-                                        com.google.fhir.r4.core.String.newBuilder()
-                                            .setValue(editable.toString()).build()
-                                    ).build()
+                        editable.toString().let {
+                            if (it.isEmpty()) {
+                                null
+                            } else {
+                                QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                                    value =
+                                        QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                                            .setStringValue(
+                                                com.google.fhir.r4.core.String.newBuilder()
+                                                    .setValue(it).build()
+                                            ).build()
+                                }
                             }
+                        }
                 }
             }
 

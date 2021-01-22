@@ -64,7 +64,8 @@ internal class QuestionnaireItemAdapter(
             QuestionnaireItemTypeCode.Value.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
             QuestionnaireItemTypeCode.Value.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
             QuestionnaireItemTypeCode.Value.STRING -> QuestionnaireItemViewHolderType.EDIT_TEXT
-            QuestionnaireItemTypeCode.Value.INTEGER -> QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
+            QuestionnaireItemTypeCode.Value.INTEGER ->
+                QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
             else -> throw NotImplementedError("Question type $type not supported.")
         }.value
 

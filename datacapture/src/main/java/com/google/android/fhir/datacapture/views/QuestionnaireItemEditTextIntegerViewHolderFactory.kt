@@ -23,43 +23,43 @@ import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import org.hl7.fhir.r4.model.IntegerType
-import org.hl7.fhir.r4.model.QuestionnaireResponse
+import com.google.fhir.r4.core.Integer
+import com.google.fhir.r4.core.QuestionnaireResponse
 
 object QuestionnaireItemEditTextIntegerViewHolderFactory : QuestionnaireItemViewHolderFactory(
-  R.layout.questionnaire_item_edit_text_view
+    R.layout.questionnaire_item_edit_text_view
 ) {
     override fun getQuestionnaireItemViewHolderDelegate() =
-      object : QuestionnaireItemViewHolderDelegate {
-          private lateinit var textInputLayout: TextInputLayout
-          private lateinit var textInputEditText: TextInputEditText
-          private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+        object : QuestionnaireItemViewHolderDelegate {
+            private lateinit var textInputLayout: TextInputLayout
+            private lateinit var textInputEditText: TextInputEditText
+            private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
-          override fun init(itemView: View) {
-              textInputLayout = itemView.findViewById(R.id.textInputLayout)
-              textInputEditText = itemView.findViewById(R.id.textInputEditText)
-              textInputEditText.setRawInputType(InputType.TYPE_CLASS_NUMBER or
-                InputType.TYPE_NUMBER_FLAG_SIGNED)
-              textInputEditText.doAfterTextChanged { editable: Editable? ->
-                  editable.toString().toIntOrNull()?.let {
-                      questionnaireItemViewItem.singleAnswerOrNull = QuestionnaireResponse
-                      .QuestionnaireResponseItemAnswerComponent().apply {
-                          value = IntegerType(it)
-                      }
-                  } ?: run {
-                      questionnaireItemViewItem.singleAnswerOrNull = null
-                  }
-              }
-          }
+            override fun init(itemView: View) {
+                textInputLayout = itemView.findViewById(R.id.textInputLayout)
+                textInputEditText = itemView.findViewById(R.id.textInputEditText)
+                textInputEditText.setRawInputType(InputType.TYPE_CLASS_NUMBER or
+                    InputType.TYPE_NUMBER_FLAG_SIGNED)
+                textInputEditText.doAfterTextChanged { editable: Editable? ->
+                    questionnaireItemViewItem.singleAnswerOrNull =
+                        editable.toString().toIntOrNull()?.let {
+                            QuestionnaireResponse.Item.Answer.newBuilder()
+                                .apply {
+                                    value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                                        .setInteger(Integer.newBuilder().setValue(it).build())
+                                        .build()
+                                }
+                        }
+                }
+            }
 
-          override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-              this.questionnaireItemViewItem = questionnaireItemViewItem
-              textInputLayout.hint = questionnaireItemViewItem.questionnaireItemComponent.text
-              questionnaireItemViewItem.singleAnswerOrNull?.valueIntegerType?.let {
-                  textInputEditText.setText(
-                    it.value.toString()
-                  )
-              }
-          }
-      }
+            override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+                this.questionnaireItemViewItem = questionnaireItemViewItem
+                textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.text.value
+                textInputEditText.setText(
+                    questionnaireItemViewItem.singleAnswerOrNull?.value?.integer?.value?.toString()
+                        ?: ""
+                )
+            }
+        }
 }
