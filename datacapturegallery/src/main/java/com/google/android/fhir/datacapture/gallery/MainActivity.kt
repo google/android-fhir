@@ -31,7 +31,10 @@ class MainActivity : AppCompatActivity() {
                 // Example taken from https://www.hl7.org/fhir/questionnaire-example-f201-lifelines.json.html
                 QuestionnaireListItem("HL7 example",
                     "Real-world lifelines questionnaire",
-                    "hl7-fhir-examples-f201.json")
+                    "hl7-fhir-examples-f201.json"),
+                QuestionnaireListItem("Patient registration",
+                    "Example authored by Fred Hersch",
+                    "patient-registration.json")
             )
         )
     }
