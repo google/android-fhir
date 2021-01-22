@@ -108,4 +108,18 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryInstrumentedTest {
     val answer = questionnaireItemViewItem.questionnaireResponseItemComponent.answer
     assertThat(answer.size).isEqualTo(0)
   }
+
+  @Test
+  @UiThreadTest
+  fun shouldSetInputTextToEmpty() {
+    val questionnaireItemViewItem = QuestionnaireItemViewItem(
+      Questionnaire.QuestionnaireItemComponent(),
+      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    )
+    viewHolder.bind(questionnaireItemViewItem)
+    val inputText = viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText)
+      .getText()
+
+    assertThat(inputText.toString()).isEqualTo("")
+  }
 }
