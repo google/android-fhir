@@ -52,15 +52,7 @@ class QuestionnaireItemViewItemTest {
                 )
             }
         )
-        assertThat(
-            questionnaireItemViewItem.singleAnswerOrNull!!.equals(
-                QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                    value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                        .setBoolean(Boolean.newBuilder().setValue(true))
-                        .build()
-                }
-            )
-        ).isTrue()
+        assertThat(questionnaireItemViewItem.singleAnswerOrNull!!.value.boolean.value).isTrue()
     }
 
     @Test
