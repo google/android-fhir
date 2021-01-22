@@ -35,12 +35,13 @@ class QuestionnaireItemAdapterTest {
         val questionnaireItemAdapter = QuestionnaireItemAdapter(
             listOf(
                 QuestionnaireItemViewItem(
-                    Questionnaire.Item.newBuilder().apply
-                    {
-                        type = Questionnaire.Item.TypeCode.newBuilder().setValue(
-                            QuestionnaireItemTypeCode.Value.GROUP).build()
-                    }.build(),
-                    QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                    Questionnaire.Item.newBuilder()
+                        .setType(
+                            Questionnaire.Item.TypeCode.newBuilder()
+                                .setValue(QuestionnaireItemTypeCode.Value.GROUP)
+                        )
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
                 )
             )
         )
@@ -54,11 +55,13 @@ class QuestionnaireItemAdapterTest {
         val questionnaireItemAdapter = QuestionnaireItemAdapter(
             listOf(
                 QuestionnaireItemViewItem(
-                    Questionnaire.QuestionnaireItemComponent().apply
-                    {
-                        type = Questionnaire.QuestionnaireItemType.BOOLEAN
-                    },
-                    QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                    Questionnaire.Item.newBuilder()
+                        .setType(
+                            Questionnaire.Item.TypeCode.newBuilder()
+                                .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+                        )
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
                 )
             )
         )
@@ -72,11 +75,13 @@ class QuestionnaireItemAdapterTest {
         val questionnaireItemAdapter = QuestionnaireItemAdapter(
             listOf(
                 QuestionnaireItemViewItem(
-                    Questionnaire.QuestionnaireItemComponent().apply
-                    {
-                        type = Questionnaire.QuestionnaireItemType.DATE
-                    },
-                    QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                    Questionnaire.Item.newBuilder()
+                        .setType(
+                            Questionnaire.Item.TypeCode.newBuilder()
+                                .setValue(QuestionnaireItemTypeCode.Value.DATE)
+                        )
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
                 )
             )
         )
@@ -90,11 +95,13 @@ class QuestionnaireItemAdapterTest {
         val questionnaireItemAdapter = QuestionnaireItemAdapter(
             listOf(
                 QuestionnaireItemViewItem(
-                    Questionnaire.QuestionnaireItemComponent().apply
-                    {
-                        type = Questionnaire.QuestionnaireItemType.STRING
-                    },
-                    QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                    Questionnaire.Item.newBuilder()
+                        .setType(
+                            Questionnaire.Item.TypeCode.newBuilder()
+                                .setValue(QuestionnaireItemTypeCode.Value.STRING)
+                        )
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
                 )
             )
         )
