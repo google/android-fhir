@@ -30,8 +30,8 @@ import com.google.fhir.r4.core.QuestionnaireResponse
  * CheckBox).
  */
 data class QuestionnaireItemViewItem(
-    val questionnaireItem: Questionnaire.Item,
-    val questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder
+  val questionnaireItem: Questionnaire.Item,
+  val questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder
 ) {
     /**
      * The single answer to the [QuestionnaireItemComponent], or `null` if there is none or more than
