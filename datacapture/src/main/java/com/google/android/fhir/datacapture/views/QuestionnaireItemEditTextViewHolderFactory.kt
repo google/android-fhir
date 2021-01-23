@@ -31,7 +31,10 @@ abstract class QuestionnaireItemEditTextViewHolderFactory : QuestionnaireItemVie
         QuestionnaireItemEditTextViewHolderDelegate
 }
 
-abstract class QuestionnaireItemEditTextViewHolderDelegate : QuestionnaireItemViewHolderDelegate {
+abstract class QuestionnaireItemEditTextViewHolderDelegate(
+    private val rawInputType: Int,
+    private val isSingleLine: Boolean
+) : QuestionnaireItemViewHolderDelegate {
     private lateinit var textInputLayout: TextInputLayout
     private lateinit var textInputEditText: TextInputEditText
     private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
@@ -39,7 +42,8 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate : QuestionnaireItemVi
     override fun init(itemView: View) {
         textInputLayout = itemView.findViewById(R.id.textInputLayout)
         textInputEditText = itemView.findViewById(R.id.textInputEditText)
-        textInputEditText.setRawInputType(getRawInputType())
+        textInputEditText.setRawInputType(rawInputType)
+        textInputEditText.isSingleLine = isSingleLine
         textInputEditText.doAfterTextChanged { editable: Editable? ->
             questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
         }
@@ -59,7 +63,4 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate : QuestionnaireItemVi
      * answer to the question (may be input by the user or previously recorded).
      */
     abstract fun getText(answer: QuestionnaireResponse.Item.Answer.Builder?): String
-
-    /**  Returns the raw input type of the [Editable] widget. */
-    abstract fun getRawInputType(): Int
 }

@@ -64,35 +64,10 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryInstrumentedTest {
 
     @Test
     @UiThreadTest
-    fun shouldSetInputTextToEmpty() {
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder()
-            )
-        )
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().build(),
-                QuestionnaireResponse.Item.newBuilder()
-            )
-        )
-
-        val inputText =
-            viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).text
-        assertThat(inputText.toString()).isEqualTo("")
-    }
-
-    @Test
-    @UiThreadTest
     fun shouldSetInputText() {
         viewHolder.bind(
             QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-                }.build(),
+                Questionnaire.Item.getDefaultInstance(),
                 QuestionnaireResponse.Item.newBuilder().addAnswer(
                     QuestionnaireResponse.Item.Answer.newBuilder().apply {
                         value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
@@ -105,9 +80,38 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryInstrumentedTest {
 
         assertThat(
             viewHolder.itemView.findViewById<TextInputEditText>(
-                R.id.textInputEditText).text.toString()
-                .toIntOrNull()
-        ).isEqualTo(5)
+                R.id.textInputEditText
+            ).text.toString()
+        ).isEqualTo("5")
+    }
+
+    @Test
+    @UiThreadTest
+    fun shouldSetInputTextToEmpty() {
+        viewHolder.bind(
+            QuestionnaireItemViewItem(
+                Questionnaire.Item.getDefaultInstance(),
+                QuestionnaireResponse.Item.newBuilder().addAnswer(
+                    QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                        value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                            .setInteger(Integer.newBuilder().setValue(5))
+                            .build()
+                    }
+                )
+            )
+        )
+        viewHolder.bind(
+            QuestionnaireItemViewItem(
+                Questionnaire.Item.getDefaultInstance(),
+                QuestionnaireResponse.Item.newBuilder()
+            )
+        )
+
+        assertThat(
+            viewHolder.itemView.findViewById<TextInputEditText>(
+                R.id.textInputEditText
+            ).text.toString()
+        ).isEqualTo("")
     }
 
     @Test
@@ -135,7 +139,8 @@ class QuestionnaireItemEditTextIntegerViewHolderFactoryInstrumentedTest {
         viewHolder.bind(questionnaireItemViewItem)
         viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("")
 
-        val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerList
-        assertThat(answer.size).isEqualTo(0)
+        assertThat(
+            questionnaireItemViewItem.questionnaireResponseItemBuilder.answerCount
+        ).isEqualTo(0)
     }
 }

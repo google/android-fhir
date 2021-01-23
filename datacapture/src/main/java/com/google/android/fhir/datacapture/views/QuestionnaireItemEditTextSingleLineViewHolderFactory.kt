@@ -16,12 +16,8 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.text.InputType
-
 object QuestionnaireItemEditTextSingleLineViewHolderFactory :
     QuestionnaireItemEditTextViewHolderFactory() {
-    override fun getQuestionnaireItemViewHolderDelegate() = object :
-        QuestionnaireItemEditTextStringViewHolderDelegate() {
-        override fun getRawInputType() = InputType.TYPE_CLASS_TEXT
-    }
+    override fun getQuestionnaireItemViewHolderDelegate() =
+        QuestionnaireItemEditTextStringViewHolderDelegate(true)
 }

@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.text.InputType
 import com.google.fhir.r4.core.QuestionnaireResponse
 
 /**
@@ -25,8 +26,12 @@ import com.google.fhir.r4.core.QuestionnaireResponse
  *
  * Any `ViewHolder` containing a `EditText` view that collects text data should use this class.
  */
-abstract class QuestionnaireItemEditTextStringViewHolderDelegate :
-    QuestionnaireItemEditTextViewHolderDelegate() {
+class QuestionnaireItemEditTextStringViewHolderDelegate(
+    isSingleLine: Boolean
+) : QuestionnaireItemEditTextViewHolderDelegate(
+    InputType.TYPE_CLASS_TEXT,
+    isSingleLine
+) {
     override fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder? {
         return text.let {
             if (it.isEmpty()) {
