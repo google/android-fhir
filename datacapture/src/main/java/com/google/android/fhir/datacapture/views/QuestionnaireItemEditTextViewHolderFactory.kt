@@ -32,8 +32,8 @@ abstract class QuestionnaireItemEditTextViewHolderFactory : QuestionnaireItemVie
 }
 
 abstract class QuestionnaireItemEditTextViewHolderDelegate(
-    private val rawInputType: Int,
-    private val isSingleLine: Boolean
+  private val rawInputType: Int,
+  private val isSingleLine: Boolean
 ) : QuestionnaireItemViewHolderDelegate {
     private lateinit var textInputLayout: TextInputLayout
     private lateinit var textInputEditText: TextInputEditText
