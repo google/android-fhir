@@ -24,44 +24,42 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.fhir.r4.core.QuestionnaireResponse
 
-object QuestionnaireItemEditTextViewHolderFactory : QuestionnaireItemViewHolderFactory(
+abstract class QuestionnaireItemEditTextViewHolderFactory : QuestionnaireItemViewHolderFactory(
     R.layout.questionnaire_item_edit_text_view
 ) {
-    override fun getQuestionnaireItemViewHolderDelegate() =
-        object : QuestionnaireItemViewHolderDelegate {
-            private lateinit var textInputLayout: TextInputLayout
-            private lateinit var textInputEditText: TextInputEditText
-            private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+    abstract override fun getQuestionnaireItemViewHolderDelegate():
+        QuestionnaireItemEditTextViewHolderDelegate
+}
 
-            override fun init(itemView: View) {
-                textInputLayout = itemView.findViewById(R.id.textInputLayout)
-                textInputEditText = itemView.findViewById(R.id.textInputEditText)
-                textInputEditText.doAfterTextChanged { editable: Editable? ->
-                    questionnaireItemViewItem.singleAnswerOrNull =
-                        editable.toString().let {
-                            if (it.isEmpty()) {
-                                null
-                            } else {
-                                QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                                    value =
-                                        QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                                            .setStringValue(
-                                                com.google.fhir.r4.core.String.newBuilder()
-                                                    .setValue(it).build()
-                                            ).build()
-                                }
-                            }
-                        }
-                }
-            }
+abstract class QuestionnaireItemEditTextViewHolderDelegate : QuestionnaireItemViewHolderDelegate {
+    private lateinit var textInputLayout: TextInputLayout
+    private lateinit var textInputEditText: TextInputEditText
+    private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
-            override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-                this.questionnaireItemViewItem = questionnaireItemViewItem
-                textInputLayout.hint =
-                    questionnaireItemViewItem.questionnaireItem.text.value
-                textInputEditText.setText(
-                    questionnaireItemViewItem.singleAnswerOrNull?.value?.stringValue?.value ?: ""
-                )
-            }
+    override fun init(itemView: View) {
+        textInputLayout = itemView.findViewById(R.id.textInputLayout)
+        textInputEditText = itemView.findViewById(R.id.textInputEditText)
+        textInputEditText.setRawInputType(getRawInputType())
+        textInputEditText.doAfterTextChanged { editable: Editable? ->
+            questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
         }
+    }
+
+    override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        this.questionnaireItemViewItem = questionnaireItemViewItem
+        textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.text.value
+        textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
+    }
+
+    /** Returns the answer that should be recorded given the text input by the user. */
+    abstract fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder?
+
+    /**
+     * Returns the text that should be displayed in the [TextInputEditText] from the existing
+     * answer to the question (may be input by the user or previously recorded).
+     */
+    abstract fun getText(answer: QuestionnaireResponse.Item.Answer.Builder?): String
+
+    /**  Returns the raw input type of the [Editable] widget. */
+    abstract fun getRawInputType(): Int
 }

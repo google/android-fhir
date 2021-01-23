@@ -106,7 +106,7 @@ class QuestionnaireItemAdapterTest {
             )
         )
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
-            QuestionnaireItemViewHolderType.EDIT_TEXT.value
+            QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE.value
         )
     }
 
