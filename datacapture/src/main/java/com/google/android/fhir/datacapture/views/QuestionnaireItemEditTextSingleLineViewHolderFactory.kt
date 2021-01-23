@@ -17,33 +17,11 @@
 package com.google.android.fhir.datacapture.views
 
 import android.text.InputType
-import com.google.fhir.r4.core.QuestionnaireResponse
 
 object QuestionnaireItemEditTextSingleLineViewHolderFactory :
     QuestionnaireItemEditTextViewHolderFactory() {
     override fun getQuestionnaireItemViewHolderDelegate() = object :
-        QuestionnaireItemEditTextViewHolderDelegate() {
-        override fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder? {
-            return text.let {
-                if (it.isEmpty()) {
-                    null
-                } else {
-                    QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                        value =
-                            QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                                .setStringValue(
-                                    com.google.fhir.r4.core.String.newBuilder()
-                                        .setValue(it).build()
-                                ).build()
-                    }
-                }
-            }
-        }
-
-        override fun getText(answer: QuestionnaireResponse.Item.Answer.Builder?): String {
-            return answer?.value?.stringValue?.value ?: ""
-        }
-
+        QuestionnaireItemEditTextStringViewHolderDelegate() {
         override fun getRawInputType() = InputType.TYPE_CLASS_TEXT
     }
 }
