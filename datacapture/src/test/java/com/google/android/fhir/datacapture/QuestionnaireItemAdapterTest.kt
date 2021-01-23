@@ -111,6 +111,26 @@ class QuestionnaireItemAdapterTest {
     }
 
     @Test
+    fun getItemViewType_textItemType_shouldReturnEditTextViewHolderType() {
+        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+            listOf(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setType(
+                            Questionnaire.Item.TypeCode.newBuilder()
+                                .setValue(QuestionnaireItemTypeCode.Value.TEXT)
+                        )
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                )
+            )
+        )
+        assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
+            QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE.value
+        )
+    }
+
+    @Test
     fun getItemViewType_integerItemType_shouldReturnEditTextIntegerViewHolderType() {
         val questionnaireItemAdapter = QuestionnaireItemAdapter(
             listOf(
