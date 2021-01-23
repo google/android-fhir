@@ -31,13 +31,13 @@ class MainActivity : AppCompatActivity() {
                 // Example taken from https://www.hl7.org/fhir/questionnaire-example-f201-lifelines.json.html
                 QuestionnaireListItem(
                     "Real-world lifelines questionnaire",
-                    "HL7 example id f201",
+                    "HL7 example \"f201\"",
                     "hl7-questionnaire-example-f201-lifelines.json"
                 ),
                 // Example taken from https://www.hl7.org/fhir/questionnaire-example-bluebook.json.html
                 QuestionnaireListItem(
                     "Neonate record from New South Wales, Australia",
-                    "HL7 example id bb",
+                    "HL7 example \"bb\"",
                     "hl7-questionnaire-example-bluebook.json"
                 ),
                 QuestionnaireListItem(
