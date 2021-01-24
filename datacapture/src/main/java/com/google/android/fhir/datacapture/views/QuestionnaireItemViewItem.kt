@@ -21,21 +21,20 @@ import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireResponse
 
 /**
- * Item for [QuestionnaireItemViewHolder] in [RecyclerView] containing [QuestionnaireItemComponent]
- * (the question) and [QuestionnaireResponseItemComponent] (the answer).
+ * Item for [QuestionnaireItemViewHolder] in [RecyclerView] containing [Questionnaire.Item] (the
+ * question) and [QuestionnaireResponse.Item] (the answer).
  *
- * [QuestionnaireItemComponent] (the question) and [QuestionnaireResponseItemComponent] (the answer)
- * are used to create the right type of view (e.g. a CheckBox for a yes/no question) and populate
- * the view with the right information (e.g text for the CheckBox and initial yes/no answer for the
- * CheckBox).
+ * [Questionnaire.Item] (the question) and [QuestionnaireResponse.Item] (the answer) are used to
+ * create the right type of view (e.g. a CheckBox for a yes/no question) and populate the view with
+ * the right information (e.g text for the CheckBox and initial yes/no answer for the CheckBox).
  */
 data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.Item,
   val questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder
 ) {
     /**
-     * The single answer to the [QuestionnaireItemComponent], or `null` if there is none or more than
-     * one answer.
+     * The single answer to the [QuestionnaireResponse.Item], or `null` if there is none or more
+     * than one answer.
      */
     var singleAnswerOrNull
         get() = questionnaireResponseItemBuilder.answerBuilderList.singleOrNull()

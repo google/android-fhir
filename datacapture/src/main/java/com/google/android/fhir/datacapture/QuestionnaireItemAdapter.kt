@@ -21,7 +21,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextIntegerViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextMultiLineViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextSingleLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
@@ -40,7 +41,10 @@ internal class QuestionnaireItemAdapter(
             QuestionnaireItemViewHolderType.CHECK_BOX -> QuestionnaireItemCheckBoxViewHolderFactory
             QuestionnaireItemViewHolderType.DATE_PICKER ->
                 QuestionnaireItemDatePickerViewHolderFactory
-            QuestionnaireItemViewHolderType.EDIT_TEXT -> QuestionnaireItemEditTextViewHolderFactory
+            QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE ->
+                QuestionnaireItemEditTextSingleLineViewHolderFactory
+            QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE ->
+                QuestionnaireItemEditTextMultiLineViewHolderFactory
             QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER ->
                 QuestionnaireItemEditTextIntegerViewHolderFactory
         }
@@ -63,7 +67,10 @@ internal class QuestionnaireItemAdapter(
             QuestionnaireItemTypeCode.Value.GROUP -> QuestionnaireItemViewHolderType.GROUP
             QuestionnaireItemTypeCode.Value.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
             QuestionnaireItemTypeCode.Value.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
-            QuestionnaireItemTypeCode.Value.STRING -> QuestionnaireItemViewHolderType.EDIT_TEXT
+            QuestionnaireItemTypeCode.Value.STRING ->
+                QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE
+            QuestionnaireItemTypeCode.Value.TEXT ->
+                QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE
             QuestionnaireItemTypeCode.Value.INTEGER ->
                 QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
             else -> throw NotImplementedError("Question type $type not supported.")

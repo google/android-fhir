@@ -16,50 +16,30 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.text.Editable
 import android.text.InputType
-import android.view.View
-import androidx.core.widget.doAfterTextChanged
-import com.google.android.fhir.datacapture.R
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import com.google.fhir.r4.core.Integer
 import com.google.fhir.r4.core.QuestionnaireResponse
 
-object QuestionnaireItemEditTextIntegerViewHolderFactory : QuestionnaireItemViewHolderFactory(
-    R.layout.questionnaire_item_edit_text_view
-) {
+object QuestionnaireItemEditTextIntegerViewHolderFactory :
+    QuestionnaireItemEditTextViewHolderFactory() {
     override fun getQuestionnaireItemViewHolderDelegate() =
-        object : QuestionnaireItemViewHolderDelegate {
-            private lateinit var textInputLayout: TextInputLayout
-            private lateinit var textInputEditText: TextInputEditText
-            private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-
-            override fun init(itemView: View) {
-                textInputLayout = itemView.findViewById(R.id.textInputLayout)
-                textInputEditText = itemView.findViewById(R.id.textInputEditText)
-                textInputEditText.setRawInputType(InputType.TYPE_CLASS_NUMBER or
-                    InputType.TYPE_NUMBER_FLAG_SIGNED)
-                textInputEditText.doAfterTextChanged { editable: Editable? ->
-                    questionnaireItemViewItem.singleAnswerOrNull =
-                        editable.toString().toIntOrNull()?.let {
-                            QuestionnaireResponse.Item.Answer.newBuilder()
-                                .apply {
-                                    value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                                        .setInteger(Integer.newBuilder().setValue(it).build())
-                                        .build()
-                                }
+        object : QuestionnaireItemEditTextViewHolderDelegate(
+            InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
+            true
+        ) {
+            override fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder? {
+                return text.toIntOrNull()?.let {
+                    QuestionnaireResponse.Item.Answer.newBuilder()
+                        .apply {
+                            value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                                .setInteger(Integer.newBuilder().setValue(it).build())
+                                .build()
                         }
                 }
             }
 
-            override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-                this.questionnaireItemViewItem = questionnaireItemViewItem
-                textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.text.value
-                textInputEditText.setText(
-                    questionnaireItemViewItem.singleAnswerOrNull?.value?.integer?.value?.toString()
-                        ?: ""
-                )
+            override fun getText(answer: QuestionnaireResponse.Item.Answer.Builder?): String {
+                return answer?.value?.integer?.value?.toString() ?: ""
             }
         }
 }
