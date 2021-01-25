@@ -145,6 +145,17 @@ class DatabaseImplTest {
     }
 
     @Test
+    fun insert_shouldAddInsertLocalChange() {
+        val testPatient2String = services.parser.encodeResourceToString(TEST_PATIENT_2)
+        database.insert(TEST_PATIENT_2)
+        val localChange = database.getAllLocalChanges().first { it.resourceId.equals(TEST_PATIENT_2_ID) }
+        Truth.assertThat(localChange.type).isEqualTo(LocalChange.Type.INSERT)
+        Truth.assertThat(localChange.resourceId).isEqualTo(TEST_PATIENT_2_ID)
+        Truth.assertThat(localChange.resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
+        Truth.assertThat(localChange.diff).isEqualTo(testPatient2String)
+    }
+
+    @Test
     fun update_insertAndUpdate_shouldAddUpdateLocalChange() {
         var patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
         database.insert(patient)
@@ -156,17 +167,6 @@ class DatabaseImplTest {
         Truth.assertThat(localChange.resourceId).isEqualTo(patient.id)
         Truth.assertThat(localChange.resourceType).isEqualTo(patient.resourceType.name)
         Truth.assertThat(localChange.diff).isEqualTo(patientString)
-    }
-
-    @Test
-    fun insert_shouldAddInsertLocalChange() {
-        val testPatient2String = services.parser.encodeResourceToString(TEST_PATIENT_2)
-        database.insert(TEST_PATIENT_2)
-        val localChange = database.getAllLocalChanges().first { it.resourceId.equals(TEST_PATIENT_2_ID) }
-        Truth.assertThat(localChange.type).isEqualTo(LocalChange.Type.INSERT)
-        Truth.assertThat(localChange.resourceId).isEqualTo(TEST_PATIENT_2_ID)
-        Truth.assertThat(localChange.resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
-        Truth.assertThat(localChange.diff).isEqualTo(testPatient2String)
     }
 
     @Test

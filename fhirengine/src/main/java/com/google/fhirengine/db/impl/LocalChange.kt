@@ -55,16 +55,6 @@ import androidx.room.PrimaryKey
             Index(
                     value = ["resourceType", "resourceId"]
             )
-        ],
-        foreignKeys = [
-            ForeignKey(
-                    entity = ResourceEntity::class,
-                    parentColumns = ["resourceId", "resourceType"],
-                    childColumns = ["resourceId", "resourceType"],
-                    onDelete = ForeignKey.NO_ACTION,
-                    onUpdate = ForeignKey.NO_ACTION,
-                    deferred = true
-            )
         ]
 )
 data class LocalChange(
