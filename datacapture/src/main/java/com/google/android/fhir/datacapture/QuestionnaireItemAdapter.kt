@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextDecimalViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextIntegerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextMultiLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextSingleLineViewHolderFactory
@@ -47,6 +48,8 @@ internal class QuestionnaireItemAdapter(
                 QuestionnaireItemEditTextMultiLineViewHolderFactory
             QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER ->
                 QuestionnaireItemEditTextIntegerViewHolderFactory
+            QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL ->
+                QuestionnaireItemEditTextDecimalViewHolderFactory
         }
         return viewHolder.create(parent)
     }
@@ -73,6 +76,8 @@ internal class QuestionnaireItemAdapter(
                 QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE
             QuestionnaireItemTypeCode.Value.INTEGER ->
                 QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
+            QuestionnaireItemTypeCode.Value.DECIMAL ->
+                QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
             else -> throw NotImplementedError("Question type $type not supported.")
         }.value
 

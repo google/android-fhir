@@ -150,5 +150,25 @@ class QuestionnaireItemAdapterTest {
         )
     }
 
+    @Test
+    fun getItemViewType_decimalItemType_shouldReturnEditTextDecimalViewHolderType() {
+        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+            listOf(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setType(
+                            Questionnaire.Item.TypeCode.newBuilder()
+                                .setValue(QuestionnaireItemTypeCode.Value.DECIMAL)
+                        )
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                )
+            )
+        )
+        assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
+            QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL.value
+        )
+    }
+
     // TODO: test errors thrown for unsupported types
 }
