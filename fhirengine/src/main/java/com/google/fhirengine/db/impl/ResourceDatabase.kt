@@ -44,7 +44,7 @@ import com.google.fhirengine.db.impl.entities.UriIndexEntity
             DateIndexEntity::class,
             NumberIndexEntity::class,
             SyncedResourceEntity::class,
-            LocalChange::class,
+            LocalChange::class
         ],
         version = 1,
         exportSchema = false

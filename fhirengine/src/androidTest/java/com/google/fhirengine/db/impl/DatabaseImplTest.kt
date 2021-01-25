@@ -100,9 +100,10 @@ class DatabaseImplTest {
 
     @Test
     fun update_nonExistingResource_shouldNotInsertResource() {
-        val resourceNotFoundInDbException = assertThrows(ResourceNotFoundInDbException::class.java) {
-            database.update(TEST_PATIENT_2)
-        }
+        val resourceNotFoundInDbException =
+            assertThrows(ResourceNotFoundInDbException::class.java) {
+                database.update(TEST_PATIENT_2)
+            }
         Truth.assertThat(resourceNotFoundInDbException.message)
             /* ktlint-disable max-line-length */
             .isEqualTo("Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!"
@@ -148,7 +149,8 @@ class DatabaseImplTest {
     fun insert_shouldAddInsertLocalChange() {
         val testPatient2String = services.parser.encodeResourceToString(TEST_PATIENT_2)
         database.insert(TEST_PATIENT_2)
-        val localChange = database.getAllLocalChanges().first { it.resourceId.equals(TEST_PATIENT_2_ID) }
+        val localChange = database.getAllLocalChanges()
+            .first { it.resourceId.equals(TEST_PATIENT_2_ID) }
         Truth.assertThat(localChange.type).isEqualTo(LocalChange.Type.INSERT)
         Truth.assertThat(localChange.resourceId).isEqualTo(TEST_PATIENT_2_ID)
         Truth.assertThat(localChange.resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
@@ -157,7 +159,8 @@ class DatabaseImplTest {
 
     @Test
     fun update_insertAndUpdate_shouldAddUpdateLocalChange() {
-        var patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+        var patient: Patient =
+            testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
         database.insert(patient)
         patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_1.json")
         database.update(patient)
@@ -172,7 +175,8 @@ class DatabaseImplTest {
     @Test
     fun delete_shouldAddDeleteLocalChange() {
         database.delete(Patient::class.java, TEST_PATIENT_1_ID)
-        val localChange = database.getAllLocalChanges().first { it.resourceId.equals(TEST_PATIENT_1_ID) }
+        val localChange = database.getAllLocalChanges()
+                .first { it.resourceId.equals(TEST_PATIENT_1_ID) }
         Truth.assertThat(localChange.type).isEqualTo(LocalChange.Type.DELETE)
         Truth.assertThat(localChange.resourceId).isEqualTo(TEST_PATIENT_1_ID)
         Truth.assertThat(localChange.resourceType).isEqualTo(TEST_PATIENT_1.resourceType.name)

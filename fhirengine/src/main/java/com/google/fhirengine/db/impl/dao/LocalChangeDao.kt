@@ -25,16 +25,15 @@ import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.ObjectReader
 import com.github.fge.jsonpatch.JsonPatch
 import com.github.fge.jsonpatch.diff.JsonDiff
 import com.google.fhirengine.db.impl.entities.LocalChange
 import com.google.fhirengine.db.impl.entities.LocalChange.Type
 import com.google.fhirengine.toTimeZoneString
+import java.lang.IllegalArgumentException
 import java.util.Date
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import java.lang.IllegalArgumentException
 
 /**
  * Dao for local changes made to a resource. One row in LocalChangeEntity corresponds to one change
@@ -128,9 +127,9 @@ internal abstract class LocalChangeDao {
         )
     }
 
-    fun squash(localChanges: List<LocalChange>): LocalChange =
-        localChanges.reduce {first, second -> mergeLocalChanges(first, second)}
-
+    /**
+     * Update a [Resource] with a JSON patch (RFC 6902).
+     */
     private fun applyPatch(resourceString: String, patchString: String): String {
         val objectMapper = ObjectMapper()
         val resourceJson = objectMapper.readValue(resourceString, JsonNode::class.java)
@@ -138,56 +137,31 @@ internal abstract class LocalChangeDao {
         return patchJson.apply(resourceJson).toString()
     }
 
+    /**
+     * JSON patch diff b/w two [Resource]s.
+     */
     private fun diff(source: Resource, target: Resource): String {
         val objectMapper = ObjectMapper()
         val sourceJson = objectMapper.readValue(
-            iParser.encodeResourceToString(source),
-            JsonNode::class.java
+                iParser.encodeResourceToString(source),
+                JsonNode::class.java
         )
         val targetJson = objectMapper.readValue(
-            iParser.encodeResourceToString(target),
-            JsonNode::class.java
+                iParser.encodeResourceToString(target),
+                JsonNode::class.java
         )
         val jsonDiff = JsonDiff.asJson(sourceJson, targetJson)
         if (jsonDiff.size() == 0)
             Log.w(
-                "ResourceDao",
-                "Trying to UPDATE resource ${target.resourceType}/${target.id} with no changes"
+                    "ResourceDao",
+                    "Trying to UPDATE resource ${target.resourceType}/${target.id} with no changes"
             )
         return jsonDiff.toString()
     }
 
-    private fun mergeLocalChanges(first: LocalChange, second: LocalChange): LocalChange {
-
-        val type: Type
-        val diff: String
-
-        when (second.type) {
-            Type.UPDATE -> if (first.type.equals(Type.UPDATE)) {
-                type = Type.UPDATE
-                diff = mergePatches(first.diff, second.diff)
-            } else if (first.type.equals(Type.INSERT)) {
-                type = Type.INSERT
-                diff = applyPatch(first.diff, second.diff)
-            } else {
-                throw IllegalArgumentException("Don't know how to merge ${first} and ${second}.")
-            }
-            Type.DELETE -> {
-                type = Type.DELETE
-                diff = ""
-            }
-            else ->
-                throw IllegalArgumentException("Don't know how to merge ${first} and ${second}.")
-        }
-
-        return LocalChange(
-            id = 0,
-            resourceId = second.resourceId,
-            resourceType = second.resourceType,
-            type = type,
-            diff = diff
-        )
-    }
+    /**
+     * Merge two JSON patch strings by concatenating their elements into a new JSON array.
+     */
     private fun mergePatches(firstPatch: String, secondPatch: String): String {
         val objectMapper = ObjectMapper()
         // TODO: validate patches are RFC 6902 compliant JSON patches
@@ -196,6 +170,41 @@ internal abstract class LocalChangeDao {
         val merged = updater.readValue(secondPatch, JsonPatch::class.java)
         return merged.toString()
     }
+
+    private fun mergeLocalChanges(first: LocalChange, second: LocalChange): LocalChange {
+        val type: Type
+        val diff: String
+        when (second.type) {
+            Type.UPDATE -> if (first.type.equals(Type.UPDATE)) {
+                type = Type.UPDATE
+                diff = mergePatches(first.diff, second.diff)
+            } else if (first.type.equals(Type.INSERT)) {
+                type = Type.INSERT
+                diff = applyPatch(first.diff, second.diff)
+            } else {
+                throw IllegalArgumentException("Don't know how to merge $first and $second.")
+            }
+            Type.DELETE -> {
+                type = Type.DELETE
+                diff = ""
+            }
+            else ->
+                throw IllegalArgumentException("Don't know how to merge $first and $second.")
+        }
+        return LocalChange(
+                id = 0,
+                resourceId = second.resourceId,
+                resourceType = second.resourceType,
+                type = type,
+                diff = diff
+        )
+    }
+
+    /**
+     * Squash the changes by merging them two at a time.
+     */
+    fun squash(localChanges: List<LocalChange>): LocalChange =
+        localChanges.reduce { first, second -> mergeLocalChanges(first, second) }
 
     @Query(
         """

@@ -21,7 +21,6 @@ import com.google.common.truth.Truth
 import org.hl7.fhir.r4.model.Resource
 import org.json.JSONArray
 import org.json.JSONObject
-import org.junit.Assert.assertEquals
 
 /** Utilities for testing.  */
 class TestingUtils constructor(private val iParser: IParser) {

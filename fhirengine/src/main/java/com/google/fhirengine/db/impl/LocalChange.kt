@@ -17,7 +17,6 @@
 package com.google.fhirengine.db.impl.entities
 
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
@@ -58,13 +57,13 @@ import androidx.room.PrimaryKey
         ]
 )
 data class LocalChange(
-  @PrimaryKey(autoGenerate = true)
-  val id: Long,
-  val resourceType: String,
-  val resourceId: String,
-  val timestamp: String = "",
-  val type: Type,
-  val diff: String
+    @PrimaryKey(autoGenerate = true)
+    val id: Long,
+    val resourceType: String,
+    val resourceId: String,
+    val timestamp: String = "",
+    val type: Type,
+    val diff: String
 ) {
     enum class Type(val value: Int) {
         INSERT(1), // create a new resource. payload is the entire resource json.

@@ -17,7 +17,6 @@
 package com.google.fhirengine
 
 import android.annotation.SuppressLint
-import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
