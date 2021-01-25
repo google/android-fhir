@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
@@ -60,5 +61,38 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
         assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).text).isEqualTo(
             "Group header"
         )
+    }
+
+    @Test
+    fun shouldSetTextViewVisible() {
+        viewHolder.bind(
+            QuestionnaireItemViewItem(
+                Questionnaire.Item.newBuilder().apply {
+                    text =
+                        com.google.fhir.r4.core.String.newBuilder().setValue("Group header").build()
+                }.build(),
+                QuestionnaireResponse.Item.newBuilder()
+            )
+        )
+
+        assertThat(
+            viewHolder.itemView.findViewById<TextView>(R.id.group_header).visibility
+        ).isEqualTo(View.VISIBLE)
+    }
+
+    @Test
+    fun shouldSetTextViewGone() {
+        viewHolder.bind(
+            QuestionnaireItemViewItem(
+                Questionnaire.Item.newBuilder().apply {
+                    text = com.google.fhir.r4.core.String.newBuilder().setValue("").build()
+                }.build(),
+                QuestionnaireResponse.Item.newBuilder()
+            )
+        )
+
+        assertThat(
+            viewHolder.itemView.findViewById<TextView>(R.id.group_header).visibility
+        ).isEqualTo(View.GONE)
     }
 }
