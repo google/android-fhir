@@ -40,10 +40,16 @@ class MainActivity : AppCompatActivity() {
                     "HL7 example \"bb\"",
                     "hl7-questionnaire-example-bluebook.json"
                 ),
+                // Example authored by fredhersch@google.com.
                 QuestionnaireListItem(
                     "Patient registration",
                     "Example authored by Fred Hersch",
-                    "patient-registration.json"
+                    "patient-registration.json"),
+                // Example taken from https://openhie.github.io/hiv-ig/Questionnaire-hiv-case-report-questionnaire.json.html
+                QuestionnaireListItem(
+                    "HIV Case Report",
+                    "OpenHIE HIV Case Reporting and Monitoring IG",
+                    "openhie-hiv-case-report.json"
                 )
             )
         )
