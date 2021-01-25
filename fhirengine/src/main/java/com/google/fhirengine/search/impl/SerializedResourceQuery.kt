@@ -21,11 +21,11 @@ import org.hl7.fhir.r4.model.ResourceType
 
 /** Query that returns a list of serialized resources. */
 data class SerializedResourceQuery(
-  val resourceType: ResourceType,
-  val resourceIdQuery: ResourceIdQuery?,
-  val sortCriterion: SortCriterion?,
-  val limit: Int?,
-  val skip: Int?
+    val resourceType: ResourceType,
+    val resourceIdQuery: ResourceIdQuery?,
+    val sortCriterion: SortCriterion?,
+    val limit: Int?,
+    val skip: Int?
 ) : Query() {
     override fun getQueryString(): String {
         val queryBuilder = StringBuilder()
@@ -43,9 +43,16 @@ data class SerializedResourceQuery(
             WHERE a.resourceType = ?${resourceIdQuery?.let { " AND a.resourceId IN (${it.query})" } ?: ""}
         """.trimIndent())
         sortCriterion?.also {
-            queryBuilder.appendln("""
-                ORDER BY b.index_value ${ if (sortCriterion.ascending) { "ASC" } else { "DESC" } }
-            """.trimIndent())
+            queryBuilder.appendln(
+                """
+                    ORDER BY b.index_value ${
+                        if (sortCriterion.ascending) {
+                            "ASC"
+                        } else {
+                            "DESC"
+                        }
+                    }
+                """.trimIndent())
         }
         limit?.also {
             queryBuilder.appendln("""

@@ -23,32 +23,32 @@ import java.util.concurrent.TimeUnit
  * Configuration for period synchronisation
  */
 class PeriodicSyncConfiguration(
-  val syncConfiguration: SyncConfiguration,
-  /**
-   * Constraints that specify the requirements needed before the synchronisation is triggered.
-   * E.g. network type (Wifi, 3G etc), the device should be charging etc.
-   */
-  val syncConstraints: Constraints = Constraints.Builder().build(),
+    val syncConfiguration: SyncConfiguration,
+    /**
+     * Constraints that specify the requirements needed before the synchronisation is triggered.
+     * E.g. network type (Wifi, 3G etc), the device should be charging etc.
+     */
+    val syncConstraints: Constraints = Constraints.Builder().build(),
 
-  /**
-   * Worker that will execute the periodic sync
-   */
-  val periodicSyncWorker: Class<out PeriodicSyncWorker>,
+    /**
+     * Worker that will execute the periodic sync
+     */
+    val periodicSyncWorker: Class<out PeriodicSyncWorker>,
 
-  /**
-   * The interval at which the sync should be triggered in
-   */
-  val repeat: RepeatInterval
+    /**
+     * The interval at which the sync should be triggered in
+     */
+    val repeat: RepeatInterval
 )
 
 data class RepeatInterval(
-  /**
- * The interval at which the sync should be triggered in
- */
-val interval: Long,
+    /**
+     * The interval at which the sync should be triggered in
+     */
+    val interval: Long,
 
-  /**
- * The time unit for the repeat interval
- */
-val timeUnit: TimeUnit
+    /**
+     * The time unit for the repeat interval
+     */
+    val timeUnit: TimeUnit
 )

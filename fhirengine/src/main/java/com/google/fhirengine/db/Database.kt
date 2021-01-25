@@ -69,8 +69,8 @@ interface Database {
      * @param syncedResourceEntity The synced resource
      */
     suspend fun insertSyncedResources(
-      syncedResourceEntity: SyncedResourceEntity,
-      resources: List<Resource>
+        syncedResourceEntity: SyncedResourceEntity,
+        resources: List<Resource>
     )
 
     /**
@@ -88,9 +88,9 @@ interface Database {
      * particular patient.
      */
     fun <R : Resource> searchByReference(
-      clazz: Class<R>,
-      reference: String,
-      value: String
+        clazz: Class<R>,
+        reference: String,
+        value: String
     ): List<R>
 
     /**
@@ -100,9 +100,9 @@ interface Database {
      * and `value` 'Tom' will return all patients with a given name Tom.
      */
     fun <R : Resource> searchByString(
-      clazz: Class<R>,
-      string: String,
-      value: String
+        clazz: Class<R>,
+        string: String,
+        value: String
     ): List<R>
 
     /**
@@ -114,10 +114,10 @@ interface Database {
      * all observations with the given code.
      */
     fun <R : Resource> searchByCode(
-      clazz: Class<R>,
-      code: String,
-      system: String,
-      value: String
+        clazz: Class<R>,
+        code: String,
+        system: String,
+        value: String
     ): List<R>
 
     /**
@@ -130,12 +130,12 @@ interface Database {
      * all observations associated with the particular patient by reference and with the given code.
      */
     fun <R : Resource> searchByReferenceAndCode(
-      clazz: Class<R>,
-      reference: String,
-      referenceValue: String,
-      code: String,
-      codeSystem: String,
-      codeValue: String
+        clazz: Class<R>,
+        reference: String,
+        referenceValue: String,
+        code: String,
+        codeSystem: String,
+        codeValue: String
     ): List<R>
 
     fun <R : Resource> search(query: Query): List<R>

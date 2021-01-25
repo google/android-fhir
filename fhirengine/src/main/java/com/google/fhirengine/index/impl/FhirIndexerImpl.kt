@@ -60,26 +60,26 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                 SEARCH_PARAM_DEFINITION_TYPE_STRING -> {
                     resource.valuesForPath(searchParamDefinition).stringValues().forEach { value ->
                         indexBuilder.addStringIndex(
-                                StringIndex(
-                                        name = searchParamDefinition.name,
-                                        path = searchParamDefinition.path,
-                                        value = value
-                                ))
+                            StringIndex(
+                                name = searchParamDefinition.name,
+                                path = searchParamDefinition.path,
+                                value = value
+                            ))
                     }
                 }
                 SEARCH_PARAM_DEFINITION_TYPE_REFERENCE -> {
                     resource.valuesForPath(searchParamDefinition)
-                            .referenceValues()
-                            .forEach { reference ->
-                                if (reference.reference?.isNotEmpty() == true) {
-                                    indexBuilder.addReferenceIndex(
-                                            ReferenceIndex(
-                                                    name = searchParamDefinition.name,
-                                                    path = searchParamDefinition.path,
-                                                    value = reference.reference
-                                            ))
-                                }
+                        .referenceValues()
+                        .forEach { reference ->
+                            if (reference.reference?.isNotEmpty() == true) {
+                                indexBuilder.addReferenceIndex(
+                                    ReferenceIndex(
+                                        name = searchParamDefinition.name,
+                                        path = searchParamDefinition.path,
+                                        value = reference.reference
+                                    ))
                             }
+                        }
                 }
                 SEARCH_PARAM_DEFINITION_TYPE_CODE -> {
                     resource.valuesForPath(searchParamDefinition).codeValues().forEach { code ->
@@ -87,77 +87,77 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                         val value = code.code
                         if (system?.isNotEmpty() == true && value?.isNotEmpty() == true) {
                             indexBuilder.addCodeIndex(
-                                    TokenIndex(
-                                            name = searchParamDefinition.name,
-                                            path = searchParamDefinition.path,
-                                            system = system,
-                                            value = value
-                                    ))
+                                TokenIndex(
+                                    name = searchParamDefinition.name,
+                                    path = searchParamDefinition.path,
+                                    system = system,
+                                    value = value
+                                ))
                         }
                     }
                 }
                 SEARCH_PARAM_DEFINITION_TYPE_QUANTITY -> {
                     resource.valuesForPath(searchParamDefinition)
-                            .quantityValues()
-                            .forEach { quantity ->
+                        .quantityValues()
+                        .forEach { quantity ->
 
-                        val system: String
-                        val unit: String
-                        val value: BigDecimal
+                            val system: String
+                            val unit: String
+                            val value: BigDecimal
 
-                        if (quantity is Quantity) {
-                            system = quantity.system
-                            unit = quantity.unit
-                            value = quantity.value
-                        } else if (quantity is Money) {
-                            system = FHIR_CURRENCY_SYSTEM
-                            unit = quantity.currency
-                            value = quantity.value
-                        } else {
-                            throw IllegalArgumentException(
+                            if (quantity is Quantity) {
+                                system = quantity.system
+                                unit = quantity.unit
+                                value = quantity.value
+                            } else if (quantity is Money) {
+                                system = FHIR_CURRENCY_SYSTEM
+                                unit = quantity.currency
+                                value = quantity.value
+                            } else {
+                                throw IllegalArgumentException(
                                     "$quantity is of unknown type ${quantity.javaClass.simpleName}")
-                        }
+                            }
 
-                        indexBuilder.addQuantityIndex(
+                            indexBuilder.addQuantityIndex(
                                 QuantityIndex(
-                                        name = searchParamDefinition.name,
-                                        path = searchParamDefinition.path,
-                                        system = system,
-                                        unit = unit,
-                                        value = value
+                                    name = searchParamDefinition.name,
+                                    path = searchParamDefinition.path,
+                                    system = system,
+                                    unit = unit,
+                                    value = value
                                 ))
-                    }
+                        }
                 }
                 SEARCH_PARAM_DEFINITION_TYPE_URI -> {
                     resource.valuesForPath(searchParamDefinition)
-                            .uriValues()
-                            .forEach { uri ->
-                                indexBuilder.addUriIndex(
-                                        UriIndex(
-                                                name = searchParamDefinition.name,
-                                                path = searchParamDefinition.path,
-                                                uri = uri
-                                        ))
-                            }
+                        .uriValues()
+                        .forEach { uri ->
+                            indexBuilder.addUriIndex(
+                                UriIndex(
+                                    name = searchParamDefinition.name,
+                                    path = searchParamDefinition.path,
+                                    uri = uri
+                                ))
+                        }
                 }
                 SEARCH_PARAM_DEFINITION_TYPE_DATE -> {
                     resource.valuesForPath(searchParamDefinition).dateValues().forEach { date ->
                         indexBuilder.addDateIndex(
-                                DateIndex(
-                                        name = searchParamDefinition.name,
-                                        path = searchParamDefinition.path,
-                                        tsHigh = date.value.time,
-                                        tsLow = date.value.time,
-                                        temporalPrecision = date.precision))
+                            DateIndex(
+                                name = searchParamDefinition.name,
+                                path = searchParamDefinition.path,
+                                tsHigh = date.value.time,
+                                tsLow = date.value.time,
+                                temporalPrecision = date.precision))
                     }
                 }
                 SEARCH_PARAM_DEFINITION_TYPE_NUMBER -> {
                     resource.valuesForPath(searchParamDefinition).numberValues().forEach { number ->
                         indexBuilder.addNumberIndex(
-                                NumberIndex(
-                                        name = searchParamDefinition.name,
-                                        path = searchParamDefinition.path,
-                                        value = number))
+                            NumberIndex(
+                                name = searchParamDefinition.name,
+                                path = searchParamDefinition.path,
+                                value = number))
                     }
                 }
 
@@ -169,14 +169,14 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
         if (resource.meta.hasLastUpdated()) {
             val lastUpdatedElement = resource.meta.lastUpdatedElement
             indexBuilder.addDateIndex(
-                    DateIndex(
-                            name = "lastUpdated",
-                            path = arrayOf(resource.fhirType(), "meta", "lastUpdated")
-                                    .joinToString(separator = "."),
-                            tsHigh = lastUpdatedElement.value.time,
-                            tsLow = lastUpdatedElement.value.time,
-                            temporalPrecision = lastUpdatedElement.precision
-                    ))
+                DateIndex(
+                    name = "lastUpdated",
+                    path = arrayOf(resource.fhirType(), "meta", "lastUpdated")
+                        .joinToString(separator = "."),
+                    tsHigh = lastUpdatedElement.value.time,
+                    tsLow = lastUpdatedElement.value.time,
+                    temporalPrecision = lastUpdatedElement.precision
+                ))
         }
         return indexBuilder.build()
     }
@@ -234,7 +234,7 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                 is Quantity -> sequenceOf(it).filter { it.hasSystem() && it.hasCode() }
                 is Range -> sequenceOf(it.low, it.high).filter { it.hasSystem() && it.hasCode() }
                 is Ratio -> sequenceOf(it.numerator, it.denominator)
-                        .filter { it.hasSystem() && it.hasCode() }
+                    .filter { it.hasSystem() && it.hasCode() }
                 // TODO: Find other FHIR datatypes types the "quantity" type maps to.
                 //  See: http://hl7.org/fhir/datatypes.html#quantity
                 // TODO: Add tests for Range and Ratio types
@@ -299,9 +299,9 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
      * will be added to the returned value.
      */
     private fun getFieldValues(
-      objects: Sequence<Any>,
-      fieldName: String,
-      type: String
+        objects: Sequence<Any>,
+        fieldName: String,
+        type: String
     ): Sequence<Any> {
         return objects.asSequence().flatMap {
             val value = try {
@@ -327,8 +327,8 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
     /** Returns the name of the method to retrieve the field `fieldName`.  */
     private fun getGetterName(fieldName: String, type: String): String {
         val baseGetter = GETTER_PREFIX +
-                fieldName.substring(0, 1).toUpperCase(Locale.US) +
-                fieldName.substring(1)
+            fieldName.substring(0, 1).toUpperCase(Locale.US) +
+            fieldName.substring(1)
         when (type) {
             "date" -> return baseGetter + GETTER_SUFFIX_DATE
             else -> return baseGetter
@@ -345,22 +345,31 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
     companion object {
         /** The prefix of getter methods for retrieving field values.  */
         private const val GETTER_PREFIX = "get"
+
         /** The suffix of getter methods for retrieving a date 'Element'.  */
         private const val GETTER_SUFFIX_DATE = "Element"
+
         /** The regular expression for the separator  */
         private val SEPARATOR_REGEX = "\\.".toRegex()
+
         /** The string representing the string search parameter type.  */
         private const val SEARCH_PARAM_DEFINITION_TYPE_STRING = "string"
+
         /** The string representing the reference search parameter type.  */
         private const val SEARCH_PARAM_DEFINITION_TYPE_REFERENCE = "reference"
+
         /** The string representing the code search parameter type.  */
         private const val SEARCH_PARAM_DEFINITION_TYPE_CODE = "token"
+
         /** The string representing the quantity search parameter type.  */
         private const val SEARCH_PARAM_DEFINITION_TYPE_QUANTITY = "quantity"
+
         /** The string representing the uri search parameter type.  */
         private const val SEARCH_PARAM_DEFINITION_TYPE_URI = "uri"
+
         /** The string representing the date search parameter type. */
         private const val SEARCH_PARAM_DEFINITION_TYPE_DATE = "date"
+
         /** The string representing the number search parameter type. */
         private const val SEARCH_PARAM_DEFINITION_TYPE_NUMBER = "number"
 

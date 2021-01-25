@@ -36,9 +36,9 @@ import com.google.fhirengine.FhirEngine
 class PatientDetailFragment : Fragment() {
 
     override fun onCreateView(
-      inflater: LayoutInflater,
-      container: ViewGroup?,
-      savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.patient_detail, container, false)
 

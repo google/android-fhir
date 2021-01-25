@@ -31,13 +31,13 @@ import com.google.fhirengine.sync.FhirDataSource
 import com.google.fhirengine.sync.PeriodicSyncConfiguration
 
 internal data class FhirServices(
-  val fhirEngine: FhirEngine,
-  val parser: IParser,
-  val database: Database
+    val fhirEngine: FhirEngine,
+    val parser: IParser,
+    val database: Database
 ) {
     class Builder(
-      private val dataSource: FhirDataSource,
-      private val context: Context
+        private val dataSource: FhirDataSource,
+        private val context: Context
     ) {
         private var databaseName: String? = "fhirEngine"
         private var periodicSyncConfiguration: PeriodicSyncConfiguration? = null
@@ -86,8 +86,8 @@ internal data class FhirServices(
     companion object {
         @JvmStatic
         fun builder(
-          dataSource: FhirDataSource,
-          context: Context
+            dataSource: FhirDataSource,
+            context: Context
         ) = Builder(dataSource, context)
     }
 }

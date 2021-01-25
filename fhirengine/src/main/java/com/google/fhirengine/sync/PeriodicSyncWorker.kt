@@ -26,8 +26,8 @@ import com.google.fhirengine.sync.Result.Success
  * A WorkManager Worker that handles periodic sync.
  */
 abstract class PeriodicSyncWorker(
-  appContext: Context,
-  workerParams: WorkerParameters
+    appContext: Context,
+    workerParams: WorkerParameters
 ) : CoroutineWorker(appContext, workerParams) {
 
     abstract fun getFhirEngine(): FhirEngine

@@ -46,14 +46,14 @@ import org.opencds.cqf.cql.terminology.TerminologyProvider
 
 /** Implementation of [FhirEngine].  */
 class FhirEngineImpl constructor(
-  private val database: Database,
-  private val search: Search,
-  libraryLoader: LibraryLoader,
-  dataProviderMap: Map<String, @JvmSuppressWildcards DataProvider>,
-  terminologyProvider: TerminologyProvider,
-  private var periodicSyncConfiguration: PeriodicSyncConfiguration?,
-  private val dataSource: FhirDataSource,
-  private val context: Context
+    private val database: Database,
+    private val search: Search,
+    libraryLoader: LibraryLoader,
+    dataProviderMap: Map<String, @JvmSuppressWildcards DataProvider>,
+    terminologyProvider: TerminologyProvider,
+    private var periodicSyncConfiguration: PeriodicSyncConfiguration?,
+    private val dataSource: FhirDataSource,
+    private val context: Context
 ) : FhirEngine {
 
     init {
@@ -95,9 +95,9 @@ class FhirEngineImpl constructor(
     }
 
     override fun evaluateCql(
-      libraryVersionId: String,
-      context: String,
-      expression: String
+        libraryVersionId: String,
+        context: String,
+        expression: String
     ): EvaluationResult {
         val contextMap: MutableMap<String, Any> = HashMap()
         val contextSplit = context.split("/").toTypedArray()
@@ -119,8 +119,9 @@ class FhirEngineImpl constructor(
     }
 
     override suspend fun periodicSync(): Result {
-        val syncConfig = periodicSyncConfiguration
-        ?: throw java.lang.UnsupportedOperationException("Periodic sync configuration was not set")
+        val syncConfig = periodicSyncConfiguration ?: throw java.lang.UnsupportedOperationException(
+            "Periodic sync configuration was not set"
+        )
         val syncResult = FhirSynchronizer(
             syncConfig.syncConfiguration,
             dataSource,

@@ -32,13 +32,13 @@ ListAdapter<PatientListViewModel.ObservationItem, ObservationItemViewHolder>(
     class ObservationItemDiffCallback :
         DiffUtil.ItemCallback<PatientListViewModel.ObservationItem>() {
         override fun areItemsTheSame(
-          oldItem: PatientListViewModel.ObservationItem,
-          newItem: PatientListViewModel.ObservationItem
+            oldItem: PatientListViewModel.ObservationItem,
+            newItem: PatientListViewModel.ObservationItem
         ): Boolean = oldItem.id == newItem.id
 
         override fun areContentsTheSame(
-          oldItem: PatientListViewModel.ObservationItem,
-          newItem: PatientListViewModel.ObservationItem
+            oldItem: PatientListViewModel.ObservationItem,
+            newItem: PatientListViewModel.ObservationItem
         ): Boolean = oldItem.id == newItem.id
     }
 

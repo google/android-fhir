@@ -32,8 +32,8 @@ fun SyncData.concatParams(): String {
  *  `SyncData(ResourceType.Patient, mapOf("address-country" to "United States")`
  */
 data class SyncData(
-  val resourceType: ResourceType,
-  val params: Map<String, String> = emptyMap()
+    val resourceType: ResourceType,
+    val params: Map<String, String> = emptyMap()
 ) {
     companion object {
         const val SORT_KEY = "_sort"

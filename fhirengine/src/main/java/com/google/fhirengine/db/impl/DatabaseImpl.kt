@@ -33,15 +33,15 @@ import org.hl7.fhir.r4.model.ResourceType
  * See docs for [com.google.fhirengine.db.Database] for the API docs.
  */
 internal class DatabaseImpl(
-  context: Context,
-  private val iParser: IParser,
-  fhirIndexer: FhirIndexer,
-  databaseName: String?
+    context: Context,
+    private val iParser: IParser,
+    fhirIndexer: FhirIndexer,
+    databaseName: String?
 ) : com.google.fhirengine.db.Database {
     constructor(
-      context: Context,
-      iParser: IParser,
-      fhirIndexer: FhirIndexer
+        context: Context,
+        iParser: IParser,
+        fhirIndexer: FhirIndexer
     ) : this(
         context = context,
         iParser = iParser,
@@ -94,8 +94,8 @@ internal class DatabaseImpl(
 
     @Transaction
     override suspend fun insertSyncedResources(
-      syncedResourceEntity: SyncedResourceEntity,
-      resources: List<Resource>
+        syncedResourceEntity: SyncedResourceEntity,
+        resources: List<Resource>
     ) {
         syncedResourceDao.insert(syncedResourceEntity)
         insertAll(resources)
@@ -110,9 +110,9 @@ internal class DatabaseImpl(
     }
 
     override fun <R : Resource> searchByReference(
-      clazz: Class<R>,
-      reference: String,
-      value: String
+        clazz: Class<R>,
+        reference: String,
+        value: String
     ): List<R> {
         return resourceDao.getResourceByReferenceIndex(
             getResourceType(clazz).name, reference, value)
@@ -120,9 +120,9 @@ internal class DatabaseImpl(
     }
 
     override fun <R : Resource> searchByString(
-      clazz: Class<R>,
-      string: String,
-      value: String
+        clazz: Class<R>,
+        string: String,
+        value: String
     ): List<R> {
         return resourceDao.getResourceByStringIndex(
             resourceType = getResourceType(clazz).name,
@@ -132,10 +132,10 @@ internal class DatabaseImpl(
     }
 
     override fun <R : Resource> searchByCode(
-      clazz: Class<R>,
-      code: String,
-      system: String,
-      value: String
+        clazz: Class<R>,
+        code: String,
+        system: String,
+        value: String
     ): List<R> {
         return resourceDao.getResourceByCodeIndex(
             resourceType = getResourceType(clazz).name,
@@ -146,12 +146,12 @@ internal class DatabaseImpl(
     }
 
     override fun <R : Resource> searchByReferenceAndCode(
-      clazz: Class<R>,
-      reference: String,
-      referenceValue: String,
-      code: String,
-      codeSystem: String,
-      codeValue: String
+        clazz: Class<R>,
+        reference: String,
+        referenceValue: String,
+        code: String,
+        codeSystem: String,
+        codeValue: String
     ): List<R> {
         val refs = searchByReference(clazz, reference, referenceValue).map { it.id }
         return searchByCode(clazz, code, codeSystem, codeValue).filter { refs.contains(it.id) }

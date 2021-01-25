@@ -47,14 +47,14 @@ internal abstract class ResourceDao {
     @Transaction
     open fun update(resource: Resource) {
         updateResource(resource.id,
-                resource.resourceType,
-                iParser.encodeResourceToString(resource)
+            resource.resourceType,
+            iParser.encodeResourceToString(resource)
         )
         val entity = ResourceEntity(
-                id = 0,
-                resourceType = resource.resourceType,
-                resourceId = resource.id,
-                serializedResource = iParser.encodeResourceToString(resource)
+            id = 0,
+            resourceType = resource.resourceType,
+            resourceId = resource.id,
+            serializedResource = iParser.encodeResourceToString(resource)
         )
         val index = fhirIndexer.index(resource)
         updateIndicesForResource(index, entity)
@@ -103,17 +103,17 @@ internal abstract class ResourceDao {
         AND resourceType = :resourceType
         """)
     abstract fun updateResource(
-      resourceId: String,
-      resourceType: ResourceType,
-      serializedResource: String
+        resourceId: String,
+        resourceType: ResourceType,
+        serializedResource: String
     )
 
     @Query("""
         DELETE FROM ResourceEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType""")
     abstract fun deleteResource(
-      resourceId: String,
-      resourceType: ResourceType
+        resourceId: String,
+        resourceType: ResourceType
     )
 
     @Query("""
@@ -121,8 +121,8 @@ internal abstract class ResourceDao {
         FROM ResourceEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType""")
     abstract fun getResource(
-      resourceId: String,
-      resourceType: ResourceType
+        resourceId: String,
+        resourceType: ResourceType
     ): String?
 
     @Query("""
@@ -135,9 +135,9 @@ internal abstract class ResourceDao {
             AND ReferenceIndexEntity.index_path = :indexPath
             AND ReferenceIndexEntity.index_value = :indexValue""")
     abstract fun getResourceByReferenceIndex(
-      resourceType: String,
-      indexPath: String,
-      indexValue: String
+        resourceType: String,
+        indexPath: String,
+        indexValue: String
     ): List<String>
 
     @Query("""
@@ -150,9 +150,9 @@ internal abstract class ResourceDao {
             AND StringIndexEntity.index_path = :indexPath
             AND StringIndexEntity.index_value = :indexValue""")
     abstract fun getResourceByStringIndex(
-      resourceType: String,
-      indexPath: String,
-      indexValue: String
+        resourceType: String,
+        indexPath: String,
+        indexValue: String
     ): List<String>
 
     @Query("""
@@ -166,10 +166,10 @@ internal abstract class ResourceDao {
             AND TokenIndexEntity.index_system = :indexSystem
             AND TokenIndexEntity.index_value = :indexValue""")
     abstract fun getResourceByCodeIndex(
-      resourceType: String,
-      indexPath: String,
-      indexSystem: String,
-      indexValue: String
+        resourceType: String,
+        indexPath: String,
+        indexSystem: String,
+        indexValue: String
     ): List<String>
 
     @RawQuery
@@ -177,10 +177,10 @@ internal abstract class ResourceDao {
 
     private fun insertResource(resource: Resource) {
         val entity = ResourceEntity(
-                id = 0,
-                resourceType = resource.resourceType,
-                resourceId = resource.id,
-                serializedResource = iParser.encodeResourceToString(resource)
+            id = 0,
+            resourceType = resource.resourceType,
+            resourceId = resource.id,
+            serializedResource = iParser.encodeResourceToString(resource)
         )
         insertResource(entity)
         val index = fhirIndexer.index(resource)
@@ -195,58 +195,58 @@ internal abstract class ResourceDao {
         //  https://github.com/jingtang10/fhir-engine/issues/33
         index.stringIndices.forEach {
             insertStringIndex(
-                    StringIndexEntity(
-                            id = 0,
-                            resourceType = resource.resourceType,
-                            index = it,
-                            resourceId = resource.resourceId
-                    )
+                StringIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId
+                )
             )
         }
         index.referenceIndices.forEach {
             insertReferenceIndex(
-                    ReferenceIndexEntity(
-                            id = 0,
-                            resourceType = resource.resourceType,
-                            index = it,
-                            resourceId = resource.resourceId
-                    )
+                ReferenceIndexEntity(
+                    id = 0,
+                    resourceType = resource.resourceType,
+                    index = it,
+                    resourceId = resource.resourceId
+                )
             )
         }
         index.tokenIndices.forEach {
             insertCodeIndex(TokenIndexEntity(
-                    id = 0,
-                    resourceType = resource.resourceType,
-                    index = it,
-                    resourceId = resource.resourceId))
+                id = 0,
+                resourceType = resource.resourceType,
+                index = it,
+                resourceId = resource.resourceId))
         }
         index.quantityIndices.forEach {
             insertQuantityIndex(QuantityIndexEntity(
-                    id = 0,
-                    resourceType = resource.resourceType,
-                    index = it,
-                    resourceId = resource.resourceId))
+                id = 0,
+                resourceType = resource.resourceType,
+                index = it,
+                resourceId = resource.resourceId))
         }
         index.uriIndices.forEach {
             insertUriIndex(UriIndexEntity(
-                    id = 0,
-                    resourceType = resource.resourceType,
-                    index = it,
-                    resourceId = resource.resourceId))
+                id = 0,
+                resourceType = resource.resourceType,
+                index = it,
+                resourceId = resource.resourceId))
         }
         index.dateIndices.forEach {
             insertDateIndex(DateIndexEntity(
-                    id = 0,
-                    resourceType = resource.resourceType,
-                    index = it,
-                    resourceId = resource.resourceId))
+                id = 0,
+                resourceType = resource.resourceType,
+                index = it,
+                resourceId = resource.resourceId))
         }
         index.numberIndices.forEach {
             insertNumberIndex(NumberIndexEntity(
-                    id = 0,
-                    resourceType = resource.resourceType,
-                    index = it,
-                    resourceId = resource.resourceId))
+                id = 0,
+                resourceType = resource.resourceType,
+                index = it,
+                resourceId = resource.resourceId))
         }
     }
 }

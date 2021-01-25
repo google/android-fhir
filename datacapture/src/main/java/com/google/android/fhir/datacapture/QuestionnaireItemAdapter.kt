@@ -29,7 +29,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 
 internal class QuestionnaireItemAdapter(
-  private val questionnaireItemViewItemList: List<QuestionnaireItemViewItem>
+    private val questionnaireItemViewItemList: List<QuestionnaireItemViewItem>
 ) : RecyclerView.Adapter<QuestionnaireItemViewHolder>() {
     /**
      * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the

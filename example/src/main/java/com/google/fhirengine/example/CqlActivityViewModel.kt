@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.ResourceType
 
 class CqlActivityViewModel(
-  private val fhirEngine: FhirEngine
+    private val fhirEngine: FhirEngine
 ) : ViewModel() {
 
     init {
@@ -54,7 +54,7 @@ class CqlActivityViewModel(
 }
 
 class CqlLoadActivityViewModelFactory(
-  private val fhirEngine: FhirEngine
+    private val fhirEngine: FhirEngine
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CqlActivityViewModel::class.java)) {

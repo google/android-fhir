@@ -28,6 +28,7 @@ import org.hl7.fhir.r4.model.ResourceType
  */
 internal object DbTypeConverters {
     private val resourceTypeLookup = ResourceType.values().associateBy { it.name }
+
     /**
      * Converts a [ResourceType] into a String to be persisted in the database. This allows us to
      * save [ResourceType] into the database while keeping it as the real type in entities.
@@ -42,7 +43,7 @@ internal object DbTypeConverters {
     @JvmStatic
     @TypeConverter
     fun stringToResourceType(data: String) = resourceTypeLookup[data]
-            ?: throw IllegalArgumentException("invalid resource type: $data")
+        ?: throw IllegalArgumentException("invalid resource type: $data")
 
     @JvmStatic
     @TypeConverter
@@ -55,7 +56,7 @@ internal object DbTypeConverters {
     @JvmStatic
     @TypeConverter
     fun temporalPrecisionToInt(temporalPrecision: TemporalPrecisionEnum): Int =
-            temporalPrecision.calendarConstant
+        temporalPrecision.calendarConstant
 
     @JvmStatic
     @TypeConverter

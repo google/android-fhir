@@ -61,9 +61,9 @@ class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
      * identical.
      */
     private fun populateQuestionnaireItemViewItemList(
-      questionnaireItemViewItemList: MutableList<QuestionnaireItemViewItem>,
-      questionnaireItemList: List<Questionnaire.Item>,
-      questionnaireResponseItemList: List<QuestionnaireResponse.Item.Builder>
+        questionnaireItemViewItemList: MutableList<QuestionnaireItemViewItem>,
+        questionnaireItemList: List<Questionnaire.Item>,
+        questionnaireResponseItemList: List<QuestionnaireResponse.Item.Builder>
     ) {
         val questionnaireItemListIterator = questionnaireItemList.iterator()
         val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
