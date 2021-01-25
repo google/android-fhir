@@ -20,6 +20,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth
 import com.google.fhirengine.FhirServices.Companion.builder
 import com.google.fhirengine.ResourceNotFoundException
+import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.resource.TestingUtils
 import com.google.fhirengine.sync.FhirDataSource
 import org.hl7.fhir.r4.model.Bundle
@@ -77,14 +78,13 @@ class FhirEngineImplTest {
 
     @Test
     fun update_nonexistentResource_shouldNotInsertResource() {
-        fhirEngine.update(TEST_PATIENT_2)
         val resourceNotFoundException = assertThrows(ResourceNotFoundException::class.java) {
-            fhirEngine.load(Patient::class.java, TEST_PATIENT_2_ID)
+            fhirEngine.update(TEST_PATIENT_2)
         }
         /* ktlint-disable max-line-length */
         Truth.assertThat(resourceNotFoundException.message)
             .isEqualTo("Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!")
-        /* ktlint-enable max_line_length */
+        /* ktlint-enable max-line-length */
     }
 
     @Test

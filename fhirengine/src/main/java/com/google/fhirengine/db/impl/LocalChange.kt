@@ -18,6 +18,7 @@ package com.google.fhirengine.db.impl.entities
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
@@ -47,15 +48,20 @@ import androidx.room.PrimaryKey
  *      "value": "Binny"
  *      }
  * ]
- *  For resource that is fully synced with server this table should be empty.
+ *  For resource that is fully synced with server this table should not have any rows.
  */
 @Entity(
+        indices = [
+            Index(
+                    value = ["resourceType", "resourceId"]
+            )
+        ],
         foreignKeys = [
             ForeignKey(
                     entity = ResourceEntity::class,
                     parentColumns = ["resourceId", "resourceType"],
                     childColumns = ["resourceId", "resourceType"],
-                    onDelete = ForeignKey.CASCADE,
+                    onDelete = ForeignKey.NO_ACTION,
                     onUpdate = ForeignKey.NO_ACTION,
                     deferred = true
             )
@@ -63,7 +69,7 @@ import androidx.room.PrimaryKey
 )
 data class LocalChange(
   @PrimaryKey(autoGenerate = true)
-  val id: Long = 0,
+  val id: Long,
   val resourceType: String,
   val resourceId: String,
   val timestamp: String = "",

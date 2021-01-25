@@ -70,16 +70,19 @@ internal class DatabaseImpl(
         it.iParser = iParser
     }
 
+    @Transaction
     override fun <R : Resource> insert(resource: R) {
         resourceDao.insert(resource)
         localChangeDao.addInsert(resource)
     }
 
+    @Transaction
     override fun <R : Resource> insertAll(resources: List<R>) {
         resourceDao.insertAll(resources)
         // TODO: impl insertAll in LocalChangeDao
     }
 
+    @Transaction
     override fun <R : Resource> update(resource: R) {
         val oldResource = select(resource.javaClass, resource.id)
         resourceDao.update(resource)
@@ -109,6 +112,7 @@ internal class DatabaseImpl(
         insertAll(resources)
     }
 
+    @Transaction
     override fun <R : Resource> delete(clazz: Class<R>, id: String) {
         val type = getResourceType(clazz)
         resourceDao.deleteResource(
@@ -170,9 +174,13 @@ internal class DatabaseImpl(
         resourceDao.getResources(query.getSupportSQLiteQuery())
             .map { iParser.parseResource(it) as R }
 
-    override fun <R : Resource> getLocalChanges(clazz: Class<R>, id: String): List<LocalChange> {
-        val type = getResourceType(clazz).name
-        return listOf(localChangeDao.squash(localChangeDao.getLocalChanges(id, type)))
+    override fun getAllLocalChanges(): List<LocalChange> {
+        return localChangeDao.getAllLocalChanges()
+                .groupBy { it.resourceId + it.resourceType }
+                .values
+                .map {
+                    localChangeDao.squash(it)
+                }
     }
 
     override fun <R : Resource> deleteUpdates(clazz: Class<R>, id: String) {

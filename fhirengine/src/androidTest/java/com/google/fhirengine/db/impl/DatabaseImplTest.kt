@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.google.fhirengine.FhirServices
 import com.google.fhirengine.db.ResourceNotFoundInDbException
+import com.google.fhirengine.db.impl.entities.LocalChange
 import com.google.fhirengine.resource.TestingUtils
 import com.google.fhirengine.sync.FhirDataSource
 import org.hl7.fhir.r4.model.Bundle
@@ -99,14 +100,12 @@ class DatabaseImplTest {
 
     @Test
     fun update_nonExistingResource_shouldNotInsertResource() {
-        database.update(TEST_PATIENT_2)
-        val resourceNotFoundInDbException = assertThrows(
-            ResourceNotFoundInDbException::class.java,
-            { database.select(Patient::class.java, TEST_PATIENT_2_ID) }
-        )
-        Truth.assertThat(resourceNotFoundInDbException.message).isEqualTo(
+        val resourceNotFoundInDbException = assertThrows(ResourceNotFoundInDbException::class.java) {
+            database.update(TEST_PATIENT_2)
+        }
+        Truth.assertThat(resourceNotFoundInDbException.message)
             /* ktlint-disable max-line-length */
-            "Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!"
+            .isEqualTo("Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!"
             /* ktlint-enable max-line-length */
         )
     }
@@ -143,6 +142,41 @@ class DatabaseImplTest {
             TEST_PATIENT_1,
             database.select(Patient::class.java, TEST_PATIENT_1_ID)
         )
+    }
+
+    @Test
+    fun update_insertAndUpdate_shouldAddUpdateLocalChange() {
+        var patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+        database.insert(patient)
+        patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_1.json")
+        database.update(patient)
+        val patientString = services.parser.encodeResourceToString(patient)
+        val localChange = database.getAllLocalChanges().first { it.resourceId.equals(patient.id) }
+        Truth.assertThat(localChange.type).isEqualTo(LocalChange.Type.INSERT)
+        Truth.assertThat(localChange.resourceId).isEqualTo(patient.id)
+        Truth.assertThat(localChange.resourceType).isEqualTo(patient.resourceType.name)
+        Truth.assertThat(localChange.diff).isEqualTo(patientString)
+    }
+
+    @Test
+    fun insert_shouldAddInsertLocalChange() {
+        val testPatient2String = services.parser.encodeResourceToString(TEST_PATIENT_2)
+        database.insert(TEST_PATIENT_2)
+        val localChange = database.getAllLocalChanges().first { it.resourceId.equals(TEST_PATIENT_2_ID) }
+        Truth.assertThat(localChange.type).isEqualTo(LocalChange.Type.INSERT)
+        Truth.assertThat(localChange.resourceId).isEqualTo(TEST_PATIENT_2_ID)
+        Truth.assertThat(localChange.resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
+        Truth.assertThat(localChange.diff).isEqualTo(testPatient2String)
+    }
+
+    @Test
+    fun delete_shouldAddDeleteLocalChange() {
+        database.delete(Patient::class.java, TEST_PATIENT_1_ID)
+        val localChange = database.getAllLocalChanges().first { it.resourceId.equals(TEST_PATIENT_1_ID) }
+        Truth.assertThat(localChange.type).isEqualTo(LocalChange.Type.DELETE)
+        Truth.assertThat(localChange.resourceId).isEqualTo(TEST_PATIENT_1_ID)
+        Truth.assertThat(localChange.resourceType).isEqualTo(TEST_PATIENT_1.resourceType.name)
+        Truth.assertThat(localChange.diff).isEmpty()
     }
 
     private companion object {

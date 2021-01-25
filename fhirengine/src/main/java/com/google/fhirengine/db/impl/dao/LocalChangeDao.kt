@@ -34,6 +34,7 @@ import com.google.fhirengine.toTimeZoneString
 import java.util.Date
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import java.lang.IllegalArgumentException
 
 /**
  * Dao for local changes made to a resource. One row in LocalChangeEntity corresponds to one change
@@ -67,7 +68,7 @@ internal abstract class LocalChangeDao {
         val timestamp = Date().toTimeZoneString()
         val resourceString = iParser.encodeResourceToString(resource)
 
-        if (!localChanges.isEmpty() && localChanges.last().type != Type.DELETE) {
+        if (localChanges.isNotEmpty() && !localChanges.last().type.equals(Type.DELETE)) {
             // Can't add an INSERT on top of an INSERT or UPDATE
             val lastLocalChangeType = localChanges.last().type
             throw InvalidLocalChangeException("Can not INSERT on top of $lastLocalChangeType")
@@ -95,7 +96,7 @@ internal abstract class LocalChangeDao {
         )
         val timestamp = Date().toTimeZoneString()
 
-        if (localChanges.isNotEmpty() && localChanges.last().type == Type.DELETE) {
+        if (localChanges.isNotEmpty() && localChanges.last().type.equals(Type.DELETE)) {
             throw InvalidLocalChangeException(
                 "Unexpected DELETE when updating $resourceType/$resourceId. UPDATE failed."
             )
@@ -114,85 +115,17 @@ internal abstract class LocalChangeDao {
     }
 
     fun addDelete(resourceId: String, resourceType: ResourceType) {
-        val localChanges = getLocalChanges(
-            resourceId = resourceId,
-            resourceType = resourceType.name
-        )
-
         val timestamp = Date().toTimeZoneString()
-
-        when {
-            localChanges.isEmpty() -> throw InvalidLocalChangeException(
-                "Can not DELETE non-existent resource $resourceType/$resourceId"
-            )
-            localChanges.last().type in arrayOf(Type.UPDATE, Type.INSERT) -> {
-                addLocalChange(
-                    LocalChange(
-                        id = 0,
-                        resourceType = resourceType.name,
-                        resourceId = resourceId,
-                        timestamp = timestamp,
-                        type = Type.DELETE,
-                        diff = ""
-                    )
-                )
-            }
-            else -> {
-                val lastType = localChanges.last().type
-                throw InvalidLocalChangeException("Can not DELETE on top of $lastType")
-            }
-        }
-    }
-
-    /**
-     * Squashes all local changes in to a single local change representing the current state of the
-     * resource.
-     *
-     * Algo:
-     * 1. Read the latest change, if it's a DELETE or INSERT then we are done as that's the
-     * latest representation of the resource.
-     * 2. If it's an UPDATE then squash the rest of the list recursively. Merge the result of the
-     * squash using [applyPatch].
-     *
-     * @throws InvalidLocalChangeException when no INSERT is found in the list.
-     */
-    fun squashOld(localChanges: List<LocalChange>): LocalChange {
-
-        if (localChanges.isEmpty())
-            throw InvalidLocalChangeException("Could not find INSERT in local changes.")
-
-        val last = localChanges.last()
-        return when (last.type) {
-            Type.DELETE -> LocalChange(
-                resourceId = last.resourceId,
-                resourceType = last.resourceType,
+        addLocalChange(
+            LocalChange(
+                id = 0,
+                resourceType = resourceType.name,
+                resourceId = resourceId,
+                timestamp = timestamp,
                 type = Type.DELETE,
                 diff = ""
             )
-            Type.INSERT -> LocalChange(
-                resourceId = last.resourceId,
-                resourceType = last.resourceType,
-                type = Type.INSERT,
-                diff = last.diff
-            )
-            Type.UPDATE -> {
-                val first = squashOld(localChanges.dropLast(1))
-
-                // assertion $first.type != DELETE
-                if (first.type == Type.DELETE) {
-                    throw InvalidLocalChangeException(
-                        "Expected INSERT/UPDATE at head of local changes. Found DELETE instead."
-                    )
-                }
-
-                LocalChange(
-                    resourceId = last.resourceId,
-                    resourceType = last.resourceType,
-                    type = Type.INSERT,
-                    diff = applyPatch(first.diff, last.diff)
-                )
-            }
-        }
+        )
     }
 
     fun squash(localChanges: List<LocalChange>): LocalChange =
@@ -225,11 +158,34 @@ internal abstract class LocalChangeDao {
     }
 
     private fun mergeLocalChanges(first: LocalChange, second: LocalChange): LocalChange {
+
+        val type: Type
+        val diff: String
+
+        when (second.type) {
+            Type.UPDATE -> if (first.type.equals(Type.UPDATE)) {
+                type = Type.UPDATE
+                diff = mergePatches(first.diff, second.diff)
+            } else if (first.type.equals(Type.INSERT)) {
+                type = Type.INSERT
+                diff = applyPatch(first.diff, second.diff)
+            } else {
+                throw IllegalArgumentException("Don't know how to merge ${first} and ${second}.")
+            }
+            Type.DELETE -> {
+                type = Type.DELETE
+                diff = ""
+            }
+            else ->
+                throw IllegalArgumentException("Don't know how to merge ${first} and ${second}.")
+        }
+
         return LocalChange(
+            id = 0,
             resourceId = second.resourceId,
             resourceType = second.resourceType,
-            type = Type.UPDATE,
-            diff = mergePatches(first.diff, second.diff)
+            type = type,
+            diff = diff
         )
     }
     private fun mergePatches(firstPatch: String, secondPatch: String): String {

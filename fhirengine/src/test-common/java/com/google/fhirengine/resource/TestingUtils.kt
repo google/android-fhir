@@ -19,7 +19,9 @@ package com.google.fhirengine.resource
 import ca.uhn.fhir.parser.IParser
 import com.google.common.truth.Truth
 import org.hl7.fhir.r4.model.Resource
+import org.json.JSONArray
 import org.json.JSONObject
+import org.junit.Assert.assertEquals
 
 /** Utilities for testing.  */
 class TestingUtils constructor(private val iParser: IParser) {
@@ -30,11 +32,36 @@ class TestingUtils constructor(private val iParser: IParser) {
             .isEqualTo(iParser.encodeResourceToString(expected))
     }
 
+    fun assertJsonArrayEqualsIgnoringOrder(actual: JSONArray, expected: JSONArray) {
+        Truth.assertThat(actual.length()).isEqualTo(expected.length())
+        val actuals = mutableListOf<String>()
+        val expecteds = mutableListOf<String>()
+        for (i in 0 until actual.length()) {
+            actuals.add(actual.get(i).toString())
+            expecteds.add(expected.get(i).toString())
+        }
+        actuals.sorted()
+        expecteds.sorted()
+        Truth.assertThat(actuals).containsExactlyElementsIn(expecteds)
+    }
+
     /** Reads a [Resource] from given file in the `sampledata` dir */
     fun <R : Resource> readFromFile(clazz: Class<R>, filename: String): R {
+        val resourceJson = readJsonFromFile(filename)
+        return iParser.parseResource(clazz, resourceJson.toString()) as R
+    }
+
+    /** Reads a [JSONObject] from given file in the `sampledata` dir */
+    fun readJsonFromFile(filename: String): JSONObject {
         val inputStream = javaClass.getResourceAsStream(filename)
         val content = inputStream!!.bufferedReader(Charsets.UTF_8).readText()
-        val resourceJson = JSONObject(content)
-        return iParser.parseResource(clazz, resourceJson.toString()) as R
+        return JSONObject(content)
+    }
+
+    /** Reads a [JSONArray] from given file in the `sampledata` dir */
+    fun readJsonArrayFromFile(filename: String): JSONArray {
+        val inputStream = javaClass.getResourceAsStream(filename)
+        val content = inputStream!!.bufferedReader(Charsets.UTF_8).readText()
+        return JSONArray(content)
     }
 }

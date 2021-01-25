@@ -142,10 +142,11 @@ interface Database {
     fun <R : Resource> search(query: Query): List<R>
 
     /**
-     * Retrieves all [LocalChange]s for a given [Resource]. The [LocalChange]s are in a form
-     * which can be synced. Multiple UPDATE type changes are squashed into a single [LocalChange].
+     * Retrieves all [LocalChange]s for all [Resource]s. The [LocalChange]s are in a form which
+     * can be synced. Multiple changes for a single [Resource] are squashed into a single
+     * [LocalChange].
      */
-    fun <R : Resource> getLocalChanges(clazz: Class<R>, id: String): List<LocalChange>
+    fun getAllLocalChanges(): List<LocalChange>
 
     /**
      * Remove the [LocalChange]s with given ids. Call this after a successful sync.
