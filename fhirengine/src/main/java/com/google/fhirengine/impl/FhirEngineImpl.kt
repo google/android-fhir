@@ -119,9 +119,9 @@ class FhirEngineImpl constructor(
     }
 
     override suspend fun periodicSync(): Result {
-        val syncConfig = periodicSyncConfiguration
-            ?: throw java.lang.UnsupportedOperationException(
-                "Periodic sync configuration was not set")
+        val syncConfig = periodicSyncConfiguration ?: throw java.lang.UnsupportedOperationException(
+            "Periodic sync configuration was not set"
+        )
         val syncResult = FhirSynchronizer(
             syncConfig.syncConfiguration,
             dataSource,

@@ -43,15 +43,16 @@ data class SerializedResourceQuery(
             WHERE a.resourceType = ?${resourceIdQuery?.let { " AND a.resourceId IN (${it.query})" } ?: ""}
         """.trimIndent())
         sortCriterion?.also {
-            queryBuilder.appendln("""
-                ORDER BY b.index_value ${
-                if (sortCriterion.ascending) {
-                    "ASC"
-                } else {
-                    "DESC"
-                }
-            }
-            """.trimIndent())
+            queryBuilder.appendln(
+                """
+                    ORDER BY b.index_value ${
+                        if (sortCriterion.ascending) {
+                            "ASC"
+                        } else {
+                            "DESC"
+                        }
+                    }
+                """.trimIndent())
         }
         limit?.also {
             queryBuilder.appendln("""
