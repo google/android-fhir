@@ -33,10 +33,10 @@ import org.hl7.fhir.r4.model.Bundle
  * Class that synchronises only one resource.
  */
 class ResourceSynchronizer(
-  private val syncData: SyncData,
-  private val dataSource: FhirDataSource,
-  private val database: Database,
-  retry: Boolean
+    private val syncData: SyncData,
+    private val dataSource: FhirDataSource,
+    private val database: Database,
+    retry: Boolean
 ) {
     private var retrySync = retry
 
@@ -94,7 +94,7 @@ class ResourceSynchronizer(
             database.insertSyncedResources(SyncedResourceEntity(
                 syncData.resourceType,
                 mostRecentResource.meta.lastUpdated.toTimeZoneString()),
-            resources
+                resources
             )
         }
     }

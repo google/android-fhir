@@ -29,18 +29,18 @@ import org.hl7.fhir.r4.model.Resource
  * * address that includes 'London'
  */
 class StringFilteringCriterion constructor(
-  val param: StringClientParam,
-  val operator: ParamPrefixEnum,
-  val value: String
+    val param: StringClientParam,
+    val operator: ParamPrefixEnum,
+    val value: String
 ) : FilterCriterion {
     override fun <R : Resource> query(clazz: Class<R>): ResourceIdQuery {
         // TODO: implement different queries for different operators.
         return ResourceIdQuery("""
 SELECT resourceId FROM StringIndexEntity
 WHERE resourceType = ? AND index_name = ? AND index_value = ?""",
-                listOf(clazz.simpleName, param.paramName, value))
+            listOf(clazz.simpleName, param.paramName, value))
     }
 }
 
 fun string(param: StringClientParam, operator: ParamPrefixEnum, value: String) =
-        StringFilteringCriterion(param, operator, value)
+    StringFilteringCriterion(param, operator, value)

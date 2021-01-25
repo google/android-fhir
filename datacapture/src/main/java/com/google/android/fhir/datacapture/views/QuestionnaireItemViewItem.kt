@@ -29,8 +29,8 @@ import com.google.fhir.r4.core.QuestionnaireResponse
  * the right information (e.g text for the CheckBox and initial yes/no answer for the CheckBox).
  */
 data class QuestionnaireItemViewItem(
-  val questionnaireItem: Questionnaire.Item,
-  val questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder
+    val questionnaireItem: Questionnaire.Item,
+    val questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder
 ) {
     /**
      * The single answer to the [QuestionnaireResponse.Item], or `null` if there is none or more

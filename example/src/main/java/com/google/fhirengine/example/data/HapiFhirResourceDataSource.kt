@@ -24,7 +24,7 @@ import org.hl7.fhir.r4.model.Bundle
  * Implementation of the [FhirDataSource] that communicates with hapi fhir.
  */
 class HapiFhirResourceDataSource(
-  private val service: HapiFhirService
+    private val service: HapiFhirService
 ) : FhirDataSource {
 
     override suspend fun loadData(path: String): Bundle {

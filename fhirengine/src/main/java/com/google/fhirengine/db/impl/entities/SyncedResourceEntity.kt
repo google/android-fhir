@@ -26,13 +26,13 @@ import org.hl7.fhir.r4.model.ResourceType
  */
 @Entity
 data class SyncedResourceEntity(
-  /**
-   * Resource synced
-   */
-  @PrimaryKey
-  val resourceType: ResourceType,
-  /**
-   * The highest `_lastUpdate` value of the resources synced of a specific type
-   */
-  val lastUpdate: String
+    /**
+     * Resource synced
+     */
+    @PrimaryKey
+    val resourceType: ResourceType,
+    /**
+     * The highest `_lastUpdate` value of the resources synced of a specific type
+     */
+    val lastUpdate: String
 )

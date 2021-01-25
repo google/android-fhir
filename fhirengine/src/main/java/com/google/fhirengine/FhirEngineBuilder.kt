@@ -24,8 +24,8 @@ import com.google.fhirengine.sync.PeriodicSyncConfiguration
  * The builder for [FhirEngine] instance
  */
 class FhirEngineBuilder constructor(
-  dataSource: FhirDataSource,
-  context: Context
+    dataSource: FhirDataSource,
+    context: Context
 ) {
     private val services = FhirServices.builder(dataSource, context)
 

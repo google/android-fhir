@@ -35,8 +35,8 @@ class PatientItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
     )
 
     fun bindTo(
-      patientItem: PatientListViewModel.PatientItem,
-      onItemClicked: (PatientListViewModel.PatientItem) -> Unit
+        patientItem: PatientListViewModel.PatientItem,
+        onItemClicked: (PatientListViewModel.PatientItem) -> Unit
     ) {
         this.idView.text = patientItem.id
         this.nameView.text = patientItem.name

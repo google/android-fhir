@@ -35,30 +35,30 @@ import org.hl7.fhir.r4.model.ResourceType
  * email address.
  */
 internal data class ResourceIndices(
-  /** The resource type.  */
-  val resourceType: ResourceType,
-  /** The ID of the resource.  */
-  val id: String,
-  /** The string indices.  */
-  val stringIndices: List<StringIndex>,
-  /** The reference indices.  */
-  val referenceIndices: List<ReferenceIndex>,
-  /** The token indices.  */
-  val tokenIndices: List<TokenIndex>,
-  /** The quantity indices. */
-  val quantityIndices: List<QuantityIndex>,
-  /** The URI indices. */
-  val uriIndices: List<UriIndex>,
-  /** The date indices. */
-  val dateIndices: List<DateIndex>,
-  /** The number indices. */
-  val numberIndices: List<NumberIndex>
+    /** The resource type.  */
+    val resourceType: ResourceType,
+    /** The ID of the resource.  */
+    val id: String,
+    /** The string indices.  */
+    val stringIndices: List<StringIndex>,
+    /** The reference indices.  */
+    val referenceIndices: List<ReferenceIndex>,
+    /** The token indices.  */
+    val tokenIndices: List<TokenIndex>,
+    /** The quantity indices. */
+    val quantityIndices: List<QuantityIndex>,
+    /** The URI indices. */
+    val uriIndices: List<UriIndex>,
+    /** The date indices. */
+    val dateIndices: List<DateIndex>,
+    /** The number indices. */
+    val numberIndices: List<NumberIndex>
 
 ) {
 
     class Builder(
-      val resourceType: ResourceType,
-      val id: String
+        val resourceType: ResourceType,
+        val id: String
     ) {
         private val stringIndices = mutableListOf<StringIndex>()
         private val referenceIndices = mutableListOf<ReferenceIndex>()
@@ -97,15 +97,15 @@ internal data class ResourceIndices(
         }
 
         fun build() = ResourceIndices(
-                resourceType = resourceType,
-                id = id,
-                stringIndices = stringIndices.toList(),
-                referenceIndices = referenceIndices.toList(),
-                tokenIndices = tokenIndices.toList(),
-                quantityIndices = quantityIndices.toList(),
-                uriIndices = uriIndices.toList(),
-                dateIndices = dateIndices.toList(),
-                numberIndices = numberIndices.toList()
+            resourceType = resourceType,
+            id = id,
+            stringIndices = stringIndices.toList(),
+            referenceIndices = referenceIndices.toList(),
+            tokenIndices = tokenIndices.toList(),
+            quantityIndices = quantityIndices.toList(),
+            uriIndices = uriIndices.toList(),
+            dateIndices = dateIndices.toList(),
+            numberIndices = numberIndices.toList()
         )
     }
 }

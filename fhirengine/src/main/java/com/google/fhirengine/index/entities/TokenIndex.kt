@@ -22,12 +22,12 @@ package com.google.fhirengine.index.entities
  * See https://hl7.org/FHIR/search.html#token.
  */
 internal data class TokenIndex(
-  /** The name of the code index, e.g. "code". */
-  val name: String,
-  /** The path of the code index, e.g. "Observation.code". */
-  val path: String,
-  /** The system of the code index, e.g. "http://openmrs.org/concepts". */
-  val system: String,
-  /** The value of the code index, e.g. "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA". */
-  val value: String
+    /** The name of the code index, e.g. "code". */
+    val name: String,
+    /** The path of the code index, e.g. "Observation.code". */
+    val path: String,
+    /** The system of the code index, e.g. "http://openmrs.org/concepts". */
+    val system: String,
+    /** The value of the code index, e.g. "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA". */
+    val value: String
 )

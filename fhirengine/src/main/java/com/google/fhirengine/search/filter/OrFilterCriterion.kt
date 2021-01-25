@@ -23,13 +23,13 @@ import org.hl7.fhir.r4.model.Resource
  * [FilterCriterion] that is satisfied if any of the sub [FilterCriterion]s is satisfied.
  */
 class OrFilterCriterion constructor(val left: FilterCriterion, val right: FilterCriterion) :
-        FilterCriterion {
+    FilterCriterion {
     override fun <R : Resource> query(clazz: Class<R>): ResourceIdQuery {
         val leftQuery = left.query(clazz)
         val rightQuery = right.query(clazz)
         return ResourceIdQuery(
-                "${leftQuery.query} UNION ${rightQuery.query}",
-                leftQuery.args + rightQuery.args)
+            "${leftQuery.query} UNION ${rightQuery.query}",
+            leftQuery.args + rightQuery.args)
     }
 }
 

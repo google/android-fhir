@@ -22,10 +22,10 @@ import org.hl7.fhir.r4.model.Resource
 /** Interface to specify filtering criteria for search. */
 interface FilterCriterion {
     fun and(filterCriterion: FilterCriterion): FilterCriterion =
-            and(this, filterCriterion)
+        and(this, filterCriterion)
 
     fun or(filterCriterion: FilterCriterion): FilterCriterion =
-            or(this, filterCriterion)
+        or(this, filterCriterion)
 
     /** Returns the [ResourceIdQuery] that can be used to construct a query. */
     fun <R : Resource> query(clazz: Class<R>): ResourceIdQuery

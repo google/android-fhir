@@ -27,12 +27,12 @@ import com.google.fhirengine.search.filter.FilterCriterion
  * * address that includes 'London'
  */
 data class StringSortCriterion constructor(
-  val stringParam: StringClientParam,
-  override val ascending: Boolean
+    val stringParam: StringClientParam,
+    override val ascending: Boolean
 ) : SortCriterion {
     override val table: String = "StringIndexEntity"
     override val param = stringParam.paramName
 }
 
 fun stringSort(param: StringClientParam, ascending: Boolean) =
-        StringSortCriterion(param, ascending)
+    StringSortCriterion(param, ascending)

@@ -29,7 +29,7 @@ class SearchImpl constructor(val database: Database) : Search {
 
     /** Implementation of the [Search.SearchSpecifications] interface. */
     inner class SearchSpecificationImpl<R : Resource>(
-      val clazz: Class<R>
+        val clazz: Class<R>
     ) : Search.SearchSpecifications {
         private var filterCriterion: FilterCriterion? = null
         private var sortCriterion: SortCriterion? = null
@@ -37,17 +37,17 @@ class SearchImpl constructor(val database: Database) : Search {
         private var skip: Int? = null
 
         override fun filter(filterCriterion: FilterCriterion): Search.SearchSpecifications =
-                apply { this.filterCriterion = filterCriterion }
+            apply { this.filterCriterion = filterCriterion }
 
         override fun sort(sortCriterion: SortCriterion): Search.SearchSpecifications =
-                apply { this.sortCriterion = sortCriterion }
+            apply { this.sortCriterion = sortCriterion }
 
         override fun limit(limit: Int): Search.SearchSpecifications = apply { this.limit = limit }
 
         override fun skip(skip: Int): Search.SearchSpecifications = apply { this.skip = skip }
 
         override fun <R : Resource> run(): List<R> = database.search(
-                SerializedResourceQuery(getResourceType(clazz),
-                        filterCriterion?.query(clazz), sortCriterion, limit, skip))
+            SerializedResourceQuery(getResourceType(clazz),
+                filterCriterion?.query(clazz), sortCriterion, limit, skip))
     }
 }

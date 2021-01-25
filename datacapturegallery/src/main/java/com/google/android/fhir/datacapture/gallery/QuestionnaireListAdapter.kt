@@ -25,35 +25,42 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 
 class QuestionnaireListAdapter(
-  private val questionnaireList: List<QuestionnaireListItem>
+    private val questionnaireList: List<QuestionnaireListItem>
 ) : Adapter<QuestionnaireListAdapter.ViewHolder>() {
 
-  class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    val name: TextView = view.findViewById(R.id.questionnaire_name)
-    val description: TextView = view.findViewById(R.id.questionnaire_description)
-    lateinit var questionnairelistItem: QuestionnaireListItem
-    init {
-      view.setOnClickListener {
-        val context = view.context
-        context.startActivity(Intent(context, QuestionnaireActivity::class.java).apply {
-          putExtra(QuestionnaireActivity.QUESTIONNAIRE_TITLE_KEY, questionnairelistItem.name)
-          putExtra(QuestionnaireActivity.QUESTIONNAIRE_FILE_PATH_KEY, questionnairelistItem.path)
-        })
-      }
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val name: TextView = view.findViewById(R.id.questionnaire_name)
+        val description: TextView = view.findViewById(R.id.questionnaire_description)
+        lateinit var questionnairelistItem: QuestionnaireListItem
+
+        init {
+            view.setOnClickListener {
+                val context = view.context
+                context.startActivity(Intent(context, QuestionnaireActivity::class.java).apply {
+                    putExtra(
+                        QuestionnaireActivity.QUESTIONNAIRE_TITLE_KEY,
+                        questionnairelistItem.name
+                    )
+                    putExtra(
+                        QuestionnaireActivity.QUESTIONNAIRE_FILE_PATH_KEY,
+                        questionnairelistItem.path
+                    )
+                })
+            }
+        }
     }
-  }
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder(
-    LayoutInflater.from(parent.context)
-      .inflate(R.layout.questionnaire_list_item_view, parent, false)
-  )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder(
+        LayoutInflater.from(parent.context)
+            .inflate(R.layout.questionnaire_list_item_view, parent, false)
+    )
 
-  override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-    val questionnaireListItem = questionnaireList[position]
-    holder.questionnairelistItem = questionnaireListItem
-    holder.name.text = questionnaireListItem.name
-    holder.description.text = questionnaireListItem.description
-  }
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val questionnaireListItem = questionnaireList[position]
+        holder.questionnairelistItem = questionnaireListItem
+        holder.name.text = questionnaireListItem.name
+        holder.description.text = questionnaireListItem.description
+    }
 
-  override fun getItemCount() = questionnaireList.size
+    override fun getItemCount() = questionnaireList.size
 }

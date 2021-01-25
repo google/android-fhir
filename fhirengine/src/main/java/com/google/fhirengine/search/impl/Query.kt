@@ -24,5 +24,5 @@ abstract class Query {
     abstract fun getQueryString(): String
     abstract fun getQueryArgs(): List<Any>
     fun getSupportSQLiteQuery(): SupportSQLiteQuery =
-            SimpleSQLiteQuery(getQueryString(), getQueryArgs().toTypedArray())
+        SimpleSQLiteQuery(getQueryString(), getQueryArgs().toTypedArray())
 }

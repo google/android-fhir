@@ -25,20 +25,20 @@ import androidx.recyclerview.widget.ListAdapter
  * UI Controller helper class to monitor Patient viewmodel and display list of patients.
  */
 class PatientItemRecyclerViewAdapter(
-  private val onItemClicked: (PatientListViewModel.PatientItem) -> Unit
+    private val onItemClicked: (PatientListViewModel.PatientItem) -> Unit
 ) : ListAdapter<PatientListViewModel.PatientItem, PatientItemViewHolder>(
     PatientItemDiffCallback()
 ) {
 
     class PatientItemDiffCallback : DiffUtil.ItemCallback<PatientListViewModel.PatientItem>() {
         override fun areItemsTheSame(
-          oldItem: PatientListViewModel.PatientItem,
-          newItem: PatientListViewModel.PatientItem
+            oldItem: PatientListViewModel.PatientItem,
+            newItem: PatientListViewModel.PatientItem
         ): Boolean = oldItem.id == newItem.id
 
         override fun areContentsTheSame(
-          oldItem: PatientListViewModel.PatientItem,
-          newItem: PatientListViewModel.PatientItem
+            oldItem: PatientListViewModel.PatientItem,
+            newItem: PatientListViewModel.PatientItem
         ): Boolean = oldItem.id == newItem.id
     }
 

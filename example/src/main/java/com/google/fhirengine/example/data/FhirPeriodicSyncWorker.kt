@@ -23,8 +23,8 @@ import com.google.fhirengine.example.FhirApplication
 import com.google.fhirengine.sync.PeriodicSyncWorker
 
 class FhirPeriodicSyncWorker(
-  appContext: Context,
-  workerParams: WorkerParameters
+    appContext: Context,
+    workerParams: WorkerParameters
 ) : PeriodicSyncWorker(appContext, workerParams) {
 
     override fun getFhirEngine(): FhirEngine {

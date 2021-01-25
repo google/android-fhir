@@ -22,7 +22,7 @@ package com.google.fhirengine.index.entities
  * See https://hl7.org/FHIR/search.html#uri.
  */
 internal data class UriIndex(
-  val name: String,
-  val path: String,
-  val uri: String
+    val name: String,
+    val path: String,
+    val uri: String
 )

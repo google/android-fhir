@@ -18,6 +18,6 @@ package com.google.fhirengine.db
 
 /** Exception thrown to indicate that the requested resource is not found in the database. */
 class ResourceNotFoundInDbException(
-  val type: String,
-  val id: String
+    val type: String,
+    val id: String
 ) : Exception("Resource not found with type $type and id $id!")
