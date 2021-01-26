@@ -32,9 +32,6 @@ private const val MAX_RESOURCE_COUNT = 20
  * PatientListViewModel.
  */
 class SamplePatients {
-    private val patients: MutableList<PatientListViewModel.PatientItem> = mutableListOf()
-    private val observations: MutableList<PatientListViewModel.ObservationItem> = ArrayList()
-
     // The resource bundle with Patient objects.
     private var fhirBundle: Bundle? = null
 
@@ -47,6 +44,8 @@ class SamplePatients {
      * Returns list of PatientItem objects based on patients from the json string.
      */
     fun getPatientItems(jsonString: String): List<PatientListViewModel.PatientItem> {
+        val patients: MutableList<PatientListViewModel.PatientItem> = mutableListOf()
+
         fhirBundle = fhirJsonParser.parseResource(Bundle::class.java, jsonString) as Bundle
 
         // Create a list of PatientItems from fhirPatients. The display index is 1 based.
@@ -58,15 +57,15 @@ class SamplePatients {
     }
 
     fun getPatientItems(fhirPatients: List<Patient>): List<PatientListViewModel.PatientItem> {
+        val patients: MutableList<PatientListViewModel.PatientItem> = mutableListOf()
 
-        patients.clear()
         // Create a list of PatientItems from fhirPatients. The display index is 1 based.
         fhirPatients.take(MAX_RESOURCE_COUNT)?.mapIndexed { index, fhirPatient ->
             createPatientItem(index + 1, fhirPatient)
         }?.let { patients.addAll(it) }
 
         // Return a cloned List
-        return patients.toMutableList()
+        return patients
     }
 
     /**
@@ -96,6 +95,8 @@ class SamplePatients {
      * Returns list of ObservationItem objects based on observations from the json string.
      */
     fun getObservationItems(jsonString: String): MutableList<PatientListViewModel.ObservationItem> {
+        val observations = ArrayList<PatientListViewModel.ObservationItem>()
+
         fhirBundle = fhirJsonParser.parseResource(Bundle::class.java, jsonString) as Bundle
 
         // Create a list of ObservationItems from fhirObservations. The display index is 1 based.
