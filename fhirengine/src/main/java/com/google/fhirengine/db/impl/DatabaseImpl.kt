@@ -21,6 +21,7 @@ import androidx.room.Room
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
 import com.google.fhirengine.db.ResourceNotFoundInDbException
+import com.google.fhirengine.db.impl.dao.LocalChangeUtils
 import com.google.fhirengine.db.impl.entities.LocalChange
 import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
 import com.google.fhirengine.index.FhirIndexer
@@ -179,7 +180,7 @@ internal class DatabaseImpl(
                 .groupBy { it.resourceId + it.resourceType }
                 .values
                 .map {
-                    localChangeDao.squash(it)
+                    LocalChangeUtils.squash(it)
                 }
     }
 

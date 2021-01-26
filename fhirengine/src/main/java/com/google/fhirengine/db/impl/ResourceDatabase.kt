@@ -34,20 +34,20 @@ import com.google.fhirengine.db.impl.entities.TokenIndexEntity
 import com.google.fhirengine.db.impl.entities.UriIndexEntity
 
 @Database(
-        entities = [
-            ResourceEntity::class,
-            StringIndexEntity::class,
-            ReferenceIndexEntity::class,
-            TokenIndexEntity::class,
-            QuantityIndexEntity::class,
-            UriIndexEntity::class,
-            DateIndexEntity::class,
-            NumberIndexEntity::class,
-            SyncedResourceEntity::class,
-            LocalChange::class
-        ],
-        version = 1,
-        exportSchema = false
+    entities = [
+        ResourceEntity::class,
+        StringIndexEntity::class,
+        ReferenceIndexEntity::class,
+        TokenIndexEntity::class,
+        QuantityIndexEntity::class,
+        UriIndexEntity::class,
+        DateIndexEntity::class,
+        NumberIndexEntity::class,
+        SyncedResourceEntity::class,
+        LocalChange::class
+    ],
+    version = 1,
+    exportSchema = false
 )
 @TypeConverters(
     DbTypeConverters::class

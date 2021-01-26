@@ -28,8 +28,8 @@ import java.util.Locale
 @SuppressLint("NewApi")
 fun Date.toTimeZoneString(): String {
     val simpleDateFormat = DateTimeFormatter.ofPattern(
-            "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
-            Locale.US
+        "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+        Locale.getDefault()
     ).withZone(ZoneId.systemDefault())
     return simpleDateFormat.format(this.toInstant())
 }
