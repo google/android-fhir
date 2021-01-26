@@ -51,7 +51,7 @@ object LocalChangeUtils {
                 }
                 else -> {
                     throw IllegalArgumentException(
-                            "Cannot merge local changes with type ${first.type} and ${second.type}."
+                        "Cannot merge local changes with type ${first.type} and ${second.type}."
                     )
                 }
             }
@@ -113,11 +113,12 @@ object LocalChangeUtils {
                 JsonNode::class.java
             )
         )
-        if (jsonDiff.size() == 0)
-            Log.w(
+        if (jsonDiff.size() == 0) {
+            Log.i(
             "ResourceDao",
-            "Trying to UPDATE resource ${target.resourceType}/${target.id} with no changes"
+            "Target ${target.resourceType}/${target.id} is same as source."
             )
+        }
         return jsonDiff.toString()
     }
 }

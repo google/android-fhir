@@ -18,7 +18,7 @@ package com.google.fhirengine.db.impl
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import com.google.fhirengine.FhirServices
 import com.google.fhirengine.db.ResourceNotFoundInDbException
 import com.google.fhirengine.db.impl.entities.LocalChange
@@ -29,7 +29,6 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
@@ -104,7 +103,7 @@ class DatabaseImplTest {
             assertThrows(ResourceNotFoundInDbException::class.java) {
                 database.update(TEST_PATIENT_2)
             }
-        Truth.assertThat(resourceNotFoundInDbException.message)
+        assertThat(resourceNotFoundInDbException.message)
             /* ktlint-disable max-line-length */
             .isEqualTo("Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!"
             /* ktlint-enable max-line-length */
@@ -114,27 +113,21 @@ class DatabaseImplTest {
     @Test
     fun select_invalidResourceType_shouldThrowIllegalArgumentException() {
         val illegalArgumentException =
-            assertThrows(
-                IllegalArgumentException::class.java,
-                { database.select(Resource::class.java, "resource_id") }
-            )
-        assertEquals(
-            "Cannot resolve resource type for " + Resource::class.java.name,
-            illegalArgumentException.message
-        )
+            assertThrows(IllegalArgumentException::class.java) {
+                database.select(Resource::class.java, "resource_id")
+            }
+        assertThat(illegalArgumentException.message)
+                .isEqualTo("Cannot resolve resource type for " + Resource::class.java.name)
     }
 
     @Test
     fun select_nonexistentResource_shouldThrowResourceNotFoundException() {
         val resourceNotFoundException =
-            assertThrows(
-                ResourceNotFoundInDbException::class.java,
-                { database.select(Patient::class.java, "nonexistent_patient") }
-            )
-        assertEquals(
-            "Resource not found with type ${ResourceType.Patient.name} and id nonexistent_patient!",
-            resourceNotFoundException.message
-        )
+            assertThrows(ResourceNotFoundInDbException::class.java) {
+                database.select(Patient::class.java, "nonexistent_patient")
+            }
+        assertThat(resourceNotFoundException.message)
+            .isEqualTo("Resource not found with type Patient and id nonexistent_patient!")
     }
 
     @Test
@@ -151,10 +144,10 @@ class DatabaseImplTest {
         database.insert(TEST_PATIENT_2)
         val localChange = database.getAllLocalChanges()
             .first { it.resourceId.equals(TEST_PATIENT_2_ID) }
-        Truth.assertThat(localChange.type).isEqualTo(LocalChange.Type.INSERT)
-        Truth.assertThat(localChange.resourceId).isEqualTo(TEST_PATIENT_2_ID)
-        Truth.assertThat(localChange.resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
-        Truth.assertThat(localChange.diff).isEqualTo(testPatient2String)
+        assertThat(localChange.type).isEqualTo(LocalChange.Type.INSERT)
+        assertThat(localChange.resourceId).isEqualTo(TEST_PATIENT_2_ID)
+        assertThat(localChange.resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
+        assertThat(localChange.diff).isEqualTo(testPatient2String)
     }
 
     @Test
@@ -166,10 +159,10 @@ class DatabaseImplTest {
         database.update(patient)
         val patientString = services.parser.encodeResourceToString(patient)
         val localChange = database.getAllLocalChanges().first { it.resourceId.equals(patient.id) }
-        Truth.assertThat(localChange.type).isEqualTo(LocalChange.Type.INSERT)
-        Truth.assertThat(localChange.resourceId).isEqualTo(patient.id)
-        Truth.assertThat(localChange.resourceType).isEqualTo(patient.resourceType.name)
-        Truth.assertThat(localChange.diff).isEqualTo(patientString)
+        assertThat(localChange.type).isEqualTo(LocalChange.Type.INSERT)
+        assertThat(localChange.resourceId).isEqualTo(patient.id)
+        assertThat(localChange.resourceType).isEqualTo(patient.resourceType.name)
+        assertThat(localChange.diff).isEqualTo(patientString)
     }
 
     @Test
@@ -177,10 +170,10 @@ class DatabaseImplTest {
         database.delete(Patient::class.java, TEST_PATIENT_1_ID)
         val localChange = database.getAllLocalChanges()
                 .first { it.resourceId.equals(TEST_PATIENT_1_ID) }
-        Truth.assertThat(localChange.type).isEqualTo(LocalChange.Type.DELETE)
-        Truth.assertThat(localChange.resourceId).isEqualTo(TEST_PATIENT_1_ID)
-        Truth.assertThat(localChange.resourceType).isEqualTo(TEST_PATIENT_1.resourceType.name)
-        Truth.assertThat(localChange.diff).isEmpty()
+        assertThat(localChange.type).isEqualTo(LocalChange.Type.DELETE)
+        assertThat(localChange.resourceId).isEqualTo(TEST_PATIENT_1_ID)
+        assertThat(localChange.resourceType).isEqualTo(TEST_PATIENT_1.resourceType.name)
+        assertThat(localChange.diff).isEmpty()
     }
 
     private companion object {

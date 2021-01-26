@@ -52,7 +52,7 @@ import androidx.room.PrimaryKey
 @Entity(
         indices = [
             Index(
-                    value = ["resourceType", "resourceId"]
+                value = ["resourceType", "resourceId"]
             )
         ]
 )
