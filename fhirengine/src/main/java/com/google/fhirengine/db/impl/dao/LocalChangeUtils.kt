@@ -103,15 +103,16 @@ object LocalChangeUtils {
     @JvmStatic
     internal fun diff(parser: IParser, source: Resource, target: Resource): String {
         val objectMapper = ObjectMapper()
-        val sourceJson = objectMapper.readValue(
-            parser.encodeResourceToString(source),
-            JsonNode::class.java
+        val jsonDiff = JsonDiff.asJson(
+            objectMapper.readValue(
+                parser.encodeResourceToString(source),
+                JsonNode::class.java
+            ),
+            objectMapper.readValue(
+                parser.encodeResourceToString(target),
+                JsonNode::class.java
+            )
         )
-        val targetJson = objectMapper.readValue(
-            parser.encodeResourceToString(target),
-            JsonNode::class.java
-        )
-        val jsonDiff = JsonDiff.asJson(sourceJson, targetJson)
         if (jsonDiff.size() == 0)
             Log.w(
             "ResourceDao",
