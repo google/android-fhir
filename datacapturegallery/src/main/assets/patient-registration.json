@@ -14,11 +14,8 @@
           "text": "ANC ID",
           "type": "string",
           "required": true,
+          "maxLength": 8,
           "extension": [
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-maxLength",
-              "valueInteger": 8
-            },
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction",
               "valueString": "Unique ANC ID"
@@ -30,11 +27,8 @@
           "text": "First name",
           "type": "string",
           "required": true,
+          "maxLength": 30,
           "extension": [
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-maxLength",
-              "valueInteger": 30
-            },
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction",
               "valueString": "Given name"
@@ -46,11 +40,8 @@
           "text": "Last name",
           "type": "string",
           "required": true,
+          "maxLength": 50,
           "extension": [
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-maxLength",
-              "valueInteger": 50
-            },
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction",
               "valueString": "Family name"
@@ -87,11 +78,8 @@
           "linkId": "PR-6",
           "text": "Mobile number",
           "type": "integer",
+          "maxLength": 8,
           "extension": [
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-maxLength",
-              "valueInteger": 8
-            },
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction",
               "valueString": "Mobile phone number"
@@ -114,11 +102,8 @@
           "text": "Alternate contact name",
           "type": "string",
           "required": true,
+          "maxLength": 50,
           "extension": [
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-maxLength",
-              "valueInteger": 50
-            },
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction",
               "valueString": "Alternate contact name"
@@ -129,11 +114,8 @@
           "linkId": "PR-10",
           "text": "Alternate contact number",
           "type": "integer",
+          "maxLength": 8,
           "extension": [
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-maxLength",
-              "valueInteger": 8
-            },
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction",
               "valueString": "Phone number for alternate contact"
