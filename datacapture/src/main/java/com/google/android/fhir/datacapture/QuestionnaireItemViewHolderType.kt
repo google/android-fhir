@@ -19,8 +19,12 @@ package com.google.android.fhir.datacapture
 /**
  * Questionnaire item view holder types supported by default by the data capture library.
  *
- * This is used in [QuestionnaireItemAdapter] to determine how each [QuestionnaireItemComponent] is
+ * This is used in [QuestionnaireItemAdapter] to determine how each [Questionnaire.Item] is
  * rendered.
+ *
+ * This list should provide sufficient coverage for values in
+ * https://www.hl7.org/fhir/valueset-item-type.html and
+ * http://hl7.org/fhir/R4/valueset-questionnaire-item-control.html.
  */
 enum class QuestionnaireItemViewHolderType(val value: Int) {
     GROUP(0),
@@ -28,7 +32,8 @@ enum class QuestionnaireItemViewHolderType(val value: Int) {
     DATE_PICKER(2),
     EDIT_TEXT_SINGLE_LINE(3),
     EDIT_TEXT_MULTI_LINE(4),
-    EDIT_TEXT_INTEGER(5);
+    EDIT_TEXT_INTEGER(5),
+    EDIT_TEXT_DECIMAL(6);
 
     companion object {
         private val VALUES = values()
