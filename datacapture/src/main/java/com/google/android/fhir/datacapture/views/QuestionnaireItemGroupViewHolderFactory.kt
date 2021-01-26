@@ -33,6 +33,11 @@ object QuestionnaireItemGroupViewHolderFactory : QuestionnaireItemViewHolderFact
 
             override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
                 groupHeader.text = questionnaireItemViewItem.questionnaireItem.text.value
+                groupHeader.visibility = if (groupHeader.text.isEmpty()) {
+                    View.GONE
+                } else {
+                    View.VISIBLE
+                }
             }
         }
 }
