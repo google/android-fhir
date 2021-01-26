@@ -189,7 +189,7 @@ internal abstract class LocalChangeDao {
                 diff = ""
             }
             else ->
-                throw IllegalArgumentException("Don't know how to merge $first and $second.")
+                throw IllegalArgumentException("Cannot merge local changes with type ${first.type} and ${second.type}.")
         }
         return LocalChange(
                 id = 0,

@@ -23,7 +23,7 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * Utility function to add timestamps to database rows, e.g. last local update timestamp.
+ * Utility function to format a [Date] object using the system's default locale.
  */
 @SuppressLint("NewApi")
 fun Date.toTimeZoneString(): String {
