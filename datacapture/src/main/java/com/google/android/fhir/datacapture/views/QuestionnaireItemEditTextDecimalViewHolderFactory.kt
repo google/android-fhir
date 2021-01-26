@@ -25,7 +25,7 @@ object QuestionnaireItemEditTextDecimalViewHolderFactory :
     override fun getQuestionnaireItemViewHolderDelegate() =
         object : QuestionnaireItemEditTextViewHolderDelegate(
             InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
-            true
+            isSingleLine = true
         ) {
             override fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder? {
                 return text.toDoubleOrNull()?.let {
