@@ -65,7 +65,8 @@ class SamplePatients {
             createPatientItem(index + 1, fhirPatient)
         }?.let { patients.addAll(it) }
 
-        return patients
+        // Return a cloned List
+        return patients.toMutableList()
     }
 
     /**

@@ -72,7 +72,7 @@ class PatientListActivity : AppCompatActivity() {
                 // the MutableLiveData (list of PatientItems) has changed.
                 // submit a copy of the list, otherwise adapter still thinks it's same unchanged
                 // list.
-                adapter.submitList(it?.toMutableList())
+                adapter.submitList(it)
             })
 
         patientListViewModel.getObservations().observe(this,
