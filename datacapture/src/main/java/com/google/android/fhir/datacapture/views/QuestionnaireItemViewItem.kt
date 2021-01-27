@@ -17,6 +17,8 @@
 package com.google.android.fhir.datacapture.views
 
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.QuestionnaireItemViewHolderType
+import com.google.fhir.r4.core.Extension
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireResponse
 
@@ -44,4 +46,18 @@ data class QuestionnaireItemViewItem(
                 questionnaireResponseItemBuilder.addAnswer(it)
             }
         }
+
+    val questionnaireItemControlType
+        get() = getItemControlFromExtensions(questionnaireItem.extensionList)
+
+    // Returns item control or null
+    private fun getItemControlFromExtensions(extensions: MutableList<Extension>):
+        QuestionnaireItemViewHolderType? {
+        extensions.forEach {
+            if (it.url.equals(QuestionnaireItemViewHolderType.EXTENSION_ITEM_CONTROL_URL)) {
+                return QuestionnaireItemViewHolderType.fromString(it.value?.code?.value)
+            }
+        }
+        return null
+    }
 }
