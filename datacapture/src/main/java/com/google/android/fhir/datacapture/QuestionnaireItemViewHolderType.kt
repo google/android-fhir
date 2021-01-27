@@ -33,10 +33,17 @@ enum class QuestionnaireItemViewHolderType(val value: Int) {
     EDIT_TEXT_SINGLE_LINE(3),
     EDIT_TEXT_MULTI_LINE(4),
     EDIT_TEXT_INTEGER(5),
-    EDIT_TEXT_DECIMAL(6);
+    EDIT_TEXT_DECIMAL(6),
+    DROP_DOWN(7);
 
     companion object {
+        const val EXTENSION_ITEM_CONTROL_URL =
+            "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
         private val VALUES = values()
         fun fromInt(value: Int) = VALUES[value]
+        fun fromString(code: String?) = when (code) {
+            "drop-down" -> VALUES[7]
+            else -> null
+        }
     }
 }
