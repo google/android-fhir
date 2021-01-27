@@ -51,11 +51,12 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
 
     private var patientResults: List<Patient> = getSearchResults()
     private var searchedPatients = samplePatients.getPatientItems(patientResults)
-    private val liveSearchedPatients: MutableLiveData<List<PatientItem>> = MutableLiveData()
+    private val _liveSearchedPatients: MutableLiveData<List<PatientItem>> = MutableLiveData()
+    val liveSearchedPatients: LiveData<List<PatientItem>> = _liveSearchedPatients
 
     fun getSearchedPatients(): LiveData<List<PatientItem>> {
         searchedPatients = samplePatients.getPatientItems(patientResults)
-        liveSearchedPatients.value = searchedPatients
+        _liveSearchedPatients.value = searchedPatients
         Log.d("PatientListViewModel", "getSearchedPatients(): " +
             "patientResults[${patientResults.count()}], searchedPatients[${searchedPatients
                 .count()}]")
@@ -90,7 +91,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     fun searchPatients() {
         patientResults = getSearchResults()
         searchedPatients = samplePatients.getPatientItems(patientResults)
-        liveSearchedPatients.value = searchedPatients
+        _liveSearchedPatients.value = searchedPatients
     }
 
     private fun getAssetFileAsString(filename: String): String {
