@@ -52,7 +52,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     private var patientResults: List<Patient> = getSearchResults()
     private var searchedPatients = samplePatients.getPatientItems(patientResults)
     private val _liveSearchedPatients: MutableLiveData<List<PatientItem>> = MutableLiveData()
-    val liveSearchedPatients:LiveData<List<PatientItem>> = _liveSearchedPatients
+    val liveSearchedPatients: LiveData<List<PatientItem>> = _liveSearchedPatients
 
     fun getSearchedPatients(): LiveData<List<PatientItem>> {
         searchedPatients = samplePatients.getPatientItems(patientResults)
