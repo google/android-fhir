@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemDropDownViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextDecimalViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextIntegerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextMultiLineViewHolderFactory
@@ -37,7 +38,7 @@ internal class QuestionnaireItemAdapter(
      * [QuestionnaireItemComponent].
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
-        val viewHolder = when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
+        val viewHolder = when (val type = QuestionnaireItemViewHolderType.fromInt(viewType)) {
             QuestionnaireItemViewHolderType.GROUP -> QuestionnaireItemGroupViewHolderFactory
             QuestionnaireItemViewHolderType.CHECK_BOX -> QuestionnaireItemCheckBoxViewHolderFactory
             QuestionnaireItemViewHolderType.DATE_PICKER ->
@@ -50,6 +51,9 @@ internal class QuestionnaireItemAdapter(
                 QuestionnaireItemEditTextIntegerViewHolderFactory
             QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL ->
                 QuestionnaireItemEditTextDecimalViewHolderFactory
+            QuestionnaireItemViewHolderType.DROP_DOWN ->
+                QuestionnaireItemDropDownViewHolderFactory
+            else -> throw NotImplementedError("Question type $type not supported.")
         }
         return viewHolder.create(parent)
     }
@@ -65,21 +69,37 @@ internal class QuestionnaireItemAdapter(
      * (http://hl7.org/fhir/R4/valueset-questionnaire-item-control.html) used in the
      * itemControl extension (http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html).
      */
-    override fun getItemViewType(position: Int) =
-        when (val type = questionnaireItemViewItemList[position].questionnaireItem.type.value) {
-            QuestionnaireItemTypeCode.Value.GROUP -> QuestionnaireItemViewHolderType.GROUP
-            QuestionnaireItemTypeCode.Value.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
-            QuestionnaireItemTypeCode.Value.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
+    override fun getItemViewType(position: Int): Int {
+        val viewItemType: Int
+        val questionnaireViewItem = questionnaireItemViewItemList[position]
+        questionnaireViewItem.questionnaireItemControlType?.let {
+            viewItemType = it.value
+            return viewItemType
+        }
+
+        when (val type = questionnaireViewItem.questionnaireItem.type.value) {
+            QuestionnaireItemTypeCode.Value.GROUP ->
+                viewItemType = QuestionnaireItemViewHolderType.GROUP.value
+            QuestionnaireItemTypeCode.Value.BOOLEAN ->
+                viewItemType = QuestionnaireItemViewHolderType.CHECK_BOX.value
+            QuestionnaireItemTypeCode.Value.DATE ->
+                viewItemType = QuestionnaireItemViewHolderType.DATE_PICKER.value
             QuestionnaireItemTypeCode.Value.STRING ->
-                QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE
+                viewItemType = QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE.value
             QuestionnaireItemTypeCode.Value.TEXT ->
-                QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE
+                viewItemType = QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE.value
             QuestionnaireItemTypeCode.Value.INTEGER ->
-                QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
+                viewItemType = QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER.value
             QuestionnaireItemTypeCode.Value.DECIMAL ->
-                QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
+                viewItemType = QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL.value
+            QuestionnaireItemTypeCode.Value.CHOICE -> {
+                    // TODO : Logic to determine view type in case there is no item control
+                    viewItemType = QuestionnaireItemViewHolderType.DROP_DOWN.value
+            }
             else -> throw NotImplementedError("Question type $type not supported.")
-        }.value
+        }
+    return viewItemType
+    }
 
     override fun getItemCount() = questionnaireItemViewItemList.size
 }
