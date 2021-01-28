@@ -80,7 +80,7 @@ jobs:
       if: matrix.api-level == 29 # don't run full build on older APIs
       run: ./gradlew build
     - name: Run Integration Tests
-      uses: ReactiveCircus/android-emulator-runner@v2.13.0
+      uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: ${{ matrix.api-level }}
         arch: x86_64
