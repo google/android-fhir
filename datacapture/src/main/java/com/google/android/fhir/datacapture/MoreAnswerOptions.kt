@@ -46,7 +46,7 @@ fun AnswerOption.getString(): String {
     }
 }
 
-fun AnswerOption.getResponseAnswer(): Answer.ValueX {
+fun AnswerOption.getResponseAnswerValueX(): Answer.ValueX {
     if (this.value.hasCoding()) {
         return Answer.ValueX.newBuilder()
             .setCoding(this.value.coding)

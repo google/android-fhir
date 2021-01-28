@@ -22,7 +22,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.getResponseAnswer
+import com.google.android.fhir.datacapture.getResponseAnswerValueX
 import com.google.android.fhir.datacapture.getString
 import com.google.android.material.textfield.TextInputLayout
 import com.google.fhir.r4.core.QuestionnaireResponse
@@ -67,7 +67,7 @@ object QuestionnaireItemDropDownViewHolderFactory : QuestionnaireItemViewHolderF
                                     .setValue(
                                         questionnaireItemViewItem
                                             .questionnaireItem
-                                            .answerOptionList[position].getResponseAnswer()
+                                            .answerOptionList[position].getResponseAnswerValueX()
                                     )
                         }
                     }
