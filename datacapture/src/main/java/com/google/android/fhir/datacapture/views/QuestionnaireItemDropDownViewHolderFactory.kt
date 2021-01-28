@@ -22,11 +22,10 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.getResponseAnswer
+import com.google.android.fhir.datacapture.getString
 import com.google.android.material.textfield.TextInputLayout
 import com.google.fhir.r4.core.QuestionnaireResponse
-import java.text.DateFormat.getTimeInstance
-import java.time.Instant
-import java.time.ZoneId
 
 object QuestionnaireItemDropDownViewHolderFactory : QuestionnaireItemViewHolderFactory(
     R.layout.questionnaire_item_drop_down_view
@@ -36,9 +35,6 @@ object QuestionnaireItemDropDownViewHolderFactory : QuestionnaireItemViewHolderF
             private lateinit var textInputLayout: TextInputLayout
             private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
             private lateinit var context: Context
-            private var answerOptionString = arrayListOf<String>()
-            private var answerOptionValueX = arrayListOf<QuestionnaireResponse.Item.Answer.ValueX>()
-            private val df = getTimeInstance()
 
             override fun init(itemView: View) {
                 textInputLayout = itemView.findViewById(R.id.dropdown_menu)
@@ -48,7 +44,10 @@ object QuestionnaireItemDropDownViewHolderFactory : QuestionnaireItemViewHolderF
             override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
                 this.questionnaireItemViewItem = questionnaireItemViewItem
                 textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.text.value
-                getOptionValueXFromQuestionnaire()
+                val answerOptionString = arrayListOf<String>()
+                this.questionnaireItemViewItem.questionnaireItem.answerOptionList.forEach {
+                    answerOptionString.add(it.getString())
+                }
                 val adapter = ArrayAdapter(
                     context,
                     R.layout.questionnaire_item_drop_down_list,
@@ -66,67 +65,12 @@ object QuestionnaireItemDropDownViewHolderFactory : QuestionnaireItemViewHolderF
                             questionnaireItemViewItem.singleAnswerOrNull =
                                 QuestionnaireResponse.Item.Answer.newBuilder()
                                     .setValue(
-                                        answerOptionValueX[position]
+                                        questionnaireItemViewItem
+                                            .questionnaireItem
+                                            .answerOptionList[position].getResponseAnswer()
                                     )
                         }
                     }
-            }
-            // Populate list of string to display as options and answerOptionValueX
-            private fun getOptionValueXFromQuestionnaire() {
-                questionnaireItemViewItem.questionnaireItem.answerOptionList.forEach {
-                    if (it.value.hasCoding()) {
-                        answerOptionString.add(it.value.coding.code.value)
-                        answerOptionValueX.add(
-                            QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                                .setCoding(it.value.coding)
-                                .build()
-                        )
-                    } else if (it.value.hasInteger()) {
-                        answerOptionString.add(it.value.integer.value.toString())
-                        answerOptionValueX.add(
-                            QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                                .setInteger(it.value.integer)
-                                .build()
-                        )
-                    } else if (it.value.hasDate()) {
-                        it.value.date.let {
-                            answerOptionString.add(
-                                Instant
-                                    .ofEpochMilli(it.valueUs /
-                                        QuestionnaireItemDatePickerViewHolderFactory
-                                            .NUMBER_OF_MICROSECONDS_PER_MILLISECOND
-                                    )
-                                    .atZone(
-                                        ZoneId.systemDefault()
-                                    ).toString()
-                            )
-                        }
-                        answerOptionValueX.add(
-                            QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                                .setDate(it.value.date)
-                                .build()
-                        )
-                    } else if (it.value.hasTime()) {
-                        it.value.time.let {
-                            answerOptionString.add(
-                                df.format(it.valueUs /
-                                    QuestionnaireItemDatePickerViewHolderFactory
-                                        .NUMBER_OF_MICROSECONDS_PER_MILLISECOND
-                                )
-                            )
-                        }
-                        answerOptionValueX.add(
-                            QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                                .setTime(it.value.time)
-                                .build()
-                        )
-                    } else if (it.value.hasStringValue()) {
-                        answerOptionString.add(it.value.stringValue.value.toString())
-                        QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setStringValue(it.value.stringValue)
-                            .build()
-                    }
-                }
             }
         }
 }
