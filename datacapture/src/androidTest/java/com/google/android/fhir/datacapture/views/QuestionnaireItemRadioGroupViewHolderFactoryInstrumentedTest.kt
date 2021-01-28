@@ -118,6 +118,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
     }
 
     @Test
+    @UiThreadTest
     fun shouldSetRadioButtonsChecked() {
         viewHolder.bind(
             QuestionnaireItemViewItem(
