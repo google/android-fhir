@@ -25,6 +25,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextIntege
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextMultiLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextSingleLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.fhir.r4.core.QuestionnaireItemTypeCode
@@ -50,6 +51,8 @@ internal class QuestionnaireItemAdapter(
                 QuestionnaireItemEditTextIntegerViewHolderFactory
             QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL ->
                 QuestionnaireItemEditTextDecimalViewHolderFactory
+            QuestionnaireItemViewHolderType.RADIO_GROUP ->
+                QuestionnaireItemRadioGroupViewHolderFactory
         }
         return viewHolder.create(parent)
     }
@@ -78,6 +81,8 @@ internal class QuestionnaireItemAdapter(
                 QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
             QuestionnaireItemTypeCode.Value.DECIMAL ->
                 QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
+            QuestionnaireItemTypeCode.Value.CHOICE ->
+                QuestionnaireItemViewHolderType.RADIO_GROUP
             else -> throw NotImplementedError("Question type $type not supported.")
         }.value
 
