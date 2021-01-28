@@ -37,13 +37,7 @@ enum class QuestionnaireItemViewHolderType(val value: Int) {
     DROP_DOWN(7);
 
     companion object {
-        const val EXTENSION_ITEM_CONTROL_URL =
-            "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
         private val VALUES = values()
         fun fromInt(value: Int) = VALUES[value]
-        fun fromString(code: String?) = when (code) {
-            "drop-down" -> VALUES[7]
-            else -> null
-        }
     }
 }
