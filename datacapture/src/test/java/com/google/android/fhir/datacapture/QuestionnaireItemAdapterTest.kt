@@ -171,14 +171,14 @@ class QuestionnaireItemAdapterTest {
     }
 
     @Test
-    fun getItemViewType_choiceItemType_shouldReturnEditTextDecimalViewHolderType() {
+    fun getItemViewType_choiceItemType_shouldReturnRadioGroupViewHolderType() {
         val questionnaireItemAdapter = QuestionnaireItemAdapter(
             listOf(
                 QuestionnaireItemViewItem(
                     Questionnaire.Item.newBuilder()
                         .setType(
                             Questionnaire.Item.TypeCode.newBuilder()
-                                .setValue(QuestionnaireItemTypeCode.Value.DECIMAL)
+                                .setValue(QuestionnaireItemTypeCode.Value.CHOICE)
                         )
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
@@ -186,7 +186,7 @@ class QuestionnaireItemAdapterTest {
             )
         )
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
-            QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL.value
+            QuestionnaireItemViewHolderType.RADIO_GROUP.value
         )
     }
 
