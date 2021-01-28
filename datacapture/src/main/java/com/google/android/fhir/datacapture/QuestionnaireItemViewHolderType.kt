@@ -33,7 +33,8 @@ enum class QuestionnaireItemViewHolderType(val value: Int) {
     EDIT_TEXT_SINGLE_LINE(3),
     EDIT_TEXT_MULTI_LINE(4),
     EDIT_TEXT_INTEGER(5),
-    EDIT_TEXT_DECIMAL(6);
+    EDIT_TEXT_DECIMAL(6),
+    RADIO_GROUP(7);
 
     companion object {
         private val VALUES = values()

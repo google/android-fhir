@@ -170,5 +170,25 @@ class QuestionnaireItemAdapterTest {
         )
     }
 
+    @Test
+    fun getItemViewType_choiceItemType_shouldReturnRadioGroupViewHolderType() {
+        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+            listOf(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setType(
+                            Questionnaire.Item.TypeCode.newBuilder()
+                                .setValue(QuestionnaireItemTypeCode.Value.CHOICE)
+                        )
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                )
+            )
+        )
+        assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
+            QuestionnaireItemViewHolderType.RADIO_GROUP.value
+        )
+    }
+
     // TODO: test errors thrown for unsupported types
 }

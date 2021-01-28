@@ -51,7 +51,7 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
     }
 
     @Test
-    fun noAnswer_shouldSetCheckBoxUnhecked() {
+    fun noAnswer_shouldSetCheckBoxUnchecked() {
         viewHolder.bind(
             QuestionnaireItemViewItem(
                 Questionnaire.Item.newBuilder().apply {
@@ -95,7 +95,7 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
                     QuestionnaireResponse.Item.Answer.newBuilder().apply {
                         value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
                             .setBoolean(Boolean.newBuilder().setValue(false)).build()
-                }
+                    }
                 )
             )
         )

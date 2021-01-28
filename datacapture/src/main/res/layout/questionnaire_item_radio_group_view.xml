@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
  Copyright 2020 Google LLC
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +14,20 @@
  limitations under the License.
 -->
 
-<CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/check_box"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-        android:layout_marginVertical="@dimen/item_margin_vertical" />
+        android:layout_marginVertical="@dimen/item_margin_vertical"
+        android:orientation="vertical">
+
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/radio_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    <RadioGroup
+            android:id="@+id/radio_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+</LinearLayout>
