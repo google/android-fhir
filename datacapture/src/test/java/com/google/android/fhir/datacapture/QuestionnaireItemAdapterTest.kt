@@ -19,9 +19,11 @@ package com.google.android.fhir.datacapture
 import android.os.Build
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
+import com.google.fhir.r4.core.Integer
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 import com.google.fhir.r4.core.QuestionnaireResponse
+import com.google.fhir.r4.core.String
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -170,5 +172,33 @@ class QuestionnaireItemAdapterTest {
         )
     }
 
+    @Test
+    fun getItemViewType_choiceItemType_shouldReturnDropDrownViewHolderType() {
+        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+            listOf(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setType(
+                            Questionnaire.Item.TypeCode.newBuilder()
+                                .setValue(QuestionnaireItemTypeCode.Value.CHOICE)
+                        ).addAnswerOption(0,
+                            Questionnaire.Item.AnswerOption.newBuilder()
+                                .setValue(
+                                    Questionnaire.Item.AnswerOption.ValueX.newBuilder()
+                                        .setStringValue(
+                                            String.newBuilder()
+                                                .setValue("test")
+                                        )
+                                )
+                        )
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                )
+            )
+        )
+        assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
+            QuestionnaireItemViewHolderType.DROP_DOWN.value
+        )
+    }
     // TODO: test errors thrown for unsupported types
 }
