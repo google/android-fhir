@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextSingle
 import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.fhir.r4.core.Extension
 import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 
 internal class QuestionnaireItemAdapter(
@@ -72,10 +73,6 @@ internal class QuestionnaireItemAdapter(
     override fun getItemViewType(position: Int): Int {
         val viewItemType: Int
         val questionnaireViewItem = questionnaireItemViewItemList[position]
-        questionnaireViewItem.questionnaireItemControlType?.let {
-            viewItemType = it.value
-            return viewItemType
-        }
 
         when (val type = questionnaireViewItem.questionnaireItem.type.value) {
             QuestionnaireItemTypeCode.Value.GROUP ->
@@ -92,14 +89,43 @@ internal class QuestionnaireItemAdapter(
                 viewItemType = QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER.value
             QuestionnaireItemTypeCode.Value.DECIMAL ->
                 viewItemType = QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL.value
-            QuestionnaireItemTypeCode.Value.CHOICE -> {
-                    // TODO : Logic to determine view type in case there is no item control
+            QuestionnaireItemTypeCode.Value.CHOICE ->
+            {
+                val code = getItemControlFromExtensions(
+                    questionnaireViewItem.questionnaireItem.extensionList
+                )
+                if (code != null) {
+                    when (code) {
+                        "drop-down" ->
+                            viewItemType = QuestionnaireItemViewHolderType.DROP_DOWN.value
+                        else -> throw NotImplementedError("item control type $code not supported.")
+                    }
+                } else if (questionnaireViewItem.questionnaireItem.answerOptionList.size <4) {
+                    // TODO: Add radio button , currently 4 is hardcoded. It can be a setting
                     viewItemType = QuestionnaireItemViewHolderType.DROP_DOWN.value
+                } else {
+                    viewItemType = QuestionnaireItemViewHolderType.DROP_DOWN.value
+                }
             }
             else -> throw NotImplementedError("Question type $type not supported.")
         }
-    return viewItemType
+        return viewItemType
     }
 
     override fun getItemCount() = questionnaireItemViewItemList.size
+
+    // Returns item control code as string or null
+    private fun getItemControlFromExtensions(extensions: MutableList<Extension>): String? {
+        extensions.forEach {
+            if (it.url.equals(EXTENSION_ITEM_CONTROL_URL)) {
+                return it.value.code.value
+            }
+        }
+        return null
+    }
+
+    companion object {
+        const val EXTENSION_ITEM_CONTROL_URL =
+            "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
+    }
 }
