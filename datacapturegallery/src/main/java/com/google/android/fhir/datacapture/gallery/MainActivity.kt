@@ -50,6 +50,12 @@ class MainActivity : AppCompatActivity() {
                     "HIV Case Report",
                     "OpenHIE HIV Case Reporting and Monitoring IG",
                     "openhie-hiv-case-report.json"
+                ),
+                // Example taken from https://github.com/cqframework/cds4cpm-mypain/blob/master/src/content/mypain-questionnaire.json
+                QuestionnaireListItem(
+                    "MyPAIN",
+                    "CDS For Chronic Pain Management",
+                    "cds4cpm-mypain.json"
                 )
             )
         )
