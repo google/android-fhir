@@ -26,7 +26,7 @@ import java.util.Locale
  * Utility function to format a [Date] object using the system's default locale.
  */
 @SuppressLint("NewApi")
-fun Date.toTimeZoneString(): String {
+internal fun Date.toTimeZoneString(): String {
     val simpleDateFormat = DateTimeFormatter.ofPattern(
         "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
         Locale.getDefault()

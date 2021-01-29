@@ -28,7 +28,6 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
@@ -147,7 +146,7 @@ class DatabaseImplTest {
         assertThat(localChange.type).isEqualTo(LocalChange.Type.INSERT)
         assertThat(localChange.resourceId).isEqualTo(TEST_PATIENT_2_ID)
         assertThat(localChange.resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
-        assertThat(localChange.diff).isEqualTo(testPatient2String)
+        assertThat(localChange.payload).isEqualTo(testPatient2String)
     }
 
     @Test
@@ -162,7 +161,7 @@ class DatabaseImplTest {
         assertThat(localChange.type).isEqualTo(LocalChange.Type.INSERT)
         assertThat(localChange.resourceId).isEqualTo(patient.id)
         assertThat(localChange.resourceType).isEqualTo(patient.resourceType.name)
-        assertThat(localChange.diff).isEqualTo(patientString)
+        assertThat(localChange.payload).isEqualTo(patientString)
     }
 
     @Test
@@ -173,7 +172,7 @@ class DatabaseImplTest {
         assertThat(localChange.type).isEqualTo(LocalChange.Type.DELETE)
         assertThat(localChange.resourceId).isEqualTo(TEST_PATIENT_1_ID)
         assertThat(localChange.resourceType).isEqualTo(TEST_PATIENT_1.resourceType.name)
-        assertThat(localChange.diff).isEmpty()
+        assertThat(localChange.payload).isEmpty()
     }
 
     private companion object {

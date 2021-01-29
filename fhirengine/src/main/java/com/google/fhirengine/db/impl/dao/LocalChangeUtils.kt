@@ -43,11 +43,11 @@ object LocalChangeUtils {
             LocalChange.Type.UPDATE -> when {
                 first.type.equals(LocalChange.Type.UPDATE) -> {
                     type = LocalChange.Type.UPDATE
-                    diff = mergePatches(first.diff, second.diff)
+                    diff = mergePatches(first.payload, second.payload)
                 }
                 first.type.equals(LocalChange.Type.INSERT) -> {
                     type = LocalChange.Type.INSERT
-                    diff = applyPatch(first.diff, second.diff)
+                    diff = applyPatch(first.payload, second.payload)
                 }
                 else -> {
                     throw IllegalArgumentException(
@@ -69,7 +69,7 @@ object LocalChangeUtils {
             resourceId = second.resourceId,
             resourceType = second.resourceType,
             type = type,
-            diff = diff
+            payload = diff
         )
     }
 

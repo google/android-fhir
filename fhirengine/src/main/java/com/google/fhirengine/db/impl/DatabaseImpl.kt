@@ -177,7 +177,7 @@ internal class DatabaseImpl(
 
     override fun getAllLocalChanges(): List<LocalChange> {
         return localChangeDao.getAllLocalChanges()
-                .groupBy { it.resourceId + it.resourceType }
+                .groupBy { it.resourceId to it.resourceType }
                 .values
                 .map {
                     LocalChangeUtils.squash(it)

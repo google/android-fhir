@@ -53,20 +53,15 @@ internal abstract class LocalChangeDao {
     fun addInsert(resource: Resource) {
         val resourceId = resource.id
         val resourceType = resource.resourceType
-        val localChanges = getLocalChanges(
-            resourceId = resourceId,
-            resourceType = resourceType.name
-        )
         val timestamp = Date().toTimeZoneString()
         val resourceString = iParser.encodeResourceToString(resource)
+        val lastChangeType = lastChangeType(resourceId, resourceType)
 
-        if (localChanges.isNotEmpty() && !localChanges.last().type.equals(Type.DELETE)) {
-            // Can't add an INSERT on top of an INSERT or UPDATE
-            val lastLocalChangeType = localChanges.last().type
-            throw InvalidLocalChangeException("Can not INSERT on top of $lastLocalChangeType")
+        if (!localChangeIsEmpty(resourceId, resourceType) &&
+                !lastChangeType!!.equals(Type.DELETE)) {
+            throw InvalidLocalChangeException("Can not INSERT on top of $lastChangeType")
         }
 
-        // Insert this change in the local changes table
         addLocalChange(
             LocalChange(
                 id = 0,
@@ -74,7 +69,7 @@ internal abstract class LocalChangeDao {
                 resourceId = resourceId,
                 timestamp = timestamp,
                 type = Type.INSERT,
-                diff = resourceString
+                payload = resourceString
             )
         )
     }
@@ -82,13 +77,10 @@ internal abstract class LocalChangeDao {
     fun addUpdate(oldResource: Resource, resource: Resource) {
         val resourceId = resource.id
         val resourceType = resource.resourceType
-        val localChanges = getLocalChanges(
-            resourceId = resourceId,
-            resourceType = resourceType.name
-        )
         val timestamp = Date().toTimeZoneString()
 
-        if (localChanges.isNotEmpty() && localChanges.last().type.equals(Type.DELETE)) {
+        if (!localChangeIsEmpty(resourceId, resourceType) &&
+                lastChangeType(resourceId, resourceType)!!.equals(Type.DELETE)) {
             throw InvalidLocalChangeException(
                 "Unexpected DELETE when updating $resourceType/$resourceId. UPDATE failed."
             )
@@ -101,7 +93,7 @@ internal abstract class LocalChangeDao {
                 resourceId = resourceId,
                 timestamp = timestamp,
                 type = Type.UPDATE,
-                diff = LocalChangeUtils.diff(iParser, oldResource, resource)
+                payload = LocalChangeUtils.diff(iParser, oldResource, resource)
             )
         )
     }
@@ -115,26 +107,38 @@ internal abstract class LocalChangeDao {
                 resourceId = resourceId,
                 timestamp = timestamp,
                 type = Type.DELETE,
-                diff = ""
+                payload = ""
             )
         )
     }
 
-    @Query(
-        """
-        SELECT *
-        FROM LocalChange
-        WHERE LocalChange.resourceId = (:resourceId)
-        AND LocalChange.resourceType  = (:resourceType)
-        ORDER BY LocalChange.timestamp ASC"""
-    )
-    abstract fun getLocalChanges(resourceId: String, resourceType: String): List<LocalChange>
+    @Query("""
+        SELECT type 
+        FROM LocalChange 
+        WHERE resourceId = :resourceId 
+        AND resourceType = :resourceType 
+        ORDER BY id ASC
+        LIMIT 1
+    """)
+    abstract fun lastChangeType(resourceId: String, resourceType: ResourceType): Type?
+
+    @Query("""
+        SELECT COUNT(type) 
+        FROM LocalChange 
+        WHERE resourceId = :resourceId 
+        AND resourceType = :resourceType
+        LIMIT 1
+    """)
+    abstract fun countLastChange(resourceId: String, resourceType: ResourceType): Int
+
+    private fun localChangeIsEmpty(resourceId: String, resourceType: ResourceType): Boolean =
+        countLastChange(resourceId, resourceType) == 0
 
     @Query(
         """
         SELECT *
         FROM LocalChange
-        ORDER BY LocalChange.timestamp ASC"""
+        ORDER BY LocalChange.id ASC"""
     )
     abstract fun getAllLocalChanges(): List<LocalChange>
 
