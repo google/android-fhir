@@ -21,10 +21,9 @@ import com.google.fhir.r4.core.Questionnaire.Item.AnswerOption
 import com.google.fhir.r4.core.QuestionnaireResponse.Item.Answer
 import java.security.InvalidKeyException
 import java.text.DateFormat
-import java.time.Instant
-import java.time.ZoneId
 
-private val df = DateFormat.getTimeInstance()
+private val df_time = DateFormat.getTimeInstance()
+val df_date = DateFormat.getDateInstance()
 
 fun AnswerOption.getString(): String {
     if (this.value.hasCoding()) {
@@ -32,12 +31,10 @@ fun AnswerOption.getString(): String {
     } else if (this.value.hasInteger()) {
         return this.value.integer.value.toString()
     } else if (this.value.hasDate()) {
-        return Instant.ofEpochMilli(this.value.date.valueUs /
+        return df_date.format(this.value.date.valueUs /
             QuestionnaireItemDatePickerViewHolderFactory.NUMBER_OF_MICROSECONDS_PER_MILLISECOND)
-            .atZone(ZoneId.systemDefault())
-            .toString()
     } else if (this.value.hasTime()) {
-        return df.format(this.value.time.valueUs /
+        return df_time.format(this.value.time.valueUs /
             QuestionnaireItemDatePickerViewHolderFactory.NUMBER_OF_MICROSECONDS_PER_MILLISECOND)
     } else if (this.value.hasStringValue()) {
         return this.value.stringValue.value.toString()
