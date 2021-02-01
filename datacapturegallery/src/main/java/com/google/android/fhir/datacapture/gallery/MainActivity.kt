@@ -44,12 +44,19 @@ class MainActivity : AppCompatActivity() {
                 QuestionnaireListItem(
                     "Patient registration",
                     "Example authored by Fred Hersch",
-                    "patient-registration.json"),
+                    "patient-registration.json"
+                ),
                 // Example taken from https://openhie.github.io/hiv-ig/Questionnaire-hiv-case-report-questionnaire.json.html
                 QuestionnaireListItem(
                     "HIV Case Report",
-                    "OpenHIE HIV Case Reporting and Monitoring IG",
+                    "HIV Case Reporting and Monitoring IG",
                     "openhie-hiv-case-report.json"
+                ),
+                // Example taken from https://openhie.github.io/covid-ig/Questionnaire-WhoCrQuestionnaireCovid19Surveillance.json.html
+                QuestionnaireListItem(
+                    "COVID-19 Case Report",
+                    "WHO Case Reporting for COVID-19 Surveillance IG",
+                    "openhie-covid-case-report.json"
                 ),
                 // Example taken from https://github.com/cqframework/cds4cpm-mypain/blob/master/src/content/mypain-questionnaire.json
                 QuestionnaireListItem(
