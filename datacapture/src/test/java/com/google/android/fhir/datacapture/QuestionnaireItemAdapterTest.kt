@@ -174,6 +174,7 @@ class QuestionnaireItemAdapterTest {
 
     @Test
     fun getItemViewType_choiceItemType_shouldReturnDropDrownViewHolderType() {
+        //TODO : This test will have to change after radio button support for small choice is added
         val questionnaireItemAdapter = QuestionnaireItemAdapter(
             listOf(
                 QuestionnaireItemViewItem(
