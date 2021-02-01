@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
                     "CDS For Chronic Pain Management",
                     "cds4cpm-mypain.json"
                 ),
-                // IPRD-WITS Clinic HIV Risk assessment questionnaire
+                // IPRD-WITS Clinic HIV Risk assessment questionnaire authored by @joiskash
                 QuestionnaireListItem(
                     "HIV-Risk Assessment",
                     "HIV-Risk Assessment",
