@@ -34,6 +34,9 @@ android {
         }
     }
     compileOptions {
+        // Flag to enable support for the new language APIs
+        // See https://developer.android.com/studio/write/java8-support
+        coreLibraryDesugaringEnabled true
         // Sets Java compatibility to Java 8
         // See https://developer.android.com/studio/write/java8-support
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -71,6 +74,8 @@ dependencies {
     api (deps.hapi_r4) {
         exclude module: 'junit'
     }
+
+    coreLibraryDesugaring deps.desugar
 
     implementation deps.cql_engine.fhir
     implementation deps.guava
