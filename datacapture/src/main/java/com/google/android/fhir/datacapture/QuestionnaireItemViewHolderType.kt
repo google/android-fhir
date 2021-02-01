@@ -30,11 +30,12 @@ enum class QuestionnaireItemViewHolderType(val value: Int) {
     GROUP(0),
     CHECK_BOX(1),
     DATE_PICKER(2),
-    EDIT_TEXT_SINGLE_LINE(3),
-    EDIT_TEXT_MULTI_LINE(4),
-    EDIT_TEXT_INTEGER(5),
-    EDIT_TEXT_DECIMAL(6),
-    RADIO_GROUP(7);
+    DATE_TIME_PICKER(3),
+    EDIT_TEXT_SINGLE_LINE(4),
+    EDIT_TEXT_MULTI_LINE(5),
+    EDIT_TEXT_INTEGER(6),
+    EDIT_TEXT_DECIMAL(7),
+    RADIO_GROUP(8);
 
     companion object {
         private val VALUES = values()

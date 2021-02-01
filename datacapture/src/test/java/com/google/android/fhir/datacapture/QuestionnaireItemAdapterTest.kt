@@ -91,6 +91,26 @@ class QuestionnaireItemAdapterTest {
     }
 
     @Test
+    fun getItemViewType_dateTimeItemType_shouldReturnDateTimePickerViewHolderType() {
+        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+            listOf(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setType(
+                            Questionnaire.Item.TypeCode.newBuilder()
+                                .setValue(QuestionnaireItemTypeCode.Value.DATE_TIME)
+                        )
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                )
+            )
+        )
+        assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
+            QuestionnaireItemViewHolderType.DATE_TIME_PICKER.value
+        )
+    }
+
+    @Test
     fun getItemViewType_stringItemType_shouldReturnEditTextViewHolderType() {
         val questionnaireItemAdapter = QuestionnaireItemAdapter(
             listOf(
