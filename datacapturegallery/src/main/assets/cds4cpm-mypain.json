@@ -1,0 +1,3970 @@
+{
+  "id": "mypain-questionnaire",
+  "meta": {
+    "versionId": "0.1.4",
+    "lastUpdated": "2020-07-09T17:25:11.807Z",
+    "source": "#GO30VbHeXpS2URar",
+    "profile": [
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire|2.7",
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-shareablequestionnaire"
+    ],
+    "tag": [
+      {
+        "code": "lformsVersion: 25.1.3"
+      }
+    ]
+  },
+  "extension": [ {
+    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+    "valueString": "shareable"
+  }, {
+    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+    "valueString": "publishable"
+  }, {
+    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+    "valueString": "narrative"
+  }, {
+    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+    "valueString": "computable"
+  }, {
+    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+    "valueString": "structured"
+  }, {
+    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+    "valueString": "executable"
+  }, {
+    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+    "valueString": "executable"
+  } ],
+  "status": "active",
+  "title": "MyPain Questionnaire",
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "type": "group",
+      "code": [
+        {
+          "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes",
+          "code": "pain-location",
+          "display": "Please describe the location(s) of any pain you have had in the past 7 days."
+        }
+      ],
+      "required": false,
+      "linkId": "1",
+      "text": "We’d like to ask you a few questions about your pain and how it is affecting your life. Please describe the location(s) of any pain you have had in the past 7 days.",
+      "prefix": "My Pain Location",
+      "item": [
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1038",
+              "display": "What type of HEAD pain have you had in the last 7 days?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/pain-types"
+            }
+          ],
+          "required": false,
+          "linkId": "1.1",
+          "text": "What type of HEAD pain?",
+          "prefix": "Head",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "55145008",
+                "display": "Stabbing",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "36349006",
+                "display": "Burning",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "27635008",
+                "display": "Aching",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "786837007",
+                "display": "Tingling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "162506004",
+                "display": "Prickling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "29695002",
+                "display": "Throbbing",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1039",
+              "display": "What type of NECK pain have you had in the last 7 days?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/pain-types"
+            }
+          ],
+          "required": false,
+          "linkId": "1.2",
+          "text": "What type of NECK pain?",
+          "prefix": "Neck",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "55145008",
+                "display": "Stabbing",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "36349006",
+                "display": "Burning",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "27635008",
+                "display": "Aching",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "786837007",
+                "display": "Tingling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "162506004",
+                "display": "Prickling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "29695002",
+                "display": "Throbbing",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1040",
+              "display": "What type of SHOULDERS pain have you had in the last 7 days?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/pain-types"
+            }
+          ],
+          "required": false,
+          "linkId": "1.3",
+          "text": "What type of SHOULDERS pain?",
+          "prefix": "Shoulders",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "55145008",
+                "display": "Stabbing",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "36349006",
+                "display": "Burning",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "27635008",
+                "display": "Aching",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "786837007",
+                "display": "Tingling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "162506004",
+                "display": "Prickling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "29695002",
+                "display": "Throbbing",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1041",
+              "display": "What type of ARMS pain have you had in the last 7 days?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/pain-types"
+            }
+          ],
+          "required": false,
+          "linkId": "1.4",
+          "text": "What type of ARMS pain?",
+          "prefix": "Arms",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "55145008",
+                "display": "Stabbing",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "36349006",
+                "display": "Burning",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "27635008",
+                "display": "Aching",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "786837007",
+                "display": "Tingling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "162506004",
+                "display": "Prickling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "29695002",
+                "display": "Throbbing",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1042",
+              "display": "What type of UPPER BACK pain have you had in the last 7 days?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/pain-types"
+            }
+          ],
+          "required": false,
+          "linkId": "1.5",
+          "text": "What type of UPPER BACK pain?",
+          "prefix": "Upper Back",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "55145008",
+                "display": "Stabbing",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "36349006",
+                "display": "Burning",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "27635008",
+                "display": "Aching",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "786837007",
+                "display": "Tingling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "162506004",
+                "display": "Prickling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "29695002",
+                "display": "Throbbing",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1043",
+              "display": "What type of LOWER BACK pain have you had in the last 7 days?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/pain-types"
+            }
+          ],
+          "required": false,
+          "linkId": "1.6",
+          "text": "What type of LOWER BACK pain?",
+          "prefix": "Lower Back",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "55145008",
+                "display": "Stabbing",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "36349006",
+                "display": "Burning",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "27635008",
+                "display": "Aching",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "786837007",
+                "display": "Tingling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "162506004",
+                "display": "Prickling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "29695002",
+                "display": "Throbbing",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1044",
+              "display": "What type of HANDS pain have you had in the last 7 days?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/pain-types"
+            }
+          ],
+          "required": false,
+          "linkId": "1.7",
+          "text": "What type of HANDS pain?",
+          "prefix": "Hands",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "55145008",
+                "display": "Stabbing",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "36349006",
+                "display": "Burning",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "27635008",
+                "display": "Aching",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "786837007",
+                "display": "Tingling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "162506004",
+                "display": "Prickling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "29695002",
+                "display": "Throbbing",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1045",
+              "display": "What type of ABDOMEN pain have you had in the last 7 days?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/pain-types"
+            }
+          ],
+          "required": false,
+          "linkId": "1.8",
+          "text": "What type of ABDOMEN pain?",
+          "prefix": "Abdomen",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "55145008",
+                "display": "Stabbing",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "36349006",
+                "display": "Burning",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "27635008",
+                "display": "Aching",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "786837007",
+                "display": "Tingling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "162506004",
+                "display": "Prickling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "29695002",
+                "display": "Throbbing",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1046",
+              "display": "What type of PELVIS pain have you had in the last 7 days?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/pain-types"
+            }
+          ],
+          "required": false,
+          "linkId": "1.9",
+          "text": "What type of PELVIS pain?",
+          "prefix": "Pelvis",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "55145008",
+                "display": "Stabbing",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "36349006",
+                "display": "Burning",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "27635008",
+                "display": "Aching",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "786837007",
+                "display": "Tingling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "162506004",
+                "display": "Prickling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "29695002",
+                "display": "Throbbing",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1047",
+              "display": "What type of HIPS pain have you had in the last 7 days?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/pain-types"
+            }
+          ],
+          "required": false,
+          "linkId": "1.10",
+          "text": "What type of HIPS pain?",
+          "prefix": "Hips",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "55145008",
+                "display": "Stabbing",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "36349006",
+                "display": "Burning",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "27635008",
+                "display": "Aching",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "786837007",
+                "display": "Tingling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "162506004",
+                "display": "Prickling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "29695002",
+                "display": "Throbbing",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1048",
+              "display": "What type of UPPER LEGS pain have you had in the last 7 days?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/pain-types"
+            }
+          ],
+          "required": false,
+          "linkId": "1.11",
+          "text": "What type of UPPER LEGS pain?",
+          "prefix": "Upper Legs",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "55145008",
+                "display": "Stabbing",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "36349006",
+                "display": "Burning",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "27635008",
+                "display": "Aching",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "786837007",
+                "display": "Tingling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "162506004",
+                "display": "Prickling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "29695002",
+                "display": "Throbbing",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1049",
+              "display": "What type of KNEES pain have you had in the last 7 days?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/pain-types"
+            }
+          ],
+          "required": false,
+          "linkId": "1.12",
+          "text": "What type of KNEES pain?",
+          "prefix": "Knees",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "55145008",
+                "display": "Stabbing",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "36349006",
+                "display": "Burning",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "27635008",
+                "display": "Aching",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "786837007",
+                "display": "Tingling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "162506004",
+                "display": "Prickling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "29695002",
+                "display": "Throbbing",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1050",
+              "display": "What type of LOWER LEGS pain have you had in the last 7 days?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/pain-types"
+            }
+          ],
+          "required": false,
+          "linkId": "1.13",
+          "text": "What type of LOWER LEGS pain?",
+          "prefix": "Lower Legs",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "55145008",
+                "display": "Stabbing",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "36349006",
+                "display": "Burning",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "27635008",
+                "display": "Aching",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "786837007",
+                "display": "Tingling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "162506004",
+                "display": "Prickling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "29695002",
+                "display": "Throbbing",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1051",
+              "display": "What type of FEET pain have you had in the last 7 days?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/pain-types"
+            }
+          ],
+          "required": false,
+          "linkId": "1.14",
+          "text": "What type of FEET pain?",
+          "prefix": "Feet",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "55145008",
+                "display": "Stabbing",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "36349006",
+                "display": "Burning",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "27635008",
+                "display": "Aching",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "786837007",
+                "display": "Tingling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "162506004",
+                "display": "Prickling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "29695002",
+                "display": "Throbbing",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1052",
+              "display": "What type of EVERYWHERE pain have you had in the last 7 days?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/pain-types"
+            }
+          ],
+          "required": false,
+          "linkId": "1.15",
+          "text": "What type of EVERYWHERE pain?",
+          "prefix": "Everywhere",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "55145008",
+                "display": "Stabbing",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "36349006",
+                "display": "Burning",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "27635008",
+                "display": "Aching",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "786837007",
+                "display": "Tingling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "162506004",
+                "display": "Prickling",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "29695002",
+                "display": "Throbbing",
+                "system": "http://snomed.info/sct"
+              }
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "code": [
+            {
+              "code": "mpq-1053",
+              "display": "What OTHER pain have you had in the last 7 days? Please describe",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "required": false,
+          "linkId": "1.16",
+          "text": "Other, please describe",
+          "prefix": "Other, please describe"
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "code": [
+        {
+          "code": "my-pain-intensity",
+          "display": "Thinking about your overall pain, in the past 7 days, please respond to the questions below:",
+          "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+        }
+      ],
+      "required": false,
+      "linkId": "2",
+      "text": "Thinking about your overall pain, in the past 7 days, please respond to the questions below:",
+      "prefix": "My Pain Intensity",
+      "item": [
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "75262-6",
+              "display": "How intense was your pain at its worse in the past 7 days [PROMIS]",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://loinc.org/vs/LL2949-7"
+            }
+          ],
+          "required": false,
+          "linkId": "2.1",
+          "text": "How intense was your pain at its worst?",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "LA13879-4",
+                "display": "Had no pain",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA6752-5",
+                "display": "Mild",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA6751-7",
+                "display": "Moderate",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA6750-9",
+                "display": "Severe",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13958-6",
+                "display": "Very Severe",
+                "system": "http://loinc.org"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "75261-8",
+              "display": "How intense was your average pain in the past 7 days [PROMIS]",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://loinc.org/vs/LL2949-7"
+            }
+          ],
+          "required": false,
+          "linkId": "2.2",
+          "text": "How intense was your average pain?",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "LA13879-4",
+                "display": "Had no pain",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA6752-5",
+                "display": "Mild",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA6751-7",
+                "display": "Moderate",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA6750-9",
+                "display": "Severe",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13958-6",
+                "display": "Very Severe",
+                "system": "http://loinc.org"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "75260-0",
+              "display": "What is your level of pain right now [PROMIS]",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://loinc.org/vs/LL2951-3"
+            }
+          ],
+          "required": false,
+          "linkId": "2.3",
+          "text": "What is your level of pain right now?",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "LA131-5",
+                "display": "Had no pain",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA6752-5",
+                "display": "Mild",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA6751-7",
+                "display": "Moderate",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA6750-9",
+                "display": "Severe",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13958-6",
+                "display": "Very Severe",
+                "system": "http://loinc.org"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "code": [
+        {
+          "code": "my-pain-interference",
+          "display": "Thinking about your overall pain, in the past 7 days, please respond to the questions below:",
+          "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+        }
+      ],
+      "required": false,
+      "linkId": "3",
+      "text": "Thinking about your overall pain, in the past 7 days, please respond to the questions below:",
+      "prefix": "My Pain Interference",
+      "item": [
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "61758-9",
+              "display": "How much did pain interfere with your day to day activities in past 7 days [PROMIS]",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://loinc.org/vs/LL1017-4"
+            }
+          ],
+          "required": false,
+          "linkId": "3.1",
+          "text": "How much did pain interfere with your day to day activities?",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "LA6568-5",
+                "display": "Not at all",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13863-8",
+                "display": "A little bit",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13909-9",
+                "display": "Somewhat",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13902-4",
+                "display": "Quite a bit",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13914-9",
+                "display": "Very much",
+                "system": "http://loinc.org"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "61769-6",
+              "display": "How much did pain interfere with work around the home in past 7 days [PROMIS]",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://loinc.org/vs/LL1017-4"
+            }
+          ],
+          "required": false,
+          "linkId": "3.2",
+          "text": "How much did pain interfere with your work around the home?",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "LA6568-5",
+                "display": "Not at all",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13863-8",
+                "display": "A little bit",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13909-9",
+                "display": "Somewhat",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13902-4",
+                "display": "Quite a bit",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13914-9",
+                "display": "Very much",
+                "system": "http://loinc.org"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "61773-8",
+              "display": "How much did pain interfere with your ability to participate in social activities in past 7 days [PROMIS]",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://loinc.org/vs/LL1017-4"
+            }
+          ],
+          "required": false,
+          "linkId": "3.3",
+          "text": "How much did pain interfere with your ability to participate in social activities?",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "LA6568-5",
+                "display": "Not at all",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13863-8",
+                "display": "A little bit",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13909-9",
+                "display": "Somewhat",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13902-4",
+                "display": "Quite a bit",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13914-9",
+                "display": "Very much",
+                "system": "http://loinc.org"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "61775-3",
+              "display": "How much did pain interfere with your household chores in past 7 days [PROMIS]",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://loinc.org/vs/LL1017-4"
+            }
+          ],
+          "required": false,
+          "linkId": "3.4",
+          "text": "How much did pain interfere with your household chores?",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "LA6568-5",
+                "display": "Not at all",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13863-8",
+                "display": "A little bit",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13909-9",
+                "display": "Somewhat",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13902-4",
+                "display": "Quite a bit",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13914-9",
+                "display": "Very much",
+                "system": "http://loinc.org"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "code": [
+        {
+          "code": "my-pain-interference",
+          "display": "Thinking about your overall pain, in the past 7 days, please respond to the questions below:",
+          "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+        }
+      ],
+      "required": false,
+      "linkId": "4",
+      "text": "Thinking about your overall pain, in the past 7 days, please respond to the questions below:",
+      "prefix": "My Pain Interference",
+      "item": [
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "61761-3",
+              "display": "How much did pain interfere with the things you usually do for fun in past 7 days [PROMIS]",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://loinc.org/vs/LL1017-4"
+            }
+          ],
+          "required": false,
+          "linkId": "4.1",
+          "text": "How much did pain interfere with the things you usually do for fun?",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "LA6568-5",
+                "display": "Not at all",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13863-8",
+                "display": "A little bit",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13909-9",
+                "display": "Somewhat",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13902-4",
+                "display": "Quite a bit",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13914-9",
+                "display": "Very much",
+                "system": "http://loinc.org"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "61777-9",
+              "display": "How much did pain interfere with your enjoyment of social activities in past 7 days [PROMIS]",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://loinc.org/vs/LL1017-4"
+            }
+          ],
+          "required": false,
+          "linkId": "4.2",
+          "text": "How much did pain interfere with your enjoyment of social activities?",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "LA6568-5",
+                "display": "Not at all",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13863-8",
+                "display": "A little bit",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13909-9",
+                "display": "Somewhat",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13902-4",
+                "display": "Quite a bit",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13914-9",
+                "display": "Very much",
+                "system": "http://loinc.org"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "61794-4",
+              "display": "How much did pain interfere with your enjoyment of life in past 7 days [PROMIS]",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://loinc.org/vs/LL1017-4"
+            }
+          ],
+          "required": false,
+          "linkId": "4.3",
+          "text": "How much did pain interfere with your enjoyment of life?",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "LA6568-5",
+                "display": "Not at all",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13863-8",
+                "display": "A little bit",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13909-9",
+                "display": "Somewhat",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13902-4",
+                "display": "Quite a bit",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13914-9",
+                "display": "Very much",
+                "system": "http://loinc.org"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "61762-1",
+              "display": "How much did pain interfere with your family life in past 7 days [PROMIS]",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://loinc.org/vs/LL1017-4"
+            }
+          ],
+          "required": false,
+          "linkId": "4.4",
+          "text": "How much did pain interfere with your family life?",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "LA6568-5",
+                "display": "Not at all",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13863-8",
+                "display": "A little bit",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13909-9",
+                "display": "Somewhat",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13902-4",
+                "display": "Quite a bit",
+                "system": "http://loinc.org"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA13914-9",
+                "display": "Very much",
+                "system": "http://loinc.org"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "display",
+      "linkId": "5",
+      "text": "We’d like to know more about how you manage your pain and what has worked for you. When answering these questions, please <strong>focus on pain</strong> related to what brings you in for your upcoming medical visit. <br/><br/> These treatments are organized into sections by type: <br/> Basic therapies <br/>Mind-body therapies<br/>New therapies<br/>Non-prescription medicines <br/>Prescription medicines",
+      "prefix": "About My Treatments"
+    },
+    {
+      "type": "group",
+      "code": [
+        {
+          "code": "about-my-treatments",
+          "display": "What have you tried in the <strong>past 6 months</strong> to help you with your pain? Select all answers that apply. We also want to know if it worked for you.",
+          "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+        }
+      ],
+      "required": false,
+      "linkId": "6",
+      "text": "What have you tried in the <strong>past 6 months</strong> to help you with your pain? Select all answers that apply. We also want to know if it worked for you.",
+      "prefix": "About My Treatments",
+      "item": [
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1008",
+              "display": "How often have Exercises at home (such as those assigned by a therapist) or outside (such as walking, jogging, swimming) you have tried in the past 6 months helped you with your pain?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "6.1",
+          "text": "Did it work?",
+          "prefix": "Exercises at home (such as those assigned by a therapist) or outside (such as walking, jogging, swimming)",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1009",
+              "display": "How often have Sleep positioners or devices (such as additional pillows, padding, etc.) you have tried in the past 6 months helped you with your pain?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "6.2",
+          "text": "Did it work?",
+          "prefix": "Sleep positioners or devices (such as additional pillows, padding, etc.)",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnairreresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1010",
+              "display": "How often has Stretching you have tried in the past 6 months helped you with your pain?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "6.3",
+          "text": "Did it work?",
+          "prefix": "Stretching",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1011",
+              "display": "How often has Weight loss or changes in your diet you have tried in the past 6 months helped you with your pain?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "6.4",
+          "text": "Did it work?",
+          "prefix": "Weight loss or changes in your diet",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1012",
+              "display": "How often has Setting and reaching activity goals you have tried in the past 6 months helped you with your pain?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "6.5",
+          "text": "Did it work?",
+          "prefix": "Setting and reaching activity goals",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1013",
+              "display": "How often has Ice or heat therapy you have tried in the past 6 months helped you with your pain?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "6.6",
+          "text": "Did it work?",
+          "prefix": "Ice or Heat Therapy",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1014",
+              "display": "How often has Physical therapy you have tried in the past 6 months helped you with your pain?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "6.7",
+          "text": "Did it work?",
+          "prefix": "Physical Therapy",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1015",
+              "display": "How often has Acupuncture you have tried in the past 6 months helped you with your pain?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "6.8",
+          "text": "Did it work?",
+          "prefix": "Acupuncture",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1016",
+              "display": "How often has Chiropractic treatment you have tried in the past 6 months helped you with your pain?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "6.9",
+          "text": "Did it work?",
+          "prefix": "Chiropractic treatment",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "code": [
+            {
+              "code": "mpq-1054",
+              "display": "How often have Other strategies or methods you have tried in the last 6 months helped with your pain? Please describe",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "required": false,
+          "linkId": "6.10",
+          "text": "Other, please describe",
+          "prefix": "Other, please describe"
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "code": [
+        {
+          "code": "about-my-treatments",
+          "display": "Have you used any of the following <strong>items you can buy without a prescription from your doctor</strong> to help with your pain in the <strong>last 6 months</strong> (select all that apply)?",
+          "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+        }
+      ],
+      "required": false,
+      "linkId": "7",
+      "text": "Have you used any of the following <strong>items you can buy without a prescription from your doctor</strong> to help with your pain in the <strong>last 6 months</strong> (select all that apply)?",
+      "prefix": "About My Treatments",
+      "item": [
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1017",
+              "display": "How often have Pain relievers (such as Advil, Aleve, Aspirin, Ibuprofen, Motrin, Tylenol) you can buy without a prescription from your doctor that you have used in the last 6 months helped with your pain?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "7.1",
+          "text": "Did it work?",
+          "prefix": "Pain relievers (such as Advil, Aleve, Aspirin, Ibuprofen, Motrin, Tylenol)",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1018",
+              "display": "How often have Herbal or nutritional pain relievers (such as ginseng or kava kava) that you have used in the last 6 months helped with your pain?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "7.2",
+          "text": "Did it work?",
+          "prefix": "Herbal or nutritional pain relievers (such as ginseng or kava kava)",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1019",
+              "display": "How often have Cremes, lotions, gels or patches applied to the skin (for example Bengay, Tiger Balm or BioFreeze) that you have used in the last 6 months helped with your pain?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "7.3",
+          "text": "Did it work?",
+          "prefix": "Cremes, lotions, gels or patches applied to the skin (for example BENGAY®, TIGER BALM® or BiOFREEZE®)",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "code": [
+            {
+              "code": "mpq-1055",
+              "display": "Have you used any Other items you can buy without a prescription from your doctor to help with your pain in the last 6 months? Please describe",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "required": false,
+          "linkId": "7.3",
+          "text": "Other, please describe",
+          "prefix": "Other items you can buy without a prescription from your doctor, please describe"
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "code": [
+        {
+          "code": "about-my-treatments",
+          "display": "Have you used any of the following  <strong>prescription medications</strong> to help with your pain in the <strong>last 6 months</strong>?",
+          "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+        }
+      ],
+      "required": false,
+      "linkId": "8",
+      "text": "Have you used any of the following <strong>prescription medications</strong> to help with your pain in the <strong>last 6 months</strong>?",
+      "prefix": "About My Treatments",
+      "item": [
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1020",
+              "display": "How often have prescription Opioid medications (such as hydrocodone, oxycodone, codeine, morphine and fentanyl) helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "8.1",
+          "text": "Did it work?",
+          "prefix": "Opioid medications (such as hydrocodone, oxycodone, codeine, morphine and fentanyl)",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1021",
+              "display": "How often have prescription Cortisone injections (a shot to relieve inflammation) helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "8.2",
+          "text": "Did it work?",
+          "prefix": "Procedure or Injection (such as a shot to relieve inflammation)",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1022",
+              "display": "How often have prescription Non-opioid medications as prescribed by a doctor (such as Celebrex, Cymbalta) helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "8.3",
+          "text": "Did it work?",
+          "prefix": "Non-opioid medications as prescribed by a doctor (such as Celebrex or Cymbalta)",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1056",
+              "display": "How often has Medical marijuana helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "8.4",
+          "text": "Did it work?",
+          "prefix": "Medical marijuana",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "code": [
+            {
+              "code": "mpq-1057",
+              "display": "Have you used any Other prescription medications to help with your pain in the last 6 months?: Please describe",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "required": false,
+          "linkId": "8.5",
+          "text": "Other, please describe",
+          "prefix": "Other, please describe"
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "code": [
+        {
+          "code": "about-my-treatments",
+          "display": "Have you tried any of the following <strong>new therapies</strong> to help with your pain in the <strong>last 6 months</strong> (select all that apply)?",
+          "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+        }
+      ],
+      "required": false,
+      "linkId": "9",
+      "text": "Have you tried any of the following <strong>new therapies</strong> to help with your pain in the <strong>last 6 months</strong> (select all that apply)?",
+      "prefix": "About My Treatments",
+      "item": [
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1023",
+              "display": "How often has Yoga helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "9.1",
+          "text": "Did it work?",
+          "prefix": "Yoga",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1024",
+              "display": "How often has Massage helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "9.2",
+          "text": "Did it work?",
+          "prefix": "Massage",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1025",
+              "display": "How often has Meditation helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "9.3",
+          "text": "Did it work?",
+          "prefix": "Meditation",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1026",
+              "display": "How often has Relaxation or mindfulness-based training helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "9.4",
+          "text": "Did it work?",
+          "prefix": "Relaxation or mindfulness-based training",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1027",
+              "display": "How often has Group or individual therapy for pain helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "9.5",
+          "text": "Did it work?",
+          "prefix": "Group or individual therapy for pain",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1058",
+              "display": "How often has Cognitive behavioral therapy helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "9.6",
+          "text": "Did it work?",
+          "prefix": "Cognitive behavioral therapy",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1028",
+              "display": "How often has Acceptance and commitment therapy helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "9.7",
+          "text": "Did it work?",
+          "prefix": "Acceptance or commitment therapy",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1029",
+              "display": "How often has Sleep management (such as a sleep study or CPAP) helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "9.8",
+          "text": "Did it work?",
+          "prefix": "Sleep management (such as a sleep study or CPAP)",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "code": [
+            {
+              "code": "mpq-1059",
+              "display": "Have you tried any Other mind-body techniques or therapies to help with your pain in the last 6 months? Please describe",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "required": false,
+          "linkId": "9.9",
+          "text": "Other, please describe",
+          "prefix": "Other, please describe"
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "code": [
+        {
+          "code": "about-my-treatments",
+          "display": "Have you tried any of the following <strong>new therapies</strong> to help with your pain in the <strong>last 6 months</strong> (select all that apply)?",
+          "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+        }
+      ],
+      "required": false,
+      "linkId": "10",
+      "text": "Have you tried any of the following <strong>new therapies</strong> to help with your pain in the <strong>last 6 months</strong> (select all that apply)?",
+      "prefix": "About My Treatments",
+      "item": [
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1030",
+              "display": "How often has Aromatherapy helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "10.1",
+          "text": "Did it work?",
+          "prefix": "Aromatherapy",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1031",
+              "display": "How often have Crystals helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "10.2",
+          "text": "Did it work?",
+          "prefix": "Crystals",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1032",
+              "display": "How often have Essential oils helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "10.3",
+          "text": "Did it work?",
+          "prefix": "Essential oils",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1060",
+              "display": "How often has CBD oil helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "10.4",
+          "text": "Did it work?",
+          "prefix": "CBD oil",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1033",
+              "display": "How often has Music therapy helped with your pain in the last 6 months?",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://fhir.org/guides/cqf/cds4cpm/ValueSet/three-item-likert"
+            }
+          ],
+          "required": false,
+          "linkId": "10.5",
+          "text": "Did it work?",
+          "prefix": "Music therapy",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "mpqr-1000",
+                "display": "Never",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1001",
+                "display": "Sometimes",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "mpqr-1002",
+                "display": "Always",
+                "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaireresponse-codes"
+              }
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "code": [
+            {
+              "code": "mpq-1034",
+              "display": "Have you tried any Other new treatments to help with your pain in the last 6 months? Please describe",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "required": false,
+          "linkId": "10.6",
+          "text": "Other, please describe",
+          "prefix": "Other, please describe"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "code": [
+        {
+          "code": "about-my-goals",
+          "display": "We’d like to know more about you and your goals.",
+          "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+        },
+        {
+          "code": "mpq-1035",
+          "display": "What are your most important activity goals? For example: I’d like to be able to walk without pain.",
+          "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+        }
+      ],
+      "required": false,
+      "linkId": "11",
+      "text": "We’d like to know more about you and your goals. What are your most important activity goals? For example: I’d like to be able to walk without pain.",
+      "prefix": "About My Goals"
+    },
+    {
+      "type": "text",
+      "code": [
+        {
+          "code": "about-my-goals",
+          "display": "We’d like to know more about you and your goals.",
+          "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+        },
+        {
+          "code": "mpq-1036",
+          "display": "What are the biggest barriers to achieving your activity goals? For example: I have a lot of stress from work which makes my pain worse.",
+          "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+        }
+      ],
+      "required": false,
+      "linkId": "12",
+      "text": "What are the biggest barriers to achieving your activity goals? For example: I have a lot of stress from work which makes my pain worse.",
+      "prefix": "About My Goals"
+    },
+    {
+      "type": "display",
+      "linkId": "13",
+      "text": "Below is a link to a video produced by the American Chronic Pain Association about living with chronic pain. We’d like to suggest you watch the video to help you prepare for your upcoming visit. This video can help you prepare to ask questions that are important to you when you visit with your provider. <br/> <br/> <a id=\"replace\" value=\"video\"></a>",
+      "prefix": "Managing Chronic Pain"
+    },
+    {
+      "type": "display",
+      "linkId": "14",
+      "text": "The website linked below provides some information from the U.S. Pain Foundation about the causes and diagnosis of pain in general, treatment options and self management and well-being when living with pain. This information can help you prepare to ask questions that are important to you when you visit with your provider.<br/> <br/> <img width=\"100%\" src=\"https://uspainfoundation.org//wp-content/uploads/2017/07/Woman-holding-neck-1024x682.jpg\"/> <a id=\"replace\" value=\"pain-link\"></a> ",
+      "prefix": "Managing Chronic Pain"
+    },
+    {
+      "type": "group",
+      "code": [
+        {
+          "code": "mypain-feedback",
+          "display": "Feedback about your use of MyPAIN",
+          "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+        }
+      ],
+      "required": false,
+      "linkId": "15",
+      "text": "Please indicate your level of agreement with the following statement:",
+      "prefix": "MyPAIN Feedback",
+      "item": [
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "mpq-1063",
+              "display": "Please indicate your level of agreement with the following statement: Using the MyPAIN tool has helped me begin preparing for a conversation with my provider about managing my pain.",
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-answerValueSetSource",
+              "valueCanonical": "http://loinc.org/vs/LL1606-4"
+            }
+          ],
+          "required": false,
+          "linkId": "15.1",
+          "text": "Using the MyPAIN tool has helped me begin preparing for a conversation with my provider about managing my pain.",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "LA15238-1",
+                "display": "Disagree a lot",
+                "system": "https://loinc.org/LL1606-4/"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA15239-9",
+                "display": "Disagree a little",
+                "system": "https://loinc.org/LL1606-4/"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA15240-7",
+                "display": "Neither agree nor disagree",
+                "system": "https://loinc.org/LL1606-4/"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA15241-5",
+                "display": "Agree a little",
+                "system": "https://loinc.org/LL1606-4/"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA15242-3",
+                "display": "Agree a lot",
+                "system": "https://loinc.org/LL1606-4/"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "code": [
+        {
+          "code": "mpq-1064",
+          "display": "Do you have any other feedback or thoughts to share on your use of MyPAIN?",
+          "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+        },
+        {
+          "code": "mypain-feedback",
+          "display": "Feedback on your use of MyPAIN",
+          "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes"
+        }
+      ],
+      "required": false,
+      "linkId": "16",
+      "text": "Do you have any other feedback or thoughts to share on your use of MyPAIN?",
+      "prefix": "MyPAIN Feedback"
+    }
+  ]
+}
