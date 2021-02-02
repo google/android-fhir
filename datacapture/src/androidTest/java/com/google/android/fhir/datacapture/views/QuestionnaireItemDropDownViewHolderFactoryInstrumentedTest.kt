@@ -23,6 +23,8 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.getDisplayString
+import com.google.android.fhir.datacapture.getResponseAnswerValueX
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import com.google.fhir.r4.core.Code
@@ -69,7 +71,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
 
     @Test
     @UiThreadTest
-    fun shouldSetDropDownOptionValueCoding() {
+    fun shouldPopulateDropDown() {
         val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
             .setValue(
                 Questionnaire.Item.AnswerOption.ValueX.newBuilder()
@@ -99,7 +101,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
     }
     @Test
     @UiThreadTest
-    fun shouldSetDropDownOptionValueCodingEmpty() {
+    fun shouldSetDropDownOptionEmptyIfValueCodingDisplayEmpty() {
         val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
             .setValue(
                 Questionnaire.Item.AnswerOption.ValueX.newBuilder()
@@ -124,5 +126,71 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
             .adapter
             .getItem(0)
             .toString()).isEqualTo("")
+    }
+
+    @Test
+    @UiThreadTest
+    fun shouldSetAutoTextureViewEmptyIfAnswerNull() {
+        val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
+            .setValue(
+                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
+                    .setCoding(
+                        Coding.newBuilder()
+                            .setCode(
+                                Code.newBuilder()
+                                    .setValue("test-code")
+                            )
+                            .setDisplay(
+                                String.newBuilder().setValue("Test Code"))
+                    )
+            ).build()
+
+        viewHolder.bind(
+            QuestionnaireItemViewItem(
+                Questionnaire.Item.newBuilder().apply {
+                    addAnswerOption(answerOption)
+                }.build(),
+                QuestionnaireResponse.Item.newBuilder()
+                )
+            )
+
+        assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>(
+            R.id.exposed_dropdown_menu).text.toString()).isEqualTo("")
+    }
+
+    @Test
+    @UiThreadTest
+    fun shouldAutoTextureViewToDisplayIfAnswerNotNull() {
+        val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
+            .setValue(
+                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
+                    .setCoding(
+                        Coding.newBuilder()
+                            .setCode(
+                                Code.newBuilder()
+                                    .setValue("test-code")
+                            )
+                            .setDisplay(
+                                String.newBuilder().setValue("Test Code"))
+                    )
+            ).build()
+
+        viewHolder.bind(
+            QuestionnaireItemViewItem(
+                Questionnaire.Item.newBuilder().apply {
+                    addAnswerOption(answerOption)
+                }.build(),
+                QuestionnaireResponse.Item.newBuilder().addAnswer(0,
+                    QuestionnaireResponse.Item.Answer.newBuilder()
+                        .setValue(
+                            answerOption.getResponseAnswerValueX()
+                        )
+
+                )
+            )
+        )
+
+        assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>(
+            R.id.exposed_dropdown_menu).text.toString()).isEqualTo(answerOption.getDisplayString())
     }
 }
