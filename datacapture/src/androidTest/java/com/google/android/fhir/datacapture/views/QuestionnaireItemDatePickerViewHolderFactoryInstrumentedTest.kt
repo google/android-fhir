@@ -51,7 +51,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
     }
 
     @Test
-    fun shouldSetTextViewText() {
+    fun shouldSetTextInputLayoutHint() {
         viewHolder.bind(
             QuestionnaireItemViewItem(
                 Questionnaire.Item.newBuilder().apply {
