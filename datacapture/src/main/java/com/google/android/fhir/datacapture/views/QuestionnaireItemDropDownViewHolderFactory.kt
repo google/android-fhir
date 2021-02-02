@@ -33,11 +33,13 @@ object QuestionnaireItemDropDownViewHolderFactory : QuestionnaireItemViewHolderF
     override fun getQuestionnaireItemViewHolderDelegate() =
         object : QuestionnaireItemViewHolderDelegate {
             private lateinit var textInputLayout: TextInputLayout
+            private lateinit var autoCompleteTextView: AutoCompleteTextView
             private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
             private lateinit var context: Context
 
             override fun init(itemView: View) {
                 textInputLayout = itemView.findViewById(R.id.dropdown_menu)
+                autoCompleteTextView = itemView.findViewById(R.id.exposed_dropdown_menu)
                 context = itemView.context
             }
 
@@ -53,8 +55,10 @@ object QuestionnaireItemDropDownViewHolderFactory : QuestionnaireItemViewHolderF
                     R.layout.questionnaire_item_drop_down_list,
                     answerOptionString
                 )
-                (textInputLayout.editText as? AutoCompleteTextView)?.setAdapter(adapter)
-                (textInputLayout.editText as? AutoCompleteTextView)?.onItemClickListener =
+                autoCompleteTextView.setText(
+                    questionnaireItemViewItem.singleAnswerOrNull?.value?.coding?.display?.value?:"")
+                autoCompleteTextView.setAdapter(adapter)
+                autoCompleteTextView.onItemClickListener =
                     object : AdapterView.OnItemClickListener {
                         override fun onItemClick(
                             parent: AdapterView<*>?,
