@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemDateTimePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextDecimalViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextIntegerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextMultiLineViewHolderFactory
@@ -43,6 +44,8 @@ internal class QuestionnaireItemAdapter(
             QuestionnaireItemViewHolderType.CHECK_BOX -> QuestionnaireItemCheckBoxViewHolderFactory
             QuestionnaireItemViewHolderType.DATE_PICKER ->
                 QuestionnaireItemDatePickerViewHolderFactory
+            QuestionnaireItemViewHolderType.DATE_TIME_PICKER ->
+                QuestionnaireItemDateTimePickerViewHolderFactory
             QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE ->
                 QuestionnaireItemEditTextSingleLineViewHolderFactory
             QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE ->
@@ -73,6 +76,8 @@ internal class QuestionnaireItemAdapter(
             QuestionnaireItemTypeCode.Value.GROUP -> QuestionnaireItemViewHolderType.GROUP
             QuestionnaireItemTypeCode.Value.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
             QuestionnaireItemTypeCode.Value.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
+            QuestionnaireItemTypeCode.Value.DATE_TIME ->
+                QuestionnaireItemViewHolderType.DATE_TIME_PICKER
             QuestionnaireItemTypeCode.Value.STRING ->
                 QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE
             QuestionnaireItemTypeCode.Value.TEXT ->
