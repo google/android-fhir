@@ -25,6 +25,7 @@
     <item
         android:id="@+id/action_submit"
         android:orderInCategory="300"
+        android:actionLayout="@layout/menu_action_submit"
         android:title="@string/submit_button_text"
         app:showAsAction="ifRoom" />
 

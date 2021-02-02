@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView android:id="@+id/text"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="12dp"
+    android:background="@drawable/border"
+    android:padding="12dp"
+    android:gravity="center"
+    android:textColor="#FF000000"
+    android:textAllCaps="true"
+    tools:text="@string/submit_button_text"/>
