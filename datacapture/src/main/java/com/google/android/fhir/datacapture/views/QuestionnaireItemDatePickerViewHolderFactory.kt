@@ -120,11 +120,11 @@ object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolde
         }
 
     @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
-    val LOCAL_DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE
-
-    const val NUMBER_OF_MICROSECONDS_PER_SECOND = 1000000
-    const val NUMBER_OF_MICROSECONDS_PER_MILLISECOND = 1000
+    val LOCAL_DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE!!
 }
+
+const val NUMBER_OF_MICROSECONDS_PER_SECOND = 1000000
+const val NUMBER_OF_MICROSECONDS_PER_MILLISECOND = 1000
 
 /**
  * Returns the [AppCompatActivity] if there exists one wrapped inside [ContextThemeWrapper]s, or
@@ -136,7 +136,7 @@ object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolde
  * TODO: find a more robust way to do this as it is not guaranteed that the activity is
  * an AppCompatActivity.
  */
-private fun Context.tryUnwrapContext(): AppCompatActivity? {
+internal fun Context.tryUnwrapContext(): AppCompatActivity? {
     var context = this
     while (true) {
         when (context) {

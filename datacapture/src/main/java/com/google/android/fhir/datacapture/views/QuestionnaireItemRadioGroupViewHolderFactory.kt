@@ -22,6 +22,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.fhir.r4.core.Coding
 import com.google.fhir.r4.core.QuestionnaireResponse
 
 object QuestionnaireItemRadioGroupViewHolderFactory : QuestionnaireItemViewHolderFactory(
@@ -52,7 +53,7 @@ object QuestionnaireItemRadioGroupViewHolderFactory : QuestionnaireItemViewHolde
                 questionnaireItem.answerOptionList.forEach {
                     radioGroup.addView(RadioButton(radioGroup.context).apply {
                         id = index++ // Use the answer option index as radio button ID
-                        text = it.value.coding.display.value
+                        text = it.value.coding.displayValue
                         layoutParams = ViewGroup.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -75,3 +76,13 @@ object QuestionnaireItemRadioGroupViewHolderFactory : QuestionnaireItemViewHolde
             }
         }
 }
+
+val Coding.displayValue: String
+    get() {
+        val display = this.display.value
+        return if (display.isEmpty()) {
+            this.code.value
+        } else {
+            display
+        }
+    }
