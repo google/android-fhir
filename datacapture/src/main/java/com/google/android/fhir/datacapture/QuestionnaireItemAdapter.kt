@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemDropDownViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextDecimalViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextIntegerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextMultiLineViewHolderFactory
@@ -28,6 +29,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolde
 import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.fhir.r4.core.Extension
 import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 
 internal class QuestionnaireItemAdapter(
@@ -53,6 +55,8 @@ internal class QuestionnaireItemAdapter(
                 QuestionnaireItemEditTextDecimalViewHolderFactory
             QuestionnaireItemViewHolderType.RADIO_GROUP ->
                 QuestionnaireItemRadioGroupViewHolderFactory
+            QuestionnaireItemViewHolderType.DROP_DOWN ->
+                QuestionnaireItemDropDownViewHolderFactory
         }
         return viewHolder.create(parent)
     }
@@ -68,23 +72,56 @@ internal class QuestionnaireItemAdapter(
      * (http://hl7.org/fhir/R4/valueset-questionnaire-item-control.html) used in the
      * itemControl extension (http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html).
      */
-    override fun getItemViewType(position: Int) =
-        when (val type = questionnaireItemViewItemList[position].questionnaireItem.type.value) {
-            QuestionnaireItemTypeCode.Value.GROUP -> QuestionnaireItemViewHolderType.GROUP
-            QuestionnaireItemTypeCode.Value.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
-            QuestionnaireItemTypeCode.Value.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
+    override fun getItemViewType(position: Int): Int {
+            var itemViewType: Int
+            val questionnaireViewItem = questionnaireItemViewItemList[position]
+            val itemControl = getItemControlFromExtensions(
+                questionnaireViewItem.questionnaireItem.extensionList)
+
+            itemViewType = when (val type = questionnaireViewItem.questionnaireItem.type.value) {
+            QuestionnaireItemTypeCode.Value.GROUP -> QuestionnaireItemViewHolderType.GROUP.value
+            QuestionnaireItemTypeCode.Value.BOOLEAN ->
+                QuestionnaireItemViewHolderType.CHECK_BOX.value
+            QuestionnaireItemTypeCode.Value.DATE ->
+                QuestionnaireItemViewHolderType.DATE_PICKER.value
             QuestionnaireItemTypeCode.Value.STRING ->
-                QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE
+                QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE.value
             QuestionnaireItemTypeCode.Value.TEXT ->
-                QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE
+                QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE.value
             QuestionnaireItemTypeCode.Value.INTEGER ->
-                QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
+                QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER.value
             QuestionnaireItemTypeCode.Value.DECIMAL ->
-                QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
+                QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL.value
             QuestionnaireItemTypeCode.Value.CHOICE ->
-                QuestionnaireItemViewHolderType.RADIO_GROUP
+            {
+                if (itemControl == ItemControlTypeConstants.ITEM_CONTROL_DROP_DOWN.name) {
+                    QuestionnaireItemViewHolderType.DROP_DOWN.value
+                } else if (
+                    questionnaireViewItem.questionnaireItem.answerOptionCount>
+                    MINIMUM_NUMBER_OF_ITEMS_FOR_DROP_DOWN) {
+                    QuestionnaireItemViewHolderType.DROP_DOWN.value
+                } else {
+                    QuestionnaireItemViewHolderType.RADIO_GROUP.value
+                }
+            }
             else -> throw NotImplementedError("Question type $type not supported.")
-        }.value
+        }
+            return itemViewType
+        }
 
     override fun getItemCount() = questionnaireItemViewItemList.size
+
+    // Returns item control code as string or null
+    private fun getItemControlFromExtensions(extensions: MutableList<Extension>): String? {
+        extensions.forEach {
+            if (it.url.equals(ItemControlTypeConstants.EXTENSION_ITEM_CONTROL_URL)) {
+                return it.value.code.value
+            }
+        }
+        return null
+    }
+
+    companion object {
+        var MINIMUM_NUMBER_OF_ITEMS_FOR_DROP_DOWN = 4
+    }
 }
