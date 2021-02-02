@@ -37,7 +37,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
     private val viewHolder = QuestionnaireItemRadioGroupViewHolderFactory.create(parent)
 
     @Test
-    fun shouldSetHeaderText() {
+    fun bind_shouldSetHeaderText() {
         viewHolder.bind(
             QuestionnaireItemViewItem(
                 Questionnaire.Item.newBuilder().apply {
@@ -53,7 +53,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
     }
 
     @Test
-    fun shouldCreateRadioButtons() {
+    fun bind_shouldCreateRadioButtons() {
         viewHolder.bind(
             QuestionnaireItemViewItem(
                 Questionnaire.Item.newBuilder().apply {
@@ -91,7 +91,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
     }
 
     @Test
-    fun shouldSetRadioButtonsUnchecked() {
+    fun bind_noAnswer_shouldLeaveRadioButtonsUnchecked() {
         viewHolder.bind(
             QuestionnaireItemViewItem(
                 Questionnaire.Item.newBuilder().apply {
@@ -119,7 +119,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
 
     @Test
     @UiThreadTest
-    fun shouldSetRadioButtonsChecked() {
+    fun bind_answer_shouldCheckRadioButton() {
         viewHolder.bind(
             QuestionnaireItemViewItem(
                 Questionnaire.Item.newBuilder().apply {
@@ -129,6 +129,15 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
                                 coding = Coding.newBuilder().apply {
                                     display = com.google.fhir.r4.core.String.newBuilder()
                                         .setValue("Coding 1")
+                                        .build()
+                                }.build()
+                            }.build()
+                        }.build(),
+                        Questionnaire.Item.AnswerOption.newBuilder().apply {
+                            value = Questionnaire.Item.AnswerOption.ValueX.newBuilder().apply {
+                                coding = Coding.newBuilder().apply {
+                                    display = com.google.fhir.r4.core.String.newBuilder()
+                                        .setValue("Coding 2")
                                         .build()
                                 }.build()
                             }.build()
@@ -149,15 +158,19 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
             )
         )
 
-        val radioButton =
-            viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group)
-                .getChildAt(0) as RadioButton
-        assertThat(radioButton.isChecked).isTrue()
+        assertThat(
+            (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group)
+                .getChildAt(0) as RadioButton).isChecked
+        ).isTrue()
+        assertThat(
+            (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group)
+                .getChildAt(1) as RadioButton).isChecked
+        ).isFalse()
     }
 
     @Test
     @UiThreadTest
-    fun shouldSetQuestionnaireResponseItemComponentAnswer() {
+    fun click_shouldSetQuestionnaireResponseItemAnswer() {
         val questionnaireItemViewItem = QuestionnaireItemViewItem(
             Questionnaire.Item.newBuilder().apply {
                 addAllAnswerOption(mutableListOf(
@@ -175,10 +188,53 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
             QuestionnaireResponse.Item.newBuilder()
         )
         viewHolder.bind(questionnaireItemViewItem)
-        viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0).performClick()
+        viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0)
+            .performClick()
 
         val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerBuilderList
         assertThat(answer.size).isEqualTo(1)
         assertThat(answer[0].value.coding.display.value).isEqualTo("Coding 1")
+    }
+
+    @Test
+    @UiThreadTest
+    fun click_shouldCheckRadioButton() {
+        val questionnaireItemViewItem = QuestionnaireItemViewItem(
+            Questionnaire.Item.newBuilder().apply {
+                addAllAnswerOption(mutableListOf(
+                    Questionnaire.Item.AnswerOption.newBuilder().apply {
+                        value = Questionnaire.Item.AnswerOption.ValueX.newBuilder().apply {
+                            coding = Coding.newBuilder().apply {
+                                display = com.google.fhir.r4.core.String.newBuilder()
+                                    .setValue("Coding 1")
+                                    .build()
+                            }.build()
+                        }.build()
+                    }.build(),
+                    Questionnaire.Item.AnswerOption.newBuilder().apply {
+                        value = Questionnaire.Item.AnswerOption.ValueX.newBuilder().apply {
+                            coding = Coding.newBuilder().apply {
+                                display = com.google.fhir.r4.core.String.newBuilder()
+                                    .setValue("Coding 2")
+                                    .build()
+                            }.build()
+                        }.build()
+                    }.build()
+                ))
+            }.build(),
+            QuestionnaireResponse.Item.newBuilder()
+        )
+        viewHolder.bind(questionnaireItemViewItem)
+        viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0)
+            .performClick()
+
+        assertThat(
+            (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group)
+                .getChildAt(0) as RadioButton).isChecked
+        ).isTrue()
+        assertThat(
+            (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group)
+                .getChildAt(1) as RadioButton).isChecked
+        ).isFalse()
     }
 }
