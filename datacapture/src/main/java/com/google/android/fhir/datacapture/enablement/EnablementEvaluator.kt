@@ -22,37 +22,68 @@ import com.google.fhir.r4.core.QuestionnaireItemOperatorCode
 import com.google.fhir.r4.core.QuestionnaireResponse
 import java.lang.IllegalStateException
 
-/** Evaluator for the enablement status of a [Questionnaire.Item]. */
+/**
+ * Evaluator for the enablement status of a [Questionnaire.Item]. Uses the `enableWhen` constraints
+ * and the `enableBehavior` value defined in the [Questionnaire.Item]. Also depends on the answers
+ * (or lack thereof) captured in the specified [QuestionnaireResponse.Item]s.
+ *
+ * For example, the following `enableWhen` constraint in a [Questionnaire.Item]
+ *     "enableWhen": [
+ *       {
+ *         "question": "vitaminKgiven",
+ *         "operator": "exists",
+ *         "answerBoolean": true
+ *       }
+ *     ],
+ * specifies that the [Questionnaire.Item] should be enabled only if the question with ID
+ * `vitaminKgiven` has been answered.
+ *
+ * The enablement status typically determines whether the [Questionnaire.Item] is shown or hidden.
+ * However, it is also possible that only user interaction is enabled or disabled (e.g. grayed out)
+ * with the [Questionnaire.Item] always shown.
+ *
+ * For more information see [Questionnaire.item.enableWhen](https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableWhen)
+ * and [Questionnaire.item.enableBehavior](https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableBehavior).
+ */
 object EnablementEvaluator {
 
     /**
      * Returns whether [questionnaireItem] should be enabled.
      *
      * @param questionnaireResponseItemRetriever function that returns the
-     * [QuestionnaireResponse.Item] with the `linkId`.
+     * [QuestionnaireResponse.Item] with the `linkId`, or null if there isn't one.
+     *
+     * For example, the questionnaireItem might be
      */
     fun evaluate(
         questionnaireItem: Questionnaire.Item,
-        questionnaireResponseItemRetriever: (String) -> QuestionnaireResponse.Item?
+        questionnaireResponseItemRetriever: (linkId: String) -> QuestionnaireResponse.Item?
     ): Boolean {
-        if (questionnaireItem.enableWhenList.isEmpty()) {
+        val enableWhenList = questionnaireItem.enableWhenList
+        if (enableWhenList.isEmpty()) {
+            // The questionnaire item is enabled by default if there is no `enableWhen` constraint.
             return true
         }
 
-        if (questionnaireItem.enableWhenList.size == 1) {
+        // Evaluate single `enableWhen` constraint.
+        if (enableWhenList.size == 1) {
             return evaluateEnableWhen(
-                questionnaireItem.enableWhenList.single(),
+                enableWhenList.single(),
                 questionnaireResponseItemRetriever
             )
         }
 
+        // Evaluate multiple `enableWhen` constraints and aggregate the results according to
+        // `enableBehavior` which specifies 1) all `enableWhen` constraints must be satisfied for
+        // the questionnaire item to be enabled, or 2) the questionnaire item is enabled if any
+        // `enableWhen` constraint is satisfied.
         return when (val value = questionnaireItem.enableBehavior.value) {
             EnableWhenBehaviorCode.Value.ALL ->
-                questionnaireItem.enableWhenList.all {
+                enableWhenList.all {
                     evaluateEnableWhen(it, questionnaireResponseItemRetriever)
                 }
             EnableWhenBehaviorCode.Value.ANY ->
-                questionnaireItem.enableWhenList.any {
+                enableWhenList.any {
                     evaluateEnableWhen(it, questionnaireResponseItemRetriever)
                 }
             else ->
@@ -61,21 +92,21 @@ object EnablementEvaluator {
     }
 
     /**
-     * Returns whether the `enableWhen` expression is satisfied.
+     * Returns whether the `enableWhen` constraint is satisfied.
      *
      * @param questionnaireResponseItemRetriever function that returns the
-     * [QuestionnaireResponse.Item] with the `linkId`.
+     * [QuestionnaireResponse.Item] with the `linkId`, or null if there isn't one.
      */
     private fun evaluateEnableWhen(
         enableWhen: Questionnaire.Item.EnableWhen,
-        questionnaireResponseItemRetriever: (String) -> QuestionnaireResponse.Item?
+        questionnaireResponseItemRetriever: (linkId: String) -> QuestionnaireResponse.Item?
     ): Boolean {
         val responseItem =
             questionnaireResponseItemRetriever(enableWhen.question.value) ?: return true
-        return when (enableWhen.operator.value) {
+        return when (val operator = enableWhen.operator.value) {
             QuestionnaireItemOperatorCode.Value.EXISTS ->
                 (responseItem.answerCount > 0) == enableWhen.answer.boolean.value
-            else -> throw NotImplementedError("Not implemented yet.")
+            else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
         }
     }
 }
