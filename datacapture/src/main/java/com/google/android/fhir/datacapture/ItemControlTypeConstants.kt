@@ -22,8 +22,8 @@ package com.google.android.fhir.datacapture
  * This is used in [QuestionnaireItemAdapter] to determine how each [Questionnaire.Item] is
  * rendered.
  */
-enum class ItemControlTypeConstants(s: String) {
-    ITEM_CONTROL_DROP_DOWN("drop-down"),
-    EXTENSION_ITEM_CONTROL_URL(
-        "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl");
+object ItemControlTypeConstants {
+    const val ITEM_CONTROL_DROP_DOWN = "drop-down"
+    const val EXTENSION_ITEM_CONTROL_URL =
+        "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
 }
