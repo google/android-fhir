@@ -22,8 +22,8 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.getDisplayString
-import com.google.android.fhir.datacapture.getResponseAnswerValueX
+import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.responseAnswerValueX
 import com.google.android.material.textfield.TextInputLayout
 import com.google.fhir.r4.core.QuestionnaireResponse
 
@@ -39,17 +39,17 @@ object QuestionnaireItemDropDownViewHolderFactory : QuestionnaireItemViewHolderF
 
             override fun init(itemView: View) {
                 textInputLayout = itemView.findViewById(R.id.dropdown_menu)
-                autoCompleteTextView = itemView.findViewById(R.id.exposed_dropdown_menu)
+                autoCompleteTextView = itemView.findViewById(R.id.auto_complete)
                 context = itemView.context
             }
 
             override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
                 this.questionnaireItemViewItem = questionnaireItemViewItem
                 textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.text.value
-                val answerOptionString = arrayListOf<String>()
-                this.questionnaireItemViewItem.questionnaireItem.answerOptionList.forEach {
-                    answerOptionString.add(it.getDisplayString())
-                }
+                val answerOptionString =
+                    this.questionnaireItemViewItem.questionnaireItem.answerOptionList.map {
+                        it.displayString
+                    }
                 val adapter = ArrayAdapter(
                     context,
                     R.layout.questionnaire_item_drop_down_list,
@@ -71,7 +71,7 @@ object QuestionnaireItemDropDownViewHolderFactory : QuestionnaireItemViewHolderF
                                     .setValue(
                                         questionnaireItemViewItem
                                             .questionnaireItem
-                                            .answerOptionList[position].getResponseAnswerValueX()
+                                            .answerOptionList[position].responseAnswerValueX
                                     )
                         }
                     }

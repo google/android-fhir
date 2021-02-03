@@ -19,23 +19,29 @@ package com.google.android.fhir.datacapture
 import com.google.fhir.r4.core.Questionnaire.Item.AnswerOption
 import com.google.fhir.r4.core.QuestionnaireResponse.Item.Answer
 
-// Helper functions defined for Questionnaire.Item.AnswerOption .
-// "choice" type question only expects valueCoding in answerOptions
-
-fun AnswerOption.getDisplayString(): String {
-    if (this.value.hasCoding()) {
-        return this.value.coding.display.value
-    } else {
-        throw NotImplementedError("$this is not supported")
+val AnswerOption.displayString: String
+    get() {
+        if (this.value.hasCoding()) {
+            val display = this.value.coding.display.value
+            return if (display.isEmpty()) {
+                this.value.coding.code.value
+            } else {
+                display
+            }
+        } else {
+            throw IllegalArgumentException("Answer option does not having coding.")
+        }
     }
-}
 
-fun AnswerOption.getResponseAnswerValueX(): Answer.ValueX {
-    if (this.value.hasCoding()) {
-        return Answer.ValueX.newBuilder()
-            .setCoding(this.value.coding)
-            .build()
-    } else {
-        throw NotImplementedError("$this is not supported")
+val AnswerOption.responseAnswerValueX: Answer.ValueX
+    get() {
+        if (this.value.hasCoding()) {
+            return this.value.coding.let {
+                Answer.ValueX.newBuilder()
+                    .setCoding(it)
+                    .build()
+            }
+        } else {
+            throw IllegalArgumentException("Answer option does not having coding.")
+        }
     }
-}

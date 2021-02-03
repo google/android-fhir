@@ -22,8 +22,8 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.getDisplayString
-import com.google.android.fhir.datacapture.getResponseAnswerValueX
+import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.responseAnswerValueX
 import com.google.fhir.r4.core.QuestionnaireResponse
 
 object QuestionnaireItemRadioGroupViewHolderFactory : QuestionnaireItemViewHolderFactory(
@@ -53,7 +53,7 @@ object QuestionnaireItemRadioGroupViewHolderFactory : QuestionnaireItemViewHolde
                 // TODO: support other answer types besides coding
                 questionnaireItem.answerOptionList.forEach {
                     radioGroup.addView(RadioButton(radioGroup.context).apply {
-                        text = it.getDisplayString()
+                        text = it.displayString
                         layoutParams = ViewGroup.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -66,7 +66,7 @@ object QuestionnaireItemRadioGroupViewHolderFactory : QuestionnaireItemViewHolde
                             if (isChecked) {
                                 questionnaireResponseItemBuilder.clearAnswer().addAnswer(
                                     QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                                        value = it.getResponseAnswerValueX()
+                                        value = it.responseAnswerValueX
                                     }
                                 )
                             }
