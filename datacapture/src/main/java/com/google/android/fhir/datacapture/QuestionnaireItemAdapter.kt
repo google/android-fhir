@@ -29,7 +29,6 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolde
 import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import com.google.fhir.r4.core.Extension
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 
@@ -73,7 +72,7 @@ internal class QuestionnaireItemAdapter(
      * (http://hl7.org/fhir/R4/valueset-questionnaire-item-control.html) used in the
      * itemControl extension (http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html).
      */
-    override fun getItemViewType(position: Int) : Int {
+    override fun getItemViewType(position: Int): Int {
         val questionnaireViewItem = questionnaireItemViewItemList[position]
         return when (val type = questionnaireViewItem.questionnaireItem.type.value) {
             QuestionnaireItemTypeCode.Value.GROUP -> QuestionnaireItemViewHolderType.GROUP
@@ -96,28 +95,24 @@ internal class QuestionnaireItemAdapter(
 
     override fun getItemCount() = questionnaireItemViewItemList.size
 
-    private fun getChoiceViewHolderType(questionnaireViewItem:QuestionnaireItemViewItem):
-        QuestionnaireItemViewHolderType
-    {
+    private fun getChoiceViewHolderType(questionnaireViewItem: QuestionnaireItemViewItem):
+        QuestionnaireItemViewHolderType {
         if (questionnaireViewItem.questionnaireItem.itemControl.equals(
-                ItemControlTypeConstants.ITEM_CONTROL_DROP_DOWN))
-        {
+                ItemControlTypeConstants.ITEM_CONTROL_DROP_DOWN)) {
             return QuestionnaireItemViewHolderType.DROP_DOWN
         } else if (
             questionnaireViewItem.questionnaireItem.answerOptionCount >
-            MINIMUM_NUMBER_OF_ITEMS_FOR_DROP_DOWN)
-        {
+            MINIMUM_NUMBER_OF_ITEMS_FOR_DROP_DOWN) {
             return QuestionnaireItemViewHolderType.DROP_DOWN
         } else {
             return QuestionnaireItemViewHolderType.RADIO_GROUP
         }
     }
     // Item control code as string or null
-    val Questionnaire.Item.itemControl:String?
-        get()
-        {
+    val Questionnaire.Item.itemControl: String?
+        get() {
             this.extensionList.forEach {
-                if(it.url.equals(ItemControlTypeConstants.EXTENSION_ITEM_CONTROL_URL)){
+                if (it.url.equals(ItemControlTypeConstants.EXTENSION_ITEM_CONTROL_URL)) {
                     return it.value.code.value
                 }
             }
@@ -127,6 +122,4 @@ internal class QuestionnaireItemAdapter(
     private companion object {
         const val MINIMUM_NUMBER_OF_ITEMS_FOR_DROP_DOWN = 4
     }
-
-
 }

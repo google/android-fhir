@@ -56,7 +56,9 @@ object QuestionnaireItemDropDownViewHolderFactory : QuestionnaireItemViewHolderF
                     answerOptionString
                 )
                 autoCompleteTextView.setText(
-                    questionnaireItemViewItem.singleAnswerOrNull?.value?.coding?.display?.value?:"")
+                    questionnaireItemViewItem.singleAnswerOrNull?.value?.coding?.display?.value
+                        ?: ""
+                )
                 autoCompleteTextView.setAdapter(adapter)
                 autoCompleteTextView.onItemClickListener =
                     object : AdapterView.OnItemClickListener {
