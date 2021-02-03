@@ -175,6 +175,15 @@ class DatabaseImplTest {
         assertThat(localChange.payload).isEmpty()
     }
 
+    @Test
+    fun delete_nonExistent_shouldNotInsertLocalChange() {
+        database.delete(Patient::class.java, "nonexistent_patient")
+        assertThat(database.getAllLocalChanges()
+                .none { it.type.equals(LocalChange.Type.DELETE)
+                        && it.resourceId.equals("nonexistent_patient") }
+        ).isTrue()
+    }
+
     private companion object {
         const val TEST_PATIENT_1_ID = "test_patient_1"
         val TEST_PATIENT_1 = Patient()

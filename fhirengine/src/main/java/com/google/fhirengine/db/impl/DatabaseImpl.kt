@@ -116,11 +116,11 @@ internal class DatabaseImpl(
     @Transaction
     override fun <R : Resource> delete(clazz: Class<R>, id: String) {
         val type = getResourceType(clazz)
-        resourceDao.deleteResource(
+        val rowsDeleted = resourceDao.deleteResource(
             resourceId = id,
             resourceType = type
         )
-        localChangeDao.addDelete(resourceId = id, resourceType = type)
+        if (rowsDeleted > 0) localChangeDao.addDelete(resourceId = id, resourceType = type)
     }
 
     override fun <R : Resource> searchByReference(
