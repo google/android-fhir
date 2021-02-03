@@ -95,7 +95,8 @@ class QuestionnaireItemAdapterTest {
 
     @Test
     fun getItemViewType_dateTimeItemType_shouldReturnDateTimePickerViewHolderType() {
-        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+        val questionnaireItemAdapter = QuestionnaireItemAdapter()
+        questionnaireItemAdapter.submitList(
             listOf(
                 QuestionnaireItemViewItem(
                     Questionnaire.Item.newBuilder()
