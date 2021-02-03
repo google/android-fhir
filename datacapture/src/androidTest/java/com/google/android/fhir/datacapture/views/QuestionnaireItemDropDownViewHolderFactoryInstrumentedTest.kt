@@ -23,8 +23,8 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.getDisplayString
-import com.google.android.fhir.datacapture.getResponseAnswerValueX
+import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.responseAnswerValueX
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import com.google.fhir.r4.core.Code
@@ -93,15 +93,17 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
                 QuestionnaireResponse.Item.newBuilder()
             )
         )
+
         assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>
-        (R.id.exposed_dropdown_menu)
+        (R.id.auto_complete)
             .adapter
             .getItem(0)
             .toString()).isEqualTo("Test Code")
     }
+
     @Test
     @UiThreadTest
-    fun shouldSetDropDownOptionEmptyIfValueCodingDisplayEmpty() {
+    fun shouldSetDropDownOptionToCodeIfValueCodingDisplayEmpty() {
         val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
             .setValue(
                 Questionnaire.Item.AnswerOption.ValueX.newBuilder()
@@ -121,11 +123,12 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
                 QuestionnaireResponse.Item.newBuilder()
             )
         )
+
         assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>
-        (R.id.exposed_dropdown_menu)
+        (R.id.auto_complete)
             .adapter
             .getItem(0)
-            .toString()).isEqualTo("")
+            .toString()).isEqualTo("test-code")
     }
 
     @Test
@@ -151,11 +154,11 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
                     addAnswerOption(answerOption)
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-                )
             )
+        )
 
         assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>(
-            R.id.exposed_dropdown_menu).text.toString()).isEqualTo("")
+            R.id.auto_complete).text.toString()).isEqualTo("")
     }
 
     @Test
@@ -180,10 +183,10 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
                 Questionnaire.Item.newBuilder().apply {
                     addAnswerOption(answerOption)
                 }.build(),
-                QuestionnaireResponse.Item.newBuilder().addAnswer(0,
+                QuestionnaireResponse.Item.newBuilder().addAnswer(
                     QuestionnaireResponse.Item.Answer.newBuilder()
                         .setValue(
-                            answerOption.getResponseAnswerValueX()
+                            answerOption.responseAnswerValueX
                         )
 
                 )
@@ -191,6 +194,36 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
         )
 
         assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>(
-            R.id.exposed_dropdown_menu).text.toString()).isEqualTo(answerOption.getDisplayString())
+            R.id.auto_complete).text.toString()).isEqualTo(answerOption.displayString)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    @UiThreadTest
+    fun shouldthrowErrorForAnswerOptionWithoutCoding() {
+        val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
+            .setValue(
+                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
+                    .setStringValue(
+                        String.newBuilder()
+                            .setValue("test")
+                    )
+            ).build()
+        viewHolder.bind(
+            QuestionnaireItemViewItem(
+                Questionnaire.Item.newBuilder().apply {
+                    addAnswerOption(answerOption)
+                }.build(),
+                QuestionnaireResponse.Item.newBuilder().addAnswer(
+                    QuestionnaireResponse.Item.Answer.newBuilder()
+                        .setValue(
+                            answerOption.responseAnswerValueX
+                        )
+
+                )
+            )
+        )
+
+        assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>(
+            R.id.auto_complete).text.toString()).isEqualTo(answerOption.displayString)
     }
 }
