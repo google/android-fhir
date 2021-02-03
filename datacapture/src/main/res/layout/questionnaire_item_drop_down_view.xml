@@ -23,10 +23,9 @@
     android:hint="">
 
     <AutoCompleteTextView
-        android:id="@+id/exposed_dropdown_menu"
+        android:id="@+id/auto_complete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="none"
-        />
+        android:inputType="none" />
 
 </com.google.android.material.textfield.TextInputLayout>
