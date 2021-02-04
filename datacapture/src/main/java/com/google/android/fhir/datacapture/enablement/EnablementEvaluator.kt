@@ -73,9 +73,9 @@ object EnablementEvaluator {
         }
 
         // Evaluate multiple `enableWhen` constraints and aggregate the results according to
-        // `enableBehavior` which specifies 1) all `enableWhen` constraints must be satisfied for
-        // the questionnaire item to be enabled, or 2) the questionnaire item is enabled if any
-        // `enableWhen` constraint is satisfied.
+        // `enableBehavior` which specifies one of the two behaviors: 1) the questionnaire item is
+        // enabled if ALL `enableWhen` constraints are satisfied, or 2) the questionnaire item is
+        // enabled if ANY `enableWhen` constraint is satisfied.
         return when (val value = questionnaireItem.enableBehavior.value) {
             EnableWhenBehaviorCode.Value.ALL ->
                 enableWhenList.all {
