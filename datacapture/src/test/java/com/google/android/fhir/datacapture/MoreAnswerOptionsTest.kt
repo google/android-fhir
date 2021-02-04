@@ -23,6 +23,7 @@ import com.google.fhir.r4.core.Coding
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireResponse
 import com.google.fhir.r4.core.String
+import kotlin.test.assertFailsWith
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -69,7 +70,7 @@ class MoreAnswerOptionsTest {
         assertThat(answerOption.displayString).isEqualTo("test-code")
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun getDisplayString_choiceItemType_shouldThrowExceptionForIllegalAnswerOptionValueX() {
         val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
             .setValue(
@@ -80,7 +81,9 @@ class MoreAnswerOptionsTest {
                     )
             ).build()
 
-        assertThat(answerOption.displayString).isEqualTo("test-code")
+        assertFailsWith<IllegalArgumentException> {
+            answerOption.displayString
+        }
     }
 
     @Test
@@ -112,7 +115,7 @@ class MoreAnswerOptionsTest {
         assertThat(answerOption.responseAnswerValueX).isEqualTo(answerValueX)
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun getResponseAnswerValueX_choiceItemType_shouldThrowExceptionForIllegalAnswerOptionValueX() {
         val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
             .setValue(
@@ -123,6 +126,8 @@ class MoreAnswerOptionsTest {
                     )
             ).build()
 
-        assertThat(answerOption.responseAnswerValueX).isEqualTo("test-code")
+        assertFailsWith<IllegalArgumentException> {
+            answerOption.responseAnswerValueX
+        }
     }
 }

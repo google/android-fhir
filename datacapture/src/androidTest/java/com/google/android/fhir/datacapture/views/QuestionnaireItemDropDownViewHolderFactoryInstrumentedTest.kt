@@ -32,6 +32,7 @@ import com.google.fhir.r4.core.Coding
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireResponse
 import com.google.fhir.r4.core.String
+import kotlin.test.assertFailsWith
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -163,7 +164,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
 
     @Test
     @UiThreadTest
-    fun shouldAutoTextureViewToDisplayIfAnswerNotNull() {
+    fun shouldAutoCompleteTextViewToDisplayIfAnswerNotNull() {
         val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
             .setValue(
                 Questionnaire.Item.AnswerOption.ValueX.newBuilder()
@@ -197,7 +198,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
             R.id.auto_complete).text.toString()).isEqualTo(answerOption.displayString)
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     @UiThreadTest
     fun shouldthrowErrorForAnswerOptionWithoutCoding() {
         val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
@@ -208,22 +209,22 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
                             .setValue("test")
                     )
             ).build()
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    addAnswerOption(answerOption)
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder().addAnswer(
-                    QuestionnaireResponse.Item.Answer.newBuilder()
-                        .setValue(
-                            answerOption.responseAnswerValueX
-                        )
 
+        assertFailsWith<IllegalArgumentException> {
+            viewHolder.bind(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder().apply {
+                        addAnswerOption(answerOption)
+                    }.build(),
+                    QuestionnaireResponse.Item.newBuilder().addAnswer(
+                        QuestionnaireResponse.Item.Answer.newBuilder()
+                            .setValue(
+                                answerOption.responseAnswerValueX
+                            )
+
+                    )
                 )
             )
-        )
-
-        assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>(
-            R.id.auto_complete).text.toString()).isEqualTo(answerOption.displayString)
+        }
     }
 }
