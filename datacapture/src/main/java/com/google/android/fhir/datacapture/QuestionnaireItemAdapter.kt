@@ -17,7 +17,8 @@
 package com.google.android.fhir.datacapture
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDateTimePickerViewHolderFactory
@@ -32,12 +33,11 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 
-internal class QuestionnaireItemAdapter(
-    private val questionnaireItemViewItemList: List<QuestionnaireItemViewItem>
-) : RecyclerView.Adapter<QuestionnaireItemViewHolder>() {
+internal class QuestionnaireItemAdapter :
+    ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
     /**
      * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
-     * [QuestionnaireItemComponent].
+     * [QuestionnaireItemViewItem].
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
         val viewHolder = when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
@@ -64,18 +64,18 @@ internal class QuestionnaireItemAdapter(
     }
 
     override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
-        holder.bind(questionnaireItemViewItemList[position])
+        holder.bind(getItem(position))
     }
 
     /**
      * Returns the integer value of the [QuestionnaireItemViewHolderType] that will be used to
-     * render the [QuestionnaireItemComponent]. This is determined by a combination of the data type
+     * render the [QuestionnaireItemViewItem]. This is determined by a combination of the data type
      * of the question and any additional Questionnaire Item UI Control Codes
      * (http://hl7.org/fhir/R4/valueset-questionnaire-item-control.html) used in the
      * itemControl extension (http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html).
      */
     override fun getItemViewType(position: Int) =
-        when (val type = questionnaireItemViewItemList[position].questionnaireItem.type.value) {
+        when (val type = getItem(position).questionnaireItem.type.value) {
             QuestionnaireItemTypeCode.Value.GROUP -> QuestionnaireItemViewHolderType.GROUP
             QuestionnaireItemTypeCode.Value.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
             QuestionnaireItemTypeCode.Value.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
@@ -95,6 +95,16 @@ internal class QuestionnaireItemAdapter(
                 QuestionnaireItemViewHolderType.DISPLAY
             else -> throw NotImplementedError("Question type $type not supported.")
         }.value
+}
 
-    override fun getItemCount() = questionnaireItemViewItemList.size
+internal object DiffCallback : DiffUtil.ItemCallback<QuestionnaireItemViewItem>() {
+    override fun areItemsTheSame(
+        oldItem: QuestionnaireItemViewItem,
+        newItem: QuestionnaireItemViewItem
+    ) = oldItem.questionnaireItem.linkId == newItem.questionnaireItem.linkId
+
+    override fun areContentsTheSame(
+        oldItem: QuestionnaireItemViewItem,
+        newItem: QuestionnaireItemViewItem
+    ) = oldItem.questionnaireItem == newItem.questionnaireItem
 }
