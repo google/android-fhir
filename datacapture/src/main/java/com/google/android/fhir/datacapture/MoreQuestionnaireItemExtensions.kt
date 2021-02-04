@@ -21,13 +21,19 @@ import com.google.fhir.r4.core.Questionnaire
 internal const val ITEM_CONTROL_DROP_DOWN = "drop-down"
 internal const val EXTENSION_ITEM_CONTROL_URL =
     "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
+internal const val EXTENSION_ITEM_CONTROL_SYSTEM =
+    "http://hl7.org/fhir/questionnaire-item-control"
 
 // Item control code as string or null
 internal val Questionnaire.Item.itemControl: String?
     get() {
         this.extensionList.forEach {
-            if (it.url.equals(EXTENSION_ITEM_CONTROL_URL)) {
-                return it.value.code.value
+            if (it.url.value.equals(EXTENSION_ITEM_CONTROL_URL)) {
+                it.value.codeableConcept.codingList.forEach {
+                    if (it.system.value.equals(EXTENSION_ITEM_CONTROL_SYSTEM)) {
+                        return it.code.value
+                    }
+                }
             }
         }
         return null
