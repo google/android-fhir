@@ -72,6 +72,7 @@ deps.junit = "junit:junit:$versions.junit"
 def kotlin = [:]
 kotlin.stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
 kotlin.plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
+kotlin.test  = "org.jetbrains.kotlin:kotlin-test-junit:$versions.kotlin"
 deps.kotlin = kotlin
 def lifecycle = [:]
 lifecycle.extensions = "androidx.lifecycle:lifecycle-extensions:$versions.lifecycle"
