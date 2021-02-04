@@ -49,29 +49,25 @@ object QuestionnaireItemRadioGroupViewHolderFactory : QuestionnaireItemViewHolde
                     questionnaireResponseItemBuilder.answerList.singleOrNull()?.value?.coding
                 radioHeader.text = questionnaireItem.text.value
                 radioGroup.removeAllViews()
-
-                // TODO: support other answer types besides coding
+                var index = 0
                 questionnaireItem.answerOptionList.forEach {
                     radioGroup.addView(RadioButton(radioGroup.context).apply {
+                        id = index++ // Use the answer option index as radio button ID
                         text = it.displayString
                         layoutParams = ViewGroup.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT
                         )
-                        if (questionnaireItemViewItem.singleAnswerOrNull
-                                ?.value?.coding?.equals(answer) == true) {
-                            this.isChecked = true
-                        }
-                        setOnCheckedChangeListener { buttonView, isChecked ->
-                            if (isChecked) {
-                                questionnaireResponseItemBuilder.clearAnswer().addAnswer(
-                                    QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                                        value = it.responseAnswerValueX
-                                    }
-                                )
-                            }
-                        }
+                        this.isChecked = it.value.coding == answer
                     })
+                }
+                radioGroup.setOnCheckedChangeListener { _, checkedId ->
+                    questionnaireResponseItemBuilder.clearAnswer().addAnswer(
+                        QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                            value = questionnaireItem
+                                .answerOptionList[checkedId].responseAnswerValueX
+                        }
+                    )
                 }
             }
         }
