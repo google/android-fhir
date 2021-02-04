@@ -20,8 +20,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
-import com.google.android.fhir.datacapture.views.QuestionnaireItemDropDownViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDateTimePickerViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemDropDownViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextDecimalViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextIntegerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextMultiLineViewHolderFactory
@@ -30,7 +30,6 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolde
 import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 
 internal class QuestionnaireItemAdapter(
@@ -101,7 +100,7 @@ internal class QuestionnaireItemAdapter(
     private fun getChoiceViewHolderType(questionnaireViewItem: QuestionnaireItemViewItem):
         QuestionnaireItemViewHolderType {
         if (questionnaireViewItem.questionnaireItem.itemControl.equals(
-                ItemControlTypeConstants.ITEM_CONTROL_DROP_DOWN)) {
+                ITEM_CONTROL_DROP_DOWN)) {
             return QuestionnaireItemViewHolderType.DROP_DOWN
         } else if (
             questionnaireViewItem.questionnaireItem.answerOptionCount >
@@ -111,19 +110,9 @@ internal class QuestionnaireItemAdapter(
             return QuestionnaireItemViewHolderType.RADIO_GROUP
         }
     }
-    // Item control code as string or null
-    val Questionnaire.Item.itemControl: String?
-        get() {
-            this.extensionList.forEach {
-                if (it.url.equals(ItemControlTypeConstants.EXTENSION_ITEM_CONTROL_URL)) {
-                    return it.value.code.value
-                }
-            }
-            return null
-        }
 
     private companion object {
-        //Choice questions are rendered as radio group if number of choices less than this constant
+        // Choice questions are rendered as radio group if number of choices less than this constant
         const val MINIMUM_NUMBER_OF_ITEMS_FOR_DROP_DOWN = 4
     }
 }

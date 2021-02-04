@@ -37,7 +37,7 @@ enum class QuestionnaireItemViewHolderType(val value: Int) {
     EDIT_TEXT_DECIMAL(7),
     RADIO_GROUP(8),
     DROP_DOWN(9);
-  
+
     companion object {
         private val VALUES = values()
         fun fromInt(value: Int) = VALUES[value]
