@@ -97,18 +97,14 @@ internal class QuestionnaireItemAdapter :
         }.value
 }
 
-object DiffCallback : DiffUtil.ItemCallback<QuestionnaireItemViewItem>() {
+internal object DiffCallback : DiffUtil.ItemCallback<QuestionnaireItemViewItem>() {
     override fun areItemsTheSame(
         oldItem: QuestionnaireItemViewItem,
         newItem: QuestionnaireItemViewItem
-    ): Boolean {
-        return oldItem == newItem
-    }
+    ) = oldItem.questionnaireItem.linkId == newItem.questionnaireItem.linkId
 
     override fun areContentsTheSame(
         oldItem: QuestionnaireItemViewItem,
         newItem: QuestionnaireItemViewItem
-    ): Boolean {
-        return oldItem.questionnaireItem.linkId == newItem.questionnaireItem.linkId
-    }
+    ) = oldItem.questionnaireItem == newItem.questionnaireItem
 }

@@ -22,6 +22,7 @@ import com.google.common.truth.Truth.assertThat
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 import com.google.fhir.r4.core.QuestionnaireResponse
+import com.google.fhir.r4.core.String
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -220,4 +221,85 @@ class QuestionnaireItemAdapterTest {
     }
 
     // TODO: test errors thrown for unsupported types
+
+    @Test
+    fun diffCallback_areItemsTheSame_sameLinkId_shouldReturnTrue() {
+        assertThat(
+            DiffCallback.areItemsTheSame(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setLinkId(String.newBuilder().setValue("link-id-1"))
+                        .setText(String.newBuilder().setValue("text"))
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                ),
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setLinkId(String.newBuilder().setValue("link-id-1"))
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder())
+            )
+        ).isTrue()
+    }
+
+    @Test
+    fun diffCallback_areItemsTheSame_differentLinkId_shouldReturnFalse() {
+        assertThat(
+            DiffCallback.areItemsTheSame(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setLinkId(String.newBuilder().setValue("link-id-1"))
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                ),
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setLinkId(String.newBuilder().setValue("link-id-2"))
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder())
+            )
+        ).isFalse()
+    }
+
+    @Test
+    fun diffCallback_areContentsTheSame_sameContents_shouldReturnTrue() {
+        assertThat(
+            DiffCallback.areContentsTheSame(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setLinkId(String.newBuilder().setValue("link-id-1"))
+                        .setText(String.newBuilder().setValue("text"))
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                ),
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setLinkId(String.newBuilder().setValue("link-id-1"))
+                        .setText(String.newBuilder().setValue("text"))
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder())
+            )
+        ).isTrue()
+    }
+
+    @Test
+    fun diffCallback_areContentsTheSame_differentContents_shouldReturnFalse() {
+        assertThat(
+            DiffCallback.areContentsTheSame(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setLinkId(String.newBuilder().setValue("link-id-1"))
+                        .setText(String.newBuilder().setValue("text"))
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                ),
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setLinkId(String.newBuilder().setValue("link-id-1"))
+                        .setText(String.newBuilder().setValue("different text"))
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder())
+            )
+        ).isFalse()
+    }
 }
