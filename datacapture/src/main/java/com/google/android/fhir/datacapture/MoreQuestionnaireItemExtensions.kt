@@ -16,14 +16,19 @@
 
 package com.google.android.fhir.datacapture
 
-/**
- * Questionnaire Item control types as defined in
- * http://hl7.org/fhir/R4/valueset-questionnaire-item-control.html.
- * This is used in [QuestionnaireItemAdapter] to determine how each [Questionnaire.Item] is
- * rendered.
- */
-object ItemControlTypeConstants {
-    const val ITEM_CONTROL_DROP_DOWN = "drop-down"
-    const val EXTENSION_ITEM_CONTROL_URL =
-        "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
-}
+import com.google.fhir.r4.core.Questionnaire
+
+internal const val ITEM_CONTROL_DROP_DOWN = "drop-down"
+internal const val EXTENSION_ITEM_CONTROL_URL =
+    "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
+
+// Item control code as string or null
+internal val Questionnaire.Item.itemControl: String?
+    get() {
+        this.extensionList.forEach {
+            if (it.url.equals(EXTENSION_ITEM_CONTROL_URL)) {
+                return it.value.code.value
+            }
+        }
+        return null
+    }
