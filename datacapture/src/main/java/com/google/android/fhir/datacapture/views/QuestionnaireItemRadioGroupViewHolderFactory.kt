@@ -25,7 +25,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.fhir.r4.core.Coding
 import com.google.fhir.r4.core.QuestionnaireResponse
 
-object QuestionnaireItemRadioGroupViewHolderFactory : QuestionnaireItemViewHolderFactory(
+internal object QuestionnaireItemRadioGroupViewHolderFactory : QuestionnaireItemViewHolderFactory(
     R.layout.questionnaire_item_radio_group_view
 ) {
     override fun getQuestionnaireItemViewHolderDelegate() =

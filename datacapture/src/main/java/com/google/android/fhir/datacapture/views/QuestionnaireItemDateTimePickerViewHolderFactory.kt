@@ -31,7 +31,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-object QuestionnaireItemDateTimePickerViewHolderFactory : QuestionnaireItemViewHolderFactory(
+internal object QuestionnaireItemDateTimePickerViewHolderFactory : QuestionnaireItemViewHolderFactory(
     R.layout.questionnaire_item_date_time_picker_view
 ) {
     override fun getQuestionnaireItemViewHolderDelegate() =

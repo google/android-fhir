@@ -24,7 +24,7 @@ import com.google.fhir.r4.core.Canonical
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireResponse
 
-class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
+internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     /** The current questionnaire as questions are being answered. */
     internal var questionnaire: Questionnaire
 

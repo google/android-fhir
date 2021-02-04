@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
-object QuestionnaireItemEditTextSingleLineViewHolderFactory :
+internal object QuestionnaireItemEditTextSingleLineViewHolderFactory :
     QuestionnaireItemEditTextViewHolderFactory() {
     override fun getQuestionnaireItemViewHolderDelegate() =
         QuestionnaireItemEditTextStringViewHolderDelegate(true)

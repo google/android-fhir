@@ -28,7 +28,7 @@ import com.google.fhir.r4.core.QuestionnaireResponse
  * create the right type of view (e.g. a CheckBox for a yes/no question) and populate the view with
  * the right information (e.g text for the CheckBox and initial yes/no answer for the CheckBox).
  */
-data class QuestionnaireItemViewItem(
+internal data class QuestionnaireItemViewItem(
     val questionnaireItem: Questionnaire.Item,
     val questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder
 ) {
