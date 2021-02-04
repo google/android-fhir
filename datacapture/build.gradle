@@ -4,6 +4,11 @@ plugins {
     id 'maven-publish'
 }
 
+task sourceJar(type: Jar) {
+    archiveClassifier.set('sources')
+    from android.sourceSets.main.java.srcDirs
+}
+
 afterEvaluate {
     publishing {
         publications {
@@ -13,6 +18,9 @@ afterEvaluate {
                 groupId = 'com.google.android.fhir'
                 artifactId = 'data-capture'
                 version = '0.1.0-alpha01'
+
+                // Also publish source code for developers' convenience
+                artifact(sourceJar)
 
                 pom {
                     name = 'Android FHIR Structured Data Capture Library'
