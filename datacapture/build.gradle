@@ -12,7 +12,7 @@ afterEvaluate {
 
                 groupId = 'com.google.android.fhir'
                 artifactId = 'data-capture'
-                version = '0.1.0-alpha1'
+                version = '0.1.0-alpha01'
 
                 pom {
                     name = 'Android FHIR Structured Data Capture Library'
