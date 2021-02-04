@@ -60,10 +60,9 @@ object EnablementEvaluator {
         questionnaireResponseItemRetriever: (linkId: String) -> QuestionnaireResponse.Item?
     ): Boolean {
         val enableWhenList = questionnaireItem.enableWhenList
-        if (enableWhenList.isEmpty()) {
-            // The questionnaire item is enabled by default if there is no `enableWhen` constraint.
-            return true
-        }
+
+        // The questionnaire item is enabled by default if there is no `enableWhen` constraint.
+        if (enableWhenList.isEmpty()) return true
 
         // Evaluate single `enableWhen` constraint.
         if (enableWhenList.size == 1) {
