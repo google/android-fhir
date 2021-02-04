@@ -36,10 +36,9 @@ val AnswerOption.displayString: String
 val AnswerOption.responseAnswerValueX: Answer.ValueX
     get() {
         if (this.value.hasCoding()) {
-            return this.value.coding.let {
-                Answer.ValueX.newBuilder()
-                    .setCoding(it)
-                    .build()
+            return Answer.ValueX.newBuilder()
+                .setCoding(this.value.coding)
+                .build()
             }
         } else {
             throw IllegalArgumentException("Answer option does not having coding.")
