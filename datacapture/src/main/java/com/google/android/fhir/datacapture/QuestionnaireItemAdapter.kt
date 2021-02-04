@@ -22,6 +22,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHo
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDateTimePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDropDownViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemDisplayViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextDecimalViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextIntegerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextMultiLineViewHolderFactory
@@ -59,6 +60,8 @@ internal class QuestionnaireItemAdapter(
                 QuestionnaireItemRadioGroupViewHolderFactory
             QuestionnaireItemViewHolderType.DROP_DOWN ->
                 QuestionnaireItemDropDownViewHolderFactory
+            QuestionnaireItemViewHolderType.DISPLAY ->
+                QuestionnaireItemDisplayViewHolderFactory
         }
         return viewHolder.create(parent)
     }
@@ -91,6 +94,8 @@ internal class QuestionnaireItemAdapter(
             QuestionnaireItemTypeCode.Value.DECIMAL ->
                 QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
             QuestionnaireItemTypeCode.Value.CHOICE -> getChoiceViewHolderType(questionnaireViewItem)
+            QuestionnaireItemTypeCode.Value.DISPLAY ->
+                QuestionnaireItemViewHolderType.DISPLAY
             else -> throw NotImplementedError("Question type $type not supported.")
         }.value
     }
