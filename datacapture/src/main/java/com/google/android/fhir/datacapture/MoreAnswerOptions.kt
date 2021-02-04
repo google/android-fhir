@@ -39,7 +39,6 @@ val AnswerOption.responseAnswerValueX: Answer.ValueX
             return Answer.ValueX.newBuilder()
                 .setCoding(this.value.coding)
                 .build()
-            }
         } else {
             throw IllegalArgumentException("Answer option does not having coding.")
         }
