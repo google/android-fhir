@@ -18,7 +18,6 @@ package com.google.fhirengine.db.impl.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
@@ -40,7 +39,7 @@ internal abstract class LocalChangeDao {
 
     lateinit var iParser: IParser
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert
     abstract fun addLocalChange(localChange: LocalChange)
 
     @Transaction
@@ -55,12 +54,6 @@ internal abstract class LocalChangeDao {
         val resourceType = resource.resourceType
         val timestamp = Date().toTimeZoneString()
         val resourceString = iParser.encodeResourceToString(resource)
-        val lastChangeType = lastChangeType(resourceId, resourceType)
-
-        if (!localChangeIsEmpty(resourceId, resourceType) &&
-                !lastChangeType!!.equals(Type.DELETE)) {
-            throw InvalidLocalChangeException("Can not INSERT on top of $lastChangeType")
-        }
 
         addLocalChange(
             LocalChange(

@@ -38,16 +38,16 @@ object LocalChangeUtils {
     @JvmStatic
     fun mergeLocalChanges(first: LocalChange, second: LocalChange): LocalChange {
         val type: LocalChange.Type
-        val diff: String
+        val payload: String
         when (second.type) {
             LocalChange.Type.UPDATE -> when {
                 first.type.equals(LocalChange.Type.UPDATE) -> {
                     type = LocalChange.Type.UPDATE
-                    diff = mergePatches(first.payload, second.payload)
+                    payload = mergePatches(first.payload, second.payload)
                 }
                 first.type.equals(LocalChange.Type.INSERT) -> {
                     type = LocalChange.Type.INSERT
-                    diff = applyPatch(first.payload, second.payload)
+                    payload = applyPatch(first.payload, second.payload)
                 }
                 else -> {
                     throw IllegalArgumentException(
@@ -57,19 +57,19 @@ object LocalChangeUtils {
             }
             LocalChange.Type.DELETE -> {
                 type = LocalChange.Type.DELETE
-                diff = ""
+                payload = ""
             }
-            else ->
-                throw IllegalArgumentException(
-                    "Cannot merge local changes with type ${first.type} and ${second.type}."
-                )
+            LocalChange.Type.INSERT -> {
+                type = LocalChange.Type.INSERT
+                payload = second.payload
+            }
         }
         return LocalChange(
             id = 0,
             resourceId = second.resourceId,
             resourceType = second.resourceType,
             type = type,
-            payload = diff
+            payload = payload
         )
     }
 

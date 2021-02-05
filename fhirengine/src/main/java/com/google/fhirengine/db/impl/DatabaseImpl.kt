@@ -81,7 +81,7 @@ internal class DatabaseImpl(
     @Transaction
     override fun <R : Resource> insertAll(resources: List<R>) {
         resourceDao.insertAll(resources)
-        // TODO: impl insertAll in LocalChangeDao
+        localChangeDao.addInsertAll(resources)
     }
 
     @Transaction
