@@ -126,7 +126,7 @@ class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
                 questionnaireItemViewItemList.addAll(
                     getQuestionnaireItemViewItemList(
                         questionnaireItem.itemList,
-                        questionnaireResponseItem.itemBuilderList,
+                        questionnaireResponseItem.itemBuilderList
                     )
                 )
             }
