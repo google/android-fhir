@@ -40,6 +40,7 @@ object QuestionnaireItemCheckBoxViewHolderFactory : QuestionnaireItemViewHolderF
                                     Boolean.newBuilder().setValue(checkBox.isChecked).build()
                                 ).build()
                         }
+                    questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
                 }
             }
 

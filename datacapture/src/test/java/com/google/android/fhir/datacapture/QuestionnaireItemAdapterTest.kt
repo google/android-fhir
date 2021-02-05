@@ -49,7 +49,7 @@ class QuestionnaireItemAdapterTest {
                         )
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                )
+                ) {}
             )
         )
 
@@ -71,7 +71,7 @@ class QuestionnaireItemAdapterTest {
                         )
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                )
+                ) {}
             )
         )
 
@@ -93,7 +93,7 @@ class QuestionnaireItemAdapterTest {
                         )
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                )
+                ) {}
             )
         )
 
@@ -115,7 +115,7 @@ class QuestionnaireItemAdapterTest {
                         )
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                )
+                ) {}
             )
         )
 
@@ -137,7 +137,7 @@ class QuestionnaireItemAdapterTest {
                         )
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                )
+                ) {}
             )
         )
 
@@ -159,7 +159,7 @@ class QuestionnaireItemAdapterTest {
                         )
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                )
+                ) {}
             )
         )
 
@@ -181,7 +181,7 @@ class QuestionnaireItemAdapterTest {
                         )
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                )
+                ) {}
             )
         )
 
@@ -203,7 +203,7 @@ class QuestionnaireItemAdapterTest {
                         )
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                )
+                ) {}
             )
         )
 
@@ -225,7 +225,7 @@ class QuestionnaireItemAdapterTest {
                         )
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                )
+                ) {}
             )
         )
 
@@ -272,7 +272,7 @@ class QuestionnaireItemAdapterTest {
                         .addAllAnswerOption(answerOptions)
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                )
+                ) {}
             )
         )
 
@@ -323,7 +323,7 @@ class QuestionnaireItemAdapterTest {
                         )
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                )
+                ) {}
             )
         )
 
@@ -344,13 +344,13 @@ class QuestionnaireItemAdapterTest {
                         .setText(String.newBuilder().setValue("text"))
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                ),
+                ) {},
                 QuestionnaireItemViewItem(
                     Questionnaire.Item.newBuilder()
                         .setLinkId(String.newBuilder().setValue("link-id-1"))
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                )
+                ) {}
             )
         ).isTrue()
     }
@@ -364,13 +364,13 @@ class QuestionnaireItemAdapterTest {
                         .setLinkId(String.newBuilder().setValue("link-id-1"))
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                ),
+                ) {},
                 QuestionnaireItemViewItem(
                     Questionnaire.Item.newBuilder()
                         .setLinkId(String.newBuilder().setValue("link-id-2"))
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                )
+                ) {}
             )
         ).isFalse()
     }
@@ -385,14 +385,14 @@ class QuestionnaireItemAdapterTest {
                         .setText(String.newBuilder().setValue("text"))
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                ),
+                ) {},
                 QuestionnaireItemViewItem(
                     Questionnaire.Item.newBuilder()
                         .setLinkId(String.newBuilder().setValue("link-id-1"))
                         .setText(String.newBuilder().setValue("text"))
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                )
+                ) {}
             )
         ).isTrue()
     }
@@ -407,14 +407,14 @@ class QuestionnaireItemAdapterTest {
                         .setText(String.newBuilder().setValue("text"))
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                ),
+                ) {},
                 QuestionnaireItemViewItem(
                     Questionnaire.Item.newBuilder()
                         .setLinkId(String.newBuilder().setValue("link-id-1"))
                         .setText(String.newBuilder().setValue("different text"))
                         .build(),
                     QuestionnaireResponse.Item.newBuilder()
-                )
+                ) {}
             )
         ).isFalse()
     }

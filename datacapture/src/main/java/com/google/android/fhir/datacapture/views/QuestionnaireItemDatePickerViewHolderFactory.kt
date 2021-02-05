@@ -95,6 +95,7 @@ object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolde
                                                 .setDate(date)
                                                 .build()
                                         }
+                                questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
                             }
                         }
                     )

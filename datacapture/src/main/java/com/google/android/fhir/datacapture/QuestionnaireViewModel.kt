@@ -18,26 +18,30 @@ package com.google.android.fhir.datacapture
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.fhir.common.JsonFormat
 import com.google.fhir.r4.core.Canonical
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireResponse
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 
 class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     /** The current questionnaire as questions are being answered. */
-    internal var questionnaire: Questionnaire
-
-    /** The current questionnaire response as questions are being answered. */
-    internal val questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
-
-    /** The list of [QuestionnaireItemViewItem] to be used for the [RecyclerView]. */
-    internal val questionnaireItemViewItemList = mutableListOf<QuestionnaireItemViewItem>()
+    private val questionnaire: Questionnaire
 
     init {
         val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
         val builder = Questionnaire.newBuilder()
         questionnaire = JsonFormat.getParser().merge(questionnaireJson, builder).build()
+    }
+
+    /** The current questionnaire response as questions are being answered. */
+    private val questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
+
+    init {
         questionnaireResponseBuilder.questionnaire =
             Canonical.newBuilder().setValue(questionnaire.id.value).build()
         // Retain the hierarchy and order of items within the questionnaire as specified in the
@@ -45,11 +49,45 @@ class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
         questionnaire.itemList.forEach {
             questionnaireResponseBuilder.addItem(it.createQuestionnaireResponseItem())
         }
-        populateQuestionnaireItemViewItemList(
-            questionnaireItemViewItemList,
+    }
+
+    /** Map from link IDs to questionnaire response items. */
+    private val linkIdToQuestionnaireResponseItemMap =
+        createLinkIdToQuestionnaireResponseItemMap(
+            questionnaireResponseBuilder.itemBuilderList
+        )
+
+    /** Tracks modifications in order to update the UI. */
+    private val modificationCount = MutableStateFlow(0)
+
+    /** Callback function to update the UI. */
+    private val questionnaireResponseItemChangedCallback = { modificationCount.value += 1 }
+
+    internal val questionnaireItemViewItemList
+        get() = getQuestionnaireItemViewItemList(
             questionnaire.itemList,
             questionnaireResponseBuilder.itemBuilderList
         )
+
+    /** [QuestionnaireItemViewItem]s to be displayed in the UI. */
+    internal val questionnaireItemViewItemListFlow: Flow<List<QuestionnaireItemViewItem>> =
+        modificationCount.map { questionnaireItemViewItemList }
+
+    /** The current [QuestionnaireResponse] captured by the UI. */
+    fun getQuestionnaireResponse(): QuestionnaireResponse = questionnaireResponseBuilder.build()
+
+    private fun createLinkIdToQuestionnaireResponseItemMap(
+        questionnaireResponseItemList: List<QuestionnaireResponse.Item.Builder>
+    ): Map<String, QuestionnaireResponse.Item.Builder> {
+        val linkIdToQuestionnaireResponseItemMap = questionnaireResponseItemList.map {
+            it.linkId.value to it
+        }.toMap().toMutableMap()
+        for (item in questionnaireResponseItemList) {
+            linkIdToQuestionnaireResponseItemMap.putAll(
+                createLinkIdToQuestionnaireResponseItemMap(item.itemBuilderList)
+            )
+        }
+        return linkIdToQuestionnaireResponseItemMap
     }
 
     /**
@@ -60,26 +98,40 @@ class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
      * The traverse is carried out in the two lists in tandem. The two lists should be structurally
      * identical.
      */
-    private fun populateQuestionnaireItemViewItemList(
-        questionnaireItemViewItemList: MutableList<QuestionnaireItemViewItem>,
+    private fun getQuestionnaireItemViewItemList(
         questionnaireItemList: List<Questionnaire.Item>,
         questionnaireResponseItemList: List<QuestionnaireResponse.Item.Builder>
-    ) {
+    ): List<QuestionnaireItemViewItem> {
+        val questionnaireItemViewItemList = mutableListOf<QuestionnaireItemViewItem>()
         val questionnaireItemListIterator = questionnaireItemList.iterator()
         val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-        while (questionnaireItemListIterator.hasNext() &&
-            questionnaireResponseItemListIterator.hasNext()) {
+        while (
+            questionnaireItemListIterator.hasNext() &&
+            questionnaireResponseItemListIterator.hasNext()
+        ) {
             val questionnaireItem = questionnaireItemListIterator.next()
             val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
-            questionnaireItemViewItemList.add(
-                QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem)
-            )
-            populateQuestionnaireItemViewItemList(
-                questionnaireItemViewItemList,
-                questionnaireItem.itemList,
-                questionnaireResponseItem.itemBuilderList
-            )
+
+            val enabled = EnablementEvaluator.evaluate(questionnaireItem) {
+                (linkIdToQuestionnaireResponseItemMap[it] ?: return@evaluate null).build()
+            }
+            if (enabled) {
+                questionnaireItemViewItemList.add(
+                    QuestionnaireItemViewItem(
+                        questionnaireItem,
+                        questionnaireResponseItem,
+                        questionnaireResponseItemChangedCallback
+                    )
+                )
+                questionnaireItemViewItemList.addAll(
+                    getQuestionnaireItemViewItemList(
+                        questionnaireItem.itemList,
+                        questionnaireResponseItem.itemBuilderList,
+                    )
+                )
+            }
         }
+        return questionnaireItemViewItemList
     }
 }
 
