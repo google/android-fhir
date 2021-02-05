@@ -16,6 +16,7 @@
 
 package com.google.fhirengine.db
 
+import com.google.fhirengine.db.impl.dao.LocalChangeToken
 import com.google.fhirengine.db.impl.entities.LocalChange
 import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
 import com.google.fhirengine.search.impl.Query
@@ -146,10 +147,10 @@ interface Database {
      * can be synced. Multiple changes for a single [Resource] are squashed into a single
      * [LocalChange].
      */
-    fun getAllLocalChanges(): List<LocalChange>
+    fun getAllLocalChanges(): List<Pair<LocalChangeToken, LocalChange>>
 
     /**
      * Remove the [LocalChange]s with given ids. Call this after a successful sync.
      */
-    fun <R : Resource> deleteUpdates(clazz: Class<R>, id: String)
+    fun deleteUpdates(token: LocalChangeToken)
 }

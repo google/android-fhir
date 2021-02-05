@@ -21,6 +21,7 @@ import androidx.room.Room
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
 import com.google.fhirengine.db.ResourceNotFoundInDbException
+import com.google.fhirengine.db.impl.dao.LocalChangeToken
 import com.google.fhirengine.db.impl.dao.LocalChangeUtils
 import com.google.fhirengine.db.impl.entities.LocalChange
 import com.google.fhirengine.db.impl.entities.SyncedResourceEntity
@@ -175,18 +176,20 @@ internal class DatabaseImpl(
         resourceDao.getResources(query.getSupportSQLiteQuery())
             .map { iParser.parseResource(it) as R }
 
-    override fun getAllLocalChanges(): List<LocalChange> {
-        return localChangeDao.getAllLocalChanges()
-                .groupBy { it.resourceId to it.resourceType }
-                .values
-                .map {
-                    LocalChangeUtils.squash(it)
-                }
-    }
+    /**
+     * @returns a list of pairs. Each pair is a token + squashed local change. Each token is a list
+     * of [LocalChange.id]s of rows of the [LocalChange].
+     */
+    // TODO: create a data class for squashed local change and merge token in to it.
+    override fun getAllLocalChanges(): List<Pair<LocalChangeToken, LocalChange>> =
+        localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }
+            .values
+            .map {
+                LocalChangeToken(it.map { it.id }) to LocalChangeUtils.squash(it)
+            }
 
-    override fun <R : Resource> deleteUpdates(clazz: Class<R>, id: String) {
-        val type = getResourceType(clazz).name
-        localChangeDao.discardLocalChanges(id, type)
+    override fun deleteUpdates(token: LocalChangeToken) {
+        localChangeDao.discardLocalChanges(token)
     }
 
     companion object {

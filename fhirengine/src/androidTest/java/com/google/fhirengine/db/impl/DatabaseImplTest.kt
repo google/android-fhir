@@ -116,7 +116,7 @@ class DatabaseImplTest {
                 database.select(Resource::class.java, "resource_id")
             }
         assertThat(illegalArgumentException.message)
-                .isEqualTo("Cannot resolve resource type for " + Resource::class.java.name)
+            .isEqualTo("Cannot resolve resource type for " + Resource::class.java.name)
     }
 
     @Test
@@ -141,12 +141,12 @@ class DatabaseImplTest {
     fun insert_shouldAddInsertLocalChange() {
         val testPatient2String = services.parser.encodeResourceToString(TEST_PATIENT_2)
         database.insert(TEST_PATIENT_2)
-        val localChange = database.getAllLocalChanges()
-            .first { it.resourceId.equals(TEST_PATIENT_2_ID) }
-        assertThat(localChange.type).isEqualTo(LocalChange.Type.INSERT)
-        assertThat(localChange.resourceId).isEqualTo(TEST_PATIENT_2_ID)
-        assertThat(localChange.resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
-        assertThat(localChange.payload).isEqualTo(testPatient2String)
+        val (_, resourceType, resourceId, _, type, payload) = database.getAllLocalChanges()
+            .single { it.second.resourceId.equals(TEST_PATIENT_2_ID) }.second
+        assertThat(type).isEqualTo(LocalChange.Type.INSERT)
+        assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
+        assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
+        assertThat(payload).isEqualTo(testPatient2String)
     }
 
     @Test
@@ -157,30 +157,49 @@ class DatabaseImplTest {
         patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_1.json")
         database.update(patient)
         val patientString = services.parser.encodeResourceToString(patient)
-        val localChange = database.getAllLocalChanges().first { it.resourceId.equals(patient.id) }
-        assertThat(localChange.type).isEqualTo(LocalChange.Type.INSERT)
-        assertThat(localChange.resourceId).isEqualTo(patient.id)
-        assertThat(localChange.resourceType).isEqualTo(patient.resourceType.name)
-        assertThat(localChange.payload).isEqualTo(patientString)
+        val (_, resourceType, resourceId, _, type, payload) = database.getAllLocalChanges()
+            .single { it.second.resourceId.equals(patient.id) }.second
+        assertThat(type).isEqualTo(LocalChange.Type.INSERT)
+        assertThat(resourceId).isEqualTo(patient.id)
+        assertThat(resourceType).isEqualTo(patient.resourceType.name)
+        assertThat(payload).isEqualTo(patientString)
     }
 
     @Test
     fun delete_shouldAddDeleteLocalChange() {
         database.delete(Patient::class.java, TEST_PATIENT_1_ID)
-        val localChange = database.getAllLocalChanges()
-                .first { it.resourceId.equals(TEST_PATIENT_1_ID) }
-        assertThat(localChange.type).isEqualTo(LocalChange.Type.DELETE)
-        assertThat(localChange.resourceId).isEqualTo(TEST_PATIENT_1_ID)
-        assertThat(localChange.resourceType).isEqualTo(TEST_PATIENT_1.resourceType.name)
-        assertThat(localChange.payload).isEmpty()
+        val (_, resourceType, resourceId, _, type, payload) = database.getAllLocalChanges()
+            .single { it.second.resourceId.equals(TEST_PATIENT_1_ID) }.second
+        assertThat(type).isEqualTo(LocalChange.Type.DELETE)
+        assertThat(resourceId).isEqualTo(TEST_PATIENT_1_ID)
+        assertThat(resourceType).isEqualTo(TEST_PATIENT_1.resourceType.name)
+        assertThat(payload).isEmpty()
     }
 
     @Test
     fun delete_nonExistent_shouldNotInsertLocalChange() {
         database.delete(Patient::class.java, "nonexistent_patient")
+        assertThat(database.getAllLocalChanges().map { it.second }
+            .none {
+                it.type.equals(LocalChange.Type.DELETE) &&
+                    it.resourceId.equals("nonexistent_patient")
+            }
+        ).isTrue()
+    }
+
+    @Test
+    fun deleteUpdates_shouldDeleteLocalChanges() {
+        var patient: Patient =
+            testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+        database.insert(patient)
+        patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_1.json")
+        database.update(patient)
+        services.parser.encodeResourceToString(patient)
+        val (token, _) = database.getAllLocalChanges()
+            .single { it.second.resourceId.equals(patient.id) }
+        database.deleteUpdates(token)
         assertThat(database.getAllLocalChanges()
-                .none { it.type.equals(LocalChange.Type.DELETE)
-                        && it.resourceId.equals("nonexistent_patient") }
+            .none { it.second.resourceId.equals(patient.id) }
         ).isTrue()
     }
 
