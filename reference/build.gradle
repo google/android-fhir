@@ -1,0 +1,72 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion sdk_versions.compile_sdk
+    defaultConfig {
+        applicationId "com.google.android.fhir.reference"
+        minSdkVersion sdk_versions.min_sdk
+        targetSdkVersion sdk_versions.target_sdk
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // Required when setting minSdkVersion to 20 or lower
+        // See https://developer.android.com/studio/write/java8-support
+        multiDexEnabled true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        // Flag to enable support for the new language APIs
+        // See https://developer.android.com/studio/write/java8-support
+        coreLibraryDesugaringEnabled true
+        // Sets Java compatibility to Java 8
+        // See https://developer.android.com/studio/write/java8-support
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    // See https://developer.android.com/studio/write/java8-support
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+}
+
+configurations {
+    all {
+        exclude module: 'json'
+        exclude module: 'xpp3'
+    }
+}
+
+dependencies {
+    androidTestImplementation deps.atsl.ext_junit
+    androidTestImplementation deps.atsl.espresso
+
+    coreLibraryDesugaring deps.desugar
+
+    implementation deps.appcompat
+    implementation deps.constraint_layout
+    implementation deps.coroutines.android
+    implementation deps.coroutines.core
+    implementation deps.kotlin.stdlib
+    implementation deps.lifecycle.extensions
+    implementation deps.lifecycle.livedata_ktx
+    implementation deps.lifecycle.runtime
+    implementation deps.lifecycle.viewmodel
+    implementation deps.material
+    implementation deps.okhttp_logging_interceptor
+    implementation deps.recyclerview
+    implementation deps.retrofit.core
+    implementation deps.retrofit.gson
+    implementation deps.retrofit.mock
+    implementation deps.work.runtime
+    implementation project(path: ':core')
+
+    testImplementation deps.junit
+}
