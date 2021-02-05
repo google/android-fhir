@@ -54,7 +54,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
                     text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(
@@ -78,7 +78,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
                             .build()
                     }
                 )
-            )
+            ) {}
         )
 
         assertThat(
@@ -102,13 +102,13 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
                             .build()
                     }
                 )
-            )
+            ) {}
         )
         viewHolder.bind(
             QuestionnaireItemViewItem(
                 Questionnaire.Item.getDefaultInstance(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(
@@ -124,7 +124,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
         val questionnaireItemViewItem = QuestionnaireItemViewItem(
             Questionnaire.Item.getDefaultInstance(),
             QuestionnaireResponse.Item.newBuilder()
-        )
+        ) {}
 
         viewHolder.bind(questionnaireItemViewItem)
         viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText)
@@ -141,7 +141,7 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
         val questionnaireItemViewItem = QuestionnaireItemViewItem(
             Questionnaire.Item.getDefaultInstance(),
             QuestionnaireResponse.Item.newBuilder()
-        )
+        ) {}
 
         viewHolder.bind(questionnaireItemViewItem)
         viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("")
