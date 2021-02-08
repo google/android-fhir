@@ -102,6 +102,7 @@ object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolde
                         context.supportFragmentManager,
                         DatePickerFragment.TAG
                     )
+                    textInputLayout.clearFocus()
                 }
             }
 
