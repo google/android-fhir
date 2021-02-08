@@ -236,7 +236,8 @@ class QuestionnaireItemAdapterTest {
 
     @Test
     fun getItemViewType_choiceItemType_shouldReturnDropDownViewHolderType() {
-        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+        val questionnaireItemAdapter = QuestionnaireItemAdapter()
+        questionnaireItemAdapter.submitList(
             listOf(
                 QuestionnaireItemViewItem(
                     Questionnaire.Item.newBuilder()
