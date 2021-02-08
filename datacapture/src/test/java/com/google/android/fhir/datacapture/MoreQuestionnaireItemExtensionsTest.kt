@@ -36,7 +36,7 @@ import org.robolectric.annotation.Config
 class MoreQuestionnaireItemExtensionsTest {
 
     @Test
-    fun getItemControl_shouldReturnItemControlCode() {
+    fun itemControl_shouldReturnItemControlCode() {
 
         val questionnaireItem = Questionnaire.Item.newBuilder()
             .setType(
@@ -78,7 +78,7 @@ class MoreQuestionnaireItemExtensionsTest {
     }
 
     @Test
-    fun getItemControl_shouldReturnNull() {
+    fun itemControl_wrongExtensionUrl_shouldReturnNull() {
 
         val questionnaireItem = Questionnaire.Item.newBuilder()
             .setType(
@@ -90,6 +90,48 @@ class MoreQuestionnaireItemExtensionsTest {
                     .setUrl(
                         Uri.newBuilder()
                             .setValue("null-test")
+                    )
+                    .setValue(
+                        Extension.ValueX.newBuilder()
+                            .setCodeableConcept(
+                                CodeableConcept.newBuilder()
+                                    .addCoding(
+                                        Coding.newBuilder()
+                                            .setCode(
+                                                Code.newBuilder()
+                                                    .setValue(ITEM_CONTROL_DROP_DOWN)
+                                            )
+                                            .setDisplay(
+                                                String.newBuilder()
+                                                    .setValue("Drop Down")
+                                            )
+                                            .setSystem(
+                                                Uri.newBuilder()
+                                                    .setValue(EXTENSION_ITEM_CONTROL_SYSTEM)
+                                            )
+                                    )
+                            )
+
+                    )
+            )
+            .build()
+
+        assertThat(questionnaireItem.itemControl).isNull()
+    }
+
+    @Test
+    fun itemControl_wrongExtensionCoding_shouldReturnNull() {
+
+        val questionnaireItem = Questionnaire.Item.newBuilder()
+            .setType(
+                Questionnaire.Item.TypeCode.newBuilder()
+                    .setValue(QuestionnaireItemTypeCode.Value.CHOICE)
+            )
+            .addExtension(
+                Extension.newBuilder()
+                    .setUrl(
+                        Uri.newBuilder()
+                            .setValue(EXTENSION_ITEM_CONTROL_URL)
                     )
                     .setValue(
                         Extension.ValueX.newBuilder()
