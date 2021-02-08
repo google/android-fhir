@@ -235,7 +235,56 @@ class QuestionnaireItemAdapterTest {
     }
 
     @Test
-    fun getItemViewType_choiceItemType_shouldReturnDropDownViewHolderType() {
+    fun getItemViewType_choiceItemType_shouldReturnDropDownViewHolderTypeWithoutExtension()
+    {
+        val answerOptions = Iterable {
+            iterator<Questionnaire.Item.AnswerOption> {
+                repeat(QuestionnaireItemAdapter.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN)
+                {
+                    yield(
+                        Questionnaire.Item.AnswerOption.newBuilder()
+                            .setValue(
+                                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
+                                    .setCoding(
+                                        Coding.newBuilder()
+                                            .setCode(
+                                                Code.newBuilder()
+                                                    .setValue("test-code")
+                                            )
+                                            .setDisplay(
+                                                String.newBuilder()
+                                                    .setValue("Test Code")
+                                            )
+                                    )
+                            )
+                            .build()
+                    )
+                }
+            }
+        }
+        val questionnaireItemAdapter = QuestionnaireItemAdapter()
+        questionnaireItemAdapter.submitList(
+            listOf(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setType(
+                            Questionnaire.Item.TypeCode.newBuilder()
+                                .setValue(QuestionnaireItemTypeCode.Value.CHOICE)
+                        )
+                        .addAllAnswerOption(answerOptions)
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                )
+            )
+        )
+
+        assertThat(questionnaireItemAdapter.getItemViewType(0))
+            .isEqualTo(QuestionnaireItemViewHolderType.DROP_DOWN.value)
+    }
+
+    @Test
+    fun getItemViewType_choiceItemType_shouldReturnDropDownViewHolderTypeWithItemControlExtension()
+    {
         val questionnaireItemAdapter = QuestionnaireItemAdapter()
         questionnaireItemAdapter.submitList(
             listOf(
@@ -281,8 +330,8 @@ class QuestionnaireItemAdapterTest {
             )
         )
 
-        assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
-            QuestionnaireItemViewHolderType.DROP_DOWN.value
+        assertThat(questionnaireItemAdapter.getItemViewType(0))
+            .isEqualTo(QuestionnaireItemViewHolderType.DROP_DOWN.value
         )
     }
 
