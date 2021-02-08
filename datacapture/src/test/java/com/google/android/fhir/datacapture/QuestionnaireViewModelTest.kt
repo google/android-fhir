@@ -27,6 +27,7 @@ import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 import com.google.fhir.r4.core.QuestionnaireResponse
 import com.google.fhir.r4.core.String
 import com.google.fhir.shaded.protobuf.Message
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,7 +55,7 @@ class QuestionnaireViewModelTest {
         state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
         val viewModel = QuestionnaireViewModel(state)
         assertResourceEquals(
-            viewModel.questionnaireResponseBuilder.build(),
+            viewModel.getQuestionnaireResponse(),
             QuestionnaireResponse.newBuilder().apply {
                 this.questionnaire = Canonical.newBuilder().setValue("a-questionnaire").build()
             }.build()
@@ -76,7 +77,7 @@ class QuestionnaireViewModelTest {
         state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
         val viewModel = QuestionnaireViewModel(state)
         assertResourceEquals(
-            viewModel.questionnaireResponseBuilder.build(),
+            viewModel.getQuestionnaireResponse(),
             QuestionnaireResponse.newBuilder().apply {
                 this.questionnaire = Canonical.newBuilder().setValue("a-questionnaire").build()
                 addItem(QuestionnaireResponse.Item.newBuilder().apply {
@@ -107,7 +108,7 @@ class QuestionnaireViewModelTest {
         state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
         val viewModel = QuestionnaireViewModel(state)
         assertResourceEquals(
-            viewModel.questionnaireResponseBuilder.build(),
+            viewModel.getQuestionnaireResponse(),
             QuestionnaireResponse.newBuilder().apply {
                 this.questionnaire = Canonical.newBuilder().setValue("a-questionnaire").build()
                 addItem(QuestionnaireResponse.Item.newBuilder().apply {
@@ -121,7 +122,7 @@ class QuestionnaireViewModelTest {
     }
 
     @Test
-    fun questionnaireItemViewItemList_shouldGenerateQuestionnaireItemViewItemList() {
+    fun questionnaireItemViewItemList_shouldGenerateQuestionnaireItemViewItemList() = runBlocking {
         val questionnaire = Questionnaire.newBuilder().apply {
             id = Id.newBuilder().setValue("a-questionnaire").build()
             addItem(Questionnaire.Item.newBuilder().apply {
@@ -137,16 +138,17 @@ class QuestionnaireViewModelTest {
                 })
             })
         }.build()
-        val serializedQuestionniare = printer.print(questionnaire)
-        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+        val serializedQuestionnaire = printer.print(questionnaire)
+        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
         val viewModel = QuestionnaireViewModel(state)
-        val questionnaireItemViewItemList = viewModel.questionnaireItemViewItemList
+        var questionnaireItemViewItemList = viewModel.questionnaireItemViewItemList
+        questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
         assertThat(questionnaireItemViewItemList.size).isEqualTo(2)
         val firstQuestionnaireItemViewItem = questionnaireItemViewItemList[0]
-        val firstQestionnaireItem = firstQuestionnaireItemViewItem.questionnaireItem
-        assertThat(firstQestionnaireItem.linkId.value).isEqualTo("a-link-id")
-        assertThat(firstQestionnaireItem.text.value).isEqualTo("Basic questions")
-        assertThat(firstQestionnaireItem.type.value)
+        val firstQuestionnaireItem = firstQuestionnaireItemViewItem.questionnaireItem
+        assertThat(firstQuestionnaireItem.linkId.value).isEqualTo("a-link-id")
+        assertThat(firstQuestionnaireItem.text.value).isEqualTo("Basic questions")
+        assertThat(firstQuestionnaireItem.type.value)
             .isEqualTo(QuestionnaireItemTypeCode.Value.GROUP)
         assertThat(firstQuestionnaireItemViewItem.questionnaireResponseItemBuilder.linkId.value)
             .isEqualTo("a-link-id")

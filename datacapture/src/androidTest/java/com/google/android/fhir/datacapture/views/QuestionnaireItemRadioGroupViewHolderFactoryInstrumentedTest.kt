@@ -44,7 +44,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
                     text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(viewHolder.itemView.findViewById<TextView>(R.id.radio_header).text).isEqualTo(
@@ -79,7 +79,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
                     ))
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         val radioGroup = viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group)
@@ -108,7 +108,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
                     ))
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         val radioButton =
@@ -155,7 +155,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
                         }.build()
                     })
                 }
-            )
+            ) {}
         )
 
         assertThat(
@@ -186,7 +186,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
                 ))
             }.build(),
             QuestionnaireResponse.Item.newBuilder()
-        )
+        ) {}
         viewHolder.bind(questionnaireItemViewItem)
         viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0)
             .performClick()
@@ -223,7 +223,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
                 ))
             }.build(),
             QuestionnaireResponse.Item.newBuilder()
-        )
+        ) {}
         viewHolder.bind(questionnaireItemViewItem)
         viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0)
             .performClick()

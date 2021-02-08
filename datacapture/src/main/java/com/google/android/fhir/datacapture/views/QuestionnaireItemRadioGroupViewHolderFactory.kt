@@ -68,6 +68,7 @@ object QuestionnaireItemRadioGroupViewHolderFactory : QuestionnaireItemViewHolde
                                 .answerOptionList[checkedId].responseAnswerValueX
                         }
                     )
+                    questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
                 }
             }
         }

@@ -42,7 +42,7 @@ internal class QuestionnaireItemAdapter :
      * [QuestionnaireItemViewItem].
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
-        val viewHolder = when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
+        val viewHolderFactory = when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
             QuestionnaireItemViewHolderType.GROUP -> QuestionnaireItemGroupViewHolderFactory
             QuestionnaireItemViewHolderType.CHECK_BOX -> QuestionnaireItemCheckBoxViewHolderFactory
             QuestionnaireItemViewHolderType.DATE_PICKER ->
@@ -64,7 +64,7 @@ internal class QuestionnaireItemAdapter :
             QuestionnaireItemViewHolderType.DISPLAY ->
                 QuestionnaireItemDisplayViewHolderFactory
         }
-        return viewHolder.create(parent)
+        return viewHolderFactory.create(parent)
     }
 
     override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {

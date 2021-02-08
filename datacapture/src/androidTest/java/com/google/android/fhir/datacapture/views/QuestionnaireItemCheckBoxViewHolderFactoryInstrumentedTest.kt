@@ -42,7 +42,7 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
                     text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).text).isEqualTo(
@@ -58,7 +58,7 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
                     text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).isChecked).isFalse()
@@ -78,7 +78,7 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
                             .setBoolean(Boolean.newBuilder().setValue(true)).build()
                     }
                 )
-            )
+            ) {}
         )
 
         assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).isChecked).isTrue()
@@ -97,7 +97,7 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
                             .setBoolean(Boolean.newBuilder().setValue(false)).build()
                     }
                 )
-            )
+            ) {}
         )
 
         assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).isChecked).isFalse()
@@ -111,7 +111,7 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
                 text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
             }.build(),
             QuestionnaireResponse.Item.newBuilder()
-        )
+        ) {}
         viewHolder.bind(questionnaireItemViewItem)
         viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).performClick()
 
