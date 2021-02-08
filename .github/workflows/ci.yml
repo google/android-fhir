@@ -45,10 +45,10 @@ jobs:
         java-version: 1.8
 
     - name: Make files executable
-      run: chmod +x ./gradlew && chmod +x ./fhirengine/checksum.sh
+      run: chmod +x ./gradlew && chmod +x ./core/checksum.sh
 
     - name: Generate cache key
-      run: ./fhirengine/checksum.sh checksum.txt
+      run: ./core/checksum.sh checksum.txt
 
     - name: Copy CI gradle.properties
       run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
@@ -91,13 +91,13 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: build-reports
-        path: fhirengine/build/reports
+        path: core/build/reports
     - name: Upload build dir # this is good to diagnose issues
       if: always()
       uses: actions/upload-artifact@v2
       with:
         name: build-out
-        path: fhirengine/build
+        path: core/build
    
     - name: Copy test results
       if: always()

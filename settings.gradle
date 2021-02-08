@@ -1,4 +1,4 @@
+include ':core'
 include ':datacapture'
 include ':datacapturegallery'
-include ':example'
-include ':fhirengine'
+include ':reference'
