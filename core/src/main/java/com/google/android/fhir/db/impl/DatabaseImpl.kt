@@ -30,7 +30,7 @@ import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * The implementation for the persistence layer using Room.
- * See docs for [com.google.core.db.Database] for the API docs.
+ * See docs for [com.google.android.fhir.db.Database] for the API docs.
  */
 internal class DatabaseImpl(
     context: Context,
