@@ -19,10 +19,15 @@ package com.google.android.fhir.datacapture
 import android.os.Build
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
+import com.google.fhir.r4.core.Code
+import com.google.fhir.r4.core.CodeableConcept
+import com.google.fhir.r4.core.Coding
+import com.google.fhir.r4.core.Extension
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 import com.google.fhir.r4.core.QuestionnaireResponse
 import com.google.fhir.r4.core.String
+import com.google.fhir.r4.core.Uri
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -47,6 +52,7 @@ class QuestionnaireItemAdapterTest {
                 )
             )
         )
+
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.GROUP.value
         )
@@ -68,6 +74,7 @@ class QuestionnaireItemAdapterTest {
                 )
             )
         )
+
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.CHECK_BOX.value
         )
@@ -89,6 +96,7 @@ class QuestionnaireItemAdapterTest {
                 )
             )
         )
+
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.DATE_PICKER.value
         )
@@ -110,6 +118,7 @@ class QuestionnaireItemAdapterTest {
                 )
             )
         )
+
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.DATE_TIME_PICKER.value
         )
@@ -131,6 +140,7 @@ class QuestionnaireItemAdapterTest {
                 )
             )
         )
+
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE.value
         )
@@ -152,6 +162,7 @@ class QuestionnaireItemAdapterTest {
                 )
             )
         )
+
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE.value
         )
@@ -173,6 +184,7 @@ class QuestionnaireItemAdapterTest {
                 )
             )
         )
+
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER.value
         )
@@ -194,6 +206,7 @@ class QuestionnaireItemAdapterTest {
                 )
             )
         )
+
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL.value
         )
@@ -215,8 +228,107 @@ class QuestionnaireItemAdapterTest {
                 )
             )
         )
+
         assertThat(questionnaireItemAdapter.getItemViewType(0)).isEqualTo(
             QuestionnaireItemViewHolderType.RADIO_GROUP.value
+        )
+    }
+
+    @Test
+    fun getItemViewType_choiceItemType_shouldReturnDropDownViewHolderTypeWithoutExtension() {
+        val answerOptions = Iterable {
+            iterator<Questionnaire.Item.AnswerOption> {
+                repeat(QuestionnaireItemAdapter.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN) {
+                    yield(
+                        Questionnaire.Item.AnswerOption.newBuilder()
+                            .setValue(
+                                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
+                                    .setCoding(
+                                        Coding.newBuilder()
+                                            .setCode(
+                                                Code.newBuilder()
+                                                    .setValue("test-code")
+                                            )
+                                            .setDisplay(
+                                                String.newBuilder()
+                                                    .setValue("Test Code")
+                                            )
+                                    )
+                            )
+                            .build()
+                    )
+                }
+            }
+        }
+        val questionnaireItemAdapter = QuestionnaireItemAdapter()
+        questionnaireItemAdapter.submitList(
+            listOf(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setType(
+                            Questionnaire.Item.TypeCode.newBuilder()
+                                .setValue(QuestionnaireItemTypeCode.Value.CHOICE)
+                        )
+                        .addAllAnswerOption(answerOptions)
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                )
+            )
+        )
+
+        assertThat(questionnaireItemAdapter.getItemViewType(0))
+            .isEqualTo(QuestionnaireItemViewHolderType.DROP_DOWN.value)
+    }
+
+    @Test
+    fun getItemViewType_choiceItemType_shouldReturnDropDownViewHolderTypeWithExtension() {
+        val questionnaireItemAdapter = QuestionnaireItemAdapter()
+        questionnaireItemAdapter.submitList(
+            listOf(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setType(
+                            Questionnaire.Item.TypeCode.newBuilder()
+                                .setValue(QuestionnaireItemTypeCode.Value.CHOICE)
+                        )
+                        .addExtension(
+                            Extension.newBuilder()
+                                .setUrl(
+                                    Uri.newBuilder()
+                                        .setValue(EXTENSION_ITEM_CONTROL_URL)
+                                )
+                                .setValue(
+                                    Extension.ValueX.newBuilder()
+                                        .setCodeableConcept(
+                                            CodeableConcept.newBuilder()
+                                                .addCoding(
+                                                    Coding.newBuilder()
+                                                        .setCode(
+                                                            Code.newBuilder()
+                                                                .setValue("drop-down")
+                                                        )
+                                                        .setDisplay(
+                                                            String.newBuilder()
+                                                                .setValue("Drop Down")
+                                                        )
+                                                        .setSystem(
+                                                            Uri.newBuilder()
+                                                                .setValue(
+                                                                    EXTENSION_ITEM_CONTROL_SYSTEM
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                )
+            )
+        )
+
+        assertThat(questionnaireItemAdapter.getItemViewType(0))
+            .isEqualTo(QuestionnaireItemViewHolderType.DROP_DOWN.value
         )
     }
 
@@ -237,7 +349,8 @@ class QuestionnaireItemAdapterTest {
                     Questionnaire.Item.newBuilder()
                         .setLinkId(String.newBuilder().setValue("link-id-1"))
                         .build(),
-                    QuestionnaireResponse.Item.newBuilder())
+                    QuestionnaireResponse.Item.newBuilder()
+                )
             )
         ).isTrue()
     }
@@ -256,7 +369,8 @@ class QuestionnaireItemAdapterTest {
                     Questionnaire.Item.newBuilder()
                         .setLinkId(String.newBuilder().setValue("link-id-2"))
                         .build(),
-                    QuestionnaireResponse.Item.newBuilder())
+                    QuestionnaireResponse.Item.newBuilder()
+                )
             )
         ).isFalse()
     }
@@ -277,7 +391,8 @@ class QuestionnaireItemAdapterTest {
                         .setLinkId(String.newBuilder().setValue("link-id-1"))
                         .setText(String.newBuilder().setValue("text"))
                         .build(),
-                    QuestionnaireResponse.Item.newBuilder())
+                    QuestionnaireResponse.Item.newBuilder()
+                )
             )
         ).isTrue()
     }
@@ -298,7 +413,8 @@ class QuestionnaireItemAdapterTest {
                         .setLinkId(String.newBuilder().setValue("link-id-1"))
                         .setText(String.newBuilder().setValue("different text"))
                         .build(),
-                    QuestionnaireResponse.Item.newBuilder())
+                    QuestionnaireResponse.Item.newBuilder()
+                )
             )
         ).isFalse()
     }
