@@ -78,7 +78,6 @@ internal class QuestionnaireItemAdapter :
      * (http://hl7.org/fhir/R4/valueset-questionnaire-item-control.html) used in the
      * itemControl extension (http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html).
      */
-
     override fun getItemViewType(position: Int): Int {
         val questionnaireItem = getItem(position).questionnaireItem
         return when (val type = questionnaireItem.type.value) {
@@ -108,17 +107,17 @@ internal class QuestionnaireItemAdapter :
         if (questionnaireItem.itemControl == ITEM_CONTROL_DROP_DOWN) {
             return QuestionnaireItemViewHolderType.DROP_DOWN
         } else if (
-            questionnaireItem.answerOptionCount >
-            MINIMUM_NUMBER_OF_ITEMS_FOR_DROP_DOWN) {
+            questionnaireItem.answerOptionCount >=
+            MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN) {
             return QuestionnaireItemViewHolderType.DROP_DOWN
         } else {
             return QuestionnaireItemViewHolderType.RADIO_GROUP
         }
     }
 
-    private companion object {
-        // Choice questions are rendered as radio group if number of choices less than this constant
-        const val MINIMUM_NUMBER_OF_ITEMS_FOR_DROP_DOWN = 4
+    internal companion object {
+        // Choice questions are rendered as radio group if number of options less than this constant
+        const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN = 4
     }
 }
 
