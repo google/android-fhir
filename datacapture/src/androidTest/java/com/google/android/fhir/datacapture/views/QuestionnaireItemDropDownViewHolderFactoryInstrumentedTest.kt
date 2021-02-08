@@ -62,7 +62,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
                     text = String.newBuilder().setValue("Question?").build()
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(
@@ -93,7 +93,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
                     addAnswerOption(answerOption)
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
@@ -123,7 +123,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
                     addAnswerOption(answerOption)
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(
@@ -157,7 +157,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
                     addAnswerOption(answerOption)
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(
@@ -196,7 +196,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
                         )
 
                 )
-            )
+            ) {}
         )
 
         assertThat(
@@ -231,7 +231,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
                             )
 
                     )
-                )
+                ) {}
             )
         }
     }
