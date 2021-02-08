@@ -78,8 +78,8 @@ internal class QuestionnaireItemAdapter(
      * itemControl extension (http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html).
      */
     override fun getItemViewType(position: Int): Int {
-        val questionnaireViewItem = questionnaireItemViewItemList[position]
-        return when (val type = questionnaireViewItem.questionnaireItem.type.value) {
+        val questionnaireItemViewItem = questionnaireItemViewItemList[position]
+        return when (val type = questionnaireItemViewItem.questionnaireItem.type.value) {
             QuestionnaireItemTypeCode.Value.GROUP -> QuestionnaireItemViewHolderType.GROUP
             QuestionnaireItemTypeCode.Value.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
             QuestionnaireItemTypeCode.Value.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
@@ -93,7 +93,8 @@ internal class QuestionnaireItemAdapter(
                 QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
             QuestionnaireItemTypeCode.Value.DECIMAL ->
                 QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
-            QuestionnaireItemTypeCode.Value.CHOICE -> getChoiceViewHolderType(questionnaireViewItem)
+            QuestionnaireItemTypeCode.Value.CHOICE ->
+                getChoiceViewHolderType(questionnaireItemViewItem)
             QuestionnaireItemTypeCode.Value.DISPLAY ->
                 QuestionnaireItemViewHolderType.DISPLAY
             else -> throw NotImplementedError("Question type $type not supported.")
@@ -104,8 +105,7 @@ internal class QuestionnaireItemAdapter(
 
     private fun getChoiceViewHolderType(questionnaireViewItem: QuestionnaireItemViewItem):
         QuestionnaireItemViewHolderType {
-        if (questionnaireViewItem.questionnaireItem.itemControl.equals(
-                ITEM_CONTROL_DROP_DOWN)) {
+        if (questionnaireViewItem.questionnaireItem.itemControl == ITEM_CONTROL_DROP_DOWN) {
             return QuestionnaireItemViewHolderType.DROP_DOWN
         } else if (
             questionnaireViewItem.questionnaireItem.answerOptionCount >
