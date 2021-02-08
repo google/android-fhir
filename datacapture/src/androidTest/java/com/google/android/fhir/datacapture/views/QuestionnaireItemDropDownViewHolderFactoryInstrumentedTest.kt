@@ -66,7 +66,8 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
         )
 
         assertThat(
-            viewHolder.itemView.findViewById<TextInputLayout>(R.id.dropdown_menu).hint
+            viewHolder.itemView.findViewById<TextInputLayout>(R.id.dropdown_menu)
+                .hint
         ).isEqualTo("Question?")
     }
 
@@ -95,11 +96,11 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
             )
         )
 
-        assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>
-        (R.id.auto_complete)
+        assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
             .adapter
             .getItem(0)
-            .toString()).isEqualTo("Test Code")
+            .toString()
+        ).isEqualTo("Test Code")
     }
 
     @Test
@@ -125,16 +126,17 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
             )
         )
 
-        assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>
-        (R.id.auto_complete)
+        assertThat(
+            viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
             .adapter
             .getItem(0)
-            .toString()).isEqualTo("test-code")
+            .toString()
+        ).isEqualTo("test-code")
     }
 
     @Test
     @UiThreadTest
-    fun shouldSetAutoTextureViewEmptyIfAnswerNull() {
+    fun shouldSetAutoTextViewEmptyIfAnswerNull() {
         val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
             .setValue(
                 Questionnaire.Item.AnswerOption.ValueX.newBuilder()
@@ -158,8 +160,11 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
             )
         )
 
-        assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>(
-            R.id.auto_complete).text.toString()).isEqualTo("")
+        assertThat(
+            viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
+                .text
+                .toString()
+        ).isEqualTo("")
     }
 
     @Test
@@ -194,8 +199,11 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
             )
         )
 
-        assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>(
-            R.id.auto_complete).text.toString()).isEqualTo(answerOption.displayString)
+        assertThat(
+            viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
+                .text
+                .toString()
+        ).isEqualTo(answerOption.displayString)
     }
 
     @Test
