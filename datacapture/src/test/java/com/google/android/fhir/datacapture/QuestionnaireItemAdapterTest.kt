@@ -349,7 +349,8 @@ class QuestionnaireItemAdapterTest {
                     Questionnaire.Item.newBuilder()
                         .setLinkId(String.newBuilder().setValue("link-id-1"))
                         .build(),
-                    QuestionnaireResponse.Item.newBuilder())
+                    QuestionnaireResponse.Item.newBuilder()
+                )
             )
         ).isTrue()
     }
@@ -368,7 +369,8 @@ class QuestionnaireItemAdapterTest {
                     Questionnaire.Item.newBuilder()
                         .setLinkId(String.newBuilder().setValue("link-id-2"))
                         .build(),
-                    QuestionnaireResponse.Item.newBuilder())
+                    QuestionnaireResponse.Item.newBuilder()
+                )
             )
         ).isFalse()
     }
@@ -389,7 +391,8 @@ class QuestionnaireItemAdapterTest {
                         .setLinkId(String.newBuilder().setValue("link-id-1"))
                         .setText(String.newBuilder().setValue("text"))
                         .build(),
-                    QuestionnaireResponse.Item.newBuilder())
+                    QuestionnaireResponse.Item.newBuilder()
+                )
             )
         ).isTrue()
     }
@@ -410,7 +413,8 @@ class QuestionnaireItemAdapterTest {
                         .setLinkId(String.newBuilder().setValue("link-id-1"))
                         .setText(String.newBuilder().setValue("different text"))
                         .build(),
-                    QuestionnaireResponse.Item.newBuilder())
+                    QuestionnaireResponse.Item.newBuilder()
+                )
             )
         ).isFalse()
     }
