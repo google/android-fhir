@@ -27,17 +27,14 @@ internal const val EXTENSION_ITEM_CONTROL_SYSTEM =
 // Item control code as string or null
 internal val Questionnaire.Item.itemControl: String?
     get() {
-        this.extensionList.forEach {
-            if (it.url.value.equals(EXTENSION_ITEM_CONTROL_URL)) {
-                it.value.codeableConcept.codingList.forEach {
-                    if (it.system.value.equals(EXTENSION_ITEM_CONTROL_SYSTEM)) {
-                        return when (it.code.value) {
-                            ITEM_CONTROL_DROP_DOWN -> ITEM_CONTROL_DROP_DOWN
-                            else -> null
-                        }
-                    }
-                }
-            }
+        return when (
+            this.extensionList.firstOrNull {
+                it.url.value == EXTENSION_ITEM_CONTROL_URL
+            }?.value?.codeableConcept?.codingList?.firstOrNull {
+                it.system.value == EXTENSION_ITEM_CONTROL_SYSTEM
+            }?.code?.value
+        ) {
+            ITEM_CONTROL_DROP_DOWN -> ITEM_CONTROL_DROP_DOWN
+            else -> null
         }
-        return null
     }
