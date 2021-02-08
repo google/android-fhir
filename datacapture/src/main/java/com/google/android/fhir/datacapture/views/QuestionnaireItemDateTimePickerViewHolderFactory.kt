@@ -84,6 +84,7 @@ object QuestionnaireItemDateTimePickerViewHolderFactory : QuestionnaireItemViewH
                         context.supportFragmentManager,
                         DatePickerFragment.TAG
                     )
+                    dateInputLayout.clearFocus()
                 }
 
                 timeInputLayout = itemView.findViewById(R.id.timeInputLayout)
@@ -127,6 +128,7 @@ object QuestionnaireItemDateTimePickerViewHolderFactory : QuestionnaireItemViewH
                         TimePickerFragment.TAG
                     )
                 }
+                timeInputLayout.clearFocus()
             }
 
             @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
