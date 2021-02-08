@@ -84,6 +84,7 @@ object QuestionnaireItemDateTimePickerViewHolderFactory : QuestionnaireItemViewH
                         context.supportFragmentManager,
                         DatePickerFragment.TAG
                     )
+                    // Clear focus so that the user can refocus to open the dialog
                     dateInputLayout.clearFocus()
                 }
 
@@ -127,8 +128,9 @@ object QuestionnaireItemDateTimePickerViewHolderFactory : QuestionnaireItemViewH
                         context.supportFragmentManager,
                         TimePickerFragment.TAG
                     )
+                    // Clear focus so that the user can refocus to open the dialog
+                    timeInputLayout.clearFocus()
                 }
-                timeInputLayout.clearFocus()
             }
 
             @SuppressLint("NewApi") // java.time APIs can be used due to desugaring

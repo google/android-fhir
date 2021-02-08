@@ -102,6 +102,7 @@ object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolde
                         context.supportFragmentManager,
                         DatePickerFragment.TAG
                     )
+                    // Clear focus so that the user can refocus to open the dialog
                     textInputLayout.clearFocus()
                 }
             }
