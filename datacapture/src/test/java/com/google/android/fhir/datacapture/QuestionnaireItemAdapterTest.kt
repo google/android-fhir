@@ -38,7 +38,8 @@ import org.robolectric.annotation.Config
 class QuestionnaireItemAdapterTest {
     @Test
     fun getItemViewType_groupItemType_shouldReturnGroupViewHolderType() {
-        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+        val questionnaireItemAdapter = QuestionnaireItemAdapter()
+        questionnaireItemAdapter.submitList(
             listOf(
                 QuestionnaireItemViewItem(
                     Questionnaire.Item.newBuilder()
@@ -59,7 +60,8 @@ class QuestionnaireItemAdapterTest {
 
     @Test
     fun getItemViewType_booleanItemType_shouldReturnBooleanViewHolderType() {
-        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+        val questionnaireItemAdapter = QuestionnaireItemAdapter()
+        questionnaireItemAdapter.submitList(
             listOf(
                 QuestionnaireItemViewItem(
                     Questionnaire.Item.newBuilder()
@@ -80,7 +82,8 @@ class QuestionnaireItemAdapterTest {
 
     @Test
     fun getItemViewType_dateItemType_shouldReturnDatePickerViewHolderType() {
-        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+        val questionnaireItemAdapter = QuestionnaireItemAdapter()
+        questionnaireItemAdapter.submitList(
             listOf(
                 QuestionnaireItemViewItem(
                     Questionnaire.Item.newBuilder()
@@ -101,7 +104,8 @@ class QuestionnaireItemAdapterTest {
 
     @Test
     fun getItemViewType_dateTimeItemType_shouldReturnDateTimePickerViewHolderType() {
-        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+        val questionnaireItemAdapter = QuestionnaireItemAdapter()
+        questionnaireItemAdapter.submitList(
             listOf(
                 QuestionnaireItemViewItem(
                     Questionnaire.Item.newBuilder()
@@ -122,7 +126,8 @@ class QuestionnaireItemAdapterTest {
 
     @Test
     fun getItemViewType_stringItemType_shouldReturnEditTextViewHolderType() {
-        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+        val questionnaireItemAdapter = QuestionnaireItemAdapter()
+        questionnaireItemAdapter.submitList(
             listOf(
                 QuestionnaireItemViewItem(
                     Questionnaire.Item.newBuilder()
@@ -143,7 +148,8 @@ class QuestionnaireItemAdapterTest {
 
     @Test
     fun getItemViewType_textItemType_shouldReturnEditTextViewHolderType() {
-        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+        val questionnaireItemAdapter = QuestionnaireItemAdapter()
+        questionnaireItemAdapter.submitList(
             listOf(
                 QuestionnaireItemViewItem(
                     Questionnaire.Item.newBuilder()
@@ -164,7 +170,8 @@ class QuestionnaireItemAdapterTest {
 
     @Test
     fun getItemViewType_integerItemType_shouldReturnEditTextIntegerViewHolderType() {
-        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+        val questionnaireItemAdapter = QuestionnaireItemAdapter()
+        questionnaireItemAdapter.submitList(
             listOf(
                 QuestionnaireItemViewItem(
                     Questionnaire.Item.newBuilder()
@@ -185,7 +192,8 @@ class QuestionnaireItemAdapterTest {
 
     @Test
     fun getItemViewType_decimalItemType_shouldReturnEditTextDecimalViewHolderType() {
-        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+        val questionnaireItemAdapter = QuestionnaireItemAdapter()
+        questionnaireItemAdapter.submitList(
             listOf(
                 QuestionnaireItemViewItem(
                     Questionnaire.Item.newBuilder()
@@ -206,7 +214,8 @@ class QuestionnaireItemAdapterTest {
 
     @Test
     fun getItemViewType_choiceItemType_shouldReturnRadioGroupViewHolderType() {
-        val questionnaireItemAdapter = QuestionnaireItemAdapter(
+        val questionnaireItemAdapter = QuestionnaireItemAdapter()
+        questionnaireItemAdapter.submitList(
             listOf(
                 QuestionnaireItemViewItem(
                     Questionnaire.Item.newBuilder()
@@ -277,4 +286,85 @@ class QuestionnaireItemAdapterTest {
     }
 
     // TODO: test errors thrown for unsupported types
+
+    @Test
+    fun diffCallback_areItemsTheSame_sameLinkId_shouldReturnTrue() {
+        assertThat(
+            DiffCallback.areItemsTheSame(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setLinkId(String.newBuilder().setValue("link-id-1"))
+                        .setText(String.newBuilder().setValue("text"))
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                ),
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setLinkId(String.newBuilder().setValue("link-id-1"))
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder())
+            )
+        ).isTrue()
+    }
+
+    @Test
+    fun diffCallback_areItemsTheSame_differentLinkId_shouldReturnFalse() {
+        assertThat(
+            DiffCallback.areItemsTheSame(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setLinkId(String.newBuilder().setValue("link-id-1"))
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                ),
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setLinkId(String.newBuilder().setValue("link-id-2"))
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder())
+            )
+        ).isFalse()
+    }
+
+    @Test
+    fun diffCallback_areContentsTheSame_sameContents_shouldReturnTrue() {
+        assertThat(
+            DiffCallback.areContentsTheSame(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setLinkId(String.newBuilder().setValue("link-id-1"))
+                        .setText(String.newBuilder().setValue("text"))
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                ),
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setLinkId(String.newBuilder().setValue("link-id-1"))
+                        .setText(String.newBuilder().setValue("text"))
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder())
+            )
+        ).isTrue()
+    }
+
+    @Test
+    fun diffCallback_areContentsTheSame_differentContents_shouldReturnFalse() {
+        assertThat(
+            DiffCallback.areContentsTheSame(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setLinkId(String.newBuilder().setValue("link-id-1"))
+                        .setText(String.newBuilder().setValue("text"))
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                ),
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setLinkId(String.newBuilder().setValue("link-id-1"))
+                        .setText(String.newBuilder().setValue("different text"))
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder())
+            )
+        ).isFalse()
+    }
 }

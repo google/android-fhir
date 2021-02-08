@@ -50,7 +50,8 @@ class QuestionnaireFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-        val adapter = QuestionnaireItemAdapter(viewModel.questionnaireItemViewItemList)
+        val adapter = QuestionnaireItemAdapter()
+        adapter.submitList(viewModel.questionnaireItemViewItemList)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(view.context)
     }
