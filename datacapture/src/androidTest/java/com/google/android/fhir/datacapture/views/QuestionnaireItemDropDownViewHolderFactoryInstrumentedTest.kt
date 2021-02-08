@@ -208,7 +208,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
 
     @Test
     @UiThreadTest
-    fun shouldthrowErrorForAnswerOptionWithoutCoding() {
+    fun shouldThrowErrorForAnswerOptionWithoutCoding() {
         val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
             .setValue(
                 Questionnaire.Item.AnswerOption.ValueX.newBuilder()
