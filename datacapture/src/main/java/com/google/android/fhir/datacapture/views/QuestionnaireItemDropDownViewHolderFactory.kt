@@ -27,7 +27,7 @@ import com.google.android.fhir.datacapture.responseAnswerValueX
 import com.google.android.material.textfield.TextInputLayout
 import com.google.fhir.r4.core.QuestionnaireResponse
 
-object QuestionnaireItemDropDownViewHolderFactory : QuestionnaireItemViewHolderFactory(
+internal object QuestionnaireItemDropDownViewHolderFactory : QuestionnaireItemViewHolderFactory(
     R.layout.questionnaire_item_drop_down_view
 ) {
     override fun getQuestionnaireItemViewHolderDelegate() =
