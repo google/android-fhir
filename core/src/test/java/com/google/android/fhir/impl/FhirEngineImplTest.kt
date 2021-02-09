@@ -17,12 +17,12 @@
 package com.google.android.fhir.impl
 
 import androidx.test.core.app.ApplicationProvider
-import com.google.common.truth.Truth
 import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.ResourceNotFoundException
 import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.sync.FhirDataSource
+import com.google.common.truth.Truth
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Patient

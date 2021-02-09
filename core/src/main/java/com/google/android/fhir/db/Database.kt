@@ -16,11 +16,10 @@
 
 package com.google.android.fhir.db
 
-import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.search.impl.Query
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.LocalChange
-
+import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
+import com.google.android.fhir.search.impl.Query
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -144,9 +143,9 @@ interface Database {
     fun <R : Resource> search(query: Query): List<R>
 
     /**
-     * Retrieves all [LocalChange]s for all [Resource]s. The [LocalChange]s are in a form which
-     * can be synced. Multiple changes for a single [Resource] are squashed into a single
-     * [LocalChange].
+     * Retrieves all [LocalChange]s for all [Resource]s, which can be used to update the remote
+     * FHIR server. Each [resource] will have at most one [LocalChange] (multiple changes are
+     * squashed).
      */
     fun getAllLocalChanges(): List<Pair<LocalChangeToken, LocalChange>>
 

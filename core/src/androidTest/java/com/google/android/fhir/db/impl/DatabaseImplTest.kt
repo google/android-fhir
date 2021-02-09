@@ -18,12 +18,12 @@ package com.google.android.fhir.db.impl
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
 import com.google.android.fhir.FhirServices
 import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.db.impl.entities.LocalChange
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.sync.FhirDataSource
+import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Patient
