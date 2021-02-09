@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.map
 
 class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     /** The current questionnaire as questions are being answered. */
-    private val questionnaire: Questionnaire
+    val questionnaire: Questionnaire
 
     init {
         val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!

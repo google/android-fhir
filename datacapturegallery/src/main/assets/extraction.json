@@ -1,0 +1,36 @@
+{
+  "resourceType": "Questionnaire",
+  "subjectType": [
+    "Patient"
+  ],
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
+      "valueExpression": {
+        "language": "application/x-fhir-query",
+        "expression": "Patient",
+        "name": "patient"
+      }
+    }
+  ],
+  "item": [
+    {
+      "linkId": "patient-0",
+      "type": "group",
+      "item": [
+        {
+          "linkId": "patient-0-birth-date",
+          "text": "Date of birth",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate",
+          "type": "date"
+        },
+        {
+          "linkId": "patient-0-active",
+          "text": "Active",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.active",
+          "type": "boolean"
+        }
+      ]
+    }
+  ]
+}

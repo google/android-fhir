@@ -25,6 +25,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.fhir.common.JsonFormat
+import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireResponse
 
 class QuestionnaireActivity : AppCompatActivity() {
@@ -58,24 +59,31 @@ class QuestionnaireActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.getItemId()) {
+        return when (item.itemId) {
             R.id.action_submit -> {
                 val questionnaireFragment = supportFragmentManager.findFragmentByTag(
                     QUESTIONNAIRE_FRAGMENT_TAG
                 ) as QuestionnaireFragment
-                displayQuestionnaireResponse(questionnaireFragment.getQuestionnaireResponse())
+                displayQuestionnaireResponse(
+                    questionnaireFragment.getQuestionnaire(),
+                    questionnaireFragment.getQuestionnaireResponse()
+                )
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    // Display Quesitonnaire response as a dialog
-    fun displayQuestionnaireResponse(questionnaireResponse: QuestionnaireResponse) {
+    // Display Questionnaire response as a dialog
+    private fun displayQuestionnaireResponse(
+        questionnaire: Questionnaire,
+        questionnaireResponse: QuestionnaireResponse) {
+        val questionnaireJson = JsonFormat.getPrinter().print(questionnaire)
         val questionnaireResponseJson = JsonFormat.getPrinter().print(questionnaireResponse)
         val dialogFragment = QuestionnaireResponseDialogFragment()
         dialogFragment.arguments = bundleOf(
-            QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to questionnaireResponseJson
+            QuestionnaireResponseDialogFragment.BUNDLE_KEY_QUESTIONNAIRE to questionnaireJson,
+            QuestionnaireResponseDialogFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to questionnaireResponseJson
         )
         dialogFragment.show(
             supportFragmentManager,
@@ -86,6 +94,6 @@ class QuestionnaireActivity : AppCompatActivity() {
     companion object {
         const val QUESTIONNAIRE_TITLE_KEY = "questionnaire-title-key"
         const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
-        const val QUESTIONNAIRE_FRAGMENT_TAG = "questionannire-fragment-tag"
+        const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
     }
 }

@@ -43,7 +43,7 @@ import com.google.fhir.shaded.protobuf.Message
  *
  * WARNING: This is not production-ready.
  */
-internal object ResourceMapper {
+object ResourceMapper {
 
     /**
      * Extract a FHIR resource from the `questionnaire` and `questionnaireResponse`.
