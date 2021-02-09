@@ -85,6 +85,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                         context.supportFragmentManager,
                         DatePickerFragment.TAG
                     )
+                    // Clear focus so that the user can refocus to open the dialog
+                    dateInputLayout.clearFocus()
                 }
 
                 timeInputLayout = itemView.findViewById(R.id.timeInputLayout)
@@ -127,6 +129,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                         context.supportFragmentManager,
                         TimePickerFragment.TAG
                     )
+                    // Clear focus so that the user can refocus to open the dialog
+                    timeInputLayout.clearFocus()
                 }
             }
 
