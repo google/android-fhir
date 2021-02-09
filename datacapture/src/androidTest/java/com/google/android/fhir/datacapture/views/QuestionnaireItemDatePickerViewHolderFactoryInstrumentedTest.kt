@@ -58,7 +58,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
                     text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(
@@ -75,7 +75,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
                     text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(
@@ -107,7 +107,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
                             ).build()
                     }
                 )
-            )
+            ) {}
         )
 
         assertThat(

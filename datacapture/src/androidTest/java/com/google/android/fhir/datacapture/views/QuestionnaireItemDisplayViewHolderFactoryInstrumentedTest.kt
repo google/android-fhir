@@ -55,7 +55,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
                         com.google.fhir.r4.core.String.newBuilder().setValue("Display").build()
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text_view).text).isEqualTo(
@@ -72,7 +72,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
                         com.google.fhir.r4.core.String.newBuilder().setValue("Display").build()
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(
@@ -88,7 +88,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
                     text = com.google.fhir.r4.core.String.newBuilder().setValue("").build()
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(

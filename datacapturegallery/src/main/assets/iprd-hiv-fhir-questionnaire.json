@@ -832,6 +832,7 @@
             ]
           },
           {
+            "linkId": "11.3",
             "type": "boolean",
             "required": false,
             "text": "No sex in last 3 months"
@@ -1397,7 +1398,8 @@
             }
           }
         ],
-        "required": false,
+        "required": true,
+        "linkId": "24",
         "text": "Did you experience persistent diarrhea and fatigue in last 6 months?",
         "answerOption": [
           {

@@ -17,10 +17,13 @@
 package com.google.android.fhir.datacapture
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDateTimePickerViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemDisplayViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemDropDownViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextDecimalViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextIntegerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextMultiLineViewHolderFactory
@@ -29,17 +32,17 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolde
 import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 
-internal class QuestionnaireItemAdapter(
-    private val questionnaireItemViewItemList: List<QuestionnaireItemViewItem>
-) : RecyclerView.Adapter<QuestionnaireItemViewHolder>() {
+internal class QuestionnaireItemAdapter :
+    ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
     /**
      * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
-     * [QuestionnaireItemComponent].
+     * [QuestionnaireItemViewItem].
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
-        val viewHolder = when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
+        val viewHolderFactory = when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
             QuestionnaireItemViewHolderType.GROUP -> QuestionnaireItemGroupViewHolderFactory
             QuestionnaireItemViewHolderType.CHECK_BOX -> QuestionnaireItemCheckBoxViewHolderFactory
             QuestionnaireItemViewHolderType.DATE_PICKER ->
@@ -56,23 +59,28 @@ internal class QuestionnaireItemAdapter(
                 QuestionnaireItemEditTextDecimalViewHolderFactory
             QuestionnaireItemViewHolderType.RADIO_GROUP ->
                 QuestionnaireItemRadioGroupViewHolderFactory
+            QuestionnaireItemViewHolderType.DROP_DOWN ->
+                QuestionnaireItemDropDownViewHolderFactory
+            QuestionnaireItemViewHolderType.DISPLAY ->
+                QuestionnaireItemDisplayViewHolderFactory
         }
-        return viewHolder.create(parent)
+        return viewHolderFactory.create(parent)
     }
 
     override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
-        holder.bind(questionnaireItemViewItemList[position])
+        holder.bind(getItem(position))
     }
 
     /**
      * Returns the integer value of the [QuestionnaireItemViewHolderType] that will be used to
-     * render the [QuestionnaireItemComponent]. This is determined by a combination of the data type
+     * render the [QuestionnaireItemViewItem]. This is determined by a combination of the data type
      * of the question and any additional Questionnaire Item UI Control Codes
      * (http://hl7.org/fhir/R4/valueset-questionnaire-item-control.html) used in the
      * itemControl extension (http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html).
      */
-    override fun getItemViewType(position: Int) =
-        when (val type = questionnaireItemViewItemList[position].questionnaireItem.type.value) {
+    override fun getItemViewType(position: Int): Int {
+        val questionnaireItem = getItem(position).questionnaireItem
+        return when (val type = questionnaireItem.type.value) {
             QuestionnaireItemTypeCode.Value.GROUP -> QuestionnaireItemViewHolderType.GROUP
             QuestionnaireItemTypeCode.Value.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
             QuestionnaireItemTypeCode.Value.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
@@ -87,9 +95,40 @@ internal class QuestionnaireItemAdapter(
             QuestionnaireItemTypeCode.Value.DECIMAL ->
                 QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
             QuestionnaireItemTypeCode.Value.CHOICE ->
-                QuestionnaireItemViewHolderType.RADIO_GROUP
+                getChoiceViewHolderType(questionnaireItem)
+            QuestionnaireItemTypeCode.Value.DISPLAY ->
+                QuestionnaireItemViewHolderType.DISPLAY
             else -> throw NotImplementedError("Question type $type not supported.")
         }.value
+    }
 
-    override fun getItemCount() = questionnaireItemViewItemList.size
+    private fun getChoiceViewHolderType(questionnaireItem: Questionnaire.Item):
+        QuestionnaireItemViewHolderType {
+        if (questionnaireItem.itemControl == ITEM_CONTROL_DROP_DOWN) {
+            return QuestionnaireItemViewHolderType.DROP_DOWN
+        } else if (
+            questionnaireItem.answerOptionCount >=
+            MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN) {
+            return QuestionnaireItemViewHolderType.DROP_DOWN
+        } else {
+            return QuestionnaireItemViewHolderType.RADIO_GROUP
+        }
+    }
+
+    internal companion object {
+        // Choice questions are rendered as radio group if number of options less than this constant
+        const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN = 4
+    }
+}
+
+internal object DiffCallback : DiffUtil.ItemCallback<QuestionnaireItemViewItem>() {
+    override fun areItemsTheSame(
+        oldItem: QuestionnaireItemViewItem,
+        newItem: QuestionnaireItemViewItem
+    ) = oldItem.questionnaireItem.linkId == newItem.questionnaireItem.linkId
+
+    override fun areContentsTheSame(
+        oldItem: QuestionnaireItemViewItem,
+        newItem: QuestionnaireItemViewItem
+    ) = oldItem.questionnaireItem == newItem.questionnaireItem
 }

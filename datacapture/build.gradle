@@ -59,6 +59,7 @@ dependencies {
     implementation deps.core
     implementation deps.fragment
     implementation deps.kotlin.stdlib
+    implementation deps.kotlin.test
     implementation deps.lifecycle.viewmodel_ktx
     implementation deps.material
 

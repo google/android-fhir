@@ -34,7 +34,7 @@ class QuestionnaireItemViewItemTest {
         val questionnaireItemViewItem = QuestionnaireItemViewItem(
             Questionnaire.Item.getDefaultInstance(),
             QuestionnaireResponse.Item.newBuilder()
-        )
+        ) {}
         assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
     }
 
@@ -51,7 +51,7 @@ class QuestionnaireItemViewItemTest {
                     }
                 )
             }
-        )
+        ) {}
         assertThat(questionnaireItemViewItem.singleAnswerOrNull!!.value.boolean.value).isTrue()
     }
 
@@ -75,7 +75,7 @@ class QuestionnaireItemViewItemTest {
                     }
                 )
             }
-        )
+        ) {}
         assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
     }
 }

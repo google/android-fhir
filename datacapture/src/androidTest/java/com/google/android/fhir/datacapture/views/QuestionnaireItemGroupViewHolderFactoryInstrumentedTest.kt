@@ -55,7 +55,7 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
                         com.google.fhir.r4.core.String.newBuilder().setValue("Group header").build()
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).text).isEqualTo(
@@ -72,7 +72,7 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
                         com.google.fhir.r4.core.String.newBuilder().setValue("Group header").build()
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(
@@ -88,7 +88,7 @@ class QuestionnaireItemGroupViewHolderFactoryInstrumentedTest {
                     text = com.google.fhir.r4.core.String.newBuilder().setValue("").build()
                 }.build(),
                 QuestionnaireResponse.Item.newBuilder()
-            )
+            ) {}
         )
 
         assertThat(

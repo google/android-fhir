@@ -63,8 +63,7 @@ class QuestionnaireActivity : AppCompatActivity() {
                 val questionnaireFragment = supportFragmentManager.findFragmentByTag(
                     QUESTIONNAIRE_FRAGMENT_TAG
                 ) as QuestionnaireFragment
-                displayQuestionnaireResponse(
-                    questionnaireFragment.getQuestionnaireResponseBuilder().build())
+                displayQuestionnaireResponse(questionnaireFragment.getQuestionnaireResponse())
                 true
             }
             else -> super.onOptionsItemSelected(item)
