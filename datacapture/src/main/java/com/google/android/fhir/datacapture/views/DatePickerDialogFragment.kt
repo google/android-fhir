@@ -26,7 +26,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import java.time.LocalDate
 
-class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSetListener {
+internal class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSetListener {
     @SuppressLint("NewApi") // Suppress warnings for java.time APIs
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Use the current date as the default date in the picker

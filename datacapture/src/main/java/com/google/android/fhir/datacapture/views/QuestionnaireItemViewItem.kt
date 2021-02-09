@@ -32,7 +32,7 @@ import com.google.fhir.r4.core.QuestionnaireResponse
  * `questionnaireResponseItemBuilder` is changed to inform the rest of the questionnaire to be
  * updated
  */
-data class QuestionnaireItemViewItem(
+internal data class QuestionnaireItemViewItem(
     val questionnaireItem: Questionnaire.Item,
     val questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder,
     val questionnaireResponseItemChangedCallback: () -> Unit

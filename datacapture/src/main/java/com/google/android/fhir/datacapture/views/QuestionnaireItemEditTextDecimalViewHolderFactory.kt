@@ -20,7 +20,7 @@ import android.text.InputType
 import com.google.fhir.r4.core.Decimal
 import com.google.fhir.r4.core.QuestionnaireResponse
 
-object QuestionnaireItemEditTextDecimalViewHolderFactory :
+internal object QuestionnaireItemEditTextDecimalViewHolderFactory :
     QuestionnaireItemEditTextViewHolderFactory() {
     override fun getQuestionnaireItemViewHolderDelegate() =
         object : QuestionnaireItemEditTextViewHolderDelegate(
