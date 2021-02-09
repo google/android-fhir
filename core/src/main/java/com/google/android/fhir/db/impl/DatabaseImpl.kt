@@ -21,6 +21,9 @@ import androidx.room.Room
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.ResourceNotFoundInDbException
+import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.db.impl.dao.LocalChangeUtils
+import com.google.android.fhir.db.impl.entities.LocalChange
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.index.FhirIndexer
 import com.google.android.fhir.resource.getResourceType
@@ -65,17 +68,27 @@ internal class DatabaseImpl(
         }
     }
     val syncedResourceDao = db.syncedResourceDao()
+    val localChangeDao = db.localChangeDao().also {
+        it.iParser = iParser
+    }
 
+    @Transaction
     override fun <R : Resource> insert(resource: R) {
         resourceDao.insert(resource)
+        localChangeDao.addInsert(resource)
     }
 
+    @Transaction
     override fun <R : Resource> insertAll(resources: List<R>) {
         resourceDao.insertAll(resources)
+        localChangeDao.addInsertAll(resources)
     }
 
+    @Transaction
     override fun <R : Resource> update(resource: R) {
+        val oldResource = select(resource.javaClass, resource.id)
         resourceDao.update(resource)
+        localChangeDao.addUpdate(oldResource, resource)
     }
 
     override fun <R : Resource> select(clazz: Class<R>, id: String): R {
@@ -101,12 +114,14 @@ internal class DatabaseImpl(
         insertAll(resources)
     }
 
+    @Transaction
     override fun <R : Resource> delete(clazz: Class<R>, id: String) {
         val type = getResourceType(clazz)
-        resourceDao.deleteResource(
+        val rowsDeleted = resourceDao.deleteResource(
             resourceId = id,
             resourceType = type
         )
+        if (rowsDeleted > 0) localChangeDao.addDelete(resourceId = id, resourceType = type)
     }
 
     override fun <R : Resource> searchByReference(
@@ -160,6 +175,22 @@ internal class DatabaseImpl(
     override fun <R : Resource> search(query: Query): List<R> =
         resourceDao.getResources(query.getSupportSQLiteQuery())
             .map { iParser.parseResource(it) as R }
+
+    /**
+     * @returns a list of pairs. Each pair is a token + squashed local change. Each token is a list
+     * of [LocalChange.id]s of rows of the [LocalChange].
+     */
+    // TODO: create a data class for squashed local change and merge token in to it.
+    override fun getAllLocalChanges(): List<Pair<LocalChangeToken, LocalChange>> =
+        localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }
+            .values
+            .map {
+                LocalChangeToken(it.map { it.id }) to LocalChangeUtils.squash(it)
+            }
+
+    override fun deleteUpdates(token: LocalChangeToken) {
+        localChangeDao.discardLocalChanges(token)
+    }
 
     companion object {
         private const val DEFAULT_DATABASE_NAME = "ResourceDatabase"

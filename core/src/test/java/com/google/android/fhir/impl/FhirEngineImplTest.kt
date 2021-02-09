@@ -19,6 +19,7 @@ package com.google.android.fhir.impl
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.ResourceNotFoundException
+import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.sync.FhirDataSource
 import com.google.common.truth.Truth
@@ -77,14 +78,13 @@ class FhirEngineImplTest {
 
     @Test
     fun update_nonexistentResource_shouldNotInsertResource() {
-        fhirEngine.update(TEST_PATIENT_2)
-        val resourceNotFoundException = assertThrows(ResourceNotFoundException::class.java) {
-            fhirEngine.load(Patient::class.java, TEST_PATIENT_2_ID)
+        val exception = assertThrows(ResourceNotFoundInDbException::class.java) {
+            fhirEngine.update(TEST_PATIENT_2)
         }
         /* ktlint-disable max-line-length */
-        Truth.assertThat(resourceNotFoundException.message)
+        Truth.assertThat(exception.message)
             .isEqualTo("Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!")
-        /* ktlint-enable max_line_length */
+        /* ktlint-enable max-line-length */
     }
 
     @Test
@@ -104,10 +104,10 @@ class FhirEngineImplTest {
         val resourceNotFoundException = assertThrows(ResourceNotFoundException::class.java) {
             fhirEngine.load(Patient::class.java, "nonexistent_patient")
         }
+        /* ktlint-disable max-line-length */
         Truth.assertThat(resourceNotFoundException.message)
-            /* ktlint-disable max-line-length */
             .isEqualTo("Resource not found with type ${ResourceType.Patient.name} and id nonexistent_patient!")
-            /* ktlint-enable max-line-length */
+        /* ktlint-enable max-line-length */
     }
 
     @Test

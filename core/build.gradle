@@ -42,6 +42,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    packagingOptions {
+        exclude 'META-INF/ASL-2.0.txt'
+        exclude 'META-INF/LGPL-3.0.txt'
+    }
     // See https://developer.android.com/studio/write/java8-support
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
@@ -83,6 +87,7 @@ dependencies {
     implementation deps.room.ktx
     implementation deps.room.runtime
     implementation deps.work.runtime
+    implementation deps.json_tools.json_patch
 
     kapt deps.room.compiler
 
