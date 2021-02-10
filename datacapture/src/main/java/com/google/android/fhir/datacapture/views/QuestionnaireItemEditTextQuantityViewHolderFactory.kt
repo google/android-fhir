@@ -17,13 +17,17 @@
 package com.google.android.fhir.datacapture.views
 
 import android.text.InputType
+import com.google.fhir.r4.core.Decimal
 import com.google.fhir.r4.core.Integer
+import com.google.fhir.r4.core.Quantity
 import com.google.fhir.r4.core.QuestionnaireResponse
 
-/* Currently inheriting with QuestionnaireItemEditTextViewHolderFactory, but if we want to add drop down
-    then we need to change the parent Factory*/
+/**
+ *  Currently inheriting with QuestionnaireItemEditTextViewHolderFactory, but if we want to add drop down
+ *  then we need to change the parent Factory
+ */
 
-object QuestionnaireItemEditTextQuantityViewHolderFactory :
+internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
         QuestionnaireItemEditTextViewHolderFactory() {
     override fun getQuestionnaireItemViewHolderDelegate() =
             object : QuestionnaireItemEditTextViewHolderDelegate(
@@ -31,11 +35,11 @@ object QuestionnaireItemEditTextQuantityViewHolderFactory :
                     true
             ) {
                 override fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder? {
-                    return text.toIntOrNull()?.let {
+                    return text.let {
                         QuestionnaireResponse.Item.Answer.newBuilder()
                                 .apply {
                                     value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                                            .setInteger(Integer.newBuilder().setValue(it).build())
+                                            .setQuantity(Quantity.newBuilder().setValue(Decimal.newBuilder().setValue(it).build()))
                                             .build()
 
                                 }
@@ -44,7 +48,7 @@ object QuestionnaireItemEditTextQuantityViewHolderFactory :
                 }
 
                 override fun getText(answer: QuestionnaireResponse.Item.Answer.Builder?): String {
-                    return answer?.value?.integer?.value?.toString() ?: ""
+                    return answer?.value?.quantity?.value?.value ?: ""
                 }
             }
 }
