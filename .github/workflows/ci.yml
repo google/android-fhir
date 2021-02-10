@@ -85,6 +85,12 @@ jobs:
         api-level: ${{ matrix.api-level }}
         arch: x86_64
         script: ./gradlew connectedCheck --stacktrace
+
+    - name: Run Jacoco
+      with:
+        api-level: ${{ matrix.api-level }}
+        arch: x86_64
+        script: ./gradlew jacocoTestReport
       
     - name: Upload build reports
       if: always()
