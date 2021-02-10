@@ -111,6 +111,8 @@ internal class QuestionnaireItemAdapter :
         QuestionnaireItemViewHolderType {
         if (questionnaireItem.itemControl == ITEM_CONTROL_DROP_DOWN) {
             return QuestionnaireItemViewHolderType.DROP_DOWN
+        } else if (questionnaireItem.itemControl == ITEM_CONTROL_RADIO_BUTTON) {
+            return QuestionnaireItemViewHolderType.RADIO_GROUP
         } else if (
             questionnaireItem.answerOptionCount >=
             MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN) {
