@@ -76,3 +76,6 @@ lint/tmp/
 
 # Mac OS
 .DS_Store
+
+# Jacoco
+jacoco.exec

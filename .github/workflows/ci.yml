@@ -38,7 +38,7 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
-    
+
     - name: set up JDK 1.8
       uses: actions/setup-java@v1
       with:
@@ -111,3 +111,12 @@ jobs:
       with:
         name: test-results
         path: test-output
+
+    - name: Upload coverage report to codecov
+      uses: codecov/codecov-action@v1
+      with:
+        files: .core/build/reports/jacoco/jacocoTestReport.xml
+        flags: unittests
+        name: android-fhir-codecov
+        fail_ci_if_error: false
+        verbose: true
