@@ -235,58 +235,6 @@ class QuestionnaireItemAdapterTest {
     }
 
     @Test
-    fun getItemViewType_choiceItemType_itemControlExtensionWithRadioButton_shouldReturnRadioGroupViewHolder() {
-        val questionnaireItemAdapter = QuestionnaireItemAdapter()
-        questionnaireItemAdapter.submitList(
-            listOf(
-                QuestionnaireItemViewItem(
-                    Questionnaire.Item.newBuilder()
-                        .setType(
-                            Questionnaire.Item.TypeCode.newBuilder()
-                                .setValue(QuestionnaireItemTypeCode.Value.CHOICE)
-                        )
-                        .addExtension(
-                            Extension.newBuilder()
-                                .setUrl(
-                                    Uri.newBuilder()
-                                        .setValue(EXTENSION_ITEM_CONTROL_URL)
-                                )
-                                .setValue(
-                                    Extension.ValueX.newBuilder()
-                                        .setCodeableConcept(
-                                            CodeableConcept.newBuilder()
-                                                .addCoding(
-                                                    Coding.newBuilder()
-                                                        .setCode(
-                                                            Code.newBuilder()
-                                                                .setValue(ITEM_CONTROL_RADIO_BUTTON)
-                                                        )
-                                                        .setDisplay(
-                                                            String.newBuilder()
-                                                                .setValue("Radio Button")
-                                                        )
-                                                        .setSystem(
-                                                            Uri.newBuilder()
-                                                                .setValue(
-                                                                    EXTENSION_ITEM_CONTROL_SYSTEM
-                                                                )
-                                                        )
-                                                )
-                                        )
-                                )
-                        )
-                        .build(),
-                    QuestionnaireResponse.Item.newBuilder()
-                ) {}
-            )
-        )
-
-        assertThat(questionnaireItemAdapter.getItemViewType(0))
-            .isEqualTo(QuestionnaireItemViewHolderType.RADIO_GROUP.value
-            )
-    }
-
-    @Test
     fun getItemViewType_choiceItemType_moreAnswerOptions_shouldReturnDropDownViewHolderType() {
         val answerOptions = Iterable {
             iterator<Questionnaire.Item.AnswerOption> {
@@ -333,7 +281,84 @@ class QuestionnaireItemAdapterTest {
     }
 
     @Test
-    fun getItemViewType_choiceItemType_shouldReturnDropDownViewHolderTypeWithExtension() {
+    fun getItemViewType_choiceItemType_itemControlExtensionWithRadioButton_shouldReturnRadioGroupViewHolder() { // ktlint-disable max-line-length
+        val answerOptions = Iterable {
+            iterator<Questionnaire.Item.AnswerOption> {
+                repeat(QuestionnaireItemAdapter.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN) {
+                    yield(
+                        Questionnaire.Item.AnswerOption.newBuilder()
+                            .setValue(
+                                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
+                                    .setCoding(
+                                        Coding.newBuilder()
+                                            .setCode(
+                                                Code.newBuilder()
+                                                    .setValue("test-code")
+                                            )
+                                            .setDisplay(
+                                                String.newBuilder()
+                                                    .setValue("Test Code")
+                                            )
+                                    )
+                            )
+                            .build()
+                    )
+                }
+            }
+        }
+        val questionnaireItemAdapter = QuestionnaireItemAdapter()
+        questionnaireItemAdapter.submitList(
+            listOf(
+                QuestionnaireItemViewItem(
+                    Questionnaire.Item.newBuilder()
+                        .setType(
+                            Questionnaire.Item.TypeCode.newBuilder()
+                                .setValue(QuestionnaireItemTypeCode.Value.CHOICE)
+                        )
+                        .addAllAnswerOption(answerOptions)
+                        .addExtension(
+                            Extension.newBuilder()
+                                .setUrl(
+                                    Uri.newBuilder()
+                                        .setValue(EXTENSION_ITEM_CONTROL_URL)
+                                )
+                                .setValue(
+                                    Extension.ValueX.newBuilder()
+                                        .setCodeableConcept(
+                                            CodeableConcept.newBuilder()
+                                                .addCoding(
+                                                    Coding.newBuilder()
+                                                        .setCode(
+                                                            Code.newBuilder()
+                                                                .setValue(ITEM_CONTROL_RADIO_BUTTON)
+                                                        )
+                                                        .setDisplay(
+                                                            String.newBuilder()
+                                                                .setValue("Radio Button")
+                                                        )
+                                                        .setSystem(
+                                                            Uri.newBuilder()
+                                                                .setValue(
+                                                                    EXTENSION_ITEM_CONTROL_SYSTEM
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                        .build(),
+                    QuestionnaireResponse.Item.newBuilder()
+                ) {}
+            )
+        )
+
+        assertThat(questionnaireItemAdapter.getItemViewType(0))
+            .isEqualTo(QuestionnaireItemViewHolderType.RADIO_GROUP.value
+            )
+    }
+
+    @Test
+    fun getItemViewType_choiceItemType_itemControlExtensionWithDropDown_shouldReturnDropDownViewHolderType() { // ktlint-disable max-line-length
         val questionnaireItemAdapter = QuestionnaireItemAdapter()
         questionnaireItemAdapter.submitList(
             listOf(
@@ -381,7 +406,7 @@ class QuestionnaireItemAdapterTest {
 
         assertThat(questionnaireItemAdapter.getItemViewType(0))
             .isEqualTo(QuestionnaireItemViewHolderType.DROP_DOWN.value
-        )
+            )
     }
 
     // TODO: test errors thrown for unsupported types
