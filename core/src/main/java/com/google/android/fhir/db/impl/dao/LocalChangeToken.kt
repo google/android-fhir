@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir.db.impl.dao
 
-internal object QuestionnaireItemEditTextMultiLineViewHolderFactory :
-    QuestionnaireItemEditTextViewHolderFactory() {
-    override fun getQuestionnaireItemViewHolderDelegate() =
-        QuestionnaireItemEditTextStringViewHolderDelegate(false)
-}
+data class LocalChangeToken(val ids: List<Long>)

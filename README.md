@@ -1,4 +1,4 @@
-# Android FHIR SDK (WIP)
+# Android FHIR SDK (WIP) ![master](https://github.com/google/android-fhir/workflows/CI/badge.svg?branch=master)
 
 Android FHIR SDK is an Android library that manages FHIR resources natively on Android. It also
 supports the evaluation of CQL using [cql-engine](https://github.com/DBCG/cql_engine).

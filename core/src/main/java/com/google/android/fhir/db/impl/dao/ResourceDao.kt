@@ -114,7 +114,7 @@ internal abstract class ResourceDao {
     abstract fun deleteResource(
         resourceId: String,
         resourceType: ResourceType
-    )
+    ): Int
 
     @Query("""
         SELECT serializedResource

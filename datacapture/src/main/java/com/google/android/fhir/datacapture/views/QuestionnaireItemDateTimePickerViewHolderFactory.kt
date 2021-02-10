@@ -31,9 +31,10 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-object QuestionnaireItemDateTimePickerViewHolderFactory : QuestionnaireItemViewHolderFactory(
-    R.layout.questionnaire_item_date_time_picker_view
-) {
+internal object QuestionnaireItemDateTimePickerViewHolderFactory :
+    QuestionnaireItemViewHolderFactory(
+        R.layout.questionnaire_item_date_time_picker_view
+    ) {
     override fun getQuestionnaireItemViewHolderDelegate() =
         object : QuestionnaireItemViewHolderDelegate {
             private lateinit var dateInputLayout: TextInputLayout
@@ -84,6 +85,8 @@ object QuestionnaireItemDateTimePickerViewHolderFactory : QuestionnaireItemViewH
                         context.supportFragmentManager,
                         DatePickerFragment.TAG
                     )
+                    // Clear focus so that the user can refocus to open the dialog
+                    dateInputLayout.clearFocus()
                 }
 
                 timeInputLayout = itemView.findViewById(R.id.timeInputLayout)
@@ -126,6 +129,8 @@ object QuestionnaireItemDateTimePickerViewHolderFactory : QuestionnaireItemViewH
                         context.supportFragmentManager,
                         TimePickerFragment.TAG
                     )
+                    // Clear focus so that the user can refocus to open the dialog
+                    timeInputLayout.clearFocus()
                 }
             }
 

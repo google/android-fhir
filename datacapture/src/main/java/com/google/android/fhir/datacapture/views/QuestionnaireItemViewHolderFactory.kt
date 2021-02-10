@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
  *
  * @param resId the layout resource for the view
  */
-abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId: Int) {
+internal abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId: Int) {
     internal fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
         return QuestionnaireItemViewHolder(
             LayoutInflater.from(parent.context).inflate(resId, parent, false),
@@ -71,7 +71,7 @@ internal class QuestionnaireItemViewHolder(
  * [QuestionnaireItemViewHolderDelegate] for each [QuestionnaireItemViewHolder]. This is critical
  * for the correctness of the recycler view.
  */
-interface QuestionnaireItemViewHolderDelegate {
+internal interface QuestionnaireItemViewHolderDelegate {
     /**
      * Initializes the view in [QuestionnaireItemViewHolder]. Any listeners to record user input
      * should be set in this function.

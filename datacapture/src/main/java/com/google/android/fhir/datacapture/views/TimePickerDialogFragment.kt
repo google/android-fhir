@@ -26,7 +26,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import java.time.LocalTime
 
-class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener {
+internal class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener {
     @SuppressLint("NewApi") // Suppress warnings for java.time APIs
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Use the current time as the default time in the picker

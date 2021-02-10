@@ -45,7 +45,7 @@ import java.lang.IllegalStateException
  * For more information see [Questionnaire.item.enableWhen](https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableWhen)
  * and [Questionnaire.item.enableBehavior](https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableBehavior).
  */
-object EnablementEvaluator {
+internal object EnablementEvaluator {
 
     /**
      * Returns whether [questionnaireItem] should be enabled.

@@ -14,10 +14,22 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.datacapture.views
+package com.google.android.fhir
 
-internal object QuestionnaireItemEditTextMultiLineViewHolderFactory :
-    QuestionnaireItemEditTextViewHolderFactory() {
-    override fun getQuestionnaireItemViewHolderDelegate() =
-        QuestionnaireItemEditTextStringViewHolderDelegate(false)
+import android.annotation.SuppressLint
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
+
+/**
+ * Utility function to format a [Date] object using the system's default locale.
+ */
+@SuppressLint("NewApi")
+internal fun Date.toTimeZoneString(): String {
+    val simpleDateFormat = DateTimeFormatter.ofPattern(
+        "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+        Locale.getDefault()
+    ).withZone(ZoneId.systemDefault())
+    return simpleDateFormat.format(this.toInstant())
 }

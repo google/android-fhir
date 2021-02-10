@@ -20,7 +20,7 @@ import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 
-object QuestionnaireItemGroupViewHolderFactory : QuestionnaireItemViewHolderFactory(
+internal object QuestionnaireItemGroupViewHolderFactory : QuestionnaireItemViewHolderFactory(
     R.layout.questionnaire_item_group_header_view
 ) {
     override fun getQuestionnaireItemViewHolderDelegate() =

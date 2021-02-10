@@ -1,0 +1,22 @@
+[
+  {
+    "op": "replace",
+    "path": "/contact/0/telecom/0/value",
+    "value": "0123456789"
+  },
+  {
+    "op": "replace",
+    "path": "/address/0/postalCode",
+    "value": "1017 CE"
+  },
+  {
+    "op": "replace",
+    "path": "/address/0/line/0",
+    "value": "Herengracht 609"
+  },
+  {
+    "op": "replace",
+    "path": "/telecom/1/value",
+    "value": "p.heuvel@googlemail.com"
+  }
+]

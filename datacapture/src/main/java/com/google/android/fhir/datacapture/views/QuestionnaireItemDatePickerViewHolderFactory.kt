@@ -33,7 +33,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolderFactory(
+internal object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolderFactory(
     R.layout.questionnaire_item_date_picker_view
 ) {
     override fun getQuestionnaireItemViewHolderDelegate() =
@@ -103,6 +103,8 @@ object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItemViewHolde
                         context.supportFragmentManager,
                         DatePickerFragment.TAG
                     )
+                    // Clear focus so that the user can refocus to open the dialog
+                    textInputLayout.clearFocus()
                 }
             }
 

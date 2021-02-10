@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 
-class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
+internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     /** The current questionnaire as questions are being answered. */
     private val questionnaire: Questionnaire
 

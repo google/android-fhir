@@ -26,7 +26,7 @@ import com.google.fhir.r4.core.QuestionnaireResponse
  *
  * Any `ViewHolder` containing a `EditText` view that collects text data should use this class.
  */
-class QuestionnaireItemEditTextStringViewHolderDelegate(
+internal class QuestionnaireItemEditTextStringViewHolderDelegate(
     isSingleLine: Boolean
 ) : QuestionnaireItemEditTextViewHolderDelegate(
     InputType.TYPE_CLASS_TEXT,

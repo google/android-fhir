@@ -22,7 +22,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.fhir.r4.core.Boolean
 import com.google.fhir.r4.core.QuestionnaireResponse
 
-object QuestionnaireItemCheckBoxViewHolderFactory : QuestionnaireItemViewHolderFactory(
+internal object QuestionnaireItemCheckBoxViewHolderFactory : QuestionnaireItemViewHolderFactory(
     R.layout.questionnaire_item_check_box_view
 ) {
     override fun getQuestionnaireItemViewHolderDelegate() =
