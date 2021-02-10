@@ -287,7 +287,7 @@ class QuestionnaireItemAdapterTest {
     }
 
     @Test
-    fun getItemViewType_choiceItemType_shouldReturnDropDownViewHolderTypeWithoutExtension() {
+    fun getItemViewType_choiceItemType_moreAnswerOptions_shouldReturnDropDownViewHolderType() {
         val answerOptions = Iterable {
             iterator<Questionnaire.Item.AnswerOption> {
                 repeat(QuestionnaireItemAdapter.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN) {
