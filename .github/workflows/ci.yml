@@ -87,10 +87,8 @@ jobs:
         script: ./gradlew connectedCheck --stacktrace
 
     - name: Run Jacoco
-      with:
-        api-level: ${{ matrix.api-level }}
-        arch: x86_64
-        script: ./gradlew jacocoTestReport
+      if: matrix.api-level == 29 # No code coverage on older APIs
+      run: ./gradlew jacocoTestReport
       
     - name: Upload build reports
       if: always()
@@ -121,7 +119,7 @@ jobs:
     - name: Upload coverage report to codecov
       uses: codecov/codecov-action@v1
       with:
-        files: .core/build/reports/jacoco/jacocoTestReport.xml
+        files: core/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
         flags: unittests
         name: android-fhir-codecov
         fail_ci_if_error: false
