@@ -36,7 +36,7 @@ import org.robolectric.annotation.Config
 class MoreQuestionnaireItemExtensionsTest {
 
     @Test
-    fun itemControl_shouldReturnItemControlCode() {
+    fun itemControl_shouldReturnItemControlCodeDropDown() {
 
         val questionnaireItem = Questionnaire.Item.newBuilder()
             .setType(
@@ -75,6 +75,48 @@ class MoreQuestionnaireItemExtensionsTest {
             .build()
 
         assertThat(questionnaireItem.itemControl).isEqualTo(ITEM_CONTROL_DROP_DOWN)
+    }
+
+    @Test
+    fun itemControl_shouldReturnItemControlCodeRadioButton() {
+
+        val questionnaireItem = Questionnaire.Item.newBuilder()
+            .setType(
+                Questionnaire.Item.TypeCode.newBuilder()
+                    .setValue(QuestionnaireItemTypeCode.Value.CHOICE)
+            )
+            .addExtension(
+                Extension.newBuilder()
+                    .setUrl(
+                        Uri.newBuilder()
+                            .setValue(EXTENSION_ITEM_CONTROL_URL)
+                    )
+                    .setValue(
+                        Extension.ValueX.newBuilder()
+                            .setCodeableConcept(
+                                CodeableConcept.newBuilder()
+                                    .addCoding(
+                                        Coding.newBuilder()
+                                            .setCode(
+                                                Code.newBuilder()
+                                                    .setValue(ITEM_CONTROL_RADIO_BUTTON)
+                                            )
+                                            .setDisplay(
+                                                String.newBuilder()
+                                                    .setValue("Radio Group")
+                                            )
+                                            .setSystem(
+                                                Uri.newBuilder()
+                                                    .setValue(EXTENSION_ITEM_CONTROL_SYSTEM)
+                                            )
+                                    )
+                            )
+
+                    )
+            )
+            .build()
+
+        assertThat(questionnaireItem.itemControl).isEqualTo(ITEM_CONTROL_RADIO_BUTTON)
     }
 
     @Test
