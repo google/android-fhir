@@ -235,7 +235,7 @@ class QuestionnaireItemAdapterTest {
     }
 
     @Test
-    fun getItemViewType_choiceItemType_shouldReturnRadioGroupViewHolderTypeWithExtension() {
+    fun getItemViewType_choiceItemType_itemControlExtensionWithRadioButton_shouldReturnRadioGroupViewHolder() {
         val questionnaireItemAdapter = QuestionnaireItemAdapter()
         questionnaireItemAdapter.submitList(
             listOf(
