@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.views
 
 import android.text.InputType
 import com.google.fhir.r4.core.Decimal
-import com.google.fhir.r4.core.Integer
 import com.google.fhir.r4.core.Quantity
 import com.google.fhir.r4.core.QuestionnaireResponse
 
@@ -26,24 +25,26 @@ import com.google.fhir.r4.core.QuestionnaireResponse
  *  Currently inheriting with QuestionnaireItemEditTextViewHolderFactory, but if we want to add drop down
  *  then we need to change the parent Factory
  */
-
 internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
         QuestionnaireItemEditTextViewHolderFactory() {
     override fun getQuestionnaireItemViewHolderDelegate() =
             object : QuestionnaireItemEditTextViewHolderDelegate(
                     InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
-                    true
+                    isSingleLine = true
             ) {
                 override fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder? {
                     return text.let {
                         QuestionnaireResponse.Item.Answer.newBuilder()
                                 .apply {
                                     value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                                            .setQuantity(Quantity.newBuilder().setValue(Decimal.newBuilder().setValue(it).build()))
+                                            .setQuantity(
+                                                    Quantity.newBuilder().setValue(
+                                                            Decimal.newBuilder().setValue(it)
+                                                                    .build()
+                                                    )
+                                            )
                                             .build()
-
                                 }
-
                     }
                 }
 
