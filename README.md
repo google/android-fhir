@@ -1,22 +1,83 @@
-# Android FHIR SDK (WIP) ![master](https://github.com/google/android-fhir/workflows/CI/badge.svg?branch=master)
+# Android FHIR SDK (early access) ![master](https://github.com/google/android-fhir/workflows/CI/badge.svg?branch=master)
 
-Android FHIR SDK is an Android library that manages FHIR resources natively on Android. It also
-supports the evaluation of CQL using [cql-engine](https://github.com/DBCG/cql_engine).
+The Android FHIR SDK is an Android library that enables developers to develop offline, mobile first healthcare applications that adhere to the FHIR specification. The SDK is being designed to support a number of common mobile health use cases including:
 
-**This is a prototype for developers ONLY and is NOT production-ready. Do NOT use in production.**
+- FHIR Clinical Data Repository
+- FHIR native data capture for case reporting
+- Client tracking and care coordination applications
+- Native support for on-device clinical decision support (via use of CQL)
+- Ability to run certain FHIR operations for generation of Care Plans and Indicators (for example)
 
-## Usage
+The overall goal is to simplify the process of incorporating support for FHIR into new or existing mobile solutions and to accelerate the adoption of FHIR standards as part of broader interoperability efforts in Healthcare.
 
-Requires min SDK version 21 (Lollipop).
+**The Android SDK is a community collaboration and contributions to the codebase, feature requests and suggestions about specific use cases are welcomed.** 
 
-## Developement
+If you want to provide any feedback, discuss specific use cases or have questions about getting involved, please email us at android-fhir-sdk@google.com
+
+For developers looking to get started with the SDK, see the section on Contributing
+
+## Status
+
+**This is currently in Early Access for Developers ONLY and is NOT production-ready. Do NOT use in production.**
+
+## Usage and Features
+The SDK is designed to support Android 21 (lollipop) and above
+ 
+The FHIR SDK will provide a rich set of features for building FHIR native solutions including:
+
+- Data Access API (FHIR resource management using FHIR protos)
+- Storage API (via Sqlite DB)
+- Sync API (sync capabilities to a FHIR server)
+- Search API
+- Data Capture API (Structured Data Capture library)
+- CQL Engine (using https://github.com/DBCG/cql_engine)
+
+## Details of the repository
+The repository is organised into two main libraries, *core* and *structured data capture* as well as sample demo applications for each (see sample applications).
+
+### Core library:
+This is the main SDK library providing core functionality required for use cases that require a mobile based clinical data repository using FHIR. This is currently in active development with a planned alpha release for later this year. We are actively seeking contributions from the community. To contribute [see the board here](https://github.com/google/android-fhir/projects/6)
+
+### Structured data capture:
+The goal of this library is to implement the FHIR SDC specification on Android. A common use case that the SDC Library supports is the ability to translate a FHIR Questionnaire into a data capture fragment which can capture user input (via form controls) generating a QuestionnaireResponse resource. The current release (alpha-0.1.0) provides support for 10 commonly used widgets and very basic skip logic (see release note). This library will be incrementally updated and we are actively seeking contributions from the community. To contribute [see the board here](https://github.com/google/android-fhir/projects/1)
+
+**NOTE:** The SDC library currently only supports expanded and inlined ValueSets (i.e. use of explicit answerOptions). See the demo application for samples.
+
+## Sample Applications
+Two sample applications are provided that demonstrate different features of the SDK. 
+
+**These applications are provided for demonstration purposes only and are not for use in production. Do NOT use in production.**
+
+### Clinical Data Repository (CDR) Application
+This is the initial demo application for showcasing core SDK features. The demo currently uses synthea generated data that has been loaded into the HAPI fhir server public demo site.  On-loading the application a set of synthetic patient data is downloaded from the HAPI FHIR server to the local SQLLite DB.
+
+- 1-way sync (from server to local DB)
+- Show list of patients
+- Search for a patient
+- Show patient details
+
+**Future demo features include:**
+- New patient registration
+- Edit patient profile information
+- Creation of encounters and observations for a patient
+- Bi-directional sync
+
+#### CQL Proof of Concept
+Within the CDR demo is an example of performing a CQL operation. This was developed as part of a hackathon together with Bryn Rhodes (alphora) and utilises the cqf-ruler engine. [TODO: Explanation required]
+
+### SDC Gallery App
+There is an SDC Gallery App with existing demo with a number of sample FHIR Questionnaires pre-loaded. 
+
+The Gallery App showcases the structured data capture library functionality and the ability to easily deploy a FHIR Questionnaire and turn it into a data capture form. For supported widgets, features and known bugs, see the latest release notes.
+Contributing
+
+## Contributing
+The Android FHIR SDK is being developed together with a consortium of applicaiton developers working in Global Digital Health. We welcome contributions from anyone.
 
 ### Requirements
-
 Android Studio 4.0 is required for [Java 8 library desugaring](https://developer.android.com/studio/preview/features#j8-desugar)
 
-### Spotless
-
+#### Spotless
 We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle) to maintain the
 Java/Kotlin coding style in the codebase. Run the following command to check the codebase:
 
@@ -31,7 +92,6 @@ and run the following command to apply fixes to the violations:
 ```
 
 ### License Headers
-
 Spotless maintains the license headers for Java and Kotlin files. Use
 [addlicense](https://github.com/google/addlicense) to maintain license headers in other files:
 
@@ -39,8 +99,7 @@ Spotless maintains the license headers for Java and Kotlin files. Use
 addlicense -c "Google LLC" -l apache .
 ```
 
-## Disclaimer
-
+# Disclaimer
 This is not an officially supported Google product.
 
 This product is not intended to be a medical device.
