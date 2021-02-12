@@ -14,7 +14,7 @@ The overall goal is to simplify the process of incorporating support for FHIR in
 
 If you want to provide any feedback, discuss specific use cases or have questions about getting involved, please email us at android-fhir-sdk@google.com
 
-For developers looking to get started with the SDK, see the section on Contributing
+For developers looking to get started with the SDK, see the section on [Contributing](#contributing)
 
 ## Status
 
@@ -41,7 +41,7 @@ This is the main SDK library providing core functionality required for use cases
 ### Structured data capture:
 The goal of this library is to implement the FHIR SDC specification on Android. A common use case that the SDC Library supports is the ability to translate a FHIR Questionnaire into a data capture fragment which can capture user input (via form controls) generating a QuestionnaireResponse resource. The current release (alpha-0.1.0) provides support for 10 commonly used widgets and very basic skip logic (see release note). This library will be incrementally updated and we are actively seeking contributions from the community. To contribute [see the board here](https://github.com/google/android-fhir/projects/1)
 
-**NOTE:** The SDC library currently only supports expanded and inlined ValueSets (i.e. use of explicit answerOptions). See the demo application for samples.
+**NOTE:** The SDC library currently only supports expanded and inlined ValueSets (i.e. use of explicit answerOptions). See the [sample applications](#sample applications) for samples.
 
 ## Sample Applications
 Two sample applications are provided that demonstrate different features of the SDK. 
