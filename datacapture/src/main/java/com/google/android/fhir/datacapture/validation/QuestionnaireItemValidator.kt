@@ -6,7 +6,7 @@ import com.google.fhir.r4.core.QuestionnaireResponse
 interface QuestionnaireItemValidator {
 
     /**
-     * Validates the input data as per the ViewHolder and returns the result and its resultant error messages (if any)
+     * Validates [questionnaireResponseItemBuilder] contains valid answer(s) to [questionnaireItem].
      */
     fun validate(questionnaireItem: Questionnaire.Item, questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder): ValidationResult
 
@@ -17,4 +17,3 @@ interface QuestionnaireItemValidator {
 }
 
 data class ValidationResult(val pass: Boolean, val errorMsgs: List<String>)
-
