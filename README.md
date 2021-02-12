@@ -39,7 +39,9 @@ The repository is organised into two main libraries, *core* and *structured data
 This is the main SDK library providing core functionality required for use cases that require a mobile based clinical data repository using FHIR. This is currently in active development with a planned alpha release for later this year. We are actively seeking contributions from the community. To contribute [see the board here](https://github.com/google/android-fhir/projects/6)
 
 ### Structured data capture:
-The goal of this library is to implement the FHIR SDC specification on Android. A common use case that the SDC Library supports is the ability to translate a FHIR Questionnaire into a data capture fragment which can capture user input (via form controls) generating a QuestionnaireResponse resource. The current release (alpha-0.1.0) provides support for 10 commonly used widgets and very basic skip logic (see release note). This library will be incrementally updated and we are actively seeking contributions from the community. To contribute [see the board here](https://github.com/google/android-fhir/projects/1)
+The goal of this library is to implement the FHIR SDC specification on Android. A common use case that the SDC Library supports is the ability to translate a FHIR Questionnaire into a data capture fragment which can capture user input (via form controls) generating a QuestionnaireResponse resource. 
+
+The current release (alpha-0.1.0) provides support for **10 commonly used widgets and very basic skip logic** (see release note). This library will be incrementally updated and we are actively seeking contributions from the community. To contribute [see the board here](https://github.com/google/android-fhir/projects/1)
 
 **NOTE:** The SDC library currently only supports expanded and inlined ValueSets (i.e. use of explicit answerOptions). See the [sample applications](#sample applications) for samples.
 
