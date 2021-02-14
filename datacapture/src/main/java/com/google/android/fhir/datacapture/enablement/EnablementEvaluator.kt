@@ -113,6 +113,12 @@ internal object EnablementEvaluator {
         }
     }
 
+    /**
+     * Returns whether the list of `Item` answer values contains the answer in `enableWhen`.
+     *
+     * @param responseItem contains the list of answers to look within.
+     * @param enableWhen the answer to look for.
+     */
     private fun responseItemContainsAnswer(
         responseItem: QuestionnaireResponse.Item,
         enableWhen: Questionnaire.Item.EnableWhen
