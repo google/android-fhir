@@ -102,27 +102,39 @@ internal object EnablementEvaluator {
     ): Boolean {
         val responseItem =
             questionnaireResponseItemRetriever(enableWhen.question.value) ?: return true
-        return when (val operator = enableWhen.operator.value) {
-            QuestionnaireItemOperatorCode.Value.EXISTS ->
-                (responseItem.answerCount > 0) == enableWhen.answer.boolean.value
-            QuestionnaireItemOperatorCode.Value.EQUALS ->
-                responseItemContainsAnswer(responseItem, enableWhen)
-            QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO ->
-                !responseItemContainsAnswer(responseItem, enableWhen)
-            else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
-        }
+        return if (QuestionnaireItemOperatorCode.Value.EXISTS == enableWhen.operator.value)
+            (responseItem.answerCount > 0) == enableWhen.answer.boolean.value else
+            responseItem.contains(enableWhen.toPredicate())
     }
+}
 
-    /**
-     * Returns whether the list of `Item` answer values contains the answer in `enableWhen`.
-     *
-     * @param responseItem contains the list of answers to look within.
-     * @param enableWhen the answer to look for.
-     */
-    private fun responseItemContainsAnswer(
-        responseItem: QuestionnaireResponse.Item,
-        enableWhen: Questionnaire.Item.EnableWhen
-    ) =
-        responseItem.answerList.map { it.value.toByteString() }.contains(
-            enableWhen.answer.toByteString())
+/**
+ * Returns a predicate based on the `EnableWhen` `operator` and `Answer` value.
+ */
+private fun Questionnaire.Item.EnableWhen.toPredicate(): (QuestionnaireResponse.Item.Answer)
+-> Boolean {
+    when (val operator = this.operator.value) {
+        QuestionnaireItemOperatorCode.Value.EQUALS ->
+            return {
+                this.answer.toByteString() == it.value.toByteString()
+            }
+        QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO ->
+            return {
+                this.answer.toByteString() != it.value.toByteString()
+            }
+        else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
+    }
+}
+
+/**
+ * Return if any answer in the answer list satisfies the passed predicate.
+ *
+ * @param predicate boolean predicate function that takes a `QuestionnaireResponse.Item.Answer`.
+ */
+private fun QuestionnaireResponse.Item.contains(
+    predicate: (QuestionnaireResponse.Item.Answer) -> Boolean
+): Boolean {
+    return this.answerList.any {
+        predicate(it)
+    }
 }

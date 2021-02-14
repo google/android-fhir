@@ -674,7 +674,7 @@ class EnablementEvaluatorTest {
     }
 
     @Test
-    fun evaluate_expectsAnswer_answerNotEqualOne_shouldReturnFalse() {
+    fun evaluate_expectsAnswer_answerNotEqualOne_shouldReturnTrue() {
         assertThat(
             EnablementEvaluator.evaluate(Questionnaire.Item.newBuilder()
                 .addEnableWhen(
@@ -713,11 +713,11 @@ class EnablementEvaluatorTest {
                     null
                 }
             }
-        ).isFalse()
+        ).isTrue()
     }
 
     @Test
-    fun evaluate_expectsAnswer_answerNotEqualSome_shouldReturnFalse() {
+    fun evaluate_expectsAnswer_answerNotEqualSome_shouldReturnTrue() {
         assertThat(
             EnablementEvaluator.evaluate(Questionnaire.Item.newBuilder()
                 .addEnableWhen(
@@ -763,7 +763,7 @@ class EnablementEvaluatorTest {
                     null
                 }
             }
-        ).isFalse()
+        ).isTrue()
     }
 
     @Test
