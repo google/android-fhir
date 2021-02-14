@@ -106,9 +106,16 @@ internal object EnablementEvaluator {
             QuestionnaireItemOperatorCode.Value.EXISTS ->
                 (responseItem.answerCount > 0) == enableWhen.answer.boolean.value
             QuestionnaireItemOperatorCode.Value.EQUALS ->
-                responseItem.answerList.map { it.value.toByteString() }.contains(
-                        enableWhen.answer.toByteString())
+                responseItemContainsAnswer(responseItem, enableWhen)
+            QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO ->
+                !responseItemContainsAnswer(responseItem, enableWhen)
             else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
         }
     }
+
+    private fun responseItemContainsAnswer(
+            responseItem: QuestionnaireResponse.Item,
+            enableWhen: Questionnaire.Item.EnableWhen) =
+            responseItem.answerList.map { it.value.toByteString() }.contains(
+                    enableWhen.answer.toByteString())
 }
