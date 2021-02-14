@@ -91,6 +91,8 @@ private fun Message.Builder.extractFields(
 /**
  * Extracts value for field in the builder from the corresponding question and answer in
  * [questionnaireItem] and [questionnaireResponseItem].
+ *
+ * NOTE: Nested fields are not handled. See https://github.com/google/android-fhir/issues/240.
  */
 private fun Message.Builder.extractField(
     questionnaireItem: Questionnaire.Item,
