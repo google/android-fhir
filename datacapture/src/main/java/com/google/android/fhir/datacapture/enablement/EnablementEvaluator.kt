@@ -114,8 +114,9 @@ internal object EnablementEvaluator {
     }
 
     private fun responseItemContainsAnswer(
-            responseItem: QuestionnaireResponse.Item,
-            enableWhen: Questionnaire.Item.EnableWhen) =
-            responseItem.answerList.map { it.value.toByteString() }.contains(
-                    enableWhen.answer.toByteString())
+        responseItem: QuestionnaireResponse.Item,
+        enableWhen: Questionnaire.Item.EnableWhen
+    ) =
+        responseItem.answerList.map { it.value.toByteString() }.contains(
+            enableWhen.answer.toByteString())
 }
