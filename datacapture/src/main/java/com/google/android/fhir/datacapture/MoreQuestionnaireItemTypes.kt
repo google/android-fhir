@@ -24,8 +24,6 @@ import com.google.fhir.shaded.protobuf.Message
 /**
  * Returns the value of the [Questionnaire.Item.EnableWhen.AnswerX] for the [type].
  *
- * Used to retrieve the value to set the field in the extracted FHIR resource.
- *
  * @throws IllegalArgumentException if [type] is not supported (for example, questions of type
  * [QuestionnaireItemTypeCode.Value.URL] do not have an explicit EnableWhen answer).
  */
@@ -45,8 +43,6 @@ fun Questionnaire.Item.EnableWhen.AnswerX.getValueForType(
 
 /**
  * Returns the value of the [QuestionnaireResponse.Item.Answer] for the [type].
- *
- * Used to retrieve the value to set the field in the extracted FHIR resource.
  *
  * @throws IllegalArgumentException if [type] is not supported (for example, questions of type
  * [QuestionnaireItemTypeCode.Value.GROUP] do not collect any answer).
