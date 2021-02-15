@@ -109,7 +109,7 @@ internal object EnablementEvaluator {
             questionnaireResponseItemRetriever(enableWhen.question.value) ?: return true
         return if (QuestionnaireItemOperatorCode.Value.EXISTS == enableWhen.operator.value)
             (responseItem.answerCount > 0) == enableWhen.answer.boolean.value else
-            responseItem.contains(enableWhen.toPredicate(type))
+            responseItem.contains(enableWhenTypeToPredicate(enableWhen, type))
     }
 }
 
@@ -131,12 +131,13 @@ private fun QuestionnaireResponse.Item.contains(
  *
  * @param type used to get value based on [Questionnaire.Item.TypeCode].
  */
-private fun Questionnaire.Item.EnableWhen.toPredicate(type: Questionnaire.Item.TypeCode):
+private fun enableWhenTypeToPredicate(enableWhen: Questionnaire.Item.EnableWhen,
+                                      type: Questionnaire.Item.TypeCode):
         (QuestionnaireResponse.Item.Answer) -> Boolean {
     val enableWhenAnswerValue = try {
-        this.answer.getValueForType(type)
+        enableWhen.answer.getValueForType(type)
     } catch (exception: IllegalArgumentException) {
-        this.answer.toByteString()
+        enableWhen.answer.toByteString()
     }
     return {
         val answerValue = try {
@@ -144,7 +145,7 @@ private fun Questionnaire.Item.EnableWhen.toPredicate(type: Questionnaire.Item.T
         } catch (exception: java.lang.IllegalArgumentException) {
             it.value.toByteString()
         }
-        when (val operator = this.operator.value) {
+        when (val operator = enableWhen.operator.value) {
             QuestionnaireItemOperatorCode.Value.EQUALS ->
                 answerValue == enableWhenAnswerValue
             QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO ->
