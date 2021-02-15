@@ -73,7 +73,7 @@ Within the CDR demo is an example of performing a CQL operation. This was develo
 ### SDC Gallery App
 This app includes a number of pre-loaded sample FHIR Questionnaires. 
 
-The Gallery App showcases the structured data capture library functionality and the ability to easily deploy a FHIR Questionnaire and turn it into a data capture form. For supported widgets, features and known bugs, see the latest release notes.
+It uses the SDC library to create data capture forms using FHIR questionnaires. For supported widgets, features and known bugs, see the latest release notes.
 Contributing
 
 ## Contributing
