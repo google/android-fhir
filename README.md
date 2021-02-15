@@ -79,7 +79,7 @@ The Android FHIR SDK is being developed together with a consortium of applicaito
 ### Requirements
 Android Studio 4.0 is required for [Java 8 library desugaring](https://developer.android.com/studio/preview/features#j8-desugar)
 
-#### Spotless
+### Spotless
 We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle) to maintain the
 Java/Kotlin coding style in the codebase. Run the following command to check the codebase:
 
