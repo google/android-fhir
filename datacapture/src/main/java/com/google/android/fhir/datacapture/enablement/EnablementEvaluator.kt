@@ -19,7 +19,9 @@ package com.google.android.fhir.datacapture.enablement
 import com.google.fhir.r4.core.EnableWhenBehaviorCode
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireItemOperatorCode
+import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 import com.google.fhir.r4.core.QuestionnaireResponse
+import com.google.fhir.shaded.protobuf.Message
 import java.lang.IllegalStateException
 
 /**
@@ -67,6 +69,7 @@ internal object EnablementEvaluator {
         // Evaluate single `enableWhen` constraint.
         if (enableWhenList.size == 1) {
             return evaluateEnableWhen(
+                questionnaireItem.type,
                 enableWhenList.single(),
                 questionnaireResponseItemRetriever
             )
@@ -79,11 +82,13 @@ internal object EnablementEvaluator {
         return when (val value = questionnaireItem.enableBehavior.value) {
             EnableWhenBehaviorCode.Value.ALL ->
                 enableWhenList.all {
-                    evaluateEnableWhen(it, questionnaireResponseItemRetriever)
+                    evaluateEnableWhen(
+                        questionnaireItem.type, it, questionnaireResponseItemRetriever)
                 }
             EnableWhenBehaviorCode.Value.ANY ->
                 enableWhenList.any {
-                    evaluateEnableWhen(it, questionnaireResponseItemRetriever)
+                    evaluateEnableWhen(
+                        questionnaireItem.type, it, questionnaireResponseItemRetriever)
                 }
             else ->
                 throw IllegalStateException("Unrecognized enable when behavior $value")
@@ -97,6 +102,7 @@ internal object EnablementEvaluator {
      * [QuestionnaireResponse.Item] with the `linkId`, or null if there isn't one.
      */
     private fun evaluateEnableWhen(
+        type: Questionnaire.Item.TypeCode,
         enableWhen: Questionnaire.Item.EnableWhen,
         questionnaireResponseItemRetriever: (linkId: String) -> QuestionnaireResponse.Item?
     ): Boolean {
@@ -104,32 +110,14 @@ internal object EnablementEvaluator {
             questionnaireResponseItemRetriever(enableWhen.question.value) ?: return true
         return if (QuestionnaireItemOperatorCode.Value.EXISTS == enableWhen.operator.value)
             (responseItem.answerCount > 0) == enableWhen.answer.boolean.value else
-            responseItem.contains(enableWhen.toPredicate())
-    }
-}
-
-/**
- * Returns a predicate based on the `EnableWhen` `operator` and `Answer` value.
- */
-private fun Questionnaire.Item.EnableWhen.toPredicate(): (QuestionnaireResponse.Item.Answer)
--> Boolean {
-    when (val operator = this.operator.value) {
-        QuestionnaireItemOperatorCode.Value.EQUALS ->
-            return {
-                this.answer.toByteString() == it.value.toByteString()
-            }
-        QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO ->
-            return {
-                this.answer.toByteString() != it.value.toByteString()
-            }
-        else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
+            responseItem.contains(enableWhen.toPredicate(type))
     }
 }
 
 /**
  * Return if any answer in the answer list satisfies the passed predicate.
  *
- * @param predicate boolean predicate function that takes a `QuestionnaireResponse.Item.Answer`.
+ * @param predicate boolean predicate function that takes a [QuestionnaireResponse.Item.Answer].
  */
 private fun QuestionnaireResponse.Item.contains(
     predicate: (QuestionnaireResponse.Item.Answer) -> Boolean
@@ -137,4 +125,74 @@ private fun QuestionnaireResponse.Item.contains(
     return this.answerList.any {
         predicate(it)
     }
+}
+
+/**
+ * Returns a predicate based on the `EnableWhen` `operator` and `Answer` value.
+ *
+ * @param type used to get value based on [Questionnaire.Item.TypeCode].
+ */
+private fun Questionnaire.Item.EnableWhen.toPredicate(type: Questionnaire.Item.TypeCode):
+        (QuestionnaireResponse.Item.Answer) -> Boolean {
+    val enableWhenAnswerValue = try {
+        this.answer.getValueForType(type)
+    } catch (exception: IllegalArgumentException) {
+        this.answer.toByteString()
+    }
+    return {
+        val answerValue = try {
+            it.getValueForType(type)
+        } catch (exception: java.lang.IllegalArgumentException) {
+            it.value.toByteString()
+        }
+        when (val operator = this.operator.value) {
+            QuestionnaireItemOperatorCode.Value.EQUALS ->
+                answerValue == enableWhenAnswerValue
+            QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO ->
+                answerValue != enableWhenAnswerValue
+            else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
+        }
+    }
+}
+
+/**
+ * TODO: move to a shared library with QuestionnaireResponse.Item.Answer.getValueForType
+ * Returns the value of the [Questionnaire.Item.EnableWhen.AnswerX] for the [type].
+ *
+ * Used to retrieve the value to set the field in the extracted FHIR resource.
+ *
+ * @throws IllegalArgumentException if [type] is not supported (for example, questions of type
+ * [QuestionnaireItemTypeCode.Value.URL] do not have an explicit EnableWhen answer).
+ */
+private fun Questionnaire.Item.EnableWhen.AnswerX.getValueForType(
+    type: Questionnaire.Item.TypeCode
+): Message = when (val value = type.value) {
+    QuestionnaireItemTypeCode.Value.DATE -> this.date
+    QuestionnaireItemTypeCode.Value.BOOLEAN -> this.boolean
+    QuestionnaireItemTypeCode.Value.DECIMAL -> this.decimal
+    QuestionnaireItemTypeCode.Value.INTEGER -> this.integer
+    QuestionnaireItemTypeCode.Value.DATE_TIME -> this.dateTime
+    QuestionnaireItemTypeCode.Value.TIME -> this.time
+    QuestionnaireItemTypeCode.Value.STRING, QuestionnaireItemTypeCode.Value.TEXT ->
+    this.stringValue
+    else -> throw IllegalArgumentException("Unsupported value type $value")
+}
+
+/**
+ * TODO: Replace with https://github.com/google/android-fhir/pull/222/files#diff-4d2985aba5e8203b97cc5dc2eac7dbbd0c7832be34a27036d1ecfb8e4a3a3e50R150
+ * moved to shared library
+ */
+private fun QuestionnaireResponse.Item.Answer.getValueForType(
+    type: Questionnaire.Item.TypeCode
+): Message = when (val value = type.value) {
+    QuestionnaireItemTypeCode.Value.DATE -> this.value.date
+    QuestionnaireItemTypeCode.Value.BOOLEAN -> this.value.boolean
+    QuestionnaireItemTypeCode.Value.DECIMAL -> this.value.decimal
+    QuestionnaireItemTypeCode.Value.INTEGER -> this.value.integer
+    QuestionnaireItemTypeCode.Value.DATE_TIME -> this.value.dateTime
+    QuestionnaireItemTypeCode.Value.TIME -> this.value.time
+    QuestionnaireItemTypeCode.Value.STRING, QuestionnaireItemTypeCode.Value.TEXT ->
+        this.value.stringValue
+    QuestionnaireItemTypeCode.Value.URL -> this.value.uri
+    else -> throw IllegalArgumentException("Unsupported value type $value")
 }
