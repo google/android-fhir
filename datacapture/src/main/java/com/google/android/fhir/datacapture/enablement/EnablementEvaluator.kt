@@ -107,9 +107,11 @@ internal object EnablementEvaluator {
     ): Boolean {
         val responseItem =
             questionnaireResponseItemRetriever(enableWhen.question.value) ?: return true
-        return if (QuestionnaireItemOperatorCode.Value.EXISTS == enableWhen.operator.value)
-            (responseItem.answerCount > 0) == enableWhen.answer.boolean.value else
+        return if (QuestionnaireItemOperatorCode.Value.EXISTS == enableWhen.operator.value) {
+            (responseItem.answerCount > 0) == enableWhen.answer.boolean.value
+        } else {
             responseItem.contains(enableWhenTypeToPredicate(enableWhen, type))
+        }
     }
 }
 
@@ -134,17 +136,13 @@ private fun QuestionnaireResponse.Item.contains(
 private fun enableWhenTypeToPredicate(
     enableWhen: Questionnaire.Item.EnableWhen,
     type: Questionnaire.Item.TypeCode
-):
-        (QuestionnaireResponse.Item.Answer) -> Boolean {
+): (QuestionnaireResponse.Item.Answer) -> Boolean {
     val enableWhenAnswerValue = enableWhen.answer.getValueForType(type)
-    return {
-        val answerValue = it.getValueForType(type)
-        when (val operator = enableWhen.operator.value) {
-            QuestionnaireItemOperatorCode.Value.EQUALS ->
-                answerValue == enableWhenAnswerValue
-            QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO ->
-                answerValue != enableWhenAnswerValue
-            else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
-        }
+    when (val operator = enableWhen.operator.value) {
+        QuestionnaireItemOperatorCode.Value.EQUALS ->
+            return { it.getValueForType(type) == enableWhenAnswerValue }
+        QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO ->
+            return { it.getValueForType(type) != enableWhenAnswerValue }
+        else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
     }
 }
