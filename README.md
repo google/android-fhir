@@ -1,4 +1,4 @@
-# Android FHIR SDK (early access) ![master](https://github.com/google/android-fhir/workflows/CI/badge.svg?branch=master)
+# Android FHIR SDK (Early Access) ![master](https://github.com/google/android-fhir/workflows/CI/badge.svg?branch=master)
 
 The Android FHIR SDK is an Android library for managing FHIR resources on Android. The SDK enables developers to develop offline, mobile first healthcare applications that adhere to the [FHIR specification](https://www.hl7.org/fhir/). The SDK is being designed to support a number of common mobile health use cases including:
 
