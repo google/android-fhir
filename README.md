@@ -36,7 +36,10 @@ The FHIR SDK will provide a rich set of features for building FHIR native soluti
 The repository is organised into two main libraries, *core* and *structured data capture* as well as sample demo applications for each (see sample applications).
 
 ### Core library:
-This is the main SDK library providing core functionality required for use cases that require a mobile based clinical data repository using FHIR. This is currently in active development with a planned alpha release for later this year. We are actively seeking contributions from the community. To contribute [see the board here](https://github.com/google/android-fhir/projects/6)
+This is the main library for building a mobile based clinical data repository using FHIR. It provides:
+- SQLite database for FHIR resources
+- APIs for accessing (create, read, update, and delete) FHIR resources in the database
+- APIs for searching FHIR resources in the database
 
 ### Structured data capture:
 The goal of this library is to implement the FHIR SDC specification on Android. A common use case that the SDC Library supports is the ability to translate a FHIR Questionnaire into a data capture fragment which can capture user input (via form controls) generating a QuestionnaireResponse resource. 
