@@ -16,12 +16,11 @@
 
 package com.google.android.fhir.datacapture.enablement
 
+import com.google.android.fhir.datacapture.getValueForType
 import com.google.fhir.r4.core.EnableWhenBehaviorCode
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireItemOperatorCode
-import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 import com.google.fhir.r4.core.QuestionnaireResponse
-import com.google.fhir.shaded.protobuf.Message
 import java.lang.IllegalStateException
 
 /**
@@ -153,46 +152,4 @@ private fun Questionnaire.Item.EnableWhen.toPredicate(type: Questionnaire.Item.T
             else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
         }
     }
-}
-
-/**
- * TODO: move to a shared library with QuestionnaireResponse.Item.Answer.getValueForType
- * Returns the value of the [Questionnaire.Item.EnableWhen.AnswerX] for the [type].
- *
- * Used to retrieve the value to set the field in the extracted FHIR resource.
- *
- * @throws IllegalArgumentException if [type] is not supported (for example, questions of type
- * [QuestionnaireItemTypeCode.Value.URL] do not have an explicit EnableWhen answer).
- */
-private fun Questionnaire.Item.EnableWhen.AnswerX.getValueForType(
-    type: Questionnaire.Item.TypeCode
-): Message = when (val value = type.value) {
-    QuestionnaireItemTypeCode.Value.DATE -> this.date
-    QuestionnaireItemTypeCode.Value.BOOLEAN -> this.boolean
-    QuestionnaireItemTypeCode.Value.DECIMAL -> this.decimal
-    QuestionnaireItemTypeCode.Value.INTEGER -> this.integer
-    QuestionnaireItemTypeCode.Value.DATE_TIME -> this.dateTime
-    QuestionnaireItemTypeCode.Value.TIME -> this.time
-    QuestionnaireItemTypeCode.Value.STRING, QuestionnaireItemTypeCode.Value.TEXT ->
-    this.stringValue
-    else -> throw IllegalArgumentException("Unsupported value type $value")
-}
-
-/**
- * TODO: Replace with https://github.com/google/android-fhir/pull/222/files#diff-4d2985aba5e8203b97cc5dc2eac7dbbd0c7832be34a27036d1ecfb8e4a3a3e50R150
- * moved to shared library
- */
-private fun QuestionnaireResponse.Item.Answer.getValueForType(
-    type: Questionnaire.Item.TypeCode
-): Message = when (val value = type.value) {
-    QuestionnaireItemTypeCode.Value.DATE -> this.value.date
-    QuestionnaireItemTypeCode.Value.BOOLEAN -> this.value.boolean
-    QuestionnaireItemTypeCode.Value.DECIMAL -> this.value.decimal
-    QuestionnaireItemTypeCode.Value.INTEGER -> this.value.integer
-    QuestionnaireItemTypeCode.Value.DATE_TIME -> this.value.dateTime
-    QuestionnaireItemTypeCode.Value.TIME -> this.value.time
-    QuestionnaireItemTypeCode.Value.STRING, QuestionnaireItemTypeCode.Value.TEXT ->
-        this.value.stringValue
-    QuestionnaireItemTypeCode.Value.URL -> this.value.uri
-    else -> throw IllegalArgumentException("Unsupported value type $value")
 }

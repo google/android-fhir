@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.mapping
 
+import com.google.android.fhir.datacapture.getValueForType
 import com.google.fhir.r4.core.Boolean
 import com.google.fhir.r4.core.Date
 import com.google.fhir.r4.core.DateTime
@@ -137,29 +138,6 @@ private fun Questionnaire.Item.TypeCode.getClass(): Class<out Message>? = when (
         com.google.fhir.r4.core.String::class.java
     QuestionnaireItemTypeCode.Value.URL -> Url::class.java
     else -> null
-}
-
-/**
- * Returns the value of the [QuestionnaireResponse.Item.Answer] for the [type].
- *
- * Used to retrieve the value to set the field in the extracted FHIR resource.
- *
- * @throws IllegalArgumentException if [type] is not supported (for example, questions of type
- * [QuestionnaireItemTypeCode.Value.GROUP] do not collect any answer).
- */
-private fun QuestionnaireResponse.Item.Answer.getValueForType(
-    type: Questionnaire.Item.TypeCode
-): Message = when (val value = type.value) {
-    QuestionnaireItemTypeCode.Value.DATE -> this.value.date
-    QuestionnaireItemTypeCode.Value.BOOLEAN -> this.value.boolean
-    QuestionnaireItemTypeCode.Value.DECIMAL -> this.value.decimal
-    QuestionnaireItemTypeCode.Value.INTEGER -> this.value.integer
-    QuestionnaireItemTypeCode.Value.DATE_TIME -> this.value.dateTime
-    QuestionnaireItemTypeCode.Value.TIME -> this.value.time
-    QuestionnaireItemTypeCode.Value.STRING, QuestionnaireItemTypeCode.Value.TEXT ->
-        this.value.stringValue
-    QuestionnaireItemTypeCode.Value.URL -> this.value.uri
-    else -> throw IllegalArgumentException("Unsupported value type $value")
 }
 
 /**
