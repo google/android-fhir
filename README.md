@@ -2,11 +2,11 @@
 
 The Android FHIR SDK (the SDK) is an Android library for building offline-capable, mobile-first healthcare applications using [FHIR](https://www.hl7.org/fhir/) resources on Android. It supports a number of common mobile health use cases including:
 
-- FHIR Clinical Data Repository (manage FHIR resources natively and syncing with FHIR server)
-- FHIR native data capture for case reporting (structured data capture specification)
-- Client tracking and care coordination applications (custom applications leveraging the FHIR SDK back-end)
-- Native support for on-device clinical decision support (via use of CQL)
-- Ability to run certain FHIR operations for generation of Care Plans and Indicators (for example)
+- patient registration
+- case reporting
+- referral and care coordination
+- clinical decision support
+- ... 
 
 The overall goal is to simplify the process of incorporating support for FHIR into new or existing mobile solutions and to accelerate the adoption of FHIR standards as part of broader interoperability efforts in Healthcare.
 
