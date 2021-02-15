@@ -74,7 +74,7 @@ The Gallery App showcases the structured data capture library functionality and 
 Contributing
 
 ## Contributing
-The Android FHIR SDK is being developed together with a consortium of applicaiton developers working in Global Digital Health. We welcome contributions from anyone.
+The Android FHIR SDK is being developed by a consortium of application developers. We welcome contributions from anyone.
 
 ### Requirements
 Android Studio 4.0 is required for [Java 8 library desugaring](https://developer.android.com/studio/preview/features#j8-desugar)
