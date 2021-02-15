@@ -131,20 +131,14 @@ private fun QuestionnaireResponse.Item.contains(
  *
  * @param type used to get value based on [Questionnaire.Item.TypeCode].
  */
-private fun enableWhenTypeToPredicate(enableWhen: Questionnaire.Item.EnableWhen,
-                                      type: Questionnaire.Item.TypeCode):
+private fun enableWhenTypeToPredicate(
+    enableWhen: Questionnaire.Item.EnableWhen,
+    type: Questionnaire.Item.TypeCode
+):
         (QuestionnaireResponse.Item.Answer) -> Boolean {
-    val enableWhenAnswerValue = try {
-        enableWhen.answer.getValueForType(type)
-    } catch (exception: IllegalArgumentException) {
-        enableWhen.answer.toByteString()
-    }
+    val enableWhenAnswerValue = enableWhen.answer.getValueForType(type)
     return {
-        val answerValue = try {
-            it.getValueForType(type)
-        } catch (exception: java.lang.IllegalArgumentException) {
-            it.value.toByteString()
-        }
+        val answerValue = it.getValueForType(type)
         when (val operator = enableWhen.operator.value) {
             QuestionnaireItemOperatorCode.Value.EQUALS ->
                 answerValue == enableWhenAnswerValue
