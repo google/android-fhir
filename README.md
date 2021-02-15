@@ -37,7 +37,7 @@ The FHIR SDK will provide a rich set of features for building FHIR native soluti
 ## Details of the repository
 The repository is organised into two main libraries, *core* and *structured data capture* as well as sample demo applications for each (see sample applications).
 
-### Core library:
+### Core library
 This is the main library for building a mobile based clinical data repository using FHIR. It provides:
 - SQLite database for FHIR resources
 - APIs for accessing (create, read, update, and delete) FHIR resources in the database
