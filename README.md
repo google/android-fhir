@@ -71,7 +71,7 @@ This is the initial demo application for showcasing core SDK features. The demo 
 Within the CDR demo is an example of performing a CQL operation. This was developed as part of a hackathon together with Bryn Rhodes (alphora) and utilises the cqf-ruler engine. [TODO: Explanation required]
 
 ### SDC Gallery App
-There is an SDC Gallery App with existing demo with a number of sample FHIR Questionnaires pre-loaded. 
+This app includes a number of pre-loaded sample FHIR Questionnaires. 
 
 The Gallery App showcases the structured data capture library functionality and the ability to easily deploy a FHIR Questionnaire and turn it into a data capture form. For supported widgets, features and known bugs, see the latest release notes.
 Contributing
