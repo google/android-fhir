@@ -61,14 +61,14 @@ internal abstract class ResourceDao {
     }
 
     @Transaction
-    open fun insert(resource: Resource) {
-        insertResource(resource)
+    open fun insert(resource: Resource, remoteResource: Boolean = false) {
+        insertResource(resource, remoteResource)
     }
 
     @Transaction
-    open fun insertAll(resources: List<Resource>) {
+    open fun insertAll(resources: List<Resource>, remoteResources: Boolean = false) {
         resources.forEach { resource ->
-            insertResource(resource)
+            insertResource(resource, remoteResources)
         }
     }
 
@@ -175,12 +175,13 @@ internal abstract class ResourceDao {
     @RawQuery
     abstract fun getResources(query: SupportSQLiteQuery): List<String>
 
-    private fun insertResource(resource: Resource) {
+    private fun insertResource(resource: Resource, remoteResource: Boolean) {
         val entity = ResourceEntity(
             id = 0,
             resourceType = resource.resourceType,
             resourceId = resource.id,
-            serializedResource = iParser.encodeResourceToString(resource)
+            serializedResource = iParser.encodeResourceToString(resource),
+            remoteResource = remoteResource
         )
         insertResource(entity)
         val index = fhirIndexer.index(resource)
