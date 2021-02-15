@@ -12,7 +12,9 @@ The overall goal is to simplify the process of incorporating support for FHIR in
 
 **The Android SDK is a community collaboration and contributions to the codebase, feature requests and suggestions about specific use cases are welcomed.** 
 
-If you want to provide any feedback, discuss specific use cases or have questions about getting involved, please email us at <android-fhir-sdk-feedback@google.com>
+
+## Feedback
+If you want to provide any feedback, discuss use cases, raise feature requests, or simply want to get involved, please use the [Discussions](https://github.com/google/android-fhir/discussions) section, or email us at <android-fhir-sdk-feedback@google.com>.
 
 For developers looking to get started with the SDK, see the section on [Contributing](#contributing)
 
