@@ -33,13 +33,13 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
                     isSingleLine = true
             ) {
                 override fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder? {
-                    return text.let {
+                    return text.toDoubleOrNull()?.let {
                         QuestionnaireResponse.Item.Answer.newBuilder()
                                 .apply {
                                     value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
                                             .setQuantity(
                                                     Quantity.newBuilder().setValue(
-                                                            Decimal.newBuilder().setValue(it)
+                                                            Decimal.newBuilder().setValue(it.toString())
                                                                     .build()
                                                     )
                                             )
