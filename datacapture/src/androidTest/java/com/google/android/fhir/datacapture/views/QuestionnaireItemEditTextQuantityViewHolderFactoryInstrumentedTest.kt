@@ -57,12 +57,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
                 QuestionnaireResponse.Item.newBuilder().addAnswer(
                     QuestionnaireResponse.Item.Answer.newBuilder().apply {
                         value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setQuantity(
-                                Quantity.newBuilder().setValue(
-                                    Decimal.newBuilder().setValue("5")
-                                        .build()
-                                )
-                            )
+                            .setQuantity(Quantity.newBuilder().setValue(Decimal.newBuilder().setValue("5").build()))
                             .build()
                     }
                 )
@@ -85,12 +80,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
                 QuestionnaireResponse.Item.newBuilder().addAnswer(
                     QuestionnaireResponse.Item.Answer.newBuilder().apply {
                         value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setQuantity(
-                                Quantity.newBuilder().setValue(
-                                    Decimal.newBuilder().setValue("5")
-                                        .build()
-                                )
-                            )
+                            .setQuantity(Quantity.newBuilder().setValue(Decimal.newBuilder().setValue("5").build()))
                             .build()
                     }
                 )
