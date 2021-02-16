@@ -47,7 +47,24 @@ This is the main library for building a mobile based clinical data repository us
 - APIs for searching FHIR resources in the database
 
 ### Structured data capture (SDC) library
-This library is a partial implementation of the [Structured Data Capture FHIR IG](http://build.fhir.org/ig/HL7/sdc/) on Android. It includes the UI components and APIs to capture healthcare data using FHIR questionnaires. The following code snippet renders a questionnaire using a FHIR questionnaire resource and an optional questionnaire response resource.
+This library is a partial implementation of the [Structured Data Capture FHIR IG](http://build.fhir.org/ig/HL7/sdc/) on Android. It includes the UI components and APIs to capture healthcare data using FHIR questionnaires. 
+
+The following code snippet renders a questionnaire using a FHIR questionnaire resource and an optional questionnaire response resource.
+
+```
+if (savedInstanceState == null) {
+    val fragment = QuestionnaireFragment()
+    fragment.arguments = bundleOf(
+        QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to questionnaireJsonString
+        QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to
+            questionnaireResponseJsonString
+    )
+
+    supportFragmentManager.commit {
+        add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG)
+    }
+}
+```
 
 ## Sample Applications
 Two sample applications are provided that demonstrate different features of the SDK. 
