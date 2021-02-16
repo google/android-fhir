@@ -47,20 +47,17 @@ This is the main library for building a mobile based clinical data repository us
 ### Structured data capture (SDC) library
 This library is a partial implementation of the [Structured Data Capture FHIR IG](http://build.fhir.org/ig/HL7/sdc/) on Android. It includes the UI components and APIs to capture healthcare data using FHIR questionnaires. The following code snippet renders a questionnaire using a FHIR questionnaire resource and an optional questionnaire response resource.
 
-The current release (alpha-0.1.0) provides support for **10 commonly used widgets and very basic skip logic** (see release note). This library will be incrementally updated and we are actively seeking contributions from the community. To contribute [see the board here](https://github.com/google/android-fhir/projects/1)
-
-**NOTE:** The SDC library currently only supports expanded and inlined ValueSets (i.e. use of explicit answerOptions). See the [sample applications](#sample applications) for samples.
-
 ## Sample Applications
 Two sample applications are provided that demonstrate different features of the SDK. 
 
 **These applications are provided for demonstration purposes only and are not for use in production. Do NOT use in production.**
 
 ### Clinical Data Repository (CDR) Application
-This is the initial demo application for showcasing core SDK features. The demo currently uses synthea generated data that has been loaded into the HAPI fhir server public demo site.  
+This is the initial demo application for showcasing core SDK features and CQL proof of concept. The demo uses synthea generated data that has been loaded into the HAPI fhir server public demo site.
 
 #### CQL Proof of Concept
-Within the CDR demo is an example of performing a CQL operation. This was developed as part of a hackathon together with Bryn Rhodes (alphora) and utilises the cqf-ruler engine. [TODO: Explanation required]
+. 
+Within the CDR demo is an example of evaluating CQL using the [CQL Engine](https://github.com/DBCG/cql_engine).
 
 ### SDC Gallery App
 This app includes a number of pre-loaded sample FHIR Questionnaires. 
@@ -69,7 +66,7 @@ It uses the SDC library to create data capture forms using FHIR questionnaires. 
 Contributing
 
 # Contributing
-The Android FHIR SDK is being developed by a consortium of application developers. We welcome contributions from anyone.
+The Android FHIR SDK is being developed by a consortium of application developers. We welcome contributions. Please see the [project boards](https://github.com/google/android-fhir/projects).
 
 ## Feedback
 If you want to provide any feedback, discuss use cases, raise feature requests, or simply want to get involved, please use the [Discussions](https://github.com/google/android-fhir/discussions) section, or email us at <android-fhir-sdk-feedback@google.com>.
