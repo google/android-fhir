@@ -43,13 +43,13 @@ internal abstract class LocalChangeDao {
     abstract fun addLocalChange(localChange: LocalChange)
 
     @Transaction
-    open fun addInsertAll(resources: List<Resource>, remoteResources: Boolean = false) {
+    open fun addInsertAll(resources: List<Resource>) {
         resources.forEach { resource ->
-            addInsert(resource, remoteResource = remoteResources)
+            addInsert(resource)
         }
     }
 
-    fun addInsert(resource: Resource, remoteResource: Boolean = false) {
+    fun addInsert(resource: Resource) {
         val resourceId = resource.id
         val resourceType = resource.resourceType
         val timestamp = Date().toTimeZoneString()
@@ -62,8 +62,7 @@ internal abstract class LocalChangeDao {
                 resourceId = resourceId,
                 timestamp = timestamp,
                 type = Type.INSERT,
-                payload = resourceString,
-                remoteResource = remoteResource
+                payload = resourceString
             )
         )
     }
@@ -87,8 +86,7 @@ internal abstract class LocalChangeDao {
                 resourceId = resourceId,
                 timestamp = timestamp,
                 type = Type.UPDATE,
-                payload = LocalChangeUtils.diff(iParser, oldResource, resource),
-                remoteResource = lastChange(resourceId, resourceType)!!.remoteResource
+                payload = LocalChangeUtils.diff(iParser, oldResource, resource)
             )
         )
     }
@@ -102,24 +100,20 @@ internal abstract class LocalChangeDao {
                 resourceId = resourceId,
                 timestamp = timestamp,
                 type = Type.DELETE,
-                payload = "",
-                remoteResource = lastChange(resourceId, resourceType)!!.remoteResource
+                payload = ""
             )
         )
     }
 
     @Query("""
-        SELECT * 
+        SELECT type 
         FROM LocalChange 
         WHERE resourceId = :resourceId 
         AND resourceType = :resourceType 
         ORDER BY id ASC
         LIMIT 1
     """)
-    abstract fun lastChange(resourceId: String, resourceType: ResourceType): LocalChange?
-
-    fun lastChangeType(resourceId: String, resourceType: ResourceType): Type? =
-        lastChange(resourceId, resourceType)?.type
+    abstract fun lastChangeType(resourceId: String, resourceType: ResourceType): Type?
 
     @Query("""
         SELECT COUNT(type) 

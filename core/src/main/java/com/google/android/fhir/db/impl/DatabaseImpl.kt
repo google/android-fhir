@@ -79,8 +79,7 @@ internal class DatabaseImpl(
     }
 
     override fun <R : Resource> insertRemote(resource: R) {
-        resourceDao.insert(resource, remoteResource = true)
-        localChangeDao.addInsert(resource, remoteResource = true)
+        resourceDao.insert(resource)
     }
 
     @Transaction
@@ -90,8 +89,7 @@ internal class DatabaseImpl(
     }
 
     override fun <R : Resource> insertAllRemote(resources: List<R>) {
-        resourceDao.insertAll(resources, remoteResources = true)
-        localChangeDao.addInsertAll(resources, remoteResources = true)
+        resourceDao.insertAll(resources)
     }
 
     @Transaction

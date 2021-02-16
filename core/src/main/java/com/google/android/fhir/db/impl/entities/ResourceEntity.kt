@@ -34,6 +34,5 @@ internal data class ResourceEntity(
     val id: Long,
     val resourceType: ResourceType,
     val resourceId: String,
-    val serializedResource: String,
-    val remoteResource: Boolean = false
+    val serializedResource: String
 )

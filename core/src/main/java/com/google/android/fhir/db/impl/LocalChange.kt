@@ -63,8 +63,7 @@ data class LocalChange(
     val resourceId: String,
     val timestamp: String = "",
     val type: Type,
-    val payload: String,
-    val remoteResource: Boolean = false
+    val payload: String
 ) {
     enum class Type(val value: Int) {
         INSERT(1), // create a new resource. payload is the entire resource json.
