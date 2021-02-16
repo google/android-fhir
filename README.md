@@ -46,7 +46,7 @@ This is the main library for building a mobile based clinical data repository us
 - APIs for accessing (create, read, update, and delete) FHIR resources in the database
 - APIs for searching FHIR resources in the database
 
-### Structured data capture (SDC) library
+### Structured data capture (SDC) library  [![Google Maven](https://badgen.net/maven/v/metadata-url/dl.google.com/dl/android/maven2/com/google/android/fhir/data-capture/maven-metadata.xml)](https://maven.google.com/web/index.html?#com.google.android.fhir:data-capture)
 This library is a partial implementation of the [Structured Data Capture FHIR IG](http://build.fhir.org/ig/HL7/sdc/) on Android. It includes the UI components and APIs to capture healthcare data using FHIR questionnaires. 
 
 The following code snippet renders a questionnaire using a FHIR questionnaire resource and an optional questionnaire response resource.
