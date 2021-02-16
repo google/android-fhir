@@ -4,6 +4,8 @@ The Android FHIR SDK (the SDK) is an Android library for building offline-capabl
 
 *The Android SDK is a community collaboration and contributions to the codebase, feature requests and suggestions about specific use cases are welcomed.* [See feedback section](#feedback)
 
+For developers looking to contribute to the SDK, see the section on [Contributing](#contributing)
+
 ## Status
 
 This is currently in **Early Access** for Developers ONLY and is NOT production-ready. **Do NOT use in production**.
@@ -56,7 +58,6 @@ Two sample applications are provided that demonstrate different features of the 
 This is the initial demo application for showcasing core SDK features and CQL proof of concept. The demo uses synthea generated data that has been loaded into the HAPI fhir server public demo site.
 
 #### CQL Proof of Concept
-. 
 Within the CDR demo is an example of evaluating CQL using the [CQL Engine](https://github.com/DBCG/cql_engine).
 
 ### SDC Gallery App
@@ -70,8 +71,6 @@ The Android FHIR SDK is being developed by a consortium of application developer
 
 ## Feedback
 If you want to provide any feedback, discuss use cases, raise feature requests, or simply want to get involved, please use the [Discussions](https://github.com/google/android-fhir/discussions) section, or email us at <android-fhir-sdk-feedback@google.com>.
-
-For developers looking to get started with the SDK, see the section on [Contributing](#contributing)
 
 # Disclaimer
 This is not an officially supported Google product.
