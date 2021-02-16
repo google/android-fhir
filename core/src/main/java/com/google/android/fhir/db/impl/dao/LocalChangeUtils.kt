@@ -25,6 +25,8 @@ import com.github.fge.jsonpatch.diff.JsonDiff
 import com.google.android.fhir.db.impl.entities.LocalChange
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.Resource
+import org.json.JSONArray
+import org.json.JSONObject
 
 object LocalChangeUtils {
 
@@ -85,16 +87,30 @@ object LocalChangeUtils {
     }
 
     /**
-     * Merge two JSON patch strings by concatenating their elements into a new JSON array.
+     * Merge two JSON patch strings by concatenating their elements, which should JSON patch
+     * operations, into a new JSON array.
+     * For duplicate operations, the operation from second patch is picked.
      */
     @JvmStatic
     private fun mergePatches(firstPatch: String, secondPatch: String): String {
-        val objectMapper = ObjectMapper()
         // TODO: validate patches are RFC 6902 compliant JSON patches
-        val first = objectMapper.readValue(firstPatch, JsonPatch::class.java)
-        val updater = objectMapper.readerForUpdating(first)
-        val merged = updater.readValue(secondPatch, JsonPatch::class.java)
-        return merged.toString()
+        val first = JSONArray(firstPatch)
+        val second = JSONArray(secondPatch)
+        val mergeMap = HashMap<Pair<String, String>, JSONObject>()
+
+        (0 until first.length()).forEach { index ->
+            val operation = first.optJSONObject(index) ?: JSONObject()
+            val key = operation.optString("op") to operation.optString("path")
+            mergeMap[key] = operation
+        }
+
+        (0 until second.length()).forEach { index ->
+            val operation = second.optJSONObject(index) ?: JSONObject()
+            val key = operation.optString("op") to operation.optString("path")
+            mergeMap[key] = operation
+        }
+
+        return JSONArray(mergeMap.values).toString()
     }
 
     /**
