@@ -41,6 +41,7 @@ versions.spotless = '3.27.1'
 versions.truth = '1.0.1'
 versions.work = '2.3.4'
 versions.json_tools = '1.13'
+versions.jacoco = '0.8.6'
 ext.versions = versions
 
 def deps = [:]
@@ -105,4 +106,5 @@ deps.work = work
 def json_tools = [:]
 json_tools.json_patch = "com.github.java-json-tools:json-patch:$versions.json_tools"
 deps.json_tools = json_tools
+deps.jacoco = "org.jacoco:org.jacoco.core:$versions.jacoco"
 ext.deps = deps

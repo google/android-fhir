@@ -9,6 +9,7 @@ buildscript {
         classpath deps.android_gradle_plugin
         classpath deps.kotlin.plugin
         classpath deps.spotless
+        classpath deps.jacoco
     }
 }
 
