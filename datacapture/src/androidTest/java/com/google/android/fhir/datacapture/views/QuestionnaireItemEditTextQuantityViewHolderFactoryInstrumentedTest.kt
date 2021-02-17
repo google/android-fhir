@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.datacapture.views
 
 import android.widget.FrameLayout
@@ -7,7 +23,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import com.google.fhir.r4.core.Decimal
 import com.google.fhir.r4.core.Quantity
 import com.google.fhir.r4.core.Questionnaire
@@ -44,8 +60,9 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
             ) {}
         )
 
-        Truth.assertThat(viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).hint)
-            .isEqualTo("Question?")
+        assertThat(
+            viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).hint
+        ).isEqualTo("Question?")
     }
 
     @Test
@@ -57,14 +74,16 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
                 QuestionnaireResponse.Item.newBuilder().addAnswer(
                     QuestionnaireResponse.Item.Answer.newBuilder().apply {
                         value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setQuantity(Quantity.newBuilder().setValue(Decimal.newBuilder().setValue("5").build()))
-                            .build()
+                            .setQuantity(
+                                Quantity.newBuilder()
+                                    .setValue(Decimal.newBuilder().setValue("5").build())
+                            ).build()
                     }
                 )
             ) {}
         )
 
-        Truth.assertThat(
+        assertThat(
             viewHolder.itemView.findViewById<TextInputEditText>(
                 R.id.textInputEditText
             ).text.toString()
@@ -80,8 +99,10 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
                 QuestionnaireResponse.Item.newBuilder().addAnswer(
                     QuestionnaireResponse.Item.Answer.newBuilder().apply {
                         value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setQuantity(Quantity.newBuilder().setValue(Decimal.newBuilder().setValue("5").build()))
-                            .build()
+                            .setQuantity(
+                                Quantity.newBuilder()
+                                    .setValue(Decimal.newBuilder().setValue("5").build())
+                            ).build()
                     }
                 )
             ) {}
@@ -93,7 +114,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
             ) {}
         )
 
-        Truth.assertThat(
+        assertThat(
             viewHolder.itemView.findViewById<TextInputEditText>(
                 R.id.textInputEditText
             ).text.toString()
@@ -111,8 +132,8 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
         viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("10")
 
         val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerList
-        Truth.assertThat(answer.size).isEqualTo(1)
-        Truth.assertThat(answer[0].value?.quantity?.value).isEqualTo(10)
+        assertThat(answer.size).isEqualTo(1)
+        assertThat(answer[0].value?.quantity?.value).isEqualTo(10)
     }
 
     @Test
@@ -125,7 +146,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
         viewHolder.bind(questionnaireItemViewItem)
         viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("")
 
-        Truth.assertThat(
+        assertThat(
             questionnaireItemViewItem.questionnaireResponseItemBuilder.answerCount
         ).isEqualTo(0)
     }

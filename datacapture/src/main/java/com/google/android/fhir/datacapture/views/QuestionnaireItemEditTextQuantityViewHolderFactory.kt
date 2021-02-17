@@ -39,11 +39,9 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
                             value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
                                 .setQuantity(
                                     Quantity.newBuilder().setValue(
-                                        Decimal.newBuilder().setValue(it.toString())
-                                            .build()
+                                        Decimal.newBuilder().setValue(it.toString()).build()
                                     )
-                                )
-                                .build()
+                                ).build()
                         }
                 }
             }
