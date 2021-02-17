@@ -133,7 +133,24 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
 
         val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerList
         assertThat(answer.size).isEqualTo(1)
-        assertThat(answer[0].value?.quantity?.value).isEqualTo(10)
+        assertThat(answer[0].value?.quantity?.value)
+            .isEqualTo(Decimal.newBuilder().setValue("10").build())
+    }
+
+    @Test
+    @UiThreadTest
+    fun shouldSetQuestionnaireResponseItemAnswerOneDecimalPlace() {
+        val questionnaireItemViewItem = QuestionnaireItemViewItem(
+            Questionnaire.Item.newBuilder().build(),
+            QuestionnaireResponse.Item.newBuilder()
+        ) {}
+        viewHolder.bind(questionnaireItemViewItem)
+        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("10.1")
+
+        val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerList
+        assertThat(answer.size).isEqualTo(1)
+        assertThat(answer[0].value?.quantity?.value)
+            .isEqualTo(Decimal.newBuilder().setValue("10.1").build())
     }
 
     @Test
