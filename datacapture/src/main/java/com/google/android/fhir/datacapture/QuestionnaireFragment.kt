@@ -62,6 +62,8 @@ class QuestionnaireFragment : Fragment() {
         }
     }
 
+    fun getQuestionnaire() = viewModel.questionnaire
+
     // Returns the current questionnaire response
     fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 

@@ -69,6 +69,12 @@ class MainActivity : AppCompatActivity() {
                     "HIV-Risk Assessment",
                     "HIV-Risk Assessment",
                     "iprd-hiv-fhir-questionnaire.json"
+                ),
+                // Example taken from https://developer.commure.com/docs/apis/sdc/examples
+                QuestionnaireListItem(
+                    "Extraction example",
+                    "Commure",
+                    "extraction.json"
                 )
             )
         )
