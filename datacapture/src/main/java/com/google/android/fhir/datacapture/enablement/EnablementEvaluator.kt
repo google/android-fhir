@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.enablement
 
+import com.google.android.fhir.datacapture.getValueForType
 import com.google.fhir.r4.core.EnableWhenBehaviorCode
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireItemOperatorCode
@@ -67,6 +68,7 @@ internal object EnablementEvaluator {
         // Evaluate single `enableWhen` constraint.
         if (enableWhenList.size == 1) {
             return evaluateEnableWhen(
+                questionnaireItem.type,
                 enableWhenList.single(),
                 questionnaireResponseItemRetriever
             )
@@ -79,11 +81,13 @@ internal object EnablementEvaluator {
         return when (val value = questionnaireItem.enableBehavior.value) {
             EnableWhenBehaviorCode.Value.ALL ->
                 enableWhenList.all {
-                    evaluateEnableWhen(it, questionnaireResponseItemRetriever)
+                    evaluateEnableWhen(
+                        questionnaireItem.type, it, questionnaireResponseItemRetriever)
                 }
             EnableWhenBehaviorCode.Value.ANY ->
                 enableWhenList.any {
-                    evaluateEnableWhen(it, questionnaireResponseItemRetriever)
+                    evaluateEnableWhen(
+                        questionnaireItem.type, it, questionnaireResponseItemRetriever)
                 }
             else ->
                 throw IllegalStateException("Unrecognized enable when behavior $value")
@@ -97,15 +101,48 @@ internal object EnablementEvaluator {
      * [QuestionnaireResponse.Item] with the `linkId`, or null if there isn't one.
      */
     private fun evaluateEnableWhen(
+        type: Questionnaire.Item.TypeCode,
         enableWhen: Questionnaire.Item.EnableWhen,
         questionnaireResponseItemRetriever: (linkId: String) -> QuestionnaireResponse.Item?
     ): Boolean {
         val responseItem =
             questionnaireResponseItemRetriever(enableWhen.question.value) ?: return true
-        return when (val operator = enableWhen.operator.value) {
-            QuestionnaireItemOperatorCode.Value.EXISTS ->
-                (responseItem.answerCount > 0) == enableWhen.answer.boolean.value
-            else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
+        return if (QuestionnaireItemOperatorCode.Value.EXISTS == enableWhen.operator.value) {
+            (responseItem.answerCount > 0) == enableWhen.answer.boolean.value
+        } else {
+            responseItem.contains(enableWhenTypeToPredicate(enableWhen, type))
         }
+    }
+}
+
+/**
+ * Return if any answer in the answer list satisfies the passed predicate.
+ *
+ * @param predicate boolean predicate function that takes a [QuestionnaireResponse.Item.Answer].
+ */
+private fun QuestionnaireResponse.Item.contains(
+    predicate: (QuestionnaireResponse.Item.Answer) -> Boolean
+): Boolean {
+    return this.answerList.any {
+        predicate(it)
+    }
+}
+
+/**
+ * Returns a predicate based on the `EnableWhen` `operator` and `Answer` value.
+ *
+ * @param type used to get value based on [Questionnaire.Item.TypeCode].
+ */
+private fun enableWhenTypeToPredicate(
+    enableWhen: Questionnaire.Item.EnableWhen,
+    type: Questionnaire.Item.TypeCode
+): (QuestionnaireResponse.Item.Answer) -> Boolean {
+    val enableWhenAnswerValue = enableWhen.answer.getValueForType(type)
+    when (val operator = enableWhen.operator.value) {
+        QuestionnaireItemOperatorCode.Value.EQUALS ->
+            return { it.getValueForType(type) == enableWhenAnswerValue }
+        QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO ->
+            return { it.getValueForType(type) != enableWhenAnswerValue }
+        else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
     }
 }
