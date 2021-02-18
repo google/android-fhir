@@ -133,8 +133,7 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
 
         val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerList
         assertThat(answer.size).isEqualTo(1)
-        assertThat(answer[0].value?.quantity?.value)
-            .isEqualTo(Decimal.newBuilder().setValue("10").build())
+        assertThat(answer[0].value!!.quantity!!.value!!.value).isEqualTo("10.0")
     }
 
     @Test
@@ -149,8 +148,9 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
 
         val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerList
         assertThat(answer.size).isEqualTo(1)
-        assertThat(answer[0].value?.quantity?.value)
-            .isEqualTo(Decimal.newBuilder().setValue("10.1").build())
+        assertThat(answer[0].value!!.quantity!!.value).isEqualTo(
+            Decimal.newBuilder().setValue("10.1").build()
+        )
     }
 
     @Test
