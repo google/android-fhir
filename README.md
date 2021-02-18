@@ -11,13 +11,10 @@ For developers looking to contribute to the SDK, see the section on [Contributin
 This is currently in **Early Access** for Developers ONLY and is NOT production-ready. **Do NOT use in production**.
 
 ## Usage 
-The SDK is designed to support Android 21 (lollipop) and above
+The SDK is designed to support Android 21 (lollipop) and above. Android Studio 4.0 is required for [Java 8 library desugaring](https://developer.android.com/studio/preview/features#j8-desugar)
 
-### Requirements
-Android Studio 4.0 is required for [Java 8 library desugaring](https://developer.android.com/studio/preview/features#j8-desugar)
-
-## Details of the repository
-The repository is organised into two main libraries, *core* and *structured data capture* as well as sample demo applications for each (see sample applications).
+## Libraries
+The repository is organised into two main libraries, *core* and *structured data capture*.
 
 ### Core library
 This is the main library for building a mobile based clinical data repository using FHIR. It provides:
@@ -62,10 +59,10 @@ This app includes a number of pre-loaded sample FHIR Questionnaires.
 It uses the SDC library to create data capture forms using FHIR questionnaires. For supported widgets, features and known bugs, see the latest release notes.
 Contributing
 
-# Contributing
+## Contributing
 The Android FHIR SDK is being developed by a consortium of application developers. We welcome contributions. Please see the [project boards](https://github.com/google/android-fhir/projects).
 
-## Spotless
+### Spotless
 We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle) to maintain the
 Java/Kotlin coding style in the codebase. Run the following command to check the codebase:
 
@@ -79,17 +76,17 @@ and run the following command to apply fixes to the violations:
 ./gradlew spotlessApply
 ```
 
-## License Headers
+### License Headers
 Spotless maintains the license headers for Java and Kotlin files. Use
 [addlicense](https://github.com/google/addlicense) to maintain license headers in other files:
 
 ```
 addlicense -c "Google LLC" -l apache .
 ```
-# Feedback
+## Feedback
 If you want to provide any feedback, discuss use cases, raise feature requests, or simply want to get involved, please use the [Discussions](https://github.com/google/android-fhir/discussions) section, or email us at <android-fhir-sdk-feedback@google.com>.
 
-# Disclaimer
+## Disclaimer
 This is not an officially supported Google product.
 
 This product is not intended to be a medical device.
