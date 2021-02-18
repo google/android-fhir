@@ -28,57 +28,66 @@ import com.google.fhir.common.JsonFormat
 import com.google.fhir.r4.core.QuestionnaireResponse
 
 class QuestionnaireActivity : AppCompatActivity() {
-  private val viewModel: QuestionnaireViewModel by viewModels()
+    private val viewModel: QuestionnaireViewModel by viewModels()
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_questionnaire)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_questionnaire)
 
-    supportActionBar!!.apply {
-      title = intent.getStringExtra(QUESTIONNAIRE_TITLE_KEY)
-      setDisplayHomeAsUpEnabled(true)
+        supportActionBar!!.apply {
+            title = intent.getStringExtra(QUESTIONNAIRE_TITLE_KEY)
+            setDisplayHomeAsUpEnabled(true)
+        }
+
+        // Only add the fragment once, when the activity is first created.
+        if (savedInstanceState == null) {
+            val fragment = QuestionnaireFragment()
+            fragment.arguments = bundleOf(
+                QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire,
+                QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to viewModel.questionnaireResponseJson // ktlint-disable max-line-length
+            )
+
+            supportFragmentManager.commit {
+                add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG)
+            }
+        }
     }
 
-    // Only add the fragment once, when the activity is first created.
-    if (savedInstanceState == null) {
-      val fragment = QuestionnaireFragment()
-      fragment.arguments =
-        bundleOf(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire)
-
-      supportFragmentManager.commit { add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.top_bar_menu, menu)
+        return true
     }
-  }
 
-  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-    menuInflater.inflate(R.menu.top_bar_menu, menu)
-    return true
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    return when (item.getItemId()) {
-      R.id.action_submit -> {
-        val questionnaireFragment =
-          supportFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as
-            QuestionnaireFragment
-        displayQuestionnaireResponse(questionnaireFragment.getQuestionnaireResponse())
-        true
-      }
-      else -> super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.getItemId()) {
+            R.id.action_submit -> {
+                val questionnaireFragment = supportFragmentManager.findFragmentByTag(
+                    QUESTIONNAIRE_FRAGMENT_TAG
+                ) as QuestionnaireFragment
+                displayQuestionnaireResponse(questionnaireFragment.getQuestionnaireResponse())
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
-  }
 
-  // Display Questionnaire response as a dialog
-  fun displayQuestionnaireResponse(questionnaireResponse: QuestionnaireResponse) {
-    val questionnaireResponseJson = JsonFormat.getPrinter().print(questionnaireResponse)
-    val dialogFragment = QuestionnaireResponseDialogFragment()
-    dialogFragment.arguments =
-      bundleOf(QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to questionnaireResponseJson)
-    dialogFragment.show(supportFragmentManager, QuestionnaireResponseDialogFragment.TAG)
-  }
+    // Display Quesitonnaire response as a dialog
+    fun displayQuestionnaireResponse(questionnaireResponse: QuestionnaireResponse) {
+        val questionnaireResponseJson = JsonFormat.getPrinter().print(questionnaireResponse)
+        val dialogFragment = QuestionnaireResponseDialogFragment()
+        dialogFragment.arguments = bundleOf(
+            QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to questionnaireResponseJson
+        )
+        dialogFragment.show(
+            supportFragmentManager,
+            QuestionnaireResponseDialogFragment.TAG
+        )
+    }
 
-  companion object {
-    const val QUESTIONNAIRE_TITLE_KEY = "questionnaire-title-key"
-    const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
-    const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
-  }
+    companion object {
+        const val QUESTIONNAIRE_TITLE_KEY = "questionnaire-title-key"
+        const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
+        const val QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY = "questionnaire-response-file-path-key"
+        const val QUESTIONNAIRE_FRAGMENT_TAG = "questionannire-fragment-tag"
+    }
 }
