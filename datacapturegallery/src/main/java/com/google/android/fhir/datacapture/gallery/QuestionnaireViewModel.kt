@@ -21,18 +21,26 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 
 class QuestionnaireViewModel(application: Application, private val state: SavedStateHandle) :
-  AndroidViewModel(application) {
-  var questionnaireJson: String? = null
-  val questionnaire: String
-    get() {
-      if (questionnaireJson == null) {
-        questionnaireJson =
-          getApplication<Application>()
-            .assets
-            .open(state[QuestionnaireActivity.QUESTIONNAIRE_FILE_PATH_KEY]!!)
-            .bufferedReader()
-            .use { it.readText() }
-      }
-      return questionnaireJson!!
-    }
+    AndroidViewModel(application) {
+    var questionnaireJson: String? = null
+    val questionnaire: String
+        get() {
+            if (questionnaireJson == null) {
+                questionnaireJson = getApplication<Application>().assets
+                    .open(state[QuestionnaireActivity.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+                    .bufferedReader()
+                    .use { it.readText() }
+            }
+            return questionnaireJson!!
+        }
+    var questionnaireResponseJson: String? = null
+        get() {
+            if (state.contains(QuestionnaireActivity.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY)) {
+                questionnaireResponseJson = getApplication<Application>().assets
+                    .open(state[QuestionnaireActivity.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY]!!)
+                    .bufferedReader()
+                    .use { it.readText() }
+            }
+            return field
+        }
 }
