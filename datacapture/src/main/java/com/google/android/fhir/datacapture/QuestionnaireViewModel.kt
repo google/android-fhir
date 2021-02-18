@@ -29,107 +29,134 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 
 internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
-  /** The current questionnaire as questions are being answered. */
-  private val questionnaire: Questionnaire
-
-  init {
-    val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
-    val builder = Questionnaire.newBuilder()
-    questionnaire = JsonFormat.getParser().merge(questionnaireJson, builder).build()
-  }
-
-  /** The current questionnaire response as questions are being answered. */
-  private val questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
-
-  init {
-    questionnaireResponseBuilder.questionnaire =
-      Canonical.newBuilder().setValue(questionnaire.id.value).build()
-    // Retain the hierarchy and order of items within the questionnaire as specified in the
-    // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
-    questionnaire.itemList.forEach {
-      questionnaireResponseBuilder.addItem(it.createQuestionnaireResponseItem())
+    /** The current questionnaire as questions are being answered. */
+    private val questionnaire: Questionnaire
+    private var cnt = 0
+    init {
+        val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
+        val builder = Questionnaire.newBuilder()
+        questionnaire = JsonFormat.getParser().merge(questionnaireJson, builder).build()
     }
-  }
 
-  /** Map from link IDs to questionnaire response items. */
-  private val linkIdToQuestionnaireResponseItemMap =
-    createLinkIdToQuestionnaireResponseItemMap(questionnaireResponseBuilder.itemBuilderList)
+    /** The current questionnaire response as questions are being answered. */
+    private var questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
 
-  /** Tracks modifications in order to update the UI. */
-  private val modificationCount = MutableStateFlow(0)
-
-  /** Callback function to update the UI. */
-  private val questionnaireResponseItemChangedCallback = { modificationCount.value += 1 }
-
-  internal val questionnaireItemViewItemList
-    get() =
-      getQuestionnaireItemViewItemList(
-        questionnaire.itemList,
-        questionnaireResponseBuilder.itemBuilderList
-      )
-
-  /** [QuestionnaireItemViewItem] s to be displayed in the UI. */
-  internal val questionnaireItemViewItemListFlow: Flow<List<QuestionnaireItemViewItem>> =
-    modificationCount.map { questionnaireItemViewItemList }
-
-  /** The current [QuestionnaireResponse] captured by the UI. */
-  fun getQuestionnaireResponse(): QuestionnaireResponse = questionnaireResponseBuilder.build()
-
-  private fun createLinkIdToQuestionnaireResponseItemMap(
-    questionnaireResponseItemList: List<QuestionnaireResponse.Item.Builder>
-  ): Map<String, QuestionnaireResponse.Item.Builder> {
-    val linkIdToQuestionnaireResponseItemMap =
-      questionnaireResponseItemList.map { it.linkId.value to it }.toMap().toMutableMap()
-    for (item in questionnaireResponseItemList) {
-      linkIdToQuestionnaireResponseItemMap.putAll(
-        createLinkIdToQuestionnaireResponseItemMap(item.itemBuilderList)
-      )
-    }
-    return linkIdToQuestionnaireResponseItemMap
-  }
-
-  /**
-   * Traverse (DFS) through the list of questionnaire items and the list of questionnaire response
-   * items and populate [questionnaireItemViewItemList] with matching pairs of questionnaire item
-   * and questionnaire response item.
-   *
-   * The traverse is carried out in the two lists in tandem. The two lists should be structurally
-   * identical.
-   */
-  private fun getQuestionnaireItemViewItemList(
-    questionnaireItemList: List<Questionnaire.Item>,
-    questionnaireResponseItemList: List<QuestionnaireResponse.Item.Builder>
-  ): List<QuestionnaireItemViewItem> {
-    val questionnaireItemViewItemList = mutableListOf<QuestionnaireItemViewItem>()
-    val questionnaireItemListIterator = questionnaireItemList.iterator()
-    val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-    while (questionnaireItemListIterator.hasNext() &&
-      questionnaireResponseItemListIterator.hasNext()) {
-      val questionnaireItem = questionnaireItemListIterator.next()
-      val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
-
-      val enabled =
-        EnablementEvaluator.evaluate(questionnaireItem) {
-          (linkIdToQuestionnaireResponseItemMap[it] ?: return@evaluate null).build()
+    init {
+        val questionnaireJsonResponseString: String? =
+            state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
+        questionnaireJsonResponseString?.let {
+            val questionnaireResponse =
+                JsonFormat.getParser()
+                    .merge(questionnaireJsonResponseString, questionnaireResponseBuilder)
+                    .build()
+            validateQuestionnaireResponse(questionnaire.itemList, questionnaireResponse.itemList)
+            questionnaireResponseBuilder = questionnaireResponse.toBuilder()
+        } ?: run {
+            questionnaireResponseBuilder.questionnaire =
+                Canonical.newBuilder().setValue(questionnaire.id.value).build()
+            // Retain the hierarchy and order of items within the questionnaire as specified in the
+            // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
+            questionnaire.itemList.forEach {
+                questionnaireResponseBuilder.addItem(it.createQuestionnaireResponseItem())
+            }
         }
-      if (enabled) {
-        questionnaireItemViewItemList.add(
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            questionnaireResponseItem,
-            questionnaireResponseItemChangedCallback
-          )
-        )
-        questionnaireItemViewItemList.addAll(
-          getQuestionnaireItemViewItemList(
-            questionnaireItem.itemList,
-            questionnaireResponseItem.itemBuilderList
-          )
-        )
-      }
     }
-    return questionnaireItemViewItemList
-  }
+
+    /** Map from link IDs to questionnaire response items. */
+    private val linkIdToQuestionnaireResponseItemMap =
+        createLinkIdToQuestionnaireResponseItemMap(
+            questionnaireResponseBuilder.itemBuilderList
+        )
+
+    /** Tracks modifications in order to update the UI. */
+    private val modificationCount = MutableStateFlow(0)
+
+    /** Callback function to update the UI. */
+    private val questionnaireResponseItemChangedCallback = { modificationCount.value += 1 }
+
+    internal val questionnaireItemViewItemList
+        get() = getQuestionnaireItemViewItemList(
+            questionnaire.itemList,
+            questionnaireResponseBuilder.itemBuilderList
+        )
+
+    /** [QuestionnaireItemViewItem]s to be displayed in the UI. */
+    internal val questionnaireItemViewItemListFlow: Flow<List<QuestionnaireItemViewItem>> =
+        modificationCount.map { questionnaireItemViewItemList }
+
+    /** The current [QuestionnaireResponse] captured by the UI. */
+    fun getQuestionnaireResponse(): QuestionnaireResponse = questionnaireResponseBuilder.build()
+
+    private fun createLinkIdToQuestionnaireResponseItemMap(
+        questionnaireResponseItemList: List<QuestionnaireResponse.Item.Builder>
+    ): Map<String, QuestionnaireResponse.Item.Builder> {
+        val linkIdToQuestionnaireResponseItemMap = questionnaireResponseItemList.map {
+            it.linkId.value to it
+        }.toMap().toMutableMap()
+        for (item in questionnaireResponseItemList) {
+            linkIdToQuestionnaireResponseItemMap.putAll(
+                createLinkIdToQuestionnaireResponseItemMap(item.itemBuilderList)
+            )
+        }
+        return linkIdToQuestionnaireResponseItemMap
+    }
+
+    /**
+     * Traverse (DFS) through the list of questionnaire items , the list of questionnaire response
+     * items and the list of items in the questionnaire response answer list and populate
+     * [questionnaireItemViewItemList] with matching pairs of questionnaire item
+     * and questionnaire response item.
+     *
+     * The traverse is carried out in the two lists in tandem. The two lists should be structurally
+     * identical.
+     */
+    private fun getQuestionnaireItemViewItemList(
+        questionnaireItemList: List<Questionnaire.Item>,
+        questionnaireResponseItemList: List<QuestionnaireResponse.Item.Builder>
+    ): List<QuestionnaireItemViewItem> {
+        val questionnaireItemViewItemList = mutableListOf<QuestionnaireItemViewItem>()
+        val questionnaireItemListIterator = questionnaireItemList.iterator()
+        val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
+        while (
+            questionnaireItemListIterator.hasNext() &&
+            questionnaireResponseItemListIterator.hasNext()
+        ) {
+            val questionnaireItem = questionnaireItemListIterator.next()
+            val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
+
+            val enabled = EnablementEvaluator.evaluate(questionnaireItem) {
+                (linkIdToQuestionnaireResponseItemMap[it] ?: return@evaluate null).build()
+            }
+            if (enabled) {
+                questionnaireItemViewItemList.add(
+                    QuestionnaireItemViewItem(
+                        questionnaireItem,
+                        questionnaireResponseItem,
+                        questionnaireResponseItemChangedCallback
+                    )
+                )
+                questionnaireItemViewItemList.addAll(
+                    getQuestionnaireItemViewItemList(
+                        questionnaireItem.itemList,
+                        questionnaireResponseItem.itemBuilderList
+                    )
+                )
+                if (questionnaireResponseItem.answerCount> 0) {
+                    questionnaireResponseItem.answerBuilderList?.forEach {
+                        if (it.itemCount> 0) {
+                            questionnaireItemViewItemList.addAll(
+                                getQuestionnaireItemViewItemList(
+                                    questionnaireItem.itemList,
+                                    it.itemBuilderList
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        return questionnaireItemViewItemList
+    }
 }
 
 /**
@@ -140,14 +167,43 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
 private fun Questionnaire.Item.createQuestionnaireResponseItem():
-  QuestionnaireResponse.Item.Builder {
-  return QuestionnaireResponse.Item.newBuilder().apply {
-    linkId =
-      com.google.fhir.r4.core.String.newBuilder()
-        .setValue(this@createQuestionnaireResponseItem.linkId.value)
-        .build()
-    this@createQuestionnaireResponseItem.itemList.forEach {
-      this.addItem(it.createQuestionnaireResponseItem())
+    QuestionnaireResponse.Item.Builder {
+    return QuestionnaireResponse.Item.newBuilder().apply {
+        linkId = com.google.fhir.r4.core.String.newBuilder()
+            .setValue(this@createQuestionnaireResponseItem.linkId.value).build()
+        this@createQuestionnaireResponseItem.itemList.forEach {
+            this.addItem(it.createQuestionnaireResponseItem())
+        }
     }
-  }
+}
+
+/**
+ * Traverse (DFS) through the list of questionnaire items and the list of questionnaire response
+ * items and check if the linkid of the matching pairs of questionnaire item and questionnaire
+ * response item are equal.
+ * The traverse is carried out in the two lists in tandem. The two lists should be structurally
+ * identical.
+ */
+fun validateQuestionnaireResponse(
+    questionnaireItemList: List<Questionnaire.Item>,
+    questionnaireResponseItemList: List<QuestionnaireResponse.Item>
+): Boolean {
+    val questionnaireItemListIterator = questionnaireItemList.iterator()
+    val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
+    while (
+        questionnaireItemListIterator.hasNext() &&
+        questionnaireResponseItemListIterator.hasNext()
+    ) {
+        val questionnaireItem = questionnaireItemListIterator.next()
+        val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
+        if (questionnaireItemListIterator.hasNext()
+                .xor(questionnaireResponseItemListIterator.hasNext()))
+            throw IllegalArgumentException("Structure mismatch")
+        if (!questionnaireItem.linkId.equals(questionnaireResponseItem.linkId))
+            throw IllegalArgumentException("linkId mismatch")
+        validateQuestionnaireResponse(
+            questionnaireItem.itemList,
+            questionnaireResponseItem.itemList)
+    }
+    return true
 }
