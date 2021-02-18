@@ -30,43 +30,43 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.collect
 
 class QuestionnaireFragment : Fragment() {
-  private val viewModel: QuestionnaireViewModel by viewModels()
+    private val viewModel: QuestionnaireViewModel by viewModels()
 
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View {
-    inflater.context.obtainStyledAttributes(R.styleable.QuestionnaireTheme).use {
-      val themeId =
-        it.getResourceId(
-          // Use the custom questionnaire theme if it is specified
-          R.styleable.QuestionnaireTheme_questionnaire_theme,
-          // Otherwise, use the default questionnaire theme
-          R.style.Theme_Questionnaire
-        )
-      return inflater
-        .cloneInContext(ContextThemeWrapper(inflater.context, themeId))
-        .inflate(R.layout.questionnaire_fragment, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        inflater.context.obtainStyledAttributes(R.styleable.QuestionnaireTheme).use {
+            val themeId = it.getResourceId(
+                // Use the custom questionnaire theme if it is specified
+                R.styleable.QuestionnaireTheme_questionnaire_theme,
+                // Otherwise, use the default questionnaire theme
+                R.style.Theme_Questionnaire
+            )
+            return inflater
+                .cloneInContext(ContextThemeWrapper(inflater.context, themeId))
+                .inflate(R.layout.questionnaire_fragment, container, false)
+        }
     }
-  }
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-    val adapter = QuestionnaireItemAdapter()
-    recyclerView.adapter = adapter
-    recyclerView.layoutManager = LinearLayoutManager(view.context)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
+        val adapter = QuestionnaireItemAdapter()
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(view.context)
 
-    // Listen to updates from the view model.
-    viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-      viewModel.questionnaireItemViewItemListFlow.collect { adapter.submitList(it) }
+        // Listen to updates from the view model.
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            viewModel.questionnaireItemViewItemListFlow.collect { adapter.submitList(it) }
+        }
     }
-  }
 
-  // Returns the current questionnaire response
-  fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
+    // Returns the current questionnaire response
+    fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
-  companion object {
-    const val BUNDLE_KEY_QUESTIONNAIRE = "questionnaire"
-  }
+    companion object {
+        const val BUNDLE_KEY_QUESTIONNAIRE = "questionnaire"
+        const val BUNDLE_KEY_QUESTIONNAIRE_RESPONSE = "questionnaire-response"
+    }
 }
