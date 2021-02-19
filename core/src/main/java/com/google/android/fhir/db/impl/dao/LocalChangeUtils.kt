@@ -94,18 +94,18 @@ object LocalChangeUtils {
     @JvmStatic
     private fun mergePatches(firstPatch: String, secondPatch: String): String {
         // TODO: validate patches are RFC 6902 compliant JSON patches
-        val first = JSONArray(firstPatch)
-        val second = JSONArray(secondPatch)
+        val firstPatchJsonArray = JSONArray(firstPatch)
+        val secondPatchJsonArray = JSONArray(secondPatch)
         val mergeMap = HashMap<Pair<String, String>, JSONObject>()
 
-        (0 until first.length()).forEach { index ->
-            val operation = first.optJSONObject(index) ?: JSONObject()
+        for (i in 0 until firstPatchJsonArray.length()) {
+            val operation = firstPatchJsonArray.optJSONObject(i) ?: JSONObject()
             val key = operation.optString("op") to operation.optString("path")
             mergeMap[key] = operation
         }
 
-        (0 until second.length()).forEach { index ->
-            val operation = second.optJSONObject(index) ?: JSONObject()
+        for (i in 0 until secondPatchJsonArray.length()) {
+            val operation = secondPatchJsonArray.optJSONObject(i) ?: JSONObject()
             val key = operation.optString("op") to operation.optString("path")
             mergeMap[key] = operation
         }
