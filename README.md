@@ -63,7 +63,7 @@ Contributing
 The Android FHIR SDK is being developed by a consortium of application developers. We welcome contributions. Please see the [project boards](https://github.com/google/android-fhir/projects).
 
 ### Spotless
-We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle) to maintain the
+We use [Spotless](https://github.com/diffplug/spotless/tree/main/plugin-gradle) to maintain the
 Java/Kotlin coding style in the codebase. Run the following command to check the codebase:
 
 ```
