@@ -2,7 +2,7 @@
 
 The Android FHIR SDK (the SDK) is an Android library for building offline-capable, mobile-first healthcare applications using [FHIR](https://www.hl7.org/fhir/) resources on Android. The overall goal is to simplify the process of incorporating support for FHIR into new or existing mobile solutions and to accelerate the adoption of FHIR standards as part of broader interoperability efforts in healthcare.
 
-The Android SDK is a community collaboration. To submit feature requests and suggestions about specific use cases, see [Feedback](#feedback). To contribute to the codebase, see [Contributing](#contributing).
+The SDK is a *community collaboration*. To submit feature requests and suggestions about specific use cases, see [Feedback](#feedback). To contribute to the codebase, see [Contributing](#contributing).
 
 ## Status
 
@@ -57,7 +57,7 @@ This app includes a number of pre-loaded sample FHIR Questionnaires.
 It uses the SDC library to create data capture forms using FHIR questionnaires. For supported widgets, features and known bugs, see the latest release notes.
 
 ## Contributing
-The Android FHIR SDK is being developed by a consortium of application developers. We welcome contributions. Please see the [project boards](https://github.com/google/android-fhir/projects).
+The SDK is being developed by a consortium of application developers. We welcome contributions. Please see the [project boards](https://github.com/google/android-fhir/projects).
 
 ## Feedback
 If you want to provide any feedback, discuss use cases, raise feature requests, or simply want to get involved, please use the [Discussions](https://github.com/google/android-fhir/discussions) section, or email us at <android-fhir-sdk-feedback@google.com>.
