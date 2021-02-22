@@ -87,30 +87,15 @@ object LocalChangeUtils {
     }
 
     /**
-     * Merge two JSON patch strings by concatenating their elements, which should JSON patch
-     * operations, into a new JSON array.
-     * For duplicate operations, the operation from second patch is picked.
+     * Merge two JSON patch strings by concatenating their elements into a new JSON array.
      */
     @JvmStatic
     private fun mergePatches(firstPatch: String, secondPatch: String): String {
         // TODO: validate patches are RFC 6902 compliant JSON patches
-        val firstPatchJsonArray = JSONArray(firstPatch)
-        val secondPatchJsonArray = JSONArray(secondPatch)
-        val mergeMap = HashMap<Pair<String, String>, JSONObject>()
-
-        for (i in 0 until firstPatchJsonArray.length()) {
-            val operation = firstPatchJsonArray.optJSONObject(i) ?: JSONObject()
-            val key = operation.optString("op") to operation.optString("path")
-            mergeMap[key] = operation
-        }
-
-        for (i in 0 until secondPatchJsonArray.length()) {
-            val operation = secondPatchJsonArray.optJSONObject(i) ?: JSONObject()
-            val key = operation.optString("op") to operation.optString("path")
-            mergeMap[key] = operation
-        }
-
-        return JSONArray(mergeMap.values).toString()
+        val firstMap = JSONArray(firstPatch).patchMergeMap()
+        val secondMap = JSONArray(secondPatch).patchMergeMap()
+        firstMap.putAll(secondMap)
+        return JSONArray(firstMap.values).toString()
     }
 
     /**
@@ -136,5 +121,19 @@ object LocalChangeUtils {
             )
         }
         return jsonDiff.toString()
+    }
+
+    /**
+     * Creates a mutable map from operation type (e.g. add/remove) + property path to the entire
+     * operation containing the updated value.
+     * Two such maps can be merged using `Map.putAll()` to yield a minimal set of operations
+     * equivalent to individual patches.
+     */
+    private fun JSONArray.patchMergeMap(): MutableMap<Pair<String, String>, JSONObject> {
+        return (0 until this.length())
+            .map { this.optJSONObject(it) }
+            .associateBy {
+                it.optString("op") to it.optString("path")
+            }.toMutableMap()
     }
 }

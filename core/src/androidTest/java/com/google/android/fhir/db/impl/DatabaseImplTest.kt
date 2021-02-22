@@ -220,9 +220,11 @@ class DatabaseImplTest {
         val patient: Patient =
             testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
         database.insertAllRemote(listOf(patient, TEST_PATIENT_2))
-        assertThat(database.getAllLocalChanges().map { it.second }
-            .none { it.resourceId in listOf(patient.id, TEST_PATIENT_2_ID) })
-            .isTrue()
+        assertThat(
+            database.getAllLocalChanges()
+                .map { it.second }
+                .none { it.resourceId in listOf(patient.id, TEST_PATIENT_2_ID) }
+        ).isTrue()
     }
 
     @Test
