@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views
 
 import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -25,7 +26,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.responseAnswerValueX
-import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import com.google.fhir.r4.core.Code
 import com.google.fhir.r4.core.Coding
@@ -46,7 +46,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
     @Before
     fun setUp() {
         context = ContextThemeWrapper(
-            InstrumentationRegistry.getInstrumentation().getTargetContext(),
+            InstrumentationRegistry.getInstrumentation().targetContext,
             R.style.Theme_MaterialComponents
         )
         parent = FrameLayout(context)
@@ -66,8 +66,8 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
         )
 
         assertThat(
-            viewHolder.itemView.findViewById<TextInputLayout>(R.id.dropdown_menu)
-                .hint
+            viewHolder.itemView.findViewById<TextView>(R.id.dropdown_question_title)
+                .text
         ).isEqualTo("Question?")
     }
 

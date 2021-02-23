@@ -20,7 +20,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <TextView
-        android:id="@+id/dropdown_menu"
+        android:id="@+id/dropdown_question_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
