@@ -66,8 +66,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
         )
 
         assertThat(
-            viewHolder.itemView.findViewById<TextView>(R.id.dropdown_question_title)
-                .text
+            viewHolder.itemView.findViewById<TextView>(R.id.dropdown_question_title).text
         ).isEqualTo("Question?")
     }
 
