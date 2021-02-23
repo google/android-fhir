@@ -6,7 +6,7 @@ import com.google.fhir.r4.core.QuestionnaireResponse
 
 object QuestionnaireItemValidator {
 
-    private val validators = mutableListOf<ValidationInterface>(MaxValueValidator,MinValueValidator)
+    private val validators = mutableListOf<ConstraintValidator>(MaxValueValidator,MinValueValidator)
     /**
      * Validates [questionnaireResponseItemBuilder] contains valid answer(s) to [questionnaireItem].
      */
@@ -16,7 +16,7 @@ object QuestionnaireItemValidator {
         }
         val validationResults = mutableListOf<ValidationResult>()
         validators.forEach {
-            validationResults.addAll(it.validate(questionnaireItem, questionnaireResponseItemBuilder))
+            validationResults.add(it.validate(questionnaireItem, questionnaireResponseItemBuilder))
         }
         return validationResults
     }
