@@ -25,6 +25,8 @@ import com.github.fge.jsonpatch.diff.JsonDiff
 import com.google.android.fhir.db.impl.entities.LocalChange
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.Resource
+import org.json.JSONArray
+import org.json.JSONObject
 
 object LocalChangeUtils {
 
@@ -89,12 +91,11 @@ object LocalChangeUtils {
      */
     @JvmStatic
     private fun mergePatches(firstPatch: String, secondPatch: String): String {
-        val objectMapper = ObjectMapper()
         // TODO: validate patches are RFC 6902 compliant JSON patches
-        val first = objectMapper.readValue(firstPatch, JsonPatch::class.java)
-        val updater = objectMapper.readerForUpdating(first)
-        val merged = updater.readValue(secondPatch, JsonPatch::class.java)
-        return merged.toString()
+        val firstMap = JSONArray(firstPatch).patchMergeMap()
+        val secondMap = JSONArray(secondPatch).patchMergeMap()
+        firstMap.putAll(secondMap)
+        return JSONArray(firstMap.values).toString()
     }
 
     /**
@@ -120,5 +121,19 @@ object LocalChangeUtils {
             )
         }
         return jsonDiff.toString()
+    }
+
+    /**
+     * Creates a mutable map from operation type (e.g. add/remove) + property path to the entire
+     * operation containing the updated value.
+     * Two such maps can be merged using `Map.putAll()` to yield a minimal set of operations
+     * equivalent to individual patches.
+     */
+    private fun JSONArray.patchMergeMap(): MutableMap<Pair<String, String>, JSONObject> {
+        return (0 until this.length())
+            .map { this.optJSONObject(it) }
+            .associateBy {
+                it.optString("op") to it.optString("path")
+            }.toMutableMap()
     }
 }

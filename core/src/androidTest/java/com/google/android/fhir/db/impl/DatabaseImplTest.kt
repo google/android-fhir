@@ -26,8 +26,10 @@ import com.google.android.fhir.sync.FhirDataSource
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
+import org.json.JSONArray
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
@@ -102,10 +104,10 @@ class DatabaseImplTest {
             assertThrows(ResourceNotFoundInDbException::class.java) {
                 database.update(TEST_PATIENT_2)
             }
+        /* ktlint-disable max-line-length */
         assertThat(resourceNotFoundInDbException.message)
-            /* ktlint-disable max-line-length */
             .isEqualTo("Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!"
-            /* ktlint-enable max-line-length */
+        /* ktlint-enable max-line-length */
         )
     }
 
@@ -199,8 +201,95 @@ class DatabaseImplTest {
             .single { it.second.resourceId.equals(patient.id) }
         database.deleteUpdates(token)
         assertThat(database.getAllLocalChanges()
-            .none { it.second.resourceId.equals(patient.id) }
+            .none { it.second.resourceId.equals(patient.id) })
+            .isTrue()
+    }
+
+    @Test
+    fun insert_remoteResource_shouldNotInsertLocalChange() {
+        val patient: Patient =
+            testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+        database.insertRemote(patient)
+        assertThat(database.getAllLocalChanges().map { it.second }
+            .none { it.resourceId.equals(patient.id) })
+            .isTrue()
+    }
+
+    @Test
+    fun insertAll_remoteResources_shouldNotInsertAnyLocalChange() {
+        val patient: Patient =
+            testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+        database.insertAllRemote(listOf(patient, TEST_PATIENT_2))
+        assertThat(
+            database.getAllLocalChanges()
+                .map { it.second }
+                .none { it.resourceId in listOf(patient.id, TEST_PATIENT_2_ID) }
         ).isTrue()
+    }
+
+    @Test
+    fun update_remoteResource_readSquashedChanges_shouldReturnPatch() {
+        val patient: Patient =
+            testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+        database.insertRemote(patient)
+        val updatedPatient =
+            testingUtils.readFromFile(Patient::class.java, "/update_test_patient_1.json")
+        val updatePatch = testingUtils.readJsonArrayFromFile("/update_patch_1.json")
+        database.update(updatedPatient)
+        val (_, resourceType, resourceId, _, type, payload) = database.getAllLocalChanges()
+            .single { it.second.resourceId.equals(patient.id) }.second
+        assertThat(type).isEqualTo(LocalChange.Type.UPDATE)
+        assertThat(resourceId).isEqualTo(patient.id)
+        assertThat(resourceType).isEqualTo(patient.resourceType.name)
+        testingUtils.assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
+    }
+
+    @Test
+    fun updateTwice_remoteResource_readSquashedChanges_shouldReturnMergedPatch() {
+        var patient: Patient =
+            testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+        database.insertRemote(patient)
+        patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_1.json")
+        database.update(patient)
+        patient = testingUtils.readFromFile(Patient::class.java, "/update_test_patient_2.json")
+        database.update(patient)
+        val updatePatch = testingUtils.readJsonArrayFromFile("/update_patch_2.json")
+        val (_, resourceType, resourceId, _, type, payload) = database.getAllLocalChanges()
+            .single { it.second.resourceId.equals(patient.id) }.second
+        assertThat(type).isEqualTo(LocalChange.Type.UPDATE)
+        assertThat(resourceId).isEqualTo(patient.id)
+        assertThat(resourceType).isEqualTo(patient.resourceType.name)
+        testingUtils.assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
+    }
+
+    @Test
+    fun delete_remoteResource_shouldReturnDeleteLocalChange() {
+        database.insertRemote(TEST_PATIENT_2)
+        database.delete(Patient::class.java, TEST_PATIENT_2_ID)
+        val (_, resourceType, resourceId, _, type, payload) = database.getAllLocalChanges()
+            .map { it.second }
+            .single { it.resourceId.equals(TEST_PATIENT_2_ID) }
+        assertThat(type).isEqualTo(LocalChange.Type.DELETE)
+        assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
+        assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
+        assertThat(payload).isEmpty()
+    }
+
+    @Test
+    fun delete_remoteResource_updateResource_shouldReturnDeleteLocalChange() {
+        database.insertRemote(TEST_PATIENT_2)
+        TEST_PATIENT_2.setName(listOf(HumanName().addGiven("John").setFamily("Doe")))
+        database.update(TEST_PATIENT_2)
+        TEST_PATIENT_2.setName(listOf(HumanName().addGiven("Jimmy").setFamily("Doe")))
+        database.update(TEST_PATIENT_2)
+        database.delete(Patient::class.java, TEST_PATIENT_2_ID)
+        val (_, resourceType, resourceId, _, type, payload) = database.getAllLocalChanges()
+            .map { it.second }
+            .single { it.resourceId.equals(TEST_PATIENT_2_ID) }
+        assertThat(type).isEqualTo(LocalChange.Type.DELETE)
+        assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
+        assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
+        assertThat(payload).isEmpty()
     }
 
     private companion object {
