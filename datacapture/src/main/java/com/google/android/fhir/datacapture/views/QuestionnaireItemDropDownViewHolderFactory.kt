@@ -21,10 +21,10 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.responseAnswerValueX
-import com.google.android.material.textfield.TextInputLayout
 import com.google.fhir.r4.core.QuestionnaireResponse
 
 internal object QuestionnaireItemDropDownViewHolderFactory : QuestionnaireItemViewHolderFactory(
@@ -32,20 +32,20 @@ internal object QuestionnaireItemDropDownViewHolderFactory : QuestionnaireItemVi
 ) {
     override fun getQuestionnaireItemViewHolderDelegate() =
         object : QuestionnaireItemViewHolderDelegate {
-            private lateinit var textInputLayout: TextInputLayout
+            private lateinit var textView: TextView
             private lateinit var autoCompleteTextView: AutoCompleteTextView
             private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
             private lateinit var context: Context
 
             override fun init(itemView: View) {
-                textInputLayout = itemView.findViewById(R.id.dropdown_menu)
+                textView = itemView.findViewById(R.id.dropdown_question_title)
                 autoCompleteTextView = itemView.findViewById(R.id.auto_complete)
                 context = itemView.context
             }
 
             override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
                 this.questionnaireItemViewItem = questionnaireItemViewItem
-                textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.text.value
+                textView.text = questionnaireItemViewItem.questionnaireItem.text.value
                 val answerOptionString =
                     this.questionnaireItemViewItem.questionnaireItem.answerOptionList.map {
                         it.displayString
