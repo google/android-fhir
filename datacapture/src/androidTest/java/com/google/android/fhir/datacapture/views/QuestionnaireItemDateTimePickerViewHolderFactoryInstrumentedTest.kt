@@ -27,12 +27,12 @@ import com.google.common.truth.Truth.assertThat
 import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireResponse
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
