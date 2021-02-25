@@ -29,7 +29,6 @@ import org.hl7.fhir.r4.model.ResourceType
  * Encapsulation of a FHIR resource (its resource type and ID) and all the indices that are
  * extracted from the resource.
  *
- *
  * For example, for a [org.hl7.fhir.r4.model.Patient], this class should include the patient's
  * resource type, ID, and all the field values of the patient that should be indexed such as name,
  * email address.

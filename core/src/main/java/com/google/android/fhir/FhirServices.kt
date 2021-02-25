@@ -25,7 +25,6 @@ import com.google.android.fhir.cql.FhirEngineTerminologyProvider
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
-import com.google.android.fhir.index.impl.FhirIndexerImpl
 import com.google.android.fhir.search.impl.SearchImpl
 import com.google.android.fhir.sync.FhirDataSource
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
@@ -56,11 +55,9 @@ internal data class FhirServices(
 
         fun build(): FhirServices {
             val parser = FhirContext.forR4().newJsonParser()
-            val indexer = FhirIndexerImpl()
             val db = DatabaseImpl(
                 context = context,
                 iParser = parser,
-                fhirIndexer = indexer,
                 databaseName = databaseName
             )
 

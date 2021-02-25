@@ -25,7 +25,6 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.db.impl.entities.LocalChange
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.index.FhirIndexer
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.impl.Query
 import org.hl7.fhir.r4.model.Resource
@@ -38,17 +37,14 @@ import org.hl7.fhir.r4.model.ResourceType
 internal class DatabaseImpl(
     context: Context,
     private val iParser: IParser,
-    fhirIndexer: FhirIndexer,
     databaseName: String?
 ) : com.google.android.fhir.db.Database {
     constructor(
         context: Context,
         iParser: IParser,
-        fhirIndexer: FhirIndexer
     ) : this(
         context = context,
         iParser = iParser,
-        fhirIndexer = fhirIndexer,
         databaseName = DEFAULT_DATABASE_NAME)
 
     val builder = if (databaseName == null) {
@@ -63,7 +59,6 @@ internal class DatabaseImpl(
         .build()
     val resourceDao by lazy {
         db.resourceDao().also {
-            it.fhirIndexer = fhirIndexer
             it.iParser = iParser
         }
     }
