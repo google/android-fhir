@@ -27,16 +27,13 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 
-/**
- * An activity representing a list of Patients.
- */
+/** An activity representing a list of Patients. */
 class PatientListActivity : AppCompatActivity() {
     private lateinit var fhirEngine: FhirEngine
     private lateinit var patientListViewModel: PatientListViewModel
@@ -67,15 +64,11 @@ class PatientListActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
 
         patientListViewModel.getSearchedPatients().observe(this,
-            Observer<List<PatientListViewModel.PatientItem>> {
+            {
                 Log.d("PatientListActivity", "Submitting ${it.count()} patient records")
                 adapter.submitList(it)
-            })
-
-        patientListViewModel.getObservations().observe(this,
-            Observer<List<PatientListViewModel.ObservationItem>> {
-                // adapter.submitList(it)
-            })
+            }
+        )
     }
 
     // Click handler to help display the details about the patients from the list.
@@ -127,27 +120,5 @@ class PatientListActivity : AppCompatActivity() {
         Snackbar.make(view, "Getting Patients List", Snackbar.LENGTH_LONG)
             .setAction("Action", null).show()
         patientListViewModel.searchPatients()
-    }
-
-    /**
-     * Helper function to read patient asset file data as string.
-     */
-    private fun getJsonStrForPatientData(): String {
-        val patientJsonFilename = "sample_patients_bundle.json"
-
-        return assets.open(patientJsonFilename).bufferedReader().use {
-            it.readText()
-        }
-    }
-
-    /**
-     * Helper function to read observation asset file data as string.
-     */
-    private fun getJsonStrForObservationData(): String {
-        val observationJsonFilename = "sample_observations_bundle.json"
-
-        return this.applicationContext.assets.open(observationJsonFilename).bufferedReader().use {
-            it.readText()
-        }
     }
 }
