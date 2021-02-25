@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views
 
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -57,9 +58,8 @@ class QuestionnaireItemEditTextSingleLineViewHolderFactoryInstrumentedTest {
             ) {}
         )
 
-        assertThat(
-            viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).hint
-        ).isEqualTo("Question?")
+        assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text)
+            .isEqualTo("Question?")
     }
 
     @Test
