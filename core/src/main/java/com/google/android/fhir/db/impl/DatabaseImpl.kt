@@ -41,7 +41,7 @@ internal class DatabaseImpl(
 ) : com.google.android.fhir.db.Database {
     constructor(
         context: Context,
-        iParser: IParser,
+        iParser: IParser
     ) : this(
         context = context,
         iParser = iParser,
