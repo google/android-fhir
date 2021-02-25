@@ -20,12 +20,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import com.google.fhir.r4.core.Date
 import com.google.fhir.r4.core.QuestionnaireResponse
 import java.time.Instant
@@ -38,12 +38,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItem
 ) {
     override fun getQuestionnaireItemViewHolderDelegate() =
         object : QuestionnaireItemViewHolderDelegate {
-            private lateinit var textInputLayout: TextInputLayout
+            private lateinit var textDateQuestion: TextView
             private lateinit var textInputEditText: TextInputEditText
             private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
             override fun init(itemView: View) {
-                textInputLayout = itemView.findViewById(R.id.textInputLayout)
+                textDateQuestion = itemView.findViewById(R.id.question)
                 textInputEditText = itemView.findViewById(R.id.textInputEditText)
                 // Disable direct text input to only allow input from the date picker dialog
                 textInputEditText.keyListener = null
@@ -104,14 +104,14 @@ internal object QuestionnaireItemDatePickerViewHolderFactory : QuestionnaireItem
                         DatePickerFragment.TAG
                     )
                     // Clear focus so that the user can refocus to open the dialog
-                    textInputLayout.clearFocus()
+                    textDateQuestion.clearFocus()
                 }
             }
 
             @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
             override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
                 this.questionnaireItemViewItem = questionnaireItemViewItem
-                textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.text.value
+                textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.text.value
                 textInputEditText.setText(
                     questionnaireItemViewItem.singleAnswerOrNull?.value?.date?.let {
                         Instant
