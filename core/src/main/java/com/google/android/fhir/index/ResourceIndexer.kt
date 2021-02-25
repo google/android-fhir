@@ -40,11 +40,8 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.UriType
 
-/** Implementation of [ResourceIndexer].  */
 internal object ResourceIndexer {
-    fun <R : Resource> index(resource: R): ResourceIndices {
-        return extractIndexValues(resource)
-    }
+    fun <R : Resource> index(resource: R) = extractIndexValues(resource)
 
     /** Extracts the values to be indexed for `resource`.  */
     private fun <R : Resource> extractIndexValues(resource: R): ResourceIndices {
@@ -84,7 +81,7 @@ internal object ResourceIndexer {
                         val system = code.system
                         val value = code.code
                         if (system?.isNotEmpty() == true && value?.isNotEmpty() == true) {
-                            indexBuilder.addCodeIndex(
+                            indexBuilder.addTokenIndex(
                                 TokenIndex(
                                     name = searchParamDefinition.name,
                                     path = searchParamDefinition.path,
