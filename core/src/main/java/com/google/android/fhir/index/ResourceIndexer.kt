@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.index.impl
+package com.google.android.fhir.index
 
 import android.util.Log
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
-import com.google.android.fhir.index.FhirIndexer
-import com.google.android.fhir.index.ResourceIndices
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.NumberIndex
 import com.google.android.fhir.index.entities.QuantityIndex
@@ -42,11 +40,8 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.UriType
 
-/** Implementation of [FhirIndexer].  */
-internal class FhirIndexerImpl constructor() : FhirIndexer {
-    override fun <R : Resource> index(resource: R): ResourceIndices {
-        return extractIndexValues(resource)
-    }
+internal object ResourceIndexer {
+    fun <R : Resource> index(resource: R) = extractIndexValues(resource)
 
     /** Extracts the values to be indexed for `resource`.  */
     private fun <R : Resource> extractIndexValues(resource: R): ResourceIndices {
@@ -86,7 +81,7 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
                         val system = code.system
                         val value = code.code
                         if (system?.isNotEmpty() == true && value?.isNotEmpty() == true) {
-                            indexBuilder.addCodeIndex(
+                            indexBuilder.addTokenIndex(
                                 TokenIndex(
                                     name = searchParamDefinition.name,
                                     path = searchParamDefinition.path,
@@ -342,44 +337,42 @@ internal class FhirIndexerImpl constructor() : FhirIndexer {
     @Suppress("NOTHING_TO_INLINE")
     private inline fun String.hasDotNotationOnly() = matches(DOT_NOTATION_REGEX)
 
-    companion object {
-        /** The prefix of getter methods for retrieving field values.  */
-        private const val GETTER_PREFIX = "get"
+    /** The prefix of getter methods for retrieving field values.  */
+    private const val GETTER_PREFIX = "get"
 
-        /** The suffix of getter methods for retrieving a date 'Element'.  */
-        private const val GETTER_SUFFIX_DATE = "Element"
+    /** The suffix of getter methods for retrieving a date 'Element'.  */
+    private const val GETTER_SUFFIX_DATE = "Element"
 
-        /** The regular expression for the separator  */
-        private val SEPARATOR_REGEX = "\\.".toRegex()
+    /** The regular expression for the separator  */
+    private val SEPARATOR_REGEX = "\\.".toRegex()
 
-        /** The string representing the string search parameter type.  */
-        private const val SEARCH_PARAM_DEFINITION_TYPE_STRING = "string"
+    /** The string representing the string search parameter type.  */
+    private const val SEARCH_PARAM_DEFINITION_TYPE_STRING = "string"
 
-        /** The string representing the reference search parameter type.  */
-        private const val SEARCH_PARAM_DEFINITION_TYPE_REFERENCE = "reference"
+    /** The string representing the reference search parameter type.  */
+    private const val SEARCH_PARAM_DEFINITION_TYPE_REFERENCE = "reference"
 
-        /** The string representing the code search parameter type.  */
-        private const val SEARCH_PARAM_DEFINITION_TYPE_CODE = "token"
+    /** The string representing the code search parameter type.  */
+    private const val SEARCH_PARAM_DEFINITION_TYPE_CODE = "token"
 
-        /** The string representing the quantity search parameter type.  */
-        private const val SEARCH_PARAM_DEFINITION_TYPE_QUANTITY = "quantity"
+    /** The string representing the quantity search parameter type.  */
+    private const val SEARCH_PARAM_DEFINITION_TYPE_QUANTITY = "quantity"
 
-        /** The string representing the uri search parameter type.  */
-        private const val SEARCH_PARAM_DEFINITION_TYPE_URI = "uri"
+    /** The string representing the uri search parameter type.  */
+    private const val SEARCH_PARAM_DEFINITION_TYPE_URI = "uri"
 
-        /** The string representing the date search parameter type. */
-        private const val SEARCH_PARAM_DEFINITION_TYPE_DATE = "date"
+    /** The string representing the date search parameter type. */
+    private const val SEARCH_PARAM_DEFINITION_TYPE_DATE = "date"
 
-        /** The string representing the number search parameter type. */
-        private const val SEARCH_PARAM_DEFINITION_TYPE_NUMBER = "number"
+    /** The string representing the number search parameter type. */
+    private const val SEARCH_PARAM_DEFINITION_TYPE_NUMBER = "number"
 
-        /** The string for FHIR currency system */
-        // See: https://bit.ly/30YB3ML
-        // See: https://www.hl7.org/fhir/valueset-currencies.html
-        private const val FHIR_CURRENCY_SYSTEM = "urn:iso:std:iso:4217"
+    /** The string for FHIR currency system */
+    // See: https://bit.ly/30YB3ML
+    // See: https://www.hl7.org/fhir/valueset-currencies.html
+    private const val FHIR_CURRENCY_SYSTEM = "urn:iso:std:iso:4217"
 
-        /** Tag for logging.  */
-        private const val TAG = "FhirIndexerImpl"
-        private val DOT_NOTATION_REGEX = "^[a-zA-Z0-9.]+$".toRegex()
-    }
+    /** Tag for logging.  */
+    private const val TAG = "FhirIndexerImpl"
+    private val DOT_NOTATION_REGEX = "^[a-zA-Z0-9.]+$".toRegex()
 }
