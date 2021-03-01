@@ -195,10 +195,8 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
         val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
             .setValue(
                 Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                    .setStringValue(
-                        String.newBuilder()
-                            .setValue("test")))
-            .build()
+                    .setStringValue(String.newBuilder().setValue("test"))
+            ).build()
 
         assertFailsWith<IllegalArgumentException> {
             viewHolder.bind(
