@@ -24,6 +24,7 @@ import com.google.fhir.common.JsonFormat
 import com.google.fhir.r4.core.Canonical
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireResponse
+import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -31,7 +32,6 @@ import kotlinx.coroutines.flow.map
 internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     /** The current questionnaire as questions are being answered. */
     private val questionnaire: Questionnaire
-    private var cnt = 0
     init {
         val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
         val builder = Questionnaire.newBuilder()
@@ -44,14 +44,14 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     init {
         val questionnaireJsonResponseString: String? =
             state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
-        questionnaireJsonResponseString?.let {
+        if(questionnaireJsonResponseString!=null){
             val questionnaireResponse =
                 JsonFormat.getParser()
                     .merge(questionnaireJsonResponseString, questionnaireResponseBuilder)
                     .build()
             validateQuestionnaireResponse(questionnaire.itemList, questionnaireResponse.itemList)
             questionnaireResponseBuilder = questionnaireResponse.toBuilder()
-        } ?: run {
+        }else{
             questionnaireResponseBuilder.questionnaire =
                 Canonical.newBuilder().setValue(questionnaire.id.value).build()
             // Retain the hierarchy and order of items within the questionnaire as specified in the
@@ -141,7 +141,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
                         questionnaireResponseItem.itemBuilderList
                     )
                 )
-                if (questionnaireResponseItem.answerCount> 0) {
+                if (!questionnaireItem.type.value.equals(QuestionnaireItemTypeCode.Value.GROUP)) {
                     questionnaireResponseItem.answerBuilderList?.forEach {
                         if (it.itemCount> 0) {
                             questionnaireItemViewItemList.addAll(
@@ -171,8 +171,10 @@ private fun Questionnaire.Item.createQuestionnaireResponseItem():
     return QuestionnaireResponse.Item.newBuilder().apply {
         linkId = com.google.fhir.r4.core.String.newBuilder()
             .setValue(this@createQuestionnaireResponseItem.linkId.value).build()
+        text = com.google.fhir.r4.core.String.newBuilder()
+            .setValue(this@createQuestionnaireResponseItem.text.value).build()
         this@createQuestionnaireResponseItem.itemList.forEach {
-            this.addItem(it.createQuestionnaireResponseItem())
+                this.addItem(it.createQuestionnaireResponseItem())
         }
     }
 }
@@ -184,7 +186,7 @@ private fun Questionnaire.Item.createQuestionnaireResponseItem():
  * The traverse is carried out in the two lists in tandem. The two lists should be structurally
  * identical.
  */
-fun validateQuestionnaireResponse(
+internal fun validateQuestionnaireResponse(
     questionnaireItemList: List<Questionnaire.Item>,
     questionnaireResponseItemList: List<QuestionnaireResponse.Item>
 ): Boolean {
@@ -196,8 +198,10 @@ fun validateQuestionnaireResponse(
     ) {
         val questionnaireItem = questionnaireItemListIterator.next()
         val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
-        if (questionnaireItemListIterator.hasNext()
-                .xor(questionnaireResponseItemListIterator.hasNext()))
+        if (
+            questionnaireItemListIterator.hasNext() xor
+            questionnaireResponseItemListIterator.hasNext()
+        )
             throw IllegalArgumentException("Structure mismatch")
         if (!questionnaireItem.linkId.equals(questionnaireResponseItem.linkId))
             throw IllegalArgumentException("linkId mismatch")
