@@ -23,8 +23,8 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.fhir.common.JsonFormat
 import com.google.fhir.r4.core.Canonical
 import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireResponse
 import com.google.fhir.r4.core.QuestionnaireItemTypeCode
+import com.google.fhir.r4.core.QuestionnaireResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -44,14 +44,14 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     init {
         val questionnaireJsonResponseString: String? =
             state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
-        if(questionnaireJsonResponseString!=null){
+        if (questionnaireJsonResponseString != null) {
             val questionnaireResponse =
                 JsonFormat.getParser()
                     .merge(questionnaireJsonResponseString, questionnaireResponseBuilder)
                     .build()
             validateQuestionnaireResponse(questionnaire.itemList, questionnaireResponse.itemList)
             questionnaireResponseBuilder = questionnaireResponse.toBuilder()
-        }else{
+        } else {
             questionnaireResponseBuilder.questionnaire =
                 Canonical.newBuilder().setValue(questionnaire.id.value).build()
             // Retain the hierarchy and order of items within the questionnaire as specified in the
@@ -196,6 +196,7 @@ internal fun validateQuestionnaireResponse(
         questionnaireItemListIterator.hasNext() &&
         questionnaireResponseItemListIterator.hasNext()
     ) {
+        // TODO: Validate type and item nesting
         val questionnaireItem = questionnaireItemListIterator.next()
         val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
         if (
