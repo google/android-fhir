@@ -78,11 +78,8 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
                 Questionnaire.Item.AnswerOption.ValueX.newBuilder()
                     .setCoding(
                         Coding.newBuilder()
-                            .setCode(
-                                Code.newBuilder()
-                                    .setValue("test-code"))
-                            .setDisplay(
-                                String.newBuilder().setValue("Test Code"))
+                            .setCode(Code.newBuilder().setValue("test-code"))
+                            .setDisplay(String.newBuilder().setValue("Test Code"))
                     )
             ).build()
         viewHolder.bind(
@@ -108,11 +105,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
             .setValue(
                 Questionnaire.Item.AnswerOption.ValueX.newBuilder()
                     .setCoding(
-                        Coding.newBuilder()
-                            .setCode(
-                                Code.newBuilder()
-                                    .setValue("test-code")
-                            )
+                        Coding.newBuilder().setCode(Code.newBuilder().setValue("test-code"))
                     )
             ).build()
         viewHolder.bind(
@@ -140,12 +133,10 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
                 Questionnaire.Item.AnswerOption.ValueX.newBuilder()
                     .setCoding(
                         Coding.newBuilder()
-                            .setCode(
-                                Code.newBuilder()
-                                    .setValue("test-code"))
-                            .setDisplay(
-                                String.newBuilder().setValue("Test Code"))))
-            .build()
+                            .setCode(Code.newBuilder().setValue("test-code"))
+                            .setDisplay(String.newBuilder().setValue("Test Code"))
+                    )
+            ).build()
 
         viewHolder.bind(
             QuestionnaireItemViewItem(
@@ -171,12 +162,10 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
                 Questionnaire.Item.AnswerOption.ValueX.newBuilder()
                     .setCoding(
                         Coding.newBuilder()
-                            .setCode(
-                                Code.newBuilder()
-                                    .setValue("test-code"))
-                            .setDisplay(
-                                String.newBuilder().setValue("Test Code"))))
-            .build()
+                            .setCode(Code.newBuilder().setValue("test-code"))
+                            .setDisplay(String.newBuilder().setValue("Test Code"))
+                    )
+            ).build()
 
         viewHolder.bind(
             QuestionnaireItemViewItem(
