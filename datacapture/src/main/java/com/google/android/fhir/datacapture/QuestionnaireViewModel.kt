@@ -39,7 +39,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     }
 
     /** The current questionnaire response as questions are being answered. */
-    private var questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
+    private lateinit var questionnaireResponseBuilder: QuestionnaireResponse.Builder
 
     init {
         val questionnaireJsonResponseString: String? =
