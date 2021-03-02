@@ -29,7 +29,6 @@ import com.google.android.fhir.reference.data.SamplePatients
 import com.google.android.fhir.search.filter.string
 import org.hl7.fhir.r4.model.Patient
 
-private const val PATIENTS_JSON_FILENAME = "sample_patients_bundle.json"
 private const val OBSERVATIONS_JSON_FILENAME = "sample_observations_bundle.json"
 
 /**
@@ -40,7 +39,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     AndroidViewModel(application) {
 
     // Make sample Fhir Patients and Observations available, in case needed for demo.
-    private val jsonStringPatients = getAssetFileAsString(PATIENTS_JSON_FILENAME)
     private val jsonStringObservations = getAssetFileAsString(OBSERVATIONS_JSON_FILENAME)
 
     private val samplePatients = SamplePatients()
@@ -69,13 +67,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
 
     fun getObservations(): LiveData<List<ObservationItem>> {
         return liveObservations
-    }
-    fun getPatientsMap(): Map<String, PatientItem> {
-        return searchedPatients.associateBy { it.id }
-    }
-
-    fun getObservationsMap(): Map<String, ObservationItem> {
-        return observations.associateBy { it.id }
     }
 
     private fun getSearchResults(): List<Patient> {

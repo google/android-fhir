@@ -18,6 +18,7 @@ package com.google.android.fhir.index.impl
 
 import android.os.Build
 import ca.uhn.fhir.context.FhirContext
+import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.NumberIndex
 import com.google.android.fhir.index.entities.QuantityIndex
@@ -49,12 +50,10 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/** Unit tests for {@link FhirIndexerImpl}. */
+/** Unit tests for {@link ResourceIndexerImpl}. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class FhirIndexerImplTest {
-    private val fhirIndexer = FhirIndexerImpl()
-
+class ResourceIndexerTest {
     private lateinit var qtyTestSubstance: Substance
     private lateinit var qtyTestInvoice: Invoice
     private lateinit var uriTestQuestionnaire: Questionnaire
@@ -86,7 +85,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_patient_shouldIndexGivenName() {
-        val resourceIndices = fhirIndexer.index(TEST_PATIENT_1)
+        val resourceIndices = ResourceIndexer.index(TEST_PATIENT_1)
         assertThat(resourceIndices.stringIndices)
             .contains(
                 StringIndex("given", "Patient.name.given", TEST_PATIENT_1_GIVEN_NAME_1)
@@ -95,7 +94,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_patient_shouldIndexManagingOrganization() {
-        val resourceIndices = fhirIndexer.index(TEST_PATIENT_1)
+        val resourceIndices = ResourceIndexer.index(TEST_PATIENT_1)
         assertThat(resourceIndices.referenceIndices)
             .contains(
                 ReferenceIndex("organization", "Patient.managingOrganization", TEST_PATIENT_1_ORG)
@@ -104,7 +103,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_observation_shouldIndexSubject() {
-        val resourceIndices = fhirIndexer.index(TEST_OBSERVATION_1)
+        val resourceIndices = ResourceIndexer.index(TEST_OBSERVATION_1)
         assertThat(resourceIndices.referenceIndices)
             .contains(
                 ReferenceIndex("subject", "Observation.subject", "Patient/" + TEST_PATIENT_1_ID)
@@ -113,7 +112,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_observation_shouldIndexCode() {
-        val resourceIndices = fhirIndexer.index(TEST_OBSERVATION_1)
+        val resourceIndices = ResourceIndexer.index(TEST_OBSERVATION_1)
         assertThat(resourceIndices.tokenIndices)
             .contains(
                 TokenIndex("code", "Observation.code", TEST_CODE_SYSTEM_1, TEST_CODE_VALUE_1)
@@ -122,7 +121,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_patient_nullGivenName_shouldNotIndexGivenName() {
-        val resourceIndices = fhirIndexer.index(TEST_PATIENT_NULL_FIELDS)
+        val resourceIndices = ResourceIndexer.index(TEST_PATIENT_NULL_FIELDS)
         assertThat(
             resourceIndices.stringIndices.any { stringIndex ->
                 stringIndex.path.equals("Patient.name.given")
@@ -137,7 +136,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_patient_nullOrganisation_shouldNotIndexOrganisation() {
-        val resourceIndices = fhirIndexer.index(TEST_PATIENT_NULL_FIELDS)
+        val resourceIndices = ResourceIndexer.index(TEST_PATIENT_NULL_FIELDS)
         assertThat(
             resourceIndices.referenceIndices.any { referenceIndex ->
                 referenceIndex.path.equals("Patient.managingOrganization")
@@ -152,7 +151,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_patient_emptyGivenName_shouldNotIndexGivenName() {
-        val resourceIndices = fhirIndexer.index(TEST_PATIENT_NULL_FIELDS)
+        val resourceIndices = ResourceIndexer.index(TEST_PATIENT_NULL_FIELDS)
         assertThat(
             resourceIndices.stringIndices.any { stringIndex ->
                 stringIndex.path.equals("Patient.name.given")
@@ -165,7 +164,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_patient_emptyOrganisation_shouldNotIndexOrganisation() {
-        val resourceIndices = fhirIndexer.index(TEST_PATIENT_EMPTY_FIELDS)
+        val resourceIndices = ResourceIndexer.index(TEST_PATIENT_EMPTY_FIELDS)
         assertThat(
             resourceIndices.referenceIndices.any { referenceIndex ->
                 referenceIndex.path.equals("Patient.managingOrganization")
@@ -180,7 +179,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_observation_nullCode_shouldNotIndexCode() {
-        val resourceIndices = fhirIndexer.index(TEST_OBSERVATION_NULL_CODE)
+        val resourceIndices = ResourceIndexer.index(TEST_OBSERVATION_NULL_CODE)
         assertThat(
             resourceIndices.stringIndices.any { stringIndex ->
                 stringIndex.path.equals("Observation.code")
@@ -195,7 +194,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_observation_emptyCode_shouldNotIndexCode() {
-        val resourceIndices = fhirIndexer.index(TEST_OBSERVATION_EMPTY_CODE)
+        val resourceIndices = ResourceIndexer.index(TEST_OBSERVATION_EMPTY_CODE)
         assertThat(
             resourceIndices.stringIndices.any { stringIndex ->
                 stringIndex.path.equals("Observation.code")
@@ -210,7 +209,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_invoice_shouldIndexMoneyQuantity() {
-        val resourceIndices = fhirIndexer.index(qtyTestInvoice)
+        val resourceIndices = ResourceIndexer.index(qtyTestInvoice)
         assertThat(resourceIndices.quantityIndices)
             .containsAtLeast(
                 // Search parameter names flatten camel case so "totalGross" becomes "totalgross"
@@ -233,7 +232,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_substance_shouldIndexQuantityQuantity() {
-        val resourceIndices = fhirIndexer.index(qtyTestSubstance)
+        val resourceIndices = ResourceIndexer.index(qtyTestSubstance)
         assertThat(resourceIndices.quantityIndices)
             .contains(
                 QuantityIndex(
@@ -248,7 +247,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_questionnaire_shouldIndexUri() {
-        val resourceIndices = fhirIndexer.index(uriTestQuestionnaire)
+        val resourceIndices = ResourceIndexer.index(uriTestQuestionnaire)
         assertThat(resourceIndices.uriIndices)
             .contains(
                 UriIndex("url", "Questionnaire.url", "http://hl7.org/fhir/Questionnaire/3141")
@@ -257,7 +256,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_patient_birthDate_shouldIndexBirthDate() {
-        val resourceIndices = fhirIndexer.index(dateTestPatient)
+        val resourceIndices = ResourceIndexer.index(dateTestPatient)
         val birthDateElement = dateTestPatient.getBirthDateElement()
         assertThat(resourceIndices.dateIndices)
             .contains(
@@ -273,7 +272,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_patient_lastUpdated_shouldIndexLastUpdated() {
-        val resourceIndices = fhirIndexer.index(lastUpdatedTestPatient)
+        val resourceIndices = ResourceIndexer.index(lastUpdatedTestPatient)
         val lastUpdatedElement = lastUpdatedTestPatient.getMeta().getLastUpdatedElement()
         assertThat(resourceIndices.dateIndices)
             .contains(
@@ -289,7 +288,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_chargeItem_shouldIndexFactorOverride() {
-        val resourceIndices = fhirIndexer.index(numberTestChargeItem)
+        val resourceIndices = ResourceIndexer.index(numberTestChargeItem)
         assertThat(resourceIndices.numberIndices)
             .contains(
                 NumberIndex("factor-override", "ChargeItem.factorOverride", BigDecimal("0.8"))
@@ -298,7 +297,7 @@ class FhirIndexerImplTest {
 
     @Test
     fun index_molecularSequence_shouldIndexWindowAndVariant() {
-        val resourceIndices = fhirIndexer.index(numberTestMolecularSequence)
+        val resourceIndices = ResourceIndexer.index(numberTestMolecularSequence)
         assertThat(resourceIndices.numberIndices)
             .containsAtLeast(
                 NumberIndex(
