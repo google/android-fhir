@@ -23,7 +23,6 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
-import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import com.google.fhir.r4.core.Date
 import com.google.fhir.r4.core.Questionnaire
@@ -62,7 +61,7 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
         )
 
         assertThat(
-            viewHolder.itemView.findViewById<TextInputLayout>(R.id.textInputLayout).hint
+            viewHolder.itemView.findViewById<TextView>(R.id.question).text
         ).isEqualTo("Question?")
     }
 
