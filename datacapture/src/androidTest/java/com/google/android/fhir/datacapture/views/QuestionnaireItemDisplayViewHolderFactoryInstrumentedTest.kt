@@ -39,7 +39,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
     @Before
     fun setUp() {
         context = ContextThemeWrapper(
-            InstrumentationRegistry.getInstrumentation().getTargetContext(),
+            InstrumentationRegistry.getInstrumentation().targetContext,
             R.style.Theme_MaterialComponents
         )
         parent = FrameLayout(context)

@@ -32,7 +32,7 @@ import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.StringIndexEntity
 import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
-import com.google.android.fhir.index.FhirIndexer
+import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.ResourceIndices
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -41,7 +41,6 @@ import org.hl7.fhir.r4.model.ResourceType
 internal abstract class ResourceDao {
     // this is ugly but there is no way to inject these right now in Room as it is the one creating
     // the dao
-    lateinit var fhirIndexer: FhirIndexer
     lateinit var iParser: IParser
 
     @Transaction
@@ -56,7 +55,7 @@ internal abstract class ResourceDao {
             resourceId = resource.id,
             serializedResource = iParser.encodeResourceToString(resource)
         )
-        val index = fhirIndexer.index(resource)
+        val index = ResourceIndexer.index(resource)
         updateIndicesForResource(index, entity)
     }
 
@@ -183,7 +182,7 @@ internal abstract class ResourceDao {
             serializedResource = iParser.encodeResourceToString(resource)
         )
         insertResource(entity)
-        val index = fhirIndexer.index(resource)
+        val index = ResourceIndexer.index(resource)
         updateIndicesForResource(index, entity)
     }
 

@@ -18,10 +18,10 @@ package com.google.android.fhir.datacapture.views
 
 import android.text.Editable
 import android.view.View
+import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import com.google.fhir.r4.core.QuestionnaireResponse
 
 internal abstract class QuestionnaireItemEditTextViewHolderFactory :
@@ -36,12 +36,12 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     private val rawInputType: Int,
     private val isSingleLine: Boolean
 ) : QuestionnaireItemViewHolderDelegate {
-    private lateinit var textInputLayout: TextInputLayout
+    private lateinit var textQuestion: TextView
     private lateinit var textInputEditText: TextInputEditText
     private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
     override fun init(itemView: View) {
-        textInputLayout = itemView.findViewById(R.id.textInputLayout)
+        textQuestion = itemView.findViewById(R.id.question)
         textInputEditText = itemView.findViewById(R.id.textInputEditText)
         textInputEditText.setRawInputType(rawInputType)
         textInputEditText.isSingleLine = isSingleLine
@@ -53,7 +53,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
 
     override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
-        textInputLayout.hint = questionnaireItemViewItem.questionnaireItem.text.value
+        textQuestion.text = questionnaireItemViewItem.questionnaireItem.text.value
         textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
     }
 

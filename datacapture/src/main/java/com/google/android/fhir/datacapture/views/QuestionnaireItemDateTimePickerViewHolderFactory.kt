@@ -19,10 +19,10 @@ package com.google.android.fhir.datacapture.views
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.QuestionnaireResponse
 import java.time.Instant
@@ -37,14 +37,14 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
     ) {
     override fun getQuestionnaireItemViewHolderDelegate() =
         object : QuestionnaireItemViewHolderDelegate {
-            private lateinit var dateInputLayout: TextInputLayout
+            private lateinit var textDateQuestion: TextView
             private lateinit var dateInputEditText: TextInputEditText
-            private lateinit var timeInputLayout: TextInputLayout
+            private lateinit var textTimeQuestion: TextView
             private lateinit var timeInputEditText: TextInputEditText
             private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
             override fun init(itemView: View) {
-                dateInputLayout = itemView.findViewById(R.id.dateInputLayout)
+                textDateQuestion = itemView.findViewById(R.id.date_question)
                 dateInputEditText = itemView.findViewById(R.id.dateInputEditText)
                 // Disable direct text input to only allow input from the date picker dialog
                 dateInputEditText.keyListener = null
@@ -86,10 +86,10 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                         DatePickerFragment.TAG
                     )
                     // Clear focus so that the user can refocus to open the dialog
-                    dateInputLayout.clearFocus()
+                    textDateQuestion.clearFocus()
                 }
 
-                timeInputLayout = itemView.findViewById(R.id.timeInputLayout)
+                textTimeQuestion = itemView.findViewById(R.id.time_question)
                 timeInputEditText = itemView.findViewById(R.id.timeInputEditText)
                 // Disable direct text input to only allow input from the time picker dialog
                 timeInputEditText.keyListener = null
@@ -130,15 +130,15 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                         TimePickerFragment.TAG
                     )
                     // Clear focus so that the user can refocus to open the dialog
-                    timeInputLayout.clearFocus()
+                    textTimeQuestion.clearFocus()
                 }
             }
 
             @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
             override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
                 this.questionnaireItemViewItem = questionnaireItemViewItem
-                dateInputLayout.hint = questionnaireItemViewItem.questionnaireItem.text.value
-                timeInputLayout.hint = questionnaireItemViewItem.questionnaireItem.text.value
+                textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.text.value
+                textTimeQuestion.text = questionnaireItemViewItem.questionnaireItem.text.value
                 val dateTime = questionnaireItemViewItem.singleAnswerOrNull?.value?.dateTime
                 updateDateTimeInput(
                     dateTime?.let {
