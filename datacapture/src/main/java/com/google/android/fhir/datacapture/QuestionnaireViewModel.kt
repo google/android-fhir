@@ -45,6 +45,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
         val questionnaireJsonResponseString: String? =
             state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
         if (questionnaireJsonResponseString != null) {
+            questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
             val questionnaireResponse =
                 JsonFormat.getParser()
                     .merge(questionnaireJsonResponseString, questionnaireResponseBuilder)
@@ -52,6 +53,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
             validateQuestionnaireResponse(questionnaire.itemList, questionnaireResponse.itemList)
             questionnaireResponseBuilder = questionnaireResponse.toBuilder()
         } else {
+            questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
             questionnaireResponseBuilder.questionnaire =
                 Canonical.newBuilder().setValue(questionnaire.id.value).build()
             // Retain the hierarchy and order of items within the questionnaire as specified in the
