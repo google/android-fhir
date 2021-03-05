@@ -162,12 +162,13 @@ internal object ResourceIndexer {
     private fun tokenIndex(searchParam: SearchParamDefinition, value: Base): List<TokenIndex> =
         when (value.fhirType()) {
             "boolean" ->
-                listOf(TokenIndex(
-                    searchParam.name,
-                    searchParam.path,
-                    null,
-                    value.primitiveValue()
-                )
+                listOf(
+                    TokenIndex(
+                        searchParam.name,
+                        searchParam.path,
+                        system = null,
+                        value.primitiveValue()
+                    )
                 )
             "Identifier" -> {
                 val identifier = value as Identifier
