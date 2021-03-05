@@ -34,26 +34,32 @@ internal object DbTypeConverters {
      * Converts a [ResourceType] into a String to be persisted in the database. This allows us to
      * save [ResourceType] into the database while keeping it as the real type in entities.
      */
+    @JvmStatic
     @TypeConverter
     fun typeToString(resourceType: ResourceType) = resourceType.name
 
     /**
      * Converts a String into a [ResourceType]. Called when a query returns a [ResourceType].
      */
+    @JvmStatic
     @TypeConverter
     fun stringToResourceType(data: String) = resourceTypeLookup[data]
         ?: throw IllegalArgumentException("invalid resource type: $data")
 
+    @JvmStatic
     @TypeConverter
     fun bigDecimalToString(value: BigDecimal): String = value.toString()
 
+    @JvmStatic
     @TypeConverter
     fun stringToBigDecimal(value: String): BigDecimal = value.toBigDecimal()
 
+    @JvmStatic
     @TypeConverter
     fun temporalPrecisionToInt(temporalPrecision: TemporalPrecisionEnum): Int =
         temporalPrecision.calendarConstant
 
+    @JvmStatic
     @TypeConverter
     fun intToTemporalPrecision(intTp: Int): TemporalPrecisionEnum {
         return when (intTp) {
@@ -67,9 +73,11 @@ internal object DbTypeConverters {
         }
     }
 
+    @JvmStatic
     @TypeConverter
     fun localChangeTypeToInt(updateType: LocalChange.Type): Int = updateType.value
 
+    @JvmStatic
     @TypeConverter
     fun intToLocalChangeType(value: Int): LocalChange.Type = LocalChange.Type.from(value)
 }
