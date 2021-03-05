@@ -33,3 +33,26 @@ subprojects {
         }
     }
 }
+
+// Create a CI repository and also change versions to include the build number
+afterEvaluate {
+    def buildNumber = System.getenv("GITHUB_RUN_ID")
+    if (buildNumber != null) {
+        subprojects { project ->
+            project.pluginManager.withPlugin("maven-publish") { plugin ->
+                def publishExtension = extensions.getByType(PublishingExtension.class)
+                publishExtension.repositories {
+                    maven {
+                        name("CI")
+                        url("file://${rootProject.buildDir}/ci-repo")
+                    }
+                }
+                project.publishing.publications.all {
+                    // update version to have suffix of build id
+                    it.version = "${it.version}-build_$buildNumber"
+                }
+            }
+        }
+    }
+
+}
