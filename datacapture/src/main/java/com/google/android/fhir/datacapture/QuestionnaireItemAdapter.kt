@@ -31,6 +31,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextQuanti
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextSingleLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemSliderViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.fhir.r4.core.Questionnaire
@@ -66,6 +67,8 @@ internal class QuestionnaireItemAdapter :
                 QuestionnaireItemDisplayViewHolderFactory
             QuestionnaireItemViewHolderType.QUANTITY ->
                 QuestionnaireItemEditTextQuantityViewHolderFactory
+            QuestionnaireItemViewHolderType.SLIDER ->
+                QuestionnaireItemSliderViewHolderFactory
         }
         return viewHolderFactory.create(parent)
     }
@@ -94,7 +97,7 @@ internal class QuestionnaireItemAdapter :
             QuestionnaireItemTypeCode.Value.TEXT ->
                 QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE
             QuestionnaireItemTypeCode.Value.INTEGER ->
-                QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
+                getIntegerViewHolderType(questionnaireItem)
             QuestionnaireItemTypeCode.Value.DECIMAL ->
                 QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
             QuestionnaireItemTypeCode.Value.CHOICE ->
@@ -121,6 +124,15 @@ internal class QuestionnaireItemAdapter :
             return QuestionnaireItemViewHolderType.RADIO_GROUP
         }
     }
+
+    private fun getIntegerViewHolderType(questionnaireItem: Questionnaire.Item):
+        QuestionnaireItemViewHolderType {
+        if (questionnaireItem.itemControl == ITEM_CONTROL_SLIDER) {
+            return QuestionnaireItemViewHolderType.SLIDER
+        }
+        return QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
+    }
+
 
     internal companion object {
         // Choice questions are rendered as radio group if number of options less than this constant

@@ -20,6 +20,7 @@ import com.google.fhir.r4.core.Questionnaire
 
 internal const val ITEM_CONTROL_DROP_DOWN = "drop-down"
 internal const val ITEM_CONTROL_RADIO_BUTTON = "radio-button"
+internal const val ITEM_CONTROL_SLIDER = "slider"
 
 internal const val EXTENSION_ITEM_CONTROL_URL =
     "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
@@ -38,6 +39,7 @@ internal val Questionnaire.Item.itemControl: String?
         ) {
             ITEM_CONTROL_DROP_DOWN -> ITEM_CONTROL_DROP_DOWN
             ITEM_CONTROL_RADIO_BUTTON -> ITEM_CONTROL_RADIO_BUTTON
+            ITEM_CONTROL_SLIDER -> ITEM_CONTROL_SLIDER
             else -> null
         }
     }
