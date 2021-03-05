@@ -30,14 +30,10 @@ import org.json.JSONObject
 
 object LocalChangeUtils {
 
-    /**
-     * Squash the changes by merging them two at a time.
-     */
-    @JvmStatic
+    /** Squash the changes by merging them two at a time. */
     fun squash(localChanges: List<LocalChange>): LocalChange =
-            localChanges.reduce { first, second -> mergeLocalChanges(first, second) }
+        localChanges.reduce { first, second -> mergeLocalChanges(first, second) }
 
-    @JvmStatic
     fun mergeLocalChanges(first: LocalChange, second: LocalChange): LocalChange {
         val type: LocalChange.Type
         val payload: String
@@ -75,10 +71,7 @@ object LocalChangeUtils {
         )
     }
 
-    /**
-     * Update a JSON object with a JSON patch (RFC 6902).
-     */
-    @JvmStatic
+    /** Update a JSON object with a JSON patch (RFC 6902). */
     private fun applyPatch(resourceString: String, patchString: String): String {
         val objectMapper = ObjectMapper()
         val resourceJson = objectMapper.readValue(resourceString, JsonNode::class.java)
@@ -86,10 +79,7 @@ object LocalChangeUtils {
         return patchJson.apply(resourceJson).toString()
     }
 
-    /**
-     * Merge two JSON patch strings by concatenating their elements into a new JSON array.
-     */
-    @JvmStatic
+    /**  Merge two JSON patch strings by concatenating their elements into a new JSON array. */
     private fun mergePatches(firstPatch: String, secondPatch: String): String {
         // TODO: validate patches are RFC 6902 compliant JSON patches
         val firstMap = JSONArray(firstPatch).patchMergeMap()
@@ -98,10 +88,7 @@ object LocalChangeUtils {
         return JSONArray(firstMap.values).toString()
     }
 
-    /**
-     * Calculates the JSON patch between two [Resource]s.
-     */
-    @JvmStatic
+    /** Calculates the JSON patch between two [Resource]s. */
     internal fun diff(parser: IParser, source: Resource, target: Resource): String {
         val objectMapper = ObjectMapper()
         val jsonDiff = JsonDiff.asJson(
@@ -116,8 +103,8 @@ object LocalChangeUtils {
         )
         if (jsonDiff.size() == 0) {
             Log.i(
-            "ResourceDao",
-            "Target ${target.resourceType}/${target.id} is same as source."
+                "ResourceDao",
+                "Target ${target.resourceType}/${target.id} is same as source."
             )
         }
         return jsonDiff.toString()
