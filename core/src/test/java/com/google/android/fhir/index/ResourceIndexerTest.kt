@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.index.impl
+package com.google.android.fhir.index
 
 import android.os.Build
 import ca.uhn.fhir.context.FhirContext
-import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.NumberIndex
 import com.google.android.fhir.index.entities.QuantityIndex

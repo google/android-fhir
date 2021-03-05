@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.index.entities
+package org.fhir.ucum
 
-/**
- * An index record for a token value in a resource.
- *
- * See https://hl7.org/FHIR/search.html#token.
- */
-internal data class TokenIndex(
-    /** The name of the code index, e.g. "code". */
-    val name: String,
-    /** The path of the code index, e.g. "Observation.code". */
-    val path: String,
-    /** The system of the code index, e.g. "http://openmrs.org/concepts". */
-    val system: String?,
-    /** The value of the code index, e.g. "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA". */
-    val value: String
-)
+import org.hl7.fhir.exceptions.FHIRException
+
+/** Needed for HAPI's FHIRPathEngine. See https://github.com/hapifhir/hapi-fhir/issues/2443. */
+class UcumException : FHIRException {
+    constructor() {}
+    constructor(message: String?, cause: Throwable?) : super(message, cause) {}
+    constructor(message: String?) : super(message) {}
+    constructor(cause: Throwable?) : super(cause) {}
+}
