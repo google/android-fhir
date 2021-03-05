@@ -276,7 +276,7 @@ class ResourceIndexerTest {
         assertThat(resourceIndices.dateIndices)
             .contains(
                 DateIndex(
-                    "lastUpdated",
+                    "_lastUpdated",
                     "Patient.meta.lastUpdated",
                     lastUpdatedElement.getValue().getTime(),
                     lastUpdatedElement.getValue().getTime(),
