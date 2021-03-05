@@ -79,5 +79,6 @@ internal object DbTypeConverters {
 
     @JvmStatic
     @TypeConverter
-    fun intToLocalChangeType(value: Int): LocalChangeEntity.Type = LocalChangeEntity.Type.from(value)
+    fun intToLocalChangeType(value: Int): LocalChangeEntity.Type =
+        LocalChangeEntity.Type.from(value)
 }
