@@ -23,7 +23,7 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
-import com.google.android.fhir.db.impl.entities.LocalChange
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.impl.Query
@@ -181,10 +181,10 @@ internal class DatabaseImpl(
 
     /**
      * @returns a list of pairs. Each pair is a token + squashed local change. Each token is a list
-     * of [LocalChange.id]s of rows of the [LocalChange].
+     * of [LocalChangeEntity.id]s of rows of the [LocalChangeEntity].
      */
     // TODO: create a data class for squashed local change and merge token in to it.
-    override fun getAllLocalChanges(): List<Pair<LocalChangeToken, LocalChange>> =
+    override fun getAllLocalChanges(): List<Pair<LocalChangeToken, LocalChangeEntity>> =
         localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }
             .values
             .map {

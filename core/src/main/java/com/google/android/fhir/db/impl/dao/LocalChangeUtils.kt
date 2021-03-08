@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.JsonPatch
 import com.github.fge.jsonpatch.diff.JsonDiff
-import com.google.android.fhir.db.impl.entities.LocalChange
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.Resource
 import org.json.JSONArray
@@ -30,21 +30,23 @@ import org.json.JSONObject
 
 object LocalChangeUtils {
 
-    /** Squash the changes by merging them two at a time. */
-    fun squash(localChanges: List<LocalChange>): LocalChange =
-        localChanges.reduce { first, second -> mergeLocalChanges(first, second) }
+    /**
+     * Squash the changes by merging them two at a time.
+     */
+    fun squash(localChangeEntities: List<LocalChangeEntity>): LocalChangeEntity =
+        localChangeEntities.reduce { first, second -> mergeLocalChanges(first, second) }
 
-    fun mergeLocalChanges(first: LocalChange, second: LocalChange): LocalChange {
-        val type: LocalChange.Type
+    fun mergeLocalChanges(first: LocalChangeEntity, second: LocalChangeEntity): LocalChangeEntity {
+        val type: LocalChangeEntity.Type
         val payload: String
         when (second.type) {
-            LocalChange.Type.UPDATE -> when {
-                first.type.equals(LocalChange.Type.UPDATE) -> {
-                    type = LocalChange.Type.UPDATE
+            LocalChangeEntity.Type.UPDATE -> when {
+                first.type.equals(LocalChangeEntity.Type.UPDATE) -> {
+                    type = LocalChangeEntity.Type.UPDATE
                     payload = mergePatches(first.payload, second.payload)
                 }
-                first.type.equals(LocalChange.Type.INSERT) -> {
-                    type = LocalChange.Type.INSERT
+                first.type.equals(LocalChangeEntity.Type.INSERT) -> {
+                    type = LocalChangeEntity.Type.INSERT
                     payload = applyPatch(first.payload, second.payload)
                 }
                 else -> {
@@ -53,16 +55,16 @@ object LocalChangeUtils {
                     )
                 }
             }
-            LocalChange.Type.DELETE -> {
-                type = LocalChange.Type.DELETE
+            LocalChangeEntity.Type.DELETE -> {
+                type = LocalChangeEntity.Type.DELETE
                 payload = ""
             }
-            LocalChange.Type.INSERT -> {
-                type = LocalChange.Type.INSERT
+            LocalChangeEntity.Type.INSERT -> {
+                type = LocalChangeEntity.Type.INSERT
                 payload = second.payload
             }
         }
-        return LocalChange(
+        return LocalChangeEntity(
             id = 0,
             resourceId = second.resourceId,
             resourceType = second.resourceType,
