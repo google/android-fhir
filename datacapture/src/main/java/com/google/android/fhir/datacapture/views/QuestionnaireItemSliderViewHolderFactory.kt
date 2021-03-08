@@ -42,6 +42,9 @@ internal object QuestionnaireItemSliderViewHolderFactory : QuestionnaireItemView
                 val questionnaireItem = questionnaireItemViewItem.questionnaireItem
                 val answer = questionnaireItemViewItem.singleAnswerOrNull
                 sliderHeader.text = questionnaireItem.text.value
+                slider.valueFrom = 0.0F
+                slider.valueTo = 100.0F
+                slider.stepSize = 10.0F
                 val sliderValue = answer?.value?.integer?.value?.toString() ?: "0.0"
                 slider.value = sliderValue.toFloat()
 

@@ -14,8 +14,5 @@
     <com.google.android.material.slider.Slider
         android:id="@+id/slider"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:valueFrom="0.0"
-        android:valueTo="100.0"
-        android:stepSize="10.0"/>
+        android:layout_height="wrap_content" />
 </LinearLayout>
