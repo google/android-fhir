@@ -42,9 +42,10 @@ class QuestionnaireActivity : AppCompatActivity() {
         // Only add the fragment once, when the activity is first created.
         if (savedInstanceState == null) {
             val fragment = QuestionnaireFragment()
+
             fragment.arguments = bundleOf(
                 QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire,
-                QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to viewModel.questionnaireResponseJson // ktlint-disable max-line-length
+                QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to viewModel.questionnaireResponse // ktlint-disable max-line-length
             )
 
             supportFragmentManager.commit {
