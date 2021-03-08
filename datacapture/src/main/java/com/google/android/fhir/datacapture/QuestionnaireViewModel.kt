@@ -50,7 +50,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
                 JsonFormat.getParser()
                     .merge(questionnaireJsonResponseString, questionnaireResponseBuilder)
                     .build()
-            validateQuestionnaireResponse(questionnaire.itemList, questionnaireResponse.itemList)
+            validateQuestionniareResponseItems(questionnaire.itemList, questionnaireResponse.itemList)
             questionnaireResponseBuilder = questionnaireResponse.toBuilder()
         } else {
             questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
@@ -173,10 +173,8 @@ private fun Questionnaire.Item.createQuestionnaireResponseItem():
     return QuestionnaireResponse.Item.newBuilder().apply {
         linkId = com.google.fhir.r4.core.String.newBuilder()
             .setValue(this@createQuestionnaireResponseItem.linkId.value).build()
-        text = com.google.fhir.r4.core.String.newBuilder()
-            .setValue(this@createQuestionnaireResponseItem.text.value).build()
         this@createQuestionnaireResponseItem.itemList.forEach {
-                this.addItem(it.createQuestionnaireResponseItem())
+            this.addItem(it.createQuestionnaireResponseItem())
         }
     }
 }
@@ -188,29 +186,36 @@ private fun Questionnaire.Item.createQuestionnaireResponseItem():
  * The traverse is carried out in the two lists in tandem. The two lists should be structurally
  * identical.
  */
-internal fun validateQuestionnaireResponse(
+internal fun validateQuestionniareResponseItems(
     questionnaireItemList: List<Questionnaire.Item>,
     questionnaireResponseItemList: List<QuestionnaireResponse.Item>
-): Boolean {
+) {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
     while (
         questionnaireItemListIterator.hasNext() &&
         questionnaireResponseItemListIterator.hasNext()
     ) {
-        // TODO: Validate type and item nesting
+        // TODO: Validate type and item nesting within answers for repeated answers https://github.com/google/android-fhir/issues/286
         val questionnaireItem = questionnaireItemListIterator.next()
         val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
-        if (
-            questionnaireItemListIterator.hasNext() xor
-            questionnaireResponseItemListIterator.hasNext()
-        )
-            throw IllegalArgumentException("Structure mismatch")
         if (!questionnaireItem.linkId.equals(questionnaireResponseItem.linkId))
             throw IllegalArgumentException("linkId mismatch")
-        validateQuestionnaireResponse(
-            questionnaireItem.itemList,
-            questionnaireResponseItem.itemList)
+        if(questionnaireItem.type.value.equals(QuestionnaireItemTypeCode.Value.GROUP)) {
+            validateQuestionniareResponseItems(
+                questionnaireItem.itemList,
+                questionnaireResponseItem.itemList
+            )
+        } else {
+            validateQuestionniareResponseItems(
+                questionnaireItem.itemList,
+                questionnaireResponseItem.answerList.first().itemList
+            )
+        }
     }
-    return true
+    if (
+        questionnaireItemListIterator.hasNext() xor
+        questionnaireResponseItemListIterator.hasNext()
+    )
+        throw IllegalArgumentException("Structure mismatch")
 }
