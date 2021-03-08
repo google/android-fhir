@@ -33,6 +33,7 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory : QuestionnaireItemVi
             override fun init(itemView: View) {
                 checkBox = itemView.findViewById(R.id.check_box)
                 checkBox.setOnClickListener {
+                    // if-else block to prevent over-writing of "items" nested within "answer"
                     if(questionnaireItemViewItem.singleAnswerOrNull != null){
                         questionnaireItemViewItem.singleAnswerOrNull?.value =
                             questionnaireItemViewItem.singleAnswerOrNull?.valueBuilder
