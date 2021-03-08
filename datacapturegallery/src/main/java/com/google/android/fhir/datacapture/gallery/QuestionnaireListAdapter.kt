@@ -43,12 +43,12 @@ class QuestionnaireListAdapter(
                     )
                     putExtra(
                         QuestionnaireActivity.QUESTIONNAIRE_FILE_PATH_KEY,
-                        questionnairelistItem.pathQuestionnaire
+                        questionnairelistItem.questionnairePath
                     )
-                    questionnairelistItem.pathQuestionnaireResponse?.let {
+                    questionnairelistItem.questionnaireResponsePath?.let {
                         putExtra(
                             QuestionnaireActivity.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY,
-                            questionnairelistItem.pathQuestionnaireResponse
+                            questionnairelistItem.questionnaireResponsePath
                         )
                     }
                 })

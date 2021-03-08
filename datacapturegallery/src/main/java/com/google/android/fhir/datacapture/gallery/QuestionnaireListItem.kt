@@ -19,20 +19,20 @@ package com.google.android.fhir.datacapture.gallery
 /**
  * @param name the name of the questionnaire to be displayed
  * @param description the description of the questionnaire to be displayed
- * @param pathQuestionnaire the questionnaire's JSON filename in the assets directory
- * @param pathQuestionnaireResponse the corresponding questionnaireResponse's JSON filename in the assets directory (optional)
+ * @param questionnairePath the questionnaire's JSON filename in the assets directory
+ * @param questionnaireResponsePath the corresponding questionnaireResponse's JSON filename in the assets directory (optional)
  */
 data class QuestionnaireListItem(
     val name: String,
     val description: String,
-    val pathQuestionnaire: String,
-    val pathQuestionnaireResponse: String?
+    val questionnairePath: String,
+    val questionnaireResponsePath: String?
 ) {
 
     constructor(
         name: String,
         description: String,
-        pathQuestionnaire: String
+        questionnairePath: String
     ) :
-        this(name, description, pathQuestionnaire, null)
+        this(name, description, questionnairePath, null)
 }
