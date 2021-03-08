@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
                     "Neonate record from New South Wales, Australia pre-filled",
                     "HL7 example \"bb\" with questionnaire response to pre-fill answers",
                     "hl7-questionnaire-example-bluebook.json",
-                "hl7-questionnaireresponse-example-bluebook.json"
+                    "hl7-questionnaireresponse-example-bluebook.json"
                 )
             )
         )
