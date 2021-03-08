@@ -50,7 +50,9 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
                 JsonFormat.getParser()
                     .merge(questionnaireJsonResponseString, questionnaireResponseBuilder)
                     .build()
-            validateQuestionniareResponseItems(questionnaire.itemList, questionnaireResponse.itemList)
+            validateQuestionniareResponseItems(
+                questionnaire.itemList, questionnaireResponse.itemList
+            )
             questionnaireResponseBuilder = questionnaireResponse.toBuilder()
         } else {
             questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
@@ -201,7 +203,7 @@ internal fun validateQuestionniareResponseItems(
         val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
         if (!questionnaireItem.linkId.equals(questionnaireResponseItem.linkId))
             throw IllegalArgumentException("linkId mismatch")
-        if(questionnaireItem.type.value.equals(QuestionnaireItemTypeCode.Value.GROUP)) {
+        if (questionnaireItem.type.value.equals(QuestionnaireItemTypeCode.Value.GROUP)) {
             validateQuestionniareResponseItems(
                 questionnaireItem.itemList,
                 questionnaireResponseItem.itemList

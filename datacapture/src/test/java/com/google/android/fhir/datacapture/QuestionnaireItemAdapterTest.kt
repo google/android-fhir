@@ -324,7 +324,7 @@ class QuestionnaireItemAdapterTest {
                                                         )
                                                         .setSystem(
                                                             Uri.newBuilder()
-                                                                .setValue(EXTENSION_ITEM_CONTROL_SYSTEM)// ktlint ignore max-line-limit
+                                                                .setValue(EXTENSION_ITEM_CONTROL_SYSTEM) // ktlint ignore max-line-limit
                                                         )
                                                 )
                                         )
