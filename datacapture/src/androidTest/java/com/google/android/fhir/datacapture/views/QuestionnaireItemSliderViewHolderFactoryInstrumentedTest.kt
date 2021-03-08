@@ -22,8 +22,8 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
-import com.google.common.truth.Truth
-import com.google.fhir.r4.core.Boolean
+import com.google.android.material.slider.Slider
+import com.google.common.truth.Truth.assertThat
 import com.google.fhir.r4.core.Integer
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireResponse
@@ -58,7 +58,7 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
             ) {}
         )
 
-        Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.slider_header).text)
+        assertThat(viewHolder.itemView.findViewById<TextView>(R.id.slider_header).text)
             .isEqualTo("Question?")
     }
 
@@ -69,26 +69,27 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
             QuestionnaireResponse.Item.newBuilder()
         ) {}
 
-        Truth.assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
+        assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
     }
 
     @Test
     fun singleAnswerOrNull_singleAnswer_shouldReturnSingleAnswer() {
-        val questionnaireItemViewItem = QuestionnaireItemViewItem(
-            Questionnaire.Item.getDefaultInstance(),
-            QuestionnaireResponse.Item.newBuilder().apply {
-                addAnswer(
-                    QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                        value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setInteger(Integer.newBuilder().setValue(5).build())
-                            .build()
-                    }
-                )
-            }
-        ) {}
+        viewHolder.bind(
+            QuestionnaireItemViewItem(
+                Questionnaire.Item.getDefaultInstance(),
+                QuestionnaireResponse.Item.newBuilder().apply {
+                    addAnswer(
+                        QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                            value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                                .setInteger(Integer.newBuilder().setValue(10).build())
+                                .build()
+                        }
+                    )
+                }
+            ) {}
+        )
 
-        Truth.assertThat(questionnaireItemViewItem.singleAnswerOrNull!!.value.integer.value)
-            .isEqualTo(5)
+        assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(10)
     }
 
     @Test
@@ -99,20 +100,20 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
                 addAnswer(
                     QuestionnaireResponse.Item.Answer.newBuilder().apply {
                         value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setBoolean(Boolean.newBuilder().setValue(true))
+                            .setInteger(Integer.newBuilder().setValue(10).build())
                             .build()
                     }
                 )
                 addAnswer(
                     QuestionnaireResponse.Item.Answer.newBuilder().apply {
                         value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setBoolean(Boolean.newBuilder().setValue(true))
+                            .setInteger(Integer.newBuilder().setValue(10).build())
                             .build()
                     }
                 )
             }
         ) {}
 
-        Truth.assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
+        assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
     }
 }
