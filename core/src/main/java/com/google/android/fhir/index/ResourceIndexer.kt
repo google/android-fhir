@@ -88,6 +88,8 @@ internal object ResourceIndexer {
                 SearchParamType.URI -> uriIndex(searchParam, value)?.also {
                     indexBuilder.addUriIndex(it)
                 }
+                // TODO: Handle composite type https://github.com/google/android-fhir/issues/292.
+                // TODO: Handle special type https://github.com/google/android-fhir/issues/293.
             }
         }
 
@@ -196,8 +198,8 @@ internal object ResourceIndexer {
             else -> listOf()
         }
 
-    private fun referenceIndex(searchParam: SearchParamDefinition, value: Base?): ReferenceIndex? {
-        val reference = (value as Reference)?.reference
+    private fun referenceIndex(searchParam: SearchParamDefinition, value: Base): ReferenceIndex? {
+        val reference = (value as Reference).reference
         return reference?.let {
             ReferenceIndex(searchParam.name, searchParam.path, it)
         }
