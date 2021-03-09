@@ -188,7 +188,7 @@ private fun Questionnaire.Item.createQuestionnaireResponseItem():
  * The traverse is carried out in the two lists in tandem. The two lists should be structurally
  * identical.
  */
-internal fun validateQuestionniareResponseItems(
+private fun validateQuestionniareResponseItems(
     questionnaireItemList: List<Questionnaire.Item>,
     questionnaireResponseItemList: List<QuestionnaireResponse.Item>
 ) {
