@@ -81,6 +81,9 @@ dependencies {
 
     coreLibraryDesugaring deps.desugar
 
+    // Needed for use of HAPI's FHIRPathEngine.
+    // See https://github.com/hapifhir/hapi-fhir/issues/2444.
+    implementation deps.caffeine
     implementation deps.cql_engine.fhir
     implementation deps.guava
     implementation deps.kotlin.stdlib
