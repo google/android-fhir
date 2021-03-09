@@ -73,7 +73,7 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
     }
 
     @Test
-    fun singleAnswerOrNull_singleAnswer_shouldReturnSingleAnswer() {
+    fun shouldSetSliderValue() {
         viewHolder.bind(
             QuestionnaireItemViewItem(
                 Questionnaire.Item.getDefaultInstance(),
@@ -93,7 +93,23 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
     }
 
     @Test
-    fun singleAnswerOrNull_multipleAnswers_shouldReturnNull() {
+    fun shouldSetQuestionnaireResponseSliderAnswer() {
+        val questionnaireItemViewItem = QuestionnaireItemViewItem(
+            Questionnaire.Item.getDefaultInstance(),
+            QuestionnaireResponse.Item.newBuilder()
+        ) {}
+
+        viewHolder.bind(questionnaireItemViewItem)
+        viewHolder.itemView.findViewById<Slider>(R.id.slider)
+            .value = 10.0F
+
+        val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerBuilderList
+        assertThat(answer.size).isEqualTo(1)
+        assertThat(answer[0].value.integer.value).isEqualTo(10)
+    }
+
+    @Test
+    fun shouldSetAnswerToNull() {
         val questionnaireItemViewItem = QuestionnaireItemViewItem(
             Questionnaire.Item.getDefaultInstance(),
             QuestionnaireResponse.Item.newBuilder().apply {
@@ -115,5 +131,32 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
         ) {}
 
         assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
+    }
+
+    @Test
+    fun shouldSetSliderValueToDefault() {
+        viewHolder.bind(
+            QuestionnaireItemViewItem(
+                Questionnaire.Item.getDefaultInstance(),
+                QuestionnaireResponse.Item.newBuilder().apply {
+                    addAnswer(
+                        QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                            value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                                .setInteger(Integer.newBuilder().setValue(10).build())
+                                .build()
+                        }
+                    )
+                    addAnswer(
+                        QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                            value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                                .setInteger(Integer.newBuilder().setValue(10).build())
+                                .build()
+                        }
+                    )
+                }
+            ) {}
+        )
+
+        assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(0.0F)
     }
 }

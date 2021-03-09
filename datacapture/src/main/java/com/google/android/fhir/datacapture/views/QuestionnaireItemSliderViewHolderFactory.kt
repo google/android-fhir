@@ -57,8 +57,8 @@ internal object QuestionnaireItemSliderViewHolderFactory : QuestionnaireItemView
                                     .build()).build()
 
                             questionnaireItemViewItem.singleAnswerOrNull = this
-                            questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
                         }
+                    questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
                 }
             }
         }
