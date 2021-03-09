@@ -50,14 +50,13 @@ internal object QuestionnaireItemSliderViewHolderFactory : QuestionnaireItemView
 
                 slider.addOnChangeListener { _, newValue, _ ->
                     // Responds to when slider's value is changed
-                    QuestionnaireResponse.Item.Answer.newBuilder()
-                        .apply {
-                            value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                                .setInteger(Integer.newBuilder().setValue(newValue.toInt())
-                                    .build()).build()
-
-                            questionnaireItemViewItem.singleAnswerOrNull = this
-                        }
+                    questionnaireItemViewItem.singleAnswerOrNull =
+                        QuestionnaireResponse.Item.Answer.newBuilder()
+                            .apply {
+                                value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                                    .setInteger(Integer.newBuilder().setValue(newValue.toInt())
+                                        .build()).build()
+                            }
                     questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
                 }
             }
