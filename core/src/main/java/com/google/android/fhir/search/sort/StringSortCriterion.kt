@@ -26,13 +26,10 @@ import com.google.android.fhir.search.filter.FilterCriterion
  * * name that matches 'Tom'
  * * address that includes 'London'
  */
-data class StringSortCriterion constructor(
-    val stringParam: StringClientParam,
-    override val ascending: Boolean
-) : SortCriterion {
-    override val table: String = "StringIndexEntity"
-    override val param = stringParam.paramName
+data class StringSortCriterion
+constructor(val stringParam: StringClientParam, override val ascending: Boolean) : SortCriterion {
+  override val table: String = "StringIndexEntity"
+  override val param = stringParam.paramName
 }
 
-fun stringSort(param: StringClientParam, ascending: Boolean) =
-    StringSortCriterion(param, ascending)
+fun stringSort(param: StringClientParam, ascending: Boolean) = StringSortCriterion(param, ascending)

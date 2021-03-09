@@ -21,25 +21,26 @@ import com.google.fhir.r4.core.Integer
 import com.google.fhir.r4.core.QuestionnaireResponse
 
 internal object QuestionnaireItemEditTextIntegerViewHolderFactory :
-    QuestionnaireItemEditTextViewHolderFactory() {
-    override fun getQuestionnaireItemViewHolderDelegate() =
-        object : QuestionnaireItemEditTextViewHolderDelegate(
-            InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
-            true
-        ) {
-            override fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder? {
-                return text.toIntOrNull()?.let {
-                    QuestionnaireResponse.Item.Answer.newBuilder()
-                        .apply {
-                            value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                                .setInteger(Integer.newBuilder().setValue(it).build())
-                                .build()
-                        }
-                }
-            }
-
-            override fun getText(answer: QuestionnaireResponse.Item.Answer.Builder?): String {
-                return answer?.value?.integer?.value?.toString() ?: ""
-            }
+  QuestionnaireItemEditTextViewHolderFactory() {
+  override fun getQuestionnaireItemViewHolderDelegate() =
+    object :
+      QuestionnaireItemEditTextViewHolderDelegate(
+        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
+        true
+      ) {
+      override fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder? {
+        return text.toIntOrNull()?.let {
+          QuestionnaireResponse.Item.Answer.newBuilder().apply {
+            value =
+              QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                .setInteger(Integer.newBuilder().setValue(it).build())
+                .build()
+          }
         }
+      }
+
+      override fun getText(answer: QuestionnaireResponse.Item.Answer.Builder?): String {
+        return answer?.value?.integer?.value?.toString() ?: ""
+      }
+    }
 }

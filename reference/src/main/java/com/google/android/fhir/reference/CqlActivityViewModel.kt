@@ -26,40 +26,38 @@ import com.google.android.fhir.sync.SyncData
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.ResourceType
 
-class CqlActivityViewModel(
-    private val fhirEngine: FhirEngine
-) : ViewModel() {
+class CqlActivityViewModel(private val fhirEngine: FhirEngine) : ViewModel() {
 
-    init {
-        requestPatients()
+  init {
+    requestPatients()
+  }
+
+  private fun requestPatients() {
+    viewModelScope.launch {
+      val syncData =
+        listOf(
+          SyncData(
+            // For the purpose of demo, sync patients that live in Nairobi.
+            resourceType = ResourceType.Patient,
+            // add "_revinclude" to "Observation:subject" to return Observations for
+            // the patients.
+            params = mapOf("address-city" to "NAIROBI")
+          )
+        )
+
+      val syncConfig = SyncConfiguration(syncData = syncData)
+      val result = fhirEngine.sync(syncConfig)
+      Log.d("CqlActivityViewModel", "sync result: $result")
     }
-
-    private fun requestPatients() {
-        viewModelScope.launch {
-            val syncData = listOf(
-                SyncData(
-                    // For the purpose of demo, sync patients that live in Nairobi.
-                    resourceType = ResourceType.Patient,
-                    // add "_revinclude" to "Observation:subject" to return Observations for
-                    // the patients.
-                    params = mapOf("address-city" to "NAIROBI")
-                )
-            )
-
-            val syncConfig = SyncConfiguration(syncData = syncData)
-            val result = fhirEngine.sync(syncConfig)
-            Log.d("CqlActivityViewModel", "sync result: $result")
-        }
-    }
+  }
 }
 
-class CqlLoadActivityViewModelFactory(
-    private val fhirEngine: FhirEngine
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(CqlActivityViewModel::class.java)) {
-            return CqlActivityViewModel(fhirEngine) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
+class CqlLoadActivityViewModelFactory(private val fhirEngine: FhirEngine) :
+  ViewModelProvider.Factory {
+  override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    if (modelClass.isAssignableFrom(CqlActivityViewModel::class.java)) {
+      return CqlActivityViewModel(fhirEngine) as T
     }
+    throw IllegalArgumentException("Unknown ViewModel class")
+  }
 }

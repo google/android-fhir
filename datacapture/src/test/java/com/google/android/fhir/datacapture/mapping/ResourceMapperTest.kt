@@ -33,10 +33,11 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class ResourceMapperTest {
-    @Test
-    fun extract() {
-        // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
-        val questionnaireJson = """
+  @Test
+  fun extract() {
+    // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
+    val questionnaireJson =
+      """
             {
               "resourceType": "Questionnaire",
               "subjectType": [
@@ -72,10 +73,11 @@ class ResourceMapperTest {
               ]
             }
         """.trimIndent()
-        val questionnaireBuilder = Questionnaire.newBuilder()
-        JsonFormat.getParser().merge(questionnaireJson, questionnaireBuilder)
+    val questionnaireBuilder = Questionnaire.newBuilder()
+    JsonFormat.getParser().merge(questionnaireJson, questionnaireBuilder)
 
-        val questionnaireResponseJson = """
+    val questionnaireResponseJson =
+      """
             {
               "resourceType": "QuestionnaireResponse",
               "item": [
@@ -103,24 +105,23 @@ class ResourceMapperTest {
               ]
             }
         """.trimIndent()
-        val questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
-        JsonFormat.getParser().merge(questionnaireResponseJson, questionnaireResponseBuilder)
+    val questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
+    JsonFormat.getParser().merge(questionnaireResponseJson, questionnaireResponseBuilder)
 
-        val patient = ResourceMapper.extract(
-            questionnaireBuilder.build(),
-            questionnaireResponseBuilder.build()
-        ) as Patient
+    val patient =
+      ResourceMapper.extract(questionnaireBuilder.build(), questionnaireResponseBuilder.build()) as
+        Patient
 
-        assertThat(patient.birthDate).isEqualTo(
-            Date.newBuilder()
-                .setValueUs(
-                    LocalDate.of(2021, 1, 1)
-                        .atStartOfDay(ZoneId.systemDefault())
-                        .toEpochSecond() * 1000000)
-                .setTimezone(ZoneId.systemDefault().id)
-                .setPrecision(Date.Precision.DAY)
-                .build()
-        )
-        assertThat(patient.active.value).isTrue()
-    }
+    assertThat(patient.birthDate)
+      .isEqualTo(
+        Date.newBuilder()
+          .setValueUs(
+            LocalDate.of(2021, 1, 1).atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000000
+          )
+          .setTimezone(ZoneId.systemDefault().id)
+          .setPrecision(Date.Precision.DAY)
+          .build()
+      )
+    assertThat(patient.active.value).isTrue()
+  }
 }

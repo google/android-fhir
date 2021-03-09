@@ -16,17 +16,13 @@
 
 package com.google.android.fhir.sync
 
-/**
- * Configuration for synchronization.
- */
+/** Configuration for synchronization. */
 data class SyncConfiguration(
-    /**
-     *  Data that needs to be synchronised
-     */
-    val syncData: List<SyncData> = emptyList(),
-    /**
-     *  true if the SDK needs to retry a failed sync attempt, false otherwise
-     *  If this is set to true, then the result of the sync will be reported after the retry.
-     */
-    val retry: Boolean = false
+  /** Data that needs to be synchronised */
+  val syncData: List<SyncData> = emptyList(),
+  /**
+   * true if the SDK needs to retry a failed sync attempt, false otherwise If this is set to true,
+   * then the result of the sync will be reported after the retry.
+   */
+  val retry: Boolean = false
 )

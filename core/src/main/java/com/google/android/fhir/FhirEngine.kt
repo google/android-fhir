@@ -23,61 +23,61 @@ import com.google.android.fhir.sync.SyncConfiguration
 import org.hl7.fhir.r4.model.Resource
 import org.opencds.cqf.cql.execution.EvaluationResult
 
-/** The FHIR Engine interface that handles the local storage of FHIR resources.  */
+/** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface FhirEngine {
-    /**
-     * Saves a FHIR `resource` in the local storage. If the resource already exists, it will be
-     * overwritten
-     *
-     * @param <R> The resource type which should be a subtype of [Resource].
-     */
-    fun <R : Resource> save(resource: R)
+  /**
+   * Saves a FHIR `resource` in the local storage. If the resource already exists, it will be
+   * overwritten
+   *
+   * @param <R> The resource type which should be a subtype of [Resource].
+   */
+  fun <R : Resource> save(resource: R)
 
-    /**
-     * Saves a list of FHIR `resource` in the local storage. If any of the resources already
-     * exist, they will be overwritten.
-     *
-     * @param <R> The resource type which should be a subtype of [Resource].
-     */
-    fun <R : Resource> saveAll(resources: List<R>)
+  /**
+   * Saves a list of FHIR `resource` in the local storage. If any of the resources already exist,
+   * they will be overwritten.
+   *
+   * @param <R> The resource type which should be a subtype of [Resource].
+   */
+  fun <R : Resource> saveAll(resources: List<R>)
 
-    /**
-     * Updates a FHIR `resource` in the local storage.
-     *
-     * @param <R> The resource type which should be a subtype of [Resource].
-     */
-    fun <R : Resource> update(resource: R)
+  /**
+   * Updates a FHIR `resource` in the local storage.
+   *
+   * @param <R> The resource type which should be a subtype of [Resource].
+   */
+  fun <R : Resource> update(resource: R)
 
-    /**
-     * Returns a FHIR resource of type `clazz` with `id` from the local storage.
-     *
-     * @param <R> The resource type which should be a subtype of [Resource].
-     * @throws ResourceNotFoundException if the resource is not found
-     */
-    @Throws(ResourceNotFoundException::class)
-    fun <R : Resource> load(clazz: Class<R>, id: String): R
+  /**
+   * Returns a FHIR resource of type `clazz` with `id` from the local storage.
+   *
+   * @param <R> The resource type which should be a subtype of [Resource].
+   * @throws ResourceNotFoundException if the resource is not found
+   */
+  @Throws(ResourceNotFoundException::class) fun <R : Resource> load(clazz: Class<R>, id: String): R
 
-    /**
-     * Removes a FHIR resource of type `clazz` with `id` from the local storage.
-     *
-     * @param <R> The resource type which should be a subtype of [Resource].
-     */
-    fun <R : Resource> remove(clazz: Class<R>, id: String)
+  /**
+   * Removes a FHIR resource of type `clazz` with `id` from the local storage.
+   *
+   * @param <R> The resource type which should be a subtype of [Resource].
+   */
+  fun <R : Resource> remove(clazz: Class<R>, id: String)
 
-    /** Returns the result of a CQL evaluation provided with the ID of the library.  */
-    fun evaluateCql(libraryVersionId: String, context: String, expression: String): EvaluationResult
+  /** Returns the result of a CQL evaluation provided with the ID of the library. */
+  fun evaluateCql(libraryVersionId: String, context: String, expression: String): EvaluationResult
 
-    /** Returns the entry point for [Search]. */
-    fun search(): Search
+  /** Returns the entry point for [Search]. */
+  fun search(): Search
 
-    /**
-     * One time sync.
-     *
-     * @param syncConfiguration - configuration of data that needs to be synchronised
-     */
-    suspend fun sync(syncConfiguration: SyncConfiguration): Result
+  /**
+   * One time sync.
+   *
+   * @param syncConfiguration
+   * - configuration of data that needs to be synchronised
+   */
+  suspend fun sync(syncConfiguration: SyncConfiguration): Result
 
-    suspend fun periodicSync(): Result
+  suspend fun periodicSync(): Result
 
-    fun updatePeriodicSyncConfiguration(syncConfig: PeriodicSyncConfiguration)
+  fun updatePeriodicSyncConfiguration(syncConfig: PeriodicSyncConfiguration)
 }

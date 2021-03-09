@@ -26,29 +26,24 @@ import com.google.fhir.r4.core.QuestionnaireResponse
  *
  * Any `ViewHolder` containing a `EditText` view that collects text data should use this class.
  */
-internal class QuestionnaireItemEditTextStringViewHolderDelegate(
-    isSingleLine: Boolean
-) : QuestionnaireItemEditTextViewHolderDelegate(
-    InputType.TYPE_CLASS_TEXT,
-    isSingleLine
-) {
-    override fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder? {
-        return text.let {
-            if (it.isEmpty()) {
-                null
-            } else {
-                QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                    value =
-                        QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setStringValue(
-                                com.google.fhir.r4.core.String.newBuilder().setValue(it).build()
-                            ).build()
-                }
-            }
+internal class QuestionnaireItemEditTextStringViewHolderDelegate(isSingleLine: Boolean) :
+  QuestionnaireItemEditTextViewHolderDelegate(InputType.TYPE_CLASS_TEXT, isSingleLine) {
+  override fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder? {
+    return text.let {
+      if (it.isEmpty()) {
+        null
+      } else {
+        QuestionnaireResponse.Item.Answer.newBuilder().apply {
+          value =
+            QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+              .setStringValue(com.google.fhir.r4.core.String.newBuilder().setValue(it).build())
+              .build()
         }
+      }
     }
+  }
 
-    override fun getText(answer: QuestionnaireResponse.Item.Answer.Builder?): String {
-        return answer?.value?.stringValue?.value ?: ""
-    }
+  override fun getText(answer: QuestionnaireResponse.Item.Answer.Builder?): String {
+    return answer?.value?.stringValue?.value ?: ""
+  }
 }

@@ -25,30 +25,27 @@ import com.google.android.fhir.index.entities.DateIndex
 import org.hl7.fhir.r4.model.ResourceType
 
 @Entity(
-    indices = [
-        Index(
-            value = ["resourceType", "index_name", "index_tsHigh", "index_tsLow"]
-        ),
-        Index(
-            // keep this index for faster foreign lookup
-            value = ["resourceId", "resourceType"]
-        )
-    ],
-    foreignKeys = [
-        ForeignKey(
-            entity = ResourceEntity::class,
-            parentColumns = ["resourceId", "resourceType"],
-            childColumns = ["resourceId", "resourceType"],
-            onDelete = ForeignKey.CASCADE,
-            onUpdate = ForeignKey.NO_ACTION,
-            deferred = true
-        )
-    ])
+  indices =
+    [
+      Index(value = ["resourceType", "index_name", "index_tsHigh", "index_tsLow"]),
+      Index(
+        // keep this index for faster foreign lookup
+        value = ["resourceId", "resourceType"]
+      )],
+  foreignKeys =
+    [
+      ForeignKey(
+        entity = ResourceEntity::class,
+        parentColumns = ["resourceId", "resourceType"],
+        childColumns = ["resourceId", "resourceType"],
+        onDelete = ForeignKey.CASCADE,
+        onUpdate = ForeignKey.NO_ACTION,
+        deferred = true
+      )]
+)
 internal data class DateIndexEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long,
-    val resourceType: ResourceType,
-    @Embedded(prefix = "index_")
-    val index: DateIndex,
-    val resourceId: String
+  @PrimaryKey(autoGenerate = true) val id: Long,
+  val resourceType: ResourceType,
+  @Embedded(prefix = "index_") val index: DateIndex,
+  val resourceId: String
 )
