@@ -202,7 +202,11 @@ private fun validateQuestionniareResponseItems(
         val questionnaireItem = questionnaireItemListIterator.next()
         val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
         if (!questionnaireItem.linkId.equals(questionnaireResponseItem.linkId))
-            throw IllegalArgumentException("linkId mismatch")
+            throw IllegalArgumentException(
+                "Questionnaire response items mismatch with linkIds " +
+                    questionnaireItem.linkId.value + " and " +
+                    questionnaireResponseItem.linkId.value
+            )
         if (questionnaireItem.type.value.equals(QuestionnaireItemTypeCode.Value.GROUP)) {
             validateQuestionniareResponseItems(
                 questionnaireItem.itemList,
@@ -218,6 +222,17 @@ private fun validateQuestionniareResponseItems(
     if (
         questionnaireItemListIterator.hasNext() xor
         questionnaireResponseItemListIterator.hasNext()
-    )
-        throw IllegalArgumentException("Structure mismatch")
+    ) {
+        if (questionnaireItemListIterator.hasNext()) {
+            throw IllegalArgumentException(
+                "Structure mismatch at Questionnaire item with linkId " +
+                    questionnaireItemListIterator.next().linkId.value
+            )
+        } else {
+            throw IllegalArgumentException(
+                "Structure mismatch at QuestionnaireResponse item with linkId " +
+                    questionnaireResponseItemListIterator.next().linkId.value
+            )
+        }
+    }
 }
