@@ -18,7 +18,7 @@ package com.google.android.fhir.db.impl
 
 import androidx.room.TypeConverter
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
-import com.google.android.fhir.db.impl.entities.LocalChange
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import java.math.BigDecimal
 import java.util.Calendar
 import org.hl7.fhir.r4.model.ResourceType
@@ -75,9 +75,10 @@ internal object DbTypeConverters {
 
     @JvmStatic
     @TypeConverter
-    fun localChangeTypeToInt(updateType: LocalChange.Type): Int = updateType.value
+    fun localChangeTypeToInt(updateType: LocalChangeEntity.Type): Int = updateType.value
 
     @JvmStatic
     @TypeConverter
-    fun intToLocalChangeType(value: Int): LocalChange.Type = LocalChange.Type.from(value)
+    fun intToLocalChangeType(value: Int): LocalChangeEntity.Type =
+        LocalChangeEntity.Type.from(value)
 }

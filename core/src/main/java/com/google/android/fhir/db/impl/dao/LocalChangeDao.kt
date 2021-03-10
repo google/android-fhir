@@ -21,8 +21,8 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.db.impl.entities.LocalChange
-import com.google.android.fhir.db.impl.entities.LocalChange.Type
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
 import com.google.android.fhir.toTimeZoneString
 import java.util.Date
 import org.hl7.fhir.r4.model.Resource
@@ -32,7 +32,7 @@ import org.hl7.fhir.r4.model.ResourceType
  * Dao for local changes made to a resource. One row in LocalChangeEntity corresponds to one change
  * e.g. an INSERT or UPDATE. The UPDATES (diffs) are stored as RFC 6902 JSON patches.
  * When a resource needs to be synced, all corresponding LocalChanges are 'squashed' to create a
- * a single LocalChange to sync with the server.
+ * a single LocalChangeEntity to sync with the server.
  */
 @Dao
 internal abstract class LocalChangeDao {
@@ -40,7 +40,7 @@ internal abstract class LocalChangeDao {
     lateinit var iParser: IParser
 
     @Insert
-    abstract fun addLocalChange(localChange: LocalChange)
+    abstract fun addLocalChange(localChangeEntity: LocalChangeEntity)
 
     @Transaction
     open fun addInsertAll(resources: List<Resource>) {
@@ -56,7 +56,7 @@ internal abstract class LocalChangeDao {
         val resourceString = iParser.encodeResourceToString(resource)
 
         addLocalChange(
-            LocalChange(
+            LocalChangeEntity(
                 id = 0,
                 resourceType = resourceType.name,
                 resourceId = resourceId,
@@ -80,7 +80,7 @@ internal abstract class LocalChangeDao {
         }
 
         addLocalChange(
-            LocalChange(
+            LocalChangeEntity(
                 id = 0,
                 resourceType = resourceType.name,
                 resourceId = resourceId,
@@ -94,7 +94,7 @@ internal abstract class LocalChangeDao {
     fun addDelete(resourceId: String, resourceType: ResourceType) {
         val timestamp = Date().toTimeZoneString()
         addLocalChange(
-            LocalChange(
+            LocalChangeEntity(
                 id = 0,
                 resourceType = resourceType.name,
                 resourceId = resourceId,
@@ -107,7 +107,7 @@ internal abstract class LocalChangeDao {
 
     @Query("""
         SELECT type 
-        FROM LocalChange 
+        FROM LocalChangeEntity 
         WHERE resourceId = :resourceId 
         AND resourceType = :resourceType 
         ORDER BY id ASC
@@ -117,7 +117,7 @@ internal abstract class LocalChangeDao {
 
     @Query("""
         SELECT COUNT(type) 
-        FROM LocalChange 
+        FROM LocalChangeEntity 
         WHERE resourceId = :resourceId 
         AND resourceType = :resourceType
         LIMIT 1
@@ -130,15 +130,15 @@ internal abstract class LocalChangeDao {
     @Query(
         """
         SELECT *
-        FROM LocalChange
-        ORDER BY LocalChange.id ASC"""
+        FROM LocalChangeEntity
+        ORDER BY LocalChangeEntity.id ASC"""
     )
-    abstract fun getAllLocalChanges(): List<LocalChange>
+    abstract fun getAllLocalChanges(): List<LocalChangeEntity>
 
     @Query(
         """
-        DELETE FROM LocalChange
-        WHERE LocalChange.id = (:id)
+        DELETE FROM LocalChangeEntity
+        WHERE LocalChangeEntity.id = (:id)
     """
     )
     abstract fun discardLocalChanges(id: Long)
