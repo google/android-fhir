@@ -26,15 +26,15 @@ import org.hl7.fhir.r4.model.ResourceType
 @Dao
 interface SyncedResourceDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(entity: SyncedResourceEntity)
+  @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun insert(entity: SyncedResourceEntity)
 
-    /**
-     * We will always have 1 entry for each [ResourceType] as it's the primary key, so
-     * we can limit the result to 1. If there is no entry for that [ResourceType] then `null`
-     * will be returned.
-     */
-    @Query("""SELECT lastUpdate FROM SyncedResourceEntity 
-        WHERE resourceType = :resourceType LIMIT 1""")
-    suspend fun getLastUpdate(resourceType: ResourceType): String?
+  /**
+   * We will always have 1 entry for each [ResourceType] as it's the primary key, so we can limit
+   * the result to 1. If there is no entry for that [ResourceType] then `null` will be returned.
+   */
+  @Query(
+    """SELECT lastUpdate FROM SyncedResourceEntity 
+        WHERE resourceType = :resourceType LIMIT 1"""
+  )
+  suspend fun getLastUpdate(resourceType: ResourceType): String?
 }

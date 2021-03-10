@@ -39,81 +39,88 @@ import org.junit.runner.RunWith
 import java.time.LocalDate
 import java.time.ZoneId
 
-@RunWith(AndroidJUnit4::class)
-class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest: BaseRobot() {
-     lateinit var context2: ContextThemeWrapper
-    private lateinit var parent: FrameLayout
-    private lateinit var viewHolder: QuestionnaireItemViewHolder
+class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
+  private lateinit var context: ContextThemeWrapper
+  private lateinit var parent: FrameLayout
+  private lateinit var viewHolder: QuestionnaireItemViewHolder
 
-    @Before
-    fun setUp() {
-        context2 = ContextThemeWrapper(
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            R.style.Theme_MaterialComponents
-        )
-        parent = FrameLayout(context2)
-        viewHolder = QuestionnaireItemDatePickerViewHolderFactory.create(parent)
-    }
+  @Before
+  fun setUp() {
+    context =
+      ContextThemeWrapper(
+        InstrumentationRegistry.getInstrumentation().targetContext,
+        R.style.Theme_MaterialComponents
+      )
+    parent = FrameLayout(context)
+    viewHolder = QuestionnaireItemDatePickerViewHolderFactory.create(parent)
+  }
 
-    @Test
-    fun shouldSetTextInputLayoutHint() {
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder()
-            ) {}
-        )
+  @Test
+  fun shouldSetTextInputLayoutHint() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply {
+            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
+          }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    )
 
-        assertThat(
-            viewHolder.itemView.findViewById<TextView>(R.id.question).text
-        ).isEqualTo("Question?")
-    }
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text)
+      .isEqualTo("Question?")
+  }
 
-    @Test
-    @UiThreadTest
-    fun shouldSetEmptyDateInput() {
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder()
-            ) {}
-        )
+  @Test
+  @UiThreadTest
+  fun shouldSetEmptyDateInput() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply {
+            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
+          }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    )
 
-        assertThat(
-            viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString()
-        ).isEqualTo("")
-    }
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString())
+      .isEqualTo("")
+  }
 
-    @Test
-    @UiThreadTest
-    fun shouldSetDateInput() {
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder().addAnswer(
-                    QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                        value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setDate(
-                                Date.newBuilder()
-                                    .setValueUs(
-                                        LocalDate
-                                            .of(2020, 1, 1)
-                                            .atStartOfDay()
-                                            .atZone(ZoneId.systemDefault())
-                                            .toEpochSecond() * NUMBER_OF_MICROSECONDS_PER_SECOND)
-                                    .setPrecision(Date.Precision.DAY)
-                                    .setTimezone(ZoneId.systemDefault().id)
-                            ).build()
-                    }
-                )
-            ) {}
-        )
+  @Test
+  @UiThreadTest
+  fun shouldSetDateInput() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply {
+            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
+          }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+          .addAnswer(
+            QuestionnaireResponse.Item.Answer.newBuilder().apply {
+              value =
+                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                  .setDate(
+                    Date.newBuilder()
+                      .setValueUs(
+                        LocalDate.of(2020, 1, 1)
+                          .atStartOfDay()
+                          .atZone(ZoneId.systemDefault())
+                          .toEpochSecond() * NUMBER_OF_MICROSECONDS_PER_SECOND
+                      )
+                      .setPrecision(Date.Precision.DAY)
+                      .setTimezone(ZoneId.systemDefault().id)
+                  )
+                  .build()
+            }
+          )
+      ) {}
+    )
 
         assertThat(
             viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString()
@@ -137,6 +144,4 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest: BaseRobot() 
             .check(
                 ViewAssertions.matches(withClassName(containsString("android.widget.DatePicker"))))
     }
-
-
 }

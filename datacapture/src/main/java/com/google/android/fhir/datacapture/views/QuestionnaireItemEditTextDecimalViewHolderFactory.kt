@@ -21,25 +21,26 @@ import com.google.fhir.r4.core.Decimal
 import com.google.fhir.r4.core.QuestionnaireResponse
 
 internal object QuestionnaireItemEditTextDecimalViewHolderFactory :
-    QuestionnaireItemEditTextViewHolderFactory() {
-    override fun getQuestionnaireItemViewHolderDelegate() =
-        object : QuestionnaireItemEditTextViewHolderDelegate(
-            InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
-            isSingleLine = true
-        ) {
-            override fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder? {
-                return text.toDoubleOrNull()?.let {
-                    QuestionnaireResponse.Item.Answer.newBuilder()
-                        .apply {
-                            value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                                .setDecimal(Decimal.newBuilder().setValue(it.toString()).build())
-                                .build()
-                        }
-                }
-            }
-
-            override fun getText(answer: QuestionnaireResponse.Item.Answer.Builder?): String {
-                return answer?.value?.decimal?.value?.toString() ?: ""
-            }
+  QuestionnaireItemEditTextViewHolderFactory() {
+  override fun getQuestionnaireItemViewHolderDelegate() =
+    object :
+      QuestionnaireItemEditTextViewHolderDelegate(
+        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
+        isSingleLine = true
+      ) {
+      override fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder? {
+        return text.toDoubleOrNull()?.let {
+          QuestionnaireResponse.Item.Answer.newBuilder().apply {
+            value =
+              QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                .setDecimal(Decimal.newBuilder().setValue(it.toString()).build())
+                .build()
+          }
         }
+      }
+
+      override fun getText(answer: QuestionnaireResponse.Item.Answer.Builder?): String {
+        return answer?.value?.decimal?.value?.toString() ?: ""
+      }
+    }
 }

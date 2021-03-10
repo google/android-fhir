@@ -29,13 +29,13 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class ResourcesTest {
-    @Test
-    fun getResourceType() {
-        assertThat(getResourceType(Patient::class.java)).isEqualTo(ResourceType.Patient)
-    }
+  @Test
+  fun getResourceType() {
+    assertThat(getResourceType(Patient::class.java)).isEqualTo(ResourceType.Patient)
+  }
 
-    @Test
-    fun getResourceClass() {
-        assertThat(getResourceClass<Resource>("Patient")).isEqualTo(Patient::class.java)
-    }
+  @Test
+  fun getResourceClass() {
+    assertThat(getResourceClass<Resource>("Patient")).isEqualTo(Patient::class.java)
+  }
 }

@@ -24,9 +24,9 @@ import org.hl7.fhir.r4.model.Bundle
  */
 interface FhirDataSource {
 
-    /**
-     * Implement this method to load remote data based on a url [path].
-     * A service base url is of the form: `http{s}://server/{path}`
-     */
-    suspend fun loadData(path: String): Bundle
+  /**
+   * Implement this method to load remote data based on a url [path]. A service base url is of the
+   * form: `http{s}://server/{path}`
+   */
+  suspend fun loadData(path: String): Bundle
 }

@@ -21,12 +21,12 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
- * When a local change to a resource happens, the lastUpdated timestamp in
- * [ResourceEntity] is updated and the diff itself is inserted in this table.
- * The value of the diff depends upon the type of change and can be:
+ * When a local change to a resource happens, the lastUpdated timestamp in [ResourceEntity] is
+ * updated and the diff itself is inserted in this table. The value of the diff depends upon the
+ * type of change and can be:
  * * DELETE: The empty string, "".
- * * INSERT: The full resource in JSON form, e.g.
- * {
+ * * INSERT: The full resource in JSON form, e.g. {
+ * ```
  *      "resourceType": "Patient",
  *      "id": "animal",
  *      "name": [
@@ -38,40 +38,34 @@ import androidx.room.PrimaryKey
  *              }
  *        ],
  *      ...
+ * ```
  * }
- * * UPDATE: A RFC 6902 JSON patch. e.g. a patch that changes the given name of a patient:
- * [
+ * * UPDATE: A RFC 6902 JSON patch. e.g. a patch that changes the given name of a patient: [
+ * ```
  *      {
  *      "op": "replace",
  *      "path": "/name/0/given/0",
  *      "value": "Binny"
  *      }
- * ]
- *  For resource that is fully synced with server this table should not have any rows.
+ * ```
+ * ] For resource that is fully synced with server this table should not have any rows.
  */
-@Entity(
-        indices = [
-            Index(
-                value = ["resourceType", "resourceId"]
-            )
-        ]
-)
+@Entity(indices = [Index(value = ["resourceType", "resourceId"])])
 data class LocalChangeEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long,
-    val resourceType: String,
-    val resourceId: String,
-    val timestamp: String = "",
-    val type: Type,
-    val payload: String
+  @PrimaryKey(autoGenerate = true) val id: Long,
+  val resourceType: String,
+  val resourceId: String,
+  val timestamp: String = "",
+  val type: Type,
+  val payload: String
 ) {
-    enum class Type(val value: Int) {
-        INSERT(1), // create a new resource. payload is the entire resource json.
-        UPDATE(2), // patch. payload is the json patch.
-        DELETE(3); // delete. payload is empty string.
+  enum class Type(val value: Int) {
+    INSERT(1), // create a new resource. payload is the entire resource json.
+    UPDATE(2), // patch. payload is the json patch.
+    DELETE(3); // delete. payload is empty string.
 
-        companion object {
-            fun from(input: Int): Type = values().first { it.value == input }
-        }
+    companion object {
+      fun from(input: Int): Type = values().first { it.value == input }
     }
+  }
 }

@@ -32,67 +32,62 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
-    private lateinit var context: ContextThemeWrapper
-    private lateinit var parent: FrameLayout
-    private lateinit var viewHolder: QuestionnaireItemViewHolder
+  private lateinit var context: ContextThemeWrapper
+  private lateinit var parent: FrameLayout
+  private lateinit var viewHolder: QuestionnaireItemViewHolder
 
-    @Before
-    fun setUp() {
-        context = ContextThemeWrapper(
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            R.style.Theme_MaterialComponents
-        )
-        parent = FrameLayout(context)
-        viewHolder = QuestionnaireItemDisplayViewHolderFactory.create(parent)
-    }
+  @Before
+  fun setUp() {
+    context =
+      ContextThemeWrapper(
+        InstrumentationRegistry.getInstrumentation().targetContext,
+        R.style.Theme_MaterialComponents
+      )
+    parent = FrameLayout(context)
+    viewHolder = QuestionnaireItemDisplayViewHolderFactory.create(parent)
+  }
 
-    @Test
-    fun shouldSetTextViewText() {
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    text =
-                        com.google.fhir.r4.core.String.newBuilder().setValue("Display").build()
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder()
-            ) {}
-        )
+  @Test
+  fun shouldSetTextViewText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply { text = com.google.fhir.r4.core.String.newBuilder().setValue("Display").build() }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    )
 
-        assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text_view).text).isEqualTo(
-            "Display"
-        )
-    }
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text_view).text).isEqualTo("Display")
+  }
 
-    @Test
-    fun shouldSetTextViewVisible() {
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    text =
-                        com.google.fhir.r4.core.String.newBuilder().setValue("Display").build()
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder()
-            ) {}
-        )
+  @Test
+  fun shouldSetTextViewVisible() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply { text = com.google.fhir.r4.core.String.newBuilder().setValue("Display").build() }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    )
 
-        assertThat(
-            viewHolder.itemView.findViewById<TextView>(R.id.text_view).visibility
-        ).isEqualTo(View.VISIBLE)
-    }
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text_view).visibility)
+      .isEqualTo(View.VISIBLE)
+  }
 
-    @Test
-    fun shouldSetTextViewGone() {
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    text = com.google.fhir.r4.core.String.newBuilder().setValue("").build()
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder()
-            ) {}
-        )
+  @Test
+  fun shouldSetTextViewGone() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply { text = com.google.fhir.r4.core.String.newBuilder().setValue("").build() }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    )
 
-        assertThat(
-            viewHolder.itemView.findViewById<TextView>(R.id.text_view).visibility
-        ).isEqualTo(View.GONE)
-    }
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.text_view).visibility)
+      .isEqualTo(View.GONE)
+  }
 }

@@ -24,10 +24,10 @@ import java.math.BigDecimal
  * See https://hl7.org/FHIR/search.html#number.
  */
 internal data class NumberIndex(
-    /** The name of the number index, e.g. "probability". */
-    val name: String,
-    /** The path of the number index, e.g. "RiskAssessment.​prediction.​probability". */
-    val path: String,
-    /** The value of the number index, e.g. "0.1". */
-    val value: BigDecimal
+  /** The name of the number index, e.g. "probability". */
+  val name: String,
+  /** The path of the number index, e.g. "RiskAssessment.​prediction.​probability". */
+  val path: String,
+  /** The value of the number index, e.g. "0.1". */
+  val value: BigDecimal
 )

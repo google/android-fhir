@@ -21,18 +21,10 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import org.hl7.fhir.r4.model.ResourceType
 
-@Entity(
-    indices = [
-        Index(
-            value = ["resourceType", "resourceId"],
-            unique = true
-        )
-    ]
-)
+@Entity(indices = [Index(value = ["resourceType", "resourceId"], unique = true)])
 internal data class ResourceEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long,
-    val resourceType: ResourceType,
-    val resourceId: String,
-    val serializedResource: String
+  @PrimaryKey(autoGenerate = true) val id: Long,
+  val resourceType: ResourceType,
+  val resourceId: String,
+  val serializedResource: String
 )

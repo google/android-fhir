@@ -29,53 +29,59 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class QuestionnaireItemViewItemTest {
-    @Test
-    fun singleAnswerOrNull_noAnswer_shouldReturnNull() {
-        val questionnaireItemViewItem = QuestionnaireItemViewItem(
-            Questionnaire.Item.getDefaultInstance(),
-            QuestionnaireResponse.Item.newBuilder()
-        ) {}
-        assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
-    }
+  @Test
+  fun singleAnswerOrNull_noAnswer_shouldReturnNull() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.getDefaultInstance(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
+  }
 
-    @Test
-    fun singleAnswerOrNull_singleAnswer_shouldReturnSingleAnswer() {
-        val questionnaireItemViewItem = QuestionnaireItemViewItem(
-            Questionnaire.Item.getDefaultInstance(),
-            QuestionnaireResponse.Item.newBuilder().apply {
-                addAnswer(
-                    QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                        value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setBoolean(Boolean.newBuilder().setValue(true))
-                            .build()
-                    }
-                )
+  @Test
+  fun singleAnswerOrNull_singleAnswer_shouldReturnSingleAnswer() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.getDefaultInstance(),
+        QuestionnaireResponse.Item.newBuilder().apply {
+          addAnswer(
+            QuestionnaireResponse.Item.Answer.newBuilder().apply {
+              value =
+                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                  .setBoolean(Boolean.newBuilder().setValue(true))
+                  .build()
             }
-        ) {}
-        assertThat(questionnaireItemViewItem.singleAnswerOrNull!!.value.boolean.value).isTrue()
-    }
+          )
+        }
+      ) {}
+    assertThat(questionnaireItemViewItem.singleAnswerOrNull!!.value.boolean.value).isTrue()
+  }
 
-    @Test
-    fun singleAnswerOrNull_multipleAnswers_shouldReturnNull() {
-        val questionnaireItemViewItem = QuestionnaireItemViewItem(
-            Questionnaire.Item.getDefaultInstance(),
-            QuestionnaireResponse.Item.newBuilder().apply {
-                addAnswer(
-                    QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                        value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setBoolean(Boolean.newBuilder().setValue(true))
-                            .build()
-                    }
-                )
-                addAnswer(
-                    QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                        value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setBoolean(Boolean.newBuilder().setValue(true))
-                            .build()
-                    }
-                )
+  @Test
+  fun singleAnswerOrNull_multipleAnswers_shouldReturnNull() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.getDefaultInstance(),
+        QuestionnaireResponse.Item.newBuilder().apply {
+          addAnswer(
+            QuestionnaireResponse.Item.Answer.newBuilder().apply {
+              value =
+                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                  .setBoolean(Boolean.newBuilder().setValue(true))
+                  .build()
             }
-        ) {}
-        assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
-    }
+          )
+          addAnswer(
+            QuestionnaireResponse.Item.Answer.newBuilder().apply {
+              value =
+                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                  .setBoolean(Boolean.newBuilder().setValue(true))
+                  .build()
+            }
+          )
+        }
+      ) {}
+    assertThat(questionnaireItemViewItem.singleAnswerOrNull).isNull()
+  }
 }
