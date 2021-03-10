@@ -20,39 +20,33 @@ import com.google.android.fhir.db.Database
 import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
-    object Success : Result()
-    data class Error(val exceptions: List<ResourceSyncException>) : Result()
+  object Success : Result()
+  data class Error(val exceptions: List<ResourceSyncException>) : Result()
 }
 
 data class ResourceSyncException(val resourceType: ResourceType, val exception: Exception)
 
-/**
- * Class that helps synchronize the data source and save it in the local database
- */
+/** Class that helps synchronize the data source and save it in the local database */
 class FhirSynchronizer(
-    private val syncConfiguration: SyncConfiguration,
-    private val dataSource: FhirDataSource,
-    private val database: Database
+  private val syncConfiguration: SyncConfiguration,
+  private val dataSource: FhirDataSource,
+  private val database: Database
 ) {
-    suspend fun sync(): Result {
-        val exceptions = mutableListOf<ResourceSyncException>()
-        syncConfiguration.syncData.forEach { syncData ->
-            val resourceSynchroniser = ResourceSynchronizer(
-                syncData,
-                dataSource,
-                database,
-                syncConfiguration.retry
-            )
-            try {
-                resourceSynchroniser.sync()
-            } catch (exception: Exception) {
-                exceptions.add(ResourceSyncException(syncData.resourceType, exception))
-            }
-        }
-        if (exceptions.isEmpty()) {
-            return Result.Success
-        } else {
-            return Result.Error(exceptions)
-        }
+  suspend fun sync(): Result {
+    val exceptions = mutableListOf<ResourceSyncException>()
+    syncConfiguration.syncData.forEach { syncData ->
+      val resourceSynchroniser =
+        ResourceSynchronizer(syncData, dataSource, database, syncConfiguration.retry)
+      try {
+        resourceSynchroniser.sync()
+      } catch (exception: Exception) {
+        exceptions.add(ResourceSyncException(syncData.resourceType, exception))
+      }
     }
+    if (exceptions.isEmpty()) {
+      return Result.Success
+    } else {
+      return Result.Error(exceptions)
+    }
+  }
 }

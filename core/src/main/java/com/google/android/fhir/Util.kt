@@ -23,16 +23,13 @@ import java.util.Date
 import java.util.Locale
 import org.hl7.fhir.r4.model.Resource
 
-/**
- * Utility function to format a [Date] object using the system's default locale.
- */
+/** Utility function to format a [Date] object using the system's default locale. */
 @SuppressLint("NewApi")
 internal fun Date.toTimeZoneString(): String {
-    val simpleDateFormat = DateTimeFormatter.ofPattern(
-        "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
-        Locale.getDefault()
-    ).withZone(ZoneId.systemDefault())
-    return simpleDateFormat.format(this.toInstant())
+  val simpleDateFormat =
+    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault())
+      .withZone(ZoneId.systemDefault())
+  return simpleDateFormat.format(this.toInstant())
 }
 
 /**

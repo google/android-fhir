@@ -22,18 +22,15 @@ import org.opencds.cqf.cql.model.ModelResolver
 import org.opencds.cqf.cql.retrieve.RetrieveProvider
 
 /**
- * FHIR Engine's implementation of a [org.opencds.cqf.cql.data.DataProvider] which provides
- * the [org.opencds.cqf.cql.execution.CqlEngine] required data to complete CQL evaluation.
+ * FHIR Engine's implementation of a [org.opencds.cqf.cql.data.DataProvider] which provides the
+ * [org.opencds.cqf.cql.execution.CqlEngine] required data to complete CQL evaluation.
  */
-internal class FhirEngineDataProvider internal constructor(
-    modelResolver: ModelResolver,
-    retrieveProvider: RetrieveProvider
-) : CompositeDataProvider(modelResolver, retrieveProvider) {
+internal class FhirEngineDataProvider
+internal constructor(modelResolver: ModelResolver, retrieveProvider: RetrieveProvider) :
+  CompositeDataProvider(modelResolver, retrieveProvider) {
 
-    internal object Factory {
-        internal fun create(database: Database): FhirEngineDataProvider = FhirEngineDataProvider(
-            AndroidR4FhirModelResolver(),
-            FhirEngineRetrieveProvider(database)
-        )
-    }
+  internal object Factory {
+    internal fun create(database: Database): FhirEngineDataProvider =
+      FhirEngineDataProvider(AndroidR4FhirModelResolver(), FhirEngineRetrieveProvider(database))
+  }
 }

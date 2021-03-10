@@ -25,31 +25,26 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Url
 
-/**
- * hapi.fhir.org API communication via Retrofit
- */
+/** hapi.fhir.org API communication via Retrofit */
 interface HapiFhirService {
 
-    @GET
-    suspend fun getResource(@Url url: String): Bundle
+  @GET suspend fun getResource(@Url url: String): Bundle
 
-    companion object {
-        const val BASE_URL = "https://hapi.fhir.org/baseR4/"
+  companion object {
+    const val BASE_URL = "https://hapi.fhir.org/baseR4/"
 
-        fun create(parser: IParser): HapiFhirService {
-            val logger = HttpLoggingInterceptor()
-            logger.level = HttpLoggingInterceptor.Level.BODY
+    fun create(parser: IParser): HapiFhirService {
+      val logger = HttpLoggingInterceptor()
+      logger.level = HttpLoggingInterceptor.Level.BODY
 
-            val client = OkHttpClient.Builder()
-                .addInterceptor(logger)
-                .build()
-            return Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .client(client)
-                .addConverterFactory(FhirConverterFactory(parser))
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(HapiFhirService::class.java)
-        }
+      val client = OkHttpClient.Builder().addInterceptor(logger).build()
+      return Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .client(client)
+        .addConverterFactory(FhirConverterFactory(parser))
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(HapiFhirService::class.java)
     }
+  }
 }

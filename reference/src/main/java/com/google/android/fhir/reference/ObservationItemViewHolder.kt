@@ -21,13 +21,15 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class ObservationItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    private val observationTextView: TextView = itemView.findViewById(
-        R.id.observation_detail
-    )
+  private val observationTextView: TextView = itemView.findViewById(R.id.observation_detail)
 
-    fun bindTo(observationItem: PatientListViewModel.ObservationItem) {
-        this.observationTextView.text =
-            itemView.resources.getString(R.string.observation_brief_text, observationItem.code,
-                observationItem.value, observationItem.effective)
-    }
+  fun bindTo(observationItem: PatientListViewModel.ObservationItem) {
+    this.observationTextView.text =
+      itemView.resources.getString(
+        R.string.observation_brief_text,
+        observationItem.code,
+        observationItem.value,
+        observationItem.effective
+      )
+  }
 }
