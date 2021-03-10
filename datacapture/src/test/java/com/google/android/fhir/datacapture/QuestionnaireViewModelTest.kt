@@ -245,47 +245,6 @@ class QuestionnaireViewModelTest {
     }
 
     @Test
-    fun questionnaireItemViewItemList_shouldGenerateQuestionnaireItemViewItemList() = runBlocking {
-        val questionnaire = Questionnaire.newBuilder().apply {
-            id = Id.newBuilder().setValue("a-questionnaire").build()
-            addItem(Questionnaire.Item.newBuilder().apply {
-                linkId = String.newBuilder().setValue("a-link-id").build()
-                text = String.newBuilder().setValue("Basic questions").build()
-                type = Questionnaire.Item.TypeCode.newBuilder()
-                    .setValue(QuestionnaireItemTypeCode.Value.GROUP).build()
-                addItem(Questionnaire.Item.newBuilder().apply {
-                    linkId = String.newBuilder().setValue("another-link-id").build()
-                    text = String.newBuilder().setValue("Name?").build()
-                    type = Questionnaire.Item.TypeCode.newBuilder()
-                        .setValue(QuestionnaireItemTypeCode.Value.STRING).build()
-                })
-            })
-        }.build()
-        val serializedQuestionnaire = printer.print(questionnaire)
-        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
-        val viewModel = QuestionnaireViewModel(state)
-        var questionnaireItemViewItemList = viewModel.questionnaireItemViewItemList
-        questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
-        assertThat(questionnaireItemViewItemList.size).isEqualTo(2)
-        val firstQuestionnaireItemViewItem = questionnaireItemViewItemList[0]
-        val firstQuestionnaireItem = firstQuestionnaireItemViewItem.questionnaireItem
-        assertThat(firstQuestionnaireItem.linkId.value).isEqualTo("a-link-id")
-        assertThat(firstQuestionnaireItem.text.value).isEqualTo("Basic questions")
-        assertThat(firstQuestionnaireItem.type.value)
-            .isEqualTo(QuestionnaireItemTypeCode.Value.GROUP)
-        assertThat(firstQuestionnaireItemViewItem.questionnaireResponseItemBuilder.linkId.value)
-            .isEqualTo("a-link-id")
-        val secondQuestionnaireItemViewItem = questionnaireItemViewItemList[1]
-        val secondQuestionnaireItem = secondQuestionnaireItemViewItem.questionnaireItem
-        assertThat(secondQuestionnaireItem.linkId.value).isEqualTo("another-link-id")
-        assertThat(secondQuestionnaireItem.text.value).isEqualTo("Name?")
-        assertThat(secondQuestionnaireItem.type.value)
-            .isEqualTo(QuestionnaireItemTypeCode.Value.STRING)
-        assertThat(secondQuestionnaireItemViewItem.questionnaireResponseItemBuilder.linkId.value)
-            .isEqualTo("another-link-id")
-    }
-
-    @Test
     fun stateHasQuestionnaireResponse_wrongLinkId_shouldThrowError() {
         val questionnaire = Questionnaire.newBuilder().apply {
             id = Id.newBuilder().setValue("a-questionnaire").build()
@@ -323,7 +282,7 @@ class QuestionnaireViewModelTest {
             QuestionnaireViewModel(state)
         }.localizedMessage
 
-        assertThat(errorMessage).isEqualTo("linkId mismatch")
+        assertThat(errorMessage).contains("linkId")
     }
 
     @Test
@@ -376,7 +335,48 @@ class QuestionnaireViewModelTest {
             QuestionnaireViewModel(state)
         }.localizedMessage
 
-        assertThat(errorMessage).isEqualTo("Structure mismatch")
+        assertThat(errorMessage).contains("Structure")
+    }
+
+    @Test
+    fun questionnaireItemViewItemList_shouldGenerateQuestionnaireItemViewItemList() = runBlocking {
+        val questionnaire = Questionnaire.newBuilder().apply {
+            id = Id.newBuilder().setValue("a-questionnaire").build()
+            addItem(Questionnaire.Item.newBuilder().apply {
+                linkId = String.newBuilder().setValue("a-link-id").build()
+                text = String.newBuilder().setValue("Basic questions").build()
+                type = Questionnaire.Item.TypeCode.newBuilder()
+                    .setValue(QuestionnaireItemTypeCode.Value.GROUP).build()
+                addItem(Questionnaire.Item.newBuilder().apply {
+                    linkId = String.newBuilder().setValue("another-link-id").build()
+                    text = String.newBuilder().setValue("Name?").build()
+                    type = Questionnaire.Item.TypeCode.newBuilder()
+                        .setValue(QuestionnaireItemTypeCode.Value.STRING).build()
+                })
+            })
+        }.build()
+        val serializedQuestionnaire = printer.print(questionnaire)
+        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+        val viewModel = QuestionnaireViewModel(state)
+        var questionnaireItemViewItemList = viewModel.questionnaireItemViewItemList
+        questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
+        assertThat(questionnaireItemViewItemList.size).isEqualTo(2)
+        val firstQuestionnaireItemViewItem = questionnaireItemViewItemList[0]
+        val firstQuestionnaireItem = firstQuestionnaireItemViewItem.questionnaireItem
+        assertThat(firstQuestionnaireItem.linkId.value).isEqualTo("a-link-id")
+        assertThat(firstQuestionnaireItem.text.value).isEqualTo("Basic questions")
+        assertThat(firstQuestionnaireItem.type.value)
+            .isEqualTo(QuestionnaireItemTypeCode.Value.GROUP)
+        assertThat(firstQuestionnaireItemViewItem.questionnaireResponseItemBuilder.linkId.value)
+            .isEqualTo("a-link-id")
+        val secondQuestionnaireItemViewItem = questionnaireItemViewItemList[1]
+        val secondQuestionnaireItem = secondQuestionnaireItemViewItem.questionnaireItem
+        assertThat(secondQuestionnaireItem.linkId.value).isEqualTo("another-link-id")
+        assertThat(secondQuestionnaireItem.text.value).isEqualTo("Name?")
+        assertThat(secondQuestionnaireItem.type.value)
+            .isEqualTo(QuestionnaireItemTypeCode.Value.STRING)
+        assertThat(secondQuestionnaireItemViewItem.questionnaireResponseItemBuilder.linkId.value)
+            .isEqualTo("another-link-id")
     }
 
     private companion object {
