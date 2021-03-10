@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.JsonPatch
 import com.github.fge.jsonpatch.diff.JsonDiff
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.logicalId
 import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.Resource
 import org.json.JSONArray
@@ -106,7 +107,7 @@ object LocalChangeUtils {
         if (jsonDiff.size() == 0) {
             Log.i(
                 "ResourceDao",
-                "Target ${target.resourceType}/${target.id} is same as source."
+                "Target ${target.resourceType}/${target.logicalId()} is same as source."
             )
         }
         return jsonDiff.toString()

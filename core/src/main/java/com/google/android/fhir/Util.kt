@@ -21,6 +21,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
+import org.hl7.fhir.r4.model.Resource
 
 /**
  * Utility function to format a [Date] object using the system's default locale.
@@ -33,3 +34,9 @@ internal fun Date.toTimeZoneString(): String {
     ).withZone(ZoneId.systemDefault())
     return simpleDateFormat.format(this.toInstant())
 }
+
+/**
+ * Returns only the logical ID part of this Resource's ID. For example, if the ID is
+ * "http://example.com/fhir/Patient/123/_history/456", then this method would return "123".
+ */
+internal fun Resource.logicalId(): String = this.idElement.idPart

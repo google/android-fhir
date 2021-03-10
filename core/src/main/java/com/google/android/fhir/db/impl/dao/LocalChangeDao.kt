@@ -23,6 +23,7 @@ import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
+import com.google.android.fhir.logicalId
 import com.google.android.fhir.toTimeZoneString
 import java.util.Date
 import org.hl7.fhir.r4.model.Resource
@@ -50,7 +51,7 @@ internal abstract class LocalChangeDao {
     }
 
     fun addInsert(resource: Resource) {
-        val resourceId = resource.id
+        val resourceId = resource.logicalId()
         val resourceType = resource.resourceType
         val timestamp = Date().toTimeZoneString()
         val resourceString = iParser.encodeResourceToString(resource)
@@ -68,7 +69,7 @@ internal abstract class LocalChangeDao {
     }
 
     fun addUpdate(oldResource: Resource, resource: Resource) {
-        val resourceId = resource.id
+        val resourceId = resource.logicalId()
         val resourceType = resource.resourceType
         val timestamp = Date().toTimeZoneString()
 
