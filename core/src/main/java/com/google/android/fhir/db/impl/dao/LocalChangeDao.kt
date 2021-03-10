@@ -51,7 +51,7 @@ internal abstract class LocalChangeDao {
     }
 
     fun addInsert(resource: Resource) {
-        val resourceId = resource.logicalId()
+        val resourceId = resource.logicalId
         val resourceType = resource.resourceType
         val timestamp = Date().toTimeZoneString()
         val resourceString = iParser.encodeResourceToString(resource)
@@ -69,7 +69,7 @@ internal abstract class LocalChangeDao {
     }
 
     fun addUpdate(oldResource: Resource, resource: Resource) {
-        val resourceId = resource.logicalId()
+        val resourceId = resource.logicalId
         val resourceType = resource.resourceType
         val timestamp = Date().toTimeZoneString()
 

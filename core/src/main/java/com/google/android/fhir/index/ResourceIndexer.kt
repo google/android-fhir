@@ -56,7 +56,7 @@ internal object ResourceIndexer {
     fun <R : Resource> index(resource: R) = extractIndexValues(resource)
 
     private fun <R : Resource> extractIndexValues(resource: R): ResourceIndices {
-        val indexBuilder = ResourceIndices.Builder(resource.resourceType, resource.logicalId())
+        val indexBuilder = ResourceIndices.Builder(resource.resourceType, resource.logicalId)
         resource.javaClass.fields.asSequence().mapNotNull {
             it.getAnnotation(SearchParamDefinition::class.java)
         }.filter {

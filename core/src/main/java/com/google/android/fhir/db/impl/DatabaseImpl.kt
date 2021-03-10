@@ -90,7 +90,7 @@ internal class DatabaseImpl(
 
     @Transaction
     override fun <R : Resource> update(resource: R) {
-        val oldResource = select(resource.javaClass, resource.logicalId())
+        val oldResource = select(resource.javaClass, resource.logicalId)
         resourceDao.update(resource)
         localChangeDao.addUpdate(oldResource, resource)
     }
@@ -172,9 +172,9 @@ internal class DatabaseImpl(
         codeSystem: String,
         codeValue: String
     ): List<R> {
-        val refs = searchByReference(clazz, reference, referenceValue).map { it.logicalId() }
+        val refs = searchByReference(clazz, reference, referenceValue).map { it.logicalId }
         return searchByCode(clazz, code, codeSystem, codeValue)
-            .filter { refs.contains(it.logicalId()) }
+            .filter { refs.contains(it.logicalId) }
     }
 
     override fun <R : Resource> search(query: Query): List<R> =

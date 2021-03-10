@@ -46,14 +46,14 @@ internal abstract class ResourceDao {
 
     @Transaction
     open fun update(resource: Resource) {
-        updateResource(resource.logicalId(),
+        updateResource(resource.logicalId,
             resource.resourceType,
             iParser.encodeResourceToString(resource)
         )
         val entity = ResourceEntity(
             id = 0,
             resourceType = resource.resourceType,
-            resourceId = resource.logicalId(),
+            resourceId = resource.logicalId,
             serializedResource = iParser.encodeResourceToString(resource)
         )
         val index = ResourceIndexer.index(resource)
@@ -179,7 +179,7 @@ internal abstract class ResourceDao {
         val entity = ResourceEntity(
             id = 0,
             resourceType = resource.resourceType,
-            resourceId = resource.logicalId(),
+            resourceId = resource.logicalId,
             serializedResource = iParser.encodeResourceToString(resource)
         )
         insertResource(entity)

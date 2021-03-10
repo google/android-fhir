@@ -161,9 +161,9 @@ class DatabaseImplTest {
         database.update(patient)
         val patientString = services.parser.encodeResourceToString(patient)
         val (_, resourceType, resourceId, _, type, payload) = database.getAllLocalChanges()
-            .single { it.second.resourceId.equals(patient.logicalId()) }.second
+            .single { it.second.resourceId.equals(patient.logicalId) }.second
         assertThat(type).isEqualTo(LocalChangeEntity.Type.INSERT)
-        assertThat(resourceId).isEqualTo(patient.logicalId())
+        assertThat(resourceId).isEqualTo(patient.logicalId)
         assertThat(resourceType).isEqualTo(patient.resourceType.name)
         assertThat(payload).isEqualTo(patientString)
     }
@@ -199,10 +199,10 @@ class DatabaseImplTest {
         database.update(patient)
         services.parser.encodeResourceToString(patient)
         val (token, _) = database.getAllLocalChanges()
-            .single { it.second.resourceId.equals(patient.logicalId()) }
+            .single { it.second.resourceId.equals(patient.logicalId) }
         database.deleteUpdates(token)
         assertThat(database.getAllLocalChanges()
-            .none { it.second.resourceId.equals(patient.logicalId()) })
+            .none { it.second.resourceId.equals(patient.logicalId) })
             .isTrue()
     }
 
@@ -212,7 +212,7 @@ class DatabaseImplTest {
             testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
         database.insertRemote(patient)
         assertThat(database.getAllLocalChanges().map { it.second }
-            .none { it.resourceId.equals(patient.logicalId()) })
+            .none { it.resourceId.equals(patient.logicalId) })
             .isTrue()
     }
 
@@ -224,7 +224,7 @@ class DatabaseImplTest {
         assertThat(
             database.getAllLocalChanges()
                 .map { it.second }
-                .none { it.resourceId in listOf(patient.logicalId(), TEST_PATIENT_2_ID) }
+                .none { it.resourceId in listOf(patient.logicalId, TEST_PATIENT_2_ID) }
         ).isTrue()
     }
 
@@ -238,9 +238,9 @@ class DatabaseImplTest {
         val updatePatch = testingUtils.readJsonArrayFromFile("/update_patch_1.json")
         database.update(updatedPatient)
         val (_, resourceType, resourceId, _, type, payload) = database.getAllLocalChanges()
-            .single { it.second.resourceId.equals(patient.logicalId()) }.second
+            .single { it.second.resourceId.equals(patient.logicalId) }.second
         assertThat(type).isEqualTo(LocalChangeEntity.Type.UPDATE)
-        assertThat(resourceId).isEqualTo(patient.logicalId())
+        assertThat(resourceId).isEqualTo(patient.logicalId)
         assertThat(resourceType).isEqualTo(patient.resourceType.name)
         testingUtils.assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
     }
@@ -256,9 +256,9 @@ class DatabaseImplTest {
         database.update(patient)
         val updatePatch = testingUtils.readJsonArrayFromFile("/update_patch_2.json")
         val (_, resourceType, resourceId, _, type, payload) = database.getAllLocalChanges()
-            .single { it.second.resourceId.equals(patient.logicalId()) }.second
+            .single { it.second.resourceId.equals(patient.logicalId) }.second
         assertThat(type).isEqualTo(LocalChangeEntity.Type.UPDATE)
-        assertThat(resourceId).isEqualTo(patient.logicalId())
+        assertThat(resourceId).isEqualTo(patient.logicalId)
         assertThat(resourceType).isEqualTo(patient.resourceType.name)
         testingUtils.assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
     }

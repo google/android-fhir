@@ -107,7 +107,7 @@ object LocalChangeUtils {
         if (jsonDiff.size() == 0) {
             Log.i(
                 "ResourceDao",
-                "Target ${target.resourceType}/${target.logicalId()} is same as source."
+                "Target ${target.resourceType}/${target.logicalId} is same as source."
             )
         }
         return jsonDiff.toString()
