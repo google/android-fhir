@@ -22,33 +22,32 @@ import com.google.android.fhir.datacapture.R
 import com.google.fhir.r4.core.Boolean
 import com.google.fhir.r4.core.QuestionnaireResponse
 
-internal object QuestionnaireItemCheckBoxViewHolderFactory : QuestionnaireItemViewHolderFactory(
-    R.layout.questionnaire_item_check_box_view
-) {
-    override fun getQuestionnaireItemViewHolderDelegate() =
-        object : QuestionnaireItemViewHolderDelegate {
-            private lateinit var checkBox: CheckBox
-            private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+internal object QuestionnaireItemCheckBoxViewHolderFactory :
+  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_check_box_view) {
+  override fun getQuestionnaireItemViewHolderDelegate() =
+    object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var checkBox: CheckBox
+      private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
-            override fun init(itemView: View) {
-                checkBox = itemView.findViewById(R.id.check_box)
-                checkBox.setOnClickListener {
-                    questionnaireItemViewItem.singleAnswerOrNull =
-                        QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                            value =
-                                QuestionnaireResponse.Item.Answer.ValueX.newBuilder().setBoolean(
-                                    Boolean.newBuilder().setValue(checkBox.isChecked).build()
-                                ).build()
-                        }
-                    questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-                }
+      override fun init(itemView: View) {
+        checkBox = itemView.findViewById(R.id.check_box)
+        checkBox.setOnClickListener {
+          questionnaireItemViewItem.singleAnswerOrNull =
+            QuestionnaireResponse.Item.Answer.newBuilder().apply {
+              value =
+                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                  .setBoolean(Boolean.newBuilder().setValue(checkBox.isChecked).build())
+                  .build()
             }
-
-            override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-                this.questionnaireItemViewItem = questionnaireItemViewItem
-                checkBox.text = questionnaireItemViewItem.questionnaireItem.text.value
-                checkBox.isChecked =
-                    questionnaireItemViewItem.singleAnswerOrNull?.value?.boolean?.value ?: false
-            }
+          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
         }
+      }
+
+      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        this.questionnaireItemViewItem = questionnaireItemViewItem
+        checkBox.text = questionnaireItemViewItem.questionnaireItem.text.value
+        checkBox.isChecked =
+          questionnaireItemViewItem.singleAnswerOrNull?.value?.boolean?.value ?: false
+      }
+    }
 }

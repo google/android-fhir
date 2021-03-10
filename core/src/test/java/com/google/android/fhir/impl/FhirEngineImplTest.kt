@@ -33,104 +33,107 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
-/** Unit tests for [FhirEngineImpl].  */
+/** Unit tests for [FhirEngineImpl]. */
 @RunWith(RobolectricTestRunner::class)
 class FhirEngineImplTest {
-    private val dataSource = object : FhirDataSource {
-        override suspend fun loadData(path: String): Bundle {
-            return Bundle()
-        }
+  private val dataSource =
+    object : FhirDataSource {
+      override suspend fun loadData(path: String): Bundle {
+        return Bundle()
+      }
     }
-    private val services = builder(dataSource,
-        ApplicationProvider.getApplicationContext())
-        .inMemory()
-        .build()
-    private val fhirEngine = services.fhirEngine
-    private val testingUtils = TestingUtils(services.parser)
+  private val services =
+    builder(dataSource, ApplicationProvider.getApplicationContext()).inMemory().build()
+  private val fhirEngine = services.fhirEngine
+  private val testingUtils = TestingUtils(services.parser)
 
-    @Before
-    fun setUp() {
-        fhirEngine.save(TEST_PATIENT_1)
+  @Before
+  fun setUp() {
+    fhirEngine.save(TEST_PATIENT_1)
+  }
+
+  @Test
+  fun save_shouldSaveResource() {
+    fhirEngine.save(TEST_PATIENT_2)
+    testingUtils.assertResourceEquals(
+      TEST_PATIENT_2,
+      fhirEngine.load(Patient::class.java, TEST_PATIENT_2_ID)
+    )
+  }
+
+  @Test
+  fun saveAll_shouldSaveResource() {
+    val patients = listOf(TEST_PATIENT_1, TEST_PATIENT_2)
+    fhirEngine.saveAll(patients)
+    testingUtils.assertResourceEquals(
+      TEST_PATIENT_1,
+      fhirEngine.load(Patient::class.java, TEST_PATIENT_1_ID)
+    )
+    testingUtils.assertResourceEquals(
+      TEST_PATIENT_2,
+      fhirEngine.load(Patient::class.java, TEST_PATIENT_2_ID)
+    )
+  }
+
+  @Test
+  fun update_nonexistentResource_shouldNotInsertResource() {
+    val exception =
+      assertThrows(ResourceNotFoundInDbException::class.java) { fhirEngine.update(TEST_PATIENT_2) }
+    /* ktlint-disable max-line-length */
+    Truth.assertThat(exception.message)
+      .isEqualTo(
+        "Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!"
+      )
+    /* ktlint-enable max-line-length */
+  }
+
+  @Test
+  fun update_shouldUpdateResource() {
+    val patient = Patient()
+    patient.id = TEST_PATIENT_1_ID
+    patient.gender = Enumerations.AdministrativeGender.FEMALE
+    fhirEngine.update(patient)
+    testingUtils.assertResourceEquals(
+      patient,
+      fhirEngine.load(Patient::class.java, TEST_PATIENT_1_ID)
+    )
+  }
+
+  @Test
+  fun load_nonexistentResource_shouldThrowResourceNotFoundException() {
+    val resourceNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
+        fhirEngine.load(Patient::class.java, "nonexistent_patient")
+      }
+    /* ktlint-disable max-line-length */
+    Truth.assertThat(resourceNotFoundException.message)
+      .isEqualTo(
+        "Resource not found with type ${ResourceType.Patient.name} and id nonexistent_patient!"
+      )
+    /* ktlint-enable max-line-length */
+  }
+
+  @Test
+  fun load_shouldReturnResource() {
+    testingUtils.assertResourceEquals(
+      TEST_PATIENT_1,
+      fhirEngine.load(Patient::class.java, TEST_PATIENT_1_ID)
+    )
+  }
+
+  companion object {
+    private const val TEST_PATIENT_1_ID = "test_patient_1"
+    private var TEST_PATIENT_1 = Patient()
+    init {
+      TEST_PATIENT_1.setId(TEST_PATIENT_1_ID)
+      TEST_PATIENT_1.setGender(Enumerations.AdministrativeGender.MALE)
     }
 
-    @Test
-    fun save_shouldSaveResource() {
-        fhirEngine.save(TEST_PATIENT_2)
-        testingUtils.assertResourceEquals(
-            TEST_PATIENT_2,
-            fhirEngine.load(Patient::class.java, TEST_PATIENT_2_ID)
-        )
+    private const val TEST_PATIENT_2_ID = "test_patient_2"
+    private var TEST_PATIENT_2 = Patient()
+    init {
+      TEST_PATIENT_2.setId(TEST_PATIENT_2_ID)
+      TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE)
     }
-
-    @Test
-    fun saveAll_shouldSaveResource() {
-        val patients = listOf(TEST_PATIENT_1, TEST_PATIENT_2)
-        fhirEngine.saveAll(patients)
-        testingUtils.assertResourceEquals(
-            TEST_PATIENT_1,
-            fhirEngine.load(Patient::class.java, TEST_PATIENT_1_ID)
-        )
-        testingUtils.assertResourceEquals(
-            TEST_PATIENT_2,
-            fhirEngine.load(Patient::class.java, TEST_PATIENT_2_ID)
-        )
-    }
-
-    @Test
-    fun update_nonexistentResource_shouldNotInsertResource() {
-        val exception = assertThrows(ResourceNotFoundInDbException::class.java) {
-            fhirEngine.update(TEST_PATIENT_2)
-        }
-        /* ktlint-disable max-line-length */
-        Truth.assertThat(exception.message)
-            .isEqualTo("Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!")
-        /* ktlint-enable max-line-length */
-    }
-
-    @Test
-    fun update_shouldUpdateResource() {
-        val patient = Patient()
-        patient.id = TEST_PATIENT_1_ID
-        patient.gender = Enumerations.AdministrativeGender.FEMALE
-        fhirEngine.update(patient)
-        testingUtils.assertResourceEquals(
-            patient,
-            fhirEngine.load(Patient::class.java, TEST_PATIENT_1_ID)
-        )
-    }
-
-    @Test
-    fun load_nonexistentResource_shouldThrowResourceNotFoundException() {
-        val resourceNotFoundException = assertThrows(ResourceNotFoundException::class.java) {
-            fhirEngine.load(Patient::class.java, "nonexistent_patient")
-        }
-        /* ktlint-disable max-line-length */
-        Truth.assertThat(resourceNotFoundException.message)
-            .isEqualTo("Resource not found with type ${ResourceType.Patient.name} and id nonexistent_patient!")
-        /* ktlint-enable max-line-length */
-    }
-
-    @Test
-    fun load_shouldReturnResource() {
-        testingUtils.assertResourceEquals(
-            TEST_PATIENT_1,
-            fhirEngine.load(Patient::class.java, TEST_PATIENT_1_ID)
-        )
-    }
-
-    companion object {
-        private const val TEST_PATIENT_1_ID = "test_patient_1"
-        private var TEST_PATIENT_1 = Patient()
-        init {
-            TEST_PATIENT_1.setId(TEST_PATIENT_1_ID)
-            TEST_PATIENT_1.setGender(Enumerations.AdministrativeGender.MALE)
-        }
-
-        private const val TEST_PATIENT_2_ID = "test_patient_2"
-        private var TEST_PATIENT_2 = Patient()
-        init {
-            TEST_PATIENT_2.setId(TEST_PATIENT_2_ID)
-            TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE)
-        }
-    }
+  }
 }

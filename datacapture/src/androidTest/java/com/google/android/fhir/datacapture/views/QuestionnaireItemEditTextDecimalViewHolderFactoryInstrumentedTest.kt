@@ -34,114 +34,119 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
-    private lateinit var context: ContextThemeWrapper
-    private lateinit var parent: FrameLayout
-    private lateinit var viewHolder: QuestionnaireItemViewHolder
+  private lateinit var context: ContextThemeWrapper
+  private lateinit var parent: FrameLayout
+  private lateinit var viewHolder: QuestionnaireItemViewHolder
 
-    @Before
-    fun setUp() {
-        context = ContextThemeWrapper(
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            R.style.Theme_MaterialComponents
-        )
-        parent = FrameLayout(context)
-        viewHolder = QuestionnaireItemEditTextDecimalViewHolderFactory.create(parent)
-    }
+  @Before
+  fun setUp() {
+    context =
+      ContextThemeWrapper(
+        InstrumentationRegistry.getInstrumentation().targetContext,
+        R.style.Theme_MaterialComponents
+      )
+    parent = FrameLayout(context)
+    viewHolder = QuestionnaireItemEditTextDecimalViewHolderFactory.create(parent)
+  }
 
-    @Test
-    fun shouldSetTextViewText() {
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder()
-            ) {}
-        )
+  @Test
+  fun shouldSetTextViewText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply {
+            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
+          }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    )
 
-        assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text)
-            .isEqualTo("Question?")
-    }
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text)
+      .isEqualTo("Question?")
+  }
 
-    @Test
-    @UiThreadTest
-    fun shouldSetInputText() {
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.getDefaultInstance(),
-                QuestionnaireResponse.Item.newBuilder().addAnswer(
-                    QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                        value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setDecimal(Decimal.newBuilder().setValue("1.1"))
-                            .build()
-                    }
-                )
-            ) {}
-        )
+  @Test
+  @UiThreadTest
+  fun shouldSetInputText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.getDefaultInstance(),
+        QuestionnaireResponse.Item.newBuilder()
+          .addAnswer(
+            QuestionnaireResponse.Item.Answer.newBuilder().apply {
+              value =
+                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                  .setDecimal(Decimal.newBuilder().setValue("1.1"))
+                  .build()
+            }
+          )
+      ) {}
+    )
 
-        assertThat(
-            viewHolder.itemView.findViewById<TextInputEditText>(
-                R.id.textInputEditText
-            ).text.toString()
-        ).isEqualTo("1.1")
-    }
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).text.toString()
+      )
+      .isEqualTo("1.1")
+  }
 
-    @Test
-    @UiThreadTest
-    fun shouldSetInputTextToEmpty() {
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.getDefaultInstance(),
-                QuestionnaireResponse.Item.newBuilder().addAnswer(
-                    QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                        value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setDecimal(Decimal.newBuilder().setValue("1.1"))
-                            .build()
-                    }
-                )
-            ) {}
-        )
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.getDefaultInstance(),
-                QuestionnaireResponse.Item.newBuilder()
-            ) {}
-        )
+  @Test
+  @UiThreadTest
+  fun shouldSetInputTextToEmpty() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.getDefaultInstance(),
+        QuestionnaireResponse.Item.newBuilder()
+          .addAnswer(
+            QuestionnaireResponse.Item.Answer.newBuilder().apply {
+              value =
+                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                  .setDecimal(Decimal.newBuilder().setValue("1.1"))
+                  .build()
+            }
+          )
+      ) {}
+    )
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.getDefaultInstance(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    )
 
-        assertThat(
-            viewHolder.itemView.findViewById<TextInputEditText>(
-                R.id.textInputEditText
-            ).text.toString()
-        ).isEqualTo("")
-    }
+    assertThat(
+        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).text.toString()
+      )
+      .isEqualTo("")
+  }
 
-    @Test
-    @UiThreadTest
-    fun shouldSetQuestionnaireResponseItemAnswer() {
-        val questionnaireItemViewItem = QuestionnaireItemViewItem(
-            Questionnaire.Item.newBuilder().build(),
-            QuestionnaireResponse.Item.newBuilder()
-        ) {}
-        viewHolder.bind(questionnaireItemViewItem)
-        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("1.1")
+  @Test
+  @UiThreadTest
+  fun shouldSetQuestionnaireResponseItemAnswer() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder().build(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("1.1")
 
-        val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerList
-        assertThat(answer.size).isEqualTo(1)
-        assertThat(answer[0].value.decimal.value).isEqualTo("1.1")
-    }
+    val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerList
+    assertThat(answer.size).isEqualTo(1)
+    assertThat(answer[0].value.decimal.value).isEqualTo("1.1")
+  }
 
-    @Test
-    @UiThreadTest
-    fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
-        val questionnaireItemViewItem = QuestionnaireItemViewItem(
-            Questionnaire.Item.newBuilder().build(),
-            QuestionnaireResponse.Item.newBuilder()
-        ) {}
-        viewHolder.bind(questionnaireItemViewItem)
-        viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("")
+  @Test
+  @UiThreadTest
+  fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder().build(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("")
 
-        assertThat(
-            questionnaireItemViewItem.questionnaireResponseItemBuilder.answerCount
-        ).isEqualTo(0)
-    }
+    assertThat(questionnaireItemViewItem.questionnaireResponseItemBuilder.answerCount).isEqualTo(0)
+  }
 }

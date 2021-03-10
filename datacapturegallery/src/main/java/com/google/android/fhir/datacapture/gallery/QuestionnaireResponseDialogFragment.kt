@@ -24,23 +24,22 @@ import androidx.fragment.app.DialogFragment
 
 class QuestionnaireResponseDialogFragment() : DialogFragment() {
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val contents = requireArguments().getString(BUNDLE_KEY_CONTENTS)
-        return activity?.let {
-            val view = requireActivity().layoutInflater.inflate(
-                R.layout.questionnaire_response_dialog_contents,
-                null
-            )
-            view.findViewById<TextView>(R.id.contents).text = contents
+  override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    val contents = requireArguments().getString(BUNDLE_KEY_CONTENTS)
+    return activity?.let {
+      val view =
+        requireActivity()
+          .layoutInflater
+          .inflate(R.layout.questionnaire_response_dialog_contents, null)
+      view.findViewById<TextView>(R.id.contents).text = contents
 
-            AlertDialog.Builder(it)
-                .setView(view)
-                .create()
-        } ?: throw IllegalStateException("Activity cannot be null")
+      AlertDialog.Builder(it).setView(view).create()
     }
+      ?: throw IllegalStateException("Activity cannot be null")
+  }
 
-    companion object {
-        const val TAG = "questionnaire-response-dialog-fragment"
-        const val BUNDLE_KEY_CONTENTS = "contents"
-    }
+  companion object {
+    const val TAG = "questionnaire-response-dialog-fragment"
+    const val BUNDLE_KEY_CONTENTS = "contents"
+  }
 }

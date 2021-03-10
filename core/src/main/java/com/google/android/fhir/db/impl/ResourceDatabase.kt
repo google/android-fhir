@@ -34,26 +34,24 @@ import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
 
 @Database(
-    entities = [
-        ResourceEntity::class,
-        StringIndexEntity::class,
-        ReferenceIndexEntity::class,
-        TokenIndexEntity::class,
-        QuantityIndexEntity::class,
-        UriIndexEntity::class,
-        DateIndexEntity::class,
-        NumberIndexEntity::class,
-        SyncedResourceEntity::class,
-        LocalChangeEntity::class
-    ],
-    version = 1,
-    exportSchema = false
+  entities =
+    [
+      ResourceEntity::class,
+      StringIndexEntity::class,
+      ReferenceIndexEntity::class,
+      TokenIndexEntity::class,
+      QuantityIndexEntity::class,
+      UriIndexEntity::class,
+      DateIndexEntity::class,
+      NumberIndexEntity::class,
+      SyncedResourceEntity::class,
+      LocalChangeEntity::class],
+  version = 1,
+  exportSchema = false
 )
-@TypeConverters(
-    DbTypeConverters::class
-)
+@TypeConverters(DbTypeConverters::class)
 internal abstract class ResourceDatabase : RoomDatabase() {
-    abstract fun resourceDao(): ResourceDao
-    abstract fun syncedResourceDao(): SyncedResourceDao
-    abstract fun localChangeDao(): LocalChangeDao
+  abstract fun resourceDao(): ResourceDao
+  abstract fun syncedResourceDao(): SyncedResourceDao
+  abstract fun localChangeDao(): LocalChangeDao
 }

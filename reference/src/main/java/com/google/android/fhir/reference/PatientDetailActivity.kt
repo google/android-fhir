@@ -21,41 +21,45 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 
-/**
- * An activity representing a single Patient detail screen.
- */
+/** An activity representing a single Patient detail screen. */
 class PatientDetailActivity : AppCompatActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_patient_detail)
-        setSupportActionBar(findViewById(R.id.detail_toolbar))
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_patient_detail)
+    setSupportActionBar(findViewById(R.id.detail_toolbar))
 
-        // Show the Up button in the action bar.
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    // Show the Up button in the action bar.
+    supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        if (savedInstanceState == null) {
-            // Create the detail fragment and add it to the activity
-            // using a fragment transaction.
-            val fragment = PatientDetailFragment().apply {
-                arguments = Bundle().apply {
-                    putString(PatientDetailFragment.ARG_ITEM_ID,
-                            intent.getStringExtra(PatientDetailFragment.ARG_ITEM_ID))
-                }
+    if (savedInstanceState == null) {
+      // Create the detail fragment and add it to the activity
+      // using a fragment transaction.
+      val fragment =
+        PatientDetailFragment().apply {
+          arguments =
+            Bundle().apply {
+              putString(
+                PatientDetailFragment.ARG_ITEM_ID,
+                intent.getStringExtra(PatientDetailFragment.ARG_ITEM_ID)
+              )
             }
-
-            supportFragmentManager.beginTransaction()
-                    .add(R.id.patient_detail_container, fragment)
-                    .commit()
         }
+
+      supportFragmentManager
+        .beginTransaction()
+        .add(R.id.patient_detail_container, fragment)
+        .commit()
     }
+  }
 
-    override fun onOptionsItemSelected(item: MenuItem) =
-            when (item.itemId) { android.R.id.home -> {
-                    navigateUpTo(Intent(this, PatientListActivity::class.java))
+  override fun onOptionsItemSelected(item: MenuItem) =
+    when (item.itemId) {
+      android.R.id.home -> {
+        navigateUpTo(Intent(this, PatientListActivity::class.java))
 
-                    true
-                }
-                else -> super.onOptionsItemSelected(item)
-            }
+        true
+      }
+      else -> super.onOptionsItemSelected(item)
+    }
 }

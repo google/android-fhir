@@ -21,30 +21,36 @@ import org.hl7.fhir.r4.model.ResourceType
 
 /** Query that returns a list of serialized resources. */
 data class SerializedResourceQuery(
-    val resourceType: ResourceType,
-    val resourceIdQuery: ResourceIdQuery?,
-    val sortCriterion: SortCriterion?,
-    val limit: Int?,
-    val skip: Int?
+  val resourceType: ResourceType,
+  val resourceIdQuery: ResourceIdQuery?,
+  val sortCriterion: SortCriterion?,
+  val limit: Int?,
+  val skip: Int?
 ) : Query() {
-    override fun getQueryString(): String {
-        val queryBuilder = StringBuilder()
-        queryBuilder.appendln("""
+  override fun getQueryString(): String {
+    val queryBuilder = StringBuilder()
+    queryBuilder.appendln(
+      """
             SELECT a.serializedResource
             FROM ResourceEntity a
-        """.trimIndent())
-        sortCriterion?.also {
-            queryBuilder.appendln("""
+        """.trimIndent()
+    )
+    sortCriterion?.also {
+      queryBuilder.appendln(
+        """
                 LEFT JOIN ${sortCriterion.table} b
                 ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
-            """.trimIndent())
-        }
-        queryBuilder.appendln("""
+            """.trimIndent()
+      )
+    }
+    queryBuilder.appendln(
+      """
             WHERE a.resourceType = ?${resourceIdQuery?.let { " AND a.resourceId IN (${it.query})" } ?: ""}
-        """.trimIndent())
-        sortCriterion?.also {
-            queryBuilder.appendln(
-                """
+        """.trimIndent()
+    )
+    sortCriterion?.also {
+      queryBuilder.appendln(
+        """
                     ORDER BY b.index_value ${
                         if (sortCriterion.ascending) {
                             "ASC"
@@ -52,30 +58,32 @@ data class SerializedResourceQuery(
                             "DESC"
                         }
                     }
-                """.trimIndent())
-        }
-        limit?.also {
-            queryBuilder.appendln("""
+                """.trimIndent()
+      )
+    }
+    limit?.also {
+      queryBuilder.appendln(
+        """
                 LIMIT ?${skip?.let { " OFFSET ?" } ?: ""}
-            """.trimIndent())
-        }
-        return queryBuilder.toString().trimIndent()
+            """.trimIndent()
+      )
     }
+    return queryBuilder.toString().trimIndent()
+  }
 
-    override fun getQueryArgs(): List<Any> {
-        var list: List<Any> = if (sortCriterion == null) {
-            listOf()
-        } else {
-            listOf(sortCriterion.param)
-        }
-        list = list + resourceType.name
-        resourceIdQuery?.also { list = list + it.getQueryArgs() }
-        limit?.also {
-            list = list + it
-            skip?.also {
-                list = list + it
-            }
-        }
-        return list
+  override fun getQueryArgs(): List<Any> {
+    var list: List<Any> =
+      if (sortCriterion == null) {
+        listOf()
+      } else {
+        listOf(sortCriterion.param)
+      }
+    list = list + resourceType.name
+    resourceIdQuery?.also { list = list + it.getQueryArgs() }
+    limit?.also {
+      list = list + it
+      skip?.also { list = list + it }
     }
+    return list
+  }
 }
