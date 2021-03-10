@@ -20,6 +20,11 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.test.annotation.UiThreadTest
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.matcher.ViewMatchers.withClassName
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
@@ -27,25 +32,26 @@ import com.google.common.truth.Truth.assertThat
 import com.google.fhir.r4.core.Date
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireResponse
-import java.time.LocalDate
-import java.time.ZoneId
+import org.hamcrest.Matchers.containsString
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalDate
+import java.time.ZoneId
 
 @RunWith(AndroidJUnit4::class)
-class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
-    private lateinit var context: ContextThemeWrapper
+class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest: BaseRobot() {
+     lateinit var context2: ContextThemeWrapper
     private lateinit var parent: FrameLayout
     private lateinit var viewHolder: QuestionnaireItemViewHolder
 
     @Before
     fun setUp() {
-        context = ContextThemeWrapper(
+        context2 = ContextThemeWrapper(
             InstrumentationRegistry.getInstrumentation().targetContext,
             R.style.Theme_MaterialComponents
         )
-        parent = FrameLayout(context)
+        parent = FrameLayout(context2)
         viewHolder = QuestionnaireItemDatePickerViewHolderFactory.create(parent)
     }
 
@@ -113,4 +119,24 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
             viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString()
         ).isEqualTo("2020-01-01")
     }
+
+    @Test
+    @UiThreadTest
+    fun isTimePickerDisplayed() {
+        viewHolder.bind(
+            QuestionnaireItemViewItem(
+                Questionnaire.Item.newBuilder().apply {
+                    text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
+                }.build(),
+                QuestionnaireResponse.Item.newBuilder()
+            ) {}
+        )
+        viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).performClick()
+        onView(withId(R.id.textInputEditText)).perform(ViewActions.click())
+//        isDisplayed(withClassName(endsWith("android.widget.DatePicker")))
+            .check(
+                ViewAssertions.matches(withClassName(containsString("android.widget.DatePicker"))))
+    }
+
+
 }

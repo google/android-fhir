@@ -59,4 +59,5 @@ dependencies {
 
     androidTestImplementation deps.atsl.ext_junit
     androidTestImplementation deps.atsl.espresso
+    androidTestImplementation deps.atsl.ui_automator
 }

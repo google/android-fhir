@@ -80,7 +80,8 @@ dependencies {
     androidTestImplementation deps.atsl.rules
     androidTestImplementation deps.atsl.runner
     androidTestImplementation deps.truth
-
+    androidTestImplementation deps.atsl.espresso
+    androidTestImplementation deps.atsl.ui_automator
     api deps.fhir_protos
 
     coreLibraryDesugaring deps.desugar

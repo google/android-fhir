@@ -42,6 +42,7 @@ versions.spotless = '3.27.1'
 versions.truth = '1.0.1'
 versions.work = '2.3.4'
 versions.json_tools = '1.13'
+versions.uiautomator = '2.2.0'
 ext.versions = versions
 
 def deps = [:]
@@ -58,6 +59,7 @@ deps.atsl = atsl
 deps.caffeine = "com.github.ben-manes.caffeine:caffeine:$versions.caffeine"
 deps.constraint_layout = "androidx.constraintlayout:constraintlayout:$versions.constraint_layout"
 deps.core = "androidx.core:core-ktx:$versions.core"
+atsl.ui_automator = "androidx.test.uiautomator:uiautomator:$versions.uiautomator"
 def coroutines = [:]
 coroutines.android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.coroutines"
 coroutines.core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines"
