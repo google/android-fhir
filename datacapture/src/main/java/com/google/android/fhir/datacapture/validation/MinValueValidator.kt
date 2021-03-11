@@ -1,6 +1,5 @@
 package com.google.android.fhir.datacapture.validation
 
-import com.google.android.fhir.datacapture.validation.MaxValueValidator.getExtensionsByUrl
 import com.google.fhir.r4.core.Extension
 import com.google.fhir.r4.core.Questionnaire
 import com.google.fhir.r4.core.QuestionnaireResponse
@@ -12,27 +11,27 @@ object MinValueValidator : ConstraintValidator {
     override fun validate(
             questionnaireItem: Questionnaire.Item,
             questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder
-    ): QuestionnaireItemValidator.ValidationResult {
+    ): QuestionnaireResponseItemValidator.ValidationResult {
 
         val extension = questionnaireItem.getExtensionsByUrl(MIN_VALUE_EXTENSION_URL).firstOrNull()
-                ?: return QuestionnaireItemValidator.ValidationResult(true, emptyList())
+                ?: return QuestionnaireResponseItemValidator.ValidationResult(true, null)
         return minValueIntegerValidator(extension, questionnaireResponseItemBuilder)
     }
 
-    private fun minValueIntegerValidator(extension: Extension, questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder): QuestionnaireItemValidator.ValidationResult {
+    private fun minValueIntegerValidator(extension: Extension, questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder): QuestionnaireResponseItemValidator.ValidationResult {
         val response = questionnaireResponseItemBuilder.getAnswerBuilder(0).value
         when {
             extension.value.hasInteger() && response.hasInteger() -> {
                 val answer = questionnaireResponseItemBuilder.getAnswerBuilder(0).value.integer.value
                 if (answer < extension.value.integer.value) {
-                    return QuestionnaireItemValidator.ValidationResult(false, validationMessageGenerator(extension))
+                    return QuestionnaireResponseItemValidator.ValidationResult(false, validationMessageGenerator(extension))
                 }
             }
         }
-        return QuestionnaireItemValidator.ValidationResult(true, emptyList())
+        return QuestionnaireResponseItemValidator.ValidationResult(true, null)
     }
 
-    private fun validationMessageGenerator(extension: Extension): List<String> {
-        return listOf("Minimum value allowed is:" + extension.value.integer.value)
+    private fun validationMessageGenerator(extension: Extension): String {
+        return "Minimum value allowed is:" + extension.value.integer.value
     }
 }

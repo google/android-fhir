@@ -11,26 +11,26 @@ object MaxValueValidator : ConstraintValidator {
     override fun validate(
             questionnaireItem: Questionnaire.Item,
             questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder
-    ): QuestionnaireItemValidator.ValidationResult {
+    ): QuestionnaireResponseItemValidator.ValidationResult {
         val extension = questionnaireItem.getExtensionsByUrl(MAX_VALUE_EXTENSION_URL).firstOrNull()
-                ?: return QuestionnaireItemValidator.ValidationResult(true, emptyList())
+                ?: return QuestionnaireResponseItemValidator.ValidationResult(true, null)
         return maxValueIntegerValidator(extension, questionnaireResponseItemBuilder)
     }
 
-    private fun maxValueIntegerValidator(extension: Extension, questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder): QuestionnaireItemValidator.ValidationResult {
+    private fun maxValueIntegerValidator(extension: Extension, questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder): QuestionnaireResponseItemValidator.ValidationResult {
         val response = questionnaireResponseItemBuilder.getAnswerBuilder(0).value
         when {
             extension.value.hasInteger() && response.hasInteger() -> {
                 val answer = questionnaireResponseItemBuilder.getAnswerBuilder(0).value.integer.value
                 if (answer > extension.value.integer.value) {
-                    return QuestionnaireItemValidator.ValidationResult(false, validationMessageGenerator(extension))
+                    return QuestionnaireResponseItemValidator.ValidationResult(false, validationMessageGenerator(extension))
                 }
             }
         }
-        return QuestionnaireItemValidator.ValidationResult(true, emptyList())
+        return QuestionnaireResponseItemValidator.ValidationResult(true, null)
     }
 
-    private fun validationMessageGenerator(extension: Extension): List<String> {
-        return listOf("Maximum value allowed is:" + extension.value.integer.value)
+    private fun validationMessageGenerator(extension: Extension): String {
+        return "Maximum value allowed is:" + extension.value.integer.value
     }
 }

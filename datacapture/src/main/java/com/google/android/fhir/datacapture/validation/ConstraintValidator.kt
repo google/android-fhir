@@ -12,17 +12,16 @@ interface ConstraintValidator {
      * @param questionnaireResponseItemBuilder
      * @return
      */
-    fun validate(questionnaireItem: Questionnaire.Item, questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder): QuestionnaireItemValidator.ValidationResult
+    fun validate(questionnaireItem: Questionnaire.Item, questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder): QuestionnaireResponseItemValidator.ValidationResult
 
     /**
      * Returns an extension if exists by the URL
      *
      * @param extensionUrlValue
-     * @param questionnaireItem
      * @return
      */
     fun Questionnaire.Item.getExtensionsByUrl(extensionUrlValue: String): List<Extension> {
-        var extensions = mutableListOf<Extension>()
+        val extensions = mutableListOf<Extension>()
         val extensionIterator = this.extensionList.iterator()
         while (extensionIterator.hasNext()) {
             val extension = extensionIterator.next()
