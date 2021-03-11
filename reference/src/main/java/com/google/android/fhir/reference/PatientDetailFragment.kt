@@ -46,33 +46,7 @@ class PatientDetailFragment : Fragment() {
     val adapter = ObservationItemRecyclerViewAdapter()
     recyclerView.adapter = adapter
 
-    val fhirEngine: FhirEngine = FhirApplication.fhirEngine(requireContext())
     var patient: PatientListViewModel.PatientItem? = null
-
-    val viewModel: PatientListViewModel =
-      ViewModelProvider(
-          this,
-          PatientListViewModelFactory(this.requireActivity().application, fhirEngine)
-        )
-        .get(PatientListViewModel::class.java)
-
-    viewModel
-      .getObservations()
-      .observe(
-        viewLifecycleOwner,
-        Observer<List<PatientListViewModel.ObservationItem>> { adapter.submitList(it) }
-      )
-
-    arguments?.let {
-      if (it.containsKey(ARG_ITEM_ID)) {
-        patient =
-          it.getString(ARG_ITEM_ID)?.let { patient_index ->
-            viewModel.getPatientItem(patient_index)
-          }
-        activity?.findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout)?.title = patient?.name
-      }
-    }
-
     setupPatientData(rootView, patient)
 
     return rootView
