@@ -53,7 +53,6 @@ import java.lang.IllegalStateException
  */
 internal object EnablementEvaluator {
 
-
   /**
    * Returns whether [questionnaireItem] should be enabled.
    *
@@ -74,10 +73,7 @@ internal object EnablementEvaluator {
 
     // Evaluate single `enableWhen` constraint.
     if (enableWhenList.size == 1) {
-      return evaluateEnableWhen(
-        enableWhenList.single(),
-        questionnaireResponseItemRetriever
-      )
+      return evaluateEnableWhen(enableWhenList.single(), questionnaireResponseItemRetriever)
     }
 
     // Evaluate multiple `enableWhen` constraints and aggregate the results according to
@@ -86,17 +82,10 @@ internal object EnablementEvaluator {
     // enabled if ANY `enableWhen` constraint is satisfied.
     return when (val value = questionnaireItem.enableBehavior.value) {
       EnableWhenBehaviorCode.Value.ALL ->
-        enableWhenList.all {
-          evaluateEnableWhen(
-            it, questionnaireResponseItemRetriever)
-        }
+        enableWhenList.all { evaluateEnableWhen(it, questionnaireResponseItemRetriever) }
       EnableWhenBehaviorCode.Value.ANY ->
-        enableWhenList.any {
-          evaluateEnableWhen(
-            it, questionnaireResponseItemRetriever)
-        }
-      else ->
-        throw IllegalStateException("Unrecognized enable when behavior $value")
+        enableWhenList.any { evaluateEnableWhen(it, questionnaireResponseItemRetriever) }
+      else -> throw IllegalStateException("Unrecognized enable when behavior $value")
     }
   }
 }
@@ -104,8 +93,8 @@ internal object EnablementEvaluator {
 /**
  * Returns whether the `enableWhen` constraint is satisfied.
  *
- * @param questionnaireResponseItemRetriever function that returns the
- * [QuestionnaireResponse.Item] with the `linkId`, or null if there isn't one.
+ * @param questionnaireResponseItemRetriever function that returns the [QuestionnaireResponse.Item]
+ * with the `linkId`, or null if there isn't one.
  */
 private fun evaluateEnableWhen(
   enableWhen: Questionnaire.Item.EnableWhen,
@@ -117,8 +106,9 @@ private fun evaluateEnableWhen(
   return if (QuestionnaireItemOperatorCode.Value.EXISTS == enableWhen.operator.value) {
     (questionnairePair.second!!.answerCount > 0) == enableWhen.answer.boolean.value
   } else {
-    questionnairePair.second!!.contains(enableWhenTypeToPredicate(enableWhen,
-      questionnairePair.first!!.type))
+    questionnairePair.second!!.contains(
+      enableWhenTypeToPredicate(enableWhen, questionnairePair.first!!.type)
+    )
   }
 }
 

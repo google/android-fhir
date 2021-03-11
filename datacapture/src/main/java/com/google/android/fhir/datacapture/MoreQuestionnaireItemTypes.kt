@@ -38,8 +38,7 @@ fun Questionnaire.Item.EnableWhen.AnswerX.getValueForType(
     QuestionnaireItemTypeCode.Value.DATE_TIME -> this.dateTime
     QuestionnaireItemTypeCode.Value.TIME -> this.time
     QuestionnaireItemTypeCode.Value.CHOICE -> this.coding
-    QuestionnaireItemTypeCode.Value.STRING, QuestionnaireItemTypeCode.Value.TEXT ->
-      this.stringValue
+    QuestionnaireItemTypeCode.Value.STRING, QuestionnaireItemTypeCode.Value.TEXT -> this.stringValue
     else -> throw IllegalArgumentException("Unsupported value type $value")
   }
 
