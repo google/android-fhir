@@ -53,6 +53,7 @@ dependencies {
 
     coreLibraryDesugaring deps.desugar
 
+    implementation deps.activity
     implementation deps.appcompat
     implementation deps.constraint_layout
     implementation deps.coroutines.android
