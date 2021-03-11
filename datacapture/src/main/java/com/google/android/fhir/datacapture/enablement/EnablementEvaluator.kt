@@ -64,7 +64,7 @@ internal object EnablementEvaluator {
   fun evaluate(
     questionnaireItem: Questionnaire.Item,
     questionnaireResponseItemRetriever:
-    (linkId: String) -> Pair<Questionnaire.Item?, QuestionnaireResponse.Item?>
+      (linkId: String) -> Pair<Questionnaire.Item?, QuestionnaireResponse.Item?>
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhenList
 
@@ -99,7 +99,7 @@ internal object EnablementEvaluator {
 private fun evaluateEnableWhen(
   enableWhen: Questionnaire.Item.EnableWhen,
   questionnaireResponseItemRetriever:
-  (linkId: String) -> Pair<Questionnaire.Item?, QuestionnaireResponse.Item?>
+    (linkId: String) -> Pair<Questionnaire.Item?, QuestionnaireResponse.Item?>
 ): Boolean {
   val questionnairePair = questionnaireResponseItemRetriever(enableWhen.question.value)
   if (questionnairePair.first == null || questionnairePair.second == null) return true
@@ -135,11 +135,11 @@ private fun enableWhenTypeToPredicate(
   val enableWhenAnswerValue = enableWhen.answer.getValueForType(type)
   when (val operator = enableWhen.operator.value) {
     QuestionnaireItemOperatorCode.Value.EQUALS -> return {
-      it.getValueForType(type) == enableWhenAnswerValue
-    }
+        it.getValueForType(type) == enableWhenAnswerValue
+      }
     QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO -> return {
-      it.getValueForType(type) != enableWhenAnswerValue
-    }
+        it.getValueForType(type) != enableWhenAnswerValue
+      }
     else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
   }
 }
