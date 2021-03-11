@@ -23,7 +23,7 @@ import com.google.android.fhir.db.impl.dao.LocalChangeDao
 import com.google.android.fhir.db.impl.dao.ResourceDao
 import com.google.android.fhir.db.impl.dao.SyncedResourceDao
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
-import com.google.android.fhir.db.impl.entities.LocalChange
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.NumberIndexEntity
 import com.google.android.fhir.db.impl.entities.QuantityIndexEntity
 import com.google.android.fhir.db.impl.entities.ReferenceIndexEntity
@@ -34,26 +34,24 @@ import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
 
 @Database(
-    entities = [
-        ResourceEntity::class,
-        StringIndexEntity::class,
-        ReferenceIndexEntity::class,
-        TokenIndexEntity::class,
-        QuantityIndexEntity::class,
-        UriIndexEntity::class,
-        DateIndexEntity::class,
-        NumberIndexEntity::class,
-        SyncedResourceEntity::class,
-        LocalChange::class
-    ],
-    version = 1,
-    exportSchema = false
+  entities =
+    [
+      ResourceEntity::class,
+      StringIndexEntity::class,
+      ReferenceIndexEntity::class,
+      TokenIndexEntity::class,
+      QuantityIndexEntity::class,
+      UriIndexEntity::class,
+      DateIndexEntity::class,
+      NumberIndexEntity::class,
+      SyncedResourceEntity::class,
+      LocalChangeEntity::class],
+  version = 1,
+  exportSchema = false
 )
-@TypeConverters(
-    DbTypeConverters::class
-)
+@TypeConverters(DbTypeConverters::class)
 internal abstract class ResourceDatabase : RoomDatabase() {
-    abstract fun resourceDao(): ResourceDao
-    abstract fun syncedResourceDao(): SyncedResourceDao
-    abstract fun localChangeDao(): LocalChangeDao
+  abstract fun resourceDao(): ResourceDao
+  abstract fun syncedResourceDao(): SyncedResourceDao
+  abstract fun localChangeDao(): LocalChangeDao
 }

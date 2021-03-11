@@ -24,9 +24,9 @@ import java.math.BigDecimal
  * See https://hl7.org/FHIR/search.html#quantity.
  */
 internal data class QuantityIndex(
-    val name: String,
-    val path: String,
-    val system: String,
-    val unit: String,
-    val value: BigDecimal
+  val name: String,
+  val path: String,
+  val system: String,
+  val unit: String,
+  val value: BigDecimal
 )

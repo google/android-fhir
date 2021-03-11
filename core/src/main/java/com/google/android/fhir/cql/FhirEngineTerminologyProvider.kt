@@ -21,11 +21,11 @@ import org.opencds.cqf.cql.terminology.CodeSystemInfo
 import org.opencds.cqf.cql.terminology.TerminologyProvider
 import org.opencds.cqf.cql.terminology.ValueSetInfo
 
-/** Fhir Engine's implementation of [TerminologyProvider].  */
+/** Fhir Engine's implementation of [TerminologyProvider]. */
 internal class FhirEngineTerminologyProvider : TerminologyProvider {
-    override fun `in`(code: Code, valueSet: ValueSetInfo): Boolean = false
+  override fun `in`(code: Code, valueSet: ValueSetInfo): Boolean = false
 
-    override fun expand(valueSet: ValueSetInfo): Iterable<Code>? = null
+  override fun expand(valueSet: ValueSetInfo): Iterable<Code>? = null
 
-    override fun lookup(code: Code, codeSystem: CodeSystemInfo): Code? = null
+  override fun lookup(code: Code, codeSystem: CodeSystemInfo): Code? = null
 }

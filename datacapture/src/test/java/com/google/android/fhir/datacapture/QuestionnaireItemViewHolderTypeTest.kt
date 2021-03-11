@@ -26,15 +26,15 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class QuestionnaireItemViewHolderTypeTest {
-    @Test
-    fun size_shouldReturnNumberOfQuestionnaireViewHolderTypes() {
-        assertThat(QuestionnaireItemViewHolderType.values().size).isEqualTo(13)
-    }
+  @Test
+  fun size_shouldReturnNumberOfQuestionnaireViewHolderTypes() {
+    assertThat(QuestionnaireItemViewHolderType.values().size).isEqualTo(12)
+  }
 
-    @Test
-    fun fromInt_shouldReturnQuestionnaireViewHolderType() {
-        QuestionnaireItemViewHolderType.values().forEach {
-            assertThat(QuestionnaireItemViewHolderType.fromInt(it.value)).isEqualTo(it)
-        }
+  @Test
+  fun fromInt_shouldReturnQuestionnaireViewHolderType() {
+    QuestionnaireItemViewHolderType.values().forEach {
+      assertThat(QuestionnaireItemViewHolderType.fromInt(it.value)).isEqualTo(it)
     }
+  }
 }

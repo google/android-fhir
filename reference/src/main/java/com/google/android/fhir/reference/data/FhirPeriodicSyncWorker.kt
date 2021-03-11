@@ -22,12 +22,10 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.FhirApplication
 import com.google.android.fhir.sync.PeriodicSyncWorker
 
-class FhirPeriodicSyncWorker(
-    appContext: Context,
-    workerParams: WorkerParameters
-) : PeriodicSyncWorker(appContext, workerParams) {
+class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
+  PeriodicSyncWorker(appContext, workerParams) {
 
-    override fun getFhirEngine(): FhirEngine {
-        return FhirApplication.fhirEngine(applicationContext)
-    }
+  override fun getFhirEngine(): FhirEngine {
+    return FhirApplication.fhirEngine(applicationContext)
+  }
 }

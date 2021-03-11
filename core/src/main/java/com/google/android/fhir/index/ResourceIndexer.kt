@@ -16,7 +16,8 @@
 
 package com.google.android.fhir.index
 
-import android.util.Log
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.NumberIndex
@@ -26,353 +27,188 @@ import com.google.android.fhir.index.entities.StringIndex
 import com.google.android.fhir.index.entities.TokenIndex
 import com.google.android.fhir.index.entities.UriIndex
 import java.math.BigDecimal
-import java.util.Locale
-import org.hl7.fhir.instance.model.api.IBaseDatatype
-import org.hl7.fhir.r4.model.BaseDateTimeType
+import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
+import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.CodeableConcept
-import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Identifier
+import org.hl7.fhir.r4.model.InstantType
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Money
 import org.hl7.fhir.r4.model.Quantity
-import org.hl7.fhir.r4.model.Range
-import org.hl7.fhir.r4.model.Ratio
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.UriType
+import org.hl7.fhir.r4.model.codesystems.SearchParamType
+import org.hl7.fhir.r4.utils.FHIRPathEngine
 
+/**
+ * Indexes a FHIR resource according to the
+ * [search parameters](https://www.hl7.org/fhir/searchparameter-registry.html).
+ */
 internal object ResourceIndexer {
-    fun <R : Resource> index(resource: R) = extractIndexValues(resource)
+  private val context = FhirContext.forR4()
+  private val fhirPathEngine =
+    FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
 
-    /** Extracts the values to be indexed for `resource`.  */
-    private fun <R : Resource> extractIndexValues(resource: R): ResourceIndices {
-        val indexBuilder = ResourceIndices.Builder(resource.resourceType, resource.id)
-        resource.javaClass.fields.asSequence().mapNotNull {
-            it.getAnnotation(SearchParamDefinition::class.java)
-        }.filter {
-            it.path.hasDotNotationOnly()
-        }.forEach { searchParamDefinition ->
-            when (searchParamDefinition.type) {
-                SEARCH_PARAM_DEFINITION_TYPE_STRING -> {
-                    resource.valuesForPath(searchParamDefinition).stringValues().forEach { value ->
-                        indexBuilder.addStringIndex(
-                            StringIndex(
-                                name = searchParamDefinition.name,
-                                path = searchParamDefinition.path,
-                                value = value
-                            ))
-                    }
-                }
-                SEARCH_PARAM_DEFINITION_TYPE_REFERENCE -> {
-                    resource.valuesForPath(searchParamDefinition)
-                        .referenceValues()
-                        .forEach { reference ->
-                            if (reference.reference?.isNotEmpty() == true) {
-                                indexBuilder.addReferenceIndex(
-                                    ReferenceIndex(
-                                        name = searchParamDefinition.name,
-                                        path = searchParamDefinition.path,
-                                        value = reference.reference
-                                    ))
-                            }
-                        }
-                }
-                SEARCH_PARAM_DEFINITION_TYPE_CODE -> {
-                    resource.valuesForPath(searchParamDefinition).codeValues().forEach { code ->
-                        val system = code.system
-                        val value = code.code
-                        if (system?.isNotEmpty() == true && value?.isNotEmpty() == true) {
-                            indexBuilder.addTokenIndex(
-                                TokenIndex(
-                                    name = searchParamDefinition.name,
-                                    path = searchParamDefinition.path,
-                                    system = system,
-                                    value = value
-                                ))
-                        }
-                    }
-                }
-                SEARCH_PARAM_DEFINITION_TYPE_QUANTITY -> {
-                    resource.valuesForPath(searchParamDefinition)
-                        .quantityValues()
-                        .forEach { quantity ->
+  fun <R : Resource> index(resource: R) = extractIndexValues(resource)
 
-                            val system: String
-                            val unit: String
-                            val value: BigDecimal
-
-                            if (quantity is Quantity) {
-                                system = quantity.system
-                                unit = quantity.unit
-                                value = quantity.value
-                            } else if (quantity is Money) {
-                                system = FHIR_CURRENCY_SYSTEM
-                                unit = quantity.currency
-                                value = quantity.value
-                            } else {
-                                throw IllegalArgumentException(
-                                    "$quantity is of unknown type ${quantity.javaClass.simpleName}")
-                            }
-
-                            indexBuilder.addQuantityIndex(
-                                QuantityIndex(
-                                    name = searchParamDefinition.name,
-                                    path = searchParamDefinition.path,
-                                    system = system,
-                                    unit = unit,
-                                    value = value
-                                ))
-                        }
-                }
-                SEARCH_PARAM_DEFINITION_TYPE_URI -> {
-                    resource.valuesForPath(searchParamDefinition)
-                        .uriValues()
-                        .forEach { uri ->
-                            indexBuilder.addUriIndex(
-                                UriIndex(
-                                    name = searchParamDefinition.name,
-                                    path = searchParamDefinition.path,
-                                    uri = uri
-                                ))
-                        }
-                }
-                SEARCH_PARAM_DEFINITION_TYPE_DATE -> {
-                    resource.valuesForPath(searchParamDefinition).dateValues().forEach { date ->
-                        indexBuilder.addDateIndex(
-                            DateIndex(
-                                name = searchParamDefinition.name,
-                                path = searchParamDefinition.path,
-                                tsHigh = date.value.time,
-                                tsLow = date.value.time,
-                                temporalPrecision = date.precision))
-                    }
-                }
-                SEARCH_PARAM_DEFINITION_TYPE_NUMBER -> {
-                    resource.valuesForPath(searchParamDefinition).numberValues().forEach { number ->
-                        indexBuilder.addNumberIndex(
-                            NumberIndex(
-                                name = searchParamDefinition.name,
-                                path = searchParamDefinition.path,
-                                value = number))
-                    }
-                }
-
-                // TODO: Implement token, composite and special search parameter types.
-            }
+  private fun <R : Resource> extractIndexValues(resource: R): ResourceIndices {
+    val indexBuilder = ResourceIndices.Builder(resource.resourceType, resource.id)
+    resource
+      .javaClass
+      .fields
+      .asSequence()
+      .mapNotNull { it.getAnnotation(SearchParamDefinition::class.java) }
+      .filter { it.path.isNotEmpty() }
+      .map { it to fhirPathEngine.evaluate(resource, it.path) }
+      .flatMap { pair -> pair.second.map { pair.first to it } }
+      .forEach { pair ->
+        val (searchParam, value) = pair
+        when (SearchParamType.fromCode(pair.first.type)) {
+          SearchParamType.NUMBER ->
+            numberIndex(searchParam, value)?.also { indexBuilder.addNumberIndex(it) }
+          SearchParamType.DATE ->
+            dateIndex(searchParam, value)?.also { indexBuilder.addDateIndex(it) }
+          SearchParamType.STRING ->
+            stringIndex(searchParam, value)?.also { indexBuilder.addStringIndex(it) }
+          SearchParamType.TOKEN ->
+            tokenIndex(searchParam, value).forEach { indexBuilder.addTokenIndex(it) }
+          SearchParamType.REFERENCE ->
+            referenceIndex(searchParam, value)?.also { indexBuilder.addReferenceIndex(it) }
+          SearchParamType.QUANTITY ->
+            quantityIndex(searchParam, value)?.also { indexBuilder.addQuantityIndex(it) }
+          SearchParamType.URI -> uriIndex(searchParam, value)?.also { indexBuilder.addUriIndex(it) }
+        // TODO: Handle composite type https://github.com/google/android-fhir/issues/292.
+        // TODO: Handle special type https://github.com/google/android-fhir/issues/293.
         }
-        // For all resources,
-        // add 'last updated' timestamp to date index
-        if (resource.meta.hasLastUpdated()) {
-            val lastUpdatedElement = resource.meta.lastUpdatedElement
-            indexBuilder.addDateIndex(
-                DateIndex(
-                    name = "lastUpdated",
-                    path = arrayOf(resource.fhirType(), "meta", "lastUpdated")
-                        .joinToString(separator = "."),
-                    tsHigh = lastUpdatedElement.value.time,
-                    tsLow = lastUpdatedElement.value.time,
-                    temporalPrecision = lastUpdatedElement.precision
-                ))
+      }
+
+    // Add 'lastUpdated' index to all resources.
+    if (resource.meta.hasLastUpdated()) {
+      val lastUpdatedElement = resource.meta.lastUpdatedElement
+      indexBuilder.addDateIndex(
+        DateIndex(
+          name = "_lastUpdated",
+          path = arrayOf(resource.fhirType(), "meta", "lastUpdated").joinToString(separator = "."),
+          tsHigh = lastUpdatedElement.value.time,
+          tsLow = lastUpdatedElement.value.time,
+          temporalPrecision = lastUpdatedElement.precision
+        )
+      )
+    }
+
+    return indexBuilder.build()
+  }
+
+  private fun numberIndex(searchParam: SearchParamDefinition, value: Base): NumberIndex? =
+    when (value.fhirType()) {
+      "integer" ->
+        NumberIndex(searchParam.name, searchParam.path, BigDecimal((value as IntegerType).value))
+      "decimal" -> NumberIndex(searchParam.name, searchParam.path, (value as DecimalType).value)
+      else -> null
+    }
+
+  private fun dateIndex(searchParam: SearchParamDefinition, value: Base): DateIndex? =
+    when (value.fhirType()) {
+      "date" -> {
+        val date = value as DateType
+        DateIndex(
+          searchParam.name,
+          searchParam.path,
+          date.value.time,
+          date.value.time,
+          date.precision
+        )
+      }
+      "instant" -> {
+        val instant = value as InstantType
+        DateIndex(
+          searchParam.name,
+          searchParam.path,
+          instant.value.time,
+          instant.value.time,
+          instant.precision
+        )
+      }
+      else -> null
+    }
+
+  private fun stringIndex(searchParam: SearchParamDefinition, value: Base): StringIndex? =
+    if (!value.isEmpty) {
+      StringIndex(searchParam.name, searchParam.path, value.toString())
+    } else {
+      null
+    }
+
+  private fun tokenIndex(searchParam: SearchParamDefinition, value: Base): List<TokenIndex> =
+    when (value.fhirType()) {
+      "boolean" ->
+        listOf(
+          TokenIndex(searchParam.name, searchParam.path, system = null, value.primitiveValue())
+        )
+      "Identifier" -> {
+        val identifier = value as Identifier
+        if (identifier.value != null) {
+          listOf(
+            TokenIndex(searchParam.name, searchParam.path, identifier.system, identifier.value)
+          )
+        } else {
+          listOf()
         }
-        return indexBuilder.build()
-    }
-
-    /**
-     * Returns the representative string values for the list of `objects`.
-     *
-     * If an object in the list is a Java [String], the returned list will contain the value of
-     * the Java [String]. If an object in the list is a FHIR [StringType], the returned
-     * list will contain the value of the FHIR [StringType]. If an object in the list matches a
-     * server defined search type (HumanName, Address, etc), the returned list will contain the
-     * string value representative of the type.
-     */
-    private fun Sequence<Any>.stringValues(): Sequence<String> {
-        return mapNotNull {
-            when (it) {
-                is String -> {
-                    it
-                }
-                is StringType -> {
-                    it.value
-                }
-                else -> {
-                    // TODO: Implement the server defined search parameters. According to
-                    //  https://www.hl7.org/fhir/searchparameter-registry.html, name, device name,
-                    //  and address are defined by the server
-                    //  (the FHIR Engine library in this case).
-                    null
-                }
-            }
+      }
+      "CodeableConcept" -> {
+        val codeableConcept = value as CodeableConcept
+        codeableConcept.coding.filter { it.code != null && it.code!!.isNotEmpty() }.map {
+          TokenIndex(searchParam.name, searchParam.path, it.system ?: "", it.code)
         }
+      }
+      else -> listOf()
     }
 
-    /** Returns the reference values for the list of `objects`.  */
-    private fun Sequence<Any>.referenceValues(): Sequence<Reference> {
-        return filterIsInstance(Reference::class.java)
+  private fun referenceIndex(searchParam: SearchParamDefinition, value: Base): ReferenceIndex? {
+    val reference = (value as Reference).reference
+    return reference?.let { ReferenceIndex(searchParam.name, searchParam.path, it) }
+  }
+
+  private fun quantityIndex(searchParam: SearchParamDefinition, value: Base): QuantityIndex? =
+    when (value.fhirType()) {
+      "Money" -> {
+        val money = value as Money
+        QuantityIndex(
+          searchParam.name,
+          searchParam.path,
+          FHIR_CURRENCY_CODE_SYSTEM,
+          money.currency,
+          money.value
+        )
+      }
+      "Quantity" -> {
+        val quantity = value as Quantity
+        QuantityIndex(
+          searchParam.name,
+          searchParam.path,
+          quantity.system ?: "",
+          quantity.unit ?: "",
+          quantity.value
+        )
+      }
+      else -> null
     }
 
-    /** Returns the code values for the list of `objects`.  */
-    private fun Sequence<Any>.codeValues(): Sequence<Coding> {
-        return flatMap {
-            if (it is CodeableConcept) {
-                it.coding.asSequence()
-            } else {
-                emptySequence()
-            }
-        }
+  private fun uriIndex(searchParam: SearchParamDefinition, value: Base?): UriIndex? {
+    val uri = (value as UriType).value
+    return if (uri.isNotEmpty()) {
+      UriIndex(searchParam.name, searchParam.path, uri)
+    } else {
+      null
     }
+  }
 
-    /** Returns the quantity values for the list of `objects`.  */
-    private fun Sequence<Any>.quantityValues(): Sequence<IBaseDatatype> {
-        return flatMap {
-            when (it) {
-                is Money -> sequenceOf(it).filter { it.hasCurrency() }
-                is Quantity -> sequenceOf(it).filter { it.hasSystem() && it.hasCode() }
-                is Range -> sequenceOf(it.low, it.high).filter { it.hasSystem() && it.hasCode() }
-                is Ratio -> sequenceOf(it.numerator, it.denominator)
-                    .filter { it.hasSystem() && it.hasCode() }
-                // TODO: Find other FHIR datatypes types the "quantity" type maps to.
-                //  See: http://hl7.org/fhir/datatypes.html#quantity
-                // TODO: Add tests for Range and Ratio types
-                else -> emptySequence()
-            }
-        }
-    }
-
-    /** Returns the uri values for the list of `objects`.  */
-    private fun Sequence<Any>.uriValues(): Sequence<String> {
-        return flatMap {
-            when (it) {
-                is UriType -> sequenceOf(it.value)
-                is String -> sequenceOf(it)
-                else -> emptySequence()
-            }
-        }
-    }
-
-    /** Returns the Date values for a list of `objects`. */
-    private fun Sequence<Any>.dateValues(): Sequence<BaseDateTimeType> {
-        return flatMap {
-            /** BaseDateTimeType wraps around [java.util.Date] which is what we use to extract the
-             * timestamp. Some implementations return the timestamp in local (device) timezone.
-             * Additionally, time zones are likely to be missing from health data. Date indexing
-             * is a work in progress.
-             */
-            if (it is BaseDateTimeType) {
-                sequenceOf(it)
-            } else {
-                emptySequence()
-            }
-        }.filter { it.value != null }
-    }
-
-    /** Returns the number values for a list of `objects`. */
-    private fun Sequence<Any>.numberValues(): Sequence<BigDecimal> {
-        return flatMap {
-            when {
-                it is Integer -> sequenceOf(it.toInt().toBigDecimal())
-                it is BigDecimal -> sequenceOf(it)
-                else -> emptySequence()
-            }
-        }.filterNotNull()
-    }
-
-    /** Returns the list of values corresponding to the `path` in the `resource`.  */
-    private fun Resource.valuesForPath(definition: SearchParamDefinition): Sequence<Any> {
-        val paths = definition.path.split(SEPARATOR_REGEX)
-        if (paths.size <= 1) {
-            return emptySequence()
-        }
-        return paths.asSequence().drop(1).fold(sequenceOf<Any>(this)) { acc, next ->
-            getFieldValues(acc, next, definition.type)
-        }
-    }
-
-    /**
-     * Returns the list of field values for `fieldName` in each of the `objects`.
-     *
-     * If the field is a [Collection], it will be expanded and each element of the [Collection]
-     * will be added to the returned value.
-     */
-    private fun getFieldValues(
-        objects: Sequence<Any>,
-        fieldName: String,
-        type: String
-    ): Sequence<Any> {
-        return objects.asSequence().flatMap {
-            val value = try {
-                /* TODO
-                 * Upstream HAPI FHIR returns FHIR date* types from getxxDate methods as
-                 * java.util.Date. For HAPI FHIR BaseDateTimeTypes, which support TimeZones
-                 * we need to invoke() getxxDateElement. Hence we need to pass in search parameter
-                 * type to getGetterName below.
-                 */
-                it.javaClass.getMethod(getGetterName(fieldName, type)).invoke(it)
-            } catch (error: Throwable) {
-                Log.w(TAG, error)
-                null
-            }
-            if (value is Collection<*>) {
-                value.asSequence()
-            } else {
-                sequenceOf(value)
-            }
-        }.filterNotNull()
-    }
-
-    /** Returns the name of the method to retrieve the field `fieldName`.  */
-    private fun getGetterName(fieldName: String, type: String): String {
-        val baseGetter = GETTER_PREFIX +
-            fieldName.substring(0, 1).toUpperCase(Locale.US) +
-            fieldName.substring(1)
-        when (type) {
-            "date" -> return baseGetter + GETTER_SUFFIX_DATE
-            else -> return baseGetter
-        }
-    }
-
-    /**
-     * Returns whether the given path only uses a dot notation with no additional expressions such
-     * as where() or exists().
-     */
-    @Suppress("NOTHING_TO_INLINE")
-    private inline fun String.hasDotNotationOnly() = matches(DOT_NOTATION_REGEX)
-
-    /** The prefix of getter methods for retrieving field values.  */
-    private const val GETTER_PREFIX = "get"
-
-    /** The suffix of getter methods for retrieving a date 'Element'.  */
-    private const val GETTER_SUFFIX_DATE = "Element"
-
-    /** The regular expression for the separator  */
-    private val SEPARATOR_REGEX = "\\.".toRegex()
-
-    /** The string representing the string search parameter type.  */
-    private const val SEARCH_PARAM_DEFINITION_TYPE_STRING = "string"
-
-    /** The string representing the reference search parameter type.  */
-    private const val SEARCH_PARAM_DEFINITION_TYPE_REFERENCE = "reference"
-
-    /** The string representing the code search parameter type.  */
-    private const val SEARCH_PARAM_DEFINITION_TYPE_CODE = "token"
-
-    /** The string representing the quantity search parameter type.  */
-    private const val SEARCH_PARAM_DEFINITION_TYPE_QUANTITY = "quantity"
-
-    /** The string representing the uri search parameter type.  */
-    private const val SEARCH_PARAM_DEFINITION_TYPE_URI = "uri"
-
-    /** The string representing the date search parameter type. */
-    private const val SEARCH_PARAM_DEFINITION_TYPE_DATE = "date"
-
-    /** The string representing the number search parameter type. */
-    private const val SEARCH_PARAM_DEFINITION_TYPE_NUMBER = "number"
-
-    /** The string for FHIR currency system */
-    // See: https://bit.ly/30YB3ML
-    // See: https://www.hl7.org/fhir/valueset-currencies.html
-    private const val FHIR_CURRENCY_SYSTEM = "urn:iso:std:iso:4217"
-
-    /** Tag for logging.  */
-    private const val TAG = "FhirIndexerImpl"
-    private val DOT_NOTATION_REGEX = "^[a-zA-Z0-9.]+$".toRegex()
+  /**
+   * The FHIR currency code system. See: https://bit.ly/30YB3ML. See:
+   * https://www.hl7.org/fhir/valueset-currencies.html.
+   */
+  private const val FHIR_CURRENCY_CODE_SYSTEM = "urn:iso:std:iso:4217"
 }

@@ -37,135 +37,180 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class QuestionnaireViewModelTest {
-    private lateinit var state: SavedStateHandle
+  private lateinit var state: SavedStateHandle
 
-    @Before
-    fun setUp() {
-        state = SavedStateHandle()
-    }
+  @Before
+  fun setUp() {
+    state = SavedStateHandle()
+  }
 
-    @Test
-    fun questionnaireResponse_shouldCopyQuestionnaireId() {
-        val questionnaire = Questionnaire.newBuilder().apply {
-            // TODO: if id = a-questionnaire, the json parser sets questionnaire.id.myCoercedValue =
-            // "Questionnaire/a-questionniare" when decoding which results in the test failing
-            id = Id.newBuilder().setValue("a-questionnaire").build()
-        }.build()
-        val serializedQuestionniare = printer.print(questionnaire)
-        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
-        val viewModel = QuestionnaireViewModel(state)
-        assertResourceEquals(
-            viewModel.getQuestionnaireResponse(),
-            QuestionnaireResponse.newBuilder().apply {
-                this.questionnaire = Canonical.newBuilder().setValue("a-questionnaire").build()
-            }.build()
-        )
-    }
+  @Test
+  fun questionnaireResponse_shouldCopyQuestionnaireId() {
+    val questionnaire =
+      Questionnaire.newBuilder()
+        .apply {
+          // TODO: if id = a-questionnaire, the json parser sets
+          // questionnaire.id.myCoercedValue
+          // =
+          // "Questionnaire/a-questionniare" when decoding which results in the test
+          // failing
+          id = Id.newBuilder().setValue("a-questionnaire").build()
+        }
+        .build()
+    val serializedQuestionniare = printer.print(questionnaire)
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+    val viewModel = QuestionnaireViewModel(state)
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse.newBuilder()
+        .apply { this.questionnaire = Canonical.newBuilder().setValue("a-questionnaire").build() }
+        .build()
+    )
+  }
 
-    @Test
-    fun questionnaireResponse_shouldCopyQuestion() {
-        val questionnaire = Questionnaire.newBuilder().apply {
-            id = Id.newBuilder().setValue("a-questionnaire").build()
-            addItem(Questionnaire.Item.newBuilder().apply {
+  @Test
+  fun questionnaireResponse_shouldCopyQuestion() {
+    val questionnaire =
+      Questionnaire.newBuilder()
+        .apply {
+          id = Id.newBuilder().setValue("a-questionnaire").build()
+          addItem(
+            Questionnaire.Item.newBuilder()
+              .apply {
                 linkId = String.newBuilder().setValue("a-link-id").build()
                 text = String.newBuilder().setValue("Yes or no?").build()
-                type = Questionnaire.Item.TypeCode.newBuilder()
-                    .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN).build()
-            }.build())
-        }.build()
-        val serializedQuestionniare = printer.print(questionnaire)
-        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
-        val viewModel = QuestionnaireViewModel(state)
-        assertResourceEquals(
-            viewModel.getQuestionnaireResponse(),
-            QuestionnaireResponse.newBuilder().apply {
-                this.questionnaire = Canonical.newBuilder().setValue("a-questionnaire").build()
-                addItem(QuestionnaireResponse.Item.newBuilder().apply {
-                    linkId = String.newBuilder().setValue("a-link-id").build()
-                }.build())
-            }.build()
-        )
-    }
-
-    @Test
-    fun questionnaireResponse_group_shouldCopyQuestionnaireStructure() {
-        val questionnaire = Questionnaire.newBuilder().apply {
-            id = Id.newBuilder().setValue("a-questionnaire").build()
-            addItem(Questionnaire.Item.newBuilder().apply {
-                linkId = String.newBuilder().setValue("a-link-id").build()
-                text = String.newBuilder().setValue("Basic questions").build()
-                type = Questionnaire.Item.TypeCode.newBuilder()
-                    .setValue(QuestionnaireItemTypeCode.Value.GROUP).build()
-                addItem(Questionnaire.Item.newBuilder().apply {
-                    linkId = String.newBuilder().setValue("another-link-id").build()
-                    text = String.newBuilder().setValue("Name?").build()
-                    type = Questionnaire.Item.TypeCode.newBuilder()
-                        .setValue(QuestionnaireItemTypeCode.Value.STRING).build()
-                })
-            })
-        }.build()
-        val serializedQuestionniare = printer.print(questionnaire)
-        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
-        val viewModel = QuestionnaireViewModel(state)
-        assertResourceEquals(
-            viewModel.getQuestionnaireResponse(),
-            QuestionnaireResponse.newBuilder().apply {
-                this.questionnaire = Canonical.newBuilder().setValue("a-questionnaire").build()
-                addItem(QuestionnaireResponse.Item.newBuilder().apply {
-                    linkId = String.newBuilder().setValue("a-link-id").build()
-                    addItem(QuestionnaireResponse.Item.newBuilder().apply {
-                        linkId = String.newBuilder().setValue("another-link-id").build()
-                    })
-                })
-            }.build()
-        )
-    }
-
-    @Test
-    fun questionnaireItemViewItemList_shouldGenerateQuestionnaireItemViewItemList() = runBlocking {
-        val questionnaire = Questionnaire.newBuilder().apply {
-            id = Id.newBuilder().setValue("a-questionnaire").build()
-            addItem(Questionnaire.Item.newBuilder().apply {
-                linkId = String.newBuilder().setValue("a-link-id").build()
-                text = String.newBuilder().setValue("Basic questions").build()
-                type = Questionnaire.Item.TypeCode.newBuilder()
-                    .setValue(QuestionnaireItemTypeCode.Value.GROUP).build()
-                addItem(Questionnaire.Item.newBuilder().apply {
-                    linkId = String.newBuilder().setValue("another-link-id").build()
-                    text = String.newBuilder().setValue("Name?").build()
-                    type = Questionnaire.Item.TypeCode.newBuilder()
-                        .setValue(QuestionnaireItemTypeCode.Value.STRING).build()
-                })
-            })
-        }.build()
-        val serializedQuestionnaire = printer.print(questionnaire)
-        state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
-        val viewModel = QuestionnaireViewModel(state)
-        var questionnaireItemViewItemList = viewModel.questionnaireItemViewItemList
-        questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
-        assertThat(questionnaireItemViewItemList.size).isEqualTo(2)
-        val firstQuestionnaireItemViewItem = questionnaireItemViewItemList[0]
-        val firstQuestionnaireItem = firstQuestionnaireItemViewItem.questionnaireItem
-        assertThat(firstQuestionnaireItem.linkId.value).isEqualTo("a-link-id")
-        assertThat(firstQuestionnaireItem.text.value).isEqualTo("Basic questions")
-        assertThat(firstQuestionnaireItem.type.value)
-            .isEqualTo(QuestionnaireItemTypeCode.Value.GROUP)
-        assertThat(firstQuestionnaireItemViewItem.questionnaireResponseItemBuilder.linkId.value)
-            .isEqualTo("a-link-id")
-        val secondQuestionnaireItemViewItem = questionnaireItemViewItemList[1]
-        val secondQuestionnaireItem = secondQuestionnaireItemViewItem.questionnaireItem
-        assertThat(secondQuestionnaireItem.linkId.value).isEqualTo("another-link-id")
-        assertThat(secondQuestionnaireItem.text.value).isEqualTo("Name?")
-        assertThat(secondQuestionnaireItem.type.value)
-            .isEqualTo(QuestionnaireItemTypeCode.Value.STRING)
-        assertThat(secondQuestionnaireItemViewItem.questionnaireResponseItemBuilder.linkId.value)
-            .isEqualTo("another-link-id")
-    }
-
-    private companion object {
-        val printer: JsonFormat.Printer = JsonFormat.getPrinter()
-        fun assertResourceEquals(r1: Message, r2: Message) {
-            assertThat(printer.print(r1)).isEqualTo(printer.print(r2))
+                type =
+                  Questionnaire.Item.TypeCode.newBuilder()
+                    .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+                    .build()
+              }
+              .build()
+          )
         }
+        .build()
+    val serializedQuestionniare = printer.print(questionnaire)
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+    val viewModel = QuestionnaireViewModel(state)
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse.newBuilder()
+        .apply {
+          this.questionnaire = Canonical.newBuilder().setValue("a-questionnaire").build()
+          addItem(
+            QuestionnaireResponse.Item.newBuilder()
+              .apply { linkId = String.newBuilder().setValue("a-link-id").build() }
+              .build()
+          )
+        }
+        .build()
+    )
+  }
+
+  @Test
+  fun questionnaireResponse_group_shouldCopyQuestionnaireStructure() {
+    val questionnaire =
+      Questionnaire.newBuilder()
+        .apply {
+          id = Id.newBuilder().setValue("a-questionnaire").build()
+          addItem(
+            Questionnaire.Item.newBuilder().apply {
+              linkId = String.newBuilder().setValue("a-link-id").build()
+              text = String.newBuilder().setValue("Basic questions").build()
+              type =
+                Questionnaire.Item.TypeCode.newBuilder()
+                  .setValue(QuestionnaireItemTypeCode.Value.GROUP)
+                  .build()
+              addItem(
+                Questionnaire.Item.newBuilder().apply {
+                  linkId = String.newBuilder().setValue("another-link-id").build()
+                  text = String.newBuilder().setValue("Name?").build()
+                  type =
+                    Questionnaire.Item.TypeCode.newBuilder()
+                      .setValue(QuestionnaireItemTypeCode.Value.STRING)
+                      .build()
+                }
+              )
+            }
+          )
+        }
+        .build()
+    val serializedQuestionniare = printer.print(questionnaire)
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+    val viewModel = QuestionnaireViewModel(state)
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse.newBuilder()
+        .apply {
+          this.questionnaire = Canonical.newBuilder().setValue("a-questionnaire").build()
+          addItem(
+            QuestionnaireResponse.Item.newBuilder().apply {
+              linkId = String.newBuilder().setValue("a-link-id").build()
+              addItem(
+                QuestionnaireResponse.Item.newBuilder().apply {
+                  linkId = String.newBuilder().setValue("another-link-id").build()
+                }
+              )
+            }
+          )
+        }
+        .build()
+    )
+  }
+
+  @Test
+  fun questionnaireItemViewItemList_shouldGenerateQuestionnaireItemViewItemList() = runBlocking {
+    val questionnaire =
+      Questionnaire.newBuilder()
+        .apply {
+          id = Id.newBuilder().setValue("a-questionnaire").build()
+          addItem(
+            Questionnaire.Item.newBuilder().apply {
+              linkId = String.newBuilder().setValue("a-link-id").build()
+              text = String.newBuilder().setValue("Basic questions").build()
+              type =
+                Questionnaire.Item.TypeCode.newBuilder()
+                  .setValue(QuestionnaireItemTypeCode.Value.GROUP)
+                  .build()
+              addItem(
+                Questionnaire.Item.newBuilder().apply {
+                  linkId = String.newBuilder().setValue("another-link-id").build()
+                  text = String.newBuilder().setValue("Name?").build()
+                  type =
+                    Questionnaire.Item.TypeCode.newBuilder()
+                      .setValue(QuestionnaireItemTypeCode.Value.STRING)
+                      .build()
+                }
+              )
+            }
+          )
+        }
+        .build()
+    val serializedQuestionnaire = printer.print(questionnaire)
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+    val viewModel = QuestionnaireViewModel(state)
+    var questionnaireItemViewItemList = viewModel.questionnaireItemViewItemList
+    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
+    assertThat(questionnaireItemViewItemList.size).isEqualTo(2)
+    val firstQuestionnaireItemViewItem = questionnaireItemViewItemList[0]
+    val firstQuestionnaireItem = firstQuestionnaireItemViewItem.questionnaireItem
+    assertThat(firstQuestionnaireItem.linkId.value).isEqualTo("a-link-id")
+    assertThat(firstQuestionnaireItem.text.value).isEqualTo("Basic questions")
+    assertThat(firstQuestionnaireItem.type.value).isEqualTo(QuestionnaireItemTypeCode.Value.GROUP)
+    assertThat(firstQuestionnaireItemViewItem.questionnaireResponseItemBuilder.linkId.value)
+      .isEqualTo("a-link-id")
+    val secondQuestionnaireItemViewItem = questionnaireItemViewItemList[1]
+    val secondQuestionnaireItem = secondQuestionnaireItemViewItem.questionnaireItem
+    assertThat(secondQuestionnaireItem.linkId.value).isEqualTo("another-link-id")
+    assertThat(secondQuestionnaireItem.text.value).isEqualTo("Name?")
+    assertThat(secondQuestionnaireItem.type.value).isEqualTo(QuestionnaireItemTypeCode.Value.STRING)
+    assertThat(secondQuestionnaireItemViewItem.questionnaireResponseItemBuilder.linkId.value)
+      .isEqualTo("another-link-id")
+  }
+
+  private companion object {
+    val printer: JsonFormat.Printer = JsonFormat.getPrinter()
+    fun assertResourceEquals(r1: Message, r2: Message) {
+      assertThat(printer.print(r1)).isEqualTo(printer.print(r2))
     }
+  }
 }

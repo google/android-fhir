@@ -31,92 +31,108 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
-    private val parent = FrameLayout(InstrumentationRegistry.getInstrumentation().context)
-    private val viewHolder = QuestionnaireItemCheckBoxViewHolderFactory.create(parent)
+  private val parent = FrameLayout(InstrumentationRegistry.getInstrumentation().context)
+  private val viewHolder = QuestionnaireItemCheckBoxViewHolderFactory.create(parent)
 
-    @Test
-    fun shouldSetCheckBoxText() {
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder()
-            ) {}
-        )
+  @Test
+  fun shouldSetCheckBoxText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply {
+            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
+          }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    )
 
-        assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).text).isEqualTo(
-            "Question?"
-        )
-    }
+    assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).text)
+      .isEqualTo("Question?")
+  }
 
-    @Test
-    fun noAnswer_shouldSetCheckBoxUnchecked() {
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder()
-            ) {}
-        )
+  @Test
+  fun noAnswer_shouldSetCheckBoxUnchecked() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply {
+            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
+          }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    )
 
-        assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).isChecked).isFalse()
-    }
+    assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).isChecked).isFalse()
+  }
 
-    @Test
-    @UiThreadTest
-    fun answerTrue_shouldSetCheckBoxChecked() {
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder().addAnswer(
-                    QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                        value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setBoolean(Boolean.newBuilder().setValue(true)).build()
-                    }
-                )
-            ) {}
-        )
+  @Test
+  @UiThreadTest
+  fun answerTrue_shouldSetCheckBoxChecked() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply {
+            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
+          }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+          .addAnswer(
+            QuestionnaireResponse.Item.Answer.newBuilder().apply {
+              value =
+                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                  .setBoolean(Boolean.newBuilder().setValue(true))
+                  .build()
+            }
+          )
+      ) {}
+    )
 
-        assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).isChecked).isTrue()
-    }
+    assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).isChecked).isTrue()
+  }
 
-    @Test
-    fun answerFalse_shouldSetCheckBoxUnchecked() {
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder().addAnswer(
-                    QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                        value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                            .setBoolean(Boolean.newBuilder().setValue(false)).build()
-                    }
-                )
-            ) {}
-        )
+  @Test
+  fun answerFalse_shouldSetCheckBoxUnchecked() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply {
+            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
+          }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+          .addAnswer(
+            QuestionnaireResponse.Item.Answer.newBuilder().apply {
+              value =
+                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                  .setBoolean(Boolean.newBuilder().setValue(false))
+                  .build()
+            }
+          )
+      ) {}
+    )
 
-        assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).isChecked).isFalse()
-    }
+    assertThat(viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).isChecked).isFalse()
+  }
 
-    @Test
-    @UiThreadTest
-    fun shouldSetQuestionnaireResponseItemComponentAnswer() {
-        val questionnaireItemViewItem = QuestionnaireItemViewItem(
-            Questionnaire.Item.newBuilder().apply {
-                text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-            }.build(),
-            QuestionnaireResponse.Item.newBuilder()
-        ) {}
-        viewHolder.bind(questionnaireItemViewItem)
-        viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).performClick()
+  @Test
+  @UiThreadTest
+  fun shouldSetQuestionnaireResponseItemComponentAnswer() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply {
+            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
+          }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).performClick()
 
-        val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerBuilderList
-        assertThat(answer.size).isEqualTo(1)
-        assertThat(answer[0].value.boolean.value).isTrue()
-    }
+    val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerBuilderList
+    assertThat(answer.size).isEqualTo(1)
+    assertThat(answer[0].value.boolean.value).isTrue()
+  }
 }

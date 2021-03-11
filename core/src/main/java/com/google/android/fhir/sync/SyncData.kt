@@ -20,25 +20,21 @@ import java.net.URLEncoder
 import org.hl7.fhir.r4.model.ResourceType
 
 fun SyncData.concatParams(): String {
-    return this.params.entries.joinToString("&") { (key, value) ->
-        "$key=${URLEncoder.encode(value, "UTF-8")}"
-    }
+  return this.params.entries.joinToString("&") { (key, value) ->
+    "$key=${URLEncoder.encode(value, "UTF-8")}"
+  }
 }
 
 /**
  * Class that holds what type of resources we need to synchronise and what are the parameters of
- * that type.
- * e.g. we only want to synchronise patients that live in United States
- *  `SyncData(ResourceType.Patient, mapOf("address-country" to "United States")`
+ * that type. e.g. we only want to synchronise patients that live in United States
+ * `SyncData(ResourceType.Patient, mapOf("address-country" to "United States")`
  */
-data class SyncData(
-    val resourceType: ResourceType,
-    val params: Map<String, String> = emptyMap()
-) {
-    companion object {
-        const val SORT_KEY = "_sort"
-        const val LAST_UPDATED_KEY = "_lastUpdated"
-        const val ADDRESS_COUNTRY_KEY = "address-country"
-        const val LAST_UPDATED_ASC_VALUE = "_lastUpdated"
-    }
+data class SyncData(val resourceType: ResourceType, val params: Map<String, String> = emptyMap()) {
+  companion object {
+    const val SORT_KEY = "_sort"
+    const val LAST_UPDATED_KEY = "_lastUpdated"
+    const val ADDRESS_COUNTRY_KEY = "address-country"
+    const val LAST_UPDATED_ASC_VALUE = "_lastUpdated"
+  }
 }

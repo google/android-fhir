@@ -28,18 +28,18 @@ import com.google.fhir.shaded.protobuf.Message
  * [QuestionnaireItemTypeCode.Value.URL] do not have an explicit EnableWhen answer).
  */
 fun Questionnaire.Item.EnableWhen.AnswerX.getValueForType(
-    type: Questionnaire.Item.TypeCode
-): Message = when (val value = type.value) {
+  type: Questionnaire.Item.TypeCode
+): Message =
+  when (val value = type.value) {
     QuestionnaireItemTypeCode.Value.DATE -> this.date
     QuestionnaireItemTypeCode.Value.BOOLEAN -> this.boolean
     QuestionnaireItemTypeCode.Value.DECIMAL -> this.decimal
     QuestionnaireItemTypeCode.Value.INTEGER -> this.integer
     QuestionnaireItemTypeCode.Value.DATE_TIME -> this.dateTime
     QuestionnaireItemTypeCode.Value.TIME -> this.time
-    QuestionnaireItemTypeCode.Value.STRING, QuestionnaireItemTypeCode.Value.TEXT ->
-        this.stringValue
+    QuestionnaireItemTypeCode.Value.STRING, QuestionnaireItemTypeCode.Value.TEXT -> this.stringValue
     else -> throw IllegalArgumentException("Unsupported value type $value")
-}
+  }
 
 /**
  * Returns the value of the [QuestionnaireResponse.Item.Answer] for the [type].
@@ -47,9 +47,8 @@ fun Questionnaire.Item.EnableWhen.AnswerX.getValueForType(
  * @throws IllegalArgumentException if [type] is not supported (for example, questions of type
  * [QuestionnaireItemTypeCode.Value.GROUP] do not collect any answer).
  */
-fun QuestionnaireResponse.Item.Answer.getValueForType(
-    type: Questionnaire.Item.TypeCode
-): Message = when (val value = type.value) {
+fun QuestionnaireResponse.Item.Answer.getValueForType(type: Questionnaire.Item.TypeCode): Message =
+  when (val value = type.value) {
     QuestionnaireItemTypeCode.Value.DATE -> this.value.date
     QuestionnaireItemTypeCode.Value.BOOLEAN -> this.value.boolean
     QuestionnaireItemTypeCode.Value.DECIMAL -> this.value.decimal
@@ -57,7 +56,7 @@ fun QuestionnaireResponse.Item.Answer.getValueForType(
     QuestionnaireItemTypeCode.Value.DATE_TIME -> this.value.dateTime
     QuestionnaireItemTypeCode.Value.TIME -> this.value.time
     QuestionnaireItemTypeCode.Value.STRING, QuestionnaireItemTypeCode.Value.TEXT ->
-        this.value.stringValue
+      this.value.stringValue
     QuestionnaireItemTypeCode.Value.URL -> this.value.uri
     else -> throw IllegalArgumentException("Unsupported value type $value")
-}
+  }

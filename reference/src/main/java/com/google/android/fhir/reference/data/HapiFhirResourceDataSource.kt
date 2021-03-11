@@ -20,14 +20,10 @@ import com.google.android.fhir.reference.api.HapiFhirService
 import com.google.android.fhir.sync.FhirDataSource
 import org.hl7.fhir.r4.model.Bundle
 
-/**
- * Implementation of the [FhirDataSource] that communicates with hapi fhir.
- */
-class HapiFhirResourceDataSource(
-    private val service: HapiFhirService
-) : FhirDataSource {
+/** Implementation of the [FhirDataSource] that communicates with hapi fhir. */
+class HapiFhirResourceDataSource(private val service: HapiFhirService) : FhirDataSource {
 
-    override suspend fun loadData(path: String): Bundle {
-        return service.getResource(path)
-    }
+  override suspend fun loadData(path: String): Bundle {
+    return service.getResource(path)
+  }
 }

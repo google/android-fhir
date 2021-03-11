@@ -21,8 +21,8 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.db.impl.entities.LocalChange
-import com.google.android.fhir.db.impl.entities.LocalChange.Type
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
 import com.google.android.fhir.toTimeZoneString
 import java.util.Date
 import org.hl7.fhir.r4.model.Resource
@@ -30,122 +30,124 @@ import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * Dao for local changes made to a resource. One row in LocalChangeEntity corresponds to one change
- * e.g. an INSERT or UPDATE. The UPDATES (diffs) are stored as RFC 6902 JSON patches.
- * When a resource needs to be synced, all corresponding LocalChanges are 'squashed' to create a
- * a single LocalChange to sync with the server.
+ * e.g. an INSERT or UPDATE. The UPDATES (diffs) are stored as RFC 6902 JSON patches. When a
+ * resource needs to be synced, all corresponding LocalChanges are 'squashed' to create a a single
+ * LocalChangeEntity to sync with the server.
  */
 @Dao
 internal abstract class LocalChangeDao {
 
-    lateinit var iParser: IParser
+  lateinit var iParser: IParser
 
-    @Insert
-    abstract fun addLocalChange(localChange: LocalChange)
+  @Insert abstract fun addLocalChange(localChangeEntity: LocalChangeEntity)
 
-    @Transaction
-    open fun addInsertAll(resources: List<Resource>) {
-        resources.forEach { resource ->
-            addInsert(resource)
-        }
+  @Transaction
+  open fun addInsertAll(resources: List<Resource>) {
+    resources.forEach { resource -> addInsert(resource) }
+  }
+
+  fun addInsert(resource: Resource) {
+    val resourceId = resource.id
+    val resourceType = resource.resourceType
+    val timestamp = Date().toTimeZoneString()
+    val resourceString = iParser.encodeResourceToString(resource)
+
+    addLocalChange(
+      LocalChangeEntity(
+        id = 0,
+        resourceType = resourceType.name,
+        resourceId = resourceId,
+        timestamp = timestamp,
+        type = Type.INSERT,
+        payload = resourceString
+      )
+    )
+  }
+
+  fun addUpdate(oldResource: Resource, resource: Resource) {
+    val resourceId = resource.id
+    val resourceType = resource.resourceType
+    val timestamp = Date().toTimeZoneString()
+
+    if (!localChangeIsEmpty(resourceId, resourceType) &&
+        lastChangeType(resourceId, resourceType)!!.equals(Type.DELETE)
+    ) {
+      throw InvalidLocalChangeException(
+        "Unexpected DELETE when updating $resourceType/$resourceId. UPDATE failed."
+      )
     }
 
-    fun addInsert(resource: Resource) {
-        val resourceId = resource.id
-        val resourceType = resource.resourceType
-        val timestamp = Date().toTimeZoneString()
-        val resourceString = iParser.encodeResourceToString(resource)
+    addLocalChange(
+      LocalChangeEntity(
+        id = 0,
+        resourceType = resourceType.name,
+        resourceId = resourceId,
+        timestamp = timestamp,
+        type = Type.UPDATE,
+        payload = LocalChangeUtils.diff(iParser, oldResource, resource)
+      )
+    )
+  }
 
-        addLocalChange(
-            LocalChange(
-                id = 0,
-                resourceType = resourceType.name,
-                resourceId = resourceId,
-                timestamp = timestamp,
-                type = Type.INSERT,
-                payload = resourceString
-            )
-        )
-    }
+  fun addDelete(resourceId: String, resourceType: ResourceType) {
+    val timestamp = Date().toTimeZoneString()
+    addLocalChange(
+      LocalChangeEntity(
+        id = 0,
+        resourceType = resourceType.name,
+        resourceId = resourceId,
+        timestamp = timestamp,
+        type = Type.DELETE,
+        payload = ""
+      )
+    )
+  }
 
-    fun addUpdate(oldResource: Resource, resource: Resource) {
-        val resourceId = resource.id
-        val resourceType = resource.resourceType
-        val timestamp = Date().toTimeZoneString()
-
-        if (!localChangeIsEmpty(resourceId, resourceType) &&
-                lastChangeType(resourceId, resourceType)!!.equals(Type.DELETE)) {
-            throw InvalidLocalChangeException(
-                "Unexpected DELETE when updating $resourceType/$resourceId. UPDATE failed."
-            )
-        }
-
-        addLocalChange(
-            LocalChange(
-                id = 0,
-                resourceType = resourceType.name,
-                resourceId = resourceId,
-                timestamp = timestamp,
-                type = Type.UPDATE,
-                payload = LocalChangeUtils.diff(iParser, oldResource, resource)
-            )
-        )
-    }
-
-    fun addDelete(resourceId: String, resourceType: ResourceType) {
-        val timestamp = Date().toTimeZoneString()
-        addLocalChange(
-            LocalChange(
-                id = 0,
-                resourceType = resourceType.name,
-                resourceId = resourceId,
-                timestamp = timestamp,
-                type = Type.DELETE,
-                payload = ""
-            )
-        )
-    }
-
-    @Query("""
+  @Query(
+    """
         SELECT type 
-        FROM LocalChange 
+        FROM LocalChangeEntity 
         WHERE resourceId = :resourceId 
         AND resourceType = :resourceType 
         ORDER BY id ASC
         LIMIT 1
-    """)
-    abstract fun lastChangeType(resourceId: String, resourceType: ResourceType): Type?
+    """
+  )
+  abstract fun lastChangeType(resourceId: String, resourceType: ResourceType): Type?
 
-    @Query("""
+  @Query(
+    """
         SELECT COUNT(type) 
-        FROM LocalChange 
+        FROM LocalChangeEntity 
         WHERE resourceId = :resourceId 
         AND resourceType = :resourceType
         LIMIT 1
-    """)
-    abstract fun countLastChange(resourceId: String, resourceType: ResourceType): Int
-
-    private fun localChangeIsEmpty(resourceId: String, resourceType: ResourceType): Boolean =
-        countLastChange(resourceId, resourceType) == 0
-
-    @Query(
-        """
-        SELECT *
-        FROM LocalChange
-        ORDER BY LocalChange.id ASC"""
-    )
-    abstract fun getAllLocalChanges(): List<LocalChange>
-
-    @Query(
-        """
-        DELETE FROM LocalChange
-        WHERE LocalChange.id = (:id)
     """
-    )
-    abstract fun discardLocalChanges(id: Long)
+  )
+  abstract fun countLastChange(resourceId: String, resourceType: ResourceType): Int
 
-    fun discardLocalChanges(token: LocalChangeToken) {
-        token.ids.forEach { discardLocalChanges(it) }
-    }
+  private fun localChangeIsEmpty(resourceId: String, resourceType: ResourceType): Boolean =
+    countLastChange(resourceId, resourceType) == 0
 
-    class InvalidLocalChangeException(message: String?) : Exception(message)
+  @Query(
+    """
+        SELECT *
+        FROM LocalChangeEntity
+        ORDER BY LocalChangeEntity.id ASC"""
+  )
+  abstract fun getAllLocalChanges(): List<LocalChangeEntity>
+
+  @Query(
+    """
+        DELETE FROM LocalChangeEntity
+        WHERE LocalChangeEntity.id = (:id)
+    """
+  )
+  abstract fun discardLocalChanges(id: Long)
+
+  fun discardLocalChanges(token: LocalChangeToken) {
+    token.ids.forEach { discardLocalChanges(it) }
+  }
+
+  class InvalidLocalChangeException(message: String?) : Exception(message)
 }

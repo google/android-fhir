@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.db.impl.entities
+package org.fhir.ucum
 
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
-import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.exceptions.FHIRException
 
-@Entity(indices = [Index(value = ["resourceType", "resourceId"], unique = true)])
-internal data class ResourceEntity(
-  @PrimaryKey(autoGenerate = true) val id: Long,
-  val resourceType: ResourceType,
-  val resourceId: String,
-  val serializedResource: String
-)
+/** Needed for HAPI's FHIRPathEngine. See https://github.com/hapifhir/hapi-fhir/issues/2443. */
+class UcumException : FHIRException {
+  constructor() {}
+  constructor(message: String?, cause: Throwable?) : super(message, cause) {}
+  constructor(message: String?) : super(message) {}
+  constructor(cause: Throwable?) : super(cause) {}
+}

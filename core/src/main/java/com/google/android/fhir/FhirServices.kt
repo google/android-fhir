@@ -30,61 +30,44 @@ import com.google.android.fhir.sync.FhirDataSource
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
 
 internal data class FhirServices(
-    val fhirEngine: FhirEngine,
-    val parser: IParser,
-    val database: Database
+  val fhirEngine: FhirEngine,
+  val parser: IParser,
+  val database: Database
 ) {
-    class Builder(
-        private val dataSource: FhirDataSource,
-        private val context: Context
-    ) {
-        private var databaseName: String? = "fhirEngine"
-        private var periodicSyncConfiguration: PeriodicSyncConfiguration? = null
+  class Builder(private val dataSource: FhirDataSource, private val context: Context) {
+    private var databaseName: String? = "fhirEngine"
+    private var periodicSyncConfiguration: PeriodicSyncConfiguration? = null
 
-        fun inMemory() = apply {
-            databaseName = null
-        }
+    fun inMemory() = apply { databaseName = null }
 
-        fun databaseName(name: String) = apply {
-            databaseName = name
-        }
+    fun databaseName(name: String) = apply { databaseName = name }
 
-        fun periodicSyncConfiguration(config: PeriodicSyncConfiguration) = apply {
-            periodicSyncConfiguration = config
-        }
-
-        fun build(): FhirServices {
-            val parser = FhirContext.forR4().newJsonParser()
-            val db = DatabaseImpl(
-                context = context,
-                iParser = parser,
-                databaseName = databaseName
-            )
-
-            val dataProvider = FhirEngineDataProvider.Factory.create(db)
-            val engine = FhirEngineImpl(
-                database = db,
-                search = SearchImpl(db),
-                libraryLoader = FhirEngineLibraryLoader(db),
-                dataProviderMap = mapOf("http://hl7.org/fhir" to dataProvider),
-                terminologyProvider = FhirEngineTerminologyProvider(),
-                periodicSyncConfiguration = periodicSyncConfiguration,
-                dataSource = dataSource,
-                context = context
-            )
-            return FhirServices(
-                fhirEngine = engine,
-                parser = parser,
-                database = db
-            )
-        }
+    fun periodicSyncConfiguration(config: PeriodicSyncConfiguration) = apply {
+      periodicSyncConfiguration = config
     }
 
-    companion object {
-        @JvmStatic
-        fun builder(
-            dataSource: FhirDataSource,
-            context: Context
-        ) = Builder(dataSource, context)
+    fun build(): FhirServices {
+      val parser = FhirContext.forR4().newJsonParser()
+      val db = DatabaseImpl(context = context, iParser = parser, databaseName = databaseName)
+
+      val dataProvider = FhirEngineDataProvider.Factory.create(db)
+      val engine =
+        FhirEngineImpl(
+          database = db,
+          search = SearchImpl(db),
+          libraryLoader = FhirEngineLibraryLoader(db),
+          dataProviderMap = mapOf("http://hl7.org/fhir" to dataProvider),
+          terminologyProvider = FhirEngineTerminologyProvider(),
+          periodicSyncConfiguration = periodicSyncConfiguration,
+          dataSource = dataSource,
+          context = context
+        )
+      return FhirServices(fhirEngine = engine, parser = parser, database = db)
     }
+  }
+
+  companion object {
+    @JvmStatic
+    fun builder(dataSource: FhirDataSource, context: Context) = Builder(dataSource, context)
+  }
 }

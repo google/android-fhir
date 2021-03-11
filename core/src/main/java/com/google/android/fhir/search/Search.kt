@@ -35,32 +35,24 @@ import org.hl7.fhir.r4.model.Resource
  * ```
  */
 interface Search {
-    /**
-     * Returns a [SearchSpecifications] object with the given [clazz].
-     */
-    fun <R : Resource> of(clazz: Class<R>): SearchSpecifications
+  /** Returns a [SearchSpecifications] object with the given [clazz]. */
+  fun <R : Resource> of(clazz: Class<R>): SearchSpecifications
 
-    /** The interface to specify the search criteria and to execute the search. */
-    interface SearchSpecifications {
-        /**
-         * Returns a [SearchSpecifications] object with the [filterCriterion].
-         */
-        fun filter(filterCriterion: FilterCriterion): SearchSpecifications
+  /** The interface to specify the search criteria and to execute the search. */
+  interface SearchSpecifications {
+    /** Returns a [SearchSpecifications] object with the [filterCriterion]. */
+    fun filter(filterCriterion: FilterCriterion): SearchSpecifications
 
-        /**
-         * Returns a [SearchSpecifications] object with the [sortCriterion].
-         */
-        fun sort(sortCriterion: SortCriterion): SearchSpecifications
+    /** Returns a [SearchSpecifications] object with the [sortCriterion]. */
+    fun sort(sortCriterion: SortCriterion): SearchSpecifications
 
-        /**
-         * Returns a [SearchSpecifications] object that only includes the first [limit] results.
-         */
-        fun limit(limit: Int): SearchSpecifications
+    /** Returns a [SearchSpecifications] object that only includes the first [limit] results. */
+    fun limit(limit: Int): SearchSpecifications
 
-        /** Returns a [SearchSpecifications] object that skips the first [skip] results. */
-        fun skip(skip: Int): SearchSpecifications
+    /** Returns a [SearchSpecifications] object that skips the first [skip] results. */
+    fun skip(skip: Int): SearchSpecifications
 
-        /** Runs a search with the [SearchSpecifications]. */
-        fun <R : Resource> run(): List<R>
-    }
+    /** Runs a search with the [SearchSpecifications]. */
+    fun <R : Resource> run(): List<R>
+  }
 }
