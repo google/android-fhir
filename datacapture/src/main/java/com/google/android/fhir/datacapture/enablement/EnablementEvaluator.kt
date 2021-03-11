@@ -53,6 +53,7 @@ import java.lang.IllegalStateException
  */
 internal object EnablementEvaluator {
 
+
   /**
    * Returns whether [questionnaireItem] should be enabled.
    *
@@ -63,7 +64,8 @@ internal object EnablementEvaluator {
    */
   fun evaluate(
     questionnaireItem: Questionnaire.Item,
-    questionnaireResponseItemRetriever: (linkId: String) -> QuestionnaireResponse.Item?
+    questionnaireResponseItemRetriever:
+    (linkId: String) -> Pair<Questionnaire.Item?, QuestionnaireResponse.Item?>
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhenList
 
@@ -73,7 +75,6 @@ internal object EnablementEvaluator {
     // Evaluate single `enableWhen` constraint.
     if (enableWhenList.size == 1) {
       return evaluateEnableWhen(
-        questionnaireItem.type,
         enableWhenList.single(),
         questionnaireResponseItemRetriever
       )
@@ -86,33 +87,38 @@ internal object EnablementEvaluator {
     return when (val value = questionnaireItem.enableBehavior.value) {
       EnableWhenBehaviorCode.Value.ALL ->
         enableWhenList.all {
-          evaluateEnableWhen(questionnaireItem.type, it, questionnaireResponseItemRetriever)
+          evaluateEnableWhen(
+            it, questionnaireResponseItemRetriever)
         }
       EnableWhenBehaviorCode.Value.ANY ->
         enableWhenList.any {
-          evaluateEnableWhen(questionnaireItem.type, it, questionnaireResponseItemRetriever)
+          evaluateEnableWhen(
+            it, questionnaireResponseItemRetriever)
         }
-      else -> throw IllegalStateException("Unrecognized enable when behavior $value")
+      else ->
+        throw IllegalStateException("Unrecognized enable when behavior $value")
     }
   }
+}
 
-  /**
-   * Returns whether the `enableWhen` constraint is satisfied.
-   *
-   * @param questionnaireResponseItemRetriever function that returns the
-   * [QuestionnaireResponse.Item] with the `linkId`, or null if there isn't one.
-   */
-  private fun evaluateEnableWhen(
-    type: Questionnaire.Item.TypeCode,
-    enableWhen: Questionnaire.Item.EnableWhen,
-    questionnaireResponseItemRetriever: (linkId: String) -> QuestionnaireResponse.Item?
-  ): Boolean {
-    val responseItem = questionnaireResponseItemRetriever(enableWhen.question.value) ?: return true
-    return if (QuestionnaireItemOperatorCode.Value.EXISTS == enableWhen.operator.value) {
-      (responseItem.answerCount > 0) == enableWhen.answer.boolean.value
-    } else {
-      responseItem.contains(enableWhenTypeToPredicate(enableWhen, type))
-    }
+/**
+ * Returns whether the `enableWhen` constraint is satisfied.
+ *
+ * @param questionnaireResponseItemRetriever function that returns the
+ * [QuestionnaireResponse.Item] with the `linkId`, or null if there isn't one.
+ */
+private fun evaluateEnableWhen(
+  enableWhen: Questionnaire.Item.EnableWhen,
+  questionnaireResponseItemRetriever:
+  (linkId: String) -> Pair<Questionnaire.Item?, QuestionnaireResponse.Item?>
+): Boolean {
+  val questionnairePair = questionnaireResponseItemRetriever(enableWhen.question.value)
+  if (questionnairePair.first == null || questionnairePair.second == null) return true
+  return if (QuestionnaireItemOperatorCode.Value.EXISTS == enableWhen.operator.value) {
+    (questionnairePair.second!!.answerCount > 0) == enableWhen.answer.boolean.value
+  } else {
+    questionnairePair.second!!.contains(enableWhenTypeToPredicate(enableWhen,
+      questionnairePair.first!!.type))
   }
 }
 
@@ -139,11 +145,11 @@ private fun enableWhenTypeToPredicate(
   val enableWhenAnswerValue = enableWhen.answer.getValueForType(type)
   when (val operator = enableWhen.operator.value) {
     QuestionnaireItemOperatorCode.Value.EQUALS -> return {
-        it.getValueForType(type) == enableWhenAnswerValue
-      }
+      it.getValueForType(type) == enableWhenAnswerValue
+    }
     QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO -> return {
-        it.getValueForType(type) != enableWhenAnswerValue
-      }
+      it.getValueForType(type) != enableWhenAnswerValue
+    }
     else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
   }
 }

@@ -41,6 +41,8 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
 
+  private val questionnaireBuilder = Questionnaire.newBuilder()
+
   init {
     questionnaireResponseBuilder.questionnaire =
       Canonical.newBuilder().setValue(questionnaire.id.value).build()
@@ -49,11 +51,22 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     questionnaire.itemList.forEach {
       questionnaireResponseBuilder.addItem(it.createQuestionnaireResponseItem())
     }
+
+    questionnaire.itemList.forEach {
+      questionnaireBuilder.addItem(it)
+    }
   }
 
   /** Map from link IDs to questionnaire response items. */
   private val linkIdToQuestionnaireResponseItemMap =
     createLinkIdToQuestionnaireResponseItemMap(questionnaireResponseBuilder.itemBuilderList)
+
+
+  /** Map from link IDs to questionnaire items. */
+  private val linkIdToQuestionnaireItemMap =
+    createLinkIdToQuestionnaireItemMap(
+      questionnaireBuilder.itemBuilderList
+    )
 
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
@@ -62,13 +75,12 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   private val questionnaireResponseItemChangedCallback = { modificationCount.value += 1 }
 
   internal val questionnaireItemViewItemList
-    get() =
-      getQuestionnaireItemViewItemList(
-        questionnaire.itemList,
-        questionnaireResponseBuilder.itemBuilderList
-      )
+    get() = getQuestionnaireItemViewItemList(
+      questionnaire.itemList,
+      questionnaireResponseBuilder.itemBuilderList
+    )
 
-  /** [QuestionnaireItemViewItem] s to be displayed in the UI. */
+  /** [QuestionnaireItemViewItem]s to be displayed in the UI. */
   internal val questionnaireItemViewItemListFlow: Flow<List<QuestionnaireItemViewItem>> =
     modificationCount.map { questionnaireItemViewItemList }
 
@@ -78,14 +90,29 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   private fun createLinkIdToQuestionnaireResponseItemMap(
     questionnaireResponseItemList: List<QuestionnaireResponse.Item.Builder>
   ): Map<String, QuestionnaireResponse.Item.Builder> {
-    val linkIdToQuestionnaireResponseItemMap =
-      questionnaireResponseItemList.map { it.linkId.value to it }.toMap().toMutableMap()
+    val linkIdToQuestionnaireResponseItemMap = questionnaireResponseItemList.map {
+      it.linkId.value to it
+    }.toMap().toMutableMap()
     for (item in questionnaireResponseItemList) {
       linkIdToQuestionnaireResponseItemMap.putAll(
         createLinkIdToQuestionnaireResponseItemMap(item.itemBuilderList)
       )
     }
     return linkIdToQuestionnaireResponseItemMap
+  }
+
+  private fun createLinkIdToQuestionnaireItemMap(
+    questionnaireItemList: List<Questionnaire.Item.Builder>
+  ): Map<String, Questionnaire.Item.Builder> {
+    val linkIdToQuestionnaireItemMap = questionnaireItemList.map {
+      it.linkId.value to it
+    }.toMap().toMutableMap()
+    for (item in questionnaireItemList) {
+      linkIdToQuestionnaireItemMap.putAll(
+        createLinkIdToQuestionnaireItemMap(item.itemBuilderList)
+      )
+    }
+    return linkIdToQuestionnaireItemMap
   }
 
   /**
@@ -103,15 +130,20 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     val questionnaireItemViewItemList = mutableListOf<QuestionnaireItemViewItem>()
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-    while (questionnaireItemListIterator.hasNext() &&
-      questionnaireResponseItemListIterator.hasNext()) {
+    while (
+      questionnaireItemListIterator.hasNext() &&
+      questionnaireResponseItemListIterator.hasNext()
+    ) {
       val questionnaireItem = questionnaireItemListIterator.next()
       val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
 
-      val enabled =
-        EnablementEvaluator.evaluate(questionnaireItem) {
-          (linkIdToQuestionnaireResponseItemMap[it] ?: return@evaluate null).build()
-        }
+      val enabled = EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
+
+        Pair((linkIdToQuestionnaireItemMap[linkId]
+          ?: return@evaluate Pair(null, null)).build(),
+          (linkIdToQuestionnaireResponseItemMap[linkId]
+            ?: return@evaluate Pair(null, null)).build())
+      }
       if (enabled) {
         questionnaireItemViewItemList.add(
           QuestionnaireItemViewItem(
@@ -130,24 +162,24 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     }
     return questionnaireItemViewItemList
   }
-}
 
-/**
- * Creates a [QuestionnaireResponse.QuestionnaireResponseItemComponent] from the provided
- * [Questionnaire.QuestionnaireItemComponent].
- *
- * The hierarchy and order of child items will be retained as specified in the standard. See
- * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
- */
-private fun Questionnaire.Item.createQuestionnaireResponseItem():
-  QuestionnaireResponse.Item.Builder {
-  return QuestionnaireResponse.Item.newBuilder().apply {
-    linkId =
-      com.google.fhir.r4.core.String.newBuilder()
-        .setValue(this@createQuestionnaireResponseItem.linkId.value)
-        .build()
-    this@createQuestionnaireResponseItem.itemList.forEach {
-      this.addItem(it.createQuestionnaireResponseItem())
+  /**
+   * Creates a [QuestionnaireResponse.QuestionnaireResponseItemComponent] from the provided
+   * [Questionnaire.QuestionnaireItemComponent].
+   *
+   * The hierarchy and order of child items will be retained as specified in the standard. See
+   * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
+   */
+  private fun Questionnaire.Item.createQuestionnaireResponseItem():
+    QuestionnaireResponse.Item.Builder {
+    return QuestionnaireResponse.Item.newBuilder().apply {
+      linkId =
+        com.google.fhir.r4.core.String.newBuilder()
+          .setValue(this@createQuestionnaireResponseItem.linkId.value)
+          .build()
+      this@createQuestionnaireResponseItem.itemList.forEach {
+        this.addItem(it.createQuestionnaireResponseItem())
+      }
     }
   }
 }
