@@ -23,42 +23,41 @@ import com.google.android.material.slider.Slider
 import com.google.fhir.r4.core.Integer
 import com.google.fhir.r4.core.QuestionnaireResponse
 
-internal object QuestionnaireItemSliderViewHolderFactory : QuestionnaireItemViewHolderFactory(
-    R.layout.questionnaire_item_slider
-) {
-    override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
-        object : QuestionnaireItemViewHolderDelegate {
-            private lateinit var sliderHeader: TextView
-            private lateinit var slider: Slider
-            private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
+internal object QuestionnaireItemSliderViewHolderFactory :
+  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_slider) {
+  override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
+    object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var sliderHeader: TextView
+      private lateinit var slider: Slider
+      private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
-            override fun init(itemView: View) {
-                sliderHeader = itemView.findViewById(R.id.slider_header)
-                slider = itemView.findViewById(R.id.slider)
+      override fun init(itemView: View) {
+        sliderHeader = itemView.findViewById(R.id.slider_header)
+        slider = itemView.findViewById(R.id.slider)
+      }
+
+      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        this.questionnaireItemViewItem = questionnaireItemViewItem
+        val questionnaireItem = questionnaireItemViewItem.questionnaireItem
+        val answer = questionnaireItemViewItem.singleAnswerOrNull
+        sliderHeader.text = questionnaireItem.text.value
+        slider.valueFrom = 0.0F
+        slider.valueTo = 100.0F
+        slider.stepSize = 10.0F
+        val sliderValue = answer?.value?.integer?.value?.toString() ?: "0.0"
+        slider.value = sliderValue.toFloat()
+
+        slider.addOnChangeListener { _, newValue, _ ->
+          // Responds to when slider's value is changed
+          questionnaireItemViewItem.singleAnswerOrNull =
+            QuestionnaireResponse.Item.Answer.newBuilder().apply {
+              value =
+                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                  .setInteger(Integer.newBuilder().setValue(newValue.toInt()).build())
+                  .build()
             }
-
-            override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-                this.questionnaireItemViewItem = questionnaireItemViewItem
-                val questionnaireItem = questionnaireItemViewItem.questionnaireItem
-                val answer = questionnaireItemViewItem.singleAnswerOrNull
-                sliderHeader.text = questionnaireItem.text.value
-                slider.valueFrom = 0.0F
-                slider.valueTo = 100.0F
-                slider.stepSize = 10.0F
-                val sliderValue = answer?.value?.integer?.value?.toString() ?: "0.0"
-                slider.value = sliderValue.toFloat()
-
-                slider.addOnChangeListener { _, newValue, _ ->
-                    // Responds to when slider's value is changed
-                    questionnaireItemViewItem.singleAnswerOrNull =
-                        QuestionnaireResponse.Item.Answer.newBuilder()
-                            .apply {
-                                value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                                    .setInteger(Integer.newBuilder().setValue(newValue.toInt())
-                                        .build()).build()
-                            }
-                    questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-                }
-            }
+          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
         }
+      }
+    }
 }
