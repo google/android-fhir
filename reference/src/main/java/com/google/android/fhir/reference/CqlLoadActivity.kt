@@ -18,6 +18,7 @@ package com.google.android.fhir.reference
 
 import android.os.AsyncTask
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -72,12 +73,13 @@ class CqlLoadActivity : AppCompatActivity() {
     }
 
     val evaluateButton = findViewById<Button>(R.id.evaluate_button)
-    evaluateButton.setOnClickListener { v: View? ->
+    evaluateButton.setOnClickListener {
+      Log.d("deb: ", "${libraryInput.text.toString()}, ${contextInput.text.toString()}")
       EvaluateAncLibrary()
         .execute(
-          libraryInput.getText().toString(),
-          contextInput.getText().toString(),
-          expressionInput.getText().toString()
+          libraryInput.text.toString(),
+          contextInput.text.toString(),
+          expressionInput.text.toString()
         )
     }
   }
@@ -112,34 +114,37 @@ class CqlLoadActivity : AppCompatActivity() {
     }
   }
 
-  private inner class EvaluateAncLibrary : AsyncTask<String?, String?, EvaluationResult>() {
-    override fun doInBackground(vararg strings: String?): EvaluationResult {
+  private inner class EvaluateAncLibrary : AsyncTask<String?, String?, EvaluationResult?>() {
+    override fun doInBackground(vararg strings: String?): EvaluationResult? {
       return fhirEngine!!.evaluateCql(strings[0]!!, strings[1]!!, strings[2]!!)
     }
 
-    override fun onPostExecute(result: EvaluationResult) {
+    override fun onPostExecute(result: EvaluationResult?) {
       val stringBuilder = StringBuilder()
-      for (libraryResult in result.libraryResults.values) {
-        for ((key, value) in libraryResult.expressionResults) {
-          stringBuilder.append("$key -> ")
-          if (value == null) {
-            stringBuilder.append("null")
-          } else if (MutableList::class.java.isAssignableFrom(value.javaClass)) {
-            for (listItem in value as List<*>) {
+      Log.d("deb: ", "Result val-----> $result")
+      if (result?.libraryResults?.values != null)
+        for (libraryResult in result.libraryResults.values) {
+          for ((key, value) in libraryResult.expressionResults) {
+            stringBuilder.append("$key -> ")
+            if (value == null) {
+              stringBuilder.append("null")
+            } else if (MutableList::class.java.isAssignableFrom(value.javaClass)) {
+              for (listItem in value as List<*>) {
+                stringBuilder.append(
+                  FhirContext.forR4().newJsonParser().encodeResourceToString(listItem as Resource?)
+                )
+              }
+            } else if (Resource::class.java.isAssignableFrom(value.javaClass)) {
               stringBuilder.append(
-                FhirContext.forR4().newJsonParser().encodeResourceToString(listItem as Resource?)
+                FhirContext.forR4().newJsonParser().encodeResourceToString(value as Resource)
               )
+            } else {
+              stringBuilder.append(value.toString())
             }
-          } else if (Resource::class.java.isAssignableFrom(value.javaClass)) {
-            stringBuilder.append(
-              FhirContext.forR4().newJsonParser().encodeResourceToString(value as Resource)
-            )
-          } else {
-            stringBuilder.append(value.toString())
           }
         }
-      }
-      evaluationResultTextView!!.text = stringBuilder.toString()
+      Log.d("deb:", "onPostExecute: $stringBuilder")
+      evaluationResultTextView.text = stringBuilder.toString()
     }
   }
 }

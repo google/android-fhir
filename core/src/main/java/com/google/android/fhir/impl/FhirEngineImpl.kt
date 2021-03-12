@@ -17,6 +17,7 @@
 package com.google.android.fhir.impl
 
 import android.content.Context
+import android.util.Log
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
@@ -98,7 +99,7 @@ constructor(
     libraryVersionId: String,
     context: String,
     expression: String
-  ): EvaluationResult {
+  ): EvaluationResult? {
     val contextMap: MutableMap<String, Any> = HashMap()
     val contextSplit = context.split("/").toTypedArray()
     contextMap[contextSplit[0]] = contextSplit[1]
@@ -107,7 +108,10 @@ constructor(
     expressions.add(expression)
     val map: MutableMap<VersionedIdentifier, Set<String>> = HashMap()
     map[versionedIdentifier] = expressions
-    return cqlEngine.evaluate(contextMap, null, map)
+    Log.d("deb: ", "----->>>>>> $contextMap | $map")
+    Log.d("deb", "----->>>>>> ${map.get("system")}")
+    return if (!map.get("system").isNullOrEmpty()) cqlEngine.evaluate(contextMap, null, map)
+    else null
   }
 
   override fun search(): Search {

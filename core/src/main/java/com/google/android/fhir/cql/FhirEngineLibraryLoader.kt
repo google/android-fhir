@@ -16,8 +16,10 @@
 
 package com.google.android.fhir.cql
 
+import android.util.Log
 import com.google.android.fhir.db.Database
 import java.io.IOException
+import java.io.StringReader
 import org.cqframework.cql.elm.execution.Library
 import org.cqframework.cql.elm.execution.VersionedIdentifier
 import org.opencds.cqf.cql.execution.JsonCqlLibraryReader
@@ -26,13 +28,15 @@ import org.opencds.cqf.cql.execution.LibraryLoader
 /**
  * FHIR Engine's implementation of [LibraryLoader] that loads a CQL/ELM library for the [ ] to use.
  */
+private const val TAG = "FEngineLibraryLoader"
+
 internal class FhirEngineLibraryLoader(private val database: Database) : LibraryLoader {
   /** Cached libraries. */
   private val _libraryMap = mutableMapOf<String, Library>()
   val libraryMap: Map<String, Library>
     get() = _libraryMap
 
-  override fun load(libraryIdentifier: VersionedIdentifier): Library {
+  override fun load(libraryIdentifier: VersionedIdentifier): Library? {
     val matchedLibrary =
       libraryMap
         .asSequence()
@@ -45,7 +49,7 @@ internal class FhirEngineLibraryLoader(private val database: Database) : Library
         .map { it.value }
         .firstOrNull()
     if (matchedLibrary != null) return matchedLibrary
-    val fhirLibrary =
+    val fhirLibrary: List<org.hl7.fhir.r4.model.Library>? =
       database.searchByString(
         org.hl7.fhir.r4.model.Library::class.java,
         LIBRARY_NAME_INDEX,
@@ -54,13 +58,24 @@ internal class FhirEngineLibraryLoader(private val database: Database) : Library
     // TODO: remove the assumption that there will be only one FHIR library resource which has
     // one
     //  content element.
-    val stringReader = String(fhirLibrary.first().content.first().data).reader()
-    return try {
-      val cqlLibrary = JsonCqlLibraryReader.read(stringReader)
-      _libraryMap[libraryIdentifier.id] = cqlLibrary
-      cqlLibrary
+    //    Log.d(TAG, "contents: ${fhirLibrary.first().content.first().data}")
+
+    val stringReader: StringReader? =
+      if (fhirLibrary?.isNotEmpty() == true)
+        fhirLibrary?.first()?.content?.first()?.let { String(it.data).reader() }
+      else null
+    try {
+      if (stringReader != null) {
+        val cqlLibrary = JsonCqlLibraryReader.read(stringReader)
+        _libraryMap[libraryIdentifier.id] = cqlLibrary
+        Log.d("deb: ", cqlLibrary.toString())
+        return cqlLibrary
+      } else {
+        return null
+      }
     } catch (e: IOException) {
       // TODO: Replace this with a logger call
+      Log.d("deb: ", "load: throwing exception: $e")
       e.printStackTrace()
       throw RuntimeException(e)
     }

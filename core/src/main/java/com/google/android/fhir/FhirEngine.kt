@@ -64,7 +64,7 @@ interface FhirEngine {
   fun <R : Resource> remove(clazz: Class<R>, id: String)
 
   /** Returns the result of a CQL evaluation provided with the ID of the library. */
-  fun evaluateCql(libraryVersionId: String, context: String, expression: String): EvaluationResult
+  fun evaluateCql(libraryVersionId: String, context: String, expression: String): EvaluationResult?
 
   /** Returns the entry point for [Search]. */
   fun search(): Search
