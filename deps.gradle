@@ -12,6 +12,7 @@ def build_tool_version = '30.0.2'
 ext.build_tool_version = build_tool_version
 
 def versions = [:]
+versions.activity = '1.2.1'
 versions.android_gradle_plugin = '4.2.0-beta02'
 versions.appcompat = '1.1.0'
 versions.atsl_core = '1.2.0'
@@ -45,6 +46,7 @@ versions.json_tools = '1.13'
 ext.versions = versions
 
 def deps = [:]
+deps.activity = "androidx.activity:activity:$versions.activity"
 deps.android_gradle_plugin = "com.android.tools.build:gradle:$versions.android_gradle_plugin"
 deps.appcompat = "androidx.appcompat:appcompat:$versions.appcompat"
 def atsl = [:]
