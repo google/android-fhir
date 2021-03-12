@@ -108,8 +108,6 @@ constructor(
     expressions.add(expression)
     val map: MutableMap<VersionedIdentifier, Set<String>> = HashMap()
     map[versionedIdentifier] = expressions
-    Log.d("deb: ", "----->>>>>> $contextMap | $map")
-    Log.d("deb", "----->>>>>> ${map.get("system")}")
     return if (!map.get("system").isNullOrEmpty()) cqlEngine.evaluate(contextMap, null, map)
     else null
   }

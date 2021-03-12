@@ -41,9 +41,7 @@ internal class FhirEngineLibraryLoader(private val database: Database) : Library
       libraryMap
         .asSequence()
         .filter {
-          // TODO: Change this to an exact match once the libraries are correctly indexed
-          // by
-          // name
+          // TODO: Change this to an exact match once the libraries are correctly indexed by name
           it.key.contains(libraryIdentifier.id)
         }
         .map { it.value }
@@ -55,23 +53,18 @@ internal class FhirEngineLibraryLoader(private val database: Database) : Library
         LIBRARY_NAME_INDEX,
         libraryIdentifier.id
       )
-    // TODO: remove the assumption that there will be only one FHIR library resource which has
-    // one
+    // TODO: remove the assumption that there will be only one FHIR library resource which has one
     //  content element.
-    //    Log.d(TAG, "contents: ${fhirLibrary.first().content.first().data}")
 
     val stringReader: StringReader? =
-      if (fhirLibrary?.isNotEmpty() == true)
-        fhirLibrary?.first()?.content?.first()?.let { String(it.data).reader() }
-      else null
+      fhirLibrary?.first()?.content?.first()?.let { String(it.data).reader() }
+
     try {
-      if (stringReader != null) {
-        val cqlLibrary = JsonCqlLibraryReader.read(stringReader)
+      stringReader?.let {
+        val cqlLibrary = JsonCqlLibraryReader.read(it)
         _libraryMap[libraryIdentifier.id] = cqlLibrary
         Log.d("deb: ", cqlLibrary.toString())
         return cqlLibrary
-      } else {
-        return null
       }
     } catch (e: IOException) {
       // TODO: Replace this with a logger call
@@ -79,6 +72,7 @@ internal class FhirEngineLibraryLoader(private val database: Database) : Library
       e.printStackTrace()
       throw RuntimeException(e)
     }
+    return null
   }
 
   companion object {

@@ -59,11 +59,11 @@ class CqlLoadActivity : AppCompatActivity() {
     evaluationResultTextView = findViewById(R.id.evaluate_result)
 
     val viewModel =
-      ViewModelProvider(this, CqlLoadActivityViewModelFactory(fhirEngine!!))
+      ViewModelProvider(this, CqlLoadActivityViewModelFactory(fhirEngine))
         .get(CqlActivityViewModel::class.java)
 
     val loadCqlLibButton = findViewById<Button>(R.id.load_cql_lib_button)
-    loadCqlLibButton.setOnClickListener { v: View? ->
+    loadCqlLibButton.setOnClickListener {
       DownloadFhirResource().execute(cqlLibraryUrlInput.text.toString())
     }
 
@@ -99,16 +99,16 @@ class CqlLoadActivity : AppCompatActivity() {
         }
         val fhirContext = FhirContext.forR4()
         resource = fhirContext.newJsonParser().parseResource(result) as Resource
-        fhirEngine!!.save<Resource>(resource)
+        fhirEngine.save<Resource>(resource)
         Snackbar.make(
-            cqlLibraryUrlInput!!,
-            "Loaded " + resource.resourceType.name + " with ID " + resource!!.id,
+            cqlLibraryUrlInput,
+            "Loaded " + resource.resourceType.name + " with ID " + resource.id,
             Snackbar.LENGTH_SHORT
           )
           .show()
       } catch (e: IOException) {
         e.printStackTrace()
-        Snackbar.make(cqlLibraryUrlInput!!, "Something went wrong...", Snackbar.LENGTH_SHORT).show()
+        Snackbar.make(cqlLibraryUrlInput, "Something went wrong...", Snackbar.LENGTH_SHORT).show()
       }
       return null
     }
@@ -116,7 +116,7 @@ class CqlLoadActivity : AppCompatActivity() {
 
   private inner class EvaluateAncLibrary : AsyncTask<String?, String?, EvaluationResult?>() {
     override fun doInBackground(vararg strings: String?): EvaluationResult? {
-      return fhirEngine!!.evaluateCql(strings[0]!!, strings[1]!!, strings[2]!!)
+      return fhirEngine.evaluateCql(strings[0]!!, strings[1]!!, strings[2]!!)
     }
 
     override fun onPostExecute(result: EvaluationResult?) {
