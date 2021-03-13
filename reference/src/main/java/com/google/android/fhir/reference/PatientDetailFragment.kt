@@ -23,11 +23,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.FhirEngine
-import com.google.android.material.appbar.CollapsingToolbarLayout
 
 /**
  * A fragment representing a single Patient detail screen. This fragment is contained in a
@@ -46,33 +42,7 @@ class PatientDetailFragment : Fragment() {
     val adapter = ObservationItemRecyclerViewAdapter()
     recyclerView.adapter = adapter
 
-    val fhirEngine: FhirEngine = FhirApplication.fhirEngine(requireContext())
     var patient: PatientListViewModel.PatientItem? = null
-
-    val viewModel: PatientListViewModel =
-      ViewModelProvider(
-          this,
-          PatientListViewModelFactory(this.requireActivity().application, fhirEngine)
-        )
-        .get(PatientListViewModel::class.java)
-
-    viewModel
-      .getObservations()
-      .observe(
-        viewLifecycleOwner,
-        Observer<List<PatientListViewModel.ObservationItem>> { adapter.submitList(it) }
-      )
-
-    arguments?.let {
-      if (it.containsKey(ARG_ITEM_ID)) {
-        patient =
-          it.getString(ARG_ITEM_ID)?.let { patient_index ->
-            viewModel.getPatientItem(patient_index)
-          }
-        activity?.findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout)?.title = patient?.name
-      }
-    }
-
     setupPatientData(rootView, patient)
 
     return rootView
