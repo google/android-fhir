@@ -18,8 +18,6 @@ package com.google.android.fhir.reference
 
 import android.os.AsyncTask
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -68,13 +66,12 @@ class CqlLoadActivity : AppCompatActivity() {
     }
 
     val downloadFhirResourceButton = findViewById<Button>(R.id.download_fhir_resource_button)
-    downloadFhirResourceButton.setOnClickListener { v: View? ->
-      DownloadFhirResource().execute(fhirResourceUrlInput.getText().toString())
+    downloadFhirResourceButton.setOnClickListener {
+      DownloadFhirResource().execute(fhirResourceUrlInput.text.toString())
     }
 
     val evaluateButton = findViewById<Button>(R.id.evaluate_button)
     evaluateButton.setOnClickListener {
-      Log.d("deb: ", "${libraryInput.text.toString()}, ${contextInput.text.toString()}")
       EvaluateAncLibrary()
         .execute(
           libraryInput.text.toString(),
@@ -121,7 +118,6 @@ class CqlLoadActivity : AppCompatActivity() {
 
     override fun onPostExecute(result: EvaluationResult?) {
       val stringBuilder = StringBuilder()
-      Log.d("deb: ", "Result val-----> $result")
       if (result?.libraryResults?.values != null)
         for (libraryResult in result.libraryResults.values) {
           for ((key, value) in libraryResult.expressionResults) {
@@ -143,7 +139,6 @@ class CqlLoadActivity : AppCompatActivity() {
             }
           }
         }
-      Log.d("deb:", "onPostExecute: $stringBuilder")
       evaluationResultTextView.text = stringBuilder.toString()
     }
   }

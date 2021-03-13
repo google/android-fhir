@@ -28,7 +28,7 @@ import org.opencds.cqf.cql.execution.LibraryLoader
 /**
  * FHIR Engine's implementation of [LibraryLoader] that loads a CQL/ELM library for the [ ] to use.
  */
-private const val TAG = "FEngineLibraryLoader"
+private const val TAG = "FhirEngineLibraryLoader"
 
 internal class FhirEngineLibraryLoader(private val database: Database) : LibraryLoader {
   /** Cached libraries. */
@@ -47,7 +47,7 @@ internal class FhirEngineLibraryLoader(private val database: Database) : Library
         .map { it.value }
         .firstOrNull()
     if (matchedLibrary != null) return matchedLibrary
-    val fhirLibrary: List<org.hl7.fhir.r4.model.Library>? =
+    val fhirLibrary =
       database.searchByString(
         org.hl7.fhir.r4.model.Library::class.java,
         LIBRARY_NAME_INDEX,
@@ -57,18 +57,17 @@ internal class FhirEngineLibraryLoader(private val database: Database) : Library
     //  content element.
 
     val stringReader: StringReader? =
-      fhirLibrary?.first()?.content?.first()?.let { String(it.data).reader() }
+      fhirLibrary.first().content?.first()?.let { String(it.data).reader() }
 
     try {
       stringReader?.let {
         val cqlLibrary = JsonCqlLibraryReader.read(it)
         _libraryMap[libraryIdentifier.id] = cqlLibrary
-        Log.d("deb: ", cqlLibrary.toString())
         return cqlLibrary
       }
     } catch (e: IOException) {
       // TODO: Replace this with a logger call
-      Log.d("deb: ", "load: throwing exception: $e")
+      Log.d(TAG, "load: Encountered exception: $e")
       e.printStackTrace()
       throw RuntimeException(e)
     }
