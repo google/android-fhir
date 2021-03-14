@@ -17,7 +17,12 @@
 package com.google.android.fhir.datacapture.gallery
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -30,75 +35,68 @@ import com.google.fhir.common.JsonFormat
 import com.google.fhir.r4.core.QuestionnaireResponse
 
 class MyQuestionnaireFragment : Fragment() {
-    private val viewModel: QuestionnaireViewModel by viewModels()
-    private var _binding: FragmentQuestionnaireBinding? = null
-    private val binding get() = _binding!!
-    private val args: MyQuestionnaireFragmentArgs by navArgs()
+  private val viewModel: QuestionnaireViewModel by viewModels()
+  private var _binding: FragmentQuestionnaireBinding? = null
+  private val binding
+    get() = _binding!!
+  private val args: MyQuestionnaireFragmentArgs by navArgs()
 
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    super.onCreate(savedInstanceState)
+    _binding = FragmentQuestionnaireBinding.inflate(inflater, container, false)
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        super.onCreate(savedInstanceState)
-        _binding = FragmentQuestionnaireBinding.inflate(inflater, container, false)
-
-        (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-
-            setDisplayHomeAsUpEnabled(true)
-        }
-
-        // Only add the fragment once, when this fragment is first created.
-        if (savedInstanceState == null) {
-            val fragment = QuestionnaireFragment()
-            fragment.arguments =
-                bundleOf(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire)
-
-            childFragmentManager.commit {
-                add(
-                    R.id.container,
-                    fragment,
-                    QUESTIONNAIRE_FRAGMENT_TAG
-                )
-            }
-        }
-        return binding.root
+    (requireActivity() as AppCompatActivity).supportActionBar?.apply {
+      setDisplayHomeAsUpEnabled(true)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.top_bar_menu, menu)
-    }
+    // Only add the fragment once, when this fragment is first created.
+    if (savedInstanceState == null) {
+      val fragment = QuestionnaireFragment()
+      fragment.arguments =
+        bundleOf(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire)
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_submit -> {
-                val questionnaireFragment =
-                    childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as
-                            QuestionnaireFragment
-                displayQuestionnaireResponse(questionnaireFragment.getQuestionnaireResponse())
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
+      childFragmentManager.commit { add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
     }
+    return binding.root
+  }
 
-    // Display Questionnaire response as a dialog
-    private fun displayQuestionnaireResponse(questionnaireResponse: QuestionnaireResponse) {
-        val questionnaireResponseJson = JsonFormat.getPrinter().print(questionnaireResponse)
-        val dialogFragment = QuestionnaireResponseDialogFragment()
-        dialogFragment.arguments =
-            bundleOf(QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to questionnaireResponseJson)
-        dialogFragment.show(childFragmentManager, QuestionnaireResponseDialogFragment.TAG)
-    }
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    inflater.inflate(R.menu.top_bar_menu, menu)
+  }
 
-    companion object {
-        const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
-        const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    return when (item.itemId) {
+      R.id.action_submit -> {
+        val questionnaireFragment =
+          childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as
+            QuestionnaireFragment
+        displayQuestionnaireResponse(questionnaireFragment.getQuestionnaireResponse())
+        true
+      }
+      else -> super.onOptionsItemSelected(item)
     }
+  }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+  // Display Questionnaire response as a dialog
+  private fun displayQuestionnaireResponse(questionnaireResponse: QuestionnaireResponse) {
+    val questionnaireResponseJson = JsonFormat.getPrinter().print(questionnaireResponse)
+    val dialogFragment = QuestionnaireResponseDialogFragment()
+    dialogFragment.arguments =
+      bundleOf(QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to questionnaireResponseJson)
+    dialogFragment.show(childFragmentManager, QuestionnaireResponseDialogFragment.TAG)
+  }
+
+  companion object {
+    const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
+    const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
 }

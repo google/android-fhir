@@ -24,42 +24,39 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.google.android.fhir.datacapture.gallery.databinding.QuestionnaireListItemViewBinding
 
 class QuestionnaireListAdapter(private val questionnaireList: List<QuestionnaireListItem>) :
-    Adapter<QuestionnaireListAdapter.ViewHolder>() {
+  Adapter<QuestionnaireListAdapter.ViewHolder>() {
 
-    class ViewHolder(binding: QuestionnaireListItemViewBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        val name = binding.questionnaireName
-        val description = binding.questionnaireDescription
-        lateinit var questionnairelistItem: QuestionnaireListItem
+  class ViewHolder(binding: QuestionnaireListItemViewBinding) :
+    RecyclerView.ViewHolder(binding.root) {
+    val name = binding.questionnaireName
+    val description = binding.questionnaireDescription
+    lateinit var questionnairelistItem: QuestionnaireListItem
 
-        init {
-            binding.root.setOnClickListener {
-                val action = MainFragmentDirections.actionMainFragmentToMyQuestionnaireFragment(
-                    questionnairelistItem.name,
-                    questionnairelistItem.path
-                )
-                binding.root.context
-                it.findNavController().navigate(action)
-            }
-        }
+    init {
+      binding.root.setOnClickListener {
+        val action =
+          MainFragmentDirections.actionMainFragmentToMyQuestionnaireFragment(
+            questionnairelistItem.name,
+            questionnairelistItem.path
+          )
+        binding.root.context
+        it.findNavController().navigate(action)
+      }
     }
+  }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = QuestionnaireListItemViewBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
-        return ViewHolder(binding)
-    }
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    val binding =
+      QuestionnaireListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    return ViewHolder(binding)
+  }
 
+  override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    val questionnaireListItem = questionnaireList[position]
+    holder.questionnairelistItem = questionnaireListItem
+    holder.name.text = questionnaireListItem.name
+    holder.description.text = questionnaireListItem.description
+  }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val questionnaireListItem = questionnaireList[position]
-        holder.questionnairelistItem = questionnaireListItem
-        holder.name.text = questionnaireListItem.name
-        holder.description.text = questionnaireListItem.description
-    }
-
-    override fun getItemCount() = questionnaireList.size
+  override fun getItemCount() = questionnaireList.size
 }
