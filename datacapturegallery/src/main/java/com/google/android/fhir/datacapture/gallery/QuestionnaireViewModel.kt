@@ -29,7 +29,7 @@ class QuestionnaireViewModel(application: Application, private val state: SavedS
         questionnaireJson =
           getApplication<Application>()
             .assets
-            .open(state[QuestionnaireActivity.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+            .open(state[MyQuestionnaireFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
             .bufferedReader()
             .use { it.readText() }
       }

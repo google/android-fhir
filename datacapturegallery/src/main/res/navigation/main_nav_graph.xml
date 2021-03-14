@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.google.android.fhir.datacapture.gallery.MainFragment"
+        android:label="MainFragment" >
+        <action
+            android:id="@+id/action_mainFragment_to_myQuestionnaireFragment"
+            app:destination="@id/myQuestionnaireFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/myQuestionnaireFragment"
+        android:name="com.google.android.fhir.datacapture.gallery.MyQuestionnaireFragment"
+        android:label="MyQuestionnaireFragment" >
+        <argument android:name="questionnaire-title-key"
+            app:argType="string" />
+        <argument
+            android:name="questionnaire-file-path-key"
+            app:argType="string" />
+    </fragment>
+</navigation>
