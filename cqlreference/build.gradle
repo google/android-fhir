@@ -1,0 +1,61 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion sdk_versions.compile_sdk
+    buildToolsVersion build_tool_version
+
+    defaultConfig {
+        applicationId "com.google.android.fhir.cqlreference"
+        minSdkVersion sdk_versions.min_sdk
+        targetSdkVersion sdk_versions.target_sdk
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        multiDexEnabled true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    packagingOptions {
+        exclude 'META-INF/ASL-2.0.txt'
+        exclude 'META-INF/LGPL-3.0.txt'
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+}
+
+dependencies {
+
+    coreLibraryDesugaring deps.desugar
+
+    implementation deps.kotlin.stdlib
+    implementation deps.core
+    implementation deps.appcompat
+    implementation 'androidx.core:core-ktx:1.3.2'
+    implementation deps.kotlin.test
+    implementation deps.lifecycle.viewmodel_ktx
+    implementation deps.material
+    testImplementation deps.junit
+    testImplementation deps.atsl.core
+    implementation deps.constraint_layout
+    implementation project(path: ':core')
+
+    testImplementation deps.junit
+
+    androidTestImplementation deps.atsl.ext_junit
+    androidTestImplementation deps.atsl.espresso
+}

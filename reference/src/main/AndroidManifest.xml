@@ -45,6 +45,5 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.google.android.fhir.reference.PatientListActivity" />
         </activity>
-        <activity android:name="com.google.android.fhir.reference.CqlLoadActivity"></activity>
     </application>
 </manifest>

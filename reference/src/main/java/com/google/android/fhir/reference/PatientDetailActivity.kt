@@ -57,7 +57,6 @@ class PatientDetailActivity : AppCompatActivity() {
     when (item.itemId) {
       android.R.id.home -> {
         navigateUpTo(Intent(this, PatientListActivity::class.java))
-
         true
       }
       else -> super.onOptionsItemSelected(item)
