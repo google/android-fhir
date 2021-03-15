@@ -29,8 +29,6 @@ import com.google.android.fhir.reference.data.SamplePatients
 import com.google.android.fhir.search.filter.string
 import org.hl7.fhir.r4.model.Patient
 
-private const val OBSERVATIONS_JSON_FILENAME = "sample_observations_bundle.json"
-
 /**
  * The ViewModel helper class for PatientItemRecyclerViewAdapter, that is responsible for preparing
  * data for UI.
@@ -38,14 +36,7 @@ private const val OBSERVATIONS_JSON_FILENAME = "sample_observations_bundle.json"
 class PatientListViewModel(application: Application, private val fhirEngine: FhirEngine) :
   AndroidViewModel(application) {
 
-  // Make sample Fhir Patients and Observations available, in case needed for demo.
-  private val jsonStringObservations = getAssetFileAsString(OBSERVATIONS_JSON_FILENAME)
-
   private val samplePatients = SamplePatients()
-
-  private val observations = samplePatients.getObservationItems(jsonStringObservations)
-  private val liveObservations: MutableLiveData<List<ObservationItem>> =
-    MutableLiveData(observations)
 
   private var patientResults: List<Patient> = getSearchResults()
   private var searchedPatients = samplePatients.getPatientItems(patientResults)
@@ -62,14 +53,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
                 .count()}]"
     )
     return liveSearchedPatients
-  }
-
-  fun getPatientItem(id: String): PatientItem? {
-    return searchedPatients.associateBy { it.id }[id]
-  }
-
-  fun getObservations(): LiveData<List<ObservationItem>> {
-    return liveObservations
   }
 
   private fun getSearchResults(): List<Patient> {
@@ -90,15 +73,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     patientResults = getSearchResults()
     searchedPatients = samplePatients.getPatientItems(patientResults)
     _liveSearchedPatients.value = searchedPatients
-  }
-
-  private fun getAssetFileAsString(filename: String): String {
-    return this.getApplication<Application>()
-      .applicationContext
-      .assets
-      .open(filename)
-      .bufferedReader()
-      .use { it.readText() }
   }
 
   /** The Patient's details for display purposes. */
