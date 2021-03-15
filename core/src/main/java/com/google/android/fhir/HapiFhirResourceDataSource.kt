@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.reference.data
+package com.google.android.fhir
 
-import android.content.Context
-import androidx.work.WorkerParameters
-import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.reference.FhirApplication
-import com.google.android.fhir.sync.PeriodicSyncWorker
+import com.google.android.fhir.api.HapiFhirService
+import com.google.android.fhir.sync.FhirDataSource
+import org.hl7.fhir.r4.model.Bundle
 
-class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
-  PeriodicSyncWorker(appContext, workerParams) {
+/** Implementation of the [FhirDataSource] that communicates with hapi fhir. */
+class HapiFhirResourceDataSource(private val service: HapiFhirService) : FhirDataSource {
 
-  override fun getFhirEngine(): FhirEngine {
-    return FhirApplication.fhirEngine(applicationContext)
+  override suspend fun loadData(path: String): Bundle {
+    return service.getResource(path)
   }
 }

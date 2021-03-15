@@ -30,6 +30,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.reference.FhirApplication.Companion.fhirEngine
 import com.google.android.material.snackbar.Snackbar
 
 /** An activity representing a list of Patients. */
@@ -46,7 +47,7 @@ class PatientListActivity : AppCompatActivity() {
     setSupportActionBar(toolbar)
     toolbar.title = title
 
-    fhirEngine = FhirApplication.fhirEngine(this)
+    fhirEngine = fhirEngine(this)
 
     patientListViewModel =
       ViewModelProvider(this, PatientListViewModelFactory(this.application, fhirEngine))
@@ -92,7 +93,6 @@ class PatientListActivity : AppCompatActivity() {
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     val view: View = findViewById(R.id.app_bar)
-
     // Handle item selection
     return if (item.itemId == R.id.sync_resources) {
       syncResources(view)

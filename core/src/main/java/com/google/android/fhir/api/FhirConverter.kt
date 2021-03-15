@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.reference.api
+package com.google.android.fhir.api
 
 import ca.uhn.fhir.parser.IParser
 import java.lang.reflect.Type
