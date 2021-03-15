@@ -23,6 +23,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
@@ -53,8 +54,8 @@ class MyQuestionnaireFragment : Fragment() {
     super.onCreate(savedInstanceState)
     _binding = FragmentQuestionnaireBinding.inflate(inflater, container, false)
     arguments = bundleOf(QUESTIONNAIRE_FILE_PATH_KEY to args.questionnaireFilePathKey)
-    // Setting title on Action bar
     requireActivity().title = args.questionnaireTitleKey
+    (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
     // Only add the fragment once, when this fragment is first created.
     if (savedInstanceState == null) {
       val fragment = QuestionnaireFragment()
