@@ -24,8 +24,6 @@ import com.google.android.fhir.datacapture.gallery.databinding.QuestionnaireResp
 
 class QuestionnaireResponseDialogFragment() : DialogFragment() {
   private var _binding: QuestionnaireResponseDialogContentsBinding? = null
-  // This property is only valid between onCreateView and
-  // onDestroyView.
   private val binding
     get() = _binding!!
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
