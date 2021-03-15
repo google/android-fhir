@@ -34,7 +34,7 @@ class QuestionnaireResponseDialogFragment() : DialogFragment() {
       _binding = QuestionnaireResponseDialogContentsBinding.inflate(layoutInflater)
       binding.contents.text = contents
 
-      AlertDialog.Builder(it).setView(view).create()
+      AlertDialog.Builder(it).setView(binding.root).create()
     }
       ?: throw IllegalStateException("Activity cannot be null")
   }

@@ -32,10 +32,10 @@
         android:id="@+id/myQuestionnaireFragment"
         android:name="com.google.android.fhir.datacapture.gallery.MyQuestionnaireFragment"
         android:label="MyQuestionnaireFragment" >
-        <argument android:name="questionnaire-title-key"
+        <argument android:name="questionnaireTitleKey"
             app:argType="string" />
         <argument
-            android:name="questionnaire-file-path-key"
+            android:name="questionnaireFilePathKey"
             app:argType="string" />
     </fragment>
 </navigation>

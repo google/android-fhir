@@ -23,7 +23,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
@@ -41,6 +40,11 @@ class MyQuestionnaireFragment : Fragment() {
     get() = _binding!!
   private val args: MyQuestionnaireFragmentArgs by navArgs()
 
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setHasOptionsMenu(true)
+  }
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -48,17 +52,14 @@ class MyQuestionnaireFragment : Fragment() {
   ): View? {
     super.onCreate(savedInstanceState)
     _binding = FragmentQuestionnaireBinding.inflate(inflater, container, false)
-
-    (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-      setDisplayHomeAsUpEnabled(true)
-    }
-
+    arguments = bundleOf(QUESTIONNAIRE_FILE_PATH_KEY to args.questionnaireFilePathKey)
+    // Setting title on Action bar
+    requireActivity().title = args.questionnaireTitleKey
     // Only add the fragment once, when this fragment is first created.
     if (savedInstanceState == null) {
       val fragment = QuestionnaireFragment()
       fragment.arguments =
         bundleOf(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire)
-
       childFragmentManager.commit { add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
     }
     return binding.root
