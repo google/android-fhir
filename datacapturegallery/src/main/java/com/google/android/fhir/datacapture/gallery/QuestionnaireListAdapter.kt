@@ -30,14 +30,14 @@ class QuestionnaireListAdapter(private val questionnaireList: List<Questionnaire
     RecyclerView.ViewHolder(binding.root) {
     val name = binding.questionnaireName
     val description = binding.questionnaireDescription
-    lateinit var questionnairelistItem: QuestionnaireListItem
+    lateinit var questionnaireListItem: QuestionnaireListItem
 
     init {
       binding.root.setOnClickListener {
         val action =
           MainFragmentDirections.actionMainFragmentToMyQuestionnaireFragment(
-            questionnairelistItem.name,
-            questionnairelistItem.path
+            questionnaireListItem.name,
+            questionnaireListItem.path
           )
         binding.root.context
         it.findNavController().navigate(action)
@@ -53,7 +53,7 @@ class QuestionnaireListAdapter(private val questionnaireList: List<Questionnaire
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val questionnaireListItem = questionnaireList[position]
-    holder.questionnairelistItem = questionnaireListItem
+    holder.questionnaireListItem = questionnaireListItem
     holder.name.text = questionnaireListItem.name
     holder.description.text = questionnaireListItem.description
   }
