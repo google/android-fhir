@@ -21,42 +21,67 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 
-class QuestionnaireListAdapter(private val questionnaireList: List<QuestionnaireListItem>) :
-  Adapter<QuestionnaireListAdapter.ViewHolder>() {
+class QuestionnaireListAdapter : Adapter<QuestionnaireListAdapter.ViewHolder>() {
 
-  class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+  inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
+  {
     val name: TextView = view.findViewById(R.id.questionnaire_name)
     val description: TextView = view.findViewById(R.id.questionnaire_description)
-    lateinit var questionnairelistItem: QuestionnaireListItem
-
+    lateinit var questionnaireListItem: QuestionnaireListItem
     init {
       view.setOnClickListener {
         val context = view.context
         context.startActivity(
-          Intent(context, QuestionnaireActivity::class.java).apply {
-            putExtra(QuestionnaireActivity.QUESTIONNAIRE_TITLE_KEY, questionnairelistItem.name)
-            putExtra(QuestionnaireActivity.QUESTIONNAIRE_FILE_PATH_KEY, questionnairelistItem.path)
-          }
+                Intent(context, QuestionnaireActivity::class.java).apply {
+                  putExtra(QuestionnaireActivity.QUESTIONNAIRE_TITLE_KEY, questionnaireListItem.name)
+                  putExtra(QuestionnaireActivity.QUESTIONNAIRE_FILE_PATH_KEY, questionnaireListItem.path)
+                }
         )
       }
     }
   }
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-    ViewHolder(
-      LayoutInflater.from(parent.context)
-        .inflate(R.layout.questionnaire_list_item_view, parent, false)
-    )
+  private val differCallback = object : DiffUtil.ItemCallback<QuestionnaireListItem>(){
+    override fun areItemsTheSame(
+            oldItem: QuestionnaireListItem,
+            newItem: QuestionnaireListItem
+    ): Boolean {
+      return oldItem.path == newItem.path
+    }
 
-  override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-    val questionnaireListItem = questionnaireList[position]
-    holder.questionnairelistItem = questionnaireListItem
-    holder.name.text = questionnaireListItem.name
-    holder.description.text = questionnaireListItem.description
+    override fun areContentsTheSame(
+            oldItem: QuestionnaireListItem,
+            newItem: QuestionnaireListItem
+    ): Boolean {
+      return oldItem == newItem
+    }
   }
 
-  override fun getItemCount() = questionnaireList.size
+  val differ = AsyncListDiffer(this, differCallback)
+
+  override fun getItemCount() = differ.currentList.size
+
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    return ViewHolder(
+            LayoutInflater.from(parent.context)
+                    .inflate(R.layout.questionnaire_list_item_view, parent, false)
+    )
+  }
+
+  override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    val item = differ.currentList[position]
+
+    holder.apply {
+      name.text = questionnaireListItem.name
+      description.text = questionnaireListItem.description
+      questionnaireListItem = item
+    }
+  }
 }
+
+
