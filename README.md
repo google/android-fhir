@@ -46,7 +46,7 @@ Two sample applications are provided that demonstrate different features of the 
 **These applications are provided for demonstration purposes only and are not for use in production. Do NOT use in production.**
 
 ### Clinical Data Repository (CDR) Application
-This is the initial demo application for showcasing core SDK features and CQL proof of concept. The demo uses synthea generated data that has been loaded into the HAPI fhir server public demo site.
+This is the initial demo application for showcasing core SDK features and CQL proof of concept. The demo uses synthea generated data that has been loaded into the HAPI FHIR server public demo site.
 
 #### CQL Proof of Concept
 Within the CDR demo is an example of evaluating CQL using the [CQL Engine](https://github.com/DBCG/cql_engine).
