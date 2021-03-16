@@ -44,10 +44,8 @@ class QuestionnaireViewModel(application: Application, private val state: SavedS
     }
 
   private fun readFileFromAssets(filename: String): String {
-    return getApplication<Application>()
-      .assets
-      .open(filename)
-      .bufferedReader()
-      .use { it.readText() }
+    return getApplication<Application>().assets.open(filename).bufferedReader().use {
+      it.readText()
+    }
   }
 }
