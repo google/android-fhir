@@ -20,29 +20,29 @@ import org.hl7.fhir.r4.model.ResourceType
 
 class FhirApplication : CoreApplication() {
 
-	override val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
+  override val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
 
-	override fun constructFhirEngine(): FhirEngine {
-		val parser = FhirContext.forR4().newJsonParser()
-		val service = create(parser)
-		val params = mutableMapOf("address-city" to "NAIROBI")
-		val syncData: MutableList<SyncData> = ArrayList()
-		syncData.add(SyncData(ResourceType.Patient, params))
-		val configuration = SyncConfiguration(syncData, false)
-		val periodicSyncConfiguration =
-			PeriodicSyncConfiguration(
-				syncConfiguration = configuration,
-				syncConstraints = Constraints.Builder().build(),
-				periodicSyncWorker = FhirPeriodicSyncWorker::class.java,
-				repeat = RepeatInterval(interval = 1, timeUnit = TimeUnit.HOURS)
-			)
-		val dataSource: FhirDataSource = HapiFhirResourceDataSource(service)
-		return FhirEngineBuilder(dataSource, this)
-			.periodicSyncConfiguration(periodicSyncConfiguration)
-			.build()
-	}
+  override fun constructFhirEngine(): FhirEngine {
+    val parser = FhirContext.forR4().newJsonParser()
+    val service = create(parser)
+    val params = mutableMapOf("address-city" to "NAIROBI")
+    val syncData: MutableList<SyncData> = ArrayList()
+    syncData.add(SyncData(ResourceType.Patient, params))
+    val configuration = SyncConfiguration(syncData, false)
+    val periodicSyncConfiguration =
+      PeriodicSyncConfiguration(
+        syncConfiguration = configuration,
+        syncConstraints = Constraints.Builder().build(),
+        periodicSyncWorker = FhirPeriodicSyncWorker::class.java,
+        repeat = RepeatInterval(interval = 1, timeUnit = TimeUnit.HOURS)
+      )
+    val dataSource: FhirDataSource = HapiFhirResourceDataSource(service)
+    return FhirEngineBuilder(dataSource, this)
+      .periodicSyncConfiguration(periodicSyncConfiguration)
+      .build()
+  }
 
-	companion object {
-		fun fhirEngine(context: Context) = (context.applicationContext as FhirApplication).fhirEngine
-	}
+  companion object {
+    fun fhirEngine(context: Context) = (context.applicationContext as FhirApplication).fhirEngine
+  }
 }
