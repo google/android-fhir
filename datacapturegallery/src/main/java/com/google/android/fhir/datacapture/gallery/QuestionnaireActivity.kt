@@ -46,8 +46,7 @@ class QuestionnaireActivity : AppCompatActivity() {
       fragment.arguments =
         bundleOf(
           QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire,
-          QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to
-            viewModel.questionnaireResponse 
+          QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to viewModel.questionnaireResponse
         )
 
       supportFragmentManager.commit { add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
