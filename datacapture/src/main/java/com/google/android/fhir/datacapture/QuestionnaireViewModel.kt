@@ -195,10 +195,8 @@ private fun validateQuestionniareResponseItems(
     val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
     if (!questionnaireItem.linkId.equals(questionnaireResponseItem.linkId))
       throw IllegalArgumentException(
-        "Questionnaire response items mismatch with linkIds " +
-          questionnaireItem.linkId.value +
-          " and " +
-          questionnaireResponseItem.linkId.value
+        "Mismatching linkIds for questionnaire item ${questionnaireItem.linkId.value} and " +
+          "questionnaire response item ${questionnaireResponseItem.linkId.value}"
       )
     if (questionnaireItem.type.value.equals(QuestionnaireItemTypeCode.Value.GROUP)) {
       validateQuestionniareResponseItems(
