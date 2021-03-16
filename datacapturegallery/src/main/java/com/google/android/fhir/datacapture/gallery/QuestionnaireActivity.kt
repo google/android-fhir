@@ -72,7 +72,7 @@ class QuestionnaireActivity : AppCompatActivity() {
     }
   }
 
-  // Display Quesitonnaire response as a dialog
+  // Display Questionnaire response as a dialog
   fun displayQuestionnaireResponse(questionnaireResponse: QuestionnaireResponse) {
     val questionnaireResponseJson = JsonFormat.getPrinter().print(questionnaireResponse)
     val dialogFragment = QuestionnaireResponseDialogFragment()
@@ -85,6 +85,6 @@ class QuestionnaireActivity : AppCompatActivity() {
     const val QUESTIONNAIRE_TITLE_KEY = "questionnaire-title-key"
     const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
     const val QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY = "questionnaire-response-file-path-key"
-    const val QUESTIONNAIRE_FRAGMENT_TAG = "questionannire-fragment-tag"
+    const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
   }
 }
