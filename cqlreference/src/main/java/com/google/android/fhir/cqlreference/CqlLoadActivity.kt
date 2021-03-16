@@ -98,10 +98,10 @@ class CqlLoadActivity : AppCompatActivity() {
         resource = fhirContext.newJsonParser().parseResource(result) as Resource
         fhirEngine.save<Resource>(resource)
         Snackbar.make(
-          cqlLibraryUrlInput,
-          "Loaded " + resource.resourceType.name + " with ID " + resource.id,
-          Snackbar.LENGTH_SHORT
-        )
+            cqlLibraryUrlInput,
+            "Loaded " + resource.resourceType.name + " with ID " + resource.id,
+            Snackbar.LENGTH_SHORT
+          )
           .show()
       } catch (e: IOException) {
         e.printStackTrace()
@@ -118,7 +118,7 @@ class CqlLoadActivity : AppCompatActivity() {
 
     override fun onPostExecute(result: EvaluationResult?) {
       val stringBuilder = StringBuilder()
-      if (result?.libraryResults?.values != null)
+      if (result?.libraryResults?.values != null) {
         for (libraryResult in result.libraryResults.values) {
           for ((key, value) in libraryResult.expressionResults) {
             stringBuilder.append("$key -> ")
@@ -139,6 +139,7 @@ class CqlLoadActivity : AppCompatActivity() {
             }
           }
         }
+      }
       evaluationResultTextView.text = stringBuilder.toString()
     }
   }
