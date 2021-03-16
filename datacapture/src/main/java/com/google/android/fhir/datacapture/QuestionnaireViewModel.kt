@@ -215,8 +215,7 @@ private fun validateQuestionniareResponseItems(
   if (questionnaireItemListIterator.hasNext() xor questionnaireResponseItemListIterator.hasNext()) {
     if (questionnaireItemListIterator.hasNext()) {
       throw IllegalArgumentException(
-        "Structure mismatch at Questionnaire item with linkId " +
-          questionnaireItemListIterator.next().linkId.value
+        "No matching questionnaire response item for questionnaire item ${questionnaireItemListIterator.next().linkId.value}"
       )
     } else {
       throw IllegalArgumentException(
