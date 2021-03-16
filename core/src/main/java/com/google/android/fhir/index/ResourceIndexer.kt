@@ -18,6 +18,7 @@ package com.google.android.fhir.index
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.NumberIndex
@@ -30,18 +31,18 @@ import java.math.BigDecimal
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.CodeableConcept
-import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.Period
-import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Money
+import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.model.codesystems.SearchParamType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
@@ -135,24 +136,22 @@ internal object ResourceIndexer {
           instant.precision
         )
       }
-      "period" ->{
+      "period" -> {
         val period = value as Period
         DateIndex(
           searchParam.name,
           searchParam.path,
-          //TODO handle else case
-          if (period.hasEnd()) period.end.time else period.start.time,
-          period.start.time,
-          period.startElement.precision
+          if (period.hasEnd()) period.end.time else Long.MAX_VALUE,
+          if (period.hasStart()) period.start.time else Long.MIN_VALUE,
+          period.getPrecision()
         )
       }
-
       "timing" -> {
         val timing = value as Timing
         DateIndex(
           searchParam.name,
           searchParam.path,
-          //TODO do this in one iteration instead of 3
+          // TODO do this in one iteration instead of 3
           timing.event.maxOf { it.value.time },
           timing.event.minOf { it.value.time },
           timing.event.maxOf { it.precision }
@@ -247,4 +246,13 @@ internal object ResourceIndexer {
    * https://www.hl7.org/fhir/valueset-currencies.html.
    */
   private const val FHIR_CURRENCY_CODE_SYSTEM = "urn:iso:std:iso:4217"
+}
+
+private fun Period.getPrecision(): TemporalPrecisionEnum {
+  return when {
+    (hasEnd()) -> endElement.precision
+    (hasStart()) -> startElement.precision
+    // TODO confirm else case
+    else -> DateTimeType.DEFAULT_PRECISION
+  }
 }
