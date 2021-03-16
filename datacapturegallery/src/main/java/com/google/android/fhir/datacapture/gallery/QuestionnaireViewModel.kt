@@ -46,7 +46,7 @@ class QuestionnaireViewModel(application: Application, private val state: SavedS
   private fun readFileFromAssets(filename: String): String {
     return getApplication<Application>()
       .assets
-      .open(state[QuestionnaireActivity.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY]!!)
+      .open(filename)
       .bufferedReader()
       .use { it.readText() }
   }
