@@ -30,15 +30,24 @@ class QuestionnaireListAdapter(private val questionnaireList: List<Questionnaire
   class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     val name: TextView = view.findViewById(R.id.questionnaire_name)
     val description: TextView = view.findViewById(R.id.questionnaire_description)
-    lateinit var questionnairelistItem: QuestionnaireListItem
+    lateinit var questionnaireListItem: QuestionnaireListItem
 
     init {
       view.setOnClickListener {
         val context = view.context
         context.startActivity(
           Intent(context, QuestionnaireActivity::class.java).apply {
-            putExtra(QuestionnaireActivity.QUESTIONNAIRE_TITLE_KEY, questionnairelistItem.name)
-            putExtra(QuestionnaireActivity.QUESTIONNAIRE_FILE_PATH_KEY, questionnairelistItem.path)
+            putExtra(QuestionnaireActivity.QUESTIONNAIRE_TITLE_KEY, questionnaireListItem.name)
+            putExtra(
+              QuestionnaireActivity.QUESTIONNAIRE_FILE_PATH_KEY,
+              questionnaireListItem.questionnairePath
+            )
+            questionnaireListItem.questionnaireResponsePath?.let {
+              putExtra(
+                QuestionnaireActivity.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY,
+                questionnaireListItem.questionnaireResponsePath
+              )
+            }
           }
         )
       }
@@ -53,7 +62,7 @@ class QuestionnaireListAdapter(private val questionnaireList: List<Questionnaire
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val questionnaireListItem = questionnaireList[position]
-    holder.questionnairelistItem = questionnaireListItem
+    holder.questionnaireListItem = questionnaireListItem
     holder.name.text = questionnaireListItem.name
     holder.description.text = questionnaireListItem.description
   }

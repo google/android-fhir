@@ -36,6 +36,11 @@ jobs:
         api-level: [24, 27, 29]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+    - name: Cancel previous
+      uses: styfle/cancel-workflow-action@0.7.0
+      with:
+        access_token: ${{ github.token }}
+    
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
     

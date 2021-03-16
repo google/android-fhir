@@ -35,13 +35,24 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
         checkBox = itemView.findViewById(R.id.check_box)
         prefix = itemView.findViewById(R.id.prefix)
         checkBox.setOnClickListener {
-          questionnaireItemViewItem.singleAnswerOrNull =
-            QuestionnaireResponse.Item.Answer.newBuilder().apply {
-              value =
-                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                  .setBoolean(Boolean.newBuilder().setValue(checkBox.isChecked).build())
-                  .build()
-            }
+          // if-else block to prevent over-writing of "items" nested within "answer"
+          if (questionnaireItemViewItem.singleAnswerOrNull != null) {
+            questionnaireItemViewItem.singleAnswerOrNull?.value =
+              questionnaireItemViewItem
+                .singleAnswerOrNull
+                ?.valueBuilder
+                ?.setBoolean(Boolean.newBuilder().setValue(checkBox.isChecked).build())
+                ?.build()
+          } else {
+            questionnaireItemViewItem.singleAnswerOrNull =
+              QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                value =
+                  QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                    .setBoolean(Boolean.newBuilder().setValue(checkBox.isChecked).build())
+                    .build()
+              }
+          }
+
           questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
         }
       }
