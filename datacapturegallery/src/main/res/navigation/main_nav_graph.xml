@@ -37,5 +37,9 @@
         <argument
             android:name="questionnaireFilePathKey"
             app:argType="string" />
+        <argument
+            android:name="questionnaireResponseFilePathKey"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
 </navigation>

@@ -53,7 +53,11 @@ class MyQuestionnaireFragment : Fragment() {
   ): View? {
     super.onCreate(savedInstanceState)
     _binding = FragmentQuestionnaireBinding.inflate(inflater, container, false)
-    arguments = bundleOf(QUESTIONNAIRE_FILE_PATH_KEY to args.questionnaireFilePathKey)
+    arguments =
+      bundleOf(
+        QUESTIONNAIRE_FILE_PATH_KEY to args.questionnaireFilePathKey,
+        QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY to args.questionnaireResponseFilePathKey
+      )
     requireActivity().title = args.questionnaireTitleKey
     (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
     // Only add the fragment once, when this fragment is first created.
@@ -95,6 +99,7 @@ class MyQuestionnaireFragment : Fragment() {
   companion object {
     const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
+    const val QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY = "questionnaire-response-file-path-key"
   }
 
   override fun onDestroyView() {

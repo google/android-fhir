@@ -37,7 +37,8 @@ class QuestionnaireListAdapter(private val questionnaireList: List<Questionnaire
         val action =
           MainFragmentDirections.actionMainFragmentToMyQuestionnaireFragment(
             questionnaireListItem.name,
-            questionnaireListItem.path
+            questionnaireListItem.questionnairePath,
+            questionnaireListItem.questionnaireResponsePath
           )
         binding.root.context
         it.findNavController().navigate(action)
