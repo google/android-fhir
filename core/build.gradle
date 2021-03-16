@@ -75,7 +75,7 @@ dependencies {
     androidTestImplementation deps.truth
 
     api deps.cql_engine.core
-    api (deps.hapi_r4) {
+    api(deps.hapi_r4) {
         exclude module: 'junit'
     }
 

@@ -22,9 +22,9 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.CoreApplication
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineBuilder
-import com.google.android.fhir.api.HapiFhirService.Companion.create
 import com.google.android.fhir.FhirPeriodicSyncWorker
 import com.google.android.fhir.HapiFhirResourceDataSource
+import com.google.android.fhir.api.HapiFhirService.Companion.create
 import com.google.android.fhir.sync.FhirDataSource
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.RepeatInterval
