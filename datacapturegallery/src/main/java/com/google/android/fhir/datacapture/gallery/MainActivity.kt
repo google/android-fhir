@@ -36,8 +36,7 @@ class MainActivity : AppCompatActivity() {
             "HL7 example \"f201\"",
             "hl7-questionnaire-example-f201-lifelines.json"
           ),
-          // Example taken from
-          // https://www.hl7.org/fhir/questionnaire-example-bluebook.json.html
+          // Example taken from https://www.hl7.org/fhir/questionnaire-example-bluebook.json.html
           QuestionnaireListItem(
             "Neonate record from New South Wales, Australia",
             "HL7 example \"bb\"",
@@ -71,6 +70,15 @@ class MainActivity : AppCompatActivity() {
             "HIV-Risk Assessment",
             "HIV-Risk Assessment",
             "iprd-hiv-fhir-questionnaire.json"
+          ),
+          // Example taken from
+          // https://www.hl7.org/fhir/questionnaire-example-f201-lifelines.json.html &
+          // https://www.hl7.org/fhir/questionnaireResponse-example-f201-lifelines.json.html
+          QuestionnaireListItem(
+            "Neonate record from New South Wales, Australia pre-filled",
+            "HL7 example \"bb\" with questionnaire response to pre-fill answers",
+            "hl7-questionnaire-example-bluebook.json",
+            "hl7-questionnaireresponse-example-bluebook.json"
           )
         )
       )
