@@ -31,6 +31,9 @@ import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Timing
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.InstantType
@@ -130,6 +133,39 @@ internal object ResourceIndexer {
           instant.value.time,
           instant.value.time,
           instant.precision
+        )
+      }
+      "period" ->{
+        val period = value as Period
+        DateIndex(
+          searchParam.name,
+          searchParam.path,
+          //TODO handle else case
+          if (period.hasEnd()) period.end.time else period.start.time,
+          period.start.time,
+          period.startElement.precision
+        )
+      }
+
+      "timing" -> {
+        val timing = value as Timing
+        DateIndex(
+          searchParam.name,
+          searchParam.path,
+          //TODO do this in one iteration instead of 3
+          timing.event.maxOf { it.value.time },
+          timing.event.minOf { it.value.time },
+          timing.event.maxOf { it.precision }
+        )
+      }
+      "datetime" -> {
+        val dateTime = value as DateTimeType
+        DateIndex(
+          searchParam.name,
+          searchParam.path,
+          dateTime.value.time,
+          dateTime.value.time,
+          dateTime.precision
         )
       }
       else -> null
