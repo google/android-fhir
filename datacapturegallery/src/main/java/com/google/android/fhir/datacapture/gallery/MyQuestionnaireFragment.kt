@@ -28,6 +28,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.gallery.databinding.FragmentQuestionnaireBinding
@@ -58,8 +59,10 @@ class MyQuestionnaireFragment : Fragment() {
         QUESTIONNAIRE_FILE_PATH_KEY to args.questionnaireFilePathKey,
         QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY to args.questionnaireResponseFilePathKey
       )
-    requireActivity().title = args.questionnaireTitleKey
-    (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    (requireActivity() as AppCompatActivity).supportActionBar?.apply {
+      title = args.questionnaireTitleKey
+      setDisplayHomeAsUpEnabled(true)
+    }
     // Only add the fragment once, when this fragment is first created.
     if (savedInstanceState == null) {
       val fragment = QuestionnaireFragment()
@@ -83,6 +86,10 @@ class MyQuestionnaireFragment : Fragment() {
         displayQuestionnaireResponse(questionnaireFragment.getQuestionnaireResponse())
         true
       }
+      android.R.id.home -> {
+        NavHostFragment.findNavController(this).navigateUp()
+        true
+      }
       else -> super.onOptionsItemSelected(item)
     }
   }
@@ -104,6 +111,10 @@ class MyQuestionnaireFragment : Fragment() {
 
   override fun onDestroyView() {
     super.onDestroyView()
+    (requireActivity() as AppCompatActivity).supportActionBar?.apply {
+      setDisplayHomeAsUpEnabled(false)
+      title = getString(R.string.app_name)
+    }
     _binding = null
   }
 }
