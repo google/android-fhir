@@ -151,7 +151,6 @@ internal object ResourceIndexer {
         DateIndex(
           searchParam.name,
           searchParam.path,
-          // TODO do this in one iteration instead of 3
           timing.event.maxOf { it.value.time },
           timing.event.minOf { it.value.time },
           timing.event.maxOf { it.precision }
@@ -252,7 +251,6 @@ private fun Period.getPrecision(): TemporalPrecisionEnum {
   return when {
     (hasEnd()) -> endElement.precision
     (hasStart()) -> startElement.precision
-    // TODO confirm else case
     else -> DateTimeType.DEFAULT_PRECISION
   }
 }
