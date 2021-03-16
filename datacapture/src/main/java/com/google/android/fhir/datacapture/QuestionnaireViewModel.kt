@@ -23,6 +23,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.fhir.common.JsonFormat
 import com.google.fhir.r4.core.Canonical
 import com.google.fhir.r4.core.Questionnaire
+import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 import com.google.fhir.r4.core.QuestionnaireResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +32,6 @@ import kotlinx.coroutines.flow.map
 internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   /** The current questionnaire as questions are being answered. */
   private val questionnaire: Questionnaire
-
   init {
     val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
     val builder = Questionnaire.newBuilder()
@@ -39,15 +39,28 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   }
 
   /** The current questionnaire response as questions are being answered. */
-  private val questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
+  private lateinit var questionnaireResponseBuilder: QuestionnaireResponse.Builder
 
   init {
-    questionnaireResponseBuilder.questionnaire =
-      Canonical.newBuilder().setValue(questionnaire.id.value).build()
-    // Retain the hierarchy and order of items within the questionnaire as specified in the
-    // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
-    questionnaire.itemList.forEach {
-      questionnaireResponseBuilder.addItem(it.createQuestionnaireResponseItem())
+    val questionnaireJsonResponseString: String? =
+      state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
+    if (questionnaireJsonResponseString != null) {
+      questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
+      val questionnaireResponse =
+        JsonFormat.getParser()
+          .merge(questionnaireJsonResponseString, questionnaireResponseBuilder)
+          .build()
+      validateQuestionniareResponseItems(questionnaire.itemList, questionnaireResponse.itemList)
+      questionnaireResponseBuilder = questionnaireResponse.toBuilder()
+    } else {
+      questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
+      questionnaireResponseBuilder.questionnaire =
+        Canonical.newBuilder().setValue(questionnaire.id.value).build()
+      // Retain the hierarchy and order of items within the questionnaire as specified in the
+      // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
+      questionnaire.itemList.forEach {
+        questionnaireResponseBuilder.addItem(it.createQuestionnaireResponseItem())
+      }
     }
   }
 
@@ -89,9 +102,10 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   }
 
   /**
-   * Traverse (DFS) through the list of questionnaire items and the list of questionnaire response
-   * items and populate [questionnaireItemViewItemList] with matching pairs of questionnaire item
-   * and questionnaire response item.
+   * Traverse (DFS) through the list of questionnaire items , the list of questionnaire response
+   * items and the list of items in the questionnaire response answer list and populate
+   * [questionnaireItemViewItemList] with matching pairs of questionnaire item and questionnaire
+   * response item.
    *
    * The traverse is carried out in the two lists in tandem. The two lists should be structurally
    * identical.
@@ -126,6 +140,15 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
             questionnaireResponseItem.itemBuilderList
           )
         )
+        if (!questionnaireItem.type.value.equals(QuestionnaireItemTypeCode.Value.GROUP)) {
+          questionnaireResponseItem.answerBuilderList?.forEach {
+            if (it.itemCount > 0) {
+              questionnaireItemViewItemList.addAll(
+                getQuestionnaireItemViewItemList(questionnaireItem.itemList, it.itemBuilderList)
+              )
+            }
+          }
+        }
       }
     }
     return questionnaireItemViewItemList
@@ -148,6 +171,54 @@ private fun Questionnaire.Item.createQuestionnaireResponseItem():
         .build()
     this@createQuestionnaireResponseItem.itemList.forEach {
       this.addItem(it.createQuestionnaireResponseItem())
+    }
+  }
+}
+
+/**
+ * Traverse (DFS) through the list of questionnaire items and the list of questionnaire response
+ * items and check if the linkid of the matching pairs of questionnaire item and questionnaire
+ * response item are equal. The traverse is carried out in the two lists in tandem. The two lists
+ * should be structurally identical.
+ */
+private fun validateQuestionniareResponseItems(
+  questionnaireItemList: List<Questionnaire.Item>,
+  questionnaireResponseItemList: List<QuestionnaireResponse.Item>
+) {
+  val questionnaireItemListIterator = questionnaireItemList.iterator()
+  val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
+  while (questionnaireItemListIterator.hasNext() &&
+    questionnaireResponseItemListIterator.hasNext()) {
+    // TODO: Validate type and item nesting within answers for repeated answers
+    // https://github.com/google/android-fhir/issues/286
+    val questionnaireItem = questionnaireItemListIterator.next()
+    val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
+    if (!questionnaireItem.linkId.equals(questionnaireResponseItem.linkId))
+      throw IllegalArgumentException(
+        "Mismatching linkIds for questionnaire item ${questionnaireItem.linkId.value} and " +
+          "questionnaire response item ${questionnaireResponseItem.linkId.value}"
+      )
+    if (questionnaireItem.type.value.equals(QuestionnaireItemTypeCode.Value.GROUP)) {
+      validateQuestionniareResponseItems(
+        questionnaireItem.itemList,
+        questionnaireResponseItem.itemList
+      )
+    } else {
+      validateQuestionniareResponseItems(
+        questionnaireItem.itemList,
+        questionnaireResponseItem.answerList.first().itemList
+      )
+    }
+  }
+  if (questionnaireItemListIterator.hasNext() xor questionnaireResponseItemListIterator.hasNext()) {
+    if (questionnaireItemListIterator.hasNext()) {
+      throw IllegalArgumentException(
+        "No matching questionnaire response item for questionnaire item ${questionnaireItemListIterator.next().linkId.value}"
+      )
+    } else {
+      throw IllegalArgumentException(
+        "No matching questionnaire item for questionnaire response item ${questionnaireResponseItemListIterator.next().linkId.value}"
+      )
     }
   }
 }
