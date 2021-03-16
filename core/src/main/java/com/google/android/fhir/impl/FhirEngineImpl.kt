@@ -32,26 +32,13 @@ import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.Result
 import com.google.android.fhir.sync.SyncConfiguration
 import com.google.android.fhir.sync.SyncWorkType
-import java.util.EnumSet
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
-import kotlin.collections.set
-import org.cqframework.cql.elm.execution.VersionedIdentifier
 import org.hl7.fhir.r4.model.Resource
-import org.opencds.cqf.cql.data.DataProvider
-import org.opencds.cqf.cql.execution.CqlEngine
-import org.opencds.cqf.cql.execution.EvaluationResult
-import org.opencds.cqf.cql.execution.LibraryLoader
-import org.opencds.cqf.cql.terminology.TerminologyProvider
 
 /** Implementation of [FhirEngine]. */
 class FhirEngineImpl
 constructor(
   private val database: Database,
   private val search: Search,
-  libraryLoader: LibraryLoader,
-  dataProviderMap: Map<String, @JvmSuppressWildcards DataProvider>,
-  terminologyProvider: TerminologyProvider,
   private var periodicSyncConfiguration: PeriodicSyncConfiguration?,
   private val dataSource: FhirDataSource,
   private val context: Context
@@ -60,14 +47,6 @@ constructor(
   init {
     periodicSyncConfiguration?.let { config -> triggerInitialDownload(config) }
   }
-
-  private val cqlEngine: CqlEngine =
-    CqlEngine(
-      libraryLoader,
-      dataProviderMap,
-      terminologyProvider,
-      EnumSet.noneOf(CqlEngine.Options::class.java)
-    )
 
   override fun <R : Resource> save(resource: R) {
     database.insert(resource)
@@ -92,23 +71,6 @@ constructor(
 
   override fun <R : Resource> remove(clazz: Class<R>, id: String) {
     database.delete(clazz, id)
-  }
-
-  override fun evaluateCql(
-    libraryVersionId: String,
-    context: String,
-    expression: String
-  ): EvaluationResult? {
-    val contextMap: MutableMap<String, Any> = HashMap()
-    val contextSplit = context.split("/").toTypedArray()
-    contextMap[contextSplit[0]] = contextSplit[1]
-    val versionedIdentifier = VersionedIdentifier().withId(libraryVersionId)
-    val expressions: MutableSet<String> = HashSet()
-    expressions.add(expression)
-    val map: MutableMap<VersionedIdentifier, Set<String>> = HashMap()
-    map[versionedIdentifier] = expressions
-    return if (!map.get("system").isNullOrEmpty()) cqlEngine.evaluate(contextMap, null, map)
-    else null
   }
 
   override fun search(): Search {

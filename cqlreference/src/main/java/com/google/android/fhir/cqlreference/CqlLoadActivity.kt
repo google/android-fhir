@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.cql.CqlEngineUtils
 import com.google.android.fhir.cqlreference.FhirApplication.Companion.fhirEngine
 import com.google.android.material.snackbar.Snackbar
 import java.io.BufferedReader
@@ -43,12 +44,14 @@ class CqlLoadActivity : AppCompatActivity() {
   lateinit var contextInput: EditText
   lateinit var expressionInput: EditText
   lateinit var evaluationResultTextView: TextView
+  lateinit var cqlEngineUtils: CqlEngineUtils
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_cql_load)
 
     fhirEngine = fhirEngine(this)
+    cqlEngineUtils = CqlEngineUtils(this)
     cqlLibraryUrlInput = findViewById(R.id.cql_text_input)
     fhirResourceUrlInput = findViewById(R.id.fhir_resource_url_input)
     libraryInput = findViewById(R.id.library_input)
@@ -113,7 +116,7 @@ class CqlLoadActivity : AppCompatActivity() {
 
   private inner class EvaluateAncLibrary : AsyncTask<String?, String?, EvaluationResult?>() {
     override fun doInBackground(vararg strings: String?): EvaluationResult? {
-      return fhirEngine.evaluateCql(strings[0]!!, strings[1]!!, strings[2]!!)
+      return cqlEngineUtils.evaluateCql(strings[0]!!, strings[1]!!, strings[2]!!)
     }
 
     override fun onPostExecute(result: EvaluationResult?) {
