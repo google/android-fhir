@@ -366,7 +366,48 @@ class QuestionnaireViewModelTest {
     val errorMessage =
       assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state) }.localizedMessage
 
-    assertThat(errorMessage).contains("linkId")
+    assertThat(errorMessage)
+      .isEqualTo(
+        "Mismatching linkIds for questionnaire item a-link-id and " +
+          "questionnaire response item a-different-link-id"
+      )
+  }
+
+  @Test
+  fun stateHasQuestionnaireResponse_lessItemsInQuestionnaireResponse_shouldThrowError() {
+    val questionnaire =
+      Questionnaire.newBuilder()
+        .apply {
+          id = Id.newBuilder().setValue("a-questionnaire").build()
+          addItem(
+            Questionnaire.Item.newBuilder().apply {
+              linkId = String.newBuilder().setValue("a-link-id").build()
+              text = String.newBuilder().setValue("Basic question").build()
+              type =
+                Questionnaire.Item.TypeCode.newBuilder()
+                  .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+                  .build()
+            }
+          )
+        }
+        .build()
+    val serializedQuestionniare = printer.print(questionnaire)
+    val questionnaireResponse =
+      QuestionnaireResponse.newBuilder()
+        .apply { id = Id.newBuilder().setValue("a-questionnaire-response").build() }
+        .build()
+    val serializedQuestionniareResponse = printer.print(questionnaireResponse)
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+    state.set(
+      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
+      serializedQuestionniareResponse
+    )
+
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state) }.localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo("No matching questionnaire response item for questionnaire item a-link-id")
   }
 
   @Test
@@ -428,7 +469,10 @@ class QuestionnaireViewModelTest {
     val errorMessage =
       assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state) }.localizedMessage
 
-    assertThat(errorMessage).contains("Structure")
+    assertThat(errorMessage)
+      .isEqualTo(
+        "No matching questionnaire item for questionnaire response item a-different-link-id"
+      )
   }
 
   @Test
