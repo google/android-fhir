@@ -30,7 +30,7 @@ class QuestionnaireListAdapter(private val questionnaireList: List<Questionnaire
   class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     val name: TextView = view.findViewById(R.id.questionnaire_name)
     val description: TextView = view.findViewById(R.id.questionnaire_description)
-    lateinit var questionnairelistItem: QuestionnaireListItem
+    lateinit var questionnaireListItem: QuestionnaireListItem
 
     init {
       view.setOnClickListener {
@@ -62,7 +62,7 @@ class QuestionnaireListAdapter(private val questionnaireList: List<Questionnaire
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val questionnaireListItem = questionnaireList[position]
-    holder.questionnairelistItem = questionnaireListItem
+    holder.questionnaireListItem = questionnaireListItem
     holder.name.text = questionnaireListItem.name
     holder.description.text = questionnaireListItem.description
   }
