@@ -47,7 +47,7 @@ class QuestionnaireActivity : AppCompatActivity() {
         bundleOf(
           QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire,
           QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to
-            viewModel.questionnaireResponse // ktlint-disable max-line-length
+            viewModel.questionnaireResponse 
         )
 
       supportFragmentManager.commit { add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
