@@ -306,12 +306,7 @@ class QuestionnaireItemAdapterTest {
                           Coding.newBuilder()
                             .setCode(Code.newBuilder().setValue(ITEM_CONTROL_RADIO_BUTTON))
                             .setDisplay(String.newBuilder().setValue("Radio Button"))
-                            .setSystem(
-                              Uri.newBuilder()
-                                .setValue(
-                                  EXTENSION_ITEM_CONTROL_SYSTEM
-                                ) // ktlint ignore max-line-limit
-                            )
+                            .setSystem(Uri.newBuilder().setValue(EXTENSION_ITEM_CONTROL_SYSTEM))
                         )
                     )
                 )
@@ -348,12 +343,7 @@ class QuestionnaireItemAdapterTest {
                           Coding.newBuilder()
                             .setCode(Code.newBuilder().setValue(ITEM_CONTROL_DROP_DOWN))
                             .setDisplay(String.newBuilder().setValue("Drop Down"))
-                            .setSystem(
-                              Uri.newBuilder()
-                                .setValue(
-                                  EXTENSION_ITEM_CONTROL_SYSTEM
-                                ) // ktlint-disable max-line-length
-                            )
+                            .setSystem(Uri.newBuilder().setValue(EXTENSION_ITEM_CONTROL_SYSTEM))
                         )
                     )
                 )
