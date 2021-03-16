@@ -32,12 +32,14 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var textView: TextView
+      private lateinit var prefix: TextView
       private lateinit var autoCompleteTextView: AutoCompleteTextView
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
       private lateinit var context: Context
 
       override fun init(itemView: View) {
         textView = itemView.findViewById(R.id.dropdown_question_title)
+        prefix = itemView.findViewById(R.id.prefix)
         autoCompleteTextView = itemView.findViewById(R.id.auto_complete)
         context = itemView.context
       }
@@ -45,6 +47,10 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
         textView.text = questionnaireItemViewItem.questionnaireItem.text.value
+        if (questionnaireItemViewItem.questionnaireItem.prefix.toString().isNotEmpty()) {
+          prefix.visibility = View.VISIBLE
+          prefix.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+        }
         val answerOptionString =
           this.questionnaireItemViewItem.questionnaireItem.answerOptionList.map { it.displayString }
         val adapter =

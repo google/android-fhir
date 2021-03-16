@@ -31,11 +31,13 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var radioHeader: TextView
+      private lateinit var prefix: TextView
       private lateinit var radioGroup: RadioGroup
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
         radioGroup = itemView.findViewById(R.id.radio_group)
+        prefix = itemView.findViewById(R.id.prefix)
         radioHeader = itemView.findViewById(R.id.radio_header)
       }
 
@@ -45,6 +47,10 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         val questionnaireResponseItemBuilder =
           questionnaireItemViewItem.questionnaireResponseItemBuilder
         val answer = questionnaireResponseItemBuilder.answerList.singleOrNull()?.value?.coding
+        if (questionnaireItemViewItem.questionnaireItem.prefix.toString().isNotEmpty()) {
+          prefix.visibility = View.VISIBLE
+          prefix.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+        }
         radioHeader.text = questionnaireItem.text.value
         radioGroup.removeAllViews()
         var index = 0

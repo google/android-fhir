@@ -25,9 +25,11 @@ internal object QuestionnaireItemGroupViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var groupHeader: TextView
+      private lateinit var prefix: TextView
 
       override fun init(itemView: View) {
         groupHeader = itemView.findViewById(R.id.group_header)
+        prefix = itemView.findViewById(R.id.prefix)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
@@ -38,6 +40,10 @@ internal object QuestionnaireItemGroupViewHolderFactory :
           } else {
             View.VISIBLE
           }
+        if (questionnaireItemViewItem.questionnaireItem.prefix.toString().isNotEmpty()) {
+          prefix.visibility = View.VISIBLE
+          prefix.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+        }
       }
     }
 }
