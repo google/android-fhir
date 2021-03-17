@@ -65,7 +65,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       }
     }
 
-//    questionnaire.itemList.forEach { questionnaireBuilder.addItem(it) }
+    //    questionnaire.itemList.forEach { questionnaireBuilder.addItem(it) }
   }
 
   /** Map from link IDs to questionnaire response items. */

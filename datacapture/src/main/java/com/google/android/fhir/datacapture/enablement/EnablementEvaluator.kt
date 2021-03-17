@@ -63,8 +63,7 @@ internal object EnablementEvaluator {
    */
   fun evaluate(
     questionnaireItem: Questionnaire.Item,
-    questionnaireItemAndQuestionnaireResponseItemRetriever:
-    (linkId: String) -> Result
+    questionnaireItemAndQuestionnaireResponseItemRetriever: (linkId: String) -> Result
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhenList
 
@@ -73,7 +72,10 @@ internal object EnablementEvaluator {
 
     // Evaluate single `enableWhen` constraint.
     if (enableWhenList.size == 1) {
-      return evaluateEnableWhen(enableWhenList.single(), questionnaireItemAndQuestionnaireResponseItemRetriever)
+      return evaluateEnableWhen(
+        enableWhenList.single(),
+        questionnaireItemAndQuestionnaireResponseItemRetriever
+      )
     }
 
     // Evaluate multiple `enableWhen` constraints and aggregate the results according to
@@ -82,16 +84,23 @@ internal object EnablementEvaluator {
     // enabled if ANY `enableWhen` constraint is satisfied.
     return when (val value = questionnaireItem.enableBehavior.value) {
       EnableWhenBehaviorCode.Value.ALL ->
-        enableWhenList.all { evaluateEnableWhen(it, questionnaireItemAndQuestionnaireResponseItemRetriever) }
+        enableWhenList.all {
+          evaluateEnableWhen(it, questionnaireItemAndQuestionnaireResponseItemRetriever)
+        }
       EnableWhenBehaviorCode.Value.ANY ->
-        enableWhenList.any { evaluateEnableWhen(it, questionnaireItemAndQuestionnaireResponseItemRetriever) }
+        enableWhenList.any {
+          evaluateEnableWhen(it, questionnaireItemAndQuestionnaireResponseItemRetriever)
+        }
       else -> throw IllegalStateException("Unrecognized enable when behavior $value")
     }
   }
 }
 
-/** Result class to unpack questionnaireItem and questionnaireResponseItem*/
-data class Result(val questionnaireItem: Questionnaire.Item?, val questionnaireResponseItem: QuestionnaireResponse.Item?)
+/** Result class to unpack questionnaireItem and questionnaireResponseItem */
+data class Result(
+  val questionnaireItem: Questionnaire.Item?,
+  val questionnaireResponseItem: QuestionnaireResponse.Item?
+)
 
 /**
  * Returns whether the `enableWhen` constraint is satisfied.
@@ -101,10 +110,10 @@ data class Result(val questionnaireItem: Questionnaire.Item?, val questionnaireR
  */
 private fun evaluateEnableWhen(
   enableWhen: Questionnaire.Item.EnableWhen,
-  questionnaireResponseItemRetriever:
-  (linkId: String) -> Result
+  questionnaireResponseItemRetriever: (linkId: String) -> Result
 ): Boolean {
-  val (questionnaireItem, questionnaireResponseItem) = questionnaireResponseItemRetriever(enableWhen.question.value)
+  val (questionnaireItem, questionnaireResponseItem) =
+    questionnaireResponseItemRetriever(enableWhen.question.value)
   if (questionnaireItem == null || questionnaireResponseItem == null) return true
   return if (QuestionnaireItemOperatorCode.Value.EXISTS == enableWhen.operator.value) {
     (questionnaireResponseItem.answerCount > 0) == enableWhen.answer.boolean.value
@@ -138,11 +147,11 @@ private fun enableWhenTypeToPredicate(
   val enableWhenAnswerValue = enableWhen.answer.getValueForType(type)
   when (val operator = enableWhen.operator.value) {
     QuestionnaireItemOperatorCode.Value.EQUALS -> return {
-      it.getValueForType(type) == enableWhenAnswerValue
-    }
+        it.getValueForType(type) == enableWhenAnswerValue
+      }
     QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO -> return {
-      it.getValueForType(type) != enableWhenAnswerValue
-    }
+        it.getValueForType(type) != enableWhenAnswerValue
+      }
     else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
   }
 }

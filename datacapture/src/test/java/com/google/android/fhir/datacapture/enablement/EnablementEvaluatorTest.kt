@@ -36,811 +36,811 @@ class EnablementEvaluatorTest {
   @Test
   fun evaluate_noEnableWhen_shouldReturnTrue() {
     assertThat(
-      EnablementEvaluator.evaluate(Questionnaire.Item.newBuilder().build()) { Result(null, null) }
-    )
+        EnablementEvaluator.evaluate(Questionnaire.Item.newBuilder().build()) { Result(null, null) }
+      )
       .isTrue()
   }
 
   @Test
   fun evaluate_missingQuestion_shouldReturnTrue() {
     assertThat(
-      EnablementEvaluator.evaluate(
-        Questionnaire.Item.newBuilder()
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q1"))
-          )
-          .build()
-      ) { Result(null, null) }
-    )
+        EnablementEvaluator.evaluate(
+          Questionnaire.Item.newBuilder()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q1"))
+            )
+            .build()
+        ) { Result(null, null) }
+      )
       .isTrue()
   }
 
   @Test
   fun evaluate_expectsAnswer_answerExists_shouldReturnTrue() {
     assertThat(
-      EnablementEvaluator.evaluate(
-        Questionnaire.Item.newBuilder()
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q1"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(true).build()
-                }
-              )
-          )
-          .setType(
-            Questionnaire.Item.TypeCode.newBuilder()
-              .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-          )
-          .build()
-      ) {
-        if (it == "q1") {
-          Result(
-            Questionnaire.Item.getDefaultInstance(),
-            QuestionnaireResponse.Item.newBuilder()
-              .addAnswer(QuestionnaireResponse.Item.Answer.getDefaultInstance())
-              .build()
-          )
-        } else {
-          Result(null, null)
+        EnablementEvaluator.evaluate(
+          Questionnaire.Item.newBuilder()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q1"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(true).build()
+                  }
+                )
+            )
+            .setType(
+              Questionnaire.Item.TypeCode.newBuilder()
+                .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+            )
+            .build()
+        ) {
+          if (it == "q1") {
+            Result(
+              Questionnaire.Item.getDefaultInstance(),
+              QuestionnaireResponse.Item.newBuilder()
+                .addAnswer(QuestionnaireResponse.Item.Answer.getDefaultInstance())
+                .build()
+            )
+          } else {
+            Result(null, null)
+          }
         }
-      }
-    )
+      )
       .isTrue()
   }
 
   @Test
   fun evaluate_expectsAnswer_answerDoesNotExist_shouldReturnFalse() {
     assertThat(
-      EnablementEvaluator.evaluate(
-        Questionnaire.Item.newBuilder()
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q1"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(true).build()
-                }
-              )
-          )
-          .setType(
-            Questionnaire.Item.TypeCode.newBuilder()
-              .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-          )
-          .build()
-      ) {
-        if (it == "q1") {
-          Result(
-            Questionnaire.Item.getDefaultInstance(),
-            QuestionnaireResponse.Item.getDefaultInstance()
-          )
-        } else {
-          Result(null, null)
+        EnablementEvaluator.evaluate(
+          Questionnaire.Item.newBuilder()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q1"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(true).build()
+                  }
+                )
+            )
+            .setType(
+              Questionnaire.Item.TypeCode.newBuilder()
+                .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+            )
+            .build()
+        ) {
+          if (it == "q1") {
+            Result(
+              Questionnaire.Item.getDefaultInstance(),
+              QuestionnaireResponse.Item.getDefaultInstance()
+            )
+          } else {
+            Result(null, null)
+          }
         }
-      }
-    )
+      )
       .isFalse()
   }
 
   @Test
   fun evaluate_expectsNoAnswer_answerExists_shouldReturnFalse() {
     assertThat(
-      EnablementEvaluator.evaluate(
-        Questionnaire.Item.newBuilder()
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q1"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(false).build()
-                }
-              )
-          )
-          .setType(
-            Questionnaire.Item.TypeCode.newBuilder()
-              .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-          )
-          .build()
-      ) {
-        if (it == "q1") {
-          Result(
-            Questionnaire.Item.getDefaultInstance(),
-            QuestionnaireResponse.Item.newBuilder()
-              .addAnswer(QuestionnaireResponse.Item.Answer.getDefaultInstance())
-              .build()
-          )
-        } else {
-          Result(null, null)
+        EnablementEvaluator.evaluate(
+          Questionnaire.Item.newBuilder()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q1"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(false).build()
+                  }
+                )
+            )
+            .setType(
+              Questionnaire.Item.TypeCode.newBuilder()
+                .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+            )
+            .build()
+        ) {
+          if (it == "q1") {
+            Result(
+              Questionnaire.Item.getDefaultInstance(),
+              QuestionnaireResponse.Item.newBuilder()
+                .addAnswer(QuestionnaireResponse.Item.Answer.getDefaultInstance())
+                .build()
+            )
+          } else {
+            Result(null, null)
+          }
         }
-      }
-    )
+      )
       .isFalse()
   }
 
   @Test
   fun evaluate_expectsNoAnswer_answerDoesNotExist_shouldReturnTrue() {
     assertThat(
-      EnablementEvaluator.evaluate(
-        Questionnaire.Item.newBuilder()
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q1"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(false).build()
-                }
-              )
-          )
-          .setType(
-            Questionnaire.Item.TypeCode.newBuilder()
-              .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-          )
-          .build()
-      ) {
-        if (it == "q1") {
-          Result(
-            Questionnaire.Item.getDefaultInstance(),
-            QuestionnaireResponse.Item.getDefaultInstance()
-          )
-        } else {
-          Result(null, null)
+        EnablementEvaluator.evaluate(
+          Questionnaire.Item.newBuilder()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q1"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(false).build()
+                  }
+                )
+            )
+            .setType(
+              Questionnaire.Item.TypeCode.newBuilder()
+                .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+            )
+            .build()
+        ) {
+          if (it == "q1") {
+            Result(
+              Questionnaire.Item.getDefaultInstance(),
+              QuestionnaireResponse.Item.getDefaultInstance()
+            )
+          } else {
+            Result(null, null)
+          }
         }
-      }
-    )
+      )
       .isTrue()
   }
 
   @Test
   fun evaluate_anyEnableWhens_noneSatisfied_shouldReturnFalse() {
     assertThat(
-      EnablementEvaluator.evaluate(
-        Questionnaire.Item.newBuilder()
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q1"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(true).build()
-                }
-              )
-          )
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q2"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(true).build()
-                }
-              )
-          )
-          .setEnableBehavior(
-            Questionnaire.Item.EnableBehaviorCode.newBuilder()
-              .setValue(EnableWhenBehaviorCode.Value.ANY)
-          )
-          .setType(
-            Questionnaire.Item.TypeCode.newBuilder()
-              .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-          )
-          .build()
-      ) {
-        when (it) {
-          "q1" ->
-            Result(
-              Questionnaire.Item.getDefaultInstance(),
-              QuestionnaireResponse.Item.getDefaultInstance()
+        EnablementEvaluator.evaluate(
+          Questionnaire.Item.newBuilder()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q1"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(true).build()
+                  }
+                )
             )
-          "q2" ->
-            Result(
-              Questionnaire.Item.getDefaultInstance(),
-              QuestionnaireResponse.Item.getDefaultInstance()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q2"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(true).build()
+                  }
+                )
             )
-          else -> Result(null, null)
+            .setEnableBehavior(
+              Questionnaire.Item.EnableBehaviorCode.newBuilder()
+                .setValue(EnableWhenBehaviorCode.Value.ANY)
+            )
+            .setType(
+              Questionnaire.Item.TypeCode.newBuilder()
+                .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+            )
+            .build()
+        ) {
+          when (it) {
+            "q1" ->
+              Result(
+                Questionnaire.Item.getDefaultInstance(),
+                QuestionnaireResponse.Item.getDefaultInstance()
+              )
+            "q2" ->
+              Result(
+                Questionnaire.Item.getDefaultInstance(),
+                QuestionnaireResponse.Item.getDefaultInstance()
+              )
+            else -> Result(null, null)
+          }
         }
-      }
-    )
+      )
       .isFalse()
   }
 
   @Test
   fun evaluate_anyEnableWhens_oneSatisfied_shouldReturnTrue() {
     assertThat(
-      EnablementEvaluator.evaluate(
-        Questionnaire.Item.newBuilder()
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q1"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(false).build()
-                }
-              )
-          )
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q2"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(true).build()
-                }
-              )
-          )
-          .setEnableBehavior(
-            Questionnaire.Item.EnableBehaviorCode.newBuilder()
-              .setValue(EnableWhenBehaviorCode.Value.ANY)
-          )
-          .setType(
-            Questionnaire.Item.TypeCode.newBuilder()
-              .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-          )
-          .build()
-      ) {
-        when (it) {
-          "q1" ->
-            Result(
-              Questionnaire.Item.getDefaultInstance(),
-              QuestionnaireResponse.Item.getDefaultInstance()
+        EnablementEvaluator.evaluate(
+          Questionnaire.Item.newBuilder()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q1"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(false).build()
+                  }
+                )
             )
-          "q2" ->
-            Result(
-              Questionnaire.Item.getDefaultInstance(),
-              QuestionnaireResponse.Item.getDefaultInstance()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q2"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(true).build()
+                  }
+                )
             )
-          else -> Result(null, null)
+            .setEnableBehavior(
+              Questionnaire.Item.EnableBehaviorCode.newBuilder()
+                .setValue(EnableWhenBehaviorCode.Value.ANY)
+            )
+            .setType(
+              Questionnaire.Item.TypeCode.newBuilder()
+                .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+            )
+            .build()
+        ) {
+          when (it) {
+            "q1" ->
+              Result(
+                Questionnaire.Item.getDefaultInstance(),
+                QuestionnaireResponse.Item.getDefaultInstance()
+              )
+            "q2" ->
+              Result(
+                Questionnaire.Item.getDefaultInstance(),
+                QuestionnaireResponse.Item.getDefaultInstance()
+              )
+            else -> Result(null, null)
+          }
         }
-      }
-    )
+      )
       .isTrue()
   }
 
   @Test
   fun evaluate_allEnableWhens_someSatisfied_shouldReturnFalse() {
     assertThat(
-      EnablementEvaluator.evaluate(
-        Questionnaire.Item.newBuilder()
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q1"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(false).build()
-                }
-              )
-          )
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q2"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(true).build()
-                }
-              )
-          )
-          .setEnableBehavior(
-            Questionnaire.Item.EnableBehaviorCode.newBuilder()
-              .setValue(EnableWhenBehaviorCode.Value.ALL)
-          )
-          .setType(
-            Questionnaire.Item.TypeCode.newBuilder()
-              .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-          )
-          .build()
-      ) {
-        when (it) {
-          "q1" ->
-            Result(
-              Questionnaire.Item.getDefaultInstance(),
-              QuestionnaireResponse.Item.getDefaultInstance()
+        EnablementEvaluator.evaluate(
+          Questionnaire.Item.newBuilder()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q1"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(false).build()
+                  }
+                )
             )
-          "q2" ->
-            Result(
-              Questionnaire.Item.getDefaultInstance(),
-              QuestionnaireResponse.Item.getDefaultInstance()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q2"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(true).build()
+                  }
+                )
             )
-          else -> Result(null, null)
+            .setEnableBehavior(
+              Questionnaire.Item.EnableBehaviorCode.newBuilder()
+                .setValue(EnableWhenBehaviorCode.Value.ALL)
+            )
+            .setType(
+              Questionnaire.Item.TypeCode.newBuilder()
+                .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+            )
+            .build()
+        ) {
+          when (it) {
+            "q1" ->
+              Result(
+                Questionnaire.Item.getDefaultInstance(),
+                QuestionnaireResponse.Item.getDefaultInstance()
+              )
+            "q2" ->
+              Result(
+                Questionnaire.Item.getDefaultInstance(),
+                QuestionnaireResponse.Item.getDefaultInstance()
+              )
+            else -> Result(null, null)
+          }
         }
-      }
-    )
+      )
       .isFalse()
   }
 
   @Test
   fun evaluate_allEnableWhens_allSatisfied_shouldReturnTrue() {
     assertThat(
-      EnablementEvaluator.evaluate(
-        Questionnaire.Item.newBuilder()
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q1"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(false).build()
-                }
-              )
-          )
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q2"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(false).build()
-                }
-              )
-          )
-          .setEnableBehavior(
-            Questionnaire.Item.EnableBehaviorCode.newBuilder()
-              .setValue(EnableWhenBehaviorCode.Value.ALL)
-          )
-          .setType(
-            Questionnaire.Item.TypeCode.newBuilder()
-              .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-          )
-          .build()
-      ) {
-        when (it) {
-          "q1" ->
-            Result(
-              Questionnaire.Item.getDefaultInstance(),
-              QuestionnaireResponse.Item.getDefaultInstance()
+        EnablementEvaluator.evaluate(
+          Questionnaire.Item.newBuilder()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q1"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(false).build()
+                  }
+                )
             )
-          "q2" ->
-            Result(
-              Questionnaire.Item.getDefaultInstance(),
-              QuestionnaireResponse.Item.getDefaultInstance()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q2"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.EXISTS)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(false).build()
+                  }
+                )
             )
-          else -> Result(null, null)
+            .setEnableBehavior(
+              Questionnaire.Item.EnableBehaviorCode.newBuilder()
+                .setValue(EnableWhenBehaviorCode.Value.ALL)
+            )
+            .setType(
+              Questionnaire.Item.TypeCode.newBuilder()
+                .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+            )
+            .build()
+        ) {
+          when (it) {
+            "q1" ->
+              Result(
+                Questionnaire.Item.getDefaultInstance(),
+                QuestionnaireResponse.Item.getDefaultInstance()
+              )
+            "q2" ->
+              Result(
+                Questionnaire.Item.getDefaultInstance(),
+                QuestionnaireResponse.Item.getDefaultInstance()
+              )
+            else -> Result(null, null)
+          }
         }
-      }
-    )
+      )
       .isTrue()
   }
 
   @Test
   fun evaluate_expectsAnswer_answerEqual_shouldReturnTrue() {
     assertThat(
-      EnablementEvaluator.evaluate(
-        Questionnaire.Item.newBuilder()
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q1"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.EQUALS)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(true).build()
-                }
-              )
-          )
-          .setType(
-            Questionnaire.Item.TypeCode.newBuilder()
-              .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-          )
-          .build()
-      ) {
-        if (it == "q1") {
-          Result(
-            Questionnaire.Item.newBuilder()
-              .addEnableWhen(
-                Questionnaire.Item.EnableWhen.newBuilder()
-                  .setQuestion(String.newBuilder().setValue("q1"))
-                  .setOperator(
-                    Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                      .setValue(QuestionnaireItemOperatorCode.Value.EQUALS)
-                  )
-                  .setAnswer(
-                    Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                      boolean = Boolean.newBuilder().setValue(true).build()
-                    }
-                  )
-              )
-              .setType(
-                Questionnaire.Item.TypeCode.newBuilder()
-                  .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-              )
-              .build(),
-            QuestionnaireResponse.Item.newBuilder()
-              .addAnswer(
-                QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                  value =
-                    QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                      .setBoolean(Boolean.newBuilder().setValue(true).build())
-                      .build()
-                }
-              )
-              .build()
-          )
-        } else {
-          Result(null, null)
+        EnablementEvaluator.evaluate(
+          Questionnaire.Item.newBuilder()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q1"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.EQUALS)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(true).build()
+                  }
+                )
+            )
+            .setType(
+              Questionnaire.Item.TypeCode.newBuilder()
+                .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+            )
+            .build()
+        ) {
+          if (it == "q1") {
+            Result(
+              Questionnaire.Item.newBuilder()
+                .addEnableWhen(
+                  Questionnaire.Item.EnableWhen.newBuilder()
+                    .setQuestion(String.newBuilder().setValue("q1"))
+                    .setOperator(
+                      Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                        .setValue(QuestionnaireItemOperatorCode.Value.EQUALS)
+                    )
+                    .setAnswer(
+                      Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                        boolean = Boolean.newBuilder().setValue(true).build()
+                      }
+                    )
+                )
+                .setType(
+                  Questionnaire.Item.TypeCode.newBuilder()
+                    .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+                )
+                .build(),
+              QuestionnaireResponse.Item.newBuilder()
+                .addAnswer(
+                  QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                    value =
+                      QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                        .setBoolean(Boolean.newBuilder().setValue(true).build())
+                        .build()
+                  }
+                )
+                .build()
+            )
+          } else {
+            Result(null, null)
+          }
         }
-      }
-    )
+      )
       .isTrue()
   }
 
   @Test
   fun evaluate_expectsAnswer_answerDoesNotEqual_shouldReturnFalse() {
     assertThat(
-      EnablementEvaluator.evaluate(
-        Questionnaire.Item.newBuilder()
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q1"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.EQUALS)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(true).build()
-                }
-              )
-          )
-          .setType(
-            Questionnaire.Item.TypeCode.newBuilder()
-              .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-          )
-          .build()
-      ) {
-        if (it == "q1") {
-          Result(
-            Questionnaire.Item.newBuilder()
-              .addEnableWhen(
-                Questionnaire.Item.EnableWhen.newBuilder()
-                  .setQuestion(String.newBuilder().setValue("q1"))
-                  .setOperator(
-                    Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                      .setValue(QuestionnaireItemOperatorCode.Value.EQUALS)
-                  )
-                  .setAnswer(
-                    Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                      boolean = Boolean.newBuilder().setValue(true).build()
-                    }
-                  )
-              )
-              .setType(
-                Questionnaire.Item.TypeCode.newBuilder()
-                  .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-              )
-              .build(),
-            QuestionnaireResponse.Item.newBuilder()
-              .addAnswer(
-                QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                  value =
-                    QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                      .setBoolean(Boolean.newBuilder().setValue(false).build())
-                      .build()
-                }
-              )
-              .build()
-          )
-        } else {
-          Result(null, null)
+        EnablementEvaluator.evaluate(
+          Questionnaire.Item.newBuilder()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q1"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.EQUALS)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(true).build()
+                  }
+                )
+            )
+            .setType(
+              Questionnaire.Item.TypeCode.newBuilder()
+                .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+            )
+            .build()
+        ) {
+          if (it == "q1") {
+            Result(
+              Questionnaire.Item.newBuilder()
+                .addEnableWhen(
+                  Questionnaire.Item.EnableWhen.newBuilder()
+                    .setQuestion(String.newBuilder().setValue("q1"))
+                    .setOperator(
+                      Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                        .setValue(QuestionnaireItemOperatorCode.Value.EQUALS)
+                    )
+                    .setAnswer(
+                      Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                        boolean = Boolean.newBuilder().setValue(true).build()
+                      }
+                    )
+                )
+                .setType(
+                  Questionnaire.Item.TypeCode.newBuilder()
+                    .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+                )
+                .build(),
+              QuestionnaireResponse.Item.newBuilder()
+                .addAnswer(
+                  QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                    value =
+                      QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                        .setBoolean(Boolean.newBuilder().setValue(false).build())
+                        .build()
+                  }
+                )
+                .build()
+            )
+          } else {
+            Result(null, null)
+          }
         }
-      }
-    )
+      )
       .isFalse()
   }
 
   @Test
   fun evaluate_expectsAnswer_answerEqualOne_shouldReturnTrue() {
     assertThat(
-      EnablementEvaluator.evaluate(
-        Questionnaire.Item.newBuilder()
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q1"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.EQUALS)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(true).build()
-                }
-              )
-          )
-          .setType(
-            Questionnaire.Item.TypeCode.newBuilder()
-              .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-          )
-          .build()
-      ) {
-        if (it == "q1") {
-          Result(
-            Questionnaire.Item.newBuilder()
-              .addEnableWhen(
-                Questionnaire.Item.EnableWhen.newBuilder()
-                  .setQuestion(String.newBuilder().setValue("q1"))
-                  .setOperator(
-                    Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                      .setValue(QuestionnaireItemOperatorCode.Value.EQUALS)
-                  )
-                  .setAnswer(
-                    Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                      boolean = Boolean.newBuilder().setValue(true).build()
-                    }
-                  )
-              )
-              .setType(
-                Questionnaire.Item.TypeCode.newBuilder()
-                  .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-              )
-              .build(),
-            QuestionnaireResponse.Item.newBuilder()
-              .addAnswer(
-                QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                  value =
-                    QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                      .setBoolean(Boolean.newBuilder().setValue(true).build())
-                      .build()
-                }
-              )
-              .addAnswer(
-                QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                  value =
-                    QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                      .setBoolean(Boolean.newBuilder().setValue(false).build())
-                      .build()
-                }
-              )
-              .build()
-          )
-        } else {
-          Result(null, null)
+        EnablementEvaluator.evaluate(
+          Questionnaire.Item.newBuilder()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q1"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.EQUALS)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(true).build()
+                  }
+                )
+            )
+            .setType(
+              Questionnaire.Item.TypeCode.newBuilder()
+                .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+            )
+            .build()
+        ) {
+          if (it == "q1") {
+            Result(
+              Questionnaire.Item.newBuilder()
+                .addEnableWhen(
+                  Questionnaire.Item.EnableWhen.newBuilder()
+                    .setQuestion(String.newBuilder().setValue("q1"))
+                    .setOperator(
+                      Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                        .setValue(QuestionnaireItemOperatorCode.Value.EQUALS)
+                    )
+                    .setAnswer(
+                      Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                        boolean = Boolean.newBuilder().setValue(true).build()
+                      }
+                    )
+                )
+                .setType(
+                  Questionnaire.Item.TypeCode.newBuilder()
+                    .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+                )
+                .build(),
+              QuestionnaireResponse.Item.newBuilder()
+                .addAnswer(
+                  QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                    value =
+                      QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                        .setBoolean(Boolean.newBuilder().setValue(true).build())
+                        .build()
+                  }
+                )
+                .addAnswer(
+                  QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                    value =
+                      QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                        .setBoolean(Boolean.newBuilder().setValue(false).build())
+                        .build()
+                  }
+                )
+                .build()
+            )
+          } else {
+            Result(null, null)
+          }
         }
-      }
-    )
+      )
       .isTrue()
   }
 
   @Test
   fun evaluate_expectsAnswer_answerNotEqual_shouldReturnTrue() {
     assertThat(
-      EnablementEvaluator.evaluate(
-        Questionnaire.Item.newBuilder()
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q1"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(true).build()
-                }
-              )
-          )
-          .setType(
-            Questionnaire.Item.TypeCode.newBuilder()
-              .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-          )
-          .build()
-      ) {
-        if (it == "q1") {
-          Result(
-            Questionnaire.Item.newBuilder()
-              .addEnableWhen(
-                Questionnaire.Item.EnableWhen.newBuilder()
-                  .setQuestion(String.newBuilder().setValue("q1"))
-                  .setOperator(
-                    Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                      .setValue(QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO)
-                  )
-                  .setAnswer(
-                    Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                      boolean = Boolean.newBuilder().setValue(true).build()
-                    }
-                  )
-              )
-              .setType(
-                Questionnaire.Item.TypeCode.newBuilder()
-                  .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-              )
-              .build(),
-            QuestionnaireResponse.Item.newBuilder()
-              .addAnswer(
-                QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                  value =
-                    QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                      .setBoolean(Boolean.newBuilder().setValue(false).build())
-                      .build()
-                }
-              )
-              .build()
-          )
-        } else {
-          Result(null, null)
+        EnablementEvaluator.evaluate(
+          Questionnaire.Item.newBuilder()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q1"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(true).build()
+                  }
+                )
+            )
+            .setType(
+              Questionnaire.Item.TypeCode.newBuilder()
+                .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+            )
+            .build()
+        ) {
+          if (it == "q1") {
+            Result(
+              Questionnaire.Item.newBuilder()
+                .addEnableWhen(
+                  Questionnaire.Item.EnableWhen.newBuilder()
+                    .setQuestion(String.newBuilder().setValue("q1"))
+                    .setOperator(
+                      Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                        .setValue(QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO)
+                    )
+                    .setAnswer(
+                      Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                        boolean = Boolean.newBuilder().setValue(true).build()
+                      }
+                    )
+                )
+                .setType(
+                  Questionnaire.Item.TypeCode.newBuilder()
+                    .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+                )
+                .build(),
+              QuestionnaireResponse.Item.newBuilder()
+                .addAnswer(
+                  QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                    value =
+                      QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                        .setBoolean(Boolean.newBuilder().setValue(false).build())
+                        .build()
+                  }
+                )
+                .build()
+            )
+          } else {
+            Result(null, null)
+          }
         }
-      }
-    )
+      )
       .isTrue()
   }
 
   @Test
   fun evaluate_expectsAnswer_answerDoesNotNotEqual_shouldReturnFalse() {
     assertThat(
-      EnablementEvaluator.evaluate(
-        Questionnaire.Item.newBuilder()
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q1"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(true).build()
-                }
-              )
-          )
-          .setType(
-            Questionnaire.Item.TypeCode.newBuilder()
-              .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-          )
-          .build()
-      ) {
-        if (it == "q1") {
-          Result(
-            Questionnaire.Item.newBuilder()
-              .addEnableWhen(
-                Questionnaire.Item.EnableWhen.newBuilder()
-                  .setQuestion(String.newBuilder().setValue("q1"))
-                  .setOperator(
-                    Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                      .setValue(QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO)
-                  )
-                  .setAnswer(
-                    Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                      boolean = Boolean.newBuilder().setValue(true).build()
-                    }
-                  )
-              )
-              .setType(
-                Questionnaire.Item.TypeCode.newBuilder()
-                  .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-              )
-              .build(),
-            QuestionnaireResponse.Item.newBuilder()
-              .addAnswer(
-                QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                  value =
-                    QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                      .setBoolean(Boolean.newBuilder().setValue(true).build())
-                      .build()
-                }
-              )
-              .build()
-          )
-        } else {
-          Result(null, null)
+        EnablementEvaluator.evaluate(
+          Questionnaire.Item.newBuilder()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q1"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(true).build()
+                  }
+                )
+            )
+            .setType(
+              Questionnaire.Item.TypeCode.newBuilder()
+                .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+            )
+            .build()
+        ) {
+          if (it == "q1") {
+            Result(
+              Questionnaire.Item.newBuilder()
+                .addEnableWhen(
+                  Questionnaire.Item.EnableWhen.newBuilder()
+                    .setQuestion(String.newBuilder().setValue("q1"))
+                    .setOperator(
+                      Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                        .setValue(QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO)
+                    )
+                    .setAnswer(
+                      Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                        boolean = Boolean.newBuilder().setValue(true).build()
+                      }
+                    )
+                )
+                .setType(
+                  Questionnaire.Item.TypeCode.newBuilder()
+                    .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+                )
+                .build(),
+              QuestionnaireResponse.Item.newBuilder()
+                .addAnswer(
+                  QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                    value =
+                      QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                        .setBoolean(Boolean.newBuilder().setValue(true).build())
+                        .build()
+                  }
+                )
+                .build()
+            )
+          } else {
+            Result(null, null)
+          }
         }
-      }
-    )
+      )
       .isFalse()
   }
 
   @Test
   fun evaluate_expectsAnswer_answerNotEqualOne_shouldReturnTrue() {
     assertThat(
-      EnablementEvaluator.evaluate(
-        Questionnaire.Item.newBuilder()
-          .addEnableWhen(
-            Questionnaire.Item.EnableWhen.newBuilder()
-              .setQuestion(String.newBuilder().setValue("q1"))
-              .setOperator(
-                Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                  .setValue(QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO)
-              )
-              .setAnswer(
-                Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                  boolean = Boolean.newBuilder().setValue(true).build()
-                }
-              )
-          )
-          .setType(
-            Questionnaire.Item.TypeCode.newBuilder()
-              .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-          )
-          .build()
-      ) {
-        if (it == "q1") {
-          Result(
-            Questionnaire.Item.newBuilder()
-              .addEnableWhen(
-                Questionnaire.Item.EnableWhen.newBuilder()
-                  .setQuestion(String.newBuilder().setValue("q1"))
-                  .setOperator(
-                    Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                      .setValue(QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO)
-                  )
-                  .setAnswer(
-                    Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                      boolean = Boolean.newBuilder().setValue(true).build()
-                    }
-                  )
-              )
-              .setType(
-                Questionnaire.Item.TypeCode.newBuilder()
-                  .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-              )
-              .build(),
-            QuestionnaireResponse.Item.newBuilder()
-              .addAnswer(
-                QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                  value =
-                    QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                      .setBoolean(Boolean.newBuilder().setValue(true).build())
-                      .build()
-                }
-              )
-              .addAnswer(
-                QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                  value =
-                    QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                      .setBoolean(Boolean.newBuilder().setValue(false).build())
-                      .build()
-                }
-              )
-              .build()
-          )
-        } else {
-          Result(null, null)
+        EnablementEvaluator.evaluate(
+          Questionnaire.Item.newBuilder()
+            .addEnableWhen(
+              Questionnaire.Item.EnableWhen.newBuilder()
+                .setQuestion(String.newBuilder().setValue("q1"))
+                .setOperator(
+                  Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                    .setValue(QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO)
+                )
+                .setAnswer(
+                  Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                    boolean = Boolean.newBuilder().setValue(true).build()
+                  }
+                )
+            )
+            .setType(
+              Questionnaire.Item.TypeCode.newBuilder()
+                .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+            )
+            .build()
+        ) {
+          if (it == "q1") {
+            Result(
+              Questionnaire.Item.newBuilder()
+                .addEnableWhen(
+                  Questionnaire.Item.EnableWhen.newBuilder()
+                    .setQuestion(String.newBuilder().setValue("q1"))
+                    .setOperator(
+                      Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+                        .setValue(QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO)
+                    )
+                    .setAnswer(
+                      Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
+                        boolean = Boolean.newBuilder().setValue(true).build()
+                      }
+                    )
+                )
+                .setType(
+                  Questionnaire.Item.TypeCode.newBuilder()
+                    .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
+                )
+                .build(),
+              QuestionnaireResponse.Item.newBuilder()
+                .addAnswer(
+                  QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                    value =
+                      QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                        .setBoolean(Boolean.newBuilder().setValue(true).build())
+                        .build()
+                  }
+                )
+                .addAnswer(
+                  QuestionnaireResponse.Item.Answer.newBuilder().apply {
+                    value =
+                      QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
+                        .setBoolean(Boolean.newBuilder().setValue(false).build())
+                        .build()
+                  }
+                )
+                .build()
+            )
+          } else {
+            Result(null, null)
+          }
         }
-      }
-    )
+      )
       .isTrue()
   }
 }
