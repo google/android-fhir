@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.enablement.Result
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.fhir.common.JsonFormat
 import com.google.fhir.r4.core.Canonical
@@ -42,8 +43,6 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   /** The current questionnaire response as questions are being answered. */
   private lateinit var questionnaireResponseBuilder: QuestionnaireResponse.Builder
 
-  private val questionnaireBuilder = Questionnaire.newBuilder()
-
   init {
     val questionnaireJsonResponseString: String? =
       state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
@@ -66,7 +65,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       }
     }
 
-    questionnaire.itemList.forEach { questionnaireBuilder.addItem(it) }
+//    questionnaire.itemList.forEach { questionnaireBuilder.addItem(it) }
   }
 
   /** Map from link IDs to questionnaire response items. */
@@ -75,7 +74,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
   /** Map from link IDs to questionnaire items. */
   private val linkIdToQuestionnaireItemMap =
-    createLinkIdToQuestionnaireItemMap(questionnaireBuilder.itemBuilderList)
+    createLinkIdToQuestionnaireItemMap(questionnaire.itemList)
 
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
@@ -111,12 +110,12 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   }
 
   private fun createLinkIdToQuestionnaireItemMap(
-    questionnaireItemList: List<Questionnaire.Item.Builder>
-  ): Map<String, Questionnaire.Item.Builder> {
+    questionnaireItemList: List<Questionnaire.Item>
+  ): Map<String, Questionnaire.Item> {
     val linkIdToQuestionnaireItemMap =
       questionnaireItemList.map { it.linkId.value to it }.toMap().toMutableMap()
     for (item in questionnaireItemList) {
-      linkIdToQuestionnaireItemMap.putAll(createLinkIdToQuestionnaireItemMap(item.itemBuilderList))
+      linkIdToQuestionnaireItemMap.putAll(createLinkIdToQuestionnaireItemMap(item.itemList))
     }
     return linkIdToQuestionnaireItemMap
   }
@@ -144,9 +143,9 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
       val enabled =
         EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
-          Pair(
-            (linkIdToQuestionnaireItemMap[linkId] ?: return@evaluate Pair(null, null)).build(),
-            (linkIdToQuestionnaireResponseItemMap[linkId] ?: return@evaluate Pair(null, null))
+          Result(
+            (linkIdToQuestionnaireItemMap[linkId] ?: return@evaluate Result(null, null)),
+            (linkIdToQuestionnaireResponseItemMap[linkId] ?: return@evaluate Result(null, null))
               .build()
           )
         }
@@ -198,7 +197,6 @@ private fun Questionnaire.Item.createQuestionnaireResponseItem():
     }
   }
 }
-
 
 /**
  * Traverse (DFS) through the list of questionnaire items and the list of questionnaire response
