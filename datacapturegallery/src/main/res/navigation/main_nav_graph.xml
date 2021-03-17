@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  Copyright 2021 Google LLC
 
@@ -14,32 +14,37 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_nav_graph"
-    app:startDestination="@id/questionnaire_list_fragment">
+    app:startDestination="@id/questionnaire_list_fragment"
+>
 
     <fragment
         android:id="@+id/questionnaire_list_fragment"
         android:name="com.google.android.fhir.datacapture.gallery.QuestionnaireListFragment"
-        android:label="MainFragment" >
+        android:label="MainFragment"
+    >
         <action
             android:id="@+id/action_questionnaire_list_fragment_to_my_questionnaire_fragment"
-            app:destination="@id/my_questionnaire_fragment" />
+            app:destination="@id/my_questionnaire_fragment"
+        />
     </fragment>
     <fragment
         android:id="@+id/my_questionnaire_fragment"
         android:name="com.google.android.fhir.datacapture.gallery.MyQuestionnaireFragment"
-        android:label="MyQuestionnaireFragment" >
-        <argument android:name="questionnaireTitleKey"
-            app:argType="string" />
+        android:label="MyQuestionnaireFragment"
+    >
+        <argument android:name="questionnaireTitleKey" app:argType="string" />
         <argument
             android:name="questionnaireFilePathKey"
-            app:argType="string" />
+            app:argType="string"
+        />
         <argument
             android:name="questionnaireResponseFilePathKey"
             app:argType="string"
-            app:nullable="true" />
+            app:nullable="true"
+        />
     </fragment>
 </navigation>
