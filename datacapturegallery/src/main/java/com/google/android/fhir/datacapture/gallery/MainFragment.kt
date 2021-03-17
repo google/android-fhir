@@ -23,7 +23,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.google.android.fhir.datacapture.gallery.databinding.FragmentMainBinding
 
-class MainFragment : Fragment() {
+class QuestionnaireListFragment : Fragment() {
   private var _binding: FragmentMainBinding? = null
   private val binding
     get() = _binding!!
