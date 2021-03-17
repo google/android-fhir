@@ -36,7 +36,7 @@ class QuestionnaireListAdapter(private val questionnaireList: List<Questionnaire
       binding.root.setOnClickListener {
         val action =
           QuestionnaireListFragmentDirections
-            .actionQuestionnaireListFragmentToMyQuestionnaireFragment(
+            .actionQuestionnaireListFragmentToQuestionnaireContainerFragment(
               questionnaireListItem.name,
               questionnaireListItem.questionnairePath,
               questionnaireListItem.questionnaireResponsePath

@@ -24,17 +24,17 @@
     <fragment
         android:id="@+id/questionnaire_list_fragment"
         android:name="com.google.android.fhir.datacapture.gallery.QuestionnaireListFragment"
-        android:label="MainFragment"
+        android:label="Questionnaire List Fragment"
     >
         <action
-            android:id="@+id/action_questionnaire_list_fragment_to_my_questionnaire_fragment"
+            android:id="@+id/action_questionnaire_list_fragment_to_questionnaire_container_fragment"
             app:destination="@id/my_questionnaire_fragment"
         />
     </fragment>
     <fragment
         android:id="@+id/my_questionnaire_fragment"
-        android:name="com.google.android.fhir.datacapture.gallery.MyQuestionnaireFragment"
-        android:label="MyQuestionnaireFragment"
+        android:name="com.google.android.fhir.datacapture.gallery.QuestionnaireContainerFragment"
+        android:label="Questionnaire Container Fragment"
     >
         <argument android:name="questionnaireTitleKey" app:argType="string" />
         <argument

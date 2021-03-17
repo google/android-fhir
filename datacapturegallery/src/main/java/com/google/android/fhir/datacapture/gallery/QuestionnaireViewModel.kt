@@ -27,7 +27,7 @@ class QuestionnaireViewModel(application: Application, private val state: SavedS
     get() {
       if (questionnaireJson == null) {
         questionnaireJson =
-          readFileFromAssets(state[MyQuestionnaireFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+          readFileFromAssets(state[QuestionnaireContainerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
       }
       return questionnaireJson!!
     }
@@ -35,10 +35,10 @@ class QuestionnaireViewModel(application: Application, private val state: SavedS
   val questionnaireResponse: String?
     get() {
       if (questionnaireResponseJson == null) {
-        if (state.contains(MyQuestionnaireFragment.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY)) {
+        if (state.contains(QuestionnaireContainerFragment.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY)) {
           questionnaireResponseJson =
             readFileFromAssets(
-              state[MyQuestionnaireFragment.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY]!!
+              state[QuestionnaireContainerFragment.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY]!!
             )
         }
       }
