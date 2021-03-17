@@ -18,7 +18,6 @@ package com.google.android.fhir.index
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
-import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.NumberIndex
@@ -136,17 +135,21 @@ internal object ResourceIndexer {
           instant.precision
         )
       }
-      "period" -> {
+      "Period" -> {
         val period = value as Period
         DateIndex(
           searchParam.name,
           searchParam.path,
           if (period.hasEnd()) period.end.time else Long.MAX_VALUE,
           if (period.hasStart()) period.start.time else Long.MIN_VALUE,
-          period.getPrecision()
+          when {
+            (period.hasEnd()) -> period.endElement.precision
+            (period.hasStart()) -> period.startElement.precision
+            else -> DateTimeType.DEFAULT_PRECISION
+          }
         )
       }
-      "timing" -> {
+      "timing","timing.repeat"-> {
         val timing = value as Timing
         DateIndex(
           searchParam.name,
@@ -156,7 +159,7 @@ internal object ResourceIndexer {
           timing.event.maxOf { it.precision }
         )
       }
-      "datetime" -> {
+      "dateTime" -> {
         val dateTime = value as DateTimeType
         DateIndex(
           searchParam.name,
@@ -245,12 +248,4 @@ internal object ResourceIndexer {
    * https://www.hl7.org/fhir/valueset-currencies.html.
    */
   private const val FHIR_CURRENCY_CODE_SYSTEM = "urn:iso:std:iso:4217"
-}
-
-private fun Period.getPrecision(): TemporalPrecisionEnum {
-  return when {
-    (hasEnd()) -> endElement.precision
-    (hasStart()) -> startElement.precision
-    else -> DateTimeType.DEFAULT_PRECISION
-  }
 }
