@@ -33,6 +33,10 @@ subprojects {
             ktfmt().googleStyle()
             licenseHeaderFile "${project.rootProject.projectDir}/license-header.txt"
         }
+        format 'xml', {
+            target '**/*.xml'
+            prettier(['prettier': '2.0.5', '@prettier/plugin-xml': '0.13.0']).config(['parser': 'xml', 'tabWidth': 4])
+        }
     }
 }
 
