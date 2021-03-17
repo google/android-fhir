@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  Copyright 2020 Google LLC
 
@@ -14,20 +14,21 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+<menu
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:theme="@android:style/Theme.NoTitleBar">
+    android:theme="@android:style/Theme.NoTitleBar"
+>
     <item
         android:id="@+id/sync_resources"
         app:showAsAction="always"
         android:icon="@android:drawable/stat_notify_sync"
         android:title="@string/menu_sync_resources"
-        />
+    />
     <item
         android:id="@+id/load_resource"
         app:showAsAction="withText"
         android:icon="@android:drawable/ic_menu_add"
         android:title="@string/menu_load_resource"
-        />
+    />
 </menu>
