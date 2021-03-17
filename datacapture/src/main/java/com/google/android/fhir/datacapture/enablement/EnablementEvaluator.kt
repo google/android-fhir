@@ -63,7 +63,8 @@ internal object EnablementEvaluator {
    */
   fun evaluate(
     questionnaireItem: Questionnaire.Item,
-    questionnaireItemAndQuestionnaireResponseItemRetriever: (linkId: String) -> Result
+    questionnaireItemAndQuestionnaireResponseItemRetriever:
+      (linkId: String) -> QuestionnaireItemWithResponse
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhenList
 
@@ -97,7 +98,7 @@ internal object EnablementEvaluator {
 }
 
 /** Result class to unpack questionnaireItem and questionnaireResponseItem */
-data class Result(
+data class QuestionnaireItemWithResponse(
   val questionnaireItem: Questionnaire.Item?,
   val questionnaireResponseItem: QuestionnaireResponse.Item?
 )
@@ -110,7 +111,7 @@ data class Result(
  */
 private fun evaluateEnableWhen(
   enableWhen: Questionnaire.Item.EnableWhen,
-  questionnaireResponseItemRetriever: (linkId: String) -> Result
+  questionnaireResponseItemRetriever: (linkId: String) -> QuestionnaireItemWithResponse
 ): Boolean {
   val (questionnaireItem, questionnaireResponseItem) =
     questionnaireResponseItemRetriever(enableWhen.question.value)

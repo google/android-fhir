@@ -36,7 +36,9 @@ class EnablementEvaluatorTest {
   @Test
   fun evaluate_noEnableWhen_shouldReturnTrue() {
     assertThat(
-        EnablementEvaluator.evaluate(Questionnaire.Item.newBuilder().build()) { Result(null, null) }
+        EnablementEvaluator.evaluate(Questionnaire.Item.newBuilder().build()) {
+          QuestionnaireItemWithResponse(null, null)
+        }
       )
       .isTrue()
   }
@@ -51,7 +53,7 @@ class EnablementEvaluatorTest {
                 .setQuestion(String.newBuilder().setValue("q1"))
             )
             .build()
-        ) { Result(null, null) }
+        ) { QuestionnaireItemWithResponse(null, null) }
       )
       .isTrue()
   }
@@ -81,14 +83,14 @@ class EnablementEvaluatorTest {
             .build()
         ) {
           if (it == "q1") {
-            Result(
+            QuestionnaireItemWithResponse(
               Questionnaire.Item.getDefaultInstance(),
               QuestionnaireResponse.Item.newBuilder()
                 .addAnswer(QuestionnaireResponse.Item.Answer.getDefaultInstance())
                 .build()
             )
           } else {
-            Result(null, null)
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -120,12 +122,12 @@ class EnablementEvaluatorTest {
             .build()
         ) {
           if (it == "q1") {
-            Result(
+            QuestionnaireItemWithResponse(
               Questionnaire.Item.getDefaultInstance(),
               QuestionnaireResponse.Item.getDefaultInstance()
             )
           } else {
-            Result(null, null)
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -157,14 +159,14 @@ class EnablementEvaluatorTest {
             .build()
         ) {
           if (it == "q1") {
-            Result(
+            QuestionnaireItemWithResponse(
               Questionnaire.Item.getDefaultInstance(),
               QuestionnaireResponse.Item.newBuilder()
                 .addAnswer(QuestionnaireResponse.Item.Answer.getDefaultInstance())
                 .build()
             )
           } else {
-            Result(null, null)
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -196,12 +198,12 @@ class EnablementEvaluatorTest {
             .build()
         ) {
           if (it == "q1") {
-            Result(
+            QuestionnaireItemWithResponse(
               Questionnaire.Item.getDefaultInstance(),
               QuestionnaireResponse.Item.getDefaultInstance()
             )
           } else {
-            Result(null, null)
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -251,16 +253,16 @@ class EnablementEvaluatorTest {
         ) {
           when (it) {
             "q1" ->
-              Result(
+              QuestionnaireItemWithResponse(
                 Questionnaire.Item.getDefaultInstance(),
                 QuestionnaireResponse.Item.getDefaultInstance()
               )
             "q2" ->
-              Result(
+              QuestionnaireItemWithResponse(
                 Questionnaire.Item.getDefaultInstance(),
                 QuestionnaireResponse.Item.getDefaultInstance()
               )
-            else -> Result(null, null)
+            else -> QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -310,16 +312,16 @@ class EnablementEvaluatorTest {
         ) {
           when (it) {
             "q1" ->
-              Result(
+              QuestionnaireItemWithResponse(
                 Questionnaire.Item.getDefaultInstance(),
                 QuestionnaireResponse.Item.getDefaultInstance()
               )
             "q2" ->
-              Result(
+              QuestionnaireItemWithResponse(
                 Questionnaire.Item.getDefaultInstance(),
                 QuestionnaireResponse.Item.getDefaultInstance()
               )
-            else -> Result(null, null)
+            else -> QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -369,16 +371,16 @@ class EnablementEvaluatorTest {
         ) {
           when (it) {
             "q1" ->
-              Result(
+              QuestionnaireItemWithResponse(
                 Questionnaire.Item.getDefaultInstance(),
                 QuestionnaireResponse.Item.getDefaultInstance()
               )
             "q2" ->
-              Result(
+              QuestionnaireItemWithResponse(
                 Questionnaire.Item.getDefaultInstance(),
                 QuestionnaireResponse.Item.getDefaultInstance()
               )
-            else -> Result(null, null)
+            else -> QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -428,16 +430,16 @@ class EnablementEvaluatorTest {
         ) {
           when (it) {
             "q1" ->
-              Result(
+              QuestionnaireItemWithResponse(
                 Questionnaire.Item.getDefaultInstance(),
                 QuestionnaireResponse.Item.getDefaultInstance()
               )
             "q2" ->
-              Result(
+              QuestionnaireItemWithResponse(
                 Questionnaire.Item.getDefaultInstance(),
                 QuestionnaireResponse.Item.getDefaultInstance()
               )
-            else -> Result(null, null)
+            else -> QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -469,21 +471,8 @@ class EnablementEvaluatorTest {
             .build()
         ) {
           if (it == "q1") {
-            Result(
+            QuestionnaireItemWithResponse(
               Questionnaire.Item.newBuilder()
-                .addEnableWhen(
-                  Questionnaire.Item.EnableWhen.newBuilder()
-                    .setQuestion(String.newBuilder().setValue("q1"))
-                    .setOperator(
-                      Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                        .setValue(QuestionnaireItemOperatorCode.Value.EQUALS)
-                    )
-                    .setAnswer(
-                      Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                        boolean = Boolean.newBuilder().setValue(true).build()
-                      }
-                    )
-                )
                 .setType(
                   Questionnaire.Item.TypeCode.newBuilder()
                     .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
@@ -501,7 +490,7 @@ class EnablementEvaluatorTest {
                 .build()
             )
           } else {
-            Result(null, null)
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -533,21 +522,8 @@ class EnablementEvaluatorTest {
             .build()
         ) {
           if (it == "q1") {
-            Result(
+            QuestionnaireItemWithResponse(
               Questionnaire.Item.newBuilder()
-                .addEnableWhen(
-                  Questionnaire.Item.EnableWhen.newBuilder()
-                    .setQuestion(String.newBuilder().setValue("q1"))
-                    .setOperator(
-                      Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                        .setValue(QuestionnaireItemOperatorCode.Value.EQUALS)
-                    )
-                    .setAnswer(
-                      Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                        boolean = Boolean.newBuilder().setValue(true).build()
-                      }
-                    )
-                )
                 .setType(
                   Questionnaire.Item.TypeCode.newBuilder()
                     .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
@@ -565,7 +541,7 @@ class EnablementEvaluatorTest {
                 .build()
             )
           } else {
-            Result(null, null)
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -597,21 +573,8 @@ class EnablementEvaluatorTest {
             .build()
         ) {
           if (it == "q1") {
-            Result(
+            QuestionnaireItemWithResponse(
               Questionnaire.Item.newBuilder()
-                .addEnableWhen(
-                  Questionnaire.Item.EnableWhen.newBuilder()
-                    .setQuestion(String.newBuilder().setValue("q1"))
-                    .setOperator(
-                      Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                        .setValue(QuestionnaireItemOperatorCode.Value.EQUALS)
-                    )
-                    .setAnswer(
-                      Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                        boolean = Boolean.newBuilder().setValue(true).build()
-                      }
-                    )
-                )
                 .setType(
                   Questionnaire.Item.TypeCode.newBuilder()
                     .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
@@ -637,7 +600,7 @@ class EnablementEvaluatorTest {
                 .build()
             )
           } else {
-            Result(null, null)
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -669,21 +632,8 @@ class EnablementEvaluatorTest {
             .build()
         ) {
           if (it == "q1") {
-            Result(
+            QuestionnaireItemWithResponse(
               Questionnaire.Item.newBuilder()
-                .addEnableWhen(
-                  Questionnaire.Item.EnableWhen.newBuilder()
-                    .setQuestion(String.newBuilder().setValue("q1"))
-                    .setOperator(
-                      Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                        .setValue(QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO)
-                    )
-                    .setAnswer(
-                      Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                        boolean = Boolean.newBuilder().setValue(true).build()
-                      }
-                    )
-                )
                 .setType(
                   Questionnaire.Item.TypeCode.newBuilder()
                     .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
@@ -701,7 +651,7 @@ class EnablementEvaluatorTest {
                 .build()
             )
           } else {
-            Result(null, null)
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -733,21 +683,8 @@ class EnablementEvaluatorTest {
             .build()
         ) {
           if (it == "q1") {
-            Result(
+            QuestionnaireItemWithResponse(
               Questionnaire.Item.newBuilder()
-                .addEnableWhen(
-                  Questionnaire.Item.EnableWhen.newBuilder()
-                    .setQuestion(String.newBuilder().setValue("q1"))
-                    .setOperator(
-                      Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                        .setValue(QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO)
-                    )
-                    .setAnswer(
-                      Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                        boolean = Boolean.newBuilder().setValue(true).build()
-                      }
-                    )
-                )
                 .setType(
                   Questionnaire.Item.TypeCode.newBuilder()
                     .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
@@ -765,7 +702,7 @@ class EnablementEvaluatorTest {
                 .build()
             )
           } else {
-            Result(null, null)
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -797,21 +734,8 @@ class EnablementEvaluatorTest {
             .build()
         ) {
           if (it == "q1") {
-            Result(
+            QuestionnaireItemWithResponse(
               Questionnaire.Item.newBuilder()
-                .addEnableWhen(
-                  Questionnaire.Item.EnableWhen.newBuilder()
-                    .setQuestion(String.newBuilder().setValue("q1"))
-                    .setOperator(
-                      Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-                        .setValue(QuestionnaireItemOperatorCode.Value.NOT_EQUAL_TO)
-                    )
-                    .setAnswer(
-                      Questionnaire.Item.EnableWhen.AnswerX.newBuilder().apply {
-                        boolean = Boolean.newBuilder().setValue(true).build()
-                      }
-                    )
-                )
                 .setType(
                   Questionnaire.Item.TypeCode.newBuilder()
                     .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
@@ -837,7 +761,7 @@ class EnablementEvaluatorTest {
                 .build()
             )
           } else {
-            Result(null, null)
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )

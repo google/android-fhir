@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
-import com.google.android.fhir.datacapture.enablement.Result
+import com.google.android.fhir.datacapture.enablement.QuestionnaireItemWithResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.fhir.common.JsonFormat
 import com.google.fhir.r4.core.Canonical
@@ -41,7 +41,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   }
 
   /** The current questionnaire response as questions are being answered. */
-  private lateinit var questionnaireResponseBuilder: QuestionnaireResponse.Builder
+  private var questionnaireResponseBuilder: QuestionnaireResponse.Builder
 
   init {
     val questionnaireJsonResponseString: String? =
@@ -64,8 +64,6 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
         questionnaireResponseBuilder.addItem(it.createQuestionnaireResponseItem())
       }
     }
-
-    //    questionnaire.itemList.forEach { questionnaireBuilder.addItem(it) }
   }
 
   /** Map from link IDs to questionnaire response items. */
@@ -143,10 +141,11 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
       val enabled =
         EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
-          Result(
-            (linkIdToQuestionnaireItemMap[linkId] ?: return@evaluate Result(null, null)),
-            (linkIdToQuestionnaireResponseItemMap[linkId] ?: return@evaluate Result(null, null))
-              .build()
+          QuestionnaireItemWithResponse(
+            (linkIdToQuestionnaireItemMap[linkId]
+              ?: return@evaluate QuestionnaireItemWithResponse(null, null)),
+            (linkIdToQuestionnaireResponseItemMap[linkId]
+                ?: return@evaluate QuestionnaireItemWithResponse(null, null)).build()
           )
         }
       if (enabled) {
