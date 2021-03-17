@@ -41,4 +41,9 @@ class QuestionnaireResponseDialogFragment() : DialogFragment() {
     const val TAG = "questionnaire-response-dialog-fragment"
     const val BUNDLE_KEY_CONTENTS = "contents"
   }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
 }

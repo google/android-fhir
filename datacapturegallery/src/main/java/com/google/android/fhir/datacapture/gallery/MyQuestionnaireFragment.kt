@@ -31,13 +31,13 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.datacapture.QuestionnaireFragment
-import com.google.android.fhir.datacapture.gallery.databinding.FragmentQuestionnaireBinding
+import com.google.android.fhir.datacapture.gallery.databinding.FragmentMyQuestionnaireBinding
 import com.google.fhir.common.JsonFormat
 import com.google.fhir.r4.core.QuestionnaireResponse
 
 class MyQuestionnaireFragment : Fragment() {
   private val viewModel: QuestionnaireViewModel by viewModels()
-  private var _binding: FragmentQuestionnaireBinding? = null
+  private var _binding: FragmentMyQuestionnaireBinding? = null
   private val binding
     get() = _binding!!
   private val args: MyQuestionnaireFragmentArgs by navArgs()
@@ -53,7 +53,7 @@ class MyQuestionnaireFragment : Fragment() {
     savedInstanceState: Bundle?
   ): View? {
     super.onCreate(savedInstanceState)
-    _binding = FragmentQuestionnaireBinding.inflate(inflater, container, false)
+    _binding = FragmentMyQuestionnaireBinding.inflate(inflater, container, false)
     arguments =
       bundleOf(
         QUESTIONNAIRE_FILE_PATH_KEY to args.questionnaireFilePathKey,

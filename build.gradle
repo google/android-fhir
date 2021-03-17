@@ -9,7 +9,6 @@ buildscript {
         classpath deps.android_gradle_plugin
         classpath deps.kotlin.plugin
         classpath deps.spotless
-        //TODO add to module level build scripts
         classpath deps.navigation.safeargs
     }
 }

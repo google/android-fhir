@@ -18,18 +18,18 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_nav_graph"
-    app:startDestination="@id/mainFragment">
+    app:startDestination="@id/questionnaire_list_fragment">
 
     <fragment
-        android:id="@+id/mainFragment"
-        android:name="com.google.android.fhir.datacapture.gallery.MainFragment"
+        android:id="@+id/questionnaire_list_fragment"
+        android:name="com.google.android.fhir.datacapture.gallery.QuestionnaireListFragment"
         android:label="MainFragment" >
         <action
-            android:id="@+id/action_mainFragment_to_myQuestionnaireFragment"
-            app:destination="@id/myQuestionnaireFragment" />
+            android:id="@+id/action_questionnaire_list_fragment_to_my_questionnaire_fragment"
+            app:destination="@id/my_questionnaire_fragment" />
     </fragment>
     <fragment
-        android:id="@+id/myQuestionnaireFragment"
+        android:id="@+id/my_questionnaire_fragment"
         android:name="com.google.android.fhir.datacapture.gallery.MyQuestionnaireFragment"
         android:label="MyQuestionnaireFragment" >
         <argument android:name="questionnaireTitleKey"

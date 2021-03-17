@@ -35,12 +35,12 @@ class QuestionnaireListAdapter(private val questionnaireList: List<Questionnaire
     init {
       binding.root.setOnClickListener {
         val action =
-          MainFragmentDirections.actionMainFragmentToMyQuestionnaireFragment(
-            questionnaireListItem.name,
-            questionnaireListItem.questionnairePath,
-            questionnaireListItem.questionnaireResponsePath
-          )
-        binding.root.context
+          QuestionnaireListFragmentDirections
+            .actionQuestionnaireListFragmentToMyQuestionnaireFragment(
+              questionnaireListItem.name,
+              questionnaireListItem.questionnairePath,
+              questionnaireListItem.questionnaireResponsePath
+            )
         it.findNavController().navigate(action)
       }
     }

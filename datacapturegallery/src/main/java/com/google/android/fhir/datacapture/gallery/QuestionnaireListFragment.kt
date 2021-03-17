@@ -21,10 +21,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.google.android.fhir.datacapture.gallery.databinding.FragmentMainBinding
+import com.google.android.fhir.datacapture.gallery.databinding.FragmentQuestionnaireListBinding
 
 class QuestionnaireListFragment : Fragment() {
-  private var _binding: FragmentMainBinding? = null
+  private var _binding: FragmentQuestionnaireListBinding? = null
   private val binding
     get() = _binding!!
   override fun onCreateView(
@@ -33,7 +33,7 @@ class QuestionnaireListFragment : Fragment() {
     savedInstanceState: Bundle?
   ): View? {
     super.onCreate(savedInstanceState)
-    _binding = FragmentMainBinding.inflate(inflater, container, false)
+    _binding = FragmentQuestionnaireListBinding.inflate(inflater, container, false)
 
     binding.recyclerView.adapter =
       QuestionnaireListAdapter(
