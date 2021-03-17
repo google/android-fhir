@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.map
 internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   /** The current questionnaire as questions are being answered. */
   private val questionnaire: Questionnaire
+
   init {
     val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
     val builder = Questionnaire.newBuilder()
@@ -176,27 +177,28 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     }
     return questionnaireItemViewItemList
   }
+}
 
-  /**
-   * Creates a [QuestionnaireResponse.QuestionnaireResponseItemComponent] from the provided
-   * [Questionnaire.QuestionnaireItemComponent].
-   *
-   * The hierarchy and order of child items will be retained as specified in the standard. See
-   * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
-   */
-  private fun Questionnaire.Item.createQuestionnaireResponseItem():
-    QuestionnaireResponse.Item.Builder {
-    return QuestionnaireResponse.Item.newBuilder().apply {
-      linkId =
-        com.google.fhir.r4.core.String.newBuilder()
-          .setValue(this@createQuestionnaireResponseItem.linkId.value)
-          .build()
-      this@createQuestionnaireResponseItem.itemList.forEach {
-        this.addItem(it.createQuestionnaireResponseItem())
-      }
+/**
+ * Creates a [QuestionnaireResponse.QuestionnaireResponseItemComponent] from the provided
+ * [Questionnaire.QuestionnaireItemComponent].
+ *
+ * The hierarchy and order of child items will be retained as specified in the standard. See
+ * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
+ */
+private fun Questionnaire.Item.createQuestionnaireResponseItem():
+  QuestionnaireResponse.Item.Builder {
+  return QuestionnaireResponse.Item.newBuilder().apply {
+    linkId =
+      com.google.fhir.r4.core.String.newBuilder()
+        .setValue(this@createQuestionnaireResponseItem.linkId.value)
+        .build()
+    this@createQuestionnaireResponseItem.itemList.forEach {
+      this.addItem(it.createQuestionnaireResponseItem())
     }
   }
 }
+
 
 /**
  * Traverse (DFS) through the list of questionnaire items and the list of questionnaire response
