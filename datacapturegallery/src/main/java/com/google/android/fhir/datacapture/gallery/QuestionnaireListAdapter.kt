@@ -47,9 +47,9 @@ class QuestionnaireListAdapter(private val questionnaireList: List<Questionnaire
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    val binding =
+    return ViewHolder(
       QuestionnaireListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-    return ViewHolder(binding)
+    )
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
