@@ -25,9 +25,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
-import com.google.fhir.r4.core.Coding
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -40,12 +40,8 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   fun bind_shouldSetHeaderText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -57,51 +53,19 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   fun bind_shouldCreateRadioButtons() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            addAllAnswerOption(
-              mutableListOf(
-                Questionnaire.Item.AnswerOption.newBuilder()
-                  .apply {
-                    value =
-                      Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                        .apply {
-                          coding =
-                            Coding.newBuilder()
-                              .apply {
-                                display =
-                                  com.google.fhir.r4.core.String.newBuilder()
-                                    .setValue("Coding 1")
-                                    .build()
-                              }
-                              .build()
-                        }
-                        .build()
-                  }
-                  .build(),
-                Questionnaire.Item.AnswerOption.newBuilder()
-                  .apply {
-                    value =
-                      Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                        .apply {
-                          coding =
-                            Coding.newBuilder()
-                              .apply {
-                                display =
-                                  com.google.fhir.r4.core.String.newBuilder()
-                                    .setValue("Coding 2")
-                                    .build()
-                              }
-                              .build()
-                        }
-                        .build()
-                  }
-                  .build()
-              )
-            )
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 2" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -117,33 +81,14 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   fun bind_noAnswer_shouldLeaveRadioButtonsUnchecked() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            addAllAnswerOption(
-              mutableListOf(
-                Questionnaire.Item.AnswerOption.newBuilder()
-                  .apply {
-                    value =
-                      Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                        .apply {
-                          coding =
-                            Coding.newBuilder()
-                              .apply {
-                                display =
-                                  com.google.fhir.r4.core.String.newBuilder()
-                                    .setValue("Coding 1")
-                                    .build()
-                              }
-                              .build()
-                        }
-                        .build()
-                  }
-                  .build()
-              )
-            )
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -157,65 +102,22 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   fun bind_answer_shouldCheckRadioButton() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            addAllAnswerOption(
-              mutableListOf(
-                Questionnaire.Item.AnswerOption.newBuilder()
-                  .apply {
-                    value =
-                      Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                        .apply {
-                          coding =
-                            Coding.newBuilder()
-                              .apply {
-                                display =
-                                  com.google.fhir.r4.core.String.newBuilder()
-                                    .setValue("Coding 1")
-                                    .build()
-                              }
-                              .build()
-                        }
-                        .build()
-                  }
-                  .build(),
-                Questionnaire.Item.AnswerOption.newBuilder()
-                  .apply {
-                    value =
-                      Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                        .apply {
-                          coding =
-                            Coding.newBuilder()
-                              .apply {
-                                display =
-                                  com.google.fhir.r4.core.String.newBuilder()
-                                    .setValue("Coding 2")
-                                    .build()
-                              }
-                              .build()
-                        }
-                        .build()
-                  }
-                  .build()
-              )
-            )
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder().apply {
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 2" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
-            QuestionnaireResponse.Item.Answer.newBuilder().apply {
-              value =
-                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                  .apply {
-                    coding =
-                      Coding.newBuilder()
-                        .apply {
-                          display =
-                            com.google.fhir.r4.core.String.newBuilder().setValue("Coding 1").build()
-                        }
-                        .build()
-                  }
-                  .build()
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
             }
           )
         }
@@ -241,40 +143,21 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   fun click_shouldSetQuestionnaireResponseItemAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            addAllAnswerOption(
-              mutableListOf(
-                Questionnaire.Item.AnswerOption.newBuilder()
-                  .apply {
-                    value =
-                      Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                        .apply {
-                          coding =
-                            Coding.newBuilder()
-                              .apply {
-                                display =
-                                  com.google.fhir.r4.core.String.newBuilder()
-                                    .setValue("Coding 1")
-                                    .build()
-                              }
-                              .build()
-                        }
-                        .build()
-                  }
-                  .build()
-              )
-            )
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0).performClick()
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerBuilderList
+    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].value.coding.display.value).isEqualTo("Coding 1")
+    assertThat(answer[0].valueCoding.display).isEqualTo("Coding 1")
   }
 
   @Test
@@ -282,51 +165,19 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   fun click_shouldCheckRadioButton() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            addAllAnswerOption(
-              mutableListOf(
-                Questionnaire.Item.AnswerOption.newBuilder()
-                  .apply {
-                    value =
-                      Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                        .apply {
-                          coding =
-                            Coding.newBuilder()
-                              .apply {
-                                display =
-                                  com.google.fhir.r4.core.String.newBuilder()
-                                    .setValue("Coding 1")
-                                    .build()
-                              }
-                              .build()
-                        }
-                        .build()
-                  }
-                  .build(),
-                Questionnaire.Item.AnswerOption.newBuilder()
-                  .apply {
-                    value =
-                      Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                        .apply {
-                          coding =
-                            Coding.newBuilder()
-                              .apply {
-                                display =
-                                  com.google.fhir.r4.core.String.newBuilder()
-                                    .setValue("Coding 2")
-                                    .build()
-                              }
-                              .build()
-                        }
-                        .build()
-                  }
-                  .build()
-              )
-            )
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 1" }
+            }
+          )
+          addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding 2" }
+            }
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0).performClick()

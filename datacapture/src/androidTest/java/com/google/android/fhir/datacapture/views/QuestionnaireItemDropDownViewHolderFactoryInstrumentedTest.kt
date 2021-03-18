@@ -25,14 +25,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
-import com.google.android.fhir.datacapture.responseAnswerValueX
 import com.google.common.truth.Truth.assertThat
-import com.google.fhir.r4.core.Code
-import com.google.fhir.r4.core.Coding
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireResponse
-import com.google.fhir.r4.core.String
 import kotlin.test.assertFailsWith
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -59,10 +57,8 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   fun shouldSetTextInputHint() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply { text = String.newBuilder().setValue("Question?").build() }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -74,20 +70,13 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldPopulateDropDown() {
     val answerOption =
-      Questionnaire.Item.AnswerOption.newBuilder()
-        .setValue(
-          Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-            .setCoding(
-              Coding.newBuilder()
-                .setCode(Code.newBuilder().setValue("test-code"))
-                .setDisplay(String.newBuilder().setValue("Test Code"))
-            )
-        )
-        .build()
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value = Coding().setCode("test-code").setDisplay("Test Code")
+      }
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder().apply { addAnswerOption(answerOption) }.build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -106,16 +95,13 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldSetDropDownOptionToCodeIfValueCodingDisplayEmpty() {
     val answerOption =
-      Questionnaire.Item.AnswerOption.newBuilder()
-        .setValue(
-          Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-            .setCoding(Coding.newBuilder().setCode(Code.newBuilder().setValue("test-code")))
-        )
-        .build()
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value = Coding().apply { setCode("test-code") }
+      }
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder().apply { addAnswerOption(answerOption) }.build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -134,21 +120,17 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldSetAutoTextViewEmptyIfAnswerNull() {
     val answerOption =
-      Questionnaire.Item.AnswerOption.newBuilder()
-        .setValue(
-          Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-            .setCoding(
-              Coding.newBuilder()
-                .setCode(Code.newBuilder().setValue("test-code"))
-                .setDisplay(String.newBuilder().setValue("Test Code"))
-            )
-        )
-        .build()
-
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value =
+          Coding().apply {
+            code = "test-code"
+            display = "Test Code"
+          }
+      }
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder().apply { addAnswerOption(answerOption) }.build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -162,25 +144,23 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldAutoCompleteTextViewToDisplayIfAnswerNotNull() {
     val answerOption =
-      Questionnaire.Item.AnswerOption.newBuilder()
-        .setValue(
-          Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-            .setCoding(
-              Coding.newBuilder()
-                .setCode(Code.newBuilder().setValue("test-code"))
-                .setDisplay(String.newBuilder().setValue("Test Code"))
-            )
-        )
-        .build()
-
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value =
+          Coding().apply {
+            code = "test-code"
+            display = "Test Code"
+          }
+      }
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder().apply { addAnswerOption(answerOption) }.build(),
-        QuestionnaireResponse.Item.newBuilder()
-          .addAnswer(
-            QuestionnaireResponse.Item.Answer.newBuilder()
-              .setValue(answerOption.responseAnswerValueX)
+        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = answerOption.value
+            }
           )
+        }
       ) {}
     )
 
@@ -194,22 +174,19 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   @UiThreadTest
   fun shouldThrowErrorForAnswerOptionWithoutCoding() {
     val answerOption =
-      Questionnaire.Item.AnswerOption.newBuilder()
-        .setValue(
-          Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-            .setStringValue(String.newBuilder().setValue("test"))
-        )
-        .build()
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply { value = StringType("test") }
 
     assertFailsWith<IllegalArgumentException> {
       viewHolder.bind(
         QuestionnaireItemViewItem(
-          Questionnaire.Item.newBuilder().apply { addAnswerOption(answerOption) }.build(),
-          QuestionnaireResponse.Item.newBuilder()
-            .addAnswer(
-              QuestionnaireResponse.Item.Answer.newBuilder()
-                .setValue(answerOption.responseAnswerValueX)
+          Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = answerOption.value
+              }
             )
+          }
         ) {}
       )
     }

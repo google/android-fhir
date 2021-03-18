@@ -17,8 +17,8 @@
 package com.google.android.fhir.datacapture.views
 
 import android.text.InputType
-import com.google.fhir.r4.core.Integer
-import com.google.fhir.r4.core.QuestionnaireResponse
+import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemEditTextIntegerViewHolderFactory :
   QuestionnaireItemEditTextViewHolderFactory() {
@@ -28,19 +28,18 @@ internal object QuestionnaireItemEditTextIntegerViewHolderFactory :
         InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
         true
       ) {
-      override fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder? {
+      override fun getValue(
+        text: String
+      ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
         return text.toIntOrNull()?.let {
-          QuestionnaireResponse.Item.Answer.newBuilder().apply {
-            value =
-              QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                .setInteger(Integer.newBuilder().setValue(it).build())
-                .build()
-          }
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(IntegerType(it))
         }
       }
 
-      override fun getText(answer: QuestionnaireResponse.Item.Answer.Builder?): String {
-        return answer?.value?.integer?.value?.toString() ?: ""
+      override fun getText(
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
+      ): String {
+        return answer?.valueIntegerType?.value?.toString() ?: ""
       }
     }
 }

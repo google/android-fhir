@@ -19,15 +19,11 @@ package com.google.android.fhir.datacapture
 import android.os.Build
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
-import com.google.fhir.r4.core.Code
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.Coding
-import com.google.fhir.r4.core.Extension
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireItemTypeCode
-import com.google.fhir.r4.core.QuestionnaireResponse
-import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Uri
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -42,13 +38,9 @@ class QuestionnaireItemAdapterTest {
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
-          Questionnaire.Item.newBuilder()
-            .setType(
-              Questionnaire.Item.TypeCode.newBuilder()
-                .setValue(QuestionnaireItemTypeCode.Value.GROUP)
-            )
-            .build(),
-          QuestionnaireResponse.Item.newBuilder()
+          Questionnaire.QuestionnaireItemComponent()
+            .setType(Questionnaire.QuestionnaireItemType.GROUP),
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
         ) {}
       )
     )
@@ -63,13 +55,9 @@ class QuestionnaireItemAdapterTest {
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
-          Questionnaire.Item.newBuilder()
-            .setType(
-              Questionnaire.Item.TypeCode.newBuilder()
-                .setValue(QuestionnaireItemTypeCode.Value.BOOLEAN)
-            )
-            .build(),
-          QuestionnaireResponse.Item.newBuilder()
+          Questionnaire.QuestionnaireItemComponent()
+            .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
         ) {}
       )
     )
@@ -84,13 +72,9 @@ class QuestionnaireItemAdapterTest {
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
-          Questionnaire.Item.newBuilder()
-            .setType(
-              Questionnaire.Item.TypeCode.newBuilder()
-                .setValue(QuestionnaireItemTypeCode.Value.DATE)
-            )
-            .build(),
-          QuestionnaireResponse.Item.newBuilder()
+          Questionnaire.QuestionnaireItemComponent()
+            .setType(Questionnaire.QuestionnaireItemType.DATE),
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
         ) {}
       )
     )
@@ -105,13 +89,9 @@ class QuestionnaireItemAdapterTest {
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
-          Questionnaire.Item.newBuilder()
-            .setType(
-              Questionnaire.Item.TypeCode.newBuilder()
-                .setValue(QuestionnaireItemTypeCode.Value.DATE_TIME)
-            )
-            .build(),
-          QuestionnaireResponse.Item.newBuilder()
+          Questionnaire.QuestionnaireItemComponent()
+            .setType(Questionnaire.QuestionnaireItemType.DATETIME),
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
         ) {}
       )
     )
@@ -126,13 +106,9 @@ class QuestionnaireItemAdapterTest {
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
-          Questionnaire.Item.newBuilder()
-            .setType(
-              Questionnaire.Item.TypeCode.newBuilder()
-                .setValue(QuestionnaireItemTypeCode.Value.STRING)
-            )
-            .build(),
-          QuestionnaireResponse.Item.newBuilder()
+          Questionnaire.QuestionnaireItemComponent()
+            .setType(Questionnaire.QuestionnaireItemType.STRING),
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
         ) {}
       )
     )
@@ -147,13 +123,9 @@ class QuestionnaireItemAdapterTest {
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
-          Questionnaire.Item.newBuilder()
-            .setType(
-              Questionnaire.Item.TypeCode.newBuilder()
-                .setValue(QuestionnaireItemTypeCode.Value.TEXT)
-            )
-            .build(),
-          QuestionnaireResponse.Item.newBuilder()
+          Questionnaire.QuestionnaireItemComponent()
+            .setType(Questionnaire.QuestionnaireItemType.TEXT),
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
         ) {}
       )
     )
@@ -168,13 +140,9 @@ class QuestionnaireItemAdapterTest {
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
-          Questionnaire.Item.newBuilder()
-            .setType(
-              Questionnaire.Item.TypeCode.newBuilder()
-                .setValue(QuestionnaireItemTypeCode.Value.INTEGER)
-            )
-            .build(),
-          QuestionnaireResponse.Item.newBuilder()
+          Questionnaire.QuestionnaireItemComponent()
+            .setType(Questionnaire.QuestionnaireItemType.INTEGER),
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
         ) {}
       )
     )
@@ -189,13 +157,9 @@ class QuestionnaireItemAdapterTest {
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
-          Questionnaire.Item.newBuilder()
-            .setType(
-              Questionnaire.Item.TypeCode.newBuilder()
-                .setValue(QuestionnaireItemTypeCode.Value.DECIMAL)
-            )
-            .build(),
-          QuestionnaireResponse.Item.newBuilder()
+          Questionnaire.QuestionnaireItemComponent()
+            .setType(Questionnaire.QuestionnaireItemType.DECIMAL),
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
         ) {}
       )
     )
@@ -210,13 +174,9 @@ class QuestionnaireItemAdapterTest {
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
-          Questionnaire.Item.newBuilder()
-            .setType(
-              Questionnaire.Item.TypeCode.newBuilder()
-                .setValue(QuestionnaireItemTypeCode.Value.CHOICE)
-            )
-            .build(),
-          QuestionnaireResponse.Item.newBuilder()
+          Questionnaire.QuestionnaireItemComponent()
+            .setType(Questionnaire.QuestionnaireItemType.CHOICE),
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
         ) {}
       )
     )
@@ -227,36 +187,19 @@ class QuestionnaireItemAdapterTest {
 
   @Test
   fun getItemViewType_choiceItemType_moreAnswerOptions_shouldReturnDropDownViewHolderType() {
-    val answerOptions = Iterable {
-      iterator<Questionnaire.Item.AnswerOption> {
-        repeat(QuestionnaireItemAdapter.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN) {
-          yield(
-            Questionnaire.Item.AnswerOption.newBuilder()
-              .setValue(
-                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                  .setCoding(
-                    Coding.newBuilder()
-                      .setCode(Code.newBuilder().setValue("test-code"))
-                      .setDisplay(String.newBuilder().setValue("Test Code"))
-                  )
-              )
-              .build()
-          )
-        }
+    val answerOptions =
+      List(QuestionnaireItemAdapter.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN) {
+        Questionnaire.QuestionnaireItemAnswerOptionComponent()
+          .setValue(Coding().setCode("test-code").setDisplay("Test Code"))
       }
-    }
     val questionnaireItemAdapter = QuestionnaireItemAdapter()
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
-          Questionnaire.Item.newBuilder()
-            .setType(
-              Questionnaire.Item.TypeCode.newBuilder()
-                .setValue(QuestionnaireItemTypeCode.Value.CHOICE)
-            )
-            .addAllAnswerOption(answerOptions)
-            .build(),
-          QuestionnaireResponse.Item.newBuilder()
+          Questionnaire.QuestionnaireItemComponent()
+            .setType(Questionnaire.QuestionnaireItemType.CHOICE)
+            .setAnswerOption(answerOptions),
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
         ) {}
       )
     )
@@ -267,52 +210,34 @@ class QuestionnaireItemAdapterTest {
 
   @Test
   fun getItemViewType_choiceItemType_itemControlExtensionWithRadioButton_shouldReturnRadioGroupViewHolder() { // ktlint-disable max-line-length
-    val answerOptions = Iterable {
-      iterator<Questionnaire.Item.AnswerOption> {
-        repeat(QuestionnaireItemAdapter.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN) {
-          yield(
-            Questionnaire.Item.AnswerOption.newBuilder()
-              .setValue(
-                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                  .setCoding(
-                    Coding.newBuilder()
-                      .setCode(Code.newBuilder().setValue("test-code"))
-                      .setDisplay(String.newBuilder().setValue("Test Code"))
-                  )
-              )
-              .build()
-          )
-        }
+    val answerOptions =
+      List(QuestionnaireItemAdapter.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN) {
+        Questionnaire.QuestionnaireItemAnswerOptionComponent()
+          .setValue(Coding().setCode("test-code").setDisplay("Test Code"))
       }
-    }
     val questionnaireItemAdapter = QuestionnaireItemAdapter()
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent()
+        .setType(Questionnaire.QuestionnaireItemType.CHOICE)
+        .setAnswerOption(answerOptions)
+    questionnaireItem.addExtension(
+      Extension()
+        .setUrl(EXTENSION_ITEM_CONTROL_URL)
+        .setValue(
+          CodeableConcept()
+            .addCoding(
+              Coding()
+                .setCode(ITEM_CONTROL_RADIO_BUTTON)
+                .setDisplay("Radio Button")
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+            )
+        )
+    )
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
-          Questionnaire.Item.newBuilder()
-            .setType(
-              Questionnaire.Item.TypeCode.newBuilder()
-                .setValue(QuestionnaireItemTypeCode.Value.CHOICE)
-            )
-            .addAllAnswerOption(answerOptions)
-            .addExtension(
-              Extension.newBuilder()
-                .setUrl(Uri.newBuilder().setValue(EXTENSION_ITEM_CONTROL_URL))
-                .setValue(
-                  Extension.ValueX.newBuilder()
-                    .setCodeableConcept(
-                      CodeableConcept.newBuilder()
-                        .addCoding(
-                          Coding.newBuilder()
-                            .setCode(Code.newBuilder().setValue(ITEM_CONTROL_RADIO_BUTTON))
-                            .setDisplay(String.newBuilder().setValue("Radio Button"))
-                            .setSystem(Uri.newBuilder().setValue(EXTENSION_ITEM_CONTROL_SYSTEM))
-                        )
-                    )
-                )
-            )
-            .build(),
-          QuestionnaireResponse.Item.newBuilder()
+          questionnaireItem,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
         ) {}
       )
     )
@@ -324,32 +249,26 @@ class QuestionnaireItemAdapterTest {
   @Test
   fun getItemViewType_choiceItemType_itemControlExtensionWithDropDown_shouldReturnDropDownViewHolderType() { // ktlint-disable max-line-length
     val questionnaireItemAdapter = QuestionnaireItemAdapter()
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
+    questionnaireItem.addExtension(
+      Extension()
+        .setUrl(EXTENSION_ITEM_CONTROL_URL)
+        .setValue(
+          CodeableConcept()
+            .addCoding(
+              Coding()
+                .setCode(ITEM_CONTROL_DROP_DOWN)
+                .setDisplay("Drop Down")
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+            )
+        )
+    )
     questionnaireItemAdapter.submitList(
       listOf(
         QuestionnaireItemViewItem(
-          Questionnaire.Item.newBuilder()
-            .setType(
-              Questionnaire.Item.TypeCode.newBuilder()
-                .setValue(QuestionnaireItemTypeCode.Value.CHOICE)
-            )
-            .addExtension(
-              Extension.newBuilder()
-                .setUrl(Uri.newBuilder().setValue(EXTENSION_ITEM_CONTROL_URL))
-                .setValue(
-                  Extension.ValueX.newBuilder()
-                    .setCodeableConcept(
-                      CodeableConcept.newBuilder()
-                        .addCoding(
-                          Coding.newBuilder()
-                            .setCode(Code.newBuilder().setValue(ITEM_CONTROL_DROP_DOWN))
-                            .setDisplay(String.newBuilder().setValue("Drop Down"))
-                            .setSystem(Uri.newBuilder().setValue(EXTENSION_ITEM_CONTROL_SYSTEM))
-                        )
-                    )
-                )
-            )
-            .build(),
-          QuestionnaireResponse.Item.newBuilder()
+          questionnaireItem,
+          QuestionnaireResponse.QuestionnaireResponseItemComponent()
         ) {}
       )
     )
@@ -365,17 +284,12 @@ class QuestionnaireItemAdapterTest {
     assertThat(
         DiffCallback.areItemsTheSame(
           QuestionnaireItemViewItem(
-            Questionnaire.Item.newBuilder()
-              .setLinkId(String.newBuilder().setValue("link-id-1"))
-              .setText(String.newBuilder().setValue("text"))
-              .build(),
-            QuestionnaireResponse.Item.newBuilder()
+            Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1").setText("text"),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent()
           ) {},
           QuestionnaireItemViewItem(
-            Questionnaire.Item.newBuilder()
-              .setLinkId(String.newBuilder().setValue("link-id-1"))
-              .build(),
-            QuestionnaireResponse.Item.newBuilder()
+            Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1"),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent()
           ) {}
         )
       )
@@ -387,16 +301,12 @@ class QuestionnaireItemAdapterTest {
     assertThat(
         DiffCallback.areItemsTheSame(
           QuestionnaireItemViewItem(
-            Questionnaire.Item.newBuilder()
-              .setLinkId(String.newBuilder().setValue("link-id-1"))
-              .build(),
-            QuestionnaireResponse.Item.newBuilder()
+            Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1"),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent()
           ) {},
           QuestionnaireItemViewItem(
-            Questionnaire.Item.newBuilder()
-              .setLinkId(String.newBuilder().setValue("link-id-2"))
-              .build(),
-            QuestionnaireResponse.Item.newBuilder()
+            Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-2"),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent()
           ) {}
         )
       )
@@ -408,18 +318,12 @@ class QuestionnaireItemAdapterTest {
     assertThat(
         DiffCallback.areContentsTheSame(
           QuestionnaireItemViewItem(
-            Questionnaire.Item.newBuilder()
-              .setLinkId(String.newBuilder().setValue("link-id-1"))
-              .setText(String.newBuilder().setValue("text"))
-              .build(),
-            QuestionnaireResponse.Item.newBuilder()
+            Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1").setText("text"),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent()
           ) {},
           QuestionnaireItemViewItem(
-            Questionnaire.Item.newBuilder()
-              .setLinkId(String.newBuilder().setValue("link-id-1"))
-              .setText(String.newBuilder().setValue("text"))
-              .build(),
-            QuestionnaireResponse.Item.newBuilder()
+            Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1").setText("text"),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent()
           ) {}
         )
       )
@@ -431,18 +335,14 @@ class QuestionnaireItemAdapterTest {
     assertThat(
         DiffCallback.areContentsTheSame(
           QuestionnaireItemViewItem(
-            Questionnaire.Item.newBuilder()
-              .setLinkId(String.newBuilder().setValue("link-id-1"))
-              .setText(String.newBuilder().setValue("text"))
-              .build(),
-            QuestionnaireResponse.Item.newBuilder()
+            Questionnaire.QuestionnaireItemComponent().setLinkId("link-id-1").setText("text"),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent()
           ) {},
           QuestionnaireItemViewItem(
-            Questionnaire.Item.newBuilder()
-              .setLinkId(String.newBuilder().setValue("link-id-1"))
-              .setText(String.newBuilder().setValue("different text"))
-              .build(),
-            QuestionnaireResponse.Item.newBuilder()
+            Questionnaire.QuestionnaireItemComponent()
+              .setLinkId("link-id-1")
+              .setText("different text"),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent()
           ) {}
         )
       )

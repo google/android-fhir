@@ -17,8 +17,8 @@
 package com.google.android.fhir.datacapture.views
 
 import android.text.InputType
-import com.google.fhir.r4.core.Decimal
-import com.google.fhir.r4.core.QuestionnaireResponse
+import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemEditTextDecimalViewHolderFactory :
   QuestionnaireItemEditTextViewHolderFactory() {
@@ -28,19 +28,19 @@ internal object QuestionnaireItemEditTextDecimalViewHolderFactory :
         InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
         isSingleLine = true
       ) {
-      override fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder? {
+      override fun getValue(
+        text: String
+      ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
         return text.toDoubleOrNull()?.let {
-          QuestionnaireResponse.Item.Answer.newBuilder().apply {
-            value =
-              QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                .setDecimal(Decimal.newBuilder().setValue(it.toString()).build())
-                .build()
-          }
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+            .setValue(DecimalType(it.toString()))
         }
       }
 
-      override fun getText(answer: QuestionnaireResponse.Item.Answer.Builder?): String {
-        return answer?.value?.decimal?.value?.toString() ?: ""
+      override fun getText(
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
+      ): String {
+        return answer?.valueDecimalType?.value?.toString() ?: ""
       }
     }
 }
