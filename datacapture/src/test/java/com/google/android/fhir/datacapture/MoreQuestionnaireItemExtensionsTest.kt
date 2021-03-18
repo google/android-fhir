@@ -18,14 +18,10 @@ package com.google.android.fhir.datacapture
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
-import com.google.fhir.r4.core.Code
-import com.google.fhir.r4.core.CodeableConcept
-import com.google.fhir.r4.core.Coding
-import com.google.fhir.r4.core.Extension
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireItemTypeCode
-import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.Uri
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.Questionnaire
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -37,29 +33,21 @@ class MoreQuestionnaireItemExtensionsTest {
 
   @Test
   fun itemControl_shouldReturnItemControlCodeDropDown() {
-
     val questionnaireItem =
-      Questionnaire.Item.newBuilder()
-        .setType(
-          Questionnaire.Item.TypeCode.newBuilder().setValue(QuestionnaireItemTypeCode.Value.CHOICE)
-        )
-        .addExtension(
-          Extension.newBuilder()
-            .setUrl(Uri.newBuilder().setValue(EXTENSION_ITEM_CONTROL_URL))
-            .setValue(
-              Extension.ValueX.newBuilder()
-                .setCodeableConcept(
-                  CodeableConcept.newBuilder()
-                    .addCoding(
-                      Coding.newBuilder()
-                        .setCode(Code.newBuilder().setValue(ITEM_CONTROL_DROP_DOWN))
-                        .setDisplay(String.newBuilder().setValue("Drop Down"))
-                        .setSystem(Uri.newBuilder().setValue(EXTENSION_ITEM_CONTROL_SYSTEM))
-                    )
-                )
+      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
+    questionnaireItem.addExtension(
+      Extension()
+        .setUrl(EXTENSION_ITEM_CONTROL_URL)
+        .setValue(
+          CodeableConcept()
+            .addCoding(
+              Coding()
+                .setCode(ITEM_CONTROL_DROP_DOWN)
+                .setDisplay("Drop Down")
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
             )
         )
-        .build()
+    )
 
     assertThat(questionnaireItem.itemControl).isEqualTo(ITEM_CONTROL_DROP_DOWN)
   }
@@ -68,27 +56,20 @@ class MoreQuestionnaireItemExtensionsTest {
   fun itemControl_shouldReturnItemControlCodeRadioButton() {
 
     val questionnaireItem =
-      Questionnaire.Item.newBuilder()
-        .setType(
-          Questionnaire.Item.TypeCode.newBuilder().setValue(QuestionnaireItemTypeCode.Value.CHOICE)
-        )
-        .addExtension(
-          Extension.newBuilder()
-            .setUrl(Uri.newBuilder().setValue(EXTENSION_ITEM_CONTROL_URL))
-            .setValue(
-              Extension.ValueX.newBuilder()
-                .setCodeableConcept(
-                  CodeableConcept.newBuilder()
-                    .addCoding(
-                      Coding.newBuilder()
-                        .setCode(Code.newBuilder().setValue(ITEM_CONTROL_RADIO_BUTTON))
-                        .setDisplay(String.newBuilder().setValue("Radio Group"))
-                        .setSystem(Uri.newBuilder().setValue(EXTENSION_ITEM_CONTROL_SYSTEM))
-                    )
-                )
+      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
+    questionnaireItem.addExtension(
+      Extension()
+        .setUrl(EXTENSION_ITEM_CONTROL_URL)
+        .setValue(
+          CodeableConcept()
+            .addCoding(
+              Coding()
+                .setCode(ITEM_CONTROL_RADIO_BUTTON)
+                .setDisplay("Radio Group")
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
             )
         )
-        .build()
+    )
 
     assertThat(questionnaireItem.itemControl).isEqualTo(ITEM_CONTROL_RADIO_BUTTON)
   }
@@ -97,27 +78,20 @@ class MoreQuestionnaireItemExtensionsTest {
   fun itemControl_wrongExtensionUrl_shouldReturnNull() {
 
     val questionnaireItem =
-      Questionnaire.Item.newBuilder()
-        .setType(
-          Questionnaire.Item.TypeCode.newBuilder().setValue(QuestionnaireItemTypeCode.Value.CHOICE)
-        )
-        .addExtension(
-          Extension.newBuilder()
-            .setUrl(Uri.newBuilder().setValue("null-test"))
-            .setValue(
-              Extension.ValueX.newBuilder()
-                .setCodeableConcept(
-                  CodeableConcept.newBuilder()
-                    .addCoding(
-                      Coding.newBuilder()
-                        .setCode(Code.newBuilder().setValue(ITEM_CONTROL_DROP_DOWN))
-                        .setDisplay(String.newBuilder().setValue("Drop Down"))
-                        .setSystem(Uri.newBuilder().setValue(EXTENSION_ITEM_CONTROL_SYSTEM))
-                    )
-                )
+      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
+    questionnaireItem.addExtension(
+      Extension()
+        .setUrl("null-test")
+        .setValue(
+          CodeableConcept()
+            .addCoding(
+              Coding()
+                .setCode(ITEM_CONTROL_DROP_DOWN)
+                .setDisplay("Drop Down")
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
             )
         )
-        .build()
+    )
 
     assertThat(questionnaireItem.itemControl).isNull()
   }
@@ -126,27 +100,20 @@ class MoreQuestionnaireItemExtensionsTest {
   fun itemControl_wrongExtensionCoding_shouldReturnNull() {
 
     val questionnaireItem =
-      Questionnaire.Item.newBuilder()
-        .setType(
-          Questionnaire.Item.TypeCode.newBuilder().setValue(QuestionnaireItemTypeCode.Value.CHOICE)
-        )
-        .addExtension(
-          Extension.newBuilder()
-            .setUrl(Uri.newBuilder().setValue(EXTENSION_ITEM_CONTROL_URL))
-            .setValue(
-              Extension.ValueX.newBuilder()
-                .setCodeableConcept(
-                  CodeableConcept.newBuilder()
-                    .addCoding(
-                      Coding.newBuilder()
-                        .setCode(Code.newBuilder().setValue("null-test"))
-                        .setDisplay(String.newBuilder().setValue("Drop Down"))
-                        .setSystem(Uri.newBuilder().setValue(EXTENSION_ITEM_CONTROL_SYSTEM))
-                    )
-                )
+      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
+    questionnaireItem.addExtension(
+      Extension()
+        .setUrl(EXTENSION_ITEM_CONTROL_URL)
+        .setValue(
+          CodeableConcept()
+            .addCoding(
+              Coding()
+                .setCode("null-test")
+                .setDisplay("Drop Down")
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
             )
         )
-        .build()
+    )
 
     assertThat(questionnaireItem.itemControl).isNull()
   }

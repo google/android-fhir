@@ -31,7 +31,7 @@ internal object QuestionnaireItemGroupViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        groupHeader.text = questionnaireItemViewItem.questionnaireItem.text.value
+        groupHeader.text = questionnaireItemViewItem.questionnaireItem.text
         groupHeader.visibility =
           if (groupHeader.text.isEmpty()) {
             View.GONE

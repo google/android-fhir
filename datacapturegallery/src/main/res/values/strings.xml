@@ -13,7 +13,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
 <resources>
     <string name="app_name">Data Capture Gallery</string>
     <string name="submit_button_text">Submit</string>

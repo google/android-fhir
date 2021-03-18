@@ -31,7 +31,7 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        textView.text = questionnaireItemViewItem.questionnaireItem.text.value
+        textView.text = questionnaireItemViewItem.questionnaireItem.text
         textView.visibility =
           if (textView.text.isEmpty()) {
             View.GONE
