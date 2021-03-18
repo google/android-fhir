@@ -16,7 +16,8 @@
 
 package com.google.android.fhir.datacapture
 
-import com.google.fhir.r4.core.Questionnaire
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Questionnaire
 
 internal const val ITEM_CONTROL_DROP_DOWN = "drop-down"
 internal const val ITEM_CONTROL_RADIO_BUTTON = "radio-button"
@@ -26,19 +27,11 @@ internal const val EXTENSION_ITEM_CONTROL_URL =
 internal const val EXTENSION_ITEM_CONTROL_SYSTEM = "http://hl7.org/fhir/questionnaire-item-control"
 
 // Item control code as string or null
-internal val Questionnaire.Item.itemControl: String?
+internal val Questionnaire.QuestionnaireItemComponent.itemControl: String?
   get() {
-    return when (this.extensionList
-        .firstOrNull { it.url.value == EXTENSION_ITEM_CONTROL_URL }
-        ?.value
-        ?.codeableConcept
-        ?.codingList
-        ?.firstOrNull { it.system.value == EXTENSION_ITEM_CONTROL_SYSTEM }
-        ?.code
-        ?.value
-    ) {
-      ITEM_CONTROL_DROP_DOWN -> ITEM_CONTROL_DROP_DOWN
-      ITEM_CONTROL_RADIO_BUTTON -> ITEM_CONTROL_RADIO_BUTTON
-      else -> null
-    }
+    val codeableConcept =
+      this.extension.firstOrNull { it.url == EXTENSION_ITEM_CONTROL_URL }?.value as CodeableConcept?
+    val code =
+      codeableConcept?.coding?.firstOrNull { it.system == EXTENSION_ITEM_CONTROL_SYSTEM }?.code
+    return listOf(ITEM_CONTROL_DROP_DOWN, ITEM_CONTROL_RADIO_BUTTON).firstOrNull { it == code }
   }
