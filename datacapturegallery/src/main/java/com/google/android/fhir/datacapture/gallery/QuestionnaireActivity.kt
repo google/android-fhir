@@ -23,9 +23,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
+import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.QuestionnaireFragment
-import com.google.fhir.common.JsonFormat
-import com.google.fhir.r4.core.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 class QuestionnaireActivity : AppCompatActivity() {
   private val viewModel: QuestionnaireViewModel by viewModels()
@@ -73,7 +73,8 @@ class QuestionnaireActivity : AppCompatActivity() {
 
   // Display Questionnaire response as a dialog
   fun displayQuestionnaireResponse(questionnaireResponse: QuestionnaireResponse) {
-    val questionnaireResponseJson = JsonFormat.getPrinter().print(questionnaireResponse)
+    val questionnaireResponseJson =
+      FhirContext.forR4().newJsonParser().encodeResourceToString(questionnaireResponse)
     val dialogFragment = QuestionnaireResponseDialogFragment()
     dialogFragment.arguments =
       bundleOf(QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to questionnaireResponseJson)

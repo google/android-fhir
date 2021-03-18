@@ -17,17 +17,18 @@
 package com.google.android.fhir.datacapture.mapping
 
 import com.google.android.fhir.datacapture.getValueForType
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.Date
-import com.google.fhir.r4.core.DateTime
-import com.google.fhir.r4.core.Decimal
-import com.google.fhir.r4.core.Integer
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireItemTypeCode
-import com.google.fhir.r4.core.QuestionnaireResponse
-import com.google.fhir.r4.core.Time
-import com.google.fhir.r4.core.Url
-import com.google.fhir.shaded.protobuf.Message
+import org.hl7.fhir.r4.model.Base
+import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.TimeType
+import org.hl7.fhir.r4.model.UrlType
 
 /**
  * Maps [QuestionnaireResponse] s to FHIR resources and vice versa.
@@ -53,13 +54,13 @@ internal object ResourceMapper {
    * This method assumes there is only one FHIR resource to be extracted from the given
    * `questionnaire` and `questionnaireResponse`.
    */
-  fun extract(questionnaire: Questionnaire, questionnaireResponse: QuestionnaireResponse): Message {
-    val builder =
-      questionnaire.itemContextNameToExpressionMap.values.first().let {
-        Class.forName("com.google.fhir.r4.core.$it").getMethod("newBuilder").invoke(null) as
-          Message.Builder
-      }
-    return builder.extractFields(questionnaire.itemList, questionnaireResponse.itemList).build()
+  fun extract(questionnaire: Questionnaire, questionnaireResponse: QuestionnaireResponse): Base {
+    return questionnaire
+      .itemContextNameToExpressionMap
+      .values
+      .first()
+      .let { Class.forName("org.hl7.fhir.r4.model.$it").newInstance() as Base }
+      .apply { extractFields(questionnaire.item, questionnaireResponse.item) }
   }
 }
 
@@ -67,10 +68,10 @@ internal object ResourceMapper {
  * Extracts values for fields in the builder from the corresponding questions and answers in
  * [questionnaireItemList] and [questionnaireResponseItemList].
  */
-private fun Message.Builder.extractFields(
-  questionnaireItemList: List<Questionnaire.Item>,
-  questionnaireResponseItemList: List<QuestionnaireResponse.Item>
-): Message.Builder {
+private fun Base.extractFields(
+  questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
+  questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+) {
   val questionnaireItemListIterator = questionnaireItemList.iterator()
   val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
   while (questionnaireItemListIterator.hasNext() &&
@@ -78,9 +79,8 @@ private fun Message.Builder.extractFields(
     val questionnaireItem = questionnaireItemListIterator.next()
     val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
     this.extractField(questionnaireItem, questionnaireResponseItem)
-    extractFields(questionnaireItem.itemList, questionnaireResponseItem.itemList)
+    extractFields(questionnaireItem.item, questionnaireResponseItem.item)
   }
-  return this
 }
 
 /**
@@ -89,21 +89,21 @@ private fun Message.Builder.extractFields(
  *
  * NOTE: Nested fields are not handled. See https://github.com/google/android-fhir/issues/240.
  */
-private fun Message.Builder.extractField(
-  questionnaireItem: Questionnaire.Item,
-  questionnaireResponseItem: QuestionnaireResponse.Item
+private fun Base.extractField(
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+  questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
 ) {
-  val targetFieldName = questionnaireItem.definitionFieldName
+  val targetFieldName = questionnaireItem.definitionFieldName ?: return
   if (targetFieldName.isEmpty()) {
     return
   }
 
   questionnaireItem.type.getClass()?.let {
     this.javaClass
-      .getMethod("set${targetFieldName.capitalize()}", it)
+      .getMethod("set${targetFieldName.capitalize()}Element", it)
       .invoke(
         this,
-        questionnaireResponseItem.answerList.single().getValueForType(questionnaireItem.type)
+        questionnaireResponseItem.answer.single().getValueForType(questionnaireItem.type)
       )
   }
 }
@@ -115,25 +115,25 @@ private fun Message.Builder.extractField(
  * `"http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate"`, this function will return
  * `"birthDate"`.
  */
-private val Questionnaire.Item.definitionFieldName
-  get() = this.definition.value.substringAfterLast(".")
+private val Questionnaire.QuestionnaireItemComponent.definitionFieldName
+  get() = this.definition?.substringAfterLast(".")
 
 /**
- * Returns the [Class] for the answer to the [Questionnaire.Item].
+ * Returns the [Class] for the answer to the [Questionnaire.QuestionnaireItemComponent].
  *
  * Used to retrieve the method to invoke to set the field in the extracted FHIR resource.
  */
-private fun Questionnaire.Item.TypeCode.getClass(): Class<out Message>? =
-  when (this.value) {
-    QuestionnaireItemTypeCode.Value.DATE -> Date::class.java
-    QuestionnaireItemTypeCode.Value.BOOLEAN -> Boolean::class.java
-    QuestionnaireItemTypeCode.Value.DECIMAL -> Decimal::class.java
-    QuestionnaireItemTypeCode.Value.INTEGER -> Integer::class.java
-    QuestionnaireItemTypeCode.Value.DATE_TIME -> DateTime::class.java
-    QuestionnaireItemTypeCode.Value.TIME -> Time::class.java
-    QuestionnaireItemTypeCode.Value.STRING, QuestionnaireItemTypeCode.Value.TEXT ->
-      com.google.fhir.r4.core.String::class.java
-    QuestionnaireItemTypeCode.Value.URL -> Url::class.java
+private fun Questionnaire.QuestionnaireItemType.getClass(): Class<out Base>? =
+  when (this) {
+    Questionnaire.QuestionnaireItemType.DATE -> DateType::class.java
+    Questionnaire.QuestionnaireItemType.BOOLEAN -> BooleanType::class.java
+    Questionnaire.QuestionnaireItemType.DECIMAL -> DecimalType::class.java
+    Questionnaire.QuestionnaireItemType.INTEGER -> IntegerType::class.java
+    Questionnaire.QuestionnaireItemType.DATETIME -> DateTimeType::class.java
+    Questionnaire.QuestionnaireItemType.TIME -> TimeType::class.java
+    Questionnaire.QuestionnaireItemType.STRING, Questionnaire.QuestionnaireItemType.TEXT ->
+      StringType::class.java
+    Questionnaire.QuestionnaireItemType.URL -> UrlType::class.java
     else -> null
   }
 
@@ -144,11 +144,11 @@ private fun Questionnaire.Item.TypeCode.getClass(): Class<out Message>? =
  */
 private val Questionnaire.itemContextNameToExpressionMap: Map<String, String>
   get() {
-    return this.extensionList
-      .filter { it.url.value == ITEM_CONTEXT_EXTENSION_URL }
+    return this.extension
+      .filter { it.url == ITEM_CONTEXT_EXTENSION_URL }
       .map {
-        val expression = it.value.expression
-        expression.name.value to expression.expression.value
+        val expression = it.value as Expression
+        expression.name to expression.expression
       }
       .toMap()
   }
