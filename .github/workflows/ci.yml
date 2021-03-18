@@ -84,6 +84,8 @@ jobs:
     - name: Build with Gradle
       if: matrix.api-level == 29 # don't run full build on older APIs
       run: ./gradlew build
+    - name: Stop Gradle # https://github.com/google/android-fhir/issues/73
+      run: ./gradlew --stop
     - name: Run Integration Tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
