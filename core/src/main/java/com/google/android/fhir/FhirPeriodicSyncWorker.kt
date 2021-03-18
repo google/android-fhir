@@ -18,12 +18,13 @@ package com.google.android.fhir
 
 import android.content.Context
 import androidx.work.WorkerParameters
+import com.google.android.fhir.CoreApplication.Companion.fhirEngine
 import com.google.android.fhir.sync.PeriodicSyncWorker
 
 class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   PeriodicSyncWorker(appContext, workerParams) {
 
   override fun getFhirEngine(): FhirEngine {
-    return CoreApplication.fhirEngine(applicationContext)
+    return fhirEngine(applicationContext)
   }
 }

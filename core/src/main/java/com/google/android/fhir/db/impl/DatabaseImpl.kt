@@ -34,28 +34,28 @@ import org.hl7.fhir.r4.model.ResourceType
  * The implementation for the persistence layer using Room. See docs for
  * [com.google.android.fhir.db.Database] for the API docs.
  */
-internal class DatabaseImpl(context: Context, private val iParser: IParser, databaseName: String?) :
+class DatabaseImpl(context: Context, private val iParser: IParser, databaseName: String?) :
   com.google.android.fhir.db.Database {
   constructor(
     context: Context,
     iParser: IParser
   ) : this(context = context, iParser = iParser, databaseName = DEFAULT_DATABASE_NAME)
 
-  val builder =
+ private val builder =
     if (databaseName == null) {
       Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
     } else {
       Room.databaseBuilder(context, ResourceDatabase::class.java, databaseName)
     }
-  val db =
+  private val db =
     builder
       // TODO https://github.com/jingtang10/fhir-engine/issues/32
       //  don't allow main thread queries
       .allowMainThreadQueries()
       .build()
-  val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
-  val syncedResourceDao = db.syncedResourceDao()
-  val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
+  private val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
+  private val syncedResourceDao = db.syncedResourceDao()
+  private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 
   @Transaction
   override fun <R : Resource> insert(resource: R) {

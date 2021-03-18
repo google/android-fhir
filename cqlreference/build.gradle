@@ -38,6 +38,22 @@ android {
     }
 }
 
+configurations {
+    all {
+        exclude module: 'json'
+        exclude module: 'xpp3'
+        exclude module: 'hamcrest-all'
+        exclude module: 'jaxb-impl'
+        exclude module: 'jaxb-core'
+        exclude module: 'jakarta.activation-api'
+        exclude module: 'javax.activation'
+        exclude module: 'jakarta.xml.bind-api'
+        // TODO: the following line can be removed from the next CQL engine release.
+        exclude module: 'hapi-fhir-jpaserver-base'
+    }
+}
+
+
 dependencies {
 
     coreLibraryDesugaring deps.desugar
@@ -55,6 +71,8 @@ dependencies {
     implementation project(path: ':core')
     implementation deps.work.runtime
     testImplementation deps.junit
+
+    implementation deps.cql_engine.fhir
 
     androidTestImplementation deps.atsl.ext_junit
     androidTestImplementation deps.atsl.espresso

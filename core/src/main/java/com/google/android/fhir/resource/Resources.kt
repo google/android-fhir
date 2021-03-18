@@ -39,7 +39,7 @@ internal fun <R : Resource> getResourceType(clazz: Class<R>): ResourceType {
 }
 
 /** Returns the {@link Class} object for the resource type. */
-internal fun <R : Resource> getResourceClass(resourceType: String): Class<R> {
+fun <R : Resource> getResourceClass(resourceType: String): Class<R> {
   // Remove any curly brackets in the resource type string. This is to work around an issue with
   // JSON deserialization in the CQL engine on Android. The resource type string incorrectly
   // includes namespace prefix in curly brackets, e.g. "{http://hl7.org/fhir}Patient" instead of
