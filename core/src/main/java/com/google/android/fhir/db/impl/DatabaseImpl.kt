@@ -41,7 +41,7 @@ class DatabaseImpl(context: Context, private val iParser: IParser, databaseName:
     iParser: IParser
   ) : this(context = context, iParser = iParser, databaseName = DEFAULT_DATABASE_NAME)
 
- private val builder =
+  private val builder =
     if (databaseName == null) {
       Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
     } else {

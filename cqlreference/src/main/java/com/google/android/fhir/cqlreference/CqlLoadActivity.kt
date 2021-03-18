@@ -25,8 +25,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.cqlreference.cql.CqlEngineUtils
 import com.google.android.fhir.cqlreference.FhirApplication.Companion.fhirEngine
+import com.google.android.fhir.cqlreference.cql.CqlEngineUtils
 import com.google.android.material.snackbar.Snackbar
 import java.io.BufferedReader
 import java.io.IOException

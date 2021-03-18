@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  Copyright 2020 Google LLC
 
@@ -14,17 +14,19 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CqlLoadActivity">
+    tools:context=".CqlLoadActivity"
+>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+    >
 
         <TextView
             android:id="@+id/cql_title"
@@ -37,7 +39,8 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display4"
             android:textSize="24sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+        />
 
         <EditText
             android:id="@+id/cql_text_input"
@@ -49,7 +52,8 @@
             app:layout_constraintEnd_toStartOf="@+id/load_cql_lib_button"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/cql_title"
-            app:layout_constraintTop_toBottomOf="@+id/cql_title" />
+            app:layout_constraintTop_toBottomOf="@+id/cql_title"
+        />
 
         <Button
             android:id="@+id/load_cql_lib_button"
@@ -61,7 +65,8 @@
             app:layout_constraintBottom_toTopOf="@+id/evaluate_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/cql_text_input"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+        />
 
         <TextView
             android:id="@+id/fhir_resource_title"
@@ -72,7 +77,8 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display4"
             android:textSize="24sp"
             app:layout_constraintStart_toStartOf="@+id/cql_text_input"
-            app:layout_constraintTop_toBottomOf="@+id/cql_text_input" />
+            app:layout_constraintTop_toBottomOf="@+id/cql_text_input"
+        />
 
         <EditText
             android:id="@+id/fhir_resource_url_input"
@@ -84,7 +90,8 @@
             app:layout_constraintEnd_toStartOf="@+id/download_fhir_resource_button"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/fhir_resource_title"
-            app:layout_constraintTop_toBottomOf="@+id/fhir_resource_title" />
+            app:layout_constraintTop_toBottomOf="@+id/fhir_resource_title"
+        />
 
         <Button
             android:id="@+id/download_fhir_resource_button"
@@ -96,7 +103,8 @@
             app:layout_constraintHorizontal_bias="0.948"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/fhir_resource_url_input"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+        />
 
         <TextView
             android:id="@+id/evaluation_title"
@@ -111,7 +119,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/fhir_resource_url_input"
-            app:layout_constraintTop_toBottomOf="@+id/fhir_resource_url_input" />
+            app:layout_constraintTop_toBottomOf="@+id/fhir_resource_url_input"
+        />
 
         <Button
             android:id="@+id/evaluate_button"
@@ -123,7 +132,8 @@
             app:layout_constraintHorizontal_bias="0.921"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/evaluation_title"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+        />
 
         <TextView
             android:id="@+id/library"
@@ -134,7 +144,8 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display4"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="@+id/evaluation_title"
-            app:layout_constraintTop_toBottomOf="@+id/evaluation_title" />
+            app:layout_constraintTop_toBottomOf="@+id/evaluation_title"
+        />
 
         <EditText
             android:id="@+id/library_input"
@@ -147,7 +158,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/library"
-            app:layout_constraintTop_toTopOf="@+id/library" />
+            app:layout_constraintTop_toTopOf="@+id/library"
+        />
 
         <TextView
             android:id="@+id/context"
@@ -158,7 +170,8 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display4"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="@+id/library"
-            app:layout_constraintTop_toBottomOf="@+id/library" />
+            app:layout_constraintTop_toBottomOf="@+id/library"
+        />
 
         <EditText
             android:id="@+id/context_input"
@@ -170,7 +183,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/context"
-            app:layout_constraintTop_toTopOf="@+id/context" />
+            app:layout_constraintTop_toTopOf="@+id/context"
+        />
 
         <TextView
             android:id="@+id/expression"
@@ -181,7 +195,8 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display4"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="@+id/context"
-            app:layout_constraintTop_toBottomOf="@+id/context" />
+            app:layout_constraintTop_toBottomOf="@+id/context"
+        />
 
         <EditText
             android:id="@+id/expression_input"
@@ -193,7 +208,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/expression"
-            app:layout_constraintTop_toTopOf="@+id/expression" />
+            app:layout_constraintTop_toTopOf="@+id/expression"
+        />
 
         <TextView
             android:id="@+id/evaluate_result"
@@ -209,7 +225,8 @@
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="@+id/fhir_resource_url_input"
             app:layout_constraintTop_toBottomOf="@+id/expression"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintVertical_bias="1.0"
+        />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
