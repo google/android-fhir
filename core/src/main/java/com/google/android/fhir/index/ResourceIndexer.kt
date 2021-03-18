@@ -149,7 +149,7 @@ internal object ResourceIndexer {
           }
         )
       }
-      "timing","timing.repeat"-> {
+      "Timing", "Timing.repeat" -> {
         val timing = value as Timing
         DateIndex(
           searchParam.name,
