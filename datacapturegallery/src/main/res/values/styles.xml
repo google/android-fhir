@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  Copyright 2021 Google LLC
 
@@ -14,12 +14,13 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
 <resources>
 
     <!-- The custom theme for the questionnaires in this application. -->
     <style name="Theme.MyQuestionnaire" parent="Theme.Questionnaire">
-        <item name="groupHeaderTextAppearance">@style/TextAppearance.MaterialComponents.Subtitle2
+        <item
+            name="groupHeaderTextAppearance"
+        >@style/TextAppearance.MaterialComponents.Subtitle2
         </item>
     </style>
 </resources>

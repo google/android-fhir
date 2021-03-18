@@ -24,8 +24,7 @@ import android.widget.AutoCompleteTextView
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
-import com.google.android.fhir.datacapture.responseAnswerValueX
-import com.google.fhir.r4.core.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemDropDownViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_drop_down_view) {
@@ -44,13 +43,13 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
-        textView.text = questionnaireItemViewItem.questionnaireItem.text.value
+        textView.text = questionnaireItemViewItem.questionnaireItem.text
         val answerOptionString =
-          this.questionnaireItemViewItem.questionnaireItem.answerOptionList.map { it.displayString }
+          this.questionnaireItemViewItem.questionnaireItem.answerOption.map { it.displayString }
         val adapter =
           ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
         autoCompleteTextView.setText(
-          questionnaireItemViewItem.singleAnswerOrNull?.value?.coding?.display?.value ?: ""
+          questionnaireItemViewItem.singleAnswerOrNull?.valueCoding?.display ?: ""
         )
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.onItemClickListener =
@@ -62,10 +61,9 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
               id: Long
             ) {
               questionnaireItemViewItem.singleAnswerOrNull =
-                QuestionnaireResponse.Item.Answer.newBuilder()
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
                   .setValue(
-                    questionnaireItemViewItem.questionnaireItem.answerOptionList[position]
-                      .responseAnswerValueX
+                    questionnaireItemViewItem.questionnaireItem.answerOption[position].valueCoding
                   )
             }
           }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  Copyright 2020 Google LLC
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,29 +11,33 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
-<LinearLayout android:layout_width="match_parent"
+<LinearLayout
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
     android:layout_marginVertical="@dimen/item_margin_vertical"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+>
 
     <TextView
         android:id="@+id/dropdown_question_title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+    />
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+    >
 
         <AutoCompleteTextView
             android:id="@+id/auto_complete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="none" />
+            android:inputType="none"
+        />
 
     </com.google.android.material.textfield.TextInputLayout>
 

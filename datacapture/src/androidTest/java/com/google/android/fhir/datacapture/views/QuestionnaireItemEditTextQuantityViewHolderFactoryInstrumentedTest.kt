@@ -25,10 +25,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.common.truth.Truth.assertThat
-import com.google.fhir.r4.core.Decimal
-import com.google.fhir.r4.core.Quantity
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireResponse
+import java.math.BigDecimal
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,15 +52,12 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
   }
 
   @Test
+  @UiThreadTest
   fun shouldSetTextViewText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -73,18 +70,14 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
   fun shouldSetInputText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.getDefaultInstance(),
-        QuestionnaireResponse.Item.newBuilder()
-          .addAnswer(
-            QuestionnaireResponse.Item.Answer.newBuilder().apply {
-              value =
-                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                  .setQuantity(
-                    Quantity.newBuilder().setValue(Decimal.newBuilder().setValue("5").build())
-                  )
-                  .build()
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Quantity().apply { value = BigDecimal("5") }
             }
           )
+        }
       ) {}
     )
 
@@ -99,24 +92,20 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
   fun shouldSetInputTextToEmpty() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.getDefaultInstance(),
-        QuestionnaireResponse.Item.newBuilder()
-          .addAnswer(
-            QuestionnaireResponse.Item.Answer.newBuilder().apply {
-              value =
-                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                  .setQuantity(
-                    Quantity.newBuilder().setValue(Decimal.newBuilder().setValue("5").build())
-                  )
-                  .build()
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = Quantity().apply { value = BigDecimal("5") }
             }
           )
+        }
       ) {}
     )
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.getDefaultInstance(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -131,15 +120,15 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
   fun shouldSetQuestionnaireResponseItemAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder().build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("10")
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerList
+    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].value!!.quantity!!.value!!.value).isEqualTo("10.0")
+    assertThat(answer[0].valueQuantity!!.value!!.toString()).isEqualTo("10.0")
   }
 
   @Test
@@ -147,16 +136,15 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
   fun shouldSetQuestionnaireResponseItemAnswerOneDecimalPlace() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder().build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("10.1")
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerList
+    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].value!!.quantity!!.value)
-      .isEqualTo(Decimal.newBuilder().setValue("10.1").build())
+    assertThat(answer[0].valueQuantity!!.value.toString()).isEqualTo("10.1")
   }
 
   @Test
@@ -164,12 +152,12 @@ class QuestionnaireItemEditTextQuantityViewHolderFactoryInstrumentedTest {
   fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder().build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("")
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItemBuilder.answerCount).isEqualTo(0)
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
   }
 }
