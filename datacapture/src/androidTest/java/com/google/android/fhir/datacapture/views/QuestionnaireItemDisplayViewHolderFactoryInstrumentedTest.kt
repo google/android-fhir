@@ -25,8 +25,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -82,10 +82,8 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
   fun shouldSetTextViewText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply { text = com.google.fhir.r4.core.String.newBuilder().setValue("Display").build() }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Display" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -96,10 +94,8 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
   fun shouldSetTextViewVisible() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply { text = com.google.fhir.r4.core.String.newBuilder().setValue("Display").build() }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Display" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -111,10 +107,8 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
   fun shouldSetTextViewGone() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply { text = com.google.fhir.r4.core.String.newBuilder().setValue("").build() }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 

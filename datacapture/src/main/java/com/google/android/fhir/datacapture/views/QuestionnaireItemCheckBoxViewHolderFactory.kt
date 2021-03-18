@@ -20,8 +20,8 @@ import android.view.View
 import android.widget.CheckBox
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.QuestionnaireResponse
+import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemCheckBoxViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_check_box_view) {
@@ -37,19 +37,11 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
         checkBox.setOnClickListener {
           // if-else block to prevent over-writing of "items" nested within "answer"
           if (questionnaireItemViewItem.singleAnswerOrNull != null) {
-            questionnaireItemViewItem.singleAnswerOrNull?.value =
-              questionnaireItemViewItem
-                .singleAnswerOrNull
-                ?.valueBuilder
-                ?.setBoolean(Boolean.newBuilder().setValue(checkBox.isChecked).build())
-                ?.build()
+            questionnaireItemViewItem.singleAnswerOrNull!!.value = BooleanType(checkBox.isChecked)
           } else {
             questionnaireItemViewItem.singleAnswerOrNull =
-              QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                value =
-                  QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                    .setBoolean(Boolean.newBuilder().setValue(checkBox.isChecked).build())
-                    .build()
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(checkBox.isChecked)
               }
           }
 
@@ -59,6 +51,7 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
+        checkBox.text = questionnaireItemViewItem.questionnaireItem.text
         if (questionnaireItemViewItem.questionnaireItem.prefix.toString().isNotEmpty()) {
           prefixTextView.visibility = View.VISIBLE
           prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix.value
@@ -67,7 +60,7 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
         }
         checkBox.text = questionnaireItemViewItem.questionnaireItem.text.value
         checkBox.isChecked =
-          questionnaireItemViewItem.singleAnswerOrNull?.value?.boolean?.value ?: false
+          questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value ?: false
       }
     }
 }

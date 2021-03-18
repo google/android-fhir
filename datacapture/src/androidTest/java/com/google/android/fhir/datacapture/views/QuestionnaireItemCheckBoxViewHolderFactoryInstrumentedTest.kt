@@ -25,9 +25,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireResponse
+import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -70,12 +70,8 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
   fun shouldSetCheckBoxText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -87,12 +83,8 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
   fun noAnswer_shouldSetCheckBoxUnchecked() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -104,18 +96,11 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
   fun answerTrue_shouldSetCheckBoxChecked() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
-            QuestionnaireResponse.Item.Answer.newBuilder().apply {
-              value =
-                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                  .setBoolean(Boolean.newBuilder().setValue(true))
-                  .build()
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = BooleanType(true)
             }
           )
       ) {}
@@ -128,18 +113,11 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
   fun answerFalse_shouldSetCheckBoxUnchecked() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
-            QuestionnaireResponse.Item.Answer.newBuilder().apply {
-              value =
-                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                  .setBoolean(Boolean.newBuilder().setValue(false))
-                  .build()
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = BooleanType(false)
             }
           )
       ) {}
@@ -153,18 +131,14 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
   fun shouldSetQuestionnaireResponseItemComponentAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<CheckBox>(R.id.check_box).performClick()
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerBuilderList
+    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].value.boolean.value).isTrue()
+    assertThat(answer[0].valueBooleanType.value).isTrue()
   }
 }

@@ -33,8 +33,8 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolde
 import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireItemTypeCode
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
 internal class QuestionnaireItemAdapter :
   ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
@@ -80,31 +80,30 @@ internal class QuestionnaireItemAdapter :
    */
   override fun getItemViewType(position: Int): Int {
     val questionnaireItem = getItem(position).questionnaireItem
-    return when (val type = questionnaireItem.type.value) {
-      QuestionnaireItemTypeCode.Value.GROUP -> QuestionnaireItemViewHolderType.GROUP
-      QuestionnaireItemTypeCode.Value.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
-      QuestionnaireItemTypeCode.Value.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
-      QuestionnaireItemTypeCode.Value.DATE_TIME -> QuestionnaireItemViewHolderType.DATE_TIME_PICKER
-      QuestionnaireItemTypeCode.Value.STRING ->
-        QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE
-      QuestionnaireItemTypeCode.Value.TEXT -> QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE
-      QuestionnaireItemTypeCode.Value.INTEGER -> QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
-      QuestionnaireItemTypeCode.Value.DECIMAL -> QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
-      QuestionnaireItemTypeCode.Value.CHOICE -> getChoiceViewHolderType(questionnaireItem)
-      QuestionnaireItemTypeCode.Value.DISPLAY -> QuestionnaireItemViewHolderType.DISPLAY
-      QuestionnaireItemTypeCode.Value.QUANTITY -> QuestionnaireItemViewHolderType.QUANTITY
+    return when (val type = questionnaireItem.type) {
+      QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP
+      QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
+      QuestionnaireItemType.DATE -> QuestionnaireItemViewHolderType.DATE_PICKER
+      QuestionnaireItemType.DATETIME -> QuestionnaireItemViewHolderType.DATE_TIME_PICKER
+      QuestionnaireItemType.STRING -> QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE
+      QuestionnaireItemType.TEXT -> QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE
+      QuestionnaireItemType.INTEGER -> QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER
+      QuestionnaireItemType.DECIMAL -> QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL
+      QuestionnaireItemType.CHOICE -> getChoiceViewHolderType(questionnaireItem)
+      QuestionnaireItemType.DISPLAY -> QuestionnaireItemViewHolderType.DISPLAY
+      QuestionnaireItemType.QUANTITY -> QuestionnaireItemViewHolderType.QUANTITY
       else -> throw NotImplementedError("Question type $type not supported.")
     }.value
   }
 
   private fun getChoiceViewHolderType(
-    questionnaireItem: Questionnaire.Item
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent
   ): QuestionnaireItemViewHolderType {
     if (questionnaireItem.itemControl == ITEM_CONTROL_DROP_DOWN) {
       return QuestionnaireItemViewHolderType.DROP_DOWN
     } else if (questionnaireItem.itemControl == ITEM_CONTROL_RADIO_BUTTON) {
       return QuestionnaireItemViewHolderType.RADIO_GROUP
-    } else if (questionnaireItem.answerOptionCount >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN
+    } else if (questionnaireItem.answerOption.size >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN
     ) {
       return QuestionnaireItemViewHolderType.DROP_DOWN
     } else {
@@ -127,5 +126,7 @@ internal object DiffCallback : DiffUtil.ItemCallback<QuestionnaireItemViewItem>(
   override fun areContentsTheSame(
     oldItem: QuestionnaireItemViewItem,
     newItem: QuestionnaireItemViewItem
-  ) = oldItem.questionnaireItem == newItem.questionnaireItem
+  ) =
+    oldItem.questionnaireItem.equalsDeep(newItem.questionnaireItem) &&
+      oldItem.questionnaireResponseItem.equalsDeep(newItem.questionnaireResponseItem)
 }

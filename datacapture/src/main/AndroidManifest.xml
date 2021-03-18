@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  Copyright 2020 Google LLC
 
@@ -14,8 +14,9 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="com.google.android.fhir.datacapture">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.google.android.fhir.datacapture"
+>
 
 </manifest>
