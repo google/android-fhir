@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.view.isVisible
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
@@ -46,6 +47,36 @@ class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
       )
     parent = FrameLayout(context)
     viewHolder = QuestionnaireItemSliderViewHolderFactory.create(parent)
+  }
+
+  @Test
+  fun shouldSetPrefixText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply {
+            prefix = com.google.fhir.r4.core.String.newBuilder().setValue("Prefix?").build()
+          }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+  }
+
+  @Test
+  fun shouldNotSetPrefixText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply { prefix = com.google.fhir.r4.core.String.newBuilder().setValue("").build() }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    )
+
+    assertThat(!viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible)
   }
 
   @Test

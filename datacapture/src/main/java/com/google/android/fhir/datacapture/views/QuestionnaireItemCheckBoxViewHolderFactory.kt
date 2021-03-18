@@ -27,13 +27,13 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_check_box_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var prefixTextView: TextView
       private lateinit var checkBox: CheckBox
-      private lateinit var prefix: TextView
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
+        prefixTextView = itemView.findViewById(R.id.prefix)
         checkBox = itemView.findViewById(R.id.check_box)
-        prefix = itemView.findViewById(R.id.prefix)
         checkBox.setOnClickListener {
           // if-else block to prevent over-writing of "items" nested within "answer"
           if (questionnaireItemViewItem.singleAnswerOrNull != null) {
@@ -60,8 +60,10 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
         if (questionnaireItemViewItem.questionnaireItem.prefix.toString().isNotEmpty()) {
-          prefix.visibility = View.VISIBLE
-          prefix.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+          prefixTextView.visibility = View.VISIBLE
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+        } else {
+          prefixTextView.visibility = View.GONE
         }
         checkBox.text = questionnaireItemViewItem.questionnaireItem.text.value
         checkBox.isChecked =

@@ -35,16 +35,16 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_date_time_picker_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var prefixTextView: TextView
       private lateinit var textDateQuestion: TextView
-      private lateinit var prefix: TextView
       private lateinit var dateInputEditText: TextInputEditText
       private lateinit var textTimeQuestion: TextView
       private lateinit var timeInputEditText: TextInputEditText
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
+        prefixTextView = itemView.findViewById(R.id.prefix)
         textDateQuestion = itemView.findViewById(R.id.date_question)
-        prefix = itemView.findViewById(R.id.prefix)
         dateInputEditText = itemView.findViewById(R.id.dateInputEditText)
         // Disable direct text input to only allow input from the date picker dialog
         dateInputEditText.keyListener = null
@@ -130,11 +130,13 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
-        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.text.value
         if (questionnaireItemViewItem.questionnaireItem.prefix.toString().isNotEmpty()) {
-          prefix.visibility = View.VISIBLE
-          prefix.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+          prefixTextView.visibility = View.VISIBLE
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+        } else {
+          prefixTextView.visibility = View.GONE
         }
+        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.text.value
         textTimeQuestion.text = questionnaireItemViewItem.questionnaireItem.text.value
         val dateTime = questionnaireItemViewItem.singleAnswerOrNull?.value?.dateTime
         updateDateTimeInput(

@@ -27,11 +27,13 @@ internal object QuestionnaireItemSliderViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_slider) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var prefixTextView: TextView
       private lateinit var sliderHeader: TextView
       private lateinit var slider: Slider
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
+        prefixTextView = itemView.findViewById(R.id.prefix)
         sliderHeader = itemView.findViewById(R.id.slider_header)
         slider = itemView.findViewById(R.id.slider)
       }
@@ -40,6 +42,12 @@ internal object QuestionnaireItemSliderViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         val answer = questionnaireItemViewItem.singleAnswerOrNull
+        if (questionnaireItemViewItem.questionnaireItem.prefix.toString().isNotEmpty()) {
+          prefixTextView.visibility = View.VISIBLE
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+        } else {
+          prefixTextView.visibility = View.GONE
+        }
         sliderHeader.text = questionnaireItem.text.value
         slider.valueFrom = 0.0F
         slider.valueTo = 100.0F

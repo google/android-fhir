@@ -34,14 +34,14 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private val rawInputType: Int,
   private val isSingleLine: Boolean
 ) : QuestionnaireItemViewHolderDelegate {
+  private lateinit var prefixTextView: TextView
   private lateinit var textQuestion: TextView
-  private lateinit var prefix: TextView
   private lateinit var textInputEditText: TextInputEditText
   private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
   override fun init(itemView: View) {
+    prefixTextView = itemView.findViewById(R.id.prefix)
     textQuestion = itemView.findViewById(R.id.question)
-    prefix = itemView.findViewById(R.id.prefix)
     textInputEditText = itemView.findViewById(R.id.textInputEditText)
     textInputEditText.setRawInputType(rawInputType)
     textInputEditText.isSingleLine = isSingleLine
@@ -53,11 +53,13 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
 
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     this.questionnaireItemViewItem = questionnaireItemViewItem
-    textQuestion.text = questionnaireItemViewItem.questionnaireItem.text.value
     if (questionnaireItemViewItem.questionnaireItem.prefix.toString().isNotEmpty()) {
-      prefix.visibility = View.VISIBLE
-      prefix.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+      prefixTextView.visibility = View.VISIBLE
+      prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+    } else {
+      prefixTextView.visibility = View.GONE
     }
+    textQuestion.text = questionnaireItemViewItem.questionnaireItem.text.value
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
   }
 

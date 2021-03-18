@@ -30,14 +30,14 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_radio_group_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var prefixTextView: TextView
       private lateinit var radioHeader: TextView
-      private lateinit var prefix: TextView
       private lateinit var radioGroup: RadioGroup
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
+        prefixTextView = itemView.findViewById(R.id.prefix)
         radioGroup = itemView.findViewById(R.id.radio_group)
-        prefix = itemView.findViewById(R.id.prefix)
         radioHeader = itemView.findViewById(R.id.radio_header)
       }
 
@@ -48,8 +48,10 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
           questionnaireItemViewItem.questionnaireResponseItemBuilder
         val answer = questionnaireResponseItemBuilder.answerList.singleOrNull()?.value?.coding
         if (questionnaireItemViewItem.questionnaireItem.prefix.toString().isNotEmpty()) {
-          prefix.visibility = View.VISIBLE
-          prefix.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+          prefixTextView.visibility = View.VISIBLE
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+        } else {
+          prefixTextView.visibility = View.GONE
         }
         radioHeader.text = questionnaireItem.text.value
         radioGroup.removeAllViews()

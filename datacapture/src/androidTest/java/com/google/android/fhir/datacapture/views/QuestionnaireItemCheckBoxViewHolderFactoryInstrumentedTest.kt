@@ -18,6 +18,8 @@ package com.google.android.fhir.datacapture.views
 
 import android.widget.CheckBox
 import android.widget.FrameLayout
+import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -33,6 +35,36 @@ import org.junit.runner.RunWith
 class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
   private val parent = FrameLayout(InstrumentationRegistry.getInstrumentation().context)
   private val viewHolder = QuestionnaireItemCheckBoxViewHolderFactory.create(parent)
+
+  @Test
+  fun shouldSetPrefixText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply {
+            prefix = com.google.fhir.r4.core.String.newBuilder().setValue("Prefix?").build()
+          }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+  }
+
+  @Test
+  fun shouldNotSetPrefixText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply { prefix = com.google.fhir.r4.core.String.newBuilder().setValue("").build() }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    )
+
+    assertThat(!viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible)
+  }
 
   @Test
   fun shouldSetCheckBoxText() {
