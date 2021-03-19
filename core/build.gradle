@@ -10,6 +10,10 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // The following argument makes the Android Test Orchestrator run its
+        // "pm clear" command after each test invocation. This command ensures
+        // that the app's state is completely cleared between tests.
+        testInstrumentationRunnerArguments clearPackageData: 'true'
         // need to specify this to prevent junit runner from going deep into our dependencies
         testInstrumentationRunnerArguments = ['package': 'com.google.android.fhir']
         // Required when setting minSdkVersion to 20 or lower
@@ -50,6 +54,9 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+    }
 }
 
 configurations {
@@ -73,6 +80,8 @@ dependencies {
     androidTestImplementation deps.atsl.runner
     androidTestImplementation deps.junit
     androidTestImplementation deps.truth
+
+    androidTestUtil deps.atsl.orchestrator
 
     api deps.cql_engine.core
     api (deps.hapi_r4) {

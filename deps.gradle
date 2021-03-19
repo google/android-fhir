@@ -54,6 +54,7 @@ atsl.core = "androidx.test:core:$versions.atsl_core"
 atsl.espresso = "androidx.test.espresso:espresso-core:$versions.atsl_expresso"
 atsl.ext_junit = "androidx.test.ext:junit:$versions.atsl_junit"
 atsl.ext_junit_ktx = "androidx.test.ext:junit-ktx:$versions.atsl_junit"
+atsl.orchestrator = "androidx.test:orchestrator:$versions.atsl_junit"
 atsl.rules = "androidx.test:rules:$versions.atsl_rules"
 atsl.runner = "androidx.test:runner:$versions.atsl_runner"
 deps.atsl = atsl
