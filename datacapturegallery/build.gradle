@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'androidx.navigation.safeargs.kotlin'
 }
 
 android {
@@ -17,6 +18,10 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         // Required when setting minSdkVersion to 20 or lower
         multiDexEnabled true
+    }
+
+    buildFeatures {
+        viewBinding true
     }
 
     buildTypes {
@@ -53,6 +58,9 @@ dependencies {
     implementation deps.fragment
     implementation deps.kotlin.stdlib
     implementation deps.material
+    implementation deps.navigation.fragment
+    implementation deps.navigation.ui
+
     implementation project(path: ':datacapture')
 
     testImplementation deps.junit
