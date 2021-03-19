@@ -33,14 +33,13 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        textView.text = questionnaireItemViewItem.questionnaireItem.text
-        textView.text = questionnaireItemViewItem.questionnaireItem.text.value
-        if (questionnaireItemViewItem.questionnaireItem.prefix.toString().isNotEmpty()) {
+        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
         } else {
           prefixTextView.visibility = View.GONE
         }
+        textView.text = questionnaireItemViewItem.questionnaireItem.text
         textView.visibility =
           if (textView.text.isEmpty()) {
             View.GONE

@@ -58,10 +58,8 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   fun shouldSetPrefixText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply { prefix = String.newBuilder().setValue("Prefix?").build() }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -73,10 +71,8 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
   fun shouldNotSetPrefixText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply { prefix = String.newBuilder().setValue("").build() }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 

@@ -45,14 +45,13 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
-        textView.text = questionnaireItemViewItem.questionnaireItem.text
-        if (questionnaireItemViewItem.questionnaireItem.prefix.toString().isNotEmpty()) {
+        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
         } else {
           prefixTextView.visibility = View.GONE
         }
-        textView.text = questionnaireItemViewItem.questionnaireItem.text.value
+        textView.text = questionnaireItemViewItem.questionnaireItem.text
         val answerOptionString =
           this.questionnaireItemViewItem.questionnaireItem.answerOption.map { it.displayString }
         val adapter =

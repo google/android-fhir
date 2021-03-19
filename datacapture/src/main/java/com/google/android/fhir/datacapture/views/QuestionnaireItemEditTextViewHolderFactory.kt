@@ -53,14 +53,13 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
 
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     this.questionnaireItemViewItem = questionnaireItemViewItem
-    textQuestion.text = questionnaireItemViewItem.questionnaireItem.text
-    if (questionnaireItemViewItem.questionnaireItem.prefix.toString().isNotEmpty()) {
+    if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
       prefixTextView.visibility = View.VISIBLE
-      prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+      prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
     } else {
       prefixTextView.visibility = View.GONE
     }
-    textQuestion.text = questionnaireItemViewItem.questionnaireItem.text.value
+    textQuestion.text = questionnaireItemViewItem.questionnaireItem.text
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
   }
 

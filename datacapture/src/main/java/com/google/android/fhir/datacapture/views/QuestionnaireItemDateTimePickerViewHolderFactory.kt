@@ -115,18 +115,15 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
-        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.text
-        textTimeQuestion.text = questionnaireItemViewItem.questionnaireItem.text
-        val dateTime = questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType
-        if (questionnaireItemViewItem.questionnaireItem.prefix.toString().isNotEmpty()) {
+        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
         } else {
           prefixTextView.visibility = View.GONE
         }
-        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.text.value
-        textTimeQuestion.text = questionnaireItemViewItem.questionnaireItem.text.value
-        val dateTime = questionnaireItemViewItem.singleAnswerOrNull?.value?.dateTime
+        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.text
+        textTimeQuestion.text = questionnaireItemViewItem.questionnaireItem.text
+        val dateTime = questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType
         updateDateTimeInput(
           dateTime?.let {
             LocalDateTime.of(it.year, it.month + 1, it.day, it.hour, it.minute, it.second)

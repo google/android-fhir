@@ -51,14 +51,13 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
-        checkBox.text = questionnaireItemViewItem.questionnaireItem.text
-        if (questionnaireItemViewItem.questionnaireItem.prefix.toString().isNotEmpty()) {
+        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
         } else {
           prefixTextView.visibility = View.GONE
         }
-        checkBox.text = questionnaireItemViewItem.questionnaireItem.text.value
+        checkBox.text = questionnaireItemViewItem.questionnaireItem.text
         checkBox.isChecked =
           questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value ?: false
       }

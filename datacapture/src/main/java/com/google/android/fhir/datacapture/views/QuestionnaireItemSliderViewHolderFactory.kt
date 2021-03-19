@@ -40,16 +40,15 @@ internal object QuestionnaireItemSliderViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
-        val questionnaireItem = questionnaireItemViewItem.questionnaireItem
-        val answer = questionnaireItemViewItem.singleAnswerOrNull
-        sliderHeader.text = questionnaireItem.text
-        if (questionnaireItemViewItem.questionnaireItem.prefix.toString().isNotEmpty()) {
+        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
         } else {
           prefixTextView.visibility = View.GONE
         }
-        sliderHeader.text = questionnaireItem.text.value
+        val questionnaireItem = questionnaireItemViewItem.questionnaireItem
+        val answer = questionnaireItemViewItem.singleAnswerOrNull
+        sliderHeader.text = questionnaireItem.text
         slider.valueFrom = 0.0F
         slider.valueTo = 100.0F
         slider.stepSize = 10.0F

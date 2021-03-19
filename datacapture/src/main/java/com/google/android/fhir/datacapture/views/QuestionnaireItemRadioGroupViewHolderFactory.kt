@@ -42,20 +42,15 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
-        val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
-        val answer = questionnaireResponseItem.answer.singleOrNull()?.valueCoding
-        radioHeader.text = questionnaireItem.text
-        val questionnaireItem = questionnaireItemViewItem.questionnaireItem
-        val questionnaireResponseItemBuilder =
-          questionnaireItemViewItem.questionnaireResponseItemBuilder
-        val answer = questionnaireResponseItemBuilder.answerList.singleOrNull()?.value?.coding
-        if (questionnaireItemViewItem.questionnaireItem.prefix.toString().isNotEmpty()) {
+        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix.value
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
         } else {
           prefixTextView.visibility = View.GONE
         }
-        radioHeader.text = questionnaireItem.text.value
+        val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
+        val answer = questionnaireResponseItem.answer.singleOrNull()?.valueCoding
+        radioHeader.text = questionnaireItem.text
         radioGroup.removeAllViews()
         var index = 0
         questionnaireItem.answerOption.forEach {

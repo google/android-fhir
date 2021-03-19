@@ -40,12 +40,8 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
   fun shouldSetPrefixText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            prefix = com.google.fhir.r4.core.String.newBuilder().setValue("Prefix?").build()
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -56,10 +52,8 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
   fun shouldNotSetPrefixText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply { prefix = com.google.fhir.r4.core.String.newBuilder().setValue("").build() }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
