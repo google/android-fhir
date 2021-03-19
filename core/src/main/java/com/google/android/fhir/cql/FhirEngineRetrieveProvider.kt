@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.cqlreference.cql
+package com.google.android.fhir.cql
 
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.resource.getResourceClass

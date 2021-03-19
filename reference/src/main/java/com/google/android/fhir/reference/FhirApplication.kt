@@ -16,10 +16,10 @@
 
 package com.google.android.fhir.reference
 
+import android.app.Application
 import android.content.Context
 import androidx.work.Constraints
 import ca.uhn.fhir.context.FhirContext
-import com.google.android.fhir.CoreApplication
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineBuilder
 import com.google.android.fhir.FhirPeriodicSyncWorker
@@ -33,12 +33,12 @@ import com.google.android.fhir.sync.SyncData
 import java.util.concurrent.TimeUnit
 import org.hl7.fhir.r4.model.ResourceType
 
-class FhirApplication : CoreApplication() {
+class FhirApplication : Application() {
 
   // only initiate the FhirEngine when used for the first time, not when the app is created
-  override val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
+  private val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
 
-  override fun constructFhirEngine(): FhirEngine {
+  private fun constructFhirEngine(): FhirEngine {
     val parser = FhirContext.forR4().newJsonParser()
     val service = create(parser)
     val params = mutableMapOf("address-city" to "NAIROBI")

@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.cqlreference
 
+import android.app.Application
 import android.content.Context
 import androidx.work.Constraints
 import ca.uhn.fhir.context.FhirContext
@@ -34,11 +35,11 @@ import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 import org.hl7.fhir.r4.model.ResourceType
 
-class FhirApplication : CoreApplication() {
+class FhirApplication : Application() {
 
-  override val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
+  val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
 
-  override fun constructFhirEngine(): FhirEngine {
+  fun constructFhirEngine(): FhirEngine {
     val parser = FhirContext.forR4().newJsonParser()
     val service = create(parser)
     val params = mutableMapOf("address-city" to "NAIROBI")

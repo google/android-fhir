@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir
+package com.google.android.fhir.cql
 
-import android.app.Application
-import android.content.Context
+import org.opencds.cqf.cql.runtime.Code
+import org.opencds.cqf.cql.terminology.CodeSystemInfo
+import org.opencds.cqf.cql.terminology.TerminologyProvider
+import org.opencds.cqf.cql.terminology.ValueSetInfo
 
-abstract class CoreApplication : Application() {
-  abstract val fhirEngine: FhirEngine
-  abstract fun constructFhirEngine(): FhirEngine
+/** Fhir Engine's implementation of [TerminologyProvider]. */
+internal class FhirEngineTerminologyProvider : TerminologyProvider {
+  override fun `in`(code: Code, valueSet: ValueSetInfo): Boolean = false
 
-  companion object {
-    fun fhirEngine(context: Context) = (context.applicationContext as CoreApplication).fhirEngine
-  }
+  override fun expand(valueSet: ValueSetInfo): Iterable<Code>? = null
+
+  override fun lookup(code: Code, codeSystem: CodeSystemInfo): Code? = null
 }

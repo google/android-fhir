@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.cqlreference.cql
+package com.google.android.fhir.cql
 
 import android.content.Context
 import ca.uhn.fhir.context.FhirContext

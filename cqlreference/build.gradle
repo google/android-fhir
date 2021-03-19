@@ -57,7 +57,9 @@ configurations {
 dependencies {
 
     coreLibraryDesugaring deps.desugar
-
+    api(deps.hapi_r4) {
+        exclude module: 'junit'
+    }
     implementation deps.kotlin.stdlib
     implementation deps.core
     implementation deps.appcompat
@@ -68,7 +70,6 @@ dependencies {
     testImplementation deps.junit
     testImplementation deps.atsl.core
     implementation deps.constraint_layout
-    implementation project(path: ':core')
     implementation deps.work.runtime
     testImplementation deps.junit
 
