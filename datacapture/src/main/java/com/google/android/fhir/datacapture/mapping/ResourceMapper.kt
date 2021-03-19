@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.datacapture.mapping
 import com.google.android.fhir.datacapture.getValueForType
-import java.util.*
+import java.util.Locale
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateTimeType
