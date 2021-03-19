@@ -46,7 +46,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       questionnaireResponse =
         FhirContext.forR4().newJsonParser().parseResource(questionnaireJsonResponseString) as
           QuestionnaireResponse
-      validateQuestionniareResponseItems(questionnaire.item, questionnaireResponse.item)
+      validateQuestionnaireResponseItems(questionnaire.item, questionnaireResponse.item)
     } else {
       questionnaireResponse =
         QuestionnaireResponse().apply {
@@ -167,7 +167,7 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
  * response item are equal. The traverse is carried out in the two lists in tandem. The two lists
  * should be structurally identical.
  */
-private fun validateQuestionniareResponseItems(
+private fun validateQuestionnaireResponseItems(
   questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
   questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
 ) {
@@ -185,9 +185,9 @@ private fun validateQuestionniareResponseItems(
           "questionnaire response item ${questionnaireResponseItem.linkId}"
       )
     if (questionnaireItem.type.equals(Questionnaire.QuestionnaireItemType.GROUP)) {
-      validateQuestionniareResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
+      validateQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
     } else {
-      validateQuestionniareResponseItems(
+      validateQuestionnaireResponseItems(
         questionnaireItem.item,
         questionnaireResponseItem.answer.first().item
       )
