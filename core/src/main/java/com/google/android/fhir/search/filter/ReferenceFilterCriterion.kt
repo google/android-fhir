@@ -21,17 +21,17 @@ import com.google.android.fhir.search.impl.ResourceIdQuery
 import org.hl7.fhir.r4.model.Resource
 
 /** [FilterCriterion] on a reference value. */
-class ReferenceFilterCriterion constructor(
-    val param: ReferenceClientParam,
-    val value: String
-) : FilterCriterion {
-    override fun <R : Resource> query(clazz: Class<R>): ResourceIdQuery {
-        // TODO: implement different queries for different operators.
-        return ResourceIdQuery("""
+class ReferenceFilterCriterion constructor(val param: ReferenceClientParam, val value: String) :
+  FilterCriterion {
+  override fun <R : Resource> query(clazz: Class<R>): ResourceIdQuery {
+    // TODO: implement different queries for different operators.
+    return ResourceIdQuery(
+      """
             SELECT resourceId FROM ReferenceIndexEntity
             WHERE resourceType = ? AND index_name = ? AND index_value = ?""".trimIndent(),
-            listOf(clazz.simpleName, param.paramName, value))
-    }
+      listOf(clazz.simpleName, param.paramName, value)
+    )
+  }
 }
 
 fun reference(param: ReferenceClientParam, value: String) = ReferenceFilterCriterion(param, value)

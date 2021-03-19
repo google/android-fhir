@@ -17,8 +17,5 @@
 package com.google.android.fhir
 
 /** Thrown to indicate that the resource already exists. */
-class ResourceAlreadyExistsException(
-    val type: String,
-    val id: String,
-    cause: Throwable
-) : Exception("Resource with type $type and id $id already exists!", cause)
+class ResourceAlreadyExistsException(val type: String, val id: String, cause: Throwable) :
+  Exception("Resource with type $type and id $id already exists!", cause)

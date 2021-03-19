@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  Copyright 2020 Google LLC
 
@@ -14,11 +14,10 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.recyclerview.widget.RecyclerView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
     android:id="@+id/observation_list"
     android:name="com.google.fhirengine.example.ObservationListFragment"
     android:layout_width="match_parent"
@@ -27,4 +26,5 @@
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context=".PatientListActivity"
-    tools:listitem="@layout/observation_list_item" />
+    tools:listitem="@layout/observation_list_item"
+/>

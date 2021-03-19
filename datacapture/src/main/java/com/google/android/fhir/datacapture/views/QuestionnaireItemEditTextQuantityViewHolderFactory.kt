@@ -17,37 +17,33 @@
 package com.google.android.fhir.datacapture.views
 
 import android.text.InputType
-import com.google.fhir.r4.core.Decimal
-import com.google.fhir.r4.core.Quantity
-import com.google.fhir.r4.core.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /**
- * Inherits from QuestionnaireItemEditTextViewHolderFactory as only the numeric part of the quantity is being handled right now.
- * Will use a separate layout to handle the unit in the quantity.
+ * Inherits from QuestionnaireItemEditTextViewHolderFactory as only the numeric part of the quantity
+ * is being handled right now. Will use a separate layout to handle the unit in the quantity.
  */
 internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
-    QuestionnaireItemEditTextViewHolderFactory() {
-    override fun getQuestionnaireItemViewHolderDelegate() =
-        object : QuestionnaireItemEditTextViewHolderDelegate(
-            InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
-            isSingleLine = true
-        ) {
-            override fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder? {
-                return text.toDoubleOrNull()?.let {
-                    QuestionnaireResponse.Item.Answer.newBuilder()
-                        .apply {
-                            value = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                                .setQuantity(
-                                    Quantity.newBuilder().setValue(
-                                        Decimal.newBuilder().setValue(it.toString()).build()
-                                    )
-                                ).build()
-                        }
-                }
-            }
-
-            override fun getText(answer: QuestionnaireResponse.Item.Answer.Builder?): String {
-                return answer?.value?.quantity?.value?.value ?: ""
-            }
+  QuestionnaireItemEditTextViewHolderFactory() {
+  override fun getQuestionnaireItemViewHolderDelegate() =
+    object :
+      QuestionnaireItemEditTextViewHolderDelegate(
+        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
+        isSingleLine = true
+      ) {
+      override fun getValue(
+        text: String
+      ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
+        return text.toDoubleOrNull()?.let {
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(Quantity(it))
         }
+      }
+
+      override fun getText(
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
+      ): String {
+        return answer?.valueQuantity?.value?.toString() ?: ""
+      }
+    }
 }

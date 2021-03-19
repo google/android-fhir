@@ -27,42 +27,47 @@ import org.opencds.cqf.cql.execution.LibraryLoader
  * FHIR Engine's implementation of [LibraryLoader] that loads a CQL/ELM library for the [ ] to use.
  */
 internal class FhirEngineLibraryLoader(private val database: Database) : LibraryLoader {
-    /** Cached libraries.  */
-    private val _libraryMap = mutableMapOf<String, Library>()
-    val libraryMap: Map<String, Library>
-        get() = _libraryMap
+  /** Cached libraries. */
+  private val _libraryMap = mutableMapOf<String, Library>()
+  val libraryMap: Map<String, Library>
+    get() = _libraryMap
 
-    override fun load(libraryIdentifier: VersionedIdentifier): Library {
-        val matchedLibrary = libraryMap
-            .asSequence()
-            .filter {
-                // TODO: Change this to an exact match once the libraries are correctly indexed by name
-                it.key.contains(libraryIdentifier.id)
-            }
-            .map { it.value }
-            .firstOrNull()
-        if (matchedLibrary != null) return matchedLibrary
-        val fhirLibrary = database.searchByString(
-            org.hl7.fhir.r4.model.Library::class.java,
-            LIBRARY_NAME_INDEX,
-            libraryIdentifier.id
-        )
-        // TODO: remove the assumption that there will be only one FHIR library resource which has one
-        //  content element.
-        val stringReader = String(fhirLibrary.first().content.first().data).reader()
-        return try {
-            val cqlLibrary = JsonCqlLibraryReader.read(stringReader)
-            _libraryMap[libraryIdentifier.id] = cqlLibrary
-            cqlLibrary
-        } catch (e: IOException) {
-            // TODO: Replace this with a logger call
-            e.printStackTrace()
-            throw RuntimeException(e)
+  override fun load(libraryIdentifier: VersionedIdentifier): Library {
+    val matchedLibrary =
+      libraryMap
+        .asSequence()
+        .filter {
+          // TODO: Change this to an exact match once the libraries are correctly indexed
+          // by
+          // name
+          it.key.contains(libraryIdentifier.id)
         }
+        .map { it.value }
+        .firstOrNull()
+    if (matchedLibrary != null) return matchedLibrary
+    val fhirLibrary =
+      database.searchByString(
+        org.hl7.fhir.r4.model.Library::class.java,
+        LIBRARY_NAME_INDEX,
+        libraryIdentifier.id
+      )
+    // TODO: remove the assumption that there will be only one FHIR library resource which has
+    // one
+    //  content element.
+    val stringReader = String(fhirLibrary.first().content.first().data).reader()
+    return try {
+      val cqlLibrary = JsonCqlLibraryReader.read(stringReader)
+      _libraryMap[libraryIdentifier.id] = cqlLibrary
+      cqlLibrary
+    } catch (e: IOException) {
+      // TODO: Replace this with a logger call
+      e.printStackTrace()
+      throw RuntimeException(e)
     }
+  }
 
-    companion object {
-        /** The index for library name.  */
-        private const val LIBRARY_NAME_INDEX = "Library.name"
-    }
+  companion object {
+    /** The index for library name. */
+    private const val LIBRARY_NAME_INDEX = "Library.name"
+  }
 }

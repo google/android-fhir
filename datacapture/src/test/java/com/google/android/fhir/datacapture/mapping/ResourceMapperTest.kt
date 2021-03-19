@@ -17,14 +17,12 @@
 package com.google.android.fhir.datacapture.mapping
 
 import android.os.Build
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.parser.IParser
 import com.google.common.truth.Truth.assertThat
-import com.google.fhir.common.JsonFormat
-import com.google.fhir.r4.core.Date
-import com.google.fhir.r4.core.Patient
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireResponse
-import java.time.LocalDate
-import java.time.ZoneId
+import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -33,10 +31,11 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class ResourceMapperTest {
-    @Test
-    fun extract() {
-        // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
-        val questionnaireJson = """
+  @Test
+  fun extract() {
+    // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
+    val questionnaireJson =
+      """
             {
               "resourceType": "Questionnaire",
               "subjectType": [
@@ -72,10 +71,10 @@ class ResourceMapperTest {
               ]
             }
         """.trimIndent()
-        val questionnaireBuilder = Questionnaire.newBuilder()
-        JsonFormat.getParser().merge(questionnaireJson, questionnaireBuilder)
+    val questionnaire = parser.parseResource(questionnaireJson) as Questionnaire
 
-        val questionnaireResponseJson = """
+    val questionnaireResponseJson =
+      """
             {
               "resourceType": "QuestionnaireResponse",
               "item": [
@@ -103,24 +102,19 @@ class ResourceMapperTest {
               ]
             }
         """.trimIndent()
-        val questionnaireResponseBuilder = QuestionnaireResponse.newBuilder()
-        JsonFormat.getParser().merge(questionnaireResponseJson, questionnaireResponseBuilder)
+    val questionnaireResponse =
+      parser.parseResource(questionnaireResponseJson) as QuestionnaireResponse
 
-        val patient = ResourceMapper.extract(
-            questionnaireBuilder.build(),
-            questionnaireResponseBuilder.build()
-        ) as Patient
+    val patient = ResourceMapper.extract(questionnaire, questionnaireResponse) as Patient
 
-        assertThat(patient.birthDate).isEqualTo(
-            Date.newBuilder()
-                .setValueUs(
-                    LocalDate.of(2021, 1, 1)
-                        .atStartOfDay(ZoneId.systemDefault())
-                        .toEpochSecond() * 1000000)
-                .setTimezone(ZoneId.systemDefault().id)
-                .setPrecision(Date.Precision.DAY)
-                .build()
-        )
-        assertThat(patient.active.value).isTrue()
-    }
+    val birthDate = patient.birthDateElement
+    assertThat(birthDate.year).isEqualTo(2021)
+    assertThat(birthDate.month).isEqualTo(0)
+    assertThat(birthDate.day).isEqualTo(1)
+    assertThat(patient.active).isTrue()
+  }
+
+  companion object {
+    val parser: IParser = FhirContext.forR4().newJsonParser()
+  }
 }

@@ -19,13 +19,12 @@ package com.google.android.fhir.datacapture.views
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.material.slider.Slider
 import com.google.common.truth.Truth.assertThat
-import java.util.Date
-import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
@@ -33,7 +32,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
+class QuestionnaireItemSliderViewHolderFactoryInstrumentedTest {
   private lateinit var context: ContextThemeWrapper
   private lateinit var parent: FrameLayout
   private lateinit var viewHolder: QuestionnaireItemViewHolder
@@ -46,12 +45,11 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
         R.style.Theme_MaterialComponents
       )
     parent = FrameLayout(context)
-    assertThat(parent).isNotNull()
-    viewHolder = QuestionnaireItemDateTimePickerViewHolderFactory.create(parent)
+    viewHolder = QuestionnaireItemSliderViewHolderFactory.create(parent)
   }
 
   @Test
-  fun shouldSetTextInputLayoutHint() {
+  fun shouldSetHeaderTextViewText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
@@ -59,45 +57,64 @@ class QuestionnaireItemDateTimePickerViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.date_question).text)
-      .isEqualTo("Question?")
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.time_question).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.slider_header).text)
       .isEqualTo("Question?")
   }
 
   @Test
-  @UiThreadTest
-  fun shouldSetEmptyDateTimeInput() {
+  fun shouldSetSliderValue() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.dateInputEditText).text.toString())
-      .isEqualTo("")
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.timeInputEditText).text.toString())
-      .isEqualTo("")
-  }
-
-  @Test
-  @UiThreadTest
-  fun shouldSetDateTimeInput() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-          .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateTimeType(Date(2020 - 1900, 1, 5, 1, 30, 0)))
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = IntegerType(10)
+            }
           )
+        }
       ) {}
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.dateInputEditText).text.toString())
-      .isEqualTo("2020-02-05")
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.timeInputEditText).text.toString())
-      .isEqualTo("01:30:00")
+    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(10)
+  }
+
+  @Test
+  fun shouldSetQuestionnaireResponseSliderAnswer() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+
+    viewHolder.bind(questionnaireItemViewItem)
+    viewHolder.itemView.findViewById<Slider>(R.id.slider).value = 10.0F
+
+    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
+    assertThat(answer.size).isEqualTo(1)
+    assertThat(answer[0].valueIntegerType.value).isEqualTo(10)
+  }
+
+  @Test
+  fun shouldSetSliderValueToDefault() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = IntegerType(10)
+            }
+          )
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = IntegerType(10)
+            }
+          )
+        }
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(0.0F)
   }
 }

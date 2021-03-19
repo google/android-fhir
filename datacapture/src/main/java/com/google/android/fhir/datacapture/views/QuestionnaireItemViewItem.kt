@@ -17,14 +17,15 @@
 package com.google.android.fhir.datacapture.views
 
 import androidx.recyclerview.widget.RecyclerView
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /**
- * Item for [QuestionnaireItemViewHolder] in [RecyclerView] containing [Questionnaire.Item] (the
- * question) and [QuestionnaireResponse.Item] (the answer).
+ * Item for [QuestionnaireItemViewHolder] in [RecyclerView] containing
+ * [Questionnaire.Item](the
+ * question) and [QuestionnaireResponse.Item](the answer).
  *
- * [Questionnaire.Item] (the question) and [QuestionnaireResponse.Item] (the answer) are used to
+ * [Questionnaire.Item](the question) and [QuestionnaireResponse.Item](the answer) are used to
  * create the right type of view (e.g. a CheckBox for a yes/no question) and populate the view with
  * the right information (e.g text for the CheckBox and initial yes/no answer for the CheckBox).
  *
@@ -33,20 +34,18 @@ import com.google.fhir.r4.core.QuestionnaireResponse
  * updated
  */
 internal data class QuestionnaireItemViewItem(
-    val questionnaireItem: Questionnaire.Item,
-    val questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder,
-    val questionnaireResponseItemChangedCallback: () -> Unit
+  val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+  val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  val questionnaireResponseItemChangedCallback: () -> Unit
 ) {
-    /**
-     * The single answer to the [QuestionnaireResponse.Item], or `null` if there is none or more
-     * than one answer.
-     */
-    var singleAnswerOrNull
-        get() = questionnaireResponseItemBuilder.answerBuilderList.singleOrNull()
-        set(value) {
-            questionnaireResponseItemBuilder.clearAnswer()
-            value?.let {
-                questionnaireResponseItemBuilder.addAnswer(it)
-            }
-        }
+  /**
+   * The single answer to the [QuestionnaireResponse.Item], or `null` if there is none or more than
+   * one answer.
+   */
+  var singleAnswerOrNull
+    get() = questionnaireResponseItem.answer.singleOrNull()
+    set(value) {
+      questionnaireResponseItem.answer.clear()
+      value?.let { questionnaireResponseItem.addAnswer(it) }
+    }
 }

@@ -17,11 +17,5 @@
 package com.google.android.fhir.db
 
 /** Exception thrown to indicate that the resource already exists in the database. */
-class ResourceAlreadyExistsInDbException(
-    val type: String,
-    val id: String,
-    cause: Throwable
-) : Exception(
-    "Resource with type $type and id $id already exists!",
-    cause
-)
+class ResourceAlreadyExistsInDbException(val type: String, val id: String, cause: Throwable) :
+  Exception("Resource with type $type and id $id already exists!", cause)

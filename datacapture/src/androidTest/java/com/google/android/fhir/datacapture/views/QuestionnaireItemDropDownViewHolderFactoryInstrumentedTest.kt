@@ -25,213 +25,170 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
-import com.google.android.fhir.datacapture.responseAnswerValueX
 import com.google.common.truth.Truth.assertThat
-import com.google.fhir.r4.core.Code
-import com.google.fhir.r4.core.Coding
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireResponse
-import com.google.fhir.r4.core.String
 import kotlin.test.assertFailsWith
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
-    private lateinit var context: ContextThemeWrapper
-    private lateinit var parent: FrameLayout
-    private lateinit var viewHolder: QuestionnaireItemViewHolder
+  private lateinit var context: ContextThemeWrapper
+  private lateinit var parent: FrameLayout
+  private lateinit var viewHolder: QuestionnaireItemViewHolder
 
-    @Before
-    fun setUp() {
-        context = ContextThemeWrapper(
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            R.style.Theme_MaterialComponents
-        )
-        parent = FrameLayout(context)
-        viewHolder = QuestionnaireItemDropDownViewHolderFactory.create(parent)
-    }
+  @Before
+  fun setUp() {
+    context =
+      ContextThemeWrapper(
+        InstrumentationRegistry.getInstrumentation().targetContext,
+        R.style.Theme_MaterialComponents
+      )
+    parent = FrameLayout(context)
+    viewHolder = QuestionnaireItemDropDownViewHolderFactory.create(parent)
+  }
 
-    @Test
-    @UiThreadTest
-    fun shouldSetTextInputHint() {
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    text = String.newBuilder().setValue("Question?").build()
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder()
-            ) {}
-        )
+  @Test
+  @UiThreadTest
+  fun shouldSetTextInputHint() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
 
-        assertThat(
-            viewHolder.itemView.findViewById<TextView>(R.id.dropdown_question_title).text
-        ).isEqualTo("Question?")
-    }
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.dropdown_question_title).text)
+      .isEqualTo("Question?")
+  }
 
-    @Test
-    @UiThreadTest
-    fun shouldPopulateDropDown() {
-        val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
-            .setValue(
-                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                    .setCoding(
-                        Coding.newBuilder()
-                            .setCode(
-                                Code.newBuilder()
-                                    .setValue("test-code")
-                            )
-                            .setDisplay(
-                                String.newBuilder().setValue("Test Code"))
-                    )
-            ).build()
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    addAnswerOption(answerOption)
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder()
-            ) {}
-        )
+  @Test
+  @UiThreadTest
+  fun shouldPopulateDropDown() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value = Coding().setCode("test-code").setDisplay("Test Code")
+      }
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
 
-        assertThat(viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
-            .adapter
-            .getItem(0)
-            .toString()
-        ).isEqualTo("Test Code")
-    }
+    assertThat(
+        viewHolder
+          .itemView
+          .findViewById<AutoCompleteTextView>(R.id.auto_complete)
+          .adapter
+          .getItem(0)
+          .toString()
+      )
+      .isEqualTo("Test Code")
+  }
 
-    @Test
-    @UiThreadTest
-    fun shouldSetDropDownOptionToCodeIfValueCodingDisplayEmpty() {
-        val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
-            .setValue(
-                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                    .setCoding(
-                        Coding.newBuilder()
-                            .setCode(
-                                Code.newBuilder()
-                                    .setValue("test-code")
-                            )
-                    )
-            ).build()
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    addAnswerOption(answerOption)
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder()
-            ) {}
-        )
+  @Test
+  @UiThreadTest
+  fun shouldSetDropDownOptionToCodeIfValueCodingDisplayEmpty() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value = Coding().apply { setCode("test-code") }
+      }
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
 
-        assertThat(
-            viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
-            .adapter
-            .getItem(0)
-            .toString()
-        ).isEqualTo("test-code")
-    }
+    assertThat(
+        viewHolder
+          .itemView
+          .findViewById<AutoCompleteTextView>(R.id.auto_complete)
+          .adapter
+          .getItem(0)
+          .toString()
+      )
+      .isEqualTo("test-code")
+  }
 
-    @Test
-    @UiThreadTest
-    fun shouldSetAutoTextViewEmptyIfAnswerNull() {
-        val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
-            .setValue(
-                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                    .setCoding(
-                        Coding.newBuilder()
-                            .setCode(
-                                Code.newBuilder()
-                                    .setValue("test-code")
-                            )
-                            .setDisplay(
-                                String.newBuilder().setValue("Test Code"))
-                    )
-            ).build()
+  @Test
+  @UiThreadTest
+  fun shouldSetAutoTextViewEmptyIfAnswerNull() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value =
+          Coding().apply {
+            code = "test-code"
+            display = "Test Code"
+          }
+      }
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
 
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    addAnswerOption(answerOption)
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder()
-            ) {}
-        )
+    assertThat(
+        viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).text.toString()
+      )
+      .isEqualTo("")
+  }
 
-        assertThat(
-            viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
-                .text
-                .toString()
-        ).isEqualTo("")
-    }
-
-    @Test
-    @UiThreadTest
-    fun shouldAutoCompleteTextViewToDisplayIfAnswerNotNull() {
-        val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
-            .setValue(
-                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                    .setCoding(
-                        Coding.newBuilder()
-                            .setCode(
-                                Code.newBuilder()
-                                    .setValue("test-code")
-                            )
-                            .setDisplay(
-                                String.newBuilder().setValue("Test Code"))
-                    )
-            ).build()
-
-        viewHolder.bind(
-            QuestionnaireItemViewItem(
-                Questionnaire.Item.newBuilder().apply {
-                    addAnswerOption(answerOption)
-                }.build(),
-                QuestionnaireResponse.Item.newBuilder().addAnswer(
-                    QuestionnaireResponse.Item.Answer.newBuilder()
-                        .setValue(
-                            answerOption.responseAnswerValueX
-                        )
-
-                )
-            ) {}
-        )
-
-        assertThat(
-            viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
-                .text
-                .toString()
-        ).isEqualTo(answerOption.displayString)
-    }
-
-    @Test
-    @UiThreadTest
-    fun shouldThrowErrorForAnswerOptionWithoutCoding() {
-        val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
-            .setValue(
-                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                    .setStringValue(
-                        String.newBuilder()
-                            .setValue("test")
-                    )
-            ).build()
-
-        assertFailsWith<IllegalArgumentException> {
-            viewHolder.bind(
-                QuestionnaireItemViewItem(
-                    Questionnaire.Item.newBuilder().apply {
-                        addAnswerOption(answerOption)
-                    }.build(),
-                    QuestionnaireResponse.Item.newBuilder().addAnswer(
-                        QuestionnaireResponse.Item.Answer.newBuilder()
-                            .setValue(
-                                answerOption.responseAnswerValueX
-                            )
-
-                    )
-                ) {}
-            )
+  @Test
+  @UiThreadTest
+  fun shouldAutoCompleteTextViewToDisplayIfAnswerNotNull() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value =
+          Coding().apply {
+            code = "test-code"
+            display = "Test Code"
+          }
+      }
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = answerOption.value
+            }
+          )
         }
+      ) {}
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).text.toString()
+      )
+      .isEqualTo(answerOption.displayString)
+  }
+
+  @Test
+  @UiThreadTest
+  fun shouldThrowErrorForAnswerOptionWithoutCoding() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply { value = StringType("test") }
+
+    assertFailsWith<IllegalArgumentException> {
+      viewHolder.bind(
+        QuestionnaireItemViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = answerOption.value
+              }
+            )
+          }
+        ) {}
+      )
     }
+  }
 }

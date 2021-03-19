@@ -20,8 +20,8 @@ import org.hl7.fhir.exceptions.FHIRException
 
 /** Needed for HAPI's FHIRPathEngine. See https://github.com/hapifhir/hapi-fhir/issues/2443. */
 class UcumException : FHIRException {
-    constructor() {}
-    constructor(message: String?, cause: Throwable?) : super(message, cause) {}
-    constructor(message: String?) : super(message) {}
-    constructor(cause: Throwable?) : super(cause) {}
+  constructor() {}
+  constructor(message: String?, cause: Throwable?) : super(message, cause) {}
+  constructor(message: String?) : super(message) {}
+  constructor(cause: Throwable?) : super(cause) {}
 }

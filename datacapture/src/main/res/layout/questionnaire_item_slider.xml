@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
- Copyright 2020 Google LLC
+ Copyright 2021 Google LLC
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -24,26 +24,14 @@
 >
 
     <TextView
-        android:id="@+id/question"
-        android:layout_width="match_parent"
+        android:id="@+id/slider_header"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
     />
 
-    <com.google.android.material.textfield.TextInputLayout
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/textInputLayout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    <com.google.android.material.slider.Slider
+        android:id="@+id/slider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:startIconDrawable="@drawable/gm_calendar_today_24"
-    >
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/textInputEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="none"
-        />
-
-    </com.google.android.material.textfield.TextInputLayout>
+    />
 </LinearLayout>

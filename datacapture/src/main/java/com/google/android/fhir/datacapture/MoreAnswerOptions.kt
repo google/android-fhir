@@ -16,30 +16,18 @@
 
 package com.google.android.fhir.datacapture
 
-import com.google.fhir.r4.core.Questionnaire.Item.AnswerOption
-import com.google.fhir.r4.core.QuestionnaireResponse.Item.Answer
+import org.hl7.fhir.r4.model.Questionnaire
 
-val AnswerOption.displayString: String
-    get() {
-        if (this.value.hasCoding()) {
-            val display = this.value.coding.display.value
-            return if (display.isEmpty()) {
-                this.value.coding.code.value
-            } else {
-                display
-            }
-        } else {
-            throw IllegalArgumentException("Answer option does not having coding.")
-        }
+val Questionnaire.QuestionnaireItemAnswerOptionComponent.displayString: String
+  get() {
+    if (hasValueCoding()) {
+      val display = valueCoding.display
+      return if (display.isNullOrEmpty()) {
+        valueCoding.code
+      } else {
+        display
+      }
+    } else {
+      throw IllegalArgumentException("Answer option does not having coding.")
     }
-
-val AnswerOption.responseAnswerValueX: Answer.ValueX
-    get() {
-        if (this.value.hasCoding()) {
-            return Answer.ValueX.newBuilder()
-                .setCoding(this.value.coding)
-                .build()
-        } else {
-            throw IllegalArgumentException("Answer option does not having coding.")
-        }
-    }
+  }

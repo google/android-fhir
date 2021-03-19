@@ -28,18 +28,18 @@ import androidx.recyclerview.widget.RecyclerView
  * @param resId the layout resource for the view
  */
 internal abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId: Int) {
-    internal fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
-        return QuestionnaireItemViewHolder(
-            LayoutInflater.from(parent.context).inflate(resId, parent, false),
-            getQuestionnaireItemViewHolderDelegate()
-        )
-    }
+  internal fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
+    return QuestionnaireItemViewHolder(
+      LayoutInflater.from(parent.context).inflate(resId, parent, false),
+      getQuestionnaireItemViewHolderDelegate()
+    )
+  }
 
-    /**
-     * Returns a [QuestionnaireItemViewHolderDelegate] that handles the initialization of views and
-     * binding of items in [RecyclerView].
-     */
-    abstract fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate
+  /**
+   * Returns a [QuestionnaireItemViewHolderDelegate] that handles the initialization of views and
+   * binding of items in [RecyclerView].
+   */
+  abstract fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate
 }
 
 /**
@@ -48,16 +48,16 @@ internal abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId:
  * This is used by [QuestionnaireItemAdapter] to initialize views and bind items in [RecyclerView].
  */
 internal class QuestionnaireItemViewHolder(
-    itemView: View,
-    private val delegate: QuestionnaireItemViewHolderDelegate
+  itemView: View,
+  private val delegate: QuestionnaireItemViewHolderDelegate
 ) : RecyclerView.ViewHolder(itemView) {
-    init {
-        delegate.init(itemView)
-    }
+  init {
+    delegate.init(itemView)
+  }
 
-    fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-        delegate.bind(questionnaireItemViewItem)
-    }
+  fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+    delegate.bind(questionnaireItemViewItem)
+  }
 }
 
 /**
@@ -66,18 +66,17 @@ internal class QuestionnaireItemViewHolder(
  * This interface provides an abstraction of the operations that need to be implemented for a type
  * of view in the questionnaire.
  *
- * There is a 1:1 relationship between this and
- * [QuestionnaireItemViewHolder]. In other words, there is a unique
- * [QuestionnaireItemViewHolderDelegate] for each [QuestionnaireItemViewHolder]. This is critical
- * for the correctness of the recycler view.
+ * There is a 1:1 relationship between this and [QuestionnaireItemViewHolder]. In other words, there
+ * is a unique [QuestionnaireItemViewHolderDelegate] for each [QuestionnaireItemViewHolder]. This is
+ * critical for the correctness of the recycler view.
  */
 internal interface QuestionnaireItemViewHolderDelegate {
-    /**
-     * Initializes the view in [QuestionnaireItemViewHolder]. Any listeners to record user input
-     * should be set in this function.
-     */
-    fun init(itemView: View)
+  /**
+   * Initializes the view in [QuestionnaireItemViewHolder]. Any listeners to record user input
+   * should be set in this function.
+   */
+  fun init(itemView: View)
 
-    /** Binds a [QuestionnaireItemViewItem] to the view. */
-    fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem)
+  /** Binds a [QuestionnaireItemViewItem] to the view. */
+  fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem)
 }

@@ -24,12 +24,17 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: 'com.diffplug.gradle.spotless'
+    apply plugin: 'com.diffplug.spotless'
     spotless {
         kotlin {
             target '**/*.kt'
-            ktlint()userData(['max_line_length': '100'])
+            ktlint().userData(['indent_size': '2', 'continuation_indent_size': '2'])
+            ktfmt().googleStyle()
             licenseHeaderFile "${project.rootProject.projectDir}/license-header.txt"
+        }
+        format 'xml', {
+            target '**/*.xml'
+            prettier(['prettier': '2.0.5', '@prettier/plugin-xml': '0.13.0']).config(['parser': 'xml', 'tabWidth': 4])
         }
     }
 }
@@ -54,5 +59,4 @@ afterEvaluate {
             }
         }
     }
-
 }

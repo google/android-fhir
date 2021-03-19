@@ -16,10 +16,8 @@
 
 package com.google.android.fhir.sync
 
-/**
- * Defines different types of synchronisation workers: download and upload
- */
+/** Defines different types of synchronisation workers: download and upload */
 internal enum class SyncWorkType(val workerName: String) {
-    DOWNLOAD("download"),
-    UPLOAD("upload")
+  DOWNLOAD("download"),
+  UPLOAD("upload")
 }

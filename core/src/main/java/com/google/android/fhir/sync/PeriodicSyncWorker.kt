@@ -22,22 +22,18 @@ import androidx.work.WorkerParameters
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.sync.Result.Success
 
-/**
- * A WorkManager Worker that handles periodic sync.
- */
-abstract class PeriodicSyncWorker(
-    appContext: Context,
-    workerParams: WorkerParameters
-) : CoroutineWorker(appContext, workerParams) {
+/** A WorkManager Worker that handles periodic sync. */
+abstract class PeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
+  CoroutineWorker(appContext, workerParams) {
 
-    abstract fun getFhirEngine(): FhirEngine
+  abstract fun getFhirEngine(): FhirEngine
 
-    override suspend fun doWork(): Result {
-        // TODO handle retry
-        val result = getFhirEngine().periodicSync()
-        if (result is Success) {
-            return Result.success()
-        }
-        return Result.failure()
+  override suspend fun doWork(): Result {
+    // TODO handle retry
+    val result = getFhirEngine().periodicSync()
+    if (result is Success) {
+      return Result.success()
     }
+    return Result.failure()
+  }
 }

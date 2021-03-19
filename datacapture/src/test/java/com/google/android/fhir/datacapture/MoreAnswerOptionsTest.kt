@@ -18,12 +18,9 @@ package com.google.android.fhir.datacapture
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
-import com.google.fhir.r4.core.Code
-import com.google.fhir.r4.core.Coding
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireResponse
-import com.google.fhir.r4.core.String
 import kotlin.test.assertFailsWith
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Questionnaire
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -33,101 +30,27 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class MoreAnswerOptionsTest {
 
-    @Test
-    fun getDisplayString_choiceItemType_answerOptionShouldReturnValueCodingDisplayValue() {
-        val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
-            .setValue(
-                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                    .setCoding(
-                        Coding.newBuilder()
-                            .setCode(
-                                Code.newBuilder()
-                                    .setValue("test-code")
-                            )
-                            .setDisplay(
-                                String.newBuilder().setValue("Test Code"))
-                    )
+  @Test
+  fun getDisplayString_choiceItemType_answerOptionShouldReturnValueCodingDisplayValue() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent()
+        .setValue(Coding().setCode("test-code").setDisplay("Test Code"))
 
-            ).build()
+    assertThat(answerOption.displayString).isEqualTo("Test Code")
+  }
 
-        assertThat(answerOption.displayString).isEqualTo("Test Code")
-    }
+  @Test
+  fun getDisplayString_choiceItemType_answerOptionShouldReturnValueCodingCodeValue() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(Coding().setCode("test-code"))
 
-    @Test
-    fun getDisplayString_choiceItemType_answerOptionShouldReturnValueCodingCodeValue() {
-        val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
-            .setValue(
-                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                    .setCoding(
-                        Coding.newBuilder()
-                            .setCode(
-                                Code.newBuilder()
-                                    .setValue("test-code")
-                            )
-                    )
-            ).build()
+    assertThat(answerOption.displayString).isEqualTo("test-code")
+  }
 
-        assertThat(answerOption.displayString).isEqualTo("test-code")
-    }
+  @Test
+  fun getDisplayString_choiceItemType_shouldThrowExceptionForIllegalAnswerOptionValueX() {
+    val answerOption = Questionnaire.QuestionnaireItemAnswerOptionComponent()
 
-    @Test
-    fun getDisplayString_choiceItemType_shouldThrowExceptionForIllegalAnswerOptionValueX() {
-        val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
-            .setValue(
-                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                    .setStringValue(
-                        String.newBuilder()
-                            .setValue("test")
-                    )
-            ).build()
-
-        assertFailsWith<IllegalArgumentException> {
-            answerOption.displayString
-        }
-    }
-
-    @Test
-    fun getResponseAnswerValueX_ShouldReturnAnswerValueCoding() {
-        val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
-            .setValue(
-                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                    .setCoding(
-                        Coding.newBuilder()
-                            .setCode(
-                                Code.newBuilder()
-                                    .setValue("test-code")
-                            )
-                            .setDisplay(
-                                String.newBuilder().setValue("Test Code"))
-                    )
-            ).build()
-        val answerValueX = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-            .setCoding(
-                Coding.newBuilder()
-                    .setCode(
-                        Code.newBuilder()
-                            .setValue("test-code")
-                    )
-                    .setDisplay(
-                        String.newBuilder().setValue("Test Code"))
-            ).build()
-
-        assertThat(answerOption.responseAnswerValueX).isEqualTo(answerValueX)
-    }
-
-    @Test
-    fun getResponseAnswerValueX_choiceItemType_shouldThrowExceptionForIllegalAnswerOptionValueX() {
-        val answerOption = Questionnaire.Item.AnswerOption.newBuilder()
-            .setValue(
-                Questionnaire.Item.AnswerOption.ValueX.newBuilder()
-                    .setStringValue(
-                        String.newBuilder()
-                            .setValue("test")
-                    )
-            ).build()
-
-        assertFailsWith<IllegalArgumentException> {
-            answerOption.responseAnswerValueX
-        }
-    }
+    assertFailsWith<IllegalArgumentException> { answerOption.displayString }
+  }
 }

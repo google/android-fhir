@@ -25,29 +25,37 @@ import org.hl7.fhir.r4.model.Resource
 
 /** Implementation of the [Search] interface. */
 class SearchImpl constructor(val database: Database) : Search {
-    override fun <R : Resource> of(clazz: Class<R>) = SearchSpecificationImpl(clazz)
+  override fun <R : Resource> of(clazz: Class<R>) = SearchSpecificationImpl(clazz)
 
-    /** Implementation of the [Search.SearchSpecifications] interface. */
-    inner class SearchSpecificationImpl<R : Resource>(
-        val clazz: Class<R>
-    ) : Search.SearchSpecifications {
-        private var filterCriterion: FilterCriterion? = null
-        private var sortCriterion: SortCriterion? = null
-        private var limit: Int? = null
-        private var skip: Int? = null
+  /** Implementation of the [Search.SearchSpecifications] interface. */
+  inner class SearchSpecificationImpl<R : Resource>(val clazz: Class<R>) :
+    Search.SearchSpecifications {
+    private var filterCriterion: FilterCriterion? = null
+    private var sortCriterion: SortCriterion? = null
+    private var limit: Int? = null
+    private var skip: Int? = null
 
-        override fun filter(filterCriterion: FilterCriterion): Search.SearchSpecifications =
-            apply { this.filterCriterion = filterCriterion }
-
-        override fun sort(sortCriterion: SortCriterion): Search.SearchSpecifications =
-            apply { this.sortCriterion = sortCriterion }
-
-        override fun limit(limit: Int): Search.SearchSpecifications = apply { this.limit = limit }
-
-        override fun skip(skip: Int): Search.SearchSpecifications = apply { this.skip = skip }
-
-        override fun <R : Resource> run(): List<R> = database.search(
-            SerializedResourceQuery(getResourceType(clazz),
-                filterCriterion?.query(clazz), sortCriterion, limit, skip))
+    override fun filter(filterCriterion: FilterCriterion): Search.SearchSpecifications = apply {
+      this.filterCriterion = filterCriterion
     }
+
+    override fun sort(sortCriterion: SortCriterion): Search.SearchSpecifications = apply {
+      this.sortCriterion = sortCriterion
+    }
+
+    override fun limit(limit: Int): Search.SearchSpecifications = apply { this.limit = limit }
+
+    override fun skip(skip: Int): Search.SearchSpecifications = apply { this.skip = skip }
+
+    override fun <R : Resource> run(): List<R> =
+      database.search(
+        SerializedResourceQuery(
+          getResourceType(clazz),
+          filterCriterion?.query(clazz),
+          sortCriterion,
+          limit,
+          skip
+        )
+      )
+  }
 }

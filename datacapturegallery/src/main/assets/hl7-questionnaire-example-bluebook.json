@@ -106,12 +106,12 @@
                   ],
                   "item": [
                     {
-                      "linkId": "vitaminiKDose1",
+                      "linkId": "vitaminKDose1",
                       "text": "1st dose",
                       "type": "dateTime"
                     },
                     {
-                      "linkId": "vitaminiKDose2",
+                      "linkId": "vitaminKDose2",
                       "text": "2nd dose",
                       "type": "dateTime"
                     }

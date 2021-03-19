@@ -20,24 +20,24 @@ import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 
-internal object QuestionnaireItemDisplayViewHolderFactory : QuestionnaireItemViewHolderFactory(
-    R.layout.questionnaire_item_display_view
-) {
-    override fun getQuestionnaireItemViewHolderDelegate() =
-        object : QuestionnaireItemViewHolderDelegate {
-            private lateinit var textView: TextView
+internal object QuestionnaireItemDisplayViewHolderFactory :
+  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_display_view) {
+  override fun getQuestionnaireItemViewHolderDelegate() =
+    object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var textView: TextView
 
-            override fun init(itemView: View) {
-                textView = itemView.findViewById(R.id.text_view)
-            }
+      override fun init(itemView: View) {
+        textView = itemView.findViewById(R.id.text_view)
+      }
 
-            override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-                textView.text = questionnaireItemViewItem.questionnaireItem.text.value
-                textView.visibility = if (textView.text.isEmpty()) {
-                    View.GONE
-                } else {
-                    View.VISIBLE
-                }
-            }
-        }
+      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+        textView.text = questionnaireItemViewItem.questionnaireItem.text
+        textView.visibility =
+          if (textView.text.isEmpty()) {
+            View.GONE
+          } else {
+            View.VISIBLE
+          }
+      }
+    }
 }

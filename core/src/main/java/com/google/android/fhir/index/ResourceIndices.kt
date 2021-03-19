@@ -32,43 +32,44 @@ import org.hl7.fhir.r4.model.ResourceType
  * See https://www.hl7.org/fhir/search.html.
  */
 internal data class ResourceIndices(
-    val resourceType: ResourceType,
-    val resourceId: String,
-    val numberIndices: List<NumberIndex>,
-    val dateIndices: List<DateIndex>,
-    val stringIndices: List<StringIndex>,
-    val uriIndices: List<UriIndex>,
-    val tokenIndices: List<TokenIndex>,
-    val quantityIndices: List<QuantityIndex>,
-    val referenceIndices: List<ReferenceIndex>
+  val resourceType: ResourceType,
+  val resourceId: String,
+  val numberIndices: List<NumberIndex>,
+  val dateIndices: List<DateIndex>,
+  val stringIndices: List<StringIndex>,
+  val uriIndices: List<UriIndex>,
+  val tokenIndices: List<TokenIndex>,
+  val quantityIndices: List<QuantityIndex>,
+  val referenceIndices: List<ReferenceIndex>
 ) {
-    class Builder(private val resourceType: ResourceType, private val resourceId: String) {
-        private val stringIndices = mutableListOf<StringIndex>()
-        private val referenceIndices = mutableListOf<ReferenceIndex>()
-        private val tokenIndices = mutableListOf<TokenIndex>()
-        private val quantityIndices = mutableListOf<QuantityIndex>()
-        private val uriIndices = mutableListOf<UriIndex>()
-        private val dateIndices = mutableListOf<DateIndex>()
-        private val numberIndices = mutableListOf<NumberIndex>()
+  class Builder(private val resourceType: ResourceType, private val resourceId: String) {
+    private val stringIndices = mutableListOf<StringIndex>()
+    private val referenceIndices = mutableListOf<ReferenceIndex>()
+    private val tokenIndices = mutableListOf<TokenIndex>()
+    private val quantityIndices = mutableListOf<QuantityIndex>()
+    private val uriIndices = mutableListOf<UriIndex>()
+    private val dateIndices = mutableListOf<DateIndex>()
+    private val numberIndices = mutableListOf<NumberIndex>()
 
-        fun addNumberIndex(numberIndex: NumberIndex) = numberIndices.add(numberIndex)
-        fun addDateIndex(dateIndex: DateIndex) = dateIndices.add(dateIndex)
-        fun addStringIndex(stringIndex: StringIndex) = stringIndices.add(stringIndex)
-        fun addUriIndex(uriIndex: UriIndex) = uriIndices.add(uriIndex)
-        fun addTokenIndex(tokenIndex: TokenIndex) = tokenIndices.add(tokenIndex)
-        fun addQuantityIndex(quantityIndex: QuantityIndex) = quantityIndices.add(quantityIndex)
-        fun addReferenceIndex(referenceIndex: ReferenceIndex) = referenceIndices.add(referenceIndex)
+    fun addNumberIndex(numberIndex: NumberIndex) = numberIndices.add(numberIndex)
+    fun addDateIndex(dateIndex: DateIndex) = dateIndices.add(dateIndex)
+    fun addStringIndex(stringIndex: StringIndex) = stringIndices.add(stringIndex)
+    fun addUriIndex(uriIndex: UriIndex) = uriIndices.add(uriIndex)
+    fun addTokenIndex(tokenIndex: TokenIndex) = tokenIndices.add(tokenIndex)
+    fun addQuantityIndex(quantityIndex: QuantityIndex) = quantityIndices.add(quantityIndex)
+    fun addReferenceIndex(referenceIndex: ReferenceIndex) = referenceIndices.add(referenceIndex)
 
-        fun build() = ResourceIndices(
-            resourceType = resourceType,
-            resourceId = resourceId,
-            numberIndices = numberIndices.toList(),
-            dateIndices = dateIndices.toList(),
-            stringIndices = stringIndices.toList(),
-            uriIndices = uriIndices.toList(),
-            tokenIndices = tokenIndices.toList(),
-            quantityIndices = quantityIndices.toList(),
-            referenceIndices = referenceIndices.toList()
-        )
-    }
+    fun build() =
+      ResourceIndices(
+        resourceType = resourceType,
+        resourceId = resourceId,
+        numberIndices = numberIndices.toList(),
+        dateIndices = dateIndices.toList(),
+        stringIndices = stringIndices.toList(),
+        uriIndices = uriIndices.toList(),
+        tokenIndices = tokenIndices.toList(),
+        quantityIndices = quantityIndices.toList(),
+        referenceIndices = referenceIndices.toList()
+      )
+  }
 }
