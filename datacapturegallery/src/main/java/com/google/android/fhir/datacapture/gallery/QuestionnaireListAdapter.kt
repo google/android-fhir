@@ -16,49 +16,41 @@
 
 package com.google.android.fhir.datacapture.gallery
 
-import android.content.Intent
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
+import com.google.android.fhir.datacapture.gallery.databinding.QuestionnaireListItemViewBinding
 
 class QuestionnaireListAdapter(private val questionnaireList: List<QuestionnaireListItem>) :
   Adapter<QuestionnaireListAdapter.ViewHolder>() {
 
-  class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    val name: TextView = view.findViewById(R.id.questionnaire_name)
-    val description: TextView = view.findViewById(R.id.questionnaire_description)
+  class ViewHolder(binding: QuestionnaireListItemViewBinding) :
+    RecyclerView.ViewHolder(binding.root) {
+    val name = binding.questionnaireName
+    val description = binding.questionnaireDescription
     lateinit var questionnaireListItem: QuestionnaireListItem
 
     init {
-      view.setOnClickListener {
-        val context = view.context
-        context.startActivity(
-          Intent(context, QuestionnaireActivity::class.java).apply {
-            putExtra(QuestionnaireActivity.QUESTIONNAIRE_TITLE_KEY, questionnaireListItem.name)
-            putExtra(
-              QuestionnaireActivity.QUESTIONNAIRE_FILE_PATH_KEY,
-              questionnaireListItem.questionnairePath
+      binding.root.setOnClickListener {
+        val action =
+          QuestionnaireListFragmentDirections
+            .actionQuestionnaireListFragmentToQuestionnaireContainerFragment(
+              questionnaireListItem.name,
+              questionnaireListItem.questionnairePath,
+              questionnaireListItem.questionnaireResponsePath
             )
-            questionnaireListItem.questionnaireResponsePath?.let {
-              putExtra(
-                QuestionnaireActivity.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY,
-                questionnaireListItem.questionnaireResponsePath
-              )
-            }
-          }
-        )
+        it.findNavController().navigate(action)
       }
     }
   }
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-    ViewHolder(
-      LayoutInflater.from(parent.context)
-        .inflate(R.layout.questionnaire_list_item_view, parent, false)
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    return ViewHolder(
+      QuestionnaireListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     )
+  }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val questionnaireListItem = questionnaireList[position]
