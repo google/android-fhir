@@ -49,14 +49,24 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textInputEditText.doAfterTextChanged { editable: Editable? ->
       questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
       questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-      applyValidationResults(QuestionnaireResponseItemValidator.validate(questionnaireItemViewItem.questionnaireItem, questionnaireItemViewItem.questionnaireResponseItemBuilder))
+      applyValidationResults(
+        QuestionnaireResponseItemValidator.validate(
+          questionnaireItemViewItem.questionnaireItem,
+          questionnaireItemViewItem.questionnaireResponseItemBuilder
+        )
+      )
     }
   }
 
-  private fun applyValidationResults(validationResults: List<QuestionnaireResponseItemValidator.ValidationResult>) {
-      val messagesSeparator = '\n'
-      val validationMessage = validationResults.filter { it.message != null }.joinToString { it.message.plus(messagesSeparator) }
-      textInputEditText.error = if (validationMessage == "") null else validationMessage
+  private fun applyValidationResults(
+    validationResults: List<QuestionnaireResponseItemValidator.ValidationResult>
+  ) {
+    val messagesSeparator = '\n'
+    val validationMessage =
+      validationResults.filter { it.message != null }.joinToString {
+        it.message.plus(messagesSeparator)
+      }
+    textInputEditText.error = if (validationMessage == "") null else validationMessage
   }
 
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
