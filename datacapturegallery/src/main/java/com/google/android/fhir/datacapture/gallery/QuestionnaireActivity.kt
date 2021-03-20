@@ -72,7 +72,7 @@ class QuestionnaireActivity : AppCompatActivity() {
   }
 
   // Display Questionnaire response as a dialog
-  fun displayQuestionnaireResponse(questionnaireResponse: QuestionnaireResponse) {
+  private fun displayQuestionnaireResponse(questionnaireResponse: QuestionnaireResponse) {
     val questionnaireResponseJson =
       FhirContext.forR4().newJsonParser().encodeResourceToString(questionnaireResponse)
     val dialogFragment = QuestionnaireResponseDialogFragment()
