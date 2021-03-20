@@ -75,9 +75,9 @@ class CqlLoadActivity : AppCompatActivity() {
     evaluateButton.setOnClickListener { v: View? ->
       EvaluateAncLibrary()
         .execute(
-          libraryInput.getText().toString(),
-          contextInput.getText().toString(),
-          expressionInput.getText().toString()
+          libraryInput.text.toString(),
+          contextInput.text.toString(),
+          expressionInput.text.toString()
         )
     }
   }
