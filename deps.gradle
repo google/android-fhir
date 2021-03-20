@@ -52,6 +52,7 @@ deps.appcompat = "androidx.appcompat:appcompat:$versions.appcompat"
 def atsl = [:]
 atsl.core = "androidx.test:core:$versions.atsl_core"
 atsl.espresso = "androidx.test.espresso:espresso-core:$versions.atsl_expresso"
+atsl.espresso_contrib = "androidx.test.espresso:espresso-contrib:$versions.atsl_expresso"
 atsl.ext_junit = "androidx.test.ext:junit:$versions.atsl_junit"
 atsl.ext_junit_ktx = "androidx.test.ext:junit-ktx:$versions.atsl_junit"
 atsl.rules = "androidx.test:rules:$versions.atsl_rules"

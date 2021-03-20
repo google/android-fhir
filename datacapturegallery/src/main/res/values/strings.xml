@@ -16,4 +16,24 @@
 <resources>
     <string name="app_name">Data Capture Gallery</string>
     <string name="submit_button_text">Submit</string>
+    <string
+        name="questionnaire_list_entry_one_title"
+    >Real-world lifelines questionnaire</string>
+    <string
+        name="questionnaire_list_entry_two_title"
+    >Neonate record from New South Wales, Australia</string>
+    <string
+        name="questionnaire_list_entry_three_title"
+    >Patient registration</string>
+    <string name="questionnaire_list_entry_four_title">HIV Case Report</string>
+    <string
+        name="questionnaire_list_entry_four_text"
+    >Reporting regulations: Monthly – applicable to each patient during the reporting period</string>
+    <string
+        name="questionnaire_list_entry_five_title"
+    >COVID-19 Case Report</string>
+    <string name="questionnaire_list_entry_six_title">MyPAIN</string>
+    <string
+        name="questionnaire_list_entry_seven_title"
+    >HIV-Risk Assessment</string>
 </resources>

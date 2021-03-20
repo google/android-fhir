@@ -60,11 +60,12 @@ dependencies {
     implementation deps.material
     implementation deps.navigation.fragment
     implementation deps.navigation.ui
-
+    androidTestImplementation deps.atsl.espresso
+    androidTestImplementation deps.atsl.rules
+    androidTestImplementation deps.atsl.espresso_contrib
     implementation project(path: ':datacapture')
 
     testImplementation deps.junit
 
     androidTestImplementation deps.atsl.ext_junit
-    androidTestImplementation deps.atsl.espresso
 }
