@@ -16,20 +16,8 @@
 
 package com.google.android.fhir.datacapture.gallery
 
-import androidx.annotation.StringRes
-import androidx.recyclerview.widget.RecyclerView
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItem
-import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withResourceName
-import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
-import org.hamcrest.Matchers
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,74 +27,43 @@ class QuestionnaireContainerFragmentTest {
   @Rule @JvmField var activityTestRule = ActivityTestRule(MainActivity::class.java)
 
   @Test
-  fun assertOnQuestionnaireFragment() {
-    onView(withText(R.string.app_name)).check(matches(isDisplayed()))
-  }
+  fun testQuestionnaireFragment() {
+    questionnaireContainerRobot {
+      assert_questionnaire_recycler_view_displayed()
 
-  @Test
-  fun assertRecyclerViewDisplayed() {
-    onView(withId(R.id.recycler_view)).check(matches(isDisplayed()))
-  }
+      click_Real_world_lifelines_questionnaire()
+      assert_displayed_Real_world_lifelines_questionnaire()
+      assert_submit_button_displayed()
+      pressBack()
 
-  @Test
-  fun testQuestionnaireListElement1() {
-    clickRecyclerViewItems(R.string.questionnaire_list_entry_one_title)
-    onView(withText(R.string.questionnaire_list_entry_one_title)).check(matches(isDisplayed()))
-    onView(withText(R.string.submit_button_text)).check(matches(isDisplayed()))
-  }
+      click_Neonate_record_from_New_South_Wales_Australia()
+      assert_submit_button_displayed()
+      assert_displayed_Neonate_record_from_New_SouthWales_Australia_questionnaire()
+      pressBack()
 
-  @Test
-  fun testQuestionnaireListElement2() {
-    clickRecyclerViewItems(R.string.questionnaire_list_entry_two_title)
-    onView(withText(R.string.questionnaire_list_entry_two_title)).check(matches(isDisplayed()))
-    onView(withText(R.string.submit_button_text)).check(matches(isDisplayed()))
-  }
+      click_Patient_registration()
+      assert_displayed_patient_registration_questionnaire()
+      assert_submit_button_displayed()
+      pressBack()
 
-  @Test
-  fun testQuestionnaireListElement3() {
-    clickRecyclerViewItems(R.string.questionnaire_list_entry_three_title)
-    onView(withText(R.string.questionnaire_list_entry_three_title)).check(matches(isDisplayed()))
-    onView(withText(R.string.submit_button_text)).check(matches(isDisplayed()))
-  }
+      click_HIV_Case_Report()
+      assert_displayed_HIV_Case_Report_questionnaire()
+      assert_submit_button_displayed()
+      pressBack()
 
-  @Test
-  fun testQuestionnaireListElement4() {
-    clickRecyclerViewItems(R.string.questionnaire_list_entry_four_title)
-    onView(withText(R.string.submit_button_text)).check(matches(isDisplayed()))
-    onView(withText(R.string.questionnaire_list_entry_four_text)).check(matches(isDisplayed()))
-  }
+      click_COVID19_Case_Report()
+      assert_displayed_COVID19_Case_Report_questionnaire()
+      assert_submit_button_displayed()
+      pressBack()
 
-  @Test
-  fun testQuestionnaireListElement5() {
-    clickRecyclerViewItems(R.string.questionnaire_list_entry_five_title)
-    onView(withText(R.string.questionnaire_list_entry_five_title)).check(matches(isDisplayed()))
-    onView(withText(R.string.submit_button_text)).check(matches(isDisplayed()))
-  }
+      click_MyPAIN()
+      assert_displayed_MyPAIN_questionnaire()
+      assert_submit_button_displayed()
+      pressBack()
 
-  @Test
-  fun testQuestionnaireListElement6() {
-    clickRecyclerViewItems(R.string.questionnaire_list_entry_six_title)
-    onView(withText(R.string.questionnaire_list_entry_six_title)).check(matches(isDisplayed()))
-    onView(withText(R.string.submit_button_text)).check(matches(isDisplayed()))
-  }
-
-  @Test
-  fun testQuestionnaireListElement7() {
-    clickRecyclerViewItems(R.string.questionnaire_list_entry_seven_title)
-    onView(withText(R.string.questionnaire_list_entry_seven_title)).check(matches(isDisplayed()))
-    onView(withText(R.string.submit_button_text)).check(matches(isDisplayed()))
-  }
-
-  companion object {
-    private fun clickRecyclerViewItems(@StringRes vararg stringIds: Int) {
-      onView(withResourceName("recycler_view"))
-        .perform(
-          actionOnItem<RecyclerView.ViewHolder>(
-            hasDescendant(Matchers.anyOf(*stringIds.matchers())),
-            ViewActions.click()
-          )
-        )
+      click_HIV_Risk_Assessment()
+      assert_displayed_HIV_Risk_Assessment_questionnaire()
+      assert_submit_button_displayed()
     }
-    private fun IntArray.matchers() = map(::withText).toTypedArray()
   }
 }
