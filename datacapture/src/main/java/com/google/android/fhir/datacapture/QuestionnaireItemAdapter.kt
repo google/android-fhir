@@ -99,15 +99,19 @@ internal class QuestionnaireItemAdapter :
   private fun getChoiceViewHolderType(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
   ): QuestionnaireItemViewHolderType {
-    if (questionnaireItem.itemControl == ITEM_CONTROL_DROP_DOWN) {
-      return QuestionnaireItemViewHolderType.DROP_DOWN
-    } else if (questionnaireItem.itemControl == ITEM_CONTROL_RADIO_BUTTON) {
-      return QuestionnaireItemViewHolderType.RADIO_GROUP
-    } else if (questionnaireItem.answerOption.size >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN
-    ) {
-      return QuestionnaireItemViewHolderType.DROP_DOWN
-    } else {
-      return QuestionnaireItemViewHolderType.RADIO_GROUP
+    return when {
+      questionnaireItem.itemControl == ITEM_CONTROL_DROP_DOWN -> {
+        QuestionnaireItemViewHolderType.DROP_DOWN
+      }
+      questionnaireItem.itemControl == ITEM_CONTROL_RADIO_BUTTON -> {
+        QuestionnaireItemViewHolderType.RADIO_GROUP
+      }
+      questionnaireItem.answerOption.size >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN -> {
+        QuestionnaireItemViewHolderType.DROP_DOWN
+      }
+      else -> {
+        QuestionnaireItemViewHolderType.RADIO_GROUP
+      }
     }
   }
 
