@@ -42,6 +42,7 @@ versions.spotless = '5.11.0'
 versions.truth = '1.0.1'
 versions.work = '2.3.4'
 versions.json_tools = '1.13'
+versions.nav_version = '2.3.4'
 ext.versions = versions
 
 def deps = [:]
@@ -107,4 +108,9 @@ deps.work = work
 def json_tools = [:]
 json_tools.json_patch = "com.github.java-json-tools:json-patch:$versions.json_tools"
 deps.json_tools = json_tools
+def navigation = [:]
+navigation.fragment = "androidx.navigation:navigation-fragment-ktx:$versions.nav_version"
+navigation.ui = "androidx.navigation:navigation-ui-ktx:$versions.nav_version"
+navigation.safeargs = "androidx.navigation:navigation-safe-args-gradle-plugin:$versions.nav_version"
+deps.navigation = navigation
 ext.deps = deps

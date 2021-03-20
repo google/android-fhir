@@ -19,21 +19,20 @@ package com.google.android.fhir.datacapture.gallery
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
-import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import com.google.android.fhir.datacapture.gallery.databinding.QuestionnaireResponseDialogContentsBinding
 
 class QuestionnaireResponseDialogFragment() : DialogFragment() {
-
+  private var _binding: QuestionnaireResponseDialogContentsBinding? = null
+  private val binding
+    get() = _binding!!
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     val contents = requireArguments().getString(BUNDLE_KEY_CONTENTS)
     return activity?.let {
-      val view =
-        requireActivity()
-          .layoutInflater
-          .inflate(R.layout.questionnaire_response_dialog_contents, null)
-      view.findViewById<TextView>(R.id.contents).text = contents
+      _binding = QuestionnaireResponseDialogContentsBinding.inflate(layoutInflater)
+      binding.contents.text = contents
 
-      AlertDialog.Builder(it).setView(view).create()
+      AlertDialog.Builder(it).setView(binding.root).create()
     }
       ?: throw IllegalStateException("Activity cannot be null")
   }
@@ -41,5 +40,10 @@ class QuestionnaireResponseDialogFragment() : DialogFragment() {
   companion object {
     const val TAG = "questionnaire-response-dialog-fragment"
     const val BUNDLE_KEY_CONTENTS = "contents"
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 }
