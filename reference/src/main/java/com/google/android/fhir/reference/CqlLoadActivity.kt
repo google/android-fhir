@@ -122,20 +122,25 @@ class CqlLoadActivity : AppCompatActivity() {
       for (libraryResult in result.libraryResults.values) {
         for ((key, value) in libraryResult.expressionResults) {
           stringBuilder.append("$key -> ")
-          if (value == null) {
-            stringBuilder.append("null")
-          } else if (MutableList::class.java.isAssignableFrom(value.javaClass)) {
-            for (listItem in value as List<*>) {
+          when {
+            value == null -> {
+              stringBuilder.append("null")
+            }
+            MutableList::class.java.isAssignableFrom(value.javaClass) -> {
+              for (listItem in value as List<*>) {
+                stringBuilder.append(
+                  FhirContext.forR4().newJsonParser().encodeResourceToString(listItem as Resource?)
+                )
+              }
+            }
+            Resource::class.java.isAssignableFrom(value.javaClass) -> {
               stringBuilder.append(
-                FhirContext.forR4().newJsonParser().encodeResourceToString(listItem as Resource?)
+                FhirContext.forR4().newJsonParser().encodeResourceToString(value as Resource)
               )
             }
-          } else if (Resource::class.java.isAssignableFrom(value.javaClass)) {
-            stringBuilder.append(
-              FhirContext.forR4().newJsonParser().encodeResourceToString(value as Resource)
-            )
-          } else {
-            stringBuilder.append(value.toString())
+            else -> {
+              stringBuilder.append(value.toString())
+            }
           }
         }
       }
