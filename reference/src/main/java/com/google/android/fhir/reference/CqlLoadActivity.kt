@@ -68,7 +68,7 @@ class CqlLoadActivity : AppCompatActivity() {
 
     val downloadFhirResourceButton = findViewById<Button>(R.id.download_fhir_resource_button)
     downloadFhirResourceButton.setOnClickListener { v: View? ->
-      DownloadFhirResource().execute(fhirResourceUrlInput.getText().toString())
+      DownloadFhirResource().execute(fhirResourceUrlInput.text.toString())
     }
 
     val evaluateButton = findViewById<Button>(R.id.evaluate_button)
