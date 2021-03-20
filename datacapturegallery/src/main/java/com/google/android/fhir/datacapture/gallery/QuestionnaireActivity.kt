@@ -59,7 +59,7 @@ class QuestionnaireActivity : AppCompatActivity() {
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    return when (item.getItemId()) {
+    return when (item.itemId) {
       R.id.action_submit -> {
         val questionnaireFragment =
           supportFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as
