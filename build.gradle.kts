@@ -1,0 +1,68 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+//    apply(from: 'deps.gradle')
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath(deps.Plugins.androidGradlePlugin)
+        classpath(deps.Plugins.kotlin)
+        classpath(deps.Plugins.spotless)
+        classpath(deps.Plugins.navSafeArgs)
+//        classpath deps.android_gradle_plugin
+//        classpath deps.kotlin.plugin
+//        classpath deps.spotless
+//        classpath deps.navigation.safeargs
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+        maven(
+            url = "https://oss.sonatype.org/content/repositories/snapshots"
+        )
+    }
+}
+
+subprojects {
+    apply(plugin = "com.diffplug.spotless")
+    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+        kotlin {
+            target ("**/*.kt")
+            ktlint().userData(mapOf("indent_size" to "2", "continuation_indent_size" to "2"))
+            ktfmt().googleStyle()
+            licenseHeaderFile("${project.rootProject.projectDir}/license-header.txt")
+        }
+
+        format ("xml") {
+            target ("**/*.xml")
+            prettier(mapOf("prettier" to "2.0.5", "@prettier/plugin-xml" to "0.13.0")).config(["parser": "xml", "tabWidth": 4])
+        }
+    }
+}
+
+// Create a CI repository and also change versions to include the build number
+afterEvaluate {
+    val buildNumber = System.getenv("GITHUB_RUN_ID")
+    if (buildNumber != null) {
+        subprojects { project: Project ->
+            project.pluginManager.withPlugin("maven-publish") { plugin: Plugin ->
+                val publishExtension: PublishingExtension = extensions.getByType(PublishingExtension.class)
+                publishExtension.repositories {
+                    maven {
+                      name = "CI",
+                      url = uri("file://${rootProject.buildDir}/ci-repo")
+                    }
+                }
+                project.publishing.publications.all {
+                    // update version to have suffix of build id
+                    it.version = "${project.version}-build_$buildNumber"
+                }
+            }
+        }
+    }
+}
