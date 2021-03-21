@@ -26,9 +26,9 @@ import com.google.android.material.textfield.TextInputEditText
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal abstract class QuestionnaireItemEditTextViewHolderFactory :
-  QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_edit_text_view) {
-  abstract override fun getQuestionnaireItemViewHolderDelegate():
-    QuestionnaireItemEditTextViewHolderDelegate
+    QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_edit_text_view) {
+    abstract override fun getQuestionnaireItemViewHolderDelegate():
+            QuestionnaireItemEditTextViewHolderDelegate
 }
 
 internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
@@ -58,16 +58,16 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
   }
 
-  private fun applyValidationResults(
-    validationResults: List<QuestionnaireResponseItemValidator.ValidationResult>
-  ) {
-    val messagesSeparator = '\n'
-    val validationMessage =
-      validationResults.filter { it.message != null }.joinToString {
-        it.message.plus(messagesSeparator)
-      }
-    textInputEditText.error = if (validationMessage == "") null else validationMessage
-  }
+    private fun applyValidationResults(
+        validationResults: List<QuestionnaireResponseItemValidator.ValidationResult>
+    ) {
+        val messagesSeparator = '\n'
+        val validationMessage =
+            validationResults.filter { it.message != null }.joinToString {
+                it.message.plus(messagesSeparator)
+            }
+        textInputEditText.error = if (validationMessage == "") null else validationMessage
+    }
 
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     this.questionnaireItemViewItem = questionnaireItemViewItem
@@ -81,16 +81,16 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
   }
 
-  /** Returns the answer that should be recorded given the text input by the user. */
-  abstract fun getValue(
-    text: String
-  ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
+    /** Returns the answer that should be recorded given the text input by the user. */
+    abstract fun getValue(
+        text: String
+    ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
 
-  /**
-   * Returns the text that should be displayed in the [TextInputEditText] from the existing answer
-   * to the question (may be input by the user or previously recorded).
-   */
-  abstract fun getText(
-    answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
-  ): String
+    /**
+     * Returns the text that should be displayed in the [TextInputEditText] from the existing answer
+     * to the question (may be input by the user or previously recorded).
+     */
+    abstract fun getText(
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
+    ): String
 }
