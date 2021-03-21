@@ -15,9 +15,9 @@ object AppDependencies {
     object Room {
       const val compiler = "androidx.room:room-compiler:${versions.AppDependencies.CoreDeps.room}"
       const val ktx = "androidx.room:room-ktx:${versions.AppDependencies.CoreDeps.room}"
-      const val runtime = "androidx.room:room-runtime:${versions.AppDependencies.CoreDeps.room}" 
+      const val runtime = "androidx.room:room-runtime:${versions.AppDependencies.CoreDeps.room}"
     }
-    
+
     object Cql {
       const val cqlEngineCore = "org.opencds.cqf:cql-engine:${versions.AppDependencies.CoreDeps.Cql.cqlEngine}"
       const val cqlEngineFhir = "org.opencds.cqf:cql-engine-fhir:${versions.AppDependencies.CoreDeps.Cql.cqlEngine}"
@@ -57,5 +57,7 @@ object AppDependencies {
 
   object Externals {
   const val jsonTools = "com.github.java-json-tools:json-patch:${versions.AppDependencies.Externals.jsonTools}"
+  const val caffeine = "com.github.ben-manes.caffeine:caffeine:${versions.AppDependencies.Externals.caffeine}"
+  const val guava = "com.google.guava:guava:${versions.AppDependencies.Externals.guava}"
   }
 }

@@ -18,4 +18,5 @@ object TestDependencies {
       "androidx.test.espresso:espresso-core:${versions.TestDependencies.Espresso.espresso}"
   }
   const val roboelectric = "org.robolectric:robolectric:${versions.TestDependencies.Espresso.roboelectric}"
+  const val standardRunner = "androidx.test.runner.AndroidJUnitRunner"
 }

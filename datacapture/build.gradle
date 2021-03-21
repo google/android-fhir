@@ -34,12 +34,12 @@ afterEvaluate {
 }
 
 android {
-    compileSdkVersion sdk_versions.compile_sdk
-    buildToolsVersion build_tool_version
+    compileSdkVersion versions.Sdk.compileSdk
+    buildToolsVersion versions.Plugins.buildTools
 
     defaultConfig {
-        minSdkVersion sdk_versions.min_sdk
-        targetSdkVersion sdk_versions.target_sdk
+        minSdkVersion versions.Sdk.minSdk
+        targetSdkVersion versions.Sdk.targetSdk
         versionCode 1
         versionName "1.0"
 
@@ -76,14 +76,27 @@ configurations {
 }
 
 dependencies {
-    androidTestImplementation deps.atsl.ext_junit_ktx
-    androidTestImplementation deps.atsl.rules
-    androidTestImplementation deps.atsl.runner
-    androidTestImplementation deps.truth
+
+    androidTestImplementation deps.TestDependencies.CoreTestDeps.core
+    androidTestImplementation deps.TestDependencies.CoreTestDeps.ext_junit
+    androidTestImplementation deps.TestDependencies.CoreTestDeps.ext_junit_ktx
+    androidTestImplementation deps.TestDependencies.CoreTestDeps.runner
+    androidTestImplementation deps.TestDependencies.truth
+
+//    androidTestImplementation deps.atsl.ext_junit_ktx
+//    androidTestImplementation deps.atsl.rules
+//    androidTestImplementation deps.atsl.runner
+//    androidTestImplementation deps.truth
 
     api deps.hapi_r4
 
-    coreLibraryDesugaring deps.desugar
+    coreLibraryDesugaring deps.AppDependencies.CoreDeps.desugar
+//    coreLibraryDesugaring deps.desugar
+
+    implementation deps.AppDependencies.CoreDeps.appCompat
+    implementation deps.AppDependencies.CoreDeps.core
+    implementation deps.AppDependencies.CoreDeps.fragment
+    implementation deps.AppDependencies.Kotlin.kotlin
 
     implementation deps.appcompat
     implementation deps.core

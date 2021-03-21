@@ -40,7 +40,7 @@ subprojects {
 
         format ("xml") {
             target ("**/*.xml")
-            prettier(mapOf("prettier" to "2.0.5", "@prettier/plugin-xml" to "0.13.0")).config(["parser": "xml", "tabWidth": 4])
+            prettier(mapOf("prettier" to "2.0.5", "@prettier/plugin-xml" to "0.13.0")).config(mapOf("parser" to "xml", "tabWidth" to 4))
         }
     }
 }
@@ -49,19 +49,24 @@ subprojects {
 afterEvaluate {
     val buildNumber = System.getenv("GITHUB_RUN_ID")
     if (buildNumber != null) {
-        subprojects { project: Project ->
-            project.pluginManager.withPlugin("maven-publish") { plugin: Plugin ->
-                val publishExtension: PublishingExtension = extensions.getByType(PublishingExtension.class)
-                publishExtension.repositories {
-                    maven {
-                      name = "CI",
-                      url = uri("file://${rootProject.buildDir}/ci-repo")
+        subprojects {
+            apply(plugin = "maven-publish")
+            configure<PublishingExtension> {
+//            project.pluginManager.withPlugin("maven-publish") { plugin ->
+//                val publishExtension = extensions.getByType(PublishingExtension.class)
+//                publishExtension {
+                    repositories {
+                        maven {
+                            name = "CI"
+                            url = uri("file://${rootProject.buildDir}/ci-repo")
+                        }
                     }
-                }
-                project.publishing.publications.all {
-                    // update version to have suffix of build id
-                    it.version = "${project.version}-build_$buildNumber"
-                }
+//                    project.publishing.publications.all {
+                        // update version to have suffix of build id
+                        project.version = "${project.version}-build_$buildNumber"
+//                    }
+//            }
+//          }
             }
         }
     }

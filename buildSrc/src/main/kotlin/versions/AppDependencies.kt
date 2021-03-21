@@ -34,5 +34,7 @@ object AppDependencies {
 
   object Externals {
     const val jsonTools = "1.13"
+    const val caffeine = "2.9.0"
+    const val guava = "28.2-android"
   }
 }

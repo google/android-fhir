@@ -3,12 +3,12 @@
 // This file is referenced by the project-level build.gradle.kts file.
 // Entries in each section of this file should be sorted alphabetically.
 def sdk_versions = [:]
-sdk_versions.compile_sdk = 29
-sdk_versions.min_sdk = 21
-sdk_versions.target_sdk = 29
+sdk_versions.compile_sdk = 29 // done
+sdk_versions.min_sdk = 21 // done
+sdk_versions.target_sdk = 29 // done
 ext.sdk_versions = sdk_versions
 
-def build_tool_version = '30.0.2'
+def build_tool_version = '30.0.2' // done
 ext.build_tool_version = build_tool_version
 
 def versions = [:]
