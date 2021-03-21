@@ -21,24 +21,24 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 object QuestionnaireResponseItemValidator {
 
-    private val validators = mutableListOf(MaxValueValidator, MinValueValidator)
+  private val validators = mutableListOf(MaxValueValidator, MinValueValidator)
 
-    /**
-     * Validates [questionnaireResponseItemBuilder] contains valid answer(s) to [questionnaireItem].
-     */
-    fun validate(
-        questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-        questionnaireResponseItemBuilder: QuestionnaireResponse.QuestionnaireResponseItemComponent
-    ): List<ValidationResult> {
-        if (questionnaireResponseItemBuilder.answer.isEmpty()) {
-            return listOf(ValidationResult(true, null))
-        }
-        val validationResults = mutableListOf<ValidationResult>()
-        validators.forEach {
-            validationResults.add(it.validate(questionnaireItem, questionnaireResponseItemBuilder))
-        }
-        return validationResults
+  /**
+   * Validates [questionnaireResponseItemBuilder] contains valid answer(s) to [questionnaireItem].
+   */
+  fun validate(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItemBuilder: QuestionnaireResponse.QuestionnaireResponseItemComponent
+  ): List<ValidationResult> {
+    if (questionnaireResponseItemBuilder.answer.isEmpty()) {
+      return listOf(ValidationResult(true, null))
     }
+    val validationResults = mutableListOf<ValidationResult>()
+    validators.forEach {
+      validationResults.add(it.validate(questionnaireItem, questionnaireResponseItemBuilder))
+    }
+    return validationResults
+  }
 
-    data class ValidationResult(val isValid: Boolean, val message: String?)
+  data class ValidationResult(val isValid: Boolean, val message: String?)
 }

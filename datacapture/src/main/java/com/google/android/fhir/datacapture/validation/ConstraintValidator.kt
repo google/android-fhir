@@ -20,15 +20,15 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 interface ConstraintValidator {
-    /**
-     * Validates the response by the user
-     *
-     * @param questionnaireItem
-     * @param questionnaireResponseItemBuilder
-     * @return
-     */
-    fun validate(
-        questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-        questionnaireResponseItemBuilder: QuestionnaireResponse.QuestionnaireResponseItemComponent
-    ): QuestionnaireResponseItemValidator.ValidationResult
+  /**
+   * Validates the response by the user
+   *
+   * @param questionnaireItem
+   * @param questionnaireResponseItemBuilder
+   * @return
+   */
+  fun validate(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItemBuilder: QuestionnaireResponse.QuestionnaireResponseItemComponent
+  ): QuestionnaireResponseItemValidator.ValidationResult
 }

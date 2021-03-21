@@ -22,40 +22,40 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 object MinValueValidator : ConstraintValidator {
 
-    private const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"
+  private const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"
 
-    override fun validate(
-        questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-        questionnaireResponseItemBuilder: QuestionnaireResponse.QuestionnaireResponseItemComponent
-    ): QuestionnaireResponseItemValidator.ValidationResult {
-        return if (questionnaireItem.hasExtension(MIN_VALUE_EXTENSION_URL))
-            minValueIntegerValidator(
-                questionnaireItem.getExtensionByUrl(MIN_VALUE_EXTENSION_URL),
-                questionnaireResponseItemBuilder
-            )
-        else QuestionnaireResponseItemValidator.ValidationResult(true, null)
-    }
+  override fun validate(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItemBuilder: QuestionnaireResponse.QuestionnaireResponseItemComponent
+  ): QuestionnaireResponseItemValidator.ValidationResult {
+    return if (questionnaireItem.hasExtension(MIN_VALUE_EXTENSION_URL))
+      minValueIntegerValidator(
+        questionnaireItem.getExtensionByUrl(MIN_VALUE_EXTENSION_URL),
+        questionnaireResponseItemBuilder
+      )
+    else QuestionnaireResponseItemValidator.ValidationResult(true, null)
+  }
 
-    private fun minValueIntegerValidator(
-        extension: Extension,
-        questionnaireResponseItemBuilder: QuestionnaireResponse.QuestionnaireResponseItemComponent
-    ): QuestionnaireResponseItemValidator.ValidationResult {
-        val answer = questionnaireResponseItemBuilder.answer[0]
-        when {
-            extension.value.fhirType().equals("integer") && answer.hasValueIntegerType() -> {
-                val answeredValue = answer.valueIntegerType.value
-                if (answeredValue < extension.value.primitiveValue().toInt()) {
-                    return QuestionnaireResponseItemValidator.ValidationResult(
-                        false,
-                        validationMessageGenerator(extension)
-                    )
-                }
-            }
+  private fun minValueIntegerValidator(
+    extension: Extension,
+    questionnaireResponseItemBuilder: QuestionnaireResponse.QuestionnaireResponseItemComponent
+  ): QuestionnaireResponseItemValidator.ValidationResult {
+    val answer = questionnaireResponseItemBuilder.answer[0]
+    when {
+      extension.value.fhirType().equals("integer") && answer.hasValueIntegerType() -> {
+        val answeredValue = answer.valueIntegerType.value
+        if (answeredValue < extension.value.primitiveValue().toInt()) {
+          return QuestionnaireResponseItemValidator.ValidationResult(
+            false,
+            validationMessageGenerator(extension)
+          )
         }
-        return QuestionnaireResponseItemValidator.ValidationResult(true, null)
+      }
     }
+    return QuestionnaireResponseItemValidator.ValidationResult(true, null)
+  }
 
-    private fun validationMessageGenerator(extension: Extension): String {
-        return "Minimum value allowed is:" + extension.value.primitiveValue()
-    }
+  private fun validationMessageGenerator(extension: Extension): String {
+    return "Minimum value allowed is:" + extension.value.primitiveValue()
+  }
 }
