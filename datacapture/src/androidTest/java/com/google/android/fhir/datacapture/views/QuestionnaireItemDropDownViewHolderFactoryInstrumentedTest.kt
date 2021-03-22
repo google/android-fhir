@@ -20,6 +20,7 @@ import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -50,6 +51,33 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
       )
     parent = FrameLayout(context)
     viewHolder = QuestionnaireItemDropDownViewHolderFactory.create(parent)
+  }
+
+  @Test
+  @UiThreadTest
+  fun shouldShowPrefixText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+  }
+
+  @Test
+  @UiThreadTest
+  fun shouldHidePrefixText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
   }
 
   @Test
