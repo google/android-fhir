@@ -1,16 +1,17 @@
-####**fixes**: 
-<!--- Add issue number here. --->
+**Fixes**: 
+Add issue number here
 
-#### **Description:**
-<!--- Clear and concise code change description. List any other important dependencies.--->
+**Description:**
+Clear and concise code change description. 
+**Type**
 
-**Change-Type Checklist:**
-<!--- **Check relevant options.** --->
-- [ ] Bug Fix
-- [ ] Feature implemented
-- [ ] Chore (workflow,dependency, documentation or others)
+- [ ] Bug fix
+- [ ] Feature
+- [ ] Documentation
+- [ ] Builds
+- [ ] Releases
+- [ ] Other (please specify)
 
 
 
-**Screenshots of changes: **
-<!--Only if applicable-->
+**Screenshots (if applicable)**
