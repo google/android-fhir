@@ -18,6 +18,7 @@ package com.google.android.fhir.index
 
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.NumberIndex
+import com.google.android.fhir.index.entities.PositionIndex
 import com.google.android.fhir.index.entities.QuantityIndex
 import com.google.android.fhir.index.entities.ReferenceIndex
 import com.google.android.fhir.index.entities.StringIndex
@@ -40,7 +41,8 @@ internal data class ResourceIndices(
   val uriIndices: List<UriIndex>,
   val tokenIndices: List<TokenIndex>,
   val quantityIndices: List<QuantityIndex>,
-  val referenceIndices: List<ReferenceIndex>
+  val referenceIndices: List<ReferenceIndex>,
+  val positionIndices: List<PositionIndex>
 ) {
   class Builder(private val resourceType: ResourceType, private val resourceId: String) {
     private val stringIndices = mutableListOf<StringIndex>()
@@ -50,6 +52,7 @@ internal data class ResourceIndices(
     private val uriIndices = mutableListOf<UriIndex>()
     private val dateIndices = mutableListOf<DateIndex>()
     private val numberIndices = mutableListOf<NumberIndex>()
+    private val positionIndices = mutableListOf<PositionIndex>()
 
     fun addNumberIndex(numberIndex: NumberIndex) = numberIndices.add(numberIndex)
     fun addDateIndex(dateIndex: DateIndex) = dateIndices.add(dateIndex)
@@ -58,6 +61,7 @@ internal data class ResourceIndices(
     fun addTokenIndex(tokenIndex: TokenIndex) = tokenIndices.add(tokenIndex)
     fun addQuantityIndex(quantityIndex: QuantityIndex) = quantityIndices.add(quantityIndex)
     fun addReferenceIndex(referenceIndex: ReferenceIndex) = referenceIndices.add(referenceIndex)
+    fun addPositionIndex(positionIndex: PositionIndex) = positionIndices.add(positionIndex)
 
     fun build() =
       ResourceIndices(
@@ -69,7 +73,8 @@ internal data class ResourceIndices(
         uriIndices = uriIndices.toList(),
         tokenIndices = tokenIndices.toList(),
         quantityIndices = quantityIndices.toList(),
-        referenceIndices = referenceIndices.toList()
+        referenceIndices = referenceIndices.toList(),
+        positionIndices = positionIndices.toList()
       )
   }
 }

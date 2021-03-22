@@ -21,6 +21,7 @@ import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.NumberIndex
+import com.google.android.fhir.index.entities.PositionIndex
 import com.google.android.fhir.index.entities.QuantityIndex
 import com.google.android.fhir.index.entities.ReferenceIndex
 import com.google.android.fhir.index.entities.StringIndex
@@ -35,6 +36,7 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Location
 import org.hl7.fhir.r4.model.Money
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
@@ -80,8 +82,9 @@ internal object ResourceIndexer {
           SearchParamType.QUANTITY ->
             quantityIndex(searchParam, value)?.also { indexBuilder.addQuantityIndex(it) }
           SearchParamType.URI -> uriIndex(searchParam, value)?.also { indexBuilder.addUriIndex(it) }
-        // TODO: Handle composite type https://github.com/google/android-fhir/issues/292.
-        // TODO: Handle special type https://github.com/google/android-fhir/issues/293.
+          // TODO: Handle composite type https://github.com/google/android-fhir/issues/292.
+          SearchParamType.SPECIAL ->
+            specialIndex(searchParam, value)?.also { indexBuilder.addPositionIndex(it) }
         }
       }
 
@@ -203,6 +206,21 @@ internal object ResourceIndexer {
       UriIndex(searchParam.name, searchParam.path, uri)
     } else {
       null
+    }
+  }
+
+  private fun specialIndex(searchParam: SearchParamDefinition, value: Base?): PositionIndex? {
+    return when (value?.fhirType()) {
+      "Location.position" -> {
+        val location = (value as Location.LocationPositionComponent)
+        return PositionIndex(
+          searchParam.name,
+          searchParam.path,
+          location.latitude,
+          location.longitude
+        )
+      }
+      else -> null
     }
   }
 
