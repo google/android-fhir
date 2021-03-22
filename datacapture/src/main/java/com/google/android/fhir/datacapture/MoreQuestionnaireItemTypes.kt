@@ -36,6 +36,7 @@ fun Questionnaire.QuestionnaireItemEnableWhenComponent.getValueForType(
     Questionnaire.QuestionnaireItemType.INTEGER -> answerIntegerType
     Questionnaire.QuestionnaireItemType.DATETIME -> answerDateTimeType
     Questionnaire.QuestionnaireItemType.TIME -> answerTimeType
+    Questionnaire.QuestionnaireItemType.CHOICE -> answerCoding
     Questionnaire.QuestionnaireItemType.STRING, Questionnaire.QuestionnaireItemType.TEXT ->
       answerStringType
     else -> throw IllegalArgumentException("Unsupported value type $type")
@@ -57,6 +58,7 @@ fun QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.getValueForTy
     Questionnaire.QuestionnaireItemType.INTEGER -> valueIntegerType
     Questionnaire.QuestionnaireItemType.DATETIME -> valueDateTimeType
     Questionnaire.QuestionnaireItemType.TIME -> valueTimeType
+    Questionnaire.QuestionnaireItemType.CHOICE -> valueCoding
     Questionnaire.QuestionnaireItemType.STRING, Questionnaire.QuestionnaireItemType.TEXT ->
       this.valueStringType
     Questionnaire.QuestionnaireItemType.URL -> this.valueUriType

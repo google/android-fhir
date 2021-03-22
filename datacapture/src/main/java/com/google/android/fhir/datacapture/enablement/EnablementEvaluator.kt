@@ -62,8 +62,8 @@ internal object EnablementEvaluator {
    */
   fun evaluate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItemRetriever:
-      (linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
+    questionnaireItemAndQuestionnaireResponseItemRetriever:
+      (linkId: String) -> QuestionnaireItemWithResponse
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhen
 
@@ -73,9 +73,8 @@ internal object EnablementEvaluator {
     // Evaluate single `enableWhen` constraint.
     if (enableWhenList.size == 1) {
       return evaluateEnableWhen(
-        questionnaireItem.type,
         enableWhenList.single(),
-        questionnaireResponseItemRetriever
+        questionnaireItemAndQuestionnaireResponseItemRetriever
       )
     }
 
@@ -86,34 +85,42 @@ internal object EnablementEvaluator {
     return when (val value = questionnaireItem.enableBehavior) {
       Questionnaire.EnableWhenBehavior.ALL ->
         enableWhenList.all {
-          evaluateEnableWhen(questionnaireItem.type, it, questionnaireResponseItemRetriever)
+          evaluateEnableWhen(it, questionnaireItemAndQuestionnaireResponseItemRetriever)
         }
       Questionnaire.EnableWhenBehavior.ANY ->
         enableWhenList.any {
-          evaluateEnableWhen(questionnaireItem.type, it, questionnaireResponseItemRetriever)
+          evaluateEnableWhen(it, questionnaireItemAndQuestionnaireResponseItemRetriever)
         }
       else -> throw IllegalStateException("Unrecognized enable when behavior $value")
     }
   }
+}
 
-  /**
-   * Returns whether the `enableWhen` constraint is satisfied.
-   *
-   * @param questionnaireResponseItemRetriever function that returns the
-   * [QuestionnaireResponse.Item] with the `linkId`, or null if there isn't one.
-   */
-  private fun evaluateEnableWhen(
-    type: Questionnaire.QuestionnaireItemType,
-    enableWhen: Questionnaire.QuestionnaireItemEnableWhenComponent,
-    questionnaireResponseItemRetriever:
-      (linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
-  ): Boolean {
-    val responseItem = questionnaireResponseItemRetriever(enableWhen.question) ?: return true
-    return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
-      (responseItem.answer.size > 0) == enableWhen.answerBooleanType.booleanValue()
-    } else {
-      responseItem.contains(enableWhenTypeToPredicate(enableWhen, type))
-    }
+/** Result class to unpack questionnaireItem and questionnaireResponseItem */
+data class QuestionnaireItemWithResponse(
+  val questionnaireItem: Questionnaire.QuestionnaireItemComponent?,
+  val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent?
+)
+
+/**
+ * Returns whether the `enableWhen` constraint is satisfied.
+ *
+ * @param questionnaireResponseItemRetriever function that returns the [QuestionnaireResponse.Item]
+ * with the `linkId`, or null if there isn't one.
+ */
+private fun evaluateEnableWhen(
+  enableWhen: Questionnaire.QuestionnaireItemEnableWhenComponent,
+  questionnaireResponseItemRetriever: (linkId: String) -> QuestionnaireItemWithResponse
+): Boolean {
+  val (questionnaireItem, questionnaireResponseItem) =
+    questionnaireResponseItemRetriever(enableWhen.question)
+  if (questionnaireItem == null || questionnaireResponseItem == null) return true
+  return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
+    (questionnaireResponseItem.answer.size > 0) == enableWhen.answerBooleanType.booleanValue()
+  } else {
+    questionnaireResponseItem.contains(
+      enableWhenTypeToPredicate(enableWhen, questionnaireItem.type)
+    )
   }
 }
 
