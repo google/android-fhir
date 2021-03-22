@@ -26,20 +26,20 @@ internal val R4_RESOURCE_PACKAGE_PREFIX = "org.hl7.fhir.r4.model."
 /** Returns the FHIR resource type. */
 internal fun <R : Resource> getResourceType(clazz: Class<R>): ResourceType {
   try {
-    return clazz.getConstructor().newInstance().getResourceType()
+    return clazz.getConstructor().newInstance().resourceType
   } catch (e: NoSuchMethodException) {
-    throw IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e)
+    throw IllegalArgumentException("Cannot resolve resource type for " + clazz.name, e)
   } catch (e: IllegalAccessException) {
-    throw IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e)
+    throw IllegalArgumentException("Cannot resolve resource type for " + clazz.name, e)
   } catch (e: InstantiationException) {
-    throw IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e)
+    throw IllegalArgumentException("Cannot resolve resource type for " + clazz.name, e)
   } catch (e: InvocationTargetException) {
-    throw IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e)
+    throw IllegalArgumentException("Cannot resolve resource type for " + clazz.name, e)
   }
 }
 
 /** Returns the {@link Class} object for the resource type. */
-fun <R : Resource> getResourceClass(resourceType: String): Class<R> {
+internal fun <R : Resource> getResourceClass(resourceType: String): Class<R> {
   // Remove any curly brackets in the resource type string. This is to work around an issue with
   // JSON deserialization in the CQL engine on Android. The resource type string incorrectly
   // includes namespace prefix in curly brackets, e.g. "{http://hl7.org/fhir}Patient" instead of
