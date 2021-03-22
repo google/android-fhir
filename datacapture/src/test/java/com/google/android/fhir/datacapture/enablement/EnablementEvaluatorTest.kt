@@ -31,7 +31,11 @@ import org.robolectric.annotation.Config
 class EnablementEvaluatorTest {
   @Test
   fun evaluate_noEnableWhen_shouldReturnTrue() {
-    assertThat(EnablementEvaluator.evaluate(Questionnaire.QuestionnaireItemComponent()) { null })
+    assertThat(
+        EnablementEvaluator.evaluate(Questionnaire.QuestionnaireItemComponent()) {
+          QuestionnaireItemWithResponse(null, null)
+        }
+      )
       .isTrue()
   }
 
@@ -43,7 +47,7 @@ class EnablementEvaluatorTest {
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             addEnableWhen(Questionnaire.QuestionnaireItemEnableWhenComponent().setQuestion("q1"))
           }
-        ) { null }
+        ) { QuestionnaireItemWithResponse(null, null) }
       )
       .isTrue()
   }
@@ -62,10 +66,13 @@ class EnablementEvaluatorTest {
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
           if (it == "q1") {
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-              .addAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
+            QuestionnaireItemWithResponse(
+              Questionnaire.QuestionnaireItemComponent(),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                .addAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
+            )
           } else {
-            null
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -86,9 +93,12 @@ class EnablementEvaluatorTest {
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
           if (it == "q1") {
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
+            QuestionnaireItemWithResponse(
+              Questionnaire.QuestionnaireItemComponent(),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent()
+            )
           } else {
-            null
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -109,10 +119,13 @@ class EnablementEvaluatorTest {
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
           if (it == "q1") {
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-              .addAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
+            QuestionnaireItemWithResponse(
+              Questionnaire.QuestionnaireItemComponent(),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                .addAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
+            )
           } else {
-            null
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -133,9 +146,12 @@ class EnablementEvaluatorTest {
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
           if (it == "q1") {
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
+            QuestionnaireItemWithResponse(
+              Questionnaire.QuestionnaireItemComponent(),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent()
+            )
           } else {
-            null
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -163,9 +179,17 @@ class EnablementEvaluatorTest {
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
           when (it) {
-            "q1" -> QuestionnaireResponse.QuestionnaireResponseItemComponent()
-            "q2" -> QuestionnaireResponse.QuestionnaireResponseItemComponent()
-            else -> null
+            "q1" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+              )
+            "q2" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+              )
+            else -> QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -193,9 +217,17 @@ class EnablementEvaluatorTest {
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
           when (it) {
-            "q1" -> QuestionnaireResponse.QuestionnaireResponseItemComponent()
-            "q2" -> QuestionnaireResponse.QuestionnaireResponseItemComponent()
-            else -> null
+            "q1" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+              )
+            "q2" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+              )
+            else -> QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -223,9 +255,17 @@ class EnablementEvaluatorTest {
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
           when (it) {
-            "q1" -> QuestionnaireResponse.QuestionnaireResponseItemComponent()
-            "q2" -> QuestionnaireResponse.QuestionnaireResponseItemComponent()
-            else -> null
+            "q1" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+              )
+            "q2" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+              )
+            else -> QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -253,9 +293,17 @@ class EnablementEvaluatorTest {
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
           when (it) {
-            "q1" -> QuestionnaireResponse.QuestionnaireResponseItemComponent()
-            "q2" -> QuestionnaireResponse.QuestionnaireResponseItemComponent()
-            else -> null
+            "q1" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+              )
+            "q2" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+              )
+            else -> QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -276,13 +324,17 @@ class EnablementEvaluatorTest {
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
           if (it == "q1") {
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-              .addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(BooleanType(true))
-              )
+            QuestionnaireItemWithResponse(
+              Questionnaire.QuestionnaireItemComponent()
+                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                .addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(BooleanType(true))
+                )
+            )
           } else {
-            null
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -303,13 +355,17 @@ class EnablementEvaluatorTest {
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
           if (it == "q1") {
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-              .addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(BooleanType(false))
-              )
+            QuestionnaireItemWithResponse(
+              Questionnaire.QuestionnaireItemComponent()
+                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                .addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(BooleanType(false))
+                )
+            )
           } else {
-            null
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -331,17 +387,21 @@ class EnablementEvaluatorTest {
           }
         ) {
           if (it == "q1") {
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-              .addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(BooleanType(true))
-              )
-              .addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(BooleanType(false))
-              )
+            QuestionnaireItemWithResponse(
+              Questionnaire.QuestionnaireItemComponent()
+                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                .addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(BooleanType(true))
+                )
+                .addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(BooleanType(false))
+                )
+            )
           } else {
-            null
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -362,13 +422,17 @@ class EnablementEvaluatorTest {
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
           if (it == "q1") {
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-              .addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(BooleanType(false))
-              )
+            QuestionnaireItemWithResponse(
+              Questionnaire.QuestionnaireItemComponent()
+                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                .addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(BooleanType(false))
+                )
+            )
           } else {
-            null
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -389,13 +453,17 @@ class EnablementEvaluatorTest {
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
           if (it == "q1") {
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-              .addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(BooleanType(true))
-              )
+            QuestionnaireItemWithResponse(
+              Questionnaire.QuestionnaireItemComponent()
+                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                .addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(BooleanType(true))
+                )
+            )
           } else {
-            null
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -416,17 +484,21 @@ class EnablementEvaluatorTest {
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
           if (it == "q1") {
-            QuestionnaireResponse.QuestionnaireResponseItemComponent()
-              .addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(BooleanType(true))
-              )
-              .addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(BooleanType(false))
-              )
+            QuestionnaireItemWithResponse(
+              Questionnaire.QuestionnaireItemComponent()
+                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                .addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(BooleanType(true))
+                )
+                .addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(BooleanType(false))
+                )
+            )
           } else {
-            null
+            QuestionnaireItemWithResponse(null, null)
           }
         }
       )
