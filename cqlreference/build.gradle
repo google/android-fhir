@@ -60,10 +60,10 @@ dependencies {
     api(deps.hapi_r4) {
         exclude module: 'junit'
     }
+    implementation deps.cql_engine.core
     implementation deps.kotlin.stdlib
     implementation deps.core
     implementation deps.appcompat
-    implementation 'androidx.core:core-ktx:1.3.2'
     implementation deps.kotlin.test
     implementation deps.lifecycle.viewmodel_ktx
     implementation deps.material

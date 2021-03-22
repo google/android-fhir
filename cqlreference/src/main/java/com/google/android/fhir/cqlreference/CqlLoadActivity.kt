@@ -22,20 +22,16 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import ca.uhn.fhir.context.FhirContext
-import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.cqlreference.FhirApplication.Companion.fhirEngine
-import com.google.android.fhir.cql.CqlEngineUtils
+import com.google.android.fhir.cqlreference.cql.CqlEngineUtils
 import com.google.android.material.snackbar.Snackbar
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.URL
-import org.apache.log4j.lf5.util.Resource
 import org.hl7.fhir.r4.model.Resource
-import org.opencds.cqf.cql.execution.EvaluationResult
 
 class CqlLoadActivity : AppCompatActivity() {
   lateinit var fhirEngine: FhirEngine
@@ -45,24 +41,20 @@ class CqlLoadActivity : AppCompatActivity() {
   lateinit var contextInput: EditText
   lateinit var expressionInput: EditText
   lateinit var evaluationResultTextView: TextView
-  lateinit var cqlEngineUtils: com.google.android.fhir.cql.CqlEngineUtils
+  lateinit var cqlEngineUtils: CqlEngineUtils
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_cql_load)
 
     fhirEngine = fhirEngine(this)
-    cqlEngineUtils = com.google.android.fhir.cql.CqlEngineUtils(this)
+    cqlEngineUtils = CqlEngineUtils(this)
     cqlLibraryUrlInput = findViewById(R.id.cql_text_input)
     fhirResourceUrlInput = findViewById(R.id.fhir_resource_url_input)
     libraryInput = findViewById(R.id.library_input)
     contextInput = findViewById(R.id.context_input)
     expressionInput = findViewById(R.id.expression_input)
     evaluationResultTextView = findViewById(R.id.evaluate_result)
-
-    val viewModel =
-      ViewModelProvider(this, CqlLoadActivityViewModelFactory(fhirEngine))
-        .get(CqlActivityViewModel::class.java)
 
     val loadCqlLibButton = findViewById<Button>(R.id.load_cql_lib_button)
     loadCqlLibButton.setOnClickListener {
@@ -76,12 +68,13 @@ class CqlLoadActivity : AppCompatActivity() {
 
     val evaluateButton = findViewById<Button>(R.id.evaluate_button)
     evaluateButton.setOnClickListener {
-      EvaluateAncLibrary()
-        .execute(
-          libraryInput.text.toString(),
-          contextInput.text.toString(),
-          expressionInput.text.toString()
-        )
+      Snackbar.make(this, it, "Not implemented", Snackbar.LENGTH_LONG).show()
+      //      EvaluateAncLibrary()
+      //        .execute(
+      //          libraryInput.text.toString(),
+      //          contextInput.text.toString(),
+      //          expressionInput.text.toString()
+
     }
   }
 
@@ -99,8 +92,9 @@ class CqlLoadActivity : AppCompatActivity() {
           line = reader.readLine()
         }
         val fhirContext = FhirContext.forR4()
-        resource = fhirContext.newJsonParser().parseResource(result) as Resource
-        fhirEngine.save<Resource>(resource)
+        resource =
+          fhirContext.newJsonParser().parseResource(result) as org.hl7.fhir.r4.model.Resource
+        fhirEngine.save(resource)
         Snackbar.make(
             cqlLibraryUrlInput,
             "Loaded " + resource.resourceType.name + " with ID " + resource.id,
@@ -115,36 +109,37 @@ class CqlLoadActivity : AppCompatActivity() {
     }
   }
 
-  private inner class EvaluateAncLibrary : AsyncTask<String?, String?, EvaluationResult?>() {
-    override fun doInBackground(vararg strings: String?): EvaluationResult? {
-      return cqlEngineUtils.evaluateCql(strings[0]!!, strings[1]!!, strings[2]!!)
-    }
-
-    override fun onPostExecute(result: EvaluationResult?) {
-      val stringBuilder = StringBuilder()
-      if (result?.libraryResults?.values != null) {
-        for (libraryResult in result.libraryResults.values) {
-          for ((key, value) in libraryResult.expressionResults) {
-            stringBuilder.append("$key -> ")
-            if (value == null) {
-              stringBuilder.append("null")
-            } else if (MutableList::class.java.isAssignableFrom(value.javaClass)) {
-              for (listItem in value as List<*>) {
-                stringBuilder.append(
-                  FhirContext.forR4().newJsonParser().encodeResourceToString(listItem as Resource?)
-                )
-              }
-            } else if (Resource::class.java.isAssignableFrom(value.javaClass)) {
-              stringBuilder.append(
-                FhirContext.forR4().newJsonParser().encodeResourceToString(value as Resource)
-              )
-            } else {
-              stringBuilder.append(value.toString())
-            }
-          }
-        }
-      }
-      evaluationResultTextView.text = stringBuilder.toString()
-    }
-  }
+  //  private inner class EvaluateAncLibrary : AsyncTask<String?, String?, EvaluationResult?>() {
+  //    override fun doInBackground(vararg strings: String?): EvaluationResult? {
+  //      return cqlEngineUtils.evaluateCql(strings[0]!!, strings[1]!!, strings[2]!!)
+  //    }
+  //
+  //    override fun onPostExecute(result: EvaluationResult?) {
+  //      val stringBuilder = StringBuilder()
+  //      if (result?.libraryResults?.values != null) {
+  //        for (libraryResult in result.libraryResults.values) {
+  //          for ((key, value) in libraryResult.expressionResults) {
+  //            stringBuilder.append("$key -> ")
+  //            if (value == null) {
+  //              stringBuilder.append("null")
+  //            } else if (MutableList::class.java.isAssignableFrom(value.javaClass)) {
+  //              for (listItem in value as List<*>) {
+  //                stringBuilder.append(
+  //                  FhirContext.forR4().newJsonParser().encodeResourceToString(listItem as
+  // Resource?)
+  //                )
+  //              }
+  //            } else if (Resource::class.java.isAssignableFrom(value.javaClass)) {
+  //              stringBuilder.append(
+  //                FhirContext.forR4().newJsonParser().encodeResourceToString(value as Resource)
+  //              )
+  //            } else {
+  //              stringBuilder.append(value.toString())
+  //            }
+  //          }
+  //        }
+  //      }
+  //      evaluationResultTextView.text = stringBuilder.toString()
+  //    }
+  //  }
 }

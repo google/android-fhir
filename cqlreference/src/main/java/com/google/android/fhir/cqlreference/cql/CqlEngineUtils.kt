@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.cqlreference
+package com.google.android.fhir.cqlreference.cql
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.google.android.fhir.FhirEngine
+import android.content.Context
 
-class CqlLoadActivityViewModelFactory(private val fhirEngine: FhirEngine) :
-  ViewModelProvider.Factory {
-  override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-    if (modelClass.isAssignableFrom(CqlActivityViewModel::class.java)) {
-      return CqlActivityViewModel(fhirEngine) as T
+class CqlEngineUtils(private val context: Context) {
+
+  class Factory() {
+    fun createCqlEngine(context: Context) {
+      // TODO: Not implemented
     }
-    throw IllegalArgumentException("Unknown ViewModel class")
+  }
+
+  /** Returns the result of a CQL evaluation provided with the ID of the library. */
+  fun evaluateCql(libraryVersionId: String, contextString: String, expression: String) {
+    // TODO Not implemented
   }
 }

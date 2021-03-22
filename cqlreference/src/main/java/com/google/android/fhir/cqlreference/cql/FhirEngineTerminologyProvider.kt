@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.cql
+package com.google.android.fhir.cqlreference.cql
 
 import org.opencds.cqf.cql.runtime.Code
 import org.opencds.cqf.cql.terminology.CodeSystemInfo
