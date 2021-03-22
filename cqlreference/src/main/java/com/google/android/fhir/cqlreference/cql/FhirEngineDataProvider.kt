@@ -26,6 +26,4 @@ import org.opencds.cqf.cql.retrieve.RetrieveProvider
  */
 internal class FhirEngineDataProvider
 internal constructor(modelResolver: ModelResolver, retrieveProvider: RetrieveProvider) :
-  CompositeDataProvider(modelResolver, retrieveProvider) {
-
-}
+  CompositeDataProvider(modelResolver, retrieveProvider)

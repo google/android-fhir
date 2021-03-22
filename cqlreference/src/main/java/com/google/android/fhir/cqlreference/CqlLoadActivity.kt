@@ -74,7 +74,6 @@ class CqlLoadActivity : AppCompatActivity() {
       //          libraryInput.text.toString(),
       //          contextInput.text.toString(),
       //          expressionInput.text.toString()
-
     }
   }
 
