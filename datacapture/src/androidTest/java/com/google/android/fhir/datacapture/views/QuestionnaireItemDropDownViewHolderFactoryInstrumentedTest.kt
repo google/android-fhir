@@ -55,7 +55,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
 
   @Test
   @UiThreadTest
-  fun shouldSetPrefixText() {
+  fun shouldShowPrefixText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
@@ -63,12 +63,13 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
   }
 
   @Test
   @UiThreadTest
-  fun shouldNotSetPrefixText() {
+  fun shouldHidePrefixText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
@@ -76,7 +77,7 @@ class QuestionnaireItemDropDownViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(!viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
   }
 
   @Test

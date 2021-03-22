@@ -38,7 +38,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   private val viewHolder = QuestionnaireItemRadioGroupViewHolderFactory.create(parent)
 
   @Test
-  fun shouldSetPrefixText() {
+  fun shouldShowPrefixText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
@@ -46,11 +46,12 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
   }
 
   @Test
-  fun shouldNotSetPrefixText() {
+  fun shouldHidePrefixText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
@@ -58,7 +59,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(!viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
   }
 
   @Test

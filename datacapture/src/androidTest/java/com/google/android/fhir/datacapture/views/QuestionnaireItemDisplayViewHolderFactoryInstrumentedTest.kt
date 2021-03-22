@@ -49,7 +49,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun shouldSetPrefixText() {
+  fun shouldShowPrefixText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
@@ -57,11 +57,12 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
   }
 
   @Test
-  fun shouldNotSetPrefixText() {
+  fun shouldHidePrefixText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
@@ -69,7 +70,7 @@ class QuestionnaireItemDisplayViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    assertThat(!viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
   }
 
   @Test
