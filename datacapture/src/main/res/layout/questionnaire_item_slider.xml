@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
- Copyright 2020 Google LLC
+ Copyright 2021 Google LLC
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -24,13 +24,13 @@
 >
 
     <TextView
-        android:id="@+id/radio_header"
+        android:id="@+id/slider_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
     />
 
-    <RadioGroup
-        android:id="@+id/radio_group"
+    <com.google.android.material.slider.Slider
+        android:id="@+id/slider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
     />

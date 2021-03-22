@@ -24,11 +24,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.common.truth.Truth.assertThat
-import com.google.fhir.r4.core.Date
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireResponse
-import java.time.LocalDate
-import java.time.ZoneId
+import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,12 +52,8 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   fun shouldSetTextInputLayoutHint() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -72,12 +66,8 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   fun shouldSetEmptyDateInput() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -90,29 +80,11 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   fun shouldSetDateInput() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
-            QuestionnaireResponse.Item.Answer.newBuilder().apply {
-              value =
-                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                  .setDate(
-                    Date.newBuilder()
-                      .setValueUs(
-                        LocalDate.of(2020, 1, 1)
-                          .atStartOfDay()
-                          .atZone(ZoneId.systemDefault())
-                          .toEpochSecond() * NUMBER_OF_MICROSECONDS_PER_SECOND
-                      )
-                      .setPrecision(Date.Precision.DAY)
-                      .setTimezone(ZoneId.systemDefault().id)
-                  )
-                  .build()
-            }
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateType(2020, 0, 1))
           )
       ) {}
     )

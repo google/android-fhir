@@ -19,8 +19,8 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.CheckBox
 import com.google.android.fhir.datacapture.R
-import com.google.fhir.r4.core.Boolean
-import com.google.fhir.r4.core.QuestionnaireResponse
+import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemCheckBoxViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_check_box_view) {
@@ -32,22 +32,25 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
       override fun init(itemView: View) {
         checkBox = itemView.findViewById(R.id.check_box)
         checkBox.setOnClickListener {
-          questionnaireItemViewItem.singleAnswerOrNull =
-            QuestionnaireResponse.Item.Answer.newBuilder().apply {
-              value =
-                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                  .setBoolean(Boolean.newBuilder().setValue(checkBox.isChecked).build())
-                  .build()
-            }
+          // if-else block to prevent over-writing of "items" nested within "answer"
+          if (questionnaireItemViewItem.singleAnswerOrNull != null) {
+            questionnaireItemViewItem.singleAnswerOrNull!!.value = BooleanType(checkBox.isChecked)
+          } else {
+            questionnaireItemViewItem.singleAnswerOrNull =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(checkBox.isChecked)
+              }
+          }
+
           questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
         }
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
-        checkBox.text = questionnaireItemViewItem.questionnaireItem.text.value
+        checkBox.text = questionnaireItemViewItem.questionnaireItem.text
         checkBox.isChecked =
-          questionnaireItemViewItem.singleAnswerOrNull?.value?.boolean?.value ?: false
+          questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value ?: false
       }
     }
 }
