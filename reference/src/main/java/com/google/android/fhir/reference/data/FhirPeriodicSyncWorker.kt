@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir
+package com.google.android.fhir.reference.data
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.google.android.fhir.FhirApplication.Companion.fhirEngine
+import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.reference.FhirApplication.Companion.fhirEngine
 import com.google.android.fhir.sync.PeriodicSyncWorker
 
 class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :

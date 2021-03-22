@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir
+package com.google.android.fhir.reference.data
 
-import com.google.android.fhir.api.HapiFhirService
+import com.google.android.fhir.reference.api.HapiFhirService
 import com.google.android.fhir.sync.FhirDataSource
 import org.hl7.fhir.r4.model.Bundle
 

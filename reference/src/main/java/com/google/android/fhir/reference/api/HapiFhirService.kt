@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.api
+package com.google.android.fhir.reference.api
 
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.api.FhirConverterFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.hl7.fhir.r4.model.Bundle
