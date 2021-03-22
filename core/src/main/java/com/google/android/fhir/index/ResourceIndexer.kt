@@ -143,6 +143,8 @@ internal object ResourceIndexer {
           if (period.hasEnd()) period.end.time else Long.MAX_VALUE,
           if (period.hasStart()) period.start.time else Long.MIN_VALUE,
           when {
+            (period.hasEnd() and period.hasStart()) ->
+              maxOf(period.startElement.precision, period.endElement.precision)
             (period.hasEnd()) -> period.endElement.precision
             (period.hasStart()) -> period.startElement.precision
             else -> DateTimeType.DEFAULT_PRECISION

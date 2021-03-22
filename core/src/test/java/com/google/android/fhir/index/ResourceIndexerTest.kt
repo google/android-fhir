@@ -28,7 +28,7 @@ import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
-import java.util.Date
+import java.text.SimpleDateFormat
 import org.hl7.fhir.r4.model.ChargeItem
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -381,6 +381,9 @@ class ResourceIndexerTest {
   // TODO: improve the tests further.
 
   private companion object {
+    val dateTimeTypeFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+    val instantFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+
     const val TEST_CODE_SYSTEM_1 = "http://openmrs.org/concepts"
     const val TEST_CODE_VALUE_1 = "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 
@@ -514,8 +517,8 @@ class ResourceIndexerTest {
         id = "non-null ID"
         effective =
           Period().apply {
-            start = Date(1516055094)
-            end = Date(1516065094)
+            startElement = DateTimeType(dateTimeTypeFormat.parse("2001-09-08T20:30:09+0530"))
+            endElement = DateTimeType(dateTimeTypeFormat.parse("2001-10-01T21:39:09+0530"))
           }
       }
     }
@@ -525,7 +528,7 @@ class ResourceIndexerTest {
     init {
       TEST_OBSERVATION_EFFECTIVE_DATE_TIME_TYPE.apply {
         id = "non-null ID"
-        effective = DateTimeType(Date(1518055094))
+        effective = DateTimeType(dateTimeTypeFormat.parse("2001-12-29T12:20:30+0700"))
       }
     }
 
@@ -536,18 +539,17 @@ class ResourceIndexerTest {
         id = "non-null ID"
         effective =
           Timing().apply {
-            addEvent(Date(1518055094))
-            addEvent(Date(1518065044))
-            addEvent(Date(1518005074))
+            addEvent(dateTimeTypeFormat.parse("2001-11-05T21:53:10+0900"))
+            addEvent(dateTimeTypeFormat.parse("2002-09-01T20:30:18+0900"))
+            addEvent(dateTimeTypeFormat.parse("2003-10-24T18:30:40+0900"))
           }
       }
     }
     val TEST_OBSERVATION_EFFECTIVE_INSTANT = Observation()
-
     init {
       TEST_OBSERVATION_EFFECTIVE_INSTANT.apply {
         id = "non-null ID"
-        effective = InstantType(Date(1518005687))
+        effective = InstantType(instantFormat.parse("2001-03-04T23:30:00.910+0530"))
       }
     }
     val TEST_OBSERVATION_EFFECTIVE_NULL = Observation()
