@@ -74,7 +74,6 @@ dependencies {
     androidTestImplementation deps.junit
     androidTestImplementation deps.truth
 
-    api deps.cql_engine.core
     api(deps.hapi_r4) {
         exclude module: 'junit'
     }
@@ -91,10 +90,7 @@ dependencies {
     implementation deps.room.runtime
     implementation deps.work.runtime
     implementation deps.json_tools.json_patch
-    implementation deps.okhttp_logging_interceptor
-    implementation deps.retrofit.core
-    implementation deps.retrofit.gson
-    implementation deps.retrofit.mock
+
     kapt deps.room.compiler
 
     testImplementation deps.atsl.core
