@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  Copyright 2020 Google LLC
 
@@ -14,9 +14,10 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.google.android.fhir.reference">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.google.android.fhir.reference"
+>
     <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:name="com.google.android.fhir.reference.FhirApplication"
@@ -25,11 +26,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+    >
         <activity
-                android:name="com.google.android.fhir.reference.PatientListActivity"
-                android:label="@string/title_patient_list"
-                android:theme="@style/AppTheme.NoActionBar">
+            android:name="com.google.android.fhir.reference.PatientListActivity"
+            android:label="@string/title_patient_list"
+            android:theme="@style/AppTheme.NoActionBar"
+        >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -40,11 +43,15 @@
             android:name="com.google.android.fhir.reference.PatientDetailActivity"
             android:label="@string/title_patient_detail"
             android:parentActivityName="com.google.android.fhir.reference.PatientListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+        >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.google.android.fhir.reference.PatientListActivity" />
+                android:value="com.google.android.fhir.reference.PatientListActivity"
+            />
         </activity>
-        <activity android:name="com.google.android.fhir.reference.CqlLoadActivity"></activity>
+        <activity
+            android:name="com.google.android.fhir.reference.CqlLoadActivity"
+        />
     </application>
 </manifest>
