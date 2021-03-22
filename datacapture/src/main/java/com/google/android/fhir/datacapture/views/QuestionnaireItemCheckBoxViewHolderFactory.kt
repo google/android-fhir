@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views
 
 import android.view.View
 import android.widget.CheckBox
+import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -26,10 +27,12 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_check_box_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var prefixTextView: TextView
       private lateinit var checkBox: CheckBox
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
+        prefixTextView = itemView.findViewById(R.id.prefix)
         checkBox = itemView.findViewById(R.id.check_box)
         checkBox.setOnClickListener {
           // if-else block to prevent over-writing of "items" nested within "answer"
@@ -48,6 +51,12 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
+        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
+          prefixTextView.visibility = View.VISIBLE
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
+        } else {
+          prefixTextView.visibility = View.GONE
+        }
         checkBox.text = questionnaireItemViewItem.questionnaireItem.text
         checkBox.isChecked =
           questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value ?: false

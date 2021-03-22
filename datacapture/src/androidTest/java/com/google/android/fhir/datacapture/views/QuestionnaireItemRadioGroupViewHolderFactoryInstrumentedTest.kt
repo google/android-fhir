@@ -20,6 +20,7 @@ import android.widget.FrameLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -35,6 +36,31 @@ import org.junit.runner.RunWith
 class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
   private val parent = FrameLayout(InstrumentationRegistry.getInstrumentation().context)
   private val viewHolder = QuestionnaireItemRadioGroupViewHolderFactory.create(parent)
+
+  @Test
+  fun shouldShowPrefixText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+  }
+
+  @Test
+  fun shouldHidePrefixText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+  }
 
   @Test
   fun bind_shouldSetHeaderText() {
