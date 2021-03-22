@@ -14,11 +14,26 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<CheckBox
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/check_box"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
     android:layout_marginVertical="@dimen/item_margin_vertical"
-/>
+    android:orientation="vertical"
+>
+
+    <TextView
+        android:id="@+id/prefix"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+    />
+
+    <CheckBox
+        android:id="@+id/check_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    />
+
+</LinearLayout>
