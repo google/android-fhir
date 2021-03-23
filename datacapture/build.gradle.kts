@@ -2,26 +2,26 @@ plugins {
     id(deps.Plugins.androidLib)
     id(deps.Plugins.kotlinAndroid)
     id(deps.Plugins.mavenPublish)
-//    id ("com.android.library")
-//    id "kotlin-android"
-//    id "maven-publish"
 }
 val group = "com.google.android.fhir"
 val version = "0.1.0-alpha01"
 
-tasks.register("sourceJar", Jar::class) {
-    archiveClassifier.set("sources")
-    from(android.sourceSets.getByName("main").java.srcDirs)
-}
+//tasks.register("sourceJar", Jar::class) {
+//    archiveClassifier.set("sources")
+//    from(android.sourceSets.getByName("main").java.srcDirs)
+//}
 
-java {
-    withSourcesJar()
+// just playing around with tasks
+val sourcesJar by tasks.creating(Jar::class) {
+    archiveClassifier.set("sources")
+    from(sourceSets.getByName("main").java.srcDirs)
 }
 
 afterEvaluate {
     publishing {
         publications {
-            register("release", MavenPublication::class) {
+            create("release", MavenPublication::class) {
+                artifact(sourcesJar)
                 from (components["java"])
                 artifactId = "data-capture"
                 // Also publish source code for developers" convenience
@@ -92,16 +92,9 @@ dependencies {
     androidTestImplementation(deps.TestDependencies.CoreTestDeps.runner)
     androidTestImplementation(deps.TestDependencies.truth)
 
-//    androidTestImplementation deps.atsl.ext_junit_ktx
-//    androidTestImplementation deps.atsl.rules
-//    androidTestImplementation deps.atsl.runner
-//    androidTestImplementation deps.truth
-
     api(deps.AppDependencies.CoreDeps.Cql.hapiR4)
-//    api deps.hapi_r4
 
     coreLibraryDesugaring(deps.AppDependencies.CoreDeps.desugar)
-//    coreLibraryDesugaring deps.desugar
 
     implementation(deps.AppDependencies.CoreDeps.appCompat)
     implementation(deps.AppDependencies.Kotlin.androidxCoreKtx)
@@ -111,21 +104,8 @@ dependencies {
     implementation(deps.AppDependencies.Lifecycle.viewModelKtx)
     implementation(deps.AppDependencies.CoreDeps.materialDesign)
 
-//    implementation deps.appcompat
-//    implementation deps.core
-//    implementation deps.fragment
-//    implementation deps.kotlin.stdlib
-//    implementation deps.kotlin.test
-//    implementation deps.lifecycle.viewmodel_ktx
-//    implementation deps.material
-
     testImplementation(deps.TestDependencies.CoreTestDeps.core)
     testImplementation(deps.TestDependencies.CoreTestDeps.extJunit)
     testImplementation(deps.TestDependencies.roboelectric)
     testImplementation(deps.TestDependencies.truth)
-
-//    testImplementation deps.atsl.core
-//    testImplementation deps.junit
-//    testImplementation deps.robolectric
-//    testImplementation deps.truth
 }

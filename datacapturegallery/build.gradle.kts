@@ -1,7 +1,6 @@
 plugins {
     id(deps.Plugins.application)
     id(deps.Plugins.kotlinAndroid)
-    id(deps.Plugins.navSafeArgs)
     id(deps.Plugins.kotlinKapt)
 }
 
@@ -54,25 +53,13 @@ dependencies {
     coreLibraryDesugaring(deps.AppDependencies.CoreDeps.desugar)
 
     implementation(deps.AppDependencies.CoreDeps.appCompat)
-//    implementation(deps.AppDependencies.Kotlin.androidxCoreKtx)
+    implementation(deps.AppDependencies.Kotlin.androidxCoreKtx)
     implementation(deps.AppDependencies.CoreDeps.fragment)
     implementation(deps.AppDependencies.Kotlin.kotlin)
     implementation(deps.AppDependencies.CoreDeps.materialDesign)
     implementation(deps.AppDependencies.CoreDeps.constraintLayout)
     implementation(deps.AppDependencies.Navigation.navFragment)
     implementation(deps.AppDependencies.Navigation.navUi)
-
-
-//    coreLibraryDesugaring deps.desugar
-
-//    implementation deps.appcompat
-//    implementation deps.constraint_layout
-//    implementation deps.core
-//    implementation deps.fragment
-//    implementation deps.kotlin.stdlib
-//    implementation deps.material
-//    implementation deps.navigation.fragment
-//    implementation deps.navigation.ui
 
     implementation (project(path = ":datacapture"))
 
