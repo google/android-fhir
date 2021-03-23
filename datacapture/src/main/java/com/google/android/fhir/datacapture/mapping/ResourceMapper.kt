@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.mapping
 
 import com.google.android.fhir.datacapture.getValueForType
+import java.util.Locale
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateTimeType
@@ -100,7 +101,7 @@ private fun Base.extractField(
 
   questionnaireItem.type.getClass()?.let {
     this.javaClass
-      .getMethod("set${targetFieldName.capitalize()}Element", it)
+      .getMethod("set${targetFieldName.capitalize(Locale.ROOT)}Element", it)
       .invoke(
         this,
         questionnaireResponseItem.answer.single().getValueForType(questionnaireItem.type)

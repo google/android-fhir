@@ -21,7 +21,6 @@ import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.Result
 import com.google.android.fhir.sync.SyncConfiguration
 import org.hl7.fhir.r4.model.Resource
-import org.opencds.cqf.cql.execution.EvaluationResult
 
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface FhirEngine {
@@ -62,9 +61,6 @@ interface FhirEngine {
    * @param <R> The resource type which should be a subtype of [Resource].
    */
   fun <R : Resource> remove(clazz: Class<R>, id: String)
-
-  /** Returns the result of a CQL evaluation provided with the ID of the library. */
-  fun evaluateCql(libraryVersionId: String, context: String, expression: String): EvaluationResult
 
   /** Returns the entry point for [Search]. */
   fun search(): Search

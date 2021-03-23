@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.cql
+package com.google.android.fhir.cqlreference.cql
 
-import com.google.android.fhir.db.Database
 import org.opencds.cqf.cql.data.CompositeDataProvider
 import org.opencds.cqf.cql.model.ModelResolver
 import org.opencds.cqf.cql.retrieve.RetrieveProvider
@@ -27,10 +26,4 @@ import org.opencds.cqf.cql.retrieve.RetrieveProvider
  */
 internal class FhirEngineDataProvider
 internal constructor(modelResolver: ModelResolver, retrieveProvider: RetrieveProvider) :
-  CompositeDataProvider(modelResolver, retrieveProvider) {
-
-  internal object Factory {
-    internal fun create(database: Database): FhirEngineDataProvider =
-      FhirEngineDataProvider(AndroidR4FhirModelResolver(), FhirEngineRetrieveProvider(database))
-  }
-}
+  CompositeDataProvider(modelResolver, retrieveProvider)
