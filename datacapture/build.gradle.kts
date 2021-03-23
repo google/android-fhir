@@ -6,23 +6,19 @@ plugins {
 val group = "com.google.android.fhir"
 val version = "0.1.0-alpha01"
 
-//tasks.register("sourceJar", Jar::class) {
-//    archiveClassifier.set("sources")
-//    from(android.sourceSets.getByName("main").java.srcDirs)
-//}
-
 // just playing around with tasks
 val sourcesJar by tasks.creating(Jar::class) {
     archiveClassifier.set("sources")
-    from(sourceSets.getByName("main").java.srcDirs)
+    from(android.sourceSets.getByName("main").java.srcDirs)
 }
 
 afterEvaluate {
     publishing {
         publications {
-            create("release", MavenPublication::class) {
+            register("release", MavenPublication::class) {
                 artifact(sourcesJar)
-                from (components["java"])
+                artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
+//                from (components["java"])
                 artifactId = "data-capture"
                 // Also publish source code for developers" convenience
                 pom {
