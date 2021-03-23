@@ -32,15 +32,20 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * @param questionnaireResponseItemChangedCallback function that should be called whenever the
  * `questionnaireResponseItemBuilder` is changed to inform the rest of the questionnaire to be
  * updated
+ * @param questionnaireResponseItemAnsweredCallback function that should be called whenever the
+ * `questionnaireItemViewItem` which can make structural changes is answered.
+ * @param questionnaireItemViewItemProperty
  */
 internal data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
   val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-  val questionnaireResponseItemChangedCallback: () -> Unit
+  val questionnaireResponseItemChangedCallback: () -> Unit,
+  val questionnaireResponseItemAnsweredCallback: (linkId: String) -> Unit,
+  val questionnaireItemViewItemProperty: QuestionnaireItemViewItemProperty
 ) {
   /**
-   * The single answer to the [QuestionnaireResponse.Item], or `null` if there is none or more than
-   * one answer.
+   * The single answer to the [QuestionnaireResponse.QuestionnaireResponseItemComponent], or `null`
+   * if there is none or more than one answer.
    */
   var singleAnswerOrNull
     get() = questionnaireResponseItem.answer.singleOrNull()
