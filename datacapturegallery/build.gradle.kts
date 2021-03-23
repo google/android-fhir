@@ -2,6 +2,7 @@ plugins {
     id(deps.Plugins.application)
     id(deps.Plugins.kotlinAndroid)
     id(deps.Plugins.navSafeArgs)
+    id(deps.Plugins.kotlinKapt)
 }
 
 android {
@@ -17,11 +18,11 @@ android {
 
         testInstrumentationRunner(deps.TestDependencies.standardRunner)
         // Required when setting minSdkVersion to 20 or lower
-        isMultiDexEnabled = true
+        multiDexEnabled = true
     }
 
     buildFeatures {
-        isViewBinding = true
+        viewBinding = true
     }
 
     buildTypes {
@@ -73,7 +74,7 @@ dependencies {
 //    implementation deps.navigation.fragment
 //    implementation deps.navigation.ui
 
-    implementation project("path" = ":datacapture")
+    implementation (project(path = ":datacapture"))
 
     testImplementation(deps.TestDependencies.CoreTestDeps.junit)
 
