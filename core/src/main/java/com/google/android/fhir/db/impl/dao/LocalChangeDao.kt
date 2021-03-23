@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.db.impl.dao
 
+import android.util.Log
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -76,7 +77,15 @@ internal abstract class LocalChangeDao {
         "Unexpected DELETE when updating $resourceType/$resourceId. UPDATE failed."
       )
     }
-
+    val jsonDiff = LocalChangeUtils.diff(iParser, oldResource, resource)
+    if (jsonDiff.length() == 0) {
+      Log.i(
+        "LocalChangeDao",
+        "New resource ${resource.resourceType}/${resource.id} is same as old resource. " +
+          "Not inserting UPDATE LocalChange."
+      )
+      return
+    }
     addLocalChange(
       LocalChangeEntity(
         id = 0,
@@ -84,7 +93,7 @@ internal abstract class LocalChangeDao {
         resourceId = resourceId,
         timestamp = timestamp,
         type = Type.UPDATE,
-        payload = LocalChangeUtils.diff(iParser, oldResource, resource)
+        payload = jsonDiff.toString()
       )
     )
   }
