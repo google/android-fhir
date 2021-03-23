@@ -1,6 +1,6 @@
 // Common gradle configuration file for dependencies.
 // This makes sure all modules use the same dependencies/versions.
-// This file is referenced by the project-level build.gradle.kts file.
+// This file is referenced by the project-level build.gradle.kts.kts file.
 // Entries in each section of this file should be sorted alphabetically.
 def sdk_versions = [:]
 sdk_versions.compile_sdk = 29 // done
