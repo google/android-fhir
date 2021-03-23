@@ -60,7 +60,6 @@ dependencies {
     implementation deps.coroutines.core
     implementation deps.fragment
     implementation deps.kotlin.stdlib
-    implementation deps.lifecycle.extensions
     implementation deps.lifecycle.livedata_ktx
     implementation deps.lifecycle.runtime
     implementation deps.lifecycle.viewmodel

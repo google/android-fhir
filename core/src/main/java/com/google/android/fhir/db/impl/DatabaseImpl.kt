@@ -59,33 +59,33 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
   val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 
   @Transaction
-  override fun <R : Resource> insert(resource: R) {
+  override suspend fun <R : Resource> insert(resource: R) {
     resourceDao.insert(resource)
     localChangeDao.addInsert(resource)
   }
 
-  override fun <R : Resource> insertRemote(resource: R) {
+  override suspend fun <R : Resource> insertRemote(resource: R) {
     resourceDao.insert(resource)
   }
 
   @Transaction
-  override fun <R : Resource> insertAll(resources: List<R>) {
+  override suspend fun <R : Resource> insertAll(resources: List<R>) {
     resourceDao.insertAll(resources)
     localChangeDao.addInsertAll(resources)
   }
 
-  override fun <R : Resource> insertAllRemote(resources: List<R>) {
+  override suspend fun <R : Resource> insertAllRemote(resources: List<R>) {
     resourceDao.insertAll(resources)
   }
 
   @Transaction
-  override fun <R : Resource> update(resource: R) {
+  override suspend fun <R : Resource> update(resource: R) {
     val oldResource = select(resource.javaClass, resource.logicalId)
     resourceDao.update(resource)
     localChangeDao.addUpdate(oldResource, resource)
   }
 
-  override fun <R : Resource> select(clazz: Class<R>, id: String): R {
+  override suspend fun <R : Resource> select(clazz: Class<R>, id: String): R {
     val type = getResourceType(clazz)
     return resourceDao.getResource(resourceId = id, resourceType = type)?.let {
       iParser.parseResource(clazz, it)
@@ -107,13 +107,13 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
   }
 
   @Transaction
-  override fun <R : Resource> delete(clazz: Class<R>, id: String) {
+  override suspend fun <R : Resource> delete(clazz: Class<R>, id: String) {
     val type = getResourceType(clazz)
     val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
     if (rowsDeleted > 0) localChangeDao.addDelete(resourceId = id, resourceType = type)
   }
 
-  override fun <R : Resource> searchByReference(
+  override suspend fun <R : Resource> searchByReference(
     clazz: Class<R>,
     reference: String,
     value: String
@@ -122,7 +122,7 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
       .map { iParser.parseResource(it) as R }
   }
 
-  override fun <R : Resource> searchByString(
+  override suspend fun <R : Resource> searchByString(
     clazz: Class<R>,
     string: String,
     value: String
@@ -135,7 +135,7 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
       .map { iParser.parseResource(it) as R }
   }
 
-  override fun <R : Resource> searchByCode(
+  override suspend fun <R : Resource> searchByCode(
     clazz: Class<R>,
     code: String,
     system: String,
@@ -150,7 +150,7 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
       .map { iParser.parseResource(it) as R }
   }
 
-  override fun <R : Resource> searchByReferenceAndCode(
+  override suspend fun <R : Resource> searchByReferenceAndCode(
     clazz: Class<R>,
     reference: String,
     referenceValue: String,
@@ -162,7 +162,7 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
     return searchByCode(clazz, code, codeSystem, codeValue).filter { refs.contains(it.logicalId) }
   }
 
-  override fun <R : Resource> search(query: Query): List<R> =
+  override suspend fun <R : Resource> search(query: Query): List<R> =
     resourceDao.getResources(query.getSupportSQLiteQuery()).map { iParser.parseResource(it) as R }
 
   /**
@@ -170,12 +170,12 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
    * [LocalChangeEntity.id] s of rows of the [LocalChangeEntity].
    */
   // TODO: create a data class for squashed local change and merge token in to it.
-  override fun getAllLocalChanges(): List<Pair<LocalChangeToken, LocalChangeEntity>> =
+  override suspend fun getAllLocalChanges(): List<Pair<LocalChangeToken, LocalChangeEntity>> =
     localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
       LocalChangeToken(it.map { it.id }) to LocalChangeUtils.squash(it)
     }
 
-  override fun deleteUpdates(token: LocalChangeToken) {
+  override suspend fun deleteUpdates(token: LocalChangeToken) {
     localChangeDao.discardLocalChanges(token)
   }
 
