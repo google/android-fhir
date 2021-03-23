@@ -9,7 +9,7 @@ android {
     buildToolsVersion(versions.Plugins.buildTools)
 
     defaultConfig {
-        applicationId "com.google.android.fhir.datacapture.gallery"
+        applicationId ("com.google.android.fhir.datacapture.gallery")
         minSdkVersion(versions.Sdk.minSdk)
         targetSdkVersion(versions.Sdk.targetSdk)
         versionCode = 1
@@ -73,7 +73,7 @@ dependencies {
 //    implementation deps.navigation.fragment
 //    implementation deps.navigation.ui
 
-    implementation project(path = ":datacapture")
+    implementation project("path" = ":datacapture")
 
     testImplementation(deps.TestDependencies.CoreTestDeps.junit)
 
