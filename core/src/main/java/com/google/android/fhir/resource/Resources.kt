@@ -26,15 +26,15 @@ internal val R4_RESOURCE_PACKAGE_PREFIX = "org.hl7.fhir.r4.model."
 /** Returns the FHIR resource type. */
 internal fun <R : Resource> getResourceType(clazz: Class<R>): ResourceType {
   try {
-    return clazz.getConstructor().newInstance().getResourceType()
+    return clazz.getConstructor().newInstance().resourceType
   } catch (e: NoSuchMethodException) {
-    throw IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e)
+    throw IllegalArgumentException("Cannot resolve resource type for " + clazz.name, e)
   } catch (e: IllegalAccessException) {
-    throw IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e)
+    throw IllegalArgumentException("Cannot resolve resource type for " + clazz.name, e)
   } catch (e: InstantiationException) {
-    throw IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e)
+    throw IllegalArgumentException("Cannot resolve resource type for " + clazz.name, e)
   } catch (e: InvocationTargetException) {
-    throw IllegalArgumentException("Cannot resolve resource type for " + clazz.getName(), e)
+    throw IllegalArgumentException("Cannot resolve resource type for " + clazz.name, e)
   }
 }
 
