@@ -44,7 +44,12 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
                 value = BooleanType(checkBox.isChecked)
               }
           }
-
+          if (questionnaireItemViewItem.questionnaireItemViewItemProperty.canModifyStructure) {
+            questionnaireItemViewItem.questionnaireResponseItemAnsweredCallback(
+              questionnaireItemViewItem.questionnaireItem.linkId
+            )
+            return@setOnClickListener
+          }
           questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
         }
       }
