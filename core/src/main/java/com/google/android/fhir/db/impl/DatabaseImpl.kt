@@ -103,7 +103,7 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
     resources: List<Resource>
   ) {
     syncedResourceDao.insert(syncedResourceEntity)
-    insertAll(resources)
+    insertAllRemote(resources)
   }
 
   @Transaction
