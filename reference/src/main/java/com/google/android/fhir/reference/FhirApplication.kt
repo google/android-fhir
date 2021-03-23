@@ -30,7 +30,6 @@ import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.RepeatInterval
 import com.google.android.fhir.sync.SyncConfiguration
 import com.google.android.fhir.sync.SyncData
-import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -60,7 +59,6 @@ class FhirApplication : Application() {
   }
 
   companion object {
-    @JvmStatic
     fun fhirEngine(context: Context) = (context.applicationContext as FhirApplication).fhirEngine
   }
 }

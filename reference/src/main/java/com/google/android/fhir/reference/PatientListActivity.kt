@@ -30,7 +30,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.fhir.reference.FhirApplication.Companion.fhirEngine
 import com.google.android.material.snackbar.Snackbar
 
 /** An activity representing a list of Patients. */
@@ -47,13 +47,7 @@ class PatientListActivity : AppCompatActivity() {
     setSupportActionBar(toolbar)
     toolbar.title = title
 
-    // Launch the old Fhir and CQL resources loading screen.
-    findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
-      val resLoadIntent = Intent(baseContext, CqlLoadActivity::class.java)
-      startActivity(resLoadIntent)
-    }
-
-    fhirEngine = FhirApplication.fhirEngine(this)
+    fhirEngine = fhirEngine(this)
 
     patientListViewModel =
       ViewModelProvider(this, PatientListViewModelFactory(this.application, fhirEngine))
@@ -99,24 +93,13 @@ class PatientListActivity : AppCompatActivity() {
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     val view: View = findViewById(R.id.app_bar)
-
     // Handle item selection
-    return when (item.itemId) {
-      R.id.sync_resources -> {
-        syncResources(view)
-        true
-      }
-      R.id.load_resource -> {
-        loadResources()
-        true
-      }
-      else -> super.onOptionsItemSelected(item)
+    return if (item.itemId == R.id.sync_resources) {
+      syncResources(view)
+      true
+    } else {
+      super.onOptionsItemSelected(item)
     }
-  }
-
-  private fun loadResources() {
-    val resLoadIntent = Intent(baseContext, CqlLoadActivity::class.java)
-    startActivity(resLoadIntent)
   }
 
   private fun syncResources(view: View) {
