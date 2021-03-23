@@ -17,8 +17,8 @@
 package com.google.android.fhir.datacapture.views
 
 import androidx.recyclerview.widget.RecyclerView
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /**
  * Item for [QuestionnaireItemViewHolder] in [RecyclerView] containing
@@ -34,8 +34,8 @@ import com.google.fhir.r4.core.QuestionnaireResponse
  * updated
  */
 internal data class QuestionnaireItemViewItem(
-  val questionnaireItem: Questionnaire.Item,
-  val questionnaireResponseItemBuilder: QuestionnaireResponse.Item.Builder,
+  val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+  val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   val questionnaireResponseItemChangedCallback: () -> Unit
 ) {
   /**
@@ -43,9 +43,9 @@ internal data class QuestionnaireItemViewItem(
    * one answer.
    */
   var singleAnswerOrNull
-    get() = questionnaireResponseItemBuilder.answerBuilderList.singleOrNull()
+    get() = questionnaireResponseItem.answer.singleOrNull()
     set(value) {
-      questionnaireResponseItemBuilder.clearAnswer()
-      value?.let { questionnaireResponseItemBuilder.addAnswer(it) }
+      questionnaireResponseItem.answer.clear()
+      value?.let { questionnaireResponseItem.addAnswer(it) }
     }
 }

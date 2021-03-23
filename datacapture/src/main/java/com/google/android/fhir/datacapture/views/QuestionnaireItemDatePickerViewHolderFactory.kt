@@ -26,22 +26,22 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
-import com.google.fhir.r4.core.Date
-import com.google.fhir.r4.core.QuestionnaireResponse
-import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemDatePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_date_picker_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var prefixTextView: TextView
       private lateinit var textDateQuestion: TextView
       private lateinit var textInputEditText: TextInputEditText
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
+        prefixTextView = itemView.findViewById(R.id.prefix)
         textDateQuestion = itemView.findViewById(R.id.question)
         textInputEditText = itemView.findViewById(R.id.textInputEditText)
         // Disable direct text input to only allow input from the date picker dialog
@@ -65,7 +65,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                 val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
                 val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
                 val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
-                val zonedDateTime =
+                textInputEditText.setText(
                   LocalDate.of(
                       year,
                       // Month values are 1-12 in java.time but 0-11 in
@@ -73,20 +73,13 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                       month + 1,
                       dayOfMonth
                     )
-                    .atStartOfDay()
-                    .atZone(ZoneId.systemDefault())
-                textInputEditText.setText(zonedDateTime.format(LOCAL_DATE_FORMATTER))
+                    .format(LOCAL_DATE_FORMATTER)
+                )
 
-                val date =
-                  Date.newBuilder()
-                    .setValueUs(zonedDateTime.toEpochSecond() * NUMBER_OF_MICROSECONDS_PER_SECOND)
-                    .setPrecision(Date.Precision.DAY)
-                    .setTimezone(ZoneId.systemDefault().id)
-                    .build()
+                val date = DateType(year, month, dayOfMonth)
                 questionnaireItemViewItem.singleAnswerOrNull =
-                  QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                    value =
-                      QuestionnaireResponse.Item.Answer.ValueX.newBuilder().setDate(date).build()
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = date
                   }
                 questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
               }
@@ -101,15 +94,24 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
-        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.text.value
+        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
+          prefixTextView.visibility = View.VISIBLE
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
+        } else {
+          prefixTextView.visibility = View.GONE
+        }
+        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.text
         textInputEditText.setText(
           questionnaireItemViewItem
             .singleAnswerOrNull
-            ?.value
-            ?.date
+            ?.valueDateType
             ?.let {
-              Instant.ofEpochMilli(it.valueUs / NUMBER_OF_MICROSECONDS_PER_MILLISECOND)
-                .atZone(ZoneId.systemDefault())
+              LocalDate.of(
+                it.year,
+                // month values are 1-12 in java.time but 0-11 in DateType (FHIR)
+                it.month + 1,
+                it.day
+              )
             }
             ?.format(LOCAL_DATE_FORMATTER)
             ?: ""

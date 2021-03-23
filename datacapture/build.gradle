@@ -81,10 +81,7 @@ dependencies {
     androidTestImplementation deps.atsl.runner
     androidTestImplementation deps.truth
 
-    api deps.fhir_protos
-    api (deps.hapi_r4) {
-        exclude module: 'junit'
-    }
+    api deps.hapi_r4
 
     coreLibraryDesugaring deps.desugar
 

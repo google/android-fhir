@@ -27,7 +27,7 @@ class QuestionnaireViewModel(application: Application, private val state: SavedS
     get() {
       if (questionnaireJson == null) {
         questionnaireJson =
-          readFileFromAssets(state[QuestionnaireActivity.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+          readFileFromAssets(state[QuestionnaireContainerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
       }
       return questionnaireJson!!
     }
@@ -35,19 +35,19 @@ class QuestionnaireViewModel(application: Application, private val state: SavedS
   val questionnaireResponse: String?
     get() {
       if (questionnaireResponseJson == null) {
-        if (state.contains(QuestionnaireActivity.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY)) {
+        if (state.contains(QuestionnaireContainerFragment.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY)) {
           questionnaireResponseJson =
-            readFileFromAssets(state[QuestionnaireActivity.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY]!!)
+            readFileFromAssets(
+              state[QuestionnaireContainerFragment.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY]!!
+            )
         }
       }
       return questionnaireResponseJson
     }
 
   private fun readFileFromAssets(filename: String): String {
-    return getApplication<Application>()
-      .assets
-      .open(state[QuestionnaireActivity.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY]!!)
-      .bufferedReader()
-      .use { it.readText() }
+    return getApplication<Application>().assets.open(filename).bufferedReader().use {
+      it.readText()
+    }
   }
 }

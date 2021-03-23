@@ -23,32 +23,37 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
-import com.google.android.fhir.datacapture.responseAnswerValueX
-import com.google.fhir.r4.core.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemRadioGroupViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_radio_group_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var prefixTextView: TextView
       private lateinit var radioHeader: TextView
       private lateinit var radioGroup: RadioGroup
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
+        prefixTextView = itemView.findViewById(R.id.prefix)
         radioGroup = itemView.findViewById(R.id.radio_group)
         radioHeader = itemView.findViewById(R.id.radio_header)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
-        val questionnaireItem = questionnaireItemViewItem.questionnaireItem
-        val questionnaireResponseItemBuilder =
-          questionnaireItemViewItem.questionnaireResponseItemBuilder
-        val answer = questionnaireResponseItemBuilder.answerList.singleOrNull()?.value?.coding
-        radioHeader.text = questionnaireItem.text.value
+        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
+          prefixTextView.visibility = View.VISIBLE
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
+        } else {
+          prefixTextView.visibility = View.GONE
+        }
+        val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
+        val answer = questionnaireResponseItem.answer.singleOrNull()?.valueCoding
+        radioHeader.text = questionnaireItem.text
         radioGroup.removeAllViews()
         var index = 0
-        questionnaireItem.answerOptionList.forEach {
+        questionnaireItem.answerOption.forEach {
           radioGroup.addView(
             RadioButton(radioGroup.context).apply {
               id = index++ // Use the answer option index as radio button ID
@@ -58,27 +63,27 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
                   ViewGroup.LayoutParams.MATCH_PARENT,
                   ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-              this.isChecked = it.value.coding == answer
+              isChecked = it.valueCoding.equalsDeep(answer)
             }
           )
         }
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
           // if-else block to prevent over-writing of "items" nested within "answer"
-          if (questionnaireResponseItemBuilder.answerCount > 0) {
-            val tmpItems = questionnaireResponseItemBuilder.answerList.first().itemList
-            QuestionnaireResponse.Item.Answer.newBuilder()
-              .setValue(questionnaireItem.answerOptionList[checkedId].responseAnswerValueX)
-              .addAllItem(tmpItems)
+          if (questionnaireResponseItem.answer.size > 0) {
+            val tmpItems = questionnaireResponseItem.answer.first().item
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = questionnaireItem.answerOption[checkedId].value
+            }
           } else {
-            questionnaireResponseItemBuilder
-              .clearAnswer()
-              .addAnswer(
-                QuestionnaireResponse.Item.Answer.newBuilder().apply {
-                  value = questionnaireItem.answerOptionList[checkedId].responseAnswerValueX
+            questionnaireResponseItem.answer.apply {
+              clear()
+              add(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = questionnaireItem.answerOption[checkedId].value
                 }
               )
+            }
           }
-
           questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
         }
       }

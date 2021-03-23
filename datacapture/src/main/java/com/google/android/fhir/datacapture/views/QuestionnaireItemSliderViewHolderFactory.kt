@@ -20,42 +20,46 @@ import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.slider.Slider
-import com.google.fhir.r4.core.Integer
-import com.google.fhir.r4.core.QuestionnaireResponse
+import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemSliderViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_slider) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var prefixTextView: TextView
       private lateinit var sliderHeader: TextView
       private lateinit var slider: Slider
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
+        prefixTextView = itemView.findViewById(R.id.prefix)
         sliderHeader = itemView.findViewById(R.id.slider_header)
         slider = itemView.findViewById(R.id.slider)
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
+        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
+          prefixTextView.visibility = View.VISIBLE
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
+        } else {
+          prefixTextView.visibility = View.GONE
+        }
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         val answer = questionnaireItemViewItem.singleAnswerOrNull
-        sliderHeader.text = questionnaireItem.text.value
+        sliderHeader.text = questionnaireItem.text
         slider.valueFrom = 0.0F
         slider.valueTo = 100.0F
         slider.stepSize = 10.0F
-        val sliderValue = answer?.value?.integer?.value?.toString() ?: "0.0"
+        val sliderValue = answer?.valueIntegerType?.value?.toString() ?: "0.0"
         slider.value = sliderValue.toFloat()
 
         slider.addOnChangeListener { _, newValue, _ ->
           // Responds to when slider's value is changed
           questionnaireItemViewItem.singleAnswerOrNull =
-            QuestionnaireResponse.Item.Answer.newBuilder().apply {
-              value =
-                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                  .setInteger(Integer.newBuilder().setValue(newValue.toInt()).build())
-                  .build()
-            }
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(IntegerType(newValue.toInt()))
           questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
         }
       }

@@ -22,7 +22,7 @@ import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
-import com.google.fhir.r4.core.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal abstract class QuestionnaireItemEditTextViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_edit_text_view) {
@@ -34,11 +34,13 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private val rawInputType: Int,
   private val isSingleLine: Boolean
 ) : QuestionnaireItemViewHolderDelegate {
+  private lateinit var prefixTextView: TextView
   private lateinit var textQuestion: TextView
   private lateinit var textInputEditText: TextInputEditText
   private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
   override fun init(itemView: View) {
+    prefixTextView = itemView.findViewById(R.id.prefix)
     textQuestion = itemView.findViewById(R.id.question)
     textInputEditText = itemView.findViewById(R.id.textInputEditText)
     textInputEditText.setRawInputType(rawInputType)
@@ -51,16 +53,26 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
 
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     this.questionnaireItemViewItem = questionnaireItemViewItem
-    textQuestion.text = questionnaireItemViewItem.questionnaireItem.text.value
+    if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
+      prefixTextView.visibility = View.VISIBLE
+      prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
+    } else {
+      prefixTextView.visibility = View.GONE
+    }
+    textQuestion.text = questionnaireItemViewItem.questionnaireItem.text
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
   }
 
   /** Returns the answer that should be recorded given the text input by the user. */
-  abstract fun getValue(text: String): QuestionnaireResponse.Item.Answer.Builder?
+  abstract fun getValue(
+    text: String
+  ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
 
   /**
    * Returns the text that should be displayed in the [TextInputEditText] from the existing answer
    * to the question (may be input by the user or previously recorded).
    */
-  abstract fun getText(answer: QuestionnaireResponse.Item.Answer.Builder?): String
+  abstract fun getText(
+    answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?
+  ): String
 }
