@@ -4,8 +4,8 @@ object TestDependencies {
 
   object CoreTestDeps {
     const val core = "androidx.test:core:${versions.TestDependencies.CoreTest.core}"
-    const val ext_junit = "androidx.test.ext:junit:${versions.TestDependencies.CoreTest.junit}"
-    const val ext_junit_ktx =
+    const val extJunit = "androidx.test.ext:junit:${versions.TestDependencies.CoreTest.junit}"
+    const val extJunitKtx =
       "androidx.test.ext:junit-ktx:${versions.TestDependencies.CoreTest.junit}"
     const val rules = "androidx.test:rules:${versions.TestDependencies.CoreTest.rules}"
     const val runner = "androidx.test:runner:${versions.TestDependencies.CoreTest.runner}"

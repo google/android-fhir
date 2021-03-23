@@ -8,6 +8,9 @@ plugins {
 //apply plugin =  'kotlin-android'
 //apply plugin =  'kotlin-kapt'
 
+val packageName = "com.google.android.fhir.datacapture"
+val pkg = "package"
+
 android {
     compileSdkVersion(versions.Sdk.compileSdk)
     defaultConfig {
@@ -17,7 +20,7 @@ android {
         versionName = "1.0"
         testInstrumentationRunner(deps.TestDependencies.standardRunner)
         // need to specify this to prevent junit runner from going deep into our dependencies
-//        testInstrumentationRunnerArguments = mutableMapOf("package" to "com.google.android.fhir")
+        testInstrumentationRunnerArguments(mapOf(pkg to packageName))
         // Required when setting minSdkVersion to 20 or lower
         // See https = //developer.android.com/studio/write/java8-support
         multiDexEnabled = true
@@ -73,7 +76,7 @@ android {
     compileOptions {
         // Flag to enable support for the new language APIs
         // See https = //developer.android.com/studio/write/java8-support
-//        coreLibraryDesugaringEnabled(true)
+        isCoreLibraryDesugaringEnabled = true
         // Sets Java compatibility to Java 8
         // See https = //developer.android.com/studio/write/java8-support
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -106,8 +109,8 @@ configurations {
 
 dependencies {
     androidTestImplementation(deps.TestDependencies.CoreTestDeps.core)
-    androidTestImplementation(deps.TestDependencies.CoreTestDeps.ext_junit)
-    androidTestImplementation(deps.TestDependencies.CoreTestDeps.ext_junit_ktx)
+    androidTestImplementation(deps.TestDependencies.CoreTestDeps.extJunit)
+    androidTestImplementation(deps.TestDependencies.CoreTestDeps.extJunitKtx)
     androidTestImplementation(deps.TestDependencies.CoreTestDeps.runner)
     androidTestImplementation(deps.TestDependencies.truth)
 //    androidTestImplementation (deps.atsl.core)
@@ -154,7 +157,7 @@ dependencies {
 //    kapt deps.room.compiler
 
     testImplementation(deps.TestDependencies.CoreTestDeps.core)
-    testImplementation(deps.TestDependencies.CoreTestDeps.ext_junit)
+    testImplementation(deps.TestDependencies.CoreTestDeps.extJunit)
     testImplementation(deps.TestDependencies.truth)
     testImplementation(deps.TestDependencies.roboelectric)
 
