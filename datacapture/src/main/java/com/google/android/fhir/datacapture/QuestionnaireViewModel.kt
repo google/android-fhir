@@ -20,6 +20,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.enablement.QuestionnaireItemWithResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItemProperty
 import kotlinx.coroutines.flow.Flow
@@ -67,6 +68,9 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   private val linkIdToQuestionnaireResponseItemMap =
     createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse.item)
 
+  /** Map from link IDs to questionnaire items. */
+  private val linkIdToQuestionnaireItemMap = createLinkIdToQuestionnaireItemMap(questionnaire.item)
+
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
 
@@ -103,6 +107,17 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     return linkIdToQuestionnaireResponseItemMap
   }
 
+  private fun createLinkIdToQuestionnaireItemMap(
+    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>
+  ): Map<String, Questionnaire.QuestionnaireItemComponent> {
+    val linkIdToQuestionnaireItemMap =
+      questionnaireItemList.map { it.linkId to it }.toMap().toMutableMap()
+    for (item in questionnaireItemList) {
+      linkIdToQuestionnaireItemMap.putAll(createLinkIdToQuestionnaireItemMap(item.item))
+    }
+    return linkIdToQuestionnaireItemMap
+  }
+
   /**
    * Traverse (DFS) through the list of questionnaire items , the list of questionnaire response
    * items and the list of items in the questionnaire response answer list and populate
@@ -125,8 +140,13 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
 
       val enabled =
-        EnablementEvaluator.evaluate(questionnaireItem) {
-          (linkIdToQuestionnaireResponseItemMap[it] ?: return@evaluate null)
+        EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
+          QuestionnaireItemWithResponse(
+            (linkIdToQuestionnaireItemMap[linkId]
+              ?: return@evaluate QuestionnaireItemWithResponse(null, null)),
+            (linkIdToQuestionnaireResponseItemMap[linkId]
+              ?: return@evaluate QuestionnaireItemWithResponse(null, null))
+          )
         }
       if (enabled) {
         questionnaireItemViewItemList.add(
