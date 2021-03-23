@@ -25,6 +25,7 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
+import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.impl.Query
 import org.hl7.fhir.r4.model.Resource
@@ -79,7 +80,7 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
 
   @Transaction
   override fun <R : Resource> update(resource: R) {
-    val oldResource = select(resource.javaClass, resource.id)
+    val oldResource = select(resource.javaClass, resource.logicalId)
     resourceDao.update(resource)
     localChangeDao.addUpdate(oldResource, resource)
   }
@@ -157,8 +158,8 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
     codeSystem: String,
     codeValue: String
   ): List<R> {
-    val refs = searchByReference(clazz, reference, referenceValue).map { it.id }
-    return searchByCode(clazz, code, codeSystem, codeValue).filter { refs.contains(it.id) }
+    val refs = searchByReference(clazz, reference, referenceValue).map { it.logicalId }
+    return searchByCode(clazz, code, codeSystem, codeValue).filter { refs.contains(it.logicalId) }
   }
 
   override fun <R : Resource> search(query: Query): List<R> =
