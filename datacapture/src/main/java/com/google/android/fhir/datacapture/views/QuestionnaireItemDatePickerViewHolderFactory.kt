@@ -35,11 +35,13 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_date_picker_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var prefixTextView: TextView
       private lateinit var textDateQuestion: TextView
       private lateinit var textInputEditText: TextInputEditText
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
+        prefixTextView = itemView.findViewById(R.id.prefix)
         textDateQuestion = itemView.findViewById(R.id.question)
         textInputEditText = itemView.findViewById(R.id.textInputEditText)
         // Disable direct text input to only allow input from the date picker dialog
@@ -92,6 +94,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
+        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
+          prefixTextView.visibility = View.VISIBLE
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
+        } else {
+          prefixTextView.visibility = View.GONE
+        }
         textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.text
         textInputEditText.setText(
           questionnaireItemViewItem

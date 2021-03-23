@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.cql
+package com.google.android.fhir.cqlreference.cql
 
 import org.hl7.fhir.instance.model.api.IBase
 import org.opencds.cqf.cql.model.R4FhirModelResolver

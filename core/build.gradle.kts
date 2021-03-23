@@ -136,7 +136,6 @@ dependencies {
 
     // Needed for use of HAPI's FHIRPathEngine.
     // See https = //github.com/hapifhir/hapi-fhir/issues/2444.
-    implementation(deps.AppDependencies.CoreDeps.Cql.cqlEngineFhir)
     implementation(deps.AppDependencies.CoreDeps.Room.runtime)
     implementation(deps.AppDependencies.CoreDeps.Room.ktx)
     implementation(deps.AppDependencies.CoreDeps.work)
