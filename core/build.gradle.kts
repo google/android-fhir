@@ -110,6 +110,7 @@ configurations {
 dependencies {
     androidTestImplementation(deps.TestDependencies.CoreTestDeps.core)
     androidTestImplementation(deps.TestDependencies.CoreTestDeps.extJunit)
+    androidTestImplementation(deps.TestDependencies.CoreTestDeps.junit)
     androidTestImplementation(deps.TestDependencies.CoreTestDeps.extJunitKtx)
     androidTestImplementation(deps.TestDependencies.CoreTestDeps.runner)
     androidTestImplementation(deps.TestDependencies.truth)

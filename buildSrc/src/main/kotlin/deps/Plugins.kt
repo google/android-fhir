@@ -2,6 +2,7 @@ package deps
 
 object Plugins {
   const val androidLib = "com.android.library"
+  const val application = "com.android.application"
   const val kotlinAndroid = "kotlin-android"
   const val kotlinKapt = "kotlin-kapt"
   const val mavenPublish = "maven-publish"
