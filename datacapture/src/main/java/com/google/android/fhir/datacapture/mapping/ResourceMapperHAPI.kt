@@ -57,11 +57,20 @@ object ResourceMapperHAPI {
       }
 
       if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
-        val innerClass =
-          Class.forName(
-            "org.hl7.fhir.r4.model.${questionnaireItem.itemContextNameToExpressionMap2.values.first()}"
-          )
-        var type: Type = innerClass.newInstance() as Type
+        var innerClass: Class<*>
+        try {
+          innerClass =
+            Class.forName(
+              "com.google.android.fhir.datacapture.model.${questionnaireItem.itemContextNameToExpressionMap2.values.first()}"
+            )
+        } catch (e: ClassNotFoundException) {
+          innerClass =
+            Class.forName(
+              "org.hl7.fhir.r4.model.${questionnaireItem.itemContextNameToExpressionMap2.values.first()}"
+            )
+        }
+
+        val type: Type = innerClass.newInstance() as Type
 
         createInnerClassObject(type, questionnaireItem.item, questionnaireResponseItem.item)
 
@@ -112,6 +121,13 @@ object ResourceMapperHAPI {
             .javaClass
             .getMethod("set${targetFieldName2.capitalize()}", List::class.java)
             .invoke(type, listOf(questionnaireResponseItem2.answer.first().value))
+        }
+      } catch (e: NoSuchElementException) {
+        questionnaireItem2.type.getClass()?.let {
+          type
+            .javaClass
+            .getMethod("set${targetFieldName2.capitalize()}Element", it)
+            .invoke(type, questionnaireItem2.initial.first().value)
         }
       }
     }

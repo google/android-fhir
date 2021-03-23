@@ -176,6 +176,7 @@ class ResourceMapperHAPITest {
     val uriTestQuestionnaire =
       iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
         org.hl7.fhir.r4.model.Questionnaire
+
     val uriTestQuestionnaireResponse =
       iParser.parseResource(
         org.hl7.fhir.r4.model.QuestionnaireResponse::class.java,
