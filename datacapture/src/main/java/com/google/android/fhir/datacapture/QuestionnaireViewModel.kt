@@ -20,8 +20,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
-import com.google.android.fhir.datacapture.enablement.QuestionnaireItemWithResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItemProperty
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -31,6 +31,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   /** The current questionnaire as questions are being answered. */
   private val questionnaire: Questionnaire
+  private var questionnaireItemBeingSearched: Questionnaire.QuestionnaireItemComponent? = null
 
   init {
     val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
@@ -48,7 +49,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       questionnaireResponse =
         FhirContext.forR4().newJsonParser().parseResource(questionnaireJsonResponseString) as
           QuestionnaireResponse
-      validateQuestionnaireResponseItems(questionnaire.item, questionnaireResponse.item)
+      validateQuestionniareResponseItems(questionnaire.item, questionnaireResponse.item)
     } else {
       questionnaireResponse =
         QuestionnaireResponse().apply {
@@ -66,15 +67,19 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   private val linkIdToQuestionnaireResponseItemMap =
     createLinkIdToQuestionnaireResponseItemMap(questionnaireResponse.item)
 
-  /** Map from link IDs to questionnaire items. */
-  private val linkIdToQuestionnaireItemMap = createLinkIdToQuestionnaireItemMap(questionnaire.item)
-
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
 
   /** Callback function to update the UI. */
   private val questionnaireResponseItemChangedCallback = { modificationCount.value += 1 }
 
+  /**
+   * Callback function to update the UI. Based on the link Id of the
+   * [Questionnaire.QuestionnaireItemComponent] answered
+   */
+  private val questionnaireResponseItemAnsweredCallback: (String) -> Unit = { linkId ->
+    run { updateQuestionnaireResponseItemComponent(linkId) }
+  }
   internal val questionnaireItemViewItemList
     get() = getQuestionnaireItemViewItemList(questionnaire.item, questionnaireResponse.item)
 
@@ -96,17 +101,6 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       )
     }
     return linkIdToQuestionnaireResponseItemMap
-  }
-
-  private fun createLinkIdToQuestionnaireItemMap(
-    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>
-  ): Map<String, Questionnaire.QuestionnaireItemComponent> {
-    val linkIdToQuestionnaireItemMap =
-      questionnaireItemList.map { it.linkId to it }.toMap().toMutableMap()
-    for (item in questionnaireItemList) {
-      linkIdToQuestionnaireItemMap.putAll(createLinkIdToQuestionnaireItemMap(item.item))
-    }
-    return linkIdToQuestionnaireItemMap
   }
 
   /**
@@ -131,37 +125,102 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
 
       val enabled =
-        EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
-          QuestionnaireItemWithResponse(
-            (linkIdToQuestionnaireItemMap[linkId]
-              ?: return@evaluate QuestionnaireItemWithResponse(null, null)),
-            (linkIdToQuestionnaireResponseItemMap[linkId]
-              ?: return@evaluate QuestionnaireItemWithResponse(null, null))
-          )
+        EnablementEvaluator.evaluate(questionnaireItem) {
+          (linkIdToQuestionnaireResponseItemMap[it] ?: return@evaluate null)
         }
       if (enabled) {
         questionnaireItemViewItemList.add(
           QuestionnaireItemViewItem(
             questionnaireItem,
             questionnaireResponseItem,
-            questionnaireResponseItemChangedCallback
+            questionnaireResponseItemChangedCallback,
+            questionnaireResponseItemAnsweredCallback,
+            questionnaireItem.createQuestionnaireItemViewItemProperty()
           )
         )
-        questionnaireItemViewItemList.addAll(
-          getQuestionnaireItemViewItemList(questionnaireItem.item, questionnaireResponseItem.item)
-        )
-        if (!questionnaireItem.type.equals(Questionnaire.QuestionnaireItemType.GROUP)) {
-          questionnaireResponseItem.answer?.forEach {
-            if (it.item.size > 0) {
-              questionnaireItemViewItemList.addAll(
-                getQuestionnaireItemViewItemList(questionnaireItem.item, it.item)
-              )
-            }
-          }
+        if (questionnaireResponseItem.item.isEmpty() &&
+            questionnaireItem.item.isNotEmpty() &&
+            questionnaireResponseItem.answer.isNotEmpty()
+        ) {
+          questionnaireItemViewItemList.addAll(
+            getQuestionnaireItemViewItemList(
+              questionnaireItem.item,
+              questionnaireResponseItem.answer.first().item
+            )
+          )
+        } else {
+          questionnaireItemViewItemList.addAll(
+            getQuestionnaireItemViewItemList(questionnaireItem.item, questionnaireResponseItem.item)
+          )
         }
       }
     }
     return questionnaireItemViewItemList
+  }
+
+  private fun updateQuestionnaireResponseItemComponent(linkId: String) {
+    questionnaire.item.getItemWithLinkId(linkId)
+    questionnaireItemBeingSearched?.let {
+      questionnaireResponse.item.addNestedItemsOfItemWithLinkId(linkId)
+    }
+    modificationCount.value += 1
+  }
+
+  /** Traverse (DFS) through the list of questionnaire items and find the item with given linkId */
+  private fun MutableList<Questionnaire.QuestionnaireItemComponent>.getItemWithLinkId(
+    linkId: String
+  ) {
+    val questionnaireItemIterator = this.iterator()
+    while (questionnaireItemIterator.hasNext()) {
+      val questionnaireItem = questionnaireItemIterator.next()
+      if (questionnaireItem.linkId == linkId) {
+        questionnaireItemBeingSearched = questionnaireItem
+      } else if (questionnaireItem.item.isNotEmpty()) {
+        questionnaireItem.item.getItemWithLinkId(linkId)
+      }
+    }
+  }
+
+  /**
+   * Traverse (DFS) through the list of questionnaire response items and add nested items to the
+   * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] of the
+   * [QuestionnaireResponse.QuestionnaireResponseItemComponent] with the given linkId
+   */
+  private fun MutableList<
+    QuestionnaireResponse.QuestionnaireResponseItemComponent>.addNestedItemsOfItemWithLinkId(
+    linkId: String
+  ) {
+    val questionnaireResponseItemIterator = this.iterator()
+    var index = 0
+    while (questionnaireResponseItemIterator.hasNext()) {
+      val questionnaireResponseItem = questionnaireResponseItemIterator.next()
+      if (questionnaireResponseItem.linkId == linkId) {
+        this[index] = this[index].addNestedItemsToAnswer()
+        break
+      } else if (!questionnaireResponseItem.hasItem() && questionnaireResponseItem.hasAnswer()) {
+        if (questionnaireResponseItem.answer.first().hasItem()) {
+          questionnaireResponseItem.answer.first().item.addNestedItemsOfItemWithLinkId(linkId)
+        }
+      } else if (questionnaireResponseItem.hasItem()) {
+        questionnaireResponseItem.item.addNestedItemsOfItemWithLinkId(linkId)
+      }
+      index++
+    }
+  }
+
+  /**
+   * Add items within [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] from the
+   * provided parent [Questionnaire.QuestionnaireItemComponent] with nested items. The hierarchy and
+   * order of child items will be retained as specified in the standard. See
+   * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
+   */
+  private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAnswer():
+    QuestionnaireResponse.QuestionnaireResponseItemComponent {
+    return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+      linkId = this@addNestedItemsToAnswer.linkId
+      answer = this@addNestedItemsToAnswer.answer
+      answer.first().item = questionnaireItemBeingSearched?.createListOfItemInAnswer()
+    }
   }
 }
 
@@ -176,10 +235,49 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   QuestionnaireResponse.QuestionnaireResponseItemComponent {
   return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
-    this@createQuestionnaireResponseItem.item.forEach {
-      this.addItem(it.createQuestionnaireResponseItem())
+    if (this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
+        this@createQuestionnaireResponseItem.item.count() > 0
+    ) {
+      if (this.answer.isNotEmpty()) {
+        this@createQuestionnaireResponseItem.createListOfItemInAnswer().forEach {
+          this.answer.first().addItem(it)
+        }
+      }
+    } else if (this@createQuestionnaireResponseItem.type ==
+        Questionnaire.QuestionnaireItemType.GROUP
+    ) {
+      this@createQuestionnaireResponseItem.item.forEach {
+        this.addItem(it.createQuestionnaireResponseItem())
+      }
     }
   }
+}
+
+/**
+ * Creates a List of [QuestionnaireResponse.QuestionnaireResponseItemComponent] from the provided
+ * [Questionnaire.QuestionnaireItemComponent].
+ *
+ * The hierarchy and order of child items will be retained as specified in the standard. See
+ * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
+ */
+private fun Questionnaire.QuestionnaireItemComponent.createListOfItemInAnswer():
+  List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+  val listOfNestedItems = mutableListOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
+  this.item.forEach { listOfNestedItems.add(it.createQuestionnaireResponseItem()) }
+  return listOfNestedItems
+}
+
+/**
+ * Creates an instance of [QuestionnaireItemViewItemProperty] from the provided
+ * [Questionnaire.QuestionnaireItemComponent].
+ */
+private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireItemViewItemProperty():
+  QuestionnaireItemViewItemProperty {
+  val questionnaireItemViewItemProperty = QuestionnaireItemViewItemProperty()
+  if (this.item.isNotEmpty() && this.type != Questionnaire.QuestionnaireItemType.GROUP) {
+    questionnaireItemViewItemProperty.canModifyStructure = true
+  }
+  return questionnaireItemViewItemProperty
 }
 
 /**
@@ -188,7 +286,7 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
  * response item are equal. The traverse is carried out in the two lists in tandem. The two lists
  * should be structurally identical.
  */
-private fun validateQuestionnaireResponseItems(
+private fun validateQuestionniareResponseItems(
   questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
   questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
 ) {
@@ -206,9 +304,9 @@ private fun validateQuestionnaireResponseItems(
           "questionnaire response item ${questionnaireResponseItem.linkId}"
       )
     if (questionnaireItem.type.equals(Questionnaire.QuestionnaireItemType.GROUP)) {
-      validateQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
+      validateQuestionniareResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
     } else {
-      validateQuestionnaireResponseItems(
+      validateQuestionniareResponseItems(
         questionnaireItem.item,
         questionnaireResponseItem.answer.first().item
       )
