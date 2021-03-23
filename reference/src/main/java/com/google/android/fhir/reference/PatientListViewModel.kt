@@ -64,7 +64,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
         .run()
     Log.d(
       "PatientListViewModel",
-      "${searchResults.count()} search results: " + "${searchResults.joinToString(" ")}"
+      "${searchResults.count()} search results: ${searchResults.joinToString(" ")}"
     )
     return searchResults
   }
