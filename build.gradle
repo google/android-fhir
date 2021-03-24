@@ -3,7 +3,8 @@ buildscript {
     apply from: 'deps.gradle'
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        gradlePluginPortal()
     }
     dependencies {
         classpath deps.android_gradle_plugin
@@ -16,7 +17,6 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
         mavenCentral()
         maven {
             url 'https://oss.sonatype.org/content/repositories/snapshots'
