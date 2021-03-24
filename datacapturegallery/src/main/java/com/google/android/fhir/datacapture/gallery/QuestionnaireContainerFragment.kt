@@ -67,7 +67,10 @@ class QuestionnaireContainerFragment : Fragment() {
     if (savedInstanceState == null) {
       val fragment = QuestionnaireFragment()
       fragment.arguments =
-        bundleOf(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire)
+        bundleOf(
+          QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire,
+          QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to viewModel.questionnaireResponse
+        )
       childFragmentManager.commit { add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
     }
     return binding.root
