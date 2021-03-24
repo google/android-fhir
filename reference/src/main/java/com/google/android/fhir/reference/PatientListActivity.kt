@@ -26,6 +26,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
@@ -34,7 +35,7 @@ import com.google.android.fhir.reference.FhirApplication.Companion.fhirEngine
 import com.google.android.material.snackbar.Snackbar
 
 /** An activity representing a list of Patients. */
-class PatientListActivity : AppCompatActivity() {
+class PatientListActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
   private lateinit var fhirEngine: FhirEngine
   private lateinit var patientListViewModel: PatientListViewModel
 
@@ -107,5 +108,13 @@ class PatientListActivity : AppCompatActivity() {
       .setAction("Action", null)
       .show()
     patientListViewModel.searchPatients()
+  }
+
+  override fun onQueryTextSubmit(query: String?): Boolean {
+    TODO("Not yet implemented")
+  }
+
+  override fun onQueryTextChange(newText: String?): Boolean {
+    TODO("Not yet implemented")
   }
 }
