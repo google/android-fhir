@@ -1,6 +1,35 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'maven-publish'
+
+group = 'com.google.android.fhir'
+version = "0.1.0-alpha01"
+task sourceJar(type: Jar) {
+    archiveClassifier.set('sources')
+    from android.sourceSets.main.java.srcDirs
+}
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                artifactId = 'core'
+                // Also publish source code for developers' convenience
+                artifact(sourceJar)
+                pom {
+                    name = 'Android FHIR Core Library'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 android {
     compileSdkVersion sdk_versions.compile_sdk
