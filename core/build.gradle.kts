@@ -57,8 +57,16 @@ android {
 //    }
 
     sourceSets {
-        getByName("androidTest").java.srcDirs("src/test-common/java")
-        getByName("test").java.srcDirs("src/test-common/java")
+        getByName("androidTest").apply {
+            java.srcDirs("src/test-common/java")
+            resources.setSrcDirs(listOf("sampledata"))
+        }
+
+        getByName("test").apply {
+            java.srcDirs("src/test-common/java")
+            resources.setSrcDirs(listOf("sampledata"))
+        }
+
 //        unitTestVariants { resources.srcDirs("")}
 //        unitTestVariants.loadPropertyFromResources("sampledata")
 
