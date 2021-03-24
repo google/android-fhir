@@ -8,7 +8,7 @@ plugins {
 //apply plugin =  'kotlin-android'
 //apply plugin =  'kotlin-kapt'
 
-val packageName = "com.google.android.fhir.datacapture"
+val packageName = "com.google.android.fhir"
 val pkg = "package"
 
 android {
