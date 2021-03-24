@@ -24,38 +24,26 @@ object MaxValueValidator : ConstraintValidator {
 
   private const val MAX_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/maxValue"
 
-  override fun validate(
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItemBuilder: QuestionnaireResponse.QuestionnaireResponseItemComponent
-  ): QuestionnaireResponseItemValidator.ValidationResult {
-    return if (questionnaireItem.hasExtension(MAX_VALUE_EXTENSION_URL))
-      maxValueIntegerValidator(
-        questionnaireItem.getExtensionByUrl(MAX_VALUE_EXTENSION_URL),
-        questionnaireResponseItemBuilder
-      )
-    else QuestionnaireResponseItemValidator.ValidationResult(true, null)
-  }
-
-  private fun maxValueIntegerValidator(
-    extension: Extension,
-    questionnaireResponseItemBuilder: QuestionnaireResponse.QuestionnaireResponseItemComponent
-  ): QuestionnaireResponseItemValidator.ValidationResult {
-    val answer = questionnaireResponseItemBuilder.answer[0]
-    when {
-      extension.value.fhirType().equals("integer") && answer.hasValueIntegerType() -> {
-        val answeredValue = answer.valueIntegerType.value
-        if (answeredValue > extension.value.primitiveValue().toInt()) {
-          return QuestionnaireResponseItemValidator.ValidationResult(
-            false,
-            validationMessageGenerator(extension)
-          )
-        }
-      }
+    override fun validate(
+        questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+        questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+    ): ConstraintValidator.ConstraintValidationResult {
+        val extension = questionnaireItem.getExtensionByUrl(MAX_VALUE_EXTENSION_URL)
+        if (questionnaireItem.hasExtension(MAX_VALUE_EXTENSION_URL))
+            if (ValueConstraintValidator.valueConstraintValidator(
+                    extension,
+                    questionnaireResponseItem, ">"
+                )
+            ) {
+                return ConstraintValidator.ConstraintValidationResult(
+                    false,
+                    validationMessageGenerator(extension)
+                )
+            }
+        return ConstraintValidator.ConstraintValidationResult(true, null)
     }
-    return QuestionnaireResponseItemValidator.ValidationResult(true, null)
-  }
 
-  private fun validationMessageGenerator(extension: Extension): String {
-    return "Maximum value allowed is:" + extension.value.primitiveValue()
-  }
+    private fun validationMessageGenerator(extension: Extension): String {
+        return "Maximum value allowed is:" + extension.value.primitiveValue()
+    }
 }

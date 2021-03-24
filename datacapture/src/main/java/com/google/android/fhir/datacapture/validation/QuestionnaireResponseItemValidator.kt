@@ -21,24 +21,33 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 object QuestionnaireResponseItemValidator {
 
-  private val validators = mutableListOf(MaxValueValidator, MinValueValidator)
+    private val validators = mutableListOf(MaxValueValidator, MinValueValidator)
 
-  /**
-   * Validates [questionnaireResponseItemBuilder] contains valid answer(s) to [questionnaireItem].
-   */
-  fun validate(
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItemBuilder: QuestionnaireResponse.QuestionnaireResponseItemComponent
-  ): List<ValidationResult> {
-    if (questionnaireResponseItemBuilder.answer.isEmpty()) {
-      return listOf(ValidationResult(true, null))
+    /**
+     * Validates [questionnaireResponseItemBuilder] contains valid answer(s) to [questionnaireItem].
+     */
+    fun validate(
+        questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+        questionnaireResponseItemBuilder: QuestionnaireResponse.QuestionnaireResponseItemComponent
+    ): ValidationResult {
+        if (questionnaireResponseItemBuilder.answer.isEmpty()) {
+            return ValidationResult(true, mutableListOf())
+        }
+        val validationResults = mutableListOf<ConstraintValidator.ConstraintValidationResult>()
+        validators.forEach {
+            validationResults.add(it.validate(questionnaireItem, questionnaireResponseItemBuilder))
+        }
+        return packConstraintValidationResults(validationResults)
     }
-    val validationResults = mutableListOf<ValidationResult>()
-    validators.forEach {
-      validationResults.add(it.validate(questionnaireItem, questionnaireResponseItemBuilder))
-    }
-    return validationResults
-  }
 
-  data class ValidationResult(val isValid: Boolean, val message: String?)
+    data class ValidationResult(var isValid: Boolean, val validationMessages: MutableList<String?>)
+
+    private fun packConstraintValidationResults(validationResults: List<ConstraintValidator.ConstraintValidationResult>): ValidationResult {
+        val validationResult = ValidationResult(true, mutableListOf())
+        validationResults.forEach {
+            validationResult.isValid = validationResult.isValid && it.isValid
+            if (!it.message.isNullOrEmpty()) validationResult.validationMessages.add(it.message)
+        }
+        return validationResult
+    }
 }
