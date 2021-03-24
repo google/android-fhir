@@ -83,8 +83,7 @@ internal object ResourceIndexer {
             quantityIndex(searchParam, value)?.also { indexBuilder.addQuantityIndex(it) }
           SearchParamType.URI -> uriIndex(searchParam, value)?.also { indexBuilder.addUriIndex(it) }
           // TODO: Handle composite type https://github.com/google/android-fhir/issues/292.
-          SearchParamType.SPECIAL ->
-            specialIndex(searchParam, value)?.also { indexBuilder.addPositionIndex(it) }
+          SearchParamType.SPECIAL -> specialIndex(value)?.also { indexBuilder.addPositionIndex(it) }
         }
       }
 
@@ -209,16 +208,11 @@ internal object ResourceIndexer {
     }
   }
 
-  private fun specialIndex(searchParam: SearchParamDefinition, value: Base?): PositionIndex? {
+  private fun specialIndex(value: Base?): PositionIndex? {
     return when (value?.fhirType()) {
       "Location.position" -> {
         val location = (value as Location.LocationPositionComponent)
-        return PositionIndex(
-          searchParam.name,
-          searchParam.path,
-          location.latitude,
-          location.longitude
-        )
+        return PositionIndex(location.latitude.toDouble(), location.longitude.toDouble())
       }
       else -> null
     }

@@ -18,7 +18,14 @@ package com.google.android.fhir.index
 
 import android.os.Build
 import ca.uhn.fhir.context.FhirContext
-import com.google.android.fhir.index.entities.* // ktlint-disable no-wildcard-imports
+import com.google.android.fhir.index.entities.DateIndex
+import com.google.android.fhir.index.entities.NumberIndex
+import com.google.android.fhir.index.entities.PositionIndex
+import com.google.android.fhir.index.entities.QuantityIndex
+import com.google.android.fhir.index.entities.ReferenceIndex
+import com.google.android.fhir.index.entities.StringIndex
+import com.google.android.fhir.index.entities.TokenIndex
+import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -284,10 +291,7 @@ class ResourceIndexerTest {
   @Test
   fun index_location_shouldIndexPosition() {
     val resourceIndices = ResourceIndexer.index(specialTestLocation)
-    assertThat(resourceIndices.positionIndices)
-      .contains(
-        PositionIndex("near", "Location.position", BigDecimal("-83.69471"), BigDecimal("42.2565"))
-      )
+    assertThat(resourceIndices.positionIndices).contains(PositionIndex(-83.69471, 42.2565))
   }
   @Test
   fun index_molecularSequence_shouldIndexWindowAndVariant() {

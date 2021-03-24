@@ -16,20 +16,11 @@
 
 package com.google.android.fhir.index.entities
 
-import java.math.BigDecimal
-
 /**
  * An index record for a position value in a location resource.
- * @property [name] name of the Index
- * @property [path] path of the Index
  * @property [latitude] the latitude
  * @property [longitude] the longitude
  *
  * See https://www.hl7.org/fhir/search.html#special.
  */
-data class PositionIndex(
-  val name: String,
-  val path: String,
-  val latitude: BigDecimal,
-  val longitude: BigDecimal
-)
+data class PositionIndex(val latitude: Double, val longitude: Double)
