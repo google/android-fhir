@@ -1,10 +1,9 @@
 import org.gradle.language.nativeplatform.internal.Dimensions.unitTestVariants
 import org.jetbrains.kotlin.gradle.utils.loadPropertyFromResources
-
 plugins {
-    id(deps.Plugins.androidLib)
-    id(deps.Plugins.kotlinAndroid)
-    id(deps.Plugins.kotlinKapt)
+    id(BuildPlugins.androidLib)
+    id(BuildPlugins.kotlinAndroid)
+    id(BuildPlugins.kotlinKapt)
 }
 
 //apply(plugin =  "com.android.library")

@@ -1,7 +1,7 @@
 plugins {
-    id(deps.Plugins.application)
-    id(deps.Plugins.kotlinAndroid)
-    id(deps.Plugins.kotlinKapt)
+    id(BuildPlugins.application)
+    id(BuildPlugins.kotlinAndroid)
+    id(BuildPlugins.navSafeArgs)
 }
 
 android {

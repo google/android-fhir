@@ -1,11 +1,6 @@
 package deps
 
 object Plugins {
-  const val androidLib = "com.android.library"
-  const val application = "com.android.application"
-  const val kotlinAndroid = "kotlin-android"
-  const val kotlinKapt = "kotlin-kapt"
-  const val mavenPublish = "maven-publish"
   const val androidGradlePlugin = "com.android.tools.build:gradle:${versions.Plugins.androidGradlePlugin}"
   const val kotlin =
     "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.AppDependencies.Kotlin.kotlin}"

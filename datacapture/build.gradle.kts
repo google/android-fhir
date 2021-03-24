@@ -1,7 +1,7 @@
 plugins {
-    id(deps.Plugins.androidLib)
-    id(deps.Plugins.kotlinAndroid)
-    id(deps.Plugins.mavenPublish)
+    id(BuildPlugins.androidLib)
+    id(BuildPlugins.kotlinAndroid)
+    id(BuildPlugins.mavenPublish)
 }
 val group = "com.google.android.fhir"
 val version = "0.1.0-alpha01"
@@ -87,6 +87,7 @@ dependencies {
     androidTestImplementation(deps.TestDependencies.CoreTestDeps.extJunitKtx)
     androidTestImplementation(deps.TestDependencies.CoreTestDeps.runner)
     androidTestImplementation(deps.TestDependencies.truth)
+    androidTestImplementation(deps.TestDependencies.CoreTestDeps.rules)
 
     api(deps.AppDependencies.CoreDeps.Cql.hapiR4)
 
@@ -101,7 +102,7 @@ dependencies {
     implementation(deps.AppDependencies.CoreDeps.materialDesign)
 
     testImplementation(deps.TestDependencies.CoreTestDeps.core)
-    testImplementation(deps.TestDependencies.CoreTestDeps.extJunit)
+    testImplementation(deps.TestDependencies.CoreTestDeps.junit)
     testImplementation(deps.TestDependencies.roboelectric)
     testImplementation(deps.TestDependencies.truth)
 }
