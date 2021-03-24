@@ -1,3 +1,6 @@
+import org.gradle.language.nativeplatform.internal.Dimensions.unitTestVariants
+import org.jetbrains.kotlin.gradle.utils.loadPropertyFromResources
+
 plugins {
     id(deps.Plugins.androidLib)
     id(deps.Plugins.kotlinAndroid)
@@ -49,8 +52,16 @@ android {
 //        }
 //    }
     // experimental, modify it
+//    sourceSets {
+//        map { it.java.srcDir("src/test-common/java") }
+//    }
+
     sourceSets {
-        map { it.java.srcDir("src/${it.name}/kotlin") }
+        getByName("androidTest").java.srcDirs("src/test-common/java")
+        getByName("test").java.srcDirs("src/test-common/java")
+//        unitTestVariants { resources.srcDirs("")}
+//        unitTestVariants.loadPropertyFromResources("sampledata")
+
     }
 
 //    sourceSets["androidTest"].apply {
@@ -109,7 +120,7 @@ configurations {
 
 dependencies {
     androidTestImplementation(deps.TestDependencies.CoreTestDeps.core)
-    androidTestImplementation(deps.TestDependencies.CoreTestDeps.extJunit)
+//    androidTestImplementation(deps.TestDependencies.CoreTestDeps.extJunit)
     androidTestImplementation(deps.TestDependencies.CoreTestDeps.junit)
     androidTestImplementation(deps.TestDependencies.CoreTestDeps.extJunitKtx)
     androidTestImplementation(deps.TestDependencies.CoreTestDeps.runner)
@@ -157,7 +168,8 @@ dependencies {
 //    kapt deps.room.compiler
 
     testImplementation(deps.TestDependencies.CoreTestDeps.core)
-    testImplementation(deps.TestDependencies.CoreTestDeps.extJunit)
+    testImplementation(deps.TestDependencies.CoreTestDeps.junit)
+//    testImplementation(deps.TestDependencies.CoreTestDeps.extJunit)
     testImplementation(deps.TestDependencies.truth)
     testImplementation(deps.TestDependencies.roboelectric)
 
