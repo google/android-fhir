@@ -4,10 +4,6 @@ plugins {
     id(BuildPlugins.kotlinKapt)
 }
 
-//apply plugin: "com.android.application"
-//apply plugin: "kotlin-android"
-//apply plugin: "kotlin-kapt"
-
 android {
     compileSdkVersion(versions.Sdk.compileSdk)
     defaultConfig {
@@ -69,25 +65,10 @@ dependencies {
     implementation(deps.AppDependencies.CoreDeps.constraintLayout)
     implementation(deps.AppDependencies.Navigation.navFragment)
     implementation(deps.AppDependencies.Navigation.navUi)
-
     implementation(deps.AppDependencies.Lifecycle.extensions)
     implementation(deps.AppDependencies.Lifecycle.runtime)
     implementation(deps.AppDependencies.Lifecycle.liveDataKtx)
     implementation(deps.AppDependencies.Lifecycle.viewModel)
-
-//    implementation deps.activity
-//    implementation deps.appcompat
-//    implementation deps.constraint_layout
-//    implementation deps.coroutines.android
-//    implementation deps.coroutines.core
-//    implementation deps.fragment
-//    implementation deps.kotlin.stdlib
-//    implementation deps.lifecycle.extensions
-//    implementation deps.lifecycle.livedata_ktx
-//    implementation deps.lifecycle.runtime
-//    implementation deps.lifecycle.viewmodel
-//    implementation deps.material
-
     implementation(deps.AppDependencies.Networking.httpInterceptor)
     implementation(deps.AppDependencies.Networking.coreRetrofit)
     implementation(deps.AppDependencies.Networking.gsonConverter)
@@ -95,12 +76,6 @@ dependencies {
     implementation(deps.AppDependencies.CoreDeps.recyclerView)
     implementation(deps.AppDependencies.CoreDeps.work)
 
-//    implementation deps.okhttp_logging_interceptor
-//    implementation deps.recyclerview
-//    implementation deps.retrofit.core
-//    implementation deps.retrofit.gson
-//    implementation deps.retrofit.mock
-//    implementation deps.work.runtime
     implementation(project(path = ":core"))
 
     testImplementation(deps.TestDependencies.CoreTestDeps.junit)
