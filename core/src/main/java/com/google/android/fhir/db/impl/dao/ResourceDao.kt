@@ -35,6 +35,7 @@ import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.ResourceIndices
+import com.google.android.fhir.logicalId
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -46,12 +47,16 @@ internal abstract class ResourceDao {
 
   @Transaction
   open fun update(resource: Resource) {
-    updateResource(resource.id, resource.resourceType, iParser.encodeResourceToString(resource))
+    updateResource(
+      resource.logicalId,
+      resource.resourceType,
+      iParser.encodeResourceToString(resource)
+    )
     val entity =
       ResourceEntity(
         id = 0,
         resourceType = resource.resourceType,
-        resourceId = resource.id,
+        resourceId = resource.logicalId,
         serializedResource = iParser.encodeResourceToString(resource)
       )
     val index = ResourceIndexer.index(resource)
@@ -184,7 +189,7 @@ internal abstract class ResourceDao {
       ResourceEntity(
         id = 0,
         resourceType = resource.resourceType,
-        resourceId = resource.id,
+        resourceId = resource.logicalId,
         serializedResource = iParser.encodeResourceToString(resource)
       )
     insertResource(entity)
