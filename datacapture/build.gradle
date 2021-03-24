@@ -90,7 +90,7 @@ dependencies {
     implementation deps.fragment
     implementation deps.kotlin.stdlib
     implementation deps.kotlin.test
-    implementation deps.lifecycle.viewmodel_ktx
+    implementation deps.lifecycle.viewmodel
     implementation deps.material
 
     testImplementation deps.atsl.core
