@@ -135,4 +135,24 @@ class QuestionnaireItemCheckBoxViewHolderFactoryInstrumentedTest {
     assertThat(answer.size).isEqualTo(1)
     assertThat(answer[0].value.boolean.value).isTrue()
   }
+
+  @Test
+  @UiThreadTest
+  fun clickOnCheckboxShouldToggleItsCurrentState() {
+    val questionnaireItemViewItem =
+      QuestionnaireItemViewItem(
+        Questionnaire.Item.newBuilder()
+          .apply {
+            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
+          }
+          .build(),
+        QuestionnaireResponse.Item.newBuilder()
+      ) {}
+    viewHolder.bind(questionnaireItemViewItem)
+    val checkBox = viewHolder.itemView.findViewById<CheckBox>(R.id.check_box) // use it to avoid 3overhead searches for the same view
+    checkBox.performClick()
+    assertThat(checkBox.isChecked).isTrue()
+    checkBox.performClick()
+    assertThat(checkBox.isChecked).isFalse()
+  }
 }
