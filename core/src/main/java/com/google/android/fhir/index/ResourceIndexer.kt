@@ -26,6 +26,7 @@ import com.google.android.fhir.index.entities.ReferenceIndex
 import com.google.android.fhir.index.entities.StringIndex
 import com.google.android.fhir.index.entities.TokenIndex
 import com.google.android.fhir.index.entities.UriIndex
+import com.google.android.fhir.logicalId
 import java.math.BigDecimal
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
@@ -55,7 +56,7 @@ internal object ResourceIndexer {
   fun <R : Resource> index(resource: R) = extractIndexValues(resource)
 
   private fun <R : Resource> extractIndexValues(resource: R): ResourceIndices {
-    val indexBuilder = ResourceIndices.Builder(resource.resourceType, resource.id)
+    val indexBuilder = ResourceIndices.Builder(resource.resourceType, resource.logicalId)
     resource
       .javaClass
       .fields

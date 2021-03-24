@@ -34,3 +34,6 @@ If applicable, add screenshots to help explain your problem.
 
 **Additional context**
 Add any other context about the problem here.
+
+**Would you like to work on the issue?**
+Please state if this issue should be assigned to you or who you think could help to solve this issue.
