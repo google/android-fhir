@@ -94,7 +94,7 @@ dependencies {
   implementation(deps.AppDependencies.CoreDeps.fragment)
   implementation(deps.AppDependencies.Kotlin.kotlin)
   implementation(deps.AppDependencies.Kotlin.kotlinTesting)
-  implementation(deps.AppDependencies.Lifecycle.viewModelKtx)
+  implementation(deps.AppDependencies.Lifecycle.viewModel)
   implementation(deps.AppDependencies.CoreDeps.materialDesign)
 
   testImplementation(deps.TestDependencies.CoreTestDeps.core)

@@ -65,7 +65,6 @@ dependencies {
     implementation(deps.AppDependencies.CoreDeps.constraintLayout)
     implementation(deps.AppDependencies.Navigation.navFragment)
     implementation(deps.AppDependencies.Navigation.navUi)
-    implementation(deps.AppDependencies.Lifecycle.extensions)
     implementation(deps.AppDependencies.Lifecycle.runtime)
     implementation(deps.AppDependencies.Lifecycle.liveDataKtx)
     implementation(deps.AppDependencies.Lifecycle.viewModel)
