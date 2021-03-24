@@ -20,6 +20,13 @@
     android:theme="@android:style/Theme.NoTitleBar"
 >
     <item
+        android:id="@+id/menu_search"
+        android:title="search"
+        android:icon="@drawable/ic_search"
+        android:iconTint="@color/white"
+        app:showAsAction="ifRoom"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"/>
+    <item
         android:id="@+id/sync_resources"
         app:showAsAction="always"
         android:icon="@android:drawable/stat_notify_sync"
