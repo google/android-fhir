@@ -35,7 +35,7 @@ import com.google.android.fhir.reference.FhirApplication.Companion.fhirEngine
 import com.google.android.material.snackbar.Snackbar
 
 /** An activity representing a list of Patients. */
-class PatientListActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
+class PatientListActivity : AppCompatActivity(),SearchView.OnQueryTextListener {
   private lateinit var fhirEngine: FhirEngine
   private lateinit var patientListViewModel: PatientListViewModel
 
