@@ -19,15 +19,17 @@ package com.google.android.fhir.datacapture.views
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.common.truth.Truth.assertThat
-import com.google.fhir.r4.core.Decimal
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireResponse
+import java.math.BigDecimal
+import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,15 +52,36 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
   }
 
   @Test
+  fun shouldShowPrefixText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+  }
+
+  @Test
+  fun shouldHidePrefixText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+  }
+
+  @Test
   fun shouldSetTextViewText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -71,16 +94,14 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
   fun shouldSetInputText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.getDefaultInstance(),
-        QuestionnaireResponse.Item.newBuilder()
-          .addAnswer(
-            QuestionnaireResponse.Item.Answer.newBuilder().apply {
-              value =
-                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                  .setDecimal(Decimal.newBuilder().setValue("1.1"))
-                  .build()
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = DecimalType("1.1")
             }
           )
+        }
       ) {}
     )
 
@@ -95,22 +116,20 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
   fun shouldSetInputTextToEmpty() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.getDefaultInstance(),
-        QuestionnaireResponse.Item.newBuilder()
-          .addAnswer(
-            QuestionnaireResponse.Item.Answer.newBuilder().apply {
-              value =
-                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                  .setDecimal(Decimal.newBuilder().setValue("1.1"))
-                  .build()
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = DecimalType("1.1")
             }
           )
+        }
       ) {}
     )
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.getDefaultInstance(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -125,15 +144,15 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
   fun shouldSetQuestionnaireResponseItemAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder().build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("1.1")
 
-    val answer = questionnaireItemViewItem.questionnaireResponseItemBuilder.answerList
+    val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.size).isEqualTo(1)
-    assertThat(answer[0].value.decimal.value).isEqualTo("1.1")
+    assertThat(answer[0].valueDecimalType.value).isEqualTo(BigDecimal("1.1"))
   }
 
   @Test
@@ -141,12 +160,12 @@ class QuestionnaireItemEditTextDecimalViewHolderFactoryInstrumentedTest {
   fun shouldSetQuestionnaireResponseItemAnswerToEmpty() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder().build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).setText("")
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItemBuilder.answerCount).isEqualTo(0)
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(0)
   }
 }

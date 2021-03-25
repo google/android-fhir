@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.db.impl.dao
 
-import android.util.Log
 import ca.uhn.fhir.parser.IParser
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -90,17 +89,14 @@ object LocalChangeUtils {
   }
 
   /** Calculates the JSON patch between two [Resource] s. */
-  internal fun diff(parser: IParser, source: Resource, target: Resource): String {
+  internal fun diff(parser: IParser, source: Resource, target: Resource): JSONArray {
     val objectMapper = ObjectMapper()
     val jsonDiff =
       JsonDiff.asJson(
         objectMapper.readValue(parser.encodeResourceToString(source), JsonNode::class.java),
         objectMapper.readValue(parser.encodeResourceToString(target), JsonNode::class.java)
       )
-    if (jsonDiff.size() == 0) {
-      Log.i("ResourceDao", "Target ${target.resourceType}/${target.id} is same as source.")
-    }
-    return jsonDiff.toString()
+    return JSONArray(jsonDiff.toString())
   }
 
   /**

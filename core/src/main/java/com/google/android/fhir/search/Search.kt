@@ -53,6 +53,6 @@ interface Search {
     fun skip(skip: Int): SearchSpecifications
 
     /** Runs a search with the [SearchSpecifications]. */
-    fun <R : Resource> run(): List<R>
+    suspend fun <R : Resource> run(): List<R>
   }
 }

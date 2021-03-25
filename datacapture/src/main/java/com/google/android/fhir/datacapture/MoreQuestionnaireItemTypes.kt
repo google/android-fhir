@@ -16,10 +16,9 @@
 
 package com.google.android.fhir.datacapture
 
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireItemTypeCode
-import com.google.fhir.r4.core.QuestionnaireResponse
-import com.google.fhir.shaded.protobuf.Message
+import org.hl7.fhir.r4.model.Base
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /**
  * Returns the value of the [Questionnaire.Item.EnableWhen.AnswerX] for the [type].
@@ -27,18 +26,20 @@ import com.google.fhir.shaded.protobuf.Message
  * @throws IllegalArgumentException if [type] is not supported (for example, questions of type
  * [QuestionnaireItemTypeCode.Value.URL] do not have an explicit EnableWhen answer).
  */
-fun Questionnaire.Item.EnableWhen.AnswerX.getValueForType(
-  type: Questionnaire.Item.TypeCode
-): Message =
-  when (val value = type.value) {
-    QuestionnaireItemTypeCode.Value.DATE -> this.date
-    QuestionnaireItemTypeCode.Value.BOOLEAN -> this.boolean
-    QuestionnaireItemTypeCode.Value.DECIMAL -> this.decimal
-    QuestionnaireItemTypeCode.Value.INTEGER -> this.integer
-    QuestionnaireItemTypeCode.Value.DATE_TIME -> this.dateTime
-    QuestionnaireItemTypeCode.Value.TIME -> this.time
-    QuestionnaireItemTypeCode.Value.STRING, QuestionnaireItemTypeCode.Value.TEXT -> this.stringValue
-    else -> throw IllegalArgumentException("Unsupported value type $value")
+fun Questionnaire.QuestionnaireItemEnableWhenComponent.getValueForType(
+  type: Questionnaire.QuestionnaireItemType
+): Base =
+  when (type) {
+    Questionnaire.QuestionnaireItemType.DATE -> answerDateType
+    Questionnaire.QuestionnaireItemType.BOOLEAN -> answerBooleanType
+    Questionnaire.QuestionnaireItemType.DECIMAL -> answerDecimalType
+    Questionnaire.QuestionnaireItemType.INTEGER -> answerIntegerType
+    Questionnaire.QuestionnaireItemType.DATETIME -> answerDateTimeType
+    Questionnaire.QuestionnaireItemType.TIME -> answerTimeType
+    Questionnaire.QuestionnaireItemType.CHOICE -> answerCoding
+    Questionnaire.QuestionnaireItemType.STRING, Questionnaire.QuestionnaireItemType.TEXT ->
+      answerStringType
+    else -> throw IllegalArgumentException("Unsupported value type $type")
   }
 
 /**
@@ -47,16 +48,19 @@ fun Questionnaire.Item.EnableWhen.AnswerX.getValueForType(
  * @throws IllegalArgumentException if [type] is not supported (for example, questions of type
  * [QuestionnaireItemTypeCode.Value.GROUP] do not collect any answer).
  */
-fun QuestionnaireResponse.Item.Answer.getValueForType(type: Questionnaire.Item.TypeCode): Message =
-  when (val value = type.value) {
-    QuestionnaireItemTypeCode.Value.DATE -> this.value.date
-    QuestionnaireItemTypeCode.Value.BOOLEAN -> this.value.boolean
-    QuestionnaireItemTypeCode.Value.DECIMAL -> this.value.decimal
-    QuestionnaireItemTypeCode.Value.INTEGER -> this.value.integer
-    QuestionnaireItemTypeCode.Value.DATE_TIME -> this.value.dateTime
-    QuestionnaireItemTypeCode.Value.TIME -> this.value.time
-    QuestionnaireItemTypeCode.Value.STRING, QuestionnaireItemTypeCode.Value.TEXT ->
-      this.value.stringValue
-    QuestionnaireItemTypeCode.Value.URL -> this.value.uri
+fun QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.getValueForType(
+  type: Questionnaire.QuestionnaireItemType
+): Base =
+  when (type) {
+    Questionnaire.QuestionnaireItemType.DATE -> valueDateType
+    Questionnaire.QuestionnaireItemType.BOOLEAN -> valueBooleanType
+    Questionnaire.QuestionnaireItemType.DECIMAL -> valueDecimalType
+    Questionnaire.QuestionnaireItemType.INTEGER -> valueIntegerType
+    Questionnaire.QuestionnaireItemType.DATETIME -> valueDateTimeType
+    Questionnaire.QuestionnaireItemType.TIME -> valueTimeType
+    Questionnaire.QuestionnaireItemType.CHOICE -> valueCoding
+    Questionnaire.QuestionnaireItemType.STRING, Questionnaire.QuestionnaireItemType.TEXT ->
+      this.valueStringType
+    Questionnaire.QuestionnaireItemType.URL -> this.valueUriType
     else -> throw IllegalArgumentException("Unsupported value type $value")
   }

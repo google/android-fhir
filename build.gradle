@@ -3,20 +3,22 @@ buildscript {
     apply from: 'deps.gradle'
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        gradlePluginPortal()
     }
     dependencies {
         classpath deps.android_gradle_plugin
         classpath deps.kotlin.plugin
         classpath deps.spotless
+        classpath deps.navigation.safeargs
     }
 }
 
 allprojects {
     repositories {
         google()
-        jcenter()
         mavenCentral()
+        gradlePluginPortal()
         maven {
             url 'https://oss.sonatype.org/content/repositories/snapshots'
         }
@@ -31,6 +33,10 @@ subprojects {
             ktlint().userData(['indent_size': '2', 'continuation_indent_size': '2'])
             ktfmt().googleStyle()
             licenseHeaderFile "${project.rootProject.projectDir}/license-header.txt"
+        }
+        format 'xml', {
+            target '**/*.xml'
+            prettier(['prettier': '2.0.5', '@prettier/plugin-xml': '0.13.0']).config(['parser': 'xml', 'tabWidth': 4])
         }
     }
 }

@@ -17,19 +17,15 @@
 package com.google.android.fhir.reference
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.liveData
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.data.SamplePatients
 import com.google.android.fhir.search.filter.string
 import org.hl7.fhir.r4.model.Patient
-
-private const val OBSERVATIONS_JSON_FILENAME = "sample_observations_bundle.json"
 
 /**
  * The ViewModel helper class for PatientItemRecyclerViewAdapter, that is responsible for preparing
@@ -38,67 +34,18 @@ private const val OBSERVATIONS_JSON_FILENAME = "sample_observations_bundle.json"
 class PatientListViewModel(application: Application, private val fhirEngine: FhirEngine) :
   AndroidViewModel(application) {
 
-  // Make sample Fhir Patients and Observations available, in case needed for demo.
-  private val jsonStringObservations = getAssetFileAsString(OBSERVATIONS_JSON_FILENAME)
-
   private val samplePatients = SamplePatients()
 
-  private val observations = samplePatients.getObservationItems(jsonStringObservations)
-  private val liveObservations: MutableLiveData<List<ObservationItem>> =
-    MutableLiveData(observations)
+  val liveSearchedPatients = liveData { emit(getSearchResults()) }
 
-  private var patientResults: List<Patient> = getSearchResults()
-  private var searchedPatients = samplePatients.getPatientItems(patientResults)
-  private val _liveSearchedPatients: MutableLiveData<List<PatientItem>> = MutableLiveData()
-  val liveSearchedPatients: LiveData<List<PatientItem>> = _liveSearchedPatients
-
-  fun getSearchedPatients(): LiveData<List<PatientItem>> {
-    searchedPatients = samplePatients.getPatientItems(patientResults)
-    _liveSearchedPatients.value = searchedPatients
-    Log.d(
-      "PatientListViewModel",
-      "getSearchedPatients(): " +
-        "patientResults[${patientResults.count()}], searchedPatients[${searchedPatients
-                .count()}]"
-    )
-    return liveSearchedPatients
-  }
-
-  fun getPatientItem(id: String): PatientItem? {
-    return searchedPatients.associateBy { it.id }[id]
-  }
-
-  fun getObservations(): LiveData<List<ObservationItem>> {
-    return liveObservations
-  }
-
-  private fun getSearchResults(): List<Patient> {
-    val searchResults: List<Patient> =
+  private suspend fun getSearchResults(): List<PatientItem> {
+    return samplePatients.getPatientItems(
       fhirEngine
         .search()
         .of(Patient::class.java)
         .filter(string(Patient.ADDRESS_CITY, ParamPrefixEnum.EQUAL, "NAIROBI"))
         .run()
-    Log.d(
-      "PatientListViewModel",
-      "${searchResults.count()} search results: " + "${searchResults.joinToString(" ")}"
     )
-    return searchResults
-  }
-
-  fun searchPatients() {
-    patientResults = getSearchResults()
-    searchedPatients = samplePatients.getPatientItems(patientResults)
-    _liveSearchedPatients.value = searchedPatients
-  }
-
-  private fun getAssetFileAsString(filename: String): String {
-    return this.getApplication<Application>()
-      .applicationContext
-      .assets
-      .open(filename)
-      .bufferedReader()
-      .use { it.readText() }
   }
 
   /** The Patient's details for display purposes. */

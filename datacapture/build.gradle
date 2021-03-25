@@ -81,8 +81,8 @@ dependencies {
     androidTestImplementation deps.atsl.runner
     androidTestImplementation deps.truth
     androidTestImplementation deps.atsl.espresso
-    androidTestImplementation deps.atsl.ui_automator
-    api deps.fhir_protos
+
+    api deps.hapi_r4
 
     coreLibraryDesugaring deps.desugar
 
@@ -91,7 +91,7 @@ dependencies {
     implementation deps.fragment
     implementation deps.kotlin.stdlib
     implementation deps.kotlin.test
-    implementation deps.lifecycle.viewmodel_ktx
+    implementation deps.lifecycle.viewmodel
     implementation deps.material
 
     testImplementation deps.atsl.core

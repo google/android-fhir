@@ -19,19 +19,23 @@ package com.google.android.fhir.datacapture.views
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.material.textfield.TextInputEditText
 import com.google.common.truth.Truth.assertThat
-import com.google.fhir.r4.core.Date
-import com.google.fhir.r4.core.Questionnaire
-import com.google.fhir.r4.core.QuestionnaireResponse
+import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.LocalDate
-import java.time.ZoneId
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
@@ -51,18 +55,38 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun shouldSetTextInputLayoutHint() {
+  fun shouldShowPrefixText() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
+  }
+
+  @Test
+  fun shouldHidePrefixText() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+  }
+
+  @Test
+  fun shouldSetTextInputLayoutHint() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text)
       .isEqualTo("Question?")
   }
@@ -72,12 +96,8 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   fun shouldSetEmptyDateInput() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     )
 
@@ -90,53 +110,29 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
   fun shouldSetDateInput() {
     viewHolder.bind(
       QuestionnaireItemViewItem(
-        Questionnaire.Item.newBuilder()
-          .apply {
-            text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-          }
-          .build(),
-        QuestionnaireResponse.Item.newBuilder()
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
-            QuestionnaireResponse.Item.Answer.newBuilder().apply {
-              value =
-                QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
-                  .setDate(
-                    Date.newBuilder()
-                      .setValueUs(
-                        LocalDate.of(2020, 1, 1)
-                          .atStartOfDay()
-                          .atZone(ZoneId.systemDefault())
-                          .toEpochSecond() * NUMBER_OF_MICROSECONDS_PER_SECOND
-                      )
-                      .setPrecision(Date.Precision.DAY)
-                      .setTimezone(ZoneId.systemDefault().id)
-                  )
-                  .build()
-            }
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(DateType(2020, 0, 1))
           )
       ) {}
     )
 
-    assertThat(
-      viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString()
-    ).isEqualTo("2020-01-01")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString())
+      .isEqualTo("2020-01-01")
   }
 
-//	@Test
-//	@UiThreadTest
-//	fun isTimePickerDisplayed() {
-//		viewHolder.bind(
-//			QuestionnaireItemViewItem(
-//				Questionnaire.Item.newBuilder().apply {
-//					text = com.google.fhir.r4.core.String.newBuilder().setValue("Question?").build()
-//				}.build(),
-//				QuestionnaireResponse.Item.newBuilder()
-//			) {}
-//		)
-//		viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).performClick()
-//		onView(withId(R.id.textInputEditText)).perform(ViewActions.click())
-////        isDisplayed(withClassName(endsWith("android.widget.DatePicker")))
-//			.check(
-//				ViewAssertions.matches(withClassName(containsString("android.widget.DatePicker"))))
-//	}
+  @Test
+  @UiThreadTest
+  fun clickOnEditTextShouldDisplayDatePicker() {
+    viewHolder.bind(
+      QuestionnaireItemViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      ) {}
+    )
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).performClick()
+    assertThat(DatePickerFragment().isVisible)
+  }
 }
