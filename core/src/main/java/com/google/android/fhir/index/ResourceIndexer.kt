@@ -83,8 +83,8 @@ internal object ResourceIndexer {
           SearchParamType.QUANTITY ->
             quantityIndex(searchParam, value)?.also { indexBuilder.addQuantityIndex(it) }
           SearchParamType.URI -> uriIndex(searchParam, value)?.also { indexBuilder.addUriIndex(it) }
-          // TODO: Handle composite type https://github.com/google/android-fhir/issues/292.
           SearchParamType.SPECIAL -> specialIndex(value)?.also { indexBuilder.addPositionIndex(it) }
+        // TODO: Handle composite type https://github.com/google/android-fhir/issues/292.
         }
       }
 

@@ -18,8 +18,6 @@ package com.google.android.fhir.index.entities
 
 /**
  * An index record for a position value in a location resource.
- * @property [latitude] the latitude
- * @property [longitude] the longitude
  *
  * See https://www.hl7.org/fhir/search.html#special.
  */
