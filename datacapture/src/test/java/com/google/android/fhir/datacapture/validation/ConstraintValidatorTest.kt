@@ -32,90 +32,90 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class ConstraintValidatorTest {
 
-    @Test
-    fun maxValueValidator_validate_shouldValidateScenarios() {
-        val extensionUrl = "http://hl7.org/fhir/StructureDefinition/maxValue"
+  @Test
+  fun maxValueValidator_validate_shouldValidateScenarios() {
+    val extensionUrl = "http://hl7.org/fhir/StructureDefinition/maxValue"
 
-        /**
-         * Scenario 1 - answerValue is greater than maxValue
-         */
-        var maxValue = 200000
-        var answerValue = 200001
-        val validationMessage = "Maximum value allowed is:$maxValue"
-        val maxValueValidatorScenarioOne =
-            maxValueValidatorScenarioTester(answerValue, maxValue, extensionUrl)
-        assertThat(maxValueValidatorScenarioOne.isValid).isFalse()
-        assertThat(maxValueValidatorScenarioOne.message.equals(validationMessage)).isTrue()
+    /**
+     * Scenario 1 - answerValue is greater than maxValue
+     */
+    var maxValue = 200000
+    var answerValue = 200001
+    val validationMessage = "Maximum value allowed is:$maxValue"
+    val maxValueValidatorScenarioOne =
+      maxValueValidatorScenarioTester(answerValue, maxValue, extensionUrl)
+    assertThat(maxValueValidatorScenarioOne.isValid).isFalse()
+    assertThat(maxValueValidatorScenarioOne.message.equals(validationMessage)).isTrue()
 
-        /**
-         * Scenario 2 - answerValue is greater than maxValue
-         */
-        maxValue = 200000
-        answerValue = 199999
-        val maxValueValidatorScenarioTwo =
-            maxValueValidatorScenarioTester(answerValue, maxValue, extensionUrl)
-        assertThat(maxValueValidatorScenarioTwo.isValid).isTrue()
-        assertThat(maxValueValidatorScenarioTwo.message.isNullOrBlank()).isTrue()
-    }
+    /**
+     * Scenario 2 - answerValue is greater than maxValue
+     */
+    maxValue = 200000
+    answerValue = 199999
+    val maxValueValidatorScenarioTwo =
+      maxValueValidatorScenarioTester(answerValue, maxValue, extensionUrl)
+    assertThat(maxValueValidatorScenarioTwo.isValid).isTrue()
+    assertThat(maxValueValidatorScenarioTwo.message.isNullOrBlank()).isTrue()
+  }
 
-    private fun maxValueValidatorScenarioTester(
-        answerValue: Int,
-        maxValue: Int,
-        extensionUrl: String
-    ): ConstraintValidator.ConstraintValidationResult {
-        val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
-        val extension = Extension()
-        val questionnaireResponseItemAnswerComponent = QuestionnaireResponseItemAnswerComponent()
-        questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
-        questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
-        extension.url = extensionUrl
-        extension.setValue(IntegerType(maxValue))
-        questionnaireItem.apply { addExtension(extension) }
-        return MaxValueValidator.validate(questionnaireItem, questionnaireResponseItem)
-    }
+  private fun maxValueValidatorScenarioTester(
+    answerValue: Int,
+    maxValue: Int,
+    extensionUrl: String
+  ): ConstraintValidator.ConstraintValidationResult {
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    val extension = Extension()
+    val questionnaireResponseItemAnswerComponent = QuestionnaireResponseItemAnswerComponent()
+    questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
+    questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
+    extension.url = extensionUrl
+    extension.setValue(IntegerType(maxValue))
+    questionnaireItem.apply { addExtension(extension) }
+    return MaxValueValidator.validate(questionnaireItem, questionnaireResponseItem)
+  }
 
-    @Test
-    fun minValueValidator_validate_shouldValidateScenarios() {
-        val extensionUrl = "http://hl7.org/fhir/StructureDefinition/minValue"
+  @Test
+  fun minValueValidator_validate_shouldValidateScenarios() {
+    val extensionUrl = "http://hl7.org/fhir/StructureDefinition/minValue"
 
-        /**
-         * Scenario 1 - answerValue is less than minValue
-         */
-        var minValue = 10
-        var answerValue = 9
-        val validationMessage = "Minimum value allowed is:$minValue"
-        val minValueValidatorScenarioOne =
-            minValueValidatorScenarioTester(answerValue, minValue, extensionUrl)
-        assertThat(minValueValidatorScenarioOne.isValid).isFalse()
-        assertThat(minValueValidatorScenarioOne.message.equals(validationMessage)).isTrue()
+    /**
+     * Scenario 1 - answerValue is less than minValue
+     */
+    var minValue = 10
+    var answerValue = 9
+    val validationMessage = "Minimum value allowed is:$minValue"
+    val minValueValidatorScenarioOne =
+      minValueValidatorScenarioTester(answerValue, minValue, extensionUrl)
+    assertThat(minValueValidatorScenarioOne.isValid).isFalse()
+    assertThat(minValueValidatorScenarioOne.message.equals(validationMessage)).isTrue()
 
-        /**
-         * Scenario 2 - answerValue is greater than maxValue
-         */
-        minValue = 500
-        answerValue = 501
-        val minValueValidatorScenarioTwo =
-            minValueValidatorScenarioTester(answerValue, minValue, extensionUrl)
-        assertThat(minValueValidatorScenarioTwo.isValid).isTrue()
-        assertThat(minValueValidatorScenarioTwo.message.isNullOrBlank()).isTrue()
-    }
+    /**
+     * Scenario 2 - answerValue is greater than maxValue
+     */
+    minValue = 500
+    answerValue = 501
+    val minValueValidatorScenarioTwo =
+      minValueValidatorScenarioTester(answerValue, minValue, extensionUrl)
+    assertThat(minValueValidatorScenarioTwo.isValid).isTrue()
+    assertThat(minValueValidatorScenarioTwo.message.isNullOrBlank()).isTrue()
+  }
 
-    private fun minValueValidatorScenarioTester(
-        answerValue: Int,
-        minValue: Int,
-        extensionUrl: String
-    ): ConstraintValidator.ConstraintValidationResult {
-        val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
-        val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
-        val extension = Extension()
-        val questionnaireResponseItemAnswerComponent = QuestionnaireResponseItemAnswerComponent()
-        questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
-        questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
-        extension.url = extensionUrl
-        extension.setValue(IntegerType(minValue))
-        questionnaireItem.apply { addExtension(extension) }
-        return MinValueValidator.validate(questionnaireItem, questionnaireResponseItem)
-    }
+  private fun minValueValidatorScenarioTester(
+    answerValue: Int,
+    minValue: Int,
+    extensionUrl: String
+  ): ConstraintValidator.ConstraintValidationResult {
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    val extension = Extension()
+    val questionnaireResponseItemAnswerComponent = QuestionnaireResponseItemAnswerComponent()
+    questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
+    questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
+    extension.url = extensionUrl
+    extension.setValue(IntegerType(minValue))
+    questionnaireItem.apply { addExtension(extension) }
+    return MinValueValidator.validate(questionnaireItem, questionnaireResponseItem)
+  }
 
 }
