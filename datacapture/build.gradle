@@ -80,7 +80,6 @@ dependencies {
     androidTestImplementation deps.atsl.rules
     androidTestImplementation deps.atsl.runner
     androidTestImplementation deps.truth
-    androidTestImplementation deps.atsl.espresso
 
     api deps.hapi_r4
 
