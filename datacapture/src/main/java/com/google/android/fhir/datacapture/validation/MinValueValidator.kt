@@ -24,26 +24,26 @@ object MinValueValidator : ConstraintValidator {
 
   private const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"
 
-    override fun validate(
-        questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-        questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
-    ): ConstraintValidator.ConstraintValidationResult {
-        val extension = questionnaireItem.getExtensionByUrl(MIN_VALUE_EXTENSION_URL)
-        if (questionnaireItem.hasExtension(MIN_VALUE_EXTENSION_URL))
-            if (ValueConstraintValidator.valueConstraintValidator(
-                    extension,
-                    questionnaireResponseItem, "<"
-                )
-            ) {
-                return ConstraintValidator.ConstraintValidationResult(
-                    false,
-                    validationMessageGenerator(extension)
-                )
-            }
-        return ConstraintValidator.ConstraintValidationResult(true, null)
-    }
+  override fun validate(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+  ): ConstraintValidator.ConstraintValidationResult {
+    val extension = questionnaireItem.getExtensionByUrl(MIN_VALUE_EXTENSION_URL)
+    if (questionnaireItem.hasExtension(MIN_VALUE_EXTENSION_URL))
+      if (ValueConstraintValidator.valueConstraintValidator(
+          extension,
+          questionnaireResponseItem, "<"
+        )
+      ) {
+        return ConstraintValidator.ConstraintValidationResult(
+          false,
+          validationMessageGenerator(extension)
+        )
+      }
+    return ConstraintValidator.ConstraintValidationResult(true, null)
+  }
 
-    private fun validationMessageGenerator(extension: Extension): String {
-        return "Minimum value allowed is:" + extension.value.primitiveValue()
-    }
+  private fun validationMessageGenerator(extension: Extension): String {
+    return "Minimum value allowed is:" + extension.value.primitiveValue()
+  }
 }
