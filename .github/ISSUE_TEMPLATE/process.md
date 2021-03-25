@@ -1,6 +1,6 @@
 ---
-name:  Code-Health
-about: Issues related to Refactoring, Improving Testing, Infrastructure, Documentation or related. 
+name:  Process
+about: Issues related to builds and releases, communications, templates etc.
 
 ---
 
