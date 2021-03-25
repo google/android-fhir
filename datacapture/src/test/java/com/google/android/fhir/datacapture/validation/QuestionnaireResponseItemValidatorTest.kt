@@ -74,7 +74,7 @@ class QuestionnaireResponseItemValidatorTest {
     maxValue: Int,
     minValue: Int,
     extensionUrlMaxValue: String,
-    extensionUrlMinValue: String,
+    extensionUrlMinValue: String
   ): QuestionnaireResponseItemValidator.ValidationResult {
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
