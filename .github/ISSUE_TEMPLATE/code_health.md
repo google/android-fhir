@@ -1,6 +1,6 @@
 ---
-name:  Research
-about: Issues related to creation and managing of research tasks. Includes background, goal, and methodology.
+name:  Code-Health
+about: Can include issues related to Refactoring, Improving Testing, Infrastructure, Documentation or related. 
 
 ---
 
