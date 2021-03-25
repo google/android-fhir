@@ -2,7 +2,7 @@ package versions
 
 object TestDependencies {
 
-object CoreTest {
+object Androidx {
   const val core = "1.2.0"
   const val extJunit = "1.1.2"
   const val rules = "1.1.0"

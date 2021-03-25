@@ -6,5 +6,5 @@ object Plugins {
     "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.AppDependencies.Kotlin.kotlin}"
   const val spotless = "com.diffplug.spotless:spotless-plugin-gradle:${versions.Plugins.spotless}"
   const val navSafeArgs =
-    "androidx.navigation:navigation-safe-args-gradle-plugin:${versions.AppDependencies.CoreDeps.navigation}"
+    "androidx.navigation:navigation-safe-args-gradle-plugin:${versions.AppDependencies.Androidx.navigation}"
 }

@@ -36,9 +36,6 @@ afterEvaluate {
   }
 }
 
-val packageName = "com.google.android.fhir.datacapture"
-val pkg = "package"
-
 android {
   compileSdkVersion(versions.Sdk.compileSdk)
   buildToolsVersion(versions.Plugins.buildTools)
@@ -51,7 +48,7 @@ android {
 
     testInstrumentationRunner("androidx.test.runner.AndroidJUnitRunner")
     // Need to specify this to prevent junit runner from going deep into our dependencies
-    testInstrumentationRunnerArguments(mapOf(pkg to packageName))
+    testInstrumentationRunnerArguments(mapOf("package" to "com.google.android.fhir.datacapture"))
   }
 
   buildTypes {
@@ -78,27 +75,27 @@ android {
 configurations { all { exclude(module = "xpp3") } }
 
 dependencies {
-  androidTestImplementation(deps.TestDependencies.CoreTestDeps.core)
-  androidTestImplementation(deps.TestDependencies.CoreTestDeps.extJunit)
-  androidTestImplementation(deps.TestDependencies.CoreTestDeps.extJunitKtx)
-  androidTestImplementation(deps.TestDependencies.CoreTestDeps.runner)
+  androidTestImplementation(deps.TestDependencies.AndroidxTest.core)
+  androidTestImplementation(deps.TestDependencies.AndroidxTest.extJunit)
+  androidTestImplementation(deps.TestDependencies.AndroidxTest.extJunitKtx)
+  androidTestImplementation(deps.TestDependencies.AndroidxTest.runner)
   androidTestImplementation(deps.TestDependencies.truth)
-  androidTestImplementation(deps.TestDependencies.CoreTestDeps.rules)
+  androidTestImplementation(deps.TestDependencies.AndroidxTest.rules)
 
-  api(deps.AppDependencies.CoreDeps.Cql.hapiR4)
+  api(deps.AppDependencies.Cql.hapiR4)
 
-  coreLibraryDesugaring(deps.AppDependencies.CoreDeps.desugar)
+  coreLibraryDesugaring(deps.AppDependencies.Androidx.desugar)
 
-  implementation(deps.AppDependencies.CoreDeps.appCompat)
+  implementation(deps.AppDependencies.Androidx.appCompat)
   implementation(deps.AppDependencies.Kotlin.androidxCoreKtx)
-  implementation(deps.AppDependencies.CoreDeps.fragment)
+  implementation(deps.AppDependencies.Androidx.fragment)
   implementation(deps.AppDependencies.Kotlin.kotlin)
   implementation(deps.AppDependencies.Kotlin.kotlinTesting)
   implementation(deps.AppDependencies.Lifecycle.viewModel)
-  implementation(deps.AppDependencies.CoreDeps.materialDesign)
+  implementation(deps.AppDependencies.Androidx.materialDesign)
 
-  testImplementation(deps.TestDependencies.CoreTestDeps.core)
-  testImplementation(deps.TestDependencies.CoreTestDeps.junit)
+  testImplementation(deps.TestDependencies.AndroidxTest.core)
+  testImplementation(deps.TestDependencies.AndroidxTest.junit)
   testImplementation(deps.TestDependencies.roboelectric)
   testImplementation(deps.TestDependencies.truth)
 }

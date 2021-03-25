@@ -2,14 +2,14 @@ package deps
 
 object TestDependencies {
 
-  object CoreTestDeps {
-    const val core = "androidx.test:core:${versions.TestDependencies.CoreTest.core}"
-    const val extJunit = "androidx.test.ext:junit:${versions.TestDependencies.CoreTest.extJunit}"
+  object AndroidxTest {
+    const val core = "androidx.test:core:${versions.TestDependencies.Androidx.core}"
+    const val extJunit = "androidx.test.ext:junit:${versions.TestDependencies.Androidx.extJunit}"
     const val extJunitKtx =
-      "androidx.test.ext:junit-ktx:${versions.TestDependencies.CoreTest.extJunit}"
-    const val junit = "junit:junit:${versions.TestDependencies.CoreTest.junit}"
-    const val rules = "androidx.test:rules:${versions.TestDependencies.CoreTest.rules}"
-    const val runner = "androidx.test:runner:${versions.TestDependencies.CoreTest.runner}"
+      "androidx.test.ext:junit-ktx:${versions.TestDependencies.Androidx.extJunit}"
+    const val junit = "junit:junit:${versions.TestDependencies.Androidx.junit}"
+    const val rules = "androidx.test:rules:${versions.TestDependencies.Androidx.rules}"
+    const val runner = "androidx.test:runner:${versions.TestDependencies.Androidx.runner}"
   }
 
   const val truth = "com.google.truth:truth:${versions.TestDependencies.truth}"

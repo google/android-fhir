@@ -2,7 +2,7 @@ package versions
 
 object AppDependencies {
 
-  object CoreDeps {
+  object Androidx {
     const val activity = "1.2.1"
     const val appCompat = "1.1.0"
     const val constraintLayout = "1.1.3"
@@ -14,11 +14,11 @@ object AppDependencies {
     const val room = "2.2.5"
     const val work = "2.3.4"
     const val navigation = "2.3.4"
+  }
 
-    object Cql {
-      const val cqlEngine = "1.3.14-SNAPSHOT"
-      const val hapiR4 = "5.3.0"
-    }
+  object Cql {
+    const val cqlEngine = "1.3.14-SNAPSHOT"
+    const val hapiR4 = "5.3.0"
   }
 
   object Kotlin {
@@ -27,14 +27,10 @@ object AppDependencies {
     const val coreKtCoroutines = "1.4.2"
   }
 
-  object Networking {
     const val httpInterceptor = "4.0.0"
     const val retrofit = "2.7.2"
-  }
 
-  object Externals {
     const val jsonTools = "1.13"
     const val caffeine = "2.9.0"
     const val guava = "28.2-android"
-  }
 }

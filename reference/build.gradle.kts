@@ -50,32 +50,32 @@ configurations {
 }
 
 dependencies {
-    androidTestImplementation(deps.TestDependencies.CoreTestDeps.extJunit)
+    androidTestImplementation(deps.TestDependencies.AndroidxTest.extJunit)
     androidTestImplementation(deps.TestDependencies.Espresso.espresso)
 
-    coreLibraryDesugaring(deps.AppDependencies.CoreDeps.desugar)
+    coreLibraryDesugaring(deps.AppDependencies.Androidx.desugar)
 
-    implementation(deps.AppDependencies.CoreDeps.activity)
-    implementation(deps.AppDependencies.CoreDeps.appCompat)
-    implementation(deps.AppDependencies.CoreDeps.fragment)
+    implementation(deps.AppDependencies.Androidx.activity)
+    implementation(deps.AppDependencies.Androidx.appCompat)
+    implementation(deps.AppDependencies.Androidx.fragment)
     implementation(deps.AppDependencies.Kotlin.kotlin)
     implementation(deps.AppDependencies.Kotlin.androidCoroutines)
     implementation(deps.AppDependencies.Kotlin.coreKtCoroutines)
-    implementation(deps.AppDependencies.CoreDeps.materialDesign)
-    implementation(deps.AppDependencies.CoreDeps.constraintLayout)
+    implementation(deps.AppDependencies.Androidx.materialDesign)
+    implementation(deps.AppDependencies.Androidx.constraintLayout)
     implementation(deps.AppDependencies.Navigation.navFragment)
     implementation(deps.AppDependencies.Navigation.navUi)
     implementation(deps.AppDependencies.Lifecycle.runtime)
     implementation(deps.AppDependencies.Lifecycle.liveDataKtx)
     implementation(deps.AppDependencies.Lifecycle.viewModel)
-    implementation(deps.AppDependencies.Networking.httpInterceptor)
-    implementation(deps.AppDependencies.Networking.coreRetrofit)
-    implementation(deps.AppDependencies.Networking.gsonConverter)
-    implementation(deps.AppDependencies.Networking.mockRetrofit)
-    implementation(deps.AppDependencies.CoreDeps.recyclerView)
-    implementation(deps.AppDependencies.CoreDeps.work)
+    implementation(deps.AppDependencies.httpInterceptor)
+    implementation(deps.AppDependencies.Retrofit.coreRetrofit)
+    implementation(deps.AppDependencies.Retrofit.gsonConverter)
+    implementation(deps.AppDependencies.Retrofit.mockRetrofit)
+    implementation(deps.AppDependencies.Androidx.recyclerView)
+    implementation(deps.AppDependencies.Androidx.work)
 
     implementation(project(path = ":core"))
 
-    testImplementation(deps.TestDependencies.CoreTestDeps.junit)
+    testImplementation(deps.TestDependencies.AndroidxTest.junit)
 }

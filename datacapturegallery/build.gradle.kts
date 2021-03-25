@@ -50,21 +50,21 @@ android {
 }
 
 dependencies {
-    coreLibraryDesugaring(deps.AppDependencies.CoreDeps.desugar)
+    coreLibraryDesugaring(deps.AppDependencies.Androidx.desugar)
 
-    implementation(deps.AppDependencies.CoreDeps.appCompat)
+    implementation(deps.AppDependencies.Androidx.appCompat)
     implementation(deps.AppDependencies.Kotlin.androidxCoreKtx)
-    implementation(deps.AppDependencies.CoreDeps.fragment)
+    implementation(deps.AppDependencies.Androidx.fragment)
     implementation(deps.AppDependencies.Kotlin.kotlin)
-    implementation(deps.AppDependencies.CoreDeps.materialDesign)
-    implementation(deps.AppDependencies.CoreDeps.constraintLayout)
+    implementation(deps.AppDependencies.Androidx.materialDesign)
+    implementation(deps.AppDependencies.Androidx.constraintLayout)
     implementation(deps.AppDependencies.Navigation.navFragment)
     implementation(deps.AppDependencies.Navigation.navUi)
 
     implementation (project(path = ":datacapture"))
 
-    testImplementation(deps.TestDependencies.CoreTestDeps.junit)
+    testImplementation(deps.TestDependencies.AndroidxTest.junit)
 
-    androidTestImplementation(deps.TestDependencies.CoreTestDeps.extJunit)
+    androidTestImplementation(deps.TestDependencies.AndroidxTest.extJunit)
     androidTestImplementation(deps.TestDependencies.Espresso.espresso)
 }

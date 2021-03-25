@@ -54,23 +54,23 @@ configurations {
 }
 
 dependencies {
-  coreLibraryDesugaring(deps.AppDependencies.CoreDeps.desugar)
-  api(deps.AppDependencies.CoreDeps.Cql.hapiR4) { exclude(module = "junit") }
+  coreLibraryDesugaring(deps.AppDependencies.Androidx.desugar)
+  api(deps.AppDependencies.Cql.hapiR4) { exclude(module = "junit") }
 
-  implementation(deps.AppDependencies.CoreDeps.Cql.cqlEngineCore)
-  implementation(deps.AppDependencies.CoreDeps.Cql.cqlEngineFhir)
-  implementation(deps.AppDependencies.CoreDeps.work)
+  implementation(deps.AppDependencies.Cql.cqlEngineCore)
+  implementation(deps.AppDependencies.Cql.cqlEngineFhir)
+  implementation(deps.AppDependencies.Androidx.work)
   implementation(deps.AppDependencies.Kotlin.kotlin)
   implementation(deps.AppDependencies.Kotlin.androidxCoreKtx)
   implementation(deps.AppDependencies.Kotlin.kotlinTesting)
-  implementation(deps.AppDependencies.CoreDeps.appCompat)
-  implementation(deps.AppDependencies.CoreDeps.constraintLayout)
+  implementation(deps.AppDependencies.Androidx.appCompat)
+  implementation(deps.AppDependencies.Androidx.constraintLayout)
   implementation(deps.AppDependencies.Lifecycle.viewModelKtx)
-  implementation(deps.AppDependencies.CoreDeps.materialDesign)
+  implementation(deps.AppDependencies.Androidx.materialDesign)
 
-  testImplementation(deps.TestDependencies.CoreTestDeps.junit)
-  testImplementation(deps.TestDependencies.CoreTestDeps.core)
+  testImplementation(deps.TestDependencies.AndroidxTest.junit)
+  testImplementation(deps.TestDependencies.AndroidxTest.core)
 
-  androidTestImplementation(deps.TestDependencies.CoreTestDeps.extJunit)
+  androidTestImplementation(deps.TestDependencies.AndroidxTest.extJunit)
   androidTestImplementation(deps.TestDependencies.Espresso.espresso)
 }
