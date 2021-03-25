@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.datacapture.validation
 
 import android.os.Build
@@ -20,51 +36,30 @@ class QuestionnaireResponseItemValidatorTest {
     val extensionUrlMaxValue = "http://hl7.org/fhir/StructureDefinition/maxValue"
     val extensionUrlMinValue = "http://hl7.org/fhir/StructureDefinition/minValue"
 
-    /**
-     * Scenario 1 - answerValue is greater than maxValue
-     */
+    /** Scenario 1 - answerValue is greater than maxValue */
     var minValue = 250
     var maxValue = 200000
     var answerValue = 200001
-    val validateMaxValueViolation = validateAScenario(
-      answerValue,
-      maxValue,
-      minValue,
-      extensionUrlMaxValue,
-      extensionUrlMinValue
-    )
+    val validateMaxValueViolation =
+      validateAScenario(answerValue, maxValue, minValue, extensionUrlMaxValue, extensionUrlMinValue)
     assertThat(validateMaxValueViolation.isValid).isFalse()
     assertThat(validateMaxValueViolation.validationMessages.size == 1).isTrue()
 
-    /**
-     * Scenario 2 - answerValue is lesser than minValue
-     */
+    /** Scenario 2 - answerValue is lesser than minValue */
     minValue = 250
     maxValue = 200000
     answerValue = 249
-    val validateMinValueViolation = validateAScenario(
-      answerValue,
-      maxValue,
-      minValue,
-      extensionUrlMaxValue,
-      extensionUrlMinValue
-    )
+    val validateMinValueViolation =
+      validateAScenario(answerValue, maxValue, minValue, extensionUrlMaxValue, extensionUrlMinValue)
     assertThat(validateMinValueViolation.isValid).isFalse()
     assertThat(validateMinValueViolation.validationMessages.size == 1).isTrue()
 
-    /**
-     * Scenario 3 - answerValue is in the range of maxValue & minValue
-     */
+    /** Scenario 3 - answerValue is in the range of maxValue & minValue */
     minValue = 250
     maxValue = 200000
     answerValue = 12354
-    val validateRangeValueViolation = validateAScenario(
-      answerValue,
-      maxValue,
-      minValue,
-      extensionUrlMaxValue,
-      extensionUrlMinValue
-    )
+    val validateRangeValueViolation =
+      validateAScenario(answerValue, maxValue, minValue, extensionUrlMaxValue, extensionUrlMinValue)
     assertThat(validateRangeValueViolation.isValid).isTrue()
     assertThat(validateRangeValueViolation.validationMessages.size == 0).isTrue()
   }
@@ -92,9 +87,6 @@ class QuestionnaireResponseItemValidatorTest {
       addExtension(extensionMaxValue)
       addExtension(extensionMinValue)
     }
-    return QuestionnaireResponseItemValidator.validate(
-      questionnaireItem,
-      questionnaireResponseItem
-    )
+    return QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
   }
 }

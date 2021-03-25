@@ -36,9 +36,7 @@ class ConstraintValidatorTest {
   fun maxValueValidator_validate_shouldValidateScenarios() {
     val extensionUrl = "http://hl7.org/fhir/StructureDefinition/maxValue"
 
-    /**
-     * Scenario 1 - answerValue is greater than maxValue
-     */
+    /** Scenario 1 - answerValue is greater than maxValue */
     var maxValue = 200000
     var answerValue = 200001
     val validationMessage = "Maximum value allowed is:$maxValue"
@@ -47,9 +45,7 @@ class ConstraintValidatorTest {
     assertThat(maxValueValidatorScenarioOne.isValid).isFalse()
     assertThat(maxValueValidatorScenarioOne.message.equals(validationMessage)).isTrue()
 
-    /**
-     * Scenario 2 - answerValue is greater than maxValue
-     */
+    /** Scenario 2 - answerValue is greater than maxValue */
     maxValue = 200000
     answerValue = 199999
     val maxValueValidatorScenarioTwo =
@@ -79,9 +75,7 @@ class ConstraintValidatorTest {
   fun minValueValidator_validate_shouldValidateScenarios() {
     val extensionUrl = "http://hl7.org/fhir/StructureDefinition/minValue"
 
-    /**
-     * Scenario 1 - answerValue is less than minValue
-     */
+    /** Scenario 1 - answerValue is less than minValue */
     var minValue = 10
     var answerValue = 9
     val validationMessage = "Minimum value allowed is:$minValue"
@@ -90,9 +84,7 @@ class ConstraintValidatorTest {
     assertThat(minValueValidatorScenarioOne.isValid).isFalse()
     assertThat(minValueValidatorScenarioOne.message.equals(validationMessage)).isTrue()
 
-    /**
-     * Scenario 2 - answerValue is greater than maxValue
-     */
+    /** Scenario 2 - answerValue is greater than maxValue */
     minValue = 500
     answerValue = 501
     val minValueValidatorScenarioTwo =
@@ -117,5 +109,4 @@ class ConstraintValidatorTest {
     questionnaireItem.apply { addExtension(extension) }
     return MinValueValidator.validate(questionnaireItem, questionnaireResponseItem)
   }
-
 }

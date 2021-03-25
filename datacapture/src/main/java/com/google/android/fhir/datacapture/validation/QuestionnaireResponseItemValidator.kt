@@ -42,7 +42,9 @@ object QuestionnaireResponseItemValidator {
 
   data class ValidationResult(var isValid: Boolean, val validationMessages: MutableList<String?>)
 
-  private fun packConstraintValidationResults(validationResults: List<ConstraintValidator.ConstraintValidationResult>): ValidationResult {
+  private fun packConstraintValidationResults(
+    validationResults: List<ConstraintValidator.ConstraintValidationResult>
+  ): ValidationResult {
     val validationResult = ValidationResult(true, mutableListOf())
     validationResults.forEach {
       validationResult.isValid = validationResult.isValid && it.isValid
