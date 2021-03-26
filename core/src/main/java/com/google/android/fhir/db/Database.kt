@@ -19,7 +19,7 @@ package com.google.android.fhir.db
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.search.impl.Query
+import com.google.android.fhir.search.SearchQuery
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -135,7 +135,7 @@ interface Database {
     codeValue: String
   ): List<R>
 
-  suspend fun <R : Resource> search(query: Query): List<R>
+  suspend fun <R : Resource> search(query: SearchQuery): List<R>
 
   /**
    * Retrieves all [LocalChangeEntity] s for all [Resource] s, which can be used to update the

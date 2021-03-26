@@ -14,17 +14,6 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.search.filter
+package com.google.android.fhir.search
 
-import com.google.android.fhir.search.impl.ResourceIdQuery
-import org.hl7.fhir.r4.model.Resource
-
-/** Interface to specify filtering criteria for search. */
-interface FilterCriterion {
-  fun and(filterCriterion: FilterCriterion): FilterCriterion = and(this, filterCriterion)
-
-  fun or(filterCriterion: FilterCriterion): FilterCriterion = or(this, filterCriterion)
-
-  /** Returns the [ResourceIdQuery] that can be used to construct a query. */
-  fun <R : Resource> query(clazz: Class<R>): ResourceIdQuery
-}
+@DslMarker annotation class SearchDslMarker
