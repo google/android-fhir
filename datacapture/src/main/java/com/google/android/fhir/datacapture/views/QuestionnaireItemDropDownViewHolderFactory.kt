@@ -56,9 +56,14 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
           this.questionnaireItemViewItem.questionnaireItem.answerOption.map { it.displayString }
         val adapter =
           ArrayAdapter(context, R.layout.questionnaire_item_drop_down_list, answerOptionString)
-        autoCompleteTextView.setText(
-          questionnaireItemViewItem.singleAnswerOrNull?.valueCoding?.display ?: ""
-        )
+        val initialValue = questionnaireItemViewItem.questionnaireItem.initial
+        if (questionnaireItemViewItem.singleAnswerOrNull != null || initialValue.isEmpty()) {
+          autoCompleteTextView.setText(
+            questionnaireItemViewItem.singleAnswerOrNull?.valueCoding?.display ?: ""
+          )
+        } else if (initialValue.isNotEmpty()) {
+          autoCompleteTextView.setText(initialValue[0].valueCoding.display)
+        }
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.onItemClickListener =
           object : AdapterView.OnItemClickListener {

@@ -60,7 +60,25 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
       prefixTextView.visibility = View.GONE
     }
     textQuestion.text = questionnaireItemViewItem.questionnaireItem.text
-    textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
+    val initialValue = questionnaireItemViewItem.questionnaireItem.initial
+    if (questionnaireItemViewItem.singleAnswerOrNull != null || initialValue.isEmpty()) {
+      textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
+    } else if (initialValue.isNotEmpty()) {
+      when (questionnaireItemViewItem.questionnaireItem.type.toCode()) {
+        "integer" -> {
+          textInputEditText.setText(initialValue[0].valueIntegerType?.value?.toString() ?: "")
+        }
+        "string" -> {
+          textInputEditText.setText(initialValue[0].valueStringType?.value ?: "")
+        }
+        "decimal" -> {
+          textInputEditText.setText(initialValue[0].valueDecimalType?.value?.toString() ?: "")
+        }
+        "quantity" -> {
+          textInputEditText.setText(initialValue[0].valueQuantity?.value?.toString() ?: "")
+        }
+      }
+    }
   }
 
   /** Returns the answer that should be recorded given the text input by the user. */

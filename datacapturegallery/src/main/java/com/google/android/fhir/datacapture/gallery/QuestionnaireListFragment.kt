@@ -80,6 +80,11 @@ class QuestionnaireListFragment : Fragment() {
             "HIV-Risk Assessment",
             "HIV-Risk Assessment",
             "iprd-hiv-fhir-questionnaire.json"
+          ),
+          QuestionnaireListItem(
+            "HIV-Risk Assessment with Initial Values",
+            "HIV-Risk Assessment with some Initial Values",
+            "iprd-hiv-fhir-questionnaire-initial.json"
           )
         )
       )
