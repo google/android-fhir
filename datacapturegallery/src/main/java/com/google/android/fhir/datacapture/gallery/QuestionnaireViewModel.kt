@@ -35,12 +35,8 @@ class QuestionnaireViewModel(application: Application, private val state: SavedS
   val questionnaireResponse: String?
     get() {
       if (questionnaireResponseJson == null) {
-        if (state.contains(QuestionnaireContainerFragment.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY)) {
-          questionnaireResponseJson =
-            readFileFromAssets(
-              state[QuestionnaireContainerFragment.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY]!!
-            )
-        }
+        state.get<String>(QuestionnaireContainerFragment.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY)
+          ?.let { questionnaireResponseJson = readFileFromAssets(it) }
       }
       return questionnaireResponseJson
     }
