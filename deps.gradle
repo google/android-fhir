@@ -13,7 +13,7 @@ ext.build_tool_version = build_tool_version
 
 def versions = [:]
 versions.activity = '1.2.1'
-versions.android_gradle_plugin = '4.2.0-beta06'
+versions.android_gradle_plugin = '4.2.0-beta02'
 versions.appcompat = '1.1.0'
 versions.atsl_core = '1.2.0'
 versions.atsl_expresso = '3.3.0'
