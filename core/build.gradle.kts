@@ -15,7 +15,7 @@ android {
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments(mapOf("package" to "com.google.android.fhir"))
     // Required when setting minSdkVersion to 20 or lower
-    // See https = //developer.android.com/studio/write/java8-support
+    // See https://developer.android.com/studio/write/java8-support
     multiDexEnabled = true
   }
 
