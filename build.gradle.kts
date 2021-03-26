@@ -8,8 +8,8 @@ buildscript {
   dependencies {
     classpath(deps.Plugins.androidGradlePlugin)
     classpath(deps.Plugins.kotlin)
-    classpath(deps.Plugins.spotless)
     classpath(deps.Plugins.navSafeArgs)
+    classpath(deps.Plugins.spotless)
   }
 }
 

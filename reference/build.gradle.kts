@@ -50,32 +50,33 @@ configurations {
 }
 
 dependencies {
-    androidTestImplementation(deps.TestDependencies.AndroidxTest.extJunit)
-    androidTestImplementation(deps.TestDependencies.Espresso.espresso)
-
     coreLibraryDesugaring(deps.AppDependencies.Androidx.desugar)
 
     implementation(deps.AppDependencies.Androidx.activity)
     implementation(deps.AppDependencies.Androidx.appCompat)
+    implementation(deps.AppDependencies.Androidx.constraintLayout)
     implementation(deps.AppDependencies.Androidx.fragment)
+    implementation(deps.AppDependencies.Androidx.materialDesign)
+    implementation(deps.AppDependencies.Androidx.recyclerView)
+    implementation(deps.AppDependencies.Androidx.work)
     implementation(deps.AppDependencies.Kotlin.kotlin)
     implementation(deps.AppDependencies.Kotlin.androidCoroutines)
     implementation(deps.AppDependencies.Kotlin.coreKtCoroutines)
-    implementation(deps.AppDependencies.Androidx.materialDesign)
-    implementation(deps.AppDependencies.Androidx.constraintLayout)
-    implementation(deps.AppDependencies.Navigation.navFragment)
-    implementation(deps.AppDependencies.Navigation.navUi)
     implementation(deps.AppDependencies.Lifecycle.runtime)
     implementation(deps.AppDependencies.Lifecycle.liveDataKtx)
     implementation(deps.AppDependencies.Lifecycle.viewModel)
-    implementation(deps.AppDependencies.httpInterceptor)
+    implementation(deps.AppDependencies.Navigation.navFragment)
+    implementation(deps.AppDependencies.Navigation.navUi)
     implementation(deps.AppDependencies.Retrofit.coreRetrofit)
     implementation(deps.AppDependencies.Retrofit.gsonConverter)
     implementation(deps.AppDependencies.Retrofit.mockRetrofit)
-    implementation(deps.AppDependencies.Androidx.recyclerView)
-    implementation(deps.AppDependencies.Androidx.work)
+    implementation(deps.AppDependencies.httpInterceptor)
 
     implementation(project(path = ":core"))
 
     testImplementation(deps.TestDependencies.AndroidxTest.junit)
+
+    androidTestImplementation(deps.TestDependencies.AndroidxTest.extJunit)
+    androidTestImplementation(deps.TestDependencies.Espresso.espresso)
+
 }

@@ -73,30 +73,29 @@ configurations {
 }
 
 dependencies {
-  androidTestImplementation(deps.TestDependencies.AndroidxTest.core)
-  androidTestImplementation(deps.TestDependencies.AndroidxTest.junit)
-  androidTestImplementation(deps.TestDependencies.AndroidxTest.extJunitKtx)
-  androidTestImplementation(deps.TestDependencies.AndroidxTest.runner)
-  androidTestImplementation(deps.TestDependencies.truth)
-
   api(deps.AppDependencies.Cql.cqlEngineCore)
   api(deps.AppDependencies.Cql.hapiR4) { exclude(module = "junit") }
 
   coreLibraryDesugaring(deps.AppDependencies.Androidx.desugar)
 
-  implementation(deps.AppDependencies.Kotlin.kotlin)
-
   implementation(deps.AppDependencies.Androidx.Room.runtime)
   implementation(deps.AppDependencies.Androidx.Room.ktx)
   implementation(deps.AppDependencies.Androidx.work)
-  implementation(deps.AppDependencies.jsonTools)
-  implementation(deps.AppDependencies.guava)
+  implementation(deps.AppDependencies.Kotlin.kotlin)
   implementation(deps.AppDependencies.caffeine)
+  implementation(deps.AppDependencies.guava)
+  implementation(deps.AppDependencies.jsonTools)
 
   kapt(deps.AppDependencies.Androidx.Room.compiler)
 
   testImplementation(deps.TestDependencies.AndroidxTest.core)
   testImplementation(deps.TestDependencies.AndroidxTest.junit)
-  testImplementation(deps.TestDependencies.truth)
   testImplementation(deps.TestDependencies.roboelectric)
+  testImplementation(deps.TestDependencies.truth)
+
+  androidTestImplementation(deps.TestDependencies.AndroidxTest.core)
+  androidTestImplementation(deps.TestDependencies.AndroidxTest.junit)
+  androidTestImplementation(deps.TestDependencies.AndroidxTest.extJunitKtx)
+  androidTestImplementation(deps.TestDependencies.AndroidxTest.runner)
+  androidTestImplementation(deps.TestDependencies.truth)
 }

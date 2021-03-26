@@ -53,11 +53,11 @@ dependencies {
     coreLibraryDesugaring(deps.AppDependencies.Androidx.desugar)
 
     implementation(deps.AppDependencies.Androidx.appCompat)
-    implementation(deps.AppDependencies.Kotlin.androidxCoreKtx)
-    implementation(deps.AppDependencies.Androidx.fragment)
-    implementation(deps.AppDependencies.Kotlin.kotlin)
-    implementation(deps.AppDependencies.Androidx.materialDesign)
     implementation(deps.AppDependencies.Androidx.constraintLayout)
+    implementation(deps.AppDependencies.Androidx.fragment)
+    implementation(deps.AppDependencies.Androidx.materialDesign)
+    implementation(deps.AppDependencies.Kotlin.androidxCoreKtx)
+    implementation(deps.AppDependencies.Kotlin.kotlin)
     implementation(deps.AppDependencies.Navigation.navFragment)
     implementation(deps.AppDependencies.Navigation.navUi)
 
