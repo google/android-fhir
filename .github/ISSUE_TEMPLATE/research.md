@@ -1,13 +1,19 @@
 ---
 name:  Research
-about: Issues related to creation and managing of research tasks. Includes background, goal, and methodology.
+about: Research tasks
+title: ''
+labels: 'research'
+assignees: ''
 
 ---
 
-**Describe the Issue**
+**Describe the issue to be researched**
+Include any background information and available resources.
 
-<!--Please state here specifics of what you want to do.-->
+**Describe the goal of the research**
+What's the desired outcome of this task? What artifacts should be produced?
+
+**Describe the methodology**
+What information is available for the research? Where can more information be found? Who should the assignee approach to ask questions?
 
 **Would you like to work on the issue?**
-
-<!--Please state if this issue should be assigned to you or who you think could help to solve this issue.-->

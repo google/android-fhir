@@ -1,13 +1,12 @@
 ---
-name:  Code-Health
-about: Issues related to Refactoring, Improving Testing, Infrastructure, Documentation or related. 
+name:  Code health
+about: Code refactoring, testing infrastructure, documentation, etc. 
+title: ''
+labels: 'code health'
+assignees: ''
 
 ---
 
 **Describe the Issue**
 
-<!--Please state here specifics of what you want to do.-->
-
 **Would you like to work on the issue?**
-
-<!--Please state if this issue should be assigned to you or who you think could help to solve this issue.-->
