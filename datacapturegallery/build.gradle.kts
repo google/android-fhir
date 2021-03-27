@@ -15,7 +15,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner(deps.Dependencies.androidJunitRunner)
+        testInstrumentationRunner(deps.Dependencies.TestLibraries.androidJunitRunner)
         // Required when setting minSdkVersion to 20 or lower
         multiDexEnabled = true
     }
@@ -50,21 +50,21 @@ android {
 }
 
 dependencies {
-    coreLibraryDesugaring(deps.Dependencies.desugarJdkLibs)
+    coreLibraryDesugaring(deps.Dependencies.Libraries.desugarJdkLibs)
 
-    implementation(deps.Dependencies.Androidx.appCompat)
-    implementation(deps.Dependencies.Androidx.constraintLayout)
-    implementation(deps.Dependencies.Androidx.fragmentKtx)
-    implementation(deps.Dependencies.material)
-    implementation(deps.Dependencies.Kotlin.androidxCoreKtx)
-    implementation(deps.Dependencies.Kotlin.stdlib)
-    implementation(deps.Dependencies.Navigation.navFragmentKtx)
-    implementation(deps.Dependencies.Navigation.navUiKtx)
+    implementation(deps.Dependencies.Libraries.Androidx.appCompat)
+    implementation(deps.Dependencies.Libraries.Androidx.constraintLayout)
+    implementation(deps.Dependencies.Libraries.Androidx.fragmentKtx)
+    implementation(deps.Dependencies.Libraries.material)
+    implementation(deps.Dependencies.Libraries.Kotlin.androidxCoreKtx)
+    implementation(deps.Dependencies.Libraries.Kotlin.stdlib)
+    implementation(deps.Dependencies.Libraries.Navigation.navFragmentKtx)
+    implementation(deps.Dependencies.Libraries.Navigation.navUiKtx)
 
     implementation (project(path = ":datacapture"))
 
-    testImplementation(deps.Dependencies.AndroidxTest.junit)
+    testImplementation(deps.Dependencies.TestLibraries.AndroidxTest.junit)
 
-    androidTestImplementation(deps.Dependencies.AndroidxTest.extJunit)
-    androidTestImplementation(deps.Dependencies.Espresso.espressoCore)
+    androidTestImplementation(deps.Dependencies.TestLibraries.AndroidxTest.extJunit)
+    androidTestImplementation(deps.Dependencies.TestLibraries.Espresso.espressoCore)
 }

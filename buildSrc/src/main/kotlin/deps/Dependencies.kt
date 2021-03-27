@@ -23,78 +23,92 @@ object Dependencies {
     const val targetSdk = 29
   }
 
-  object Androidx {
-    const val activity = "androidx.activity:activity:${Versions.Androidx.activity}"
-    const val appCompat = "androidx.appcompat:appcompat:${Versions.Androidx.appCompat}"
-    const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Versions.Androidx.constraintLayout}"
-    const val fragmentKtx = "androidx.fragment:fragment-ktx:${Versions.Androidx.fragmentKtx}"
-    const val recyclerView = "androidx.recyclerview:recyclerview:${Versions.Androidx.recyclerView}"
-    const val workRuntimeKtx = "androidx.work:work-runtime-ktx:${Versions.Androidx.workRuntimeKtx}"
+  object Libraries {
+    object Androidx {
+      const val activity = "androidx.activity:activity:${Versions.Androidx.activity}"
+      const val appCompat = "androidx.appcompat:appcompat:${Versions.Androidx.appCompat}"
+      const val constraintLayout =
+        "androidx.constraintlayout:constraintlayout:${Versions.Androidx.constraintLayout}"
+      const val fragmentKtx = "androidx.fragment:fragment-ktx:${Versions.Androidx.fragmentKtx}"
+      const val recyclerView =
+        "androidx.recyclerview:recyclerview:${Versions.Androidx.recyclerView}"
+      const val workRuntimeKtx =
+        "androidx.work:work-runtime-ktx:${Versions.Androidx.workRuntimeKtx}"
+    }
+
+    object Cql {
+      const val cqlEngine = "org.opencds.cqf:cql-engine:${Versions.Cql.cqlEngine}"
+      const val cqlEngineFhir = "org.opencds.cqf:cql-engine-fhir:${Versions.Cql.cqlEngine}"
+    }
+
+    object Kotlin {
+      const val androidxCoreKtx = "androidx.core:core-ktx:${Versions.Kotlin.androidxCoreKtx}"
+      const val kotlinCoroutinesAndroid =
+        "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.Kotlin.kotlinCoroutinesCore}"
+      const val kotlinCoroutinesCore =
+        "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.Kotlin.kotlinCoroutinesCore}"
+      const val kotlinTestJunit = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.Kotlin.stdlib}"
+      const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.Kotlin.stdlib}"
+    }
+
+    object Lifecycle {
+      const val extensions = "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecyle}"
+      const val liveDataCoreKtx =
+        "androidx.lifecycle:lifecycle-livedata-core-ktx:${Versions.Androidx.lifecyle}"
+      const val liveDataKtx =
+        "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.Androidx.lifecyle}"
+      const val runtime = "androidx.lifecycle:lifecycle-runtime:${Versions.Androidx.lifecyle}"
+      const val viewModelKtx =
+        "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.Androidx.lifecyle}"
+    }
+
+    object Navigation {
+      const val navFragmentKtx =
+        "androidx.navigation:navigation-fragment-ktx:${Versions.Androidx.navigation}"
+      const val navUiKtx = "androidx.navigation:navigation-ui-ktx:${Versions.Androidx.navigation}"
+    }
+
+    object Retrofit {
+      const val coreRetrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
+      const val gsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
+      const val retrofitMock = "com.squareup.retrofit2:retrofit-mock:${Versions.retrofit}"
+    }
 
     object Room {
       const val compiler = "androidx.room:room-compiler:${Versions.Androidx.room}"
       const val ktx = "androidx.room:room-ktx:${Versions.Androidx.room}"
       const val runtime = "androidx.room:room-runtime:${Versions.Androidx.room}"
     }
+
+    const val caffeine = "com.github.ben-manes.caffeine:caffeine:${Versions.caffeine}"
+    const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
+    const val guava = "com.google.guava:guava:${Versions.guava}"
+    const val hapiFhirStructuresR4 =
+      "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhirStructuresR4}"
+    const val httpInterceptor =
+      "com.squareup.okhttp3:logging-interceptor:${Versions.httpInterceptor}"
+    const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
+    const val material = "com.google.android.material:material:${Versions.material}"
   }
 
-  object Cql {
-    const val cqlEngine = "org.opencds.cqf:cql-engine:${Versions.Cql.cqlEngine}"
-    const val cqlEngineFhir = "org.opencds.cqf:cql-engine-fhir:${Versions.Cql.cqlEngine}"
+  object TestLibraries {
+    object AndroidxTest {
+      const val core = "androidx.test:core:${Versions.AndroidxTest.core}"
+      const val extJunit = "androidx.test.ext:junit:${Versions.AndroidxTest.extJunit}"
+      const val extJunitKtx = "androidx.test.ext:junit-ktx:${Versions.AndroidxTest.extJunit}"
+      const val junit = "junit:junit:${Versions.AndroidxTest.junit}"
+      const val rules = "androidx.test:rules:${Versions.AndroidxTest.rules}"
+      const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
+    }
+
+    object Espresso {
+      const val espressoCore = "androidx.test.espresso:espresso-core:${Versions.espresso}"
+    }
+
+    const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
+    const val roboelectric = "org.robolectric:robolectric:${Versions.roboelectric}"
+    const val truth = "com.google.truth:truth:${Versions.truth}"
   }
-
-  object Kotlin {
-    const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.Kotlin.stdlib}"
-    const val kotlinTestJunit = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.Kotlin.stdlib}"
-    const val androidxCoreKtx = "androidx.core:core-ktx:${Versions.Kotlin.androidxCoreKtx}"
-    const val kotlinCoroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.Kotlin.kotlinCoroutinesCore}"
-    const val kotlinCoroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.Kotlin.kotlinCoroutinesCore}"
-  }
-
-  object Lifecycle {
-    const val extensions = "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecyle}"
-    const val liveDataCoreKtx = "androidx.lifecycle:lifecycle-livedata-core-ktx:${Versions.Androidx.lifecyle}"
-    const val liveDataKtx = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.Androidx.lifecyle}"
-    const val runtime = "androidx.lifecycle:lifecycle-runtime:${Versions.Androidx.lifecyle}"
-    const val viewModelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.Androidx.lifecyle}"
-  }
-
-  object Navigation {
-    const val navFragmentKtx = "androidx.navigation:navigation-fragment-ktx:${Versions.Androidx.navigation}"
-    const val navUiKtx = "androidx.navigation:navigation-ui-ktx:${Versions.Androidx.navigation}"
-  }
-
-  object Retrofit {
-    const val coreRetrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
-    const val gsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
-  }
-
-  const val caffeine = "com.github.ben-manes.caffeine:caffeine:${Versions.caffeine}"
-  const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
-  const val hapiFhirStructuresR4 = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhirStructuresR4}"
-  const val guava = "com.google.guava:guava:${Versions.guava}"
-  const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.httpInterceptor}"
-  const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
-  const val material = "com.google.android.material:material:${Versions.material}"
-  const val retrofitMock = "com.squareup.retrofit2:retrofit-mock:${Versions.retrofit}"
-
-  object AndroidxTest {
-    const val core = "androidx.test:core:${Versions.AndroidxTest.core}"
-    const val extJunit = "androidx.test.ext:junit:${Versions.AndroidxTest.extJunit}"
-    const val extJunitKtx = "androidx.test.ext:junit-ktx:${Versions.AndroidxTest.extJunit}"
-    const val junit = "junit:junit:${Versions.AndroidxTest.junit}"
-    const val rules = "androidx.test:rules:${Versions.AndroidxTest.rules}"
-    const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
-  }
-
-  const val truth = "com.google.truth:truth:${Versions.truth}"
-
-  object Espresso {
-    const val espressoCore = "androidx.test.espresso:espresso-core:${Versions.Espresso.espresso}"
-  }
-
-  const val roboelectric = "org.robolectric:robolectric:${Versions.Espresso.roboelectric}"
-  const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
 
   object Versions {
     object Androidx {
@@ -137,10 +151,7 @@ object Dependencies {
       const val runner = "1.1.0"
     }
 
-    object Espresso {
       const val espresso = "3.3.0"
       const val roboelectric = "4.3.1"
-    }
-
   }
 }
