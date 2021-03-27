@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-  compileSdkVersion(versions.Sdk.compileSdk)
+  compileSdkVersion(deps.Dependencies.Sdk.compileSdk)
   defaultConfig {
-    minSdkVersion(versions.Sdk.minSdk)
-    targetSdkVersion(versions.Sdk.targetSdk)
+    minSdkVersion(deps.Dependencies.Sdk.minSdk)
+    targetSdkVersion(deps.Dependencies.Sdk.targetSdk)
     versionCode = 1
     versionName = "1.0"
-    testInstrumentationRunner(deps.TestDependencies.standardRunner)
+    testInstrumentationRunner(deps.Dependencies.androidJunitRunner)
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments(mapOf("package" to "com.google.android.fhir"))
     // Required when setting minSdkVersion to 20 or lower
@@ -73,29 +73,29 @@ configurations {
 }
 
 dependencies {
-  api(deps.AppDependencies.Cql.cqlEngineCore)
-  api(deps.AppDependencies.Cql.hapiR4) { exclude(module = "junit") }
+  api(deps.Dependencies.Cql.cqlEngine)
+  api(deps.Dependencies.hapiFhirStructuresR4) { exclude(module = "junit") }
 
-  coreLibraryDesugaring(deps.AppDependencies.Androidx.desugar)
+  coreLibraryDesugaring(deps.Dependencies.desugarJdkLibs)
 
-  implementation(deps.AppDependencies.Androidx.Room.runtime)
-  implementation(deps.AppDependencies.Androidx.Room.ktx)
-  implementation(deps.AppDependencies.Androidx.work)
-  implementation(deps.AppDependencies.Kotlin.kotlin)
-  implementation(deps.AppDependencies.caffeine)
-  implementation(deps.AppDependencies.guava)
-  implementation(deps.AppDependencies.jsonTools)
+  implementation(deps.Dependencies.Androidx.Room.runtime)
+  implementation(deps.Dependencies.Androidx.Room.ktx)
+  implementation(deps.Dependencies.Androidx.workRuntimeKtx)
+  implementation(deps.Dependencies.Kotlin.stdlib)
+  implementation(deps.Dependencies.caffeine)
+  implementation(deps.Dependencies.guava)
+  implementation(deps.Dependencies.jsonToolsPatch)
 
-  kapt(deps.AppDependencies.Androidx.Room.compiler)
+  kapt(deps.Dependencies.Androidx.Room.compiler)
 
-  testImplementation(deps.TestDependencies.AndroidxTest.core)
-  testImplementation(deps.TestDependencies.AndroidxTest.junit)
-  testImplementation(deps.TestDependencies.roboelectric)
-  testImplementation(deps.TestDependencies.truth)
+  testImplementation(deps.Dependencies.AndroidxTest.core)
+  testImplementation(deps.Dependencies.AndroidxTest.junit)
+  testImplementation(deps.Dependencies.roboelectric)
+  testImplementation(deps.Dependencies.truth)
 
-  androidTestImplementation(deps.TestDependencies.AndroidxTest.core)
-  androidTestImplementation(deps.TestDependencies.AndroidxTest.junit)
-  androidTestImplementation(deps.TestDependencies.AndroidxTest.extJunitKtx)
-  androidTestImplementation(deps.TestDependencies.AndroidxTest.runner)
-  androidTestImplementation(deps.TestDependencies.truth)
+  androidTestImplementation(deps.Dependencies.AndroidxTest.core)
+  androidTestImplementation(deps.Dependencies.AndroidxTest.junit)
+  androidTestImplementation(deps.Dependencies.AndroidxTest.extJunitKtx)
+  androidTestImplementation(deps.Dependencies.AndroidxTest.runner)
+  androidTestImplementation(deps.Dependencies.truth)
 }

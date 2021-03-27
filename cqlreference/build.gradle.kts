@@ -5,17 +5,17 @@ plugins {
 }
 
 android {
-  compileSdkVersion(versions.Sdk.compileSdk)
-  buildToolsVersion(versions.Plugins.buildTools)
+  compileSdkVersion(deps.Dependencies.Sdk.compileSdk)
+  buildToolsVersion(deps.Plugins.Versions.buildTools)
 
   defaultConfig {
     applicationId("com.google.android.fhir.cqlreference")
-    minSdkVersion(versions.Sdk.minSdk)
-    targetSdkVersion(versions.Sdk.targetSdk)
+    minSdkVersion(deps.Dependencies.Sdk.minSdk)
+    targetSdkVersion(deps.Dependencies.Sdk.targetSdk)
     versionCode = 1
     versionName = "1.0"
 
-    testInstrumentationRunner(deps.TestDependencies.standardRunner)
+    testInstrumentationRunner(deps.Dependencies.androidJunitRunner)
 
     multiDexEnabled = true
   }
@@ -54,24 +54,24 @@ configurations {
 }
 
 dependencies {
-  coreLibraryDesugaring(deps.AppDependencies.Androidx.desugar)
+  coreLibraryDesugaring(deps.Dependencies.desugarJdkLibs)
 
-  api(deps.AppDependencies.Cql.hapiR4) { exclude(module = "junit") }
+  api(deps.Dependencies.hapiFhirStructuresR4) { exclude(module = "junit") }
 
-  implementation(deps.AppDependencies.Androidx.appCompat)
-  implementation(deps.AppDependencies.Androidx.constraintLayout)
-  implementation(deps.AppDependencies.Androidx.materialDesign)
-  implementation(deps.AppDependencies.Androidx.work)
-  implementation(deps.AppDependencies.Cql.cqlEngineCore)
-  implementation(deps.AppDependencies.Cql.cqlEngineFhir)
-  implementation(deps.AppDependencies.Kotlin.androidxCoreKtx)
-  implementation(deps.AppDependencies.Kotlin.kotlin)
-  implementation(deps.AppDependencies.Kotlin.kotlinTesting)
-  implementation(deps.AppDependencies.Lifecycle.viewModelKtx)
+  implementation(deps.Dependencies.Androidx.appCompat)
+  implementation(deps.Dependencies.Androidx.constraintLayout)
+  implementation(deps.Dependencies.Androidx.workRuntimeKtx)
+  implementation(deps.Dependencies.Cql.cqlEngine)
+  implementation(deps.Dependencies.Cql.cqlEngineFhir)
+  implementation(deps.Dependencies.Kotlin.androidxCoreKtx)
+  implementation(deps.Dependencies.Kotlin.stdlib)
+  implementation(deps.Dependencies.Kotlin.kotlinTestJunit)
+  implementation(deps.Dependencies.Lifecycle.viewModelKtx)
+  implementation(deps.Dependencies.material)
 
-  testImplementation(deps.TestDependencies.AndroidxTest.core)
-  testImplementation(deps.TestDependencies.AndroidxTest.junit)
+  testImplementation(deps.Dependencies.AndroidxTest.core)
+  testImplementation(deps.Dependencies.AndroidxTest.junit)
 
-  androidTestImplementation(deps.TestDependencies.AndroidxTest.extJunit)
-  androidTestImplementation(deps.TestDependencies.Espresso.espresso)
+  androidTestImplementation(deps.Dependencies.AndroidxTest.extJunit)
+  androidTestImplementation(deps.Dependencies.Espresso.espressoCore)
 }

@@ -5,14 +5,14 @@ plugins {
 }
 
 android {
-    compileSdkVersion(versions.Sdk.compileSdk)
+    compileSdkVersion(deps.Dependencies.Sdk.compileSdk)
     defaultConfig {
         applicationId("com.google.android.fhir.reference")
-        minSdkVersion(versions.Sdk.minSdk)
-        targetSdkVersion(versions.Sdk.targetSdk)
+        minSdkVersion(deps.Dependencies.Sdk.minSdk)
+        targetSdkVersion(deps.Dependencies.Sdk.targetSdk)
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner(deps.TestDependencies.standardRunner)
+        testInstrumentationRunner(deps.Dependencies.androidJunitRunner)
         // Required when setting minSdkVersion to 20 or lower
         // See https://developer.android.com/studio/write/java8-support
         multiDexEnabled = true
@@ -50,33 +50,33 @@ configurations {
 }
 
 dependencies {
-    coreLibraryDesugaring(deps.AppDependencies.Androidx.desugar)
+    coreLibraryDesugaring(deps.Dependencies.desugarJdkLibs)
 
-    implementation(deps.AppDependencies.Androidx.activity)
-    implementation(deps.AppDependencies.Androidx.appCompat)
-    implementation(deps.AppDependencies.Androidx.constraintLayout)
-    implementation(deps.AppDependencies.Androidx.fragment)
-    implementation(deps.AppDependencies.Androidx.materialDesign)
-    implementation(deps.AppDependencies.Androidx.recyclerView)
-    implementation(deps.AppDependencies.Androidx.work)
-    implementation(deps.AppDependencies.Kotlin.kotlin)
-    implementation(deps.AppDependencies.Kotlin.androidCoroutines)
-    implementation(deps.AppDependencies.Kotlin.coreKtCoroutines)
-    implementation(deps.AppDependencies.Lifecycle.runtime)
-    implementation(deps.AppDependencies.Lifecycle.liveDataKtx)
-    implementation(deps.AppDependencies.Lifecycle.viewModel)
-    implementation(deps.AppDependencies.Navigation.navFragment)
-    implementation(deps.AppDependencies.Navigation.navUi)
-    implementation(deps.AppDependencies.Retrofit.coreRetrofit)
-    implementation(deps.AppDependencies.Retrofit.gsonConverter)
-    implementation(deps.AppDependencies.Retrofit.mockRetrofit)
-    implementation(deps.AppDependencies.httpInterceptor)
+    implementation(deps.Dependencies.Androidx.activity)
+    implementation(deps.Dependencies.Androidx.appCompat)
+    implementation(deps.Dependencies.Androidx.constraintLayout)
+    implementation(deps.Dependencies.Androidx.fragmentKtx)
+    implementation(deps.Dependencies.material)
+    implementation(deps.Dependencies.Androidx.recyclerView)
+    implementation(deps.Dependencies.Androidx.workRuntimeKtx)
+    implementation(deps.Dependencies.Kotlin.stdlib)
+    implementation(deps.Dependencies.Kotlin.kotlinCoroutinesAndroid)
+    implementation(deps.Dependencies.Kotlin.kotlinCoroutinesCore)
+    implementation(deps.Dependencies.Lifecycle.runtime)
+    implementation(deps.Dependencies.Lifecycle.liveDataKtx)
+    implementation(deps.Dependencies.Lifecycle.viewModelKtx)
+    implementation(deps.Dependencies.Navigation.navFragmentKtx)
+    implementation(deps.Dependencies.Navigation.navUiKtx)
+    implementation(deps.Dependencies.Retrofit.coreRetrofit)
+    implementation(deps.Dependencies.Retrofit.gsonConverter)
+    implementation(deps.Dependencies.retrofitMock)
+    implementation(deps.Dependencies.httpInterceptor)
 
     implementation(project(path = ":core"))
 
-    testImplementation(deps.TestDependencies.AndroidxTest.junit)
+    testImplementation(deps.Dependencies.AndroidxTest.junit)
 
-    androidTestImplementation(deps.TestDependencies.AndroidxTest.extJunit)
-    androidTestImplementation(deps.TestDependencies.Espresso.espresso)
+    androidTestImplementation(deps.Dependencies.AndroidxTest.extJunit)
+    androidTestImplementation(deps.Dependencies.Espresso.espressoCore)
 
 }

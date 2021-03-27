@@ -7,9 +7,9 @@ buildscript {
   }
   dependencies {
     classpath(deps.Plugins.androidGradlePlugin)
-    classpath(deps.Plugins.kotlin)
-    classpath(deps.Plugins.navSafeArgs)
-    classpath(deps.Plugins.spotless)
+    classpath(deps.Plugins.kotlinGradlePlugin)
+    classpath(deps.Plugins.navSafeArgsGradlePlugin)
+    classpath(deps.Plugins.spotlessGradlePlugin)
   }
 }
 
@@ -23,7 +23,7 @@ allprojects {
 }
 
 subprojects {
-  apply(plugin = "com.diffplug.spotless")
+  apply(plugin = BuildPlugins.spotless)
   configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     kotlin {
       target("**/*.kt")
@@ -45,7 +45,7 @@ afterEvaluate {
   val buildNumber = System.getenv("GITHUB_RUN_ID")
   if (buildNumber != null) {
     subprojects {
-      apply(plugin = "maven-publish")
+      apply(plugin = BuildPlugins.mavenPublish)
       configure<PublishingExtension> {
         repositories {
           maven {

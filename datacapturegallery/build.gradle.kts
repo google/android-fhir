@@ -5,17 +5,17 @@ plugins {
 }
 
 android {
-    compileSdkVersion(versions.Sdk.compileSdk)
-    buildToolsVersion(versions.Plugins.buildTools)
+    compileSdkVersion(deps.Dependencies.Sdk.compileSdk)
+    buildToolsVersion(deps.Plugins.Versions.buildTools)
 
     defaultConfig {
         applicationId ("com.google.android.fhir.datacapture.gallery")
-        minSdkVersion(versions.Sdk.minSdk)
-        targetSdkVersion(versions.Sdk.targetSdk)
+        minSdkVersion(deps.Dependencies.Sdk.minSdk)
+        targetSdkVersion(deps.Dependencies.Sdk.targetSdk)
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner(deps.TestDependencies.standardRunner)
+        testInstrumentationRunner(deps.Dependencies.androidJunitRunner)
         // Required when setting minSdkVersion to 20 or lower
         multiDexEnabled = true
     }
@@ -50,21 +50,21 @@ android {
 }
 
 dependencies {
-    coreLibraryDesugaring(deps.AppDependencies.Androidx.desugar)
+    coreLibraryDesugaring(deps.Dependencies.desugarJdkLibs)
 
-    implementation(deps.AppDependencies.Androidx.appCompat)
-    implementation(deps.AppDependencies.Androidx.constraintLayout)
-    implementation(deps.AppDependencies.Androidx.fragment)
-    implementation(deps.AppDependencies.Androidx.materialDesign)
-    implementation(deps.AppDependencies.Kotlin.androidxCoreKtx)
-    implementation(deps.AppDependencies.Kotlin.kotlin)
-    implementation(deps.AppDependencies.Navigation.navFragment)
-    implementation(deps.AppDependencies.Navigation.navUi)
+    implementation(deps.Dependencies.Androidx.appCompat)
+    implementation(deps.Dependencies.Androidx.constraintLayout)
+    implementation(deps.Dependencies.Androidx.fragmentKtx)
+    implementation(deps.Dependencies.material)
+    implementation(deps.Dependencies.Kotlin.androidxCoreKtx)
+    implementation(deps.Dependencies.Kotlin.stdlib)
+    implementation(deps.Dependencies.Navigation.navFragmentKtx)
+    implementation(deps.Dependencies.Navigation.navUiKtx)
 
     implementation (project(path = ":datacapture"))
 
-    testImplementation(deps.TestDependencies.AndroidxTest.junit)
+    testImplementation(deps.Dependencies.AndroidxTest.junit)
 
-    androidTestImplementation(deps.TestDependencies.AndroidxTest.extJunit)
-    androidTestImplementation(deps.TestDependencies.Espresso.espresso)
+    androidTestImplementation(deps.Dependencies.AndroidxTest.extJunit)
+    androidTestImplementation(deps.Dependencies.Espresso.espressoCore)
 }
