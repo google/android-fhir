@@ -66,5 +66,5 @@ dependencies {
 
     implementation (project(path = ":datacapture"))
 
-    testImplementation(Dependencies.AndroidxTest.junit)
+    testImplementation(Dependencies.junit)
 }

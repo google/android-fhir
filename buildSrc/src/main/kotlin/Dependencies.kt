@@ -93,7 +93,7 @@ object Dependencies {
   }
 
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
-  const val junit = "junit:junit:${Versions.AndroidxTest.junit}"
+  const val junit = "junit:junit:${Versions.junit}"
   const val roboelectric = "org.robolectric:robolectric:${Versions.roboelectric}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
 
@@ -133,12 +133,12 @@ object Dependencies {
     object AndroidxTest {
       const val core = "1.2.0"
       const val extJunit = "1.1.2"
-      const val junit = "4.13"
       const val rules = "1.1.0"
       const val runner = "1.1.0"
     }
 
     const val espresso = "3.3.0"
+    const val junit = "4.13"
     const val roboelectric = "4.3.1"
   }
 }

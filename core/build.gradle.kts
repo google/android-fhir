@@ -95,7 +95,7 @@ dependencies {
   kapt(Dependencies.Room.compiler)
 
   testImplementation(Dependencies.AndroidxTest.core)
-  testImplementation(Dependencies.AndroidxTest.junit)
+  testImplementation(Dependencies.junit)
   testImplementation(Dependencies.roboelectric)
   testImplementation(Dependencies.truth)
 }
