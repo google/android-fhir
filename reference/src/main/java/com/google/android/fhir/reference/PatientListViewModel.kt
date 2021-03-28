@@ -17,12 +17,10 @@
 package com.google.android.fhir.reference
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.liveData
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.data.SamplePatients
@@ -38,41 +36,16 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
 
   private val samplePatients = SamplePatients()
 
-  private var patientResults: List<Patient> = getSearchResults()
-  private var searchedPatients = samplePatients.getPatientItems(patientResults)
-  private val _liveSearchedPatients: MutableLiveData<List<PatientItem>> = MutableLiveData()
-  val liveSearchedPatients: LiveData<List<PatientItem>> = _liveSearchedPatients
+  val liveSearchedPatients = liveData { emit(getSearchResults()) }
 
-  fun getSearchedPatients(): LiveData<List<PatientItem>> {
-    searchedPatients = samplePatients.getPatientItems(patientResults)
-    _liveSearchedPatients.value = searchedPatients
-    Log.d(
-      "PatientListViewModel",
-      "getSearchedPatients(): " +
-        "patientResults[${patientResults.count()}], searchedPatients[${searchedPatients
-                .count()}]"
-    )
-    return liveSearchedPatients
-  }
-
-  private fun getSearchResults(): List<Patient> {
-    val searchResults: List<Patient> =
+  private suspend fun getSearchResults(): List<PatientItem> {
+    return samplePatients.getPatientItems(
       fhirEngine
         .search()
         .of(Patient::class.java)
         .filter(string(Patient.ADDRESS_CITY, ParamPrefixEnum.EQUAL, "NAIROBI"))
         .run()
-    Log.d(
-      "PatientListViewModel",
-      "${searchResults.count()} search results: " + "${searchResults.joinToString(" ")}"
     )
-    return searchResults
-  }
-
-  fun searchPatients() {
-    patientResults = getSearchResults()
-    searchedPatients = samplePatients.getPatientItems(patientResults)
-    _liveSearchedPatients.value = searchedPatients
   }
 
   /** The Patient's details for display purposes. */

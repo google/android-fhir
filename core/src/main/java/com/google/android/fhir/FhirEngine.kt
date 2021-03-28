@@ -21,7 +21,6 @@ import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.Result
 import com.google.android.fhir.sync.SyncConfiguration
 import org.hl7.fhir.r4.model.Resource
-import org.opencds.cqf.cql.execution.EvaluationResult
 
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface FhirEngine {
@@ -31,7 +30,7 @@ interface FhirEngine {
    *
    * @param <R> The resource type which should be a subtype of [Resource].
    */
-  fun <R : Resource> save(resource: R)
+  suspend fun <R : Resource> save(resource: R)
 
   /**
    * Saves a list of FHIR `resource` in the local storage. If any of the resources already exist,
@@ -39,14 +38,14 @@ interface FhirEngine {
    *
    * @param <R> The resource type which should be a subtype of [Resource].
    */
-  fun <R : Resource> saveAll(resources: List<R>)
+  suspend fun <R : Resource> saveAll(resources: List<R>)
 
   /**
    * Updates a FHIR `resource` in the local storage.
    *
    * @param <R> The resource type which should be a subtype of [Resource].
    */
-  fun <R : Resource> update(resource: R)
+  suspend fun <R : Resource> update(resource: R)
 
   /**
    * Returns a FHIR resource of type `clazz` with `id` from the local storage.
@@ -54,17 +53,15 @@ interface FhirEngine {
    * @param <R> The resource type which should be a subtype of [Resource].
    * @throws ResourceNotFoundException if the resource is not found
    */
-  @Throws(ResourceNotFoundException::class) fun <R : Resource> load(clazz: Class<R>, id: String): R
+  @Throws(ResourceNotFoundException::class)
+  suspend fun <R : Resource> load(clazz: Class<R>, id: String): R
 
   /**
    * Removes a FHIR resource of type `clazz` with `id` from the local storage.
    *
    * @param <R> The resource type which should be a subtype of [Resource].
    */
-  fun <R : Resource> remove(clazz: Class<R>, id: String)
-
-  /** Returns the result of a CQL evaluation provided with the ID of the library. */
-  fun evaluateCql(libraryVersionId: String, context: String, expression: String): EvaluationResult
+  suspend fun <R : Resource> remove(clazz: Class<R>, id: String)
 
   /** Returns the entry point for [Search]. */
   fun search(): Search
