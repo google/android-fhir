@@ -35,6 +35,7 @@ import org.hl7.fhir.r4.model.ResourceType
  * The implementation for the persistence layer using Room. See docs for
  * [com.google.android.fhir.db.Database] for the API docs.
  */
+@Suppress("UNCHECKED_CAST")
 internal class DatabaseImpl(context: Context, private val iParser: IParser, databaseName: String?) :
   com.google.android.fhir.db.Database {
   constructor(

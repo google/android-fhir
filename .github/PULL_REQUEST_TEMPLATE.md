@@ -1,6 +1,6 @@
 **IMPORTANT: All PRs must be linked to an issue (except for extremely trivial and straighforward changes).**
 
-**Fixes** #[issue number]
+Fixes #[issue number]
 
 **Description**
 Clear and concise code change description. 
