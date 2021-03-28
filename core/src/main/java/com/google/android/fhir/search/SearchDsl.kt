@@ -26,7 +26,7 @@ data class Search(val type: ResourceType? = null, var size: Int? = null, var fro
   internal val stringFilters = mutableListOf<StringFilter>()
   internal val referenceFilter = mutableListOf<ReferenceFilter>()
   internal var sort: StringClientParam? = null
-  internal var ascending: Order? = null
+  internal var order: Order? = null
 
   fun filter(stringParameter: StringClientParam, init: StringFilter.() -> Unit) {
     val filter = StringFilter(stringParameter)
@@ -40,9 +40,9 @@ data class Search(val type: ResourceType? = null, var size: Int? = null, var fro
     referenceFilter.add(filter)
   }
 
-  fun sort(parameter: StringClientParam, ascending: Order) {
+  fun sort(parameter: StringClientParam, order: Order) {
     sort = parameter
-    this.ascending = ascending
+    this.order = order
   }
 }
 

@@ -67,5 +67,5 @@ interface FhirEngine {
 
   fun updatePeriodicSyncConfiguration(syncConfig: PeriodicSyncConfiguration)
 
-  suspend fun <R : Resource> searchA(search: Search): List<R>
+  suspend fun <R : Resource> searchImpl(search: Search): List<R>
 }

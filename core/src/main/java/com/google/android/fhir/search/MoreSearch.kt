@@ -32,20 +32,34 @@ fun Search.getQuery(): SearchQuery {
   queryBuilder.appendLine(
     """
     SELECT a.serializedResource
-    FROM ResourceEntity a
-    ${sort?.let {
+    FROM ResourceEntity a${sort?.let {
     """
     LEFT JOIN StringIndexEntity b
-    ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
-    """
+    ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?"""
     } ?: ""}
-    WHERE a.resourceType = ?${filterQuery?.let { " AND a.resourceId IN (${it.query})" } ?: ""}
-    """
+    WHERE a.resourceType = ?${filterQuery?.let { " AND a.resourceId IN ("} ?: ""}
+    """.trimIndent()
   )
+  filterQuery?.also {
+    queryBuilder.appendLine(it.query)
+    queryBuilder.appendLine(")")
+  }
+  sort?.also {
+    queryBuilder.appendLine(
+      """
+      ORDER BY b.index_value ${
+        when (order!!) {
+          Order.ASCENDING -> "ASC"
+          Order.DESCENDING -> "DESC"
+        }
+      }
+      """.trimIndent()
+    )
+  }
   size?.also {
     queryBuilder.appendLine("""
-      LIMIT ?${from?.let { " OFFSET ?" } ?: ""}
-      """)
+    LIMIT ?${from?.let { " OFFSET ?" } ?: ""}
+    """.trimIndent())
   }
   val args = mutableListOf<Any>()
   if (sort != null) {
@@ -66,7 +80,7 @@ fun StringFilter.query(type: ResourceType): SearchQuery {
     """
     SELECT resourceId FROM StringIndexEntity
     WHERE resourceType = ? AND index_name = ? AND index_value = ?
-    """,
+    """.trimIndent(),
     listOf(type.name, parameter!!.paramName, value!!)
   )
 }
@@ -76,7 +90,7 @@ fun ReferenceFilter.query(type: ResourceType): SearchQuery {
     """
     SELECT resourceId FROM ReferenceIndexEntity
     WHERE resourceType = ? AND index_name = ? AND index_value = ?
-    """,
+    """.trimIndent(),
     listOf(type.name, parameter!!.paramName, value!!)
   )
 }
