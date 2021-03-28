@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.cql
+package com.google.android.fhir.cqlreference
 
-import org.opencds.cqf.cql.runtime.Code
-import org.opencds.cqf.cql.terminology.CodeSystemInfo
-import org.opencds.cqf.cql.terminology.TerminologyProvider
-import org.opencds.cqf.cql.terminology.ValueSetInfo
+import android.app.Application
+import android.content.Context
 
-/** Fhir Engine's implementation of [TerminologyProvider]. */
-internal class FhirEngineTerminologyProvider : TerminologyProvider {
-  override fun `in`(code: Code, valueSet: ValueSetInfo): Boolean = false
+class FhirApplication : Application() {
 
-  override fun expand(valueSet: ValueSetInfo): Iterable<Code>? = null
+  val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
 
-  override fun lookup(code: Code, codeSystem: CodeSystemInfo): Code? = null
+  fun constructFhirEngine(): FhirEngine {
+    return FhirEngineBuilder(this).build()
+  }
+
+  companion object {
+    fun fhirEngine(context: Context) = (context.applicationContext as FhirApplication).fhirEngine
+  }
 }

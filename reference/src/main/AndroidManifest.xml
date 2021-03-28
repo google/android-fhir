@@ -50,8 +50,5 @@
                 android:value="com.google.android.fhir.reference.PatientListActivity"
             />
         </activity>
-        <activity
-            android:name="com.google.android.fhir.reference.CqlLoadActivity"
-        />
     </application>
 </manifest>
