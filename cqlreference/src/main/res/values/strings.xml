@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">CqlReference</string>
     <string name="title_cql_load_activity">CqlLoad</string>
-    <string name = "cql_loader">CQL Library</string>
+    <string name = "cql_library">CQL Library</string>
     <string name="fhir_resource">FHIR Resource</string>
     <string name="url">URL</string>
     <string name="download">Download</string>
