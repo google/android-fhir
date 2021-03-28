@@ -20,6 +20,7 @@ import android.os.Build
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.NumberIndex
+import com.google.android.fhir.index.entities.PositionIndex
 import com.google.android.fhir.index.entities.QuantityIndex
 import com.google.android.fhir.index.entities.ReferenceIndex
 import com.google.android.fhir.index.entities.StringIndex
@@ -37,6 +38,7 @@ import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.Invoice
+import org.hl7.fhir.r4.model.Location
 import org.hl7.fhir.r4.model.MolecularSequence
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
@@ -60,6 +62,7 @@ class ResourceIndexerTest {
   private lateinit var lastUpdatedTestPatient: Patient
   private lateinit var numberTestChargeItem: ChargeItem
   private lateinit var numberTestMolecularSequence: MolecularSequence
+  private lateinit var specialTestLocation: Location
 
   @Before
   fun setUp() {
@@ -81,6 +84,8 @@ class ResourceIndexerTest {
         MolecularSequence::class.java,
         "/number_test_molecular_sequence.json"
       )
+    specialTestLocation =
+      testingUtils.readFromFile(Location::class.java, "/location-example-hl7hq.json")
   }
 
   @Test
@@ -283,6 +288,11 @@ class ResourceIndexerTest {
       .contains(NumberIndex("factor-override", "ChargeItem.factorOverride", BigDecimal("0.8")))
   }
 
+  @Test
+  fun index_location_shouldIndexPosition() {
+    val resourceIndices = ResourceIndexer.index(specialTestLocation)
+    assertThat(resourceIndices.positionIndices).contains(PositionIndex(-83.69471, 42.2565))
+  }
   @Test
   fun index_molecularSequence_shouldIndexWindowAndVariant() {
     val resourceIndices = ResourceIndexer.index(numberTestMolecularSequence)
