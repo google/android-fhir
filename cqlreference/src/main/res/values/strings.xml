@@ -1,4 +1,16 @@
 <resources>
     <string name="app_name">CqlReference</string>
     <string name="title_cql_load_activity">CqlLoad</string>
+    <string name = "cql_loader">CQL Library</string>
+    <string name="fhir_resource">FHIR Resource</string>
+    <string name="url">URL</string>
+    <string name="download">Download</string>
+    <string name="evaluate">Evaluate</string>
+    <string name="expression">Expression</string>
+    <string name="library">Library</string>
+    <string name="ancrecommendationa2">ANCRecommendationA2</string>
+    <string name="context">Context</string>
+    <string name="patient_mom">Patient/mom</string>
+    <string name="has_anaemia">Has Anaemia</string>
+    <string name="evaluation_result">Evaluation Result</string>
 </resources>
