@@ -26,7 +26,7 @@ suspend fun <R : Resource> Search.run(database: Database): List<R> {
 
 fun Search.getQuery(): SearchQuery {
   val filterQuery =
-    (stringFilters.map { it.query(type!!) } + referenceFilter.map { it.query(type!!) }).intersect()
+    (stringFilters.map { it.query(type) } + referenceFilter.map { it.query(type) }).intersect()
 
   val queryBuilder = StringBuilder()
   queryBuilder.appendLine(
@@ -65,7 +65,7 @@ fun Search.getQuery(): SearchQuery {
   if (sort != null) {
     args.add(sort!!.paramName)
   }
-  args.add(type!!.name)
+  args.add(type.name)
   filterQuery?.also { args.addAll(it.args) }
   size?.also {
     args.add(it)
@@ -81,7 +81,7 @@ fun StringFilter.query(type: ResourceType): SearchQuery {
     SELECT resourceId FROM StringIndexEntity
     WHERE resourceType = ? AND index_name = ? AND index_value = ?
     """.trimIndent(),
-    listOf(type.name, parameter!!.paramName, value!!)
+    listOf(type.name, parameter.paramName, value!!)
   )
 }
 
