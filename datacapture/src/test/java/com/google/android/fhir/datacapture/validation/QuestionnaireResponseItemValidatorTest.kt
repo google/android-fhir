@@ -32,60 +32,86 @@ import org.robolectric.annotation.Config
 class QuestionnaireResponseItemValidatorTest {
 
   @Test
-  fun questionnaireResponseItemValidator_validate_shouldAggregateAllResultsOfChildValidators() {
+  fun questionnaireResponseItemValidator_validate_shouldReturnValidationResultAsNotValidAndReturnAValidationMessageForMaxValueViolation() {
     val extensionUrlMaxValue = "http://hl7.org/fhir/StructureDefinition/maxValue"
     val extensionUrlMinValue = "http://hl7.org/fhir/StructureDefinition/minValue"
-
-    /** Scenario 1 - answerValue is greater than maxValue */
-    var minValue = 250
-    var maxValue = 200000
-    var answerValue = 200001
-    val validateMaxValueViolation =
-      validateAScenario(answerValue, maxValue, minValue, extensionUrlMaxValue, extensionUrlMinValue)
-    assertThat(validateMaxValueViolation.isValid).isFalse()
-    assertThat(validateMaxValueViolation.validationMessages.size == 1).isTrue()
-
-    /** Scenario 2 - answerValue is lesser than minValue */
-    minValue = 250
-    maxValue = 200000
-    answerValue = 249
-    val validateMinValueViolation =
-      validateAScenario(answerValue, maxValue, minValue, extensionUrlMaxValue, extensionUrlMinValue)
-    assertThat(validateMinValueViolation.isValid).isFalse()
-    assertThat(validateMinValueViolation.validationMessages.size == 1).isTrue()
-
-    /** Scenario 3 - answerValue is in the range of maxValue & minValue */
-    minValue = 250
-    maxValue = 200000
-    answerValue = 12354
-    val validateRangeValueViolation =
-      validateAScenario(answerValue, maxValue, minValue, extensionUrlMaxValue, extensionUrlMinValue)
-    assertThat(validateRangeValueViolation.isValid).isTrue()
-    assertThat(validateRangeValueViolation.validationMessages.size == 0).isTrue()
-  }
-
-  private fun validateAScenario(
-    answerValue: Int,
-    maxValue: Int,
-    minValue: Int,
-    extensionUrlMaxValue: String,
-    extensionUrlMinValue: String
-  ): QuestionnaireResponseItemValidator.ValidationResult {
-    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
     val extensionMaxValue = Extension()
     val extensionMinValue = Extension()
-    val questionnaireResponseItemAnswerComponent =
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-    questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
-    questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
+    val minValue = 250
+    val maxValue = 200000
+    val answerValue = 200001
     extensionMaxValue.url = extensionUrlMaxValue
     extensionMaxValue.setValue(IntegerType(maxValue))
     extensionMinValue.url = extensionUrlMinValue
     extensionMinValue.setValue(IntegerType(minValue))
+    val extensions = mutableListOf<Extension>().apply {
+      add(extensionMaxValue)
+      add(extensionMinValue)
+    }
+    val validateAggregationFromChildValidators =
+      applyScenario(extensions, answerValue)
+    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
+    assertThat(validateAggregationFromChildValidators.validationMessages.size == 1).isTrue()
+  }
+
+  @Test
+  fun questionnaireResponseItemValidator_validate_shouldReturnValidationResultAsNotValidAndReturnAValidationMessageForMinValueViolation() {
+    val extensionUrlMaxValue = "http://hl7.org/fhir/StructureDefinition/maxValue"
+    val extensionUrlMinValue = "http://hl7.org/fhir/StructureDefinition/minValue"
+    val extensionMaxValue = Extension()
+    val extensionMinValue = Extension()
+    val minValue = 250
+    val maxValue = 200000
+    val answerValue = 249
+    extensionMaxValue.url = extensionUrlMaxValue
+    extensionMaxValue.setValue(IntegerType(maxValue))
+    extensionMinValue.url = extensionUrlMinValue
+    extensionMinValue.setValue(IntegerType(minValue))
+    val extensions = mutableListOf<Extension>().apply {
+      add(extensionMaxValue)
+      add(extensionMinValue)
+    }
+    val validateAggregationFromChildValidators =
+      applyScenario(extensions, answerValue)
+    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
+    assertThat(validateAggregationFromChildValidators.validationMessages.size == 1).isTrue()
+  }
+
+  @Test
+  fun questionnaireResponseItemValidator_validate_shouldReturnValidationResultAsValidAndReturnEmptyValidationMessageList() {
+    val extensionUrlMaxValue = "http://hl7.org/fhir/StructureDefinition/maxValue"
+    val extensionUrlMinValue = "http://hl7.org/fhir/StructureDefinition/minValue"
+    val extensionMaxValue = Extension()
+    val extensionMinValue = Extension()
+    val minValue = 250
+    val maxValue = 200000
+    val answerValue = 251
+    extensionMaxValue.url = extensionUrlMaxValue
+    extensionMaxValue.setValue(IntegerType(maxValue))
+    extensionMinValue.url = extensionUrlMinValue
+    extensionMinValue.setValue(IntegerType(minValue))
+    val extensions = mutableListOf<Extension>().apply {
+      add(extensionMaxValue)
+      add(extensionMinValue)
+    }
+    val validateAggregationFromChildValidators =
+      applyScenario(extensions, answerValue)
+    assertThat(validateAggregationFromChildValidators.isValid).isTrue()
+    assertThat(validateAggregationFromChildValidators.validationMessages.isEmpty()).isTrue()
+  }
+
+  private fun applyScenario(
+    extensions: List<Extension>,
+    answerValue: Int
+  ): ValidationResult {
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    val questionnaireResponseItemAnswerComponent =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+    questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
+    questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
     questionnaireItem.apply {
-      addExtension(extensionMaxValue)
-      addExtension(extensionMinValue)
+      extensions.forEach { addExtension(it) }
     }
     return QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
   }

@@ -19,13 +19,13 @@ package com.google.android.fhir.datacapture.validation
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-interface ConstraintValidator {
+internal interface ConstraintValidator {
   /**
-   * Validates the \`answer\`(s) in [questionnaireResponseItem] satify any constraints of the
+   * Validates the `answer`(s) in [questionnaireResponseItem] satify any constraints of the
    * [questionnaireItem] according to the [structured data capture implementation guide]
    * (http://build.fhir.org/ig/HL7/sdc/behavior.html). This does not validate the
-   * `questionnaireResponseItem` and its child items are structurally consistent with the
-   * `questionnaireItem` and its child items.
+   * [questionnaireResponseItem] and its child items are structurally consistent with the
+   * [questionnaireItem] and its child items.
    * [Learn more](https://www.hl7.org/fhir/questionnaireresponse.html#link).
    */
   fun validate(

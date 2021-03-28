@@ -19,37 +19,33 @@ package com.google.android.fhir.datacapture.validation
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-object QuestionnaireResponseItemValidator {
+internal object QuestionnaireResponseItemValidator {
 
-  private val validators = mutableListOf(MaxValueValidator, MinValueValidator)
+  private val validators = mutableListOf(MaxValueConstraintValidator, MinValueConstraintValidator)
 
   /**
-   * Validates [questionnaireResponseItemBuilder] contains valid answer(s) to [questionnaireItem].
+   * Validates [questionnaireResponseItem] contains valid answer(s) to [questionnaireItem].
    */
   fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItemBuilder: QuestionnaireResponse.QuestionnaireResponseItemComponent
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ): ValidationResult {
-    if (questionnaireResponseItemBuilder.answer.isEmpty()) {
+    if (questionnaireResponseItem.answer.isEmpty()) {
       return ValidationResult(true, mutableListOf())
     }
     val validationResults = mutableListOf<ConstraintValidator.ConstraintValidationResult>()
     validators.forEach {
-      validationResults.add(it.validate(questionnaireItem, questionnaireResponseItemBuilder))
+      validationResults.add(it.validate(questionnaireItem, questionnaireResponseItem))
     }
     return packConstraintValidationResults(validationResults)
   }
 
-  data class ValidationResult(var isValid: Boolean, val validationMessages: MutableList<String?>)
-
   private fun packConstraintValidationResults(
     validationResults: List<ConstraintValidator.ConstraintValidationResult>
-  ): ValidationResult {
-    val validationResult = ValidationResult(true, mutableListOf())
-    validationResults.forEach {
-      validationResult.isValid = validationResult.isValid && it.isValid
-      if (!it.message.isNullOrEmpty()) validationResult.validationMessages.add(it.message)
-    }
-    return validationResult
-  }
+  ) = ValidationResult(
+    validationResults.all { it.isValid },
+    validationResults.mapNotNull { it.message }.toList()
+  )
 }
+
+internal data class ValidationResult(var isValid: Boolean, val validationMessages: List<String>)

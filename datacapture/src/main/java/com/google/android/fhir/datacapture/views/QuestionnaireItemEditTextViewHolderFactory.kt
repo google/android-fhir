@@ -22,6 +22,7 @@ import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputEditText
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -59,10 +60,10 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   }
 
   private fun applyValidationResult(
-    validationResult: QuestionnaireResponseItemValidator.ValidationResult
+    validationResult: ValidationResult
   ) {
     val validationMessage =
-      validationResult.validationMessages.filter { it != null }.joinToString {
+      validationResult.validationMessages.joinToString {
         it.plus(System.getProperty("line.separator"))
       }
     textInputEditText.error = if (validationMessage == "") null else validationMessage

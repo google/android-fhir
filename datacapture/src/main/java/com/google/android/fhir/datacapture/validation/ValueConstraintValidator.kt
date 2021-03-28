@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture.validation
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-open class ValueConstraintValidator(
+internal open class ValueConstraintValidator(
   val url: String,
   val predicate: (Int, Int) -> Boolean,
   val messageGenerator: (allowedValue: String) -> String
@@ -46,17 +46,3 @@ open class ValueConstraintValidator(
     return ConstraintValidator.ConstraintValidationResult(true, null)
   }
 }
-
-object MaxValueValidator :
-  ValueConstraintValidator(
-    url = "http://hl7.org/fhir/StructureDefinition/maxValue",
-    predicate = { a: Int, b: Int -> a > b },
-    { allowedValue: String -> "Maximum value allowed is:$allowedValue" }
-  )
-
-object MinValueValidator :
-  ValueConstraintValidator(
-    url = "http://hl7.org/fhir/StructureDefinition/minValue",
-    predicate = { a: Int, b: Int -> a < b },
-    { allowedValue: String -> "Minimum value allowed is:$allowedValue" }
-  )
