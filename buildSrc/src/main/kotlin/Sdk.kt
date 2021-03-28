@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-object BuildPlugins {
-  const val androidLib = "com.android.library"
-  const val application = "com.android.application"
-  const val kotlinAndroid = "kotlin-android"
-  const val kotlinKapt = "kotlin-kapt"
-  const val mavenPublish = "maven-publish"
-  const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
-  const val spotless = "com.diffplug.spotless"
+object Sdk {
+  const val compileSdk = 29
+  const val minSdk = 21
+  const val targetSdk = 29
 }

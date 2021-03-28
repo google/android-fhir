@@ -1,7 +1,7 @@
 plugins {
-  id(BuildPlugins.androidLib)
-  id(BuildPlugins.kotlinAndroid)
-  id(BuildPlugins.mavenPublish)
+  id(Plugins.BuildPlugins.androidLib)
+  id(Plugins.BuildPlugins.kotlinAndroid)
+  id(Plugins.BuildPlugins.mavenPublish)
 }
 
 val group = "com.google.android.fhir"
@@ -37,16 +37,16 @@ afterEvaluate {
 }
 
 android {
-  compileSdkVersion(deps.Dependencies.Sdk.compileSdk)
-  buildToolsVersion(deps.Plugins.Versions.buildTools)
+  compileSdkVersion(Sdk.compileSdk)
+  buildToolsVersion(Plugins.Versions.buildTools)
 
   defaultConfig {
-    minSdkVersion(deps.Dependencies.Sdk.minSdk)
-    targetSdkVersion(deps.Dependencies.Sdk.targetSdk)
+    minSdkVersion(Sdk.minSdk)
+    targetSdkVersion(Sdk.targetSdk)
     versionCode = 1
     versionName = "1.0"
 
-    testInstrumentationRunner(deps.Dependencies.TestLibraries.androidJunitRunner)
+    testInstrumentationRunner(Dependencies.androidJunitRunner)
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments(mapOf("package" to "com.google.android.fhir.datacapture"))
   }
@@ -75,28 +75,27 @@ android {
 configurations { all { exclude(module = "xpp3") } }
 
 dependencies {
+  androidTestImplementation(Dependencies.AndroidxTest.core)
+  androidTestImplementation(Dependencies.AndroidxTest.extJunit)
+  androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
+  androidTestImplementation(Dependencies.AndroidxTest.rules)
+  androidTestImplementation(Dependencies.AndroidxTest.runner)
+  androidTestImplementation(Dependencies.truth)
 
-  api(deps.Dependencies.Libraries.hapiFhirStructuresR4)
+  api(Dependencies.hapiFhirStructuresR4)
 
-  coreLibraryDesugaring(deps.Dependencies.Libraries.desugarJdkLibs)
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  implementation(deps.Dependencies.Libraries.Androidx.appCompat)
-  implementation(deps.Dependencies.Libraries.Androidx.fragmentKtx)
-  implementation(deps.Dependencies.Libraries.Kotlin.androidxCoreKtx)
-  implementation(deps.Dependencies.Libraries.Kotlin.kotlinTestJunit)
-  implementation(deps.Dependencies.Libraries.Kotlin.stdlib)
-  implementation(deps.Dependencies.Libraries.Lifecycle.viewModelKtx)
-  implementation(deps.Dependencies.Libraries.material)
+  implementation(Dependencies.Androidx.appCompat)
+  implementation(Dependencies.Androidx.fragmentKtx)
+  implementation(Dependencies.Kotlin.androidxCoreKtx)
+  implementation(Dependencies.Kotlin.kotlinTestJunit)
+  implementation(Dependencies.Kotlin.stdlib)
+  implementation(Dependencies.Lifecycle.viewModelKtx)
+  implementation(Dependencies.material)
 
-  testImplementation(deps.Dependencies.TestLibraries.AndroidxTest.core)
-  testImplementation(deps.Dependencies.TestLibraries.AndroidxTest.junit)
-  testImplementation(deps.Dependencies.TestLibraries.roboelectric)
-  testImplementation(deps.Dependencies.TestLibraries.truth)
-
-  androidTestImplementation(deps.Dependencies.TestLibraries.AndroidxTest.core)
-  androidTestImplementation(deps.Dependencies.TestLibraries.AndroidxTest.extJunit)
-  androidTestImplementation(deps.Dependencies.TestLibraries.AndroidxTest.extJunitKtx)
-  androidTestImplementation(deps.Dependencies.TestLibraries.AndroidxTest.rules)
-  androidTestImplementation(deps.Dependencies.TestLibraries.AndroidxTest.runner)
-  androidTestImplementation(deps.Dependencies.TestLibraries.truth)
+  testImplementation(Dependencies.AndroidxTest.core)
+  testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.roboelectric)
+  testImplementation(Dependencies.truth)
 }

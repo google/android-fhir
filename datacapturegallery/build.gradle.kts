@@ -1,21 +1,21 @@
 plugins {
-    id(BuildPlugins.application)
-    id(BuildPlugins.kotlinAndroid)
-    id(BuildPlugins.navSafeArgs)
+    id(Plugins.BuildPlugins.application)
+    id(Plugins.BuildPlugins.kotlinAndroid)
+    id(Plugins.BuildPlugins.navSafeArgs)
 }
 
 android {
-    compileSdkVersion(deps.Dependencies.Sdk.compileSdk)
-    buildToolsVersion(deps.Plugins.Versions.buildTools)
+    compileSdkVersion(Sdk.compileSdk)
+    buildToolsVersion(Plugins.Versions.buildTools)
 
     defaultConfig {
         applicationId ("com.google.android.fhir.datacapture.gallery")
-        minSdkVersion(deps.Dependencies.Sdk.minSdk)
-        targetSdkVersion(deps.Dependencies.Sdk.targetSdk)
+        minSdkVersion(Sdk.minSdk)
+        targetSdkVersion(Sdk.targetSdk)
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner(deps.Dependencies.TestLibraries.androidJunitRunner)
+        testInstrumentationRunner(Dependencies.androidJunitRunner)
         // Required when setting minSdkVersion to 20 or lower
         multiDexEnabled = true
     }
@@ -50,21 +50,21 @@ android {
 }
 
 dependencies {
-    coreLibraryDesugaring(deps.Dependencies.Libraries.desugarJdkLibs)
+    androidTestImplementation(Dependencies.AndroidxTest.extJunit)
+    androidTestImplementation(Dependencies.Espresso.espressoCore)
 
-    implementation(deps.Dependencies.Libraries.Androidx.appCompat)
-    implementation(deps.Dependencies.Libraries.Androidx.constraintLayout)
-    implementation(deps.Dependencies.Libraries.Androidx.fragmentKtx)
-    implementation(deps.Dependencies.Libraries.material)
-    implementation(deps.Dependencies.Libraries.Kotlin.androidxCoreKtx)
-    implementation(deps.Dependencies.Libraries.Kotlin.stdlib)
-    implementation(deps.Dependencies.Libraries.Navigation.navFragmentKtx)
-    implementation(deps.Dependencies.Libraries.Navigation.navUiKtx)
+    coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+
+    implementation(Dependencies.Androidx.appCompat)
+    implementation(Dependencies.Androidx.constraintLayout)
+    implementation(Dependencies.Androidx.fragmentKtx)
+    implementation(Dependencies.material)
+    implementation(Dependencies.Kotlin.androidxCoreKtx)
+    implementation(Dependencies.Kotlin.stdlib)
+    implementation(Dependencies.Navigation.navFragmentKtx)
+    implementation(Dependencies.Navigation.navUiKtx)
 
     implementation (project(path = ":datacapture"))
 
-    testImplementation(deps.Dependencies.TestLibraries.AndroidxTest.junit)
-
-    androidTestImplementation(deps.Dependencies.TestLibraries.AndroidxTest.extJunit)
-    androidTestImplementation(deps.Dependencies.TestLibraries.Espresso.espressoCore)
+    testImplementation(Dependencies.AndroidxTest.junit)
 }

@@ -1,17 +1,17 @@
 plugins {
-  id(BuildPlugins.androidLib)
-  id(BuildPlugins.kotlinAndroid)
-  id(BuildPlugins.kotlinKapt)
+  id(Plugins.BuildPlugins.androidLib)
+  id(Plugins.BuildPlugins.kotlinAndroid)
+  id(Plugins.BuildPlugins.kotlinKapt)
 }
 
 android {
-  compileSdkVersion(deps.Dependencies.Sdk.compileSdk)
+  compileSdkVersion(Sdk.compileSdk)
   defaultConfig {
-    minSdkVersion(deps.Dependencies.Sdk.minSdk)
-    targetSdkVersion(deps.Dependencies.Sdk.targetSdk)
+    minSdkVersion(Sdk.minSdk)
+    targetSdkVersion(Sdk.targetSdk)
     versionCode = 1
     versionName = "1.0"
-    testInstrumentationRunner(deps.Dependencies.TestLibraries.androidJunitRunner)
+    testInstrumentationRunner(Dependencies.androidJunitRunner)
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments(mapOf("package" to "com.google.android.fhir"))
     // Required when setting minSdkVersion to 20 or lower
@@ -73,29 +73,29 @@ configurations {
 }
 
 dependencies {
-  api(deps.Dependencies.Libraries.Cql.cqlEngine)
-  api(deps.Dependencies.Libraries.hapiFhirStructuresR4) { exclude(module = "junit") }
+  androidTestImplementation(Dependencies.AndroidxTest.core)
+  androidTestImplementation(Dependencies.junit)
+  androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
+  androidTestImplementation(Dependencies.AndroidxTest.runner)
+  androidTestImplementation(Dependencies.truth)
 
-  coreLibraryDesugaring(deps.Dependencies.Libraries.desugarJdkLibs)
+  api(Dependencies.Cql.cqlEngine)
+  api(Dependencies.hapiFhirStructuresR4) { exclude(module = "junit") }
 
-  implementation(deps.Dependencies.Libraries.Room.runtime)
-  implementation(deps.Dependencies.Libraries.Room.ktx)
-  implementation(deps.Dependencies.Libraries.Androidx.workRuntimeKtx)
-  implementation(deps.Dependencies.Libraries.Kotlin.stdlib)
-  implementation(deps.Dependencies.Libraries.caffeine)
-  implementation(deps.Dependencies.Libraries.guava)
-  implementation(deps.Dependencies.Libraries.jsonToolsPatch)
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  kapt(deps.Dependencies.Libraries.Room.compiler)
+  implementation(Dependencies.Room.runtime)
+  implementation(Dependencies.Room.ktx)
+  implementation(Dependencies.Androidx.workRuntimeKtx)
+  implementation(Dependencies.Kotlin.stdlib)
+  implementation(Dependencies.caffeine)
+  implementation(Dependencies.guava)
+  implementation(Dependencies.jsonToolsPatch)
 
-  testImplementation(deps.Dependencies.TestLibraries.AndroidxTest.core)
-  testImplementation(deps.Dependencies.TestLibraries.AndroidxTest.junit)
-  testImplementation(deps.Dependencies.TestLibraries.roboelectric)
-  testImplementation(deps.Dependencies.TestLibraries.truth)
+  kapt(Dependencies.Room.compiler)
 
-  androidTestImplementation(deps.Dependencies.TestLibraries.AndroidxTest.core)
-  androidTestImplementation(deps.Dependencies.TestLibraries.AndroidxTest.junit)
-  androidTestImplementation(deps.Dependencies.TestLibraries.AndroidxTest.extJunitKtx)
-  androidTestImplementation(deps.Dependencies.TestLibraries.AndroidxTest.runner)
-  androidTestImplementation(deps.Dependencies.TestLibraries.truth)
+  testImplementation(Dependencies.AndroidxTest.core)
+  testImplementation(Dependencies.AndroidxTest.junit)
+  testImplementation(Dependencies.roboelectric)
+  testImplementation(Dependencies.truth)
 }

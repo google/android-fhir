@@ -1,21 +1,21 @@
 plugins {
-  id(BuildPlugins.application)
-  id(BuildPlugins.kotlinAndroid)
-  id(BuildPlugins.kotlinKapt)
+  id(Plugins.BuildPlugins.application)
+  id(Plugins.BuildPlugins.kotlinAndroid)
+  id(Plugins.BuildPlugins.kotlinKapt)
 }
 
 android {
-  compileSdkVersion(deps.Dependencies.Sdk.compileSdk)
-  buildToolsVersion(deps.Plugins.Versions.buildTools)
+  compileSdkVersion(Sdk.compileSdk)
+  buildToolsVersion(Plugins.Versions.buildTools)
 
   defaultConfig {
     applicationId("com.google.android.fhir.cqlreference")
-    minSdkVersion(deps.Dependencies.Sdk.minSdk)
-    targetSdkVersion(deps.Dependencies.Sdk.targetSdk)
+    minSdkVersion(Sdk.minSdk)
+    targetSdkVersion(Sdk.targetSdk)
     versionCode = 1
     versionName = "1.0"
 
-    testInstrumentationRunner(deps.Dependencies.TestLibraries.androidJunitRunner)
+    testInstrumentationRunner(Dependencies.androidJunitRunner)
 
     multiDexEnabled = true
   }
@@ -54,24 +54,24 @@ configurations {
 }
 
 dependencies {
-  api(deps.Dependencies.Libraries.hapiFhirStructuresR4) { exclude(module = "junit") }
+  androidTestImplementation(Dependencies.AndroidxTest.extJunit)
+  androidTestImplementation(Dependencies.Espresso.espressoCore)
 
-  coreLibraryDesugaring(deps.Dependencies.Libraries.desugarJdkLibs)
+  api(Dependencies.hapiFhirStructuresR4) { exclude(module = "junit") }
 
-  implementation(deps.Dependencies.Libraries.Androidx.appCompat)
-  implementation(deps.Dependencies.Libraries.Androidx.constraintLayout)
-  implementation(deps.Dependencies.Libraries.Androidx.workRuntimeKtx)
-  implementation(deps.Dependencies.Libraries.Cql.cqlEngine)
-  implementation(deps.Dependencies.Libraries.Cql.cqlEngineFhir)
-  implementation(deps.Dependencies.Libraries.Kotlin.androidxCoreKtx)
-  implementation(deps.Dependencies.Libraries.Kotlin.kotlinTestJunit)
-  implementation(deps.Dependencies.Libraries.Kotlin.stdlib)
-  implementation(deps.Dependencies.Libraries.Lifecycle.viewModelKtx)
-  implementation(deps.Dependencies.Libraries.material)
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  testImplementation(deps.Dependencies.TestLibraries.AndroidxTest.core)
-  testImplementation(deps.Dependencies.TestLibraries.AndroidxTest.junit)
+  implementation(Dependencies.Androidx.appCompat)
+  implementation(Dependencies.Androidx.constraintLayout)
+  implementation(Dependencies.Androidx.workRuntimeKtx)
+  implementation(Dependencies.Cql.cqlEngine)
+  implementation(Dependencies.Cql.cqlEngineFhir)
+  implementation(Dependencies.Kotlin.androidxCoreKtx)
+  implementation(Dependencies.Kotlin.kotlinTestJunit)
+  implementation(Dependencies.Kotlin.stdlib)
+  implementation(Dependencies.Lifecycle.viewModelKtx)
+  implementation(Dependencies.material)
 
-  androidTestImplementation(deps.Dependencies.TestLibraries.AndroidxTest.extJunit)
-  androidTestImplementation(deps.Dependencies.TestLibraries.Espresso.espressoCore)
+  testImplementation(Dependencies.AndroidxTest.core)
+  testImplementation(Dependencies.junit)
 }

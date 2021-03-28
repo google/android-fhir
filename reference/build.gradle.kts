@@ -1,18 +1,18 @@
 plugins {
-    id(BuildPlugins.application)
-    id(BuildPlugins.kotlinAndroid)
-    id(BuildPlugins.kotlinKapt)
+    id(Plugins.BuildPlugins.application)
+    id(Plugins.BuildPlugins.kotlinAndroid)
+    id(Plugins.BuildPlugins.kotlinKapt)
 }
 
 android {
-    compileSdkVersion(deps.Dependencies.Sdk.compileSdk)
+    compileSdkVersion(Sdk.compileSdk)
     defaultConfig {
         applicationId("com.google.android.fhir.reference")
-        minSdkVersion(deps.Dependencies.Sdk.minSdk)
-        targetSdkVersion(deps.Dependencies.Sdk.targetSdk)
+        minSdkVersion(Sdk.minSdk)
+        targetSdkVersion(Sdk.targetSdk)
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner(deps.Dependencies.TestLibraries.androidJunitRunner)
+        testInstrumentationRunner(Dependencies.androidJunitRunner)
         // Required when setting minSdkVersion to 20 or lower
         // See https://developer.android.com/studio/write/java8-support
         multiDexEnabled = true
@@ -50,33 +50,32 @@ configurations {
 }
 
 dependencies {
-    coreLibraryDesugaring(deps.Dependencies.Libraries.desugarJdkLibs)
+    androidTestImplementation(Dependencies.AndroidxTest.extJunit)
+    androidTestImplementation(Dependencies.Espresso.espressoCore)
 
-    implementation(deps.Dependencies.Libraries.Androidx.activity)
-    implementation(deps.Dependencies.Libraries.Androidx.appCompat)
-    implementation(deps.Dependencies.Libraries.Androidx.constraintLayout)
-    implementation(deps.Dependencies.Libraries.Androidx.fragmentKtx)
-    implementation(deps.Dependencies.Libraries.Androidx.recyclerView)
-    implementation(deps.Dependencies.Libraries.Androidx.workRuntimeKtx)
-    implementation(deps.Dependencies.Libraries.Kotlin.kotlinCoroutinesAndroid)
-    implementation(deps.Dependencies.Libraries.Kotlin.kotlinCoroutinesCore)
-    implementation(deps.Dependencies.Libraries.Kotlin.stdlib)
-    implementation(deps.Dependencies.Libraries.Lifecycle.liveDataKtx)
-    implementation(deps.Dependencies.Libraries.Lifecycle.runtime)
-    implementation(deps.Dependencies.Libraries.Lifecycle.viewModelKtx)
-    implementation(deps.Dependencies.Libraries.Navigation.navFragmentKtx)
-    implementation(deps.Dependencies.Libraries.Navigation.navUiKtx)
-    implementation(deps.Dependencies.Libraries.Retrofit.coreRetrofit)
-    implementation(deps.Dependencies.Libraries.Retrofit.gsonConverter)
-    implementation(deps.Dependencies.Libraries.Retrofit.retrofitMock)
-    implementation(deps.Dependencies.Libraries.httpInterceptor)
-    implementation(deps.Dependencies.Libraries.material)
+    coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+
+    implementation(Dependencies.Androidx.activity)
+    implementation(Dependencies.Androidx.appCompat)
+    implementation(Dependencies.Androidx.constraintLayout)
+    implementation(Dependencies.Androidx.fragmentKtx)
+    implementation(Dependencies.Androidx.recyclerView)
+    implementation(Dependencies.Androidx.workRuntimeKtx)
+    implementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
+    implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
+    implementation(Dependencies.Kotlin.stdlib)
+    implementation(Dependencies.Lifecycle.liveDataKtx)
+    implementation(Dependencies.Lifecycle.runtime)
+    implementation(Dependencies.Lifecycle.viewModelKtx)
+    implementation(Dependencies.Navigation.navFragmentKtx)
+    implementation(Dependencies.Navigation.navUiKtx)
+    implementation(Dependencies.Retrofit.coreRetrofit)
+    implementation(Dependencies.Retrofit.gsonConverter)
+    implementation(Dependencies.Retrofit.retrofitMock)
+    implementation(Dependencies.httpInterceptor)
+    implementation(Dependencies.material)
 
     implementation(project(path = ":core"))
 
-    testImplementation(deps.Dependencies.TestLibraries.AndroidxTest.junit)
-
-    androidTestImplementation(deps.Dependencies.TestLibraries.AndroidxTest.extJunit)
-    androidTestImplementation(deps.Dependencies.TestLibraries.Espresso.espressoCore)
-
+    testImplementation(Dependencies.junit)
 }
