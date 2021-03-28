@@ -23,9 +23,7 @@ internal object QuestionnaireResponseItemValidator {
 
   private val validators = mutableListOf(MaxValueConstraintValidator, MinValueConstraintValidator)
 
-  /**
-   * Validates [questionnaireResponseItem] contains valid answer(s) to [questionnaireItem].
-   */
+  /** Validates [questionnaireResponseItem] contains valid answer(s) to [questionnaireItem]. */
   fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
@@ -42,10 +40,11 @@ internal object QuestionnaireResponseItemValidator {
 
   private fun packConstraintValidationResults(
     validationResults: List<ConstraintValidator.ConstraintValidationResult>
-  ) = ValidationResult(
-    validationResults.all { it.isValid },
-    validationResults.mapNotNull { it.message }.toList()
-  )
+  ) =
+    ValidationResult(
+      validationResults.all { it.isValid },
+      validationResults.mapNotNull { it.message }.toList()
+    )
 }
 
 internal data class ValidationResult(var isValid: Boolean, val validationMessages: List<String>)

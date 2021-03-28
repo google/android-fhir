@@ -59,9 +59,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     }
   }
 
-  private fun applyValidationResult(
-    validationResult: ValidationResult
-  ) {
+  private fun applyValidationResult(validationResult: ValidationResult) {
     val validationMessage =
       validationResult.validationMessages.joinToString {
         it.plus(System.getProperty("line.separator"))

@@ -44,12 +44,12 @@ class QuestionnaireResponseItemValidatorTest {
     extensionMaxValue.setValue(IntegerType(maxValue))
     extensionMinValue.url = extensionUrlMinValue
     extensionMinValue.setValue(IntegerType(minValue))
-    val extensions = mutableListOf<Extension>().apply {
-      add(extensionMaxValue)
-      add(extensionMinValue)
-    }
-    val validateAggregationFromChildValidators =
-      applyScenario(extensions, answerValue)
+    val extensions =
+      mutableListOf<Extension>().apply {
+        add(extensionMaxValue)
+        add(extensionMinValue)
+      }
+    val validateAggregationFromChildValidators = applyScenario(extensions, answerValue)
     assertThat(validateAggregationFromChildValidators.isValid).isFalse()
     assertThat(validateAggregationFromChildValidators.validationMessages.size == 1).isTrue()
   }
@@ -67,12 +67,12 @@ class QuestionnaireResponseItemValidatorTest {
     extensionMaxValue.setValue(IntegerType(maxValue))
     extensionMinValue.url = extensionUrlMinValue
     extensionMinValue.setValue(IntegerType(minValue))
-    val extensions = mutableListOf<Extension>().apply {
-      add(extensionMaxValue)
-      add(extensionMinValue)
-    }
-    val validateAggregationFromChildValidators =
-      applyScenario(extensions, answerValue)
+    val extensions =
+      mutableListOf<Extension>().apply {
+        add(extensionMaxValue)
+        add(extensionMinValue)
+      }
+    val validateAggregationFromChildValidators = applyScenario(extensions, answerValue)
     assertThat(validateAggregationFromChildValidators.isValid).isFalse()
     assertThat(validateAggregationFromChildValidators.validationMessages.size == 1).isTrue()
   }
@@ -90,29 +90,24 @@ class QuestionnaireResponseItemValidatorTest {
     extensionMaxValue.setValue(IntegerType(maxValue))
     extensionMinValue.url = extensionUrlMinValue
     extensionMinValue.setValue(IntegerType(minValue))
-    val extensions = mutableListOf<Extension>().apply {
-      add(extensionMaxValue)
-      add(extensionMinValue)
-    }
-    val validateAggregationFromChildValidators =
-      applyScenario(extensions, answerValue)
+    val extensions =
+      mutableListOf<Extension>().apply {
+        add(extensionMaxValue)
+        add(extensionMinValue)
+      }
+    val validateAggregationFromChildValidators = applyScenario(extensions, answerValue)
     assertThat(validateAggregationFromChildValidators.isValid).isTrue()
     assertThat(validateAggregationFromChildValidators.validationMessages.isEmpty()).isTrue()
   }
 
-  private fun applyScenario(
-    extensions: List<Extension>,
-    answerValue: Int
-  ): ValidationResult {
+  private fun applyScenario(extensions: List<Extension>, answerValue: Int): ValidationResult {
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
     val questionnaireResponseItemAnswerComponent =
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
     questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
     questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
-    questionnaireItem.apply {
-      extensions.forEach { addExtension(it) }
-    }
+    questionnaireItem.apply { extensions.forEach { addExtension(it) } }
     return QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
   }
 }
