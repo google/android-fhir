@@ -26,6 +26,7 @@ import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.annotation.Transaction
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.NumberIndexEntity
+import com.google.android.fhir.db.impl.entities.PositionIndexEntity
 import com.google.android.fhir.db.impl.entities.QuantityIndexEntity
 import com.google.android.fhir.db.impl.entities.ReferenceIndexEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
@@ -95,6 +96,9 @@ internal abstract class ResourceDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   abstract fun insertNumberIndex(numberIndexEntity: NumberIndexEntity)
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  abstract fun insertPositionIndex(positionIndexEntity: PositionIndexEntity)
 
   @Query(
     """
@@ -262,6 +266,16 @@ internal abstract class ResourceDao {
     index.numberIndices.forEach {
       insertNumberIndex(
         NumberIndexEntity(
+          id = 0,
+          resourceType = resource.resourceType,
+          index = it,
+          resourceId = resource.resourceId
+        )
+      )
+    }
+    index.positionIndices.forEach {
+      insertPositionIndex(
+        PositionIndexEntity(
           id = 0,
           resourceType = resource.resourceType,
           index = it,
