@@ -5,7 +5,7 @@ plugins {
 }
 
 val group = "com.google.android.fhir"
-val version = "0.1.0-alpha01"
+val version = "0.1.0-alpha02"
 
 tasks {
   val sourcesJar by creating(Jar::class) {
