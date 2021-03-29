@@ -4,7 +4,7 @@ plugins {
     id 'maven-publish'
 }
 group = 'com.google.android.fhir'
-version = "0.1.0-alpha01"
+version = "0.1.0-alpha02"
 task sourceJar(type: Jar) {
     archiveClassifier.set('sources')
     from android.sourceSets.main.java.srcDirs
