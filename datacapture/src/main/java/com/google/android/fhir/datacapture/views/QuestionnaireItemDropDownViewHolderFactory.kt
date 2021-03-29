@@ -63,6 +63,9 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
           )
         } else if (initialValue.isNotEmpty()) {
           autoCompleteTextView.setText(initialValue[0].valueCoding.display)
+          questionnaireItemViewItem.singleAnswerOrNull =
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(initialValue[0].valueCoding)
         }
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.onItemClickListener =

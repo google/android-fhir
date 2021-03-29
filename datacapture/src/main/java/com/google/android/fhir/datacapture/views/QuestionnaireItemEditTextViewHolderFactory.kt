@@ -22,7 +22,11 @@ import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
+import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 
 internal abstract class QuestionnaireItemEditTextViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_edit_text_view) {
@@ -67,15 +71,35 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
       when (questionnaireItemViewItem.questionnaireItem.type.toCode()) {
         "integer" -> {
           textInputEditText.setText(initialValue[0].valueIntegerType?.value?.toString() ?: "")
+          initialValue[0].valueIntegerType?.value?.let {
+            questionnaireItemViewItem.singleAnswerOrNull =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .setValue(IntegerType(it))
+          }
         }
         "string" -> {
           textInputEditText.setText(initialValue[0].valueStringType?.value ?: "")
+          initialValue[0].valueStringType?.value?.let {
+            questionnaireItemViewItem.singleAnswerOrNull =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .setValue(StringType(it))
+          }
         }
         "decimal" -> {
           textInputEditText.setText(initialValue[0].valueDecimalType?.value?.toString() ?: "")
+          initialValue[0].valueDecimalType?.value?.let {
+            questionnaireItemViewItem.singleAnswerOrNull =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .setValue(DecimalType(it))
+          }
         }
         "quantity" -> {
           textInputEditText.setText(initialValue[0].valueQuantity?.value?.toString() ?: "")
+          initialValue[0].valueQuantity?.value?.toDouble()?.let {
+            questionnaireItemViewItem.singleAnswerOrNull =
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .setValue(Quantity(it))
+          }
         }
       }
     }

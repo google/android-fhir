@@ -65,6 +65,10 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
         } else if (initialValue.isNotEmpty()) {
           checkBox.isChecked =
             questionnaireItemViewItem.questionnaireItem.initial[0].valueBooleanType.value
+          questionnaireItemViewItem.singleAnswerOrNull =
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = BooleanType(checkBox.isChecked)
+            }
         }
       }
     }

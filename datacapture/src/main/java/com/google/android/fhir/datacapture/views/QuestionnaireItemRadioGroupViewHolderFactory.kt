@@ -68,6 +68,14 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
                 isChecked = it.valueCoding.equalsDeep(answer)
               } else if (initialValue.isNotEmpty()) {
                 isChecked = initialValue[0].valueCoding.equalsDeep(it.valueCoding)
+                questionnaireResponseItem.answer.apply {
+                  clear()
+                  add(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = initialValue[0].value
+                    }
+                  )
+                }
               }
             }
           )
