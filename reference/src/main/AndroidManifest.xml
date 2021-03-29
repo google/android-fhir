@@ -31,6 +31,7 @@
         <activity
             android:name="com.google.android.fhir.reference.PatientListActivity"
             android:label="@string/title_patient_list"
+
             android:theme="@style/AppTheme.NoActionBar"
         >
             <intent-filter>
