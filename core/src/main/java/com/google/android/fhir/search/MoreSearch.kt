@@ -20,7 +20,7 @@ import com.google.android.fhir.db.Database
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
-suspend fun <R : Resource> Search.run(database: Database): List<R> {
+suspend fun <R : Resource> Search.execute(database: Database): List<R> {
   return database.search(getQuery())
 }
 
