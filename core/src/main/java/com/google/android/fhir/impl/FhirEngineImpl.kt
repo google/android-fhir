@@ -48,12 +48,8 @@ constructor(
     periodicSyncConfiguration?.let { config -> triggerInitialDownload(config) }
   }
 
-  override suspend fun <R : Resource> save(resource: R) {
-    database.insert(resource)
-  }
-
-  override suspend fun <R : Resource> saveAll(resources: List<R>) {
-    database.insert(*resources.toTypedArray<Resource>())
+  override suspend fun <R : Resource> save(vararg resource: R) {
+    database.insert(*resource)
   }
 
   override suspend fun <R : Resource> update(resource: R) {
