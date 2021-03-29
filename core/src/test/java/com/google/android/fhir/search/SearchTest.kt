@@ -101,7 +101,8 @@ class SearchTest {
         """
         SELECT a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ? AND a.resourceId IN (
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
         SELECT resourceId FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
@@ -178,7 +179,8 @@ class SearchTest {
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
-        WHERE a.resourceType = ? AND a.resourceId IN (
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
         SELECT resourceId FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
