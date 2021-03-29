@@ -51,7 +51,8 @@ fun Search.getQuery(): SearchQuery {
   val filterQuery =
     (stringFilters.map { it.query(type) } + referenceFilter.map { it.query(type) }).intersect()
   if (filterQuery != null) {
-    filterStatement = """
+    filterStatement =
+      """
       AND a.resourceId IN (
       ${filterQuery.query}
       )
