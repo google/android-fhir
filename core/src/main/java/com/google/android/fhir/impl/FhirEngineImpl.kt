@@ -53,7 +53,7 @@ constructor(
   }
 
   override suspend fun <R : Resource> saveAll(resources: List<R>) {
-    database.insertAll(resources)
+    database.insert(*resources.toTypedArray<Resource>())
   }
 
   override suspend fun <R : Resource> update(resource: R) {

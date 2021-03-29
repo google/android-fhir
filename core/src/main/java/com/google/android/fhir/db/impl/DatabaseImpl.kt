@@ -55,28 +55,18 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
       //  don't allow main thread queries
       .allowMainThreadQueries()
       .build()
-  val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
-  val syncedResourceDao = db.syncedResourceDao()
-  val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
+  private val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
+  private val syncedResourceDao = db.syncedResourceDao()
+  private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 
   @Transaction
-  override suspend fun <R : Resource> insert(resource: R) {
-    resourceDao.insert(resource)
-    localChangeDao.addInsert(resource)
+  override suspend fun <R : Resource> insert(vararg resources: R) {
+    resourceDao.insertAll(resources.toList())
+    localChangeDao.addInsertAll(resources.toList())
   }
 
-  override suspend fun <R : Resource> insertRemote(resource: R) {
-    resourceDao.insert(resource)
-  }
-
-  @Transaction
-  override suspend fun <R : Resource> insertAll(resources: List<R>) {
-    resourceDao.insertAll(resources)
-    localChangeDao.addInsertAll(resources)
-  }
-
-  override suspend fun <R : Resource> insertAllRemote(resources: List<R>) {
-    resourceDao.insertAll(resources)
+  override suspend fun <R : Resource> insertRemote(vararg resources: R) {
+    resourceDao.insertAll(resources.toList())
   }
 
   @Transaction
@@ -104,7 +94,7 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
     resources: List<Resource>
   ) {
     syncedResourceDao.insert(syncedResourceEntity)
-    insertAllRemote(resources)
+    insertRemote(*resources.toTypedArray())
   }
 
   @Transaction
