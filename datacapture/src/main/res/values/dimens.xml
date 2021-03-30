@@ -15,6 +15,7 @@
  limitations under the License.
 -->
 <resources>
+    <dimen name="width_null">0dp</dimen>
     <dimen name="item_margin_horizontal">16dp</dimen>
     <dimen name="item_margin_vertical">8dp</dimen>
     <dimen name="padding_drop_down">16dp</dimen>

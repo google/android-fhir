@@ -25,7 +25,7 @@
 >
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="@dimen/width_null"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
@@ -78,7 +78,7 @@
     />
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="@dimen/width_null"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"

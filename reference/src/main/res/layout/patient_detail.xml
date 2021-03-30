@@ -19,8 +19,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
+    android:paddingLeft="@dimen/padding_large"
+    android:paddingRight="@dimen/padding_large"
     android:orientation="vertical"
 >
 
@@ -28,16 +28,16 @@
         android:id="@+id/patient_info_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="16dp"
+        android:layout_marginTop="@dimen/margin_moderate"
+        android:padding="@dimen/padding_large"
     >
         <androidx.appcompat.widget.LinearLayoutCompat
             xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
+            android:paddingLeft="@dimen/padding_large"
+            android:paddingRight="@dimen/padding_large"
             android:orientation="vertical"
         >
 
@@ -48,7 +48,7 @@
                 style="?android:attr/textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="16dp"
+                android:padding="@dimen/padding_large"
                 android:textIsSelectable="true"
                 tools:context=".PatientDetailFragment"
             />
@@ -57,7 +57,7 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="10dp"
+        android:layout_marginVertical="@dimen/margin_moderate"
     >
 
         <include layout="@layout/observation_list" />

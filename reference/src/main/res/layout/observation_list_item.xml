@@ -20,8 +20,8 @@
     android:id="@+id/observation_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="2dp"
-    android:padding="16dp"
+    android:layout_marginVertical="@dimen/margin_very_small"
+    android:padding="@dimen/padding_large"
 >
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -33,7 +33,7 @@
             style="?android:attr/textAppearanceSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:padding="@dimen/padding_large"
             android:text="This will show observations."
             android:textIsSelectable="true"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -20,7 +20,7 @@
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="@dimen/padding_large"
 >
 
     <TextView
