@@ -36,12 +36,7 @@ fun Search.getQuery(): SearchQuery {
       """.trimIndent()
     sortOrderStatement =
       """
-      ORDER BY b.index_value ${
-        when (order!!) {
-          Order.ASCENDING -> "ASC"
-          Order.DESCENDING -> "DESC"
-        }
-      }
+      ORDER BY b.index_value ${order.sqlString}
       """.trimIndent()
     sortArgs.add(sort!!.paramName)
   }
@@ -114,3 +109,11 @@ fun List<SearchQuery>.intersect(): SearchQuery? {
     SearchQuery(joinToString("\nINTERSECT\n") { it.query }, flatMap { it.args })
   }
 }
+
+val Order?.sqlString: String
+  get() =
+    when (this) {
+      Order.ASCENDING -> "ASC"
+      Order.DESCENDING -> "DESC"
+      null -> ""
+    }
