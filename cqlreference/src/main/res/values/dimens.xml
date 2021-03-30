@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+
+    <!--dimension specifics-->
+    <dimen name="width_null">0dp</dimen>
+
+    <!--margin dimensions-->
+    <dimen name="margin_268">268dp</dimen>
+    <dimen name="margin_extra_extra_large">32dp</dimen>
+    <dimen name="margin_extra_large">28dp</dimen>
+    <dimen name="margin_large">24dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
+    <dimen name="margin_small">12dp</dimen>
+    <dimen name="margin_extra_small">8dp</dimen>
+
+    <!--text dimensions-->
+    <dimen name="text_large">24sp</dimen>
+    <dimen name="text_medium">18sp</dimen>
+
+    <!--layout specifics-->
+    <dimen name="layout_157">157dp</dimen>
+
+</resources>
