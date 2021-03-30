@@ -27,22 +27,21 @@ suspend fun <R : Resource> Search.execute(database: Database): List<R> {
 fun Search.getQuery(): SearchQuery {
   var sortJoinStatement = ""
   var sortOrderStatement = ""
-  var sortArgs = mutableListOf<Any>()
+  val sortArgs = mutableListOf<Any>()
   if (sort != null) {
     sortJoinStatement =
       """
       LEFT JOIN StringIndexEntity b
       ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
       """.trimIndent()
-    sortOrderStatement =
-      """
+    sortOrderStatement = """
       ORDER BY b.index_value ${order.sqlString}
       """.trimIndent()
-    sortArgs.add(sort!!.paramName)
+    sortArgs += sort!!.paramName
   }
 
   var filterStatement = ""
-  var filterArgs = mutableListOf<Any>()
+  val filterArgs = mutableListOf<Any>()
   val filterQuery =
     (stringFilters.map { it.query(type) } + referenceFilter.map { it.query(type) }).intersect()
   if (filterQuery != null) {
@@ -56,13 +55,13 @@ fun Search.getQuery(): SearchQuery {
   }
 
   var limitStatement = ""
-  var limitArgs = mutableListOf<Any>()
+  val limitArgs = mutableListOf<Any>()
   if (count != null) {
     limitStatement = "LIMIT ?"
-    limitArgs.add(count!!)
+    limitArgs += count!!
     if (from != null) {
-      limitStatement = "LIMIT ? OFFSET ?"
-      limitArgs.add(from!!)
+      limitStatement += " OFFSET ?"
+      limitArgs += from!!
     }
   }
 
