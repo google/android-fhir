@@ -62,9 +62,9 @@ fun Search.getQuery(): SearchQuery {
 
   var limitStatement = ""
   var limitArgs = mutableListOf<Any>()
-  if (size != null) {
+  if (count != null) {
     limitStatement = "LIMIT ?"
-    limitArgs.add(size!!)
+    limitArgs.add(count!!)
     if (from != null) {
       limitStatement = "LIMIT ? OFFSET ?"
       limitArgs.add(from!!)

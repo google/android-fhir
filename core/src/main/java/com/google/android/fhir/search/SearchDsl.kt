@@ -22,7 +22,7 @@ import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import org.hl7.fhir.r4.model.ResourceType
 
 @SearchDslMarker
-data class Search(val type: ResourceType, var size: Int? = null, var from: Int? = null) {
+data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
   internal val stringFilters = mutableListOf<StringFilter>()
   internal val referenceFilter = mutableListOf<ReferenceFilter>()
   internal var sort: StringClientParam? = null

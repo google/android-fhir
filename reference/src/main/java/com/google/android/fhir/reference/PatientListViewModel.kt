@@ -47,7 +47,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
           value = "NAIROBI"
         }
         sort(Patient.GIVEN, Order.ASCENDING)
-        size = 100
+        count = 100
         from = 0
       }
     return samplePatients.getPatientItems(searchResults)

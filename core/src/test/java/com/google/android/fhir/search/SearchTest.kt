@@ -48,7 +48,7 @@ class SearchTest {
 
   @Test
   fun search_size() {
-    val query = Search(ResourceType.Patient).apply { size = 10 }.getQuery()
+    val query = Search(ResourceType.Patient).apply { count = 10 }.getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -67,7 +67,7 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient)
         .apply {
-          size = 10
+          count = 10
           from = 20
         }
         .getQuery()
@@ -167,7 +167,7 @@ class SearchTest {
             value = "Jones"
           }
           sort(Patient.GIVEN, Order.ASCENDING)
-          size = 10
+          count = 10
           from = 20
         }
         .getQuery()
