@@ -39,8 +39,16 @@ class MinValueConstraintValidatorTest {
     val minValue = 10
     val answerValue = 9
     val validationMessage = "Minimum value allowed is:$minValue"
-    val minValueValidatorScenarioOne =
-      minValueValidatorScenarioTester(answerValue, minValue, extensionUrl)
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    val extension = Extension()
+    val questionnaireResponseItemAnswerComponent = QuestionnaireResponseItemAnswerComponent()
+    questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
+    questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
+    extension.url = extensionUrl
+    extension.setValue(IntegerType(minValue))
+    questionnaireItem.apply { addExtension(extension) }
+    val minValueValidatorScenarioOne = MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
     assertThat(minValueValidatorScenarioOne.isValid).isFalse()
     assertThat(minValueValidatorScenarioOne.message.equals(validationMessage)).isTrue()
   }
@@ -51,17 +59,6 @@ class MinValueConstraintValidatorTest {
     val extensionUrl = "http://hl7.org/fhir/StructureDefinition/minValue"
     val minValue = 500
     val answerValue = 501
-    val minValueValidatorScenarioTwo =
-      minValueValidatorScenarioTester(answerValue, minValue, extensionUrl)
-    assertThat(minValueValidatorScenarioTwo.isValid).isTrue()
-    assertThat(minValueValidatorScenarioTwo.message.isNullOrBlank()).isTrue()
-  }
-
-  private fun minValueValidatorScenarioTester(
-    answerValue: Int,
-    minValue: Int,
-    extensionUrl: String
-  ): ConstraintValidator.ConstraintValidationResult {
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
     val extension = Extension()
@@ -71,6 +68,8 @@ class MinValueConstraintValidatorTest {
     extension.url = extensionUrl
     extension.setValue(IntegerType(minValue))
     questionnaireItem.apply { addExtension(extension) }
-    return MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
+    val minValueValidatorScenarioTwo = MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
+    assertThat(minValueValidatorScenarioTwo.isValid).isTrue()
+    assertThat(minValueValidatorScenarioTwo.message.isNullOrBlank()).isTrue()
   }
 }

@@ -32,53 +32,7 @@ import org.robolectric.annotation.Config
 class QuestionnaireResponseItemValidatorTest {
 
   @Test
-  fun questionnaireResponseItemValidator_validate_shouldReturnValidationResultAsNotValidAndReturnAValidationMessageForMaxValueViolation() {
-    val extensionUrlMaxValue = "http://hl7.org/fhir/StructureDefinition/maxValue"
-    val extensionUrlMinValue = "http://hl7.org/fhir/StructureDefinition/minValue"
-    val extensionMaxValue = Extension()
-    val extensionMinValue = Extension()
-    val minValue = 250
-    val maxValue = 200000
-    val answerValue = 200001
-    extensionMaxValue.url = extensionUrlMaxValue
-    extensionMaxValue.setValue(IntegerType(maxValue))
-    extensionMinValue.url = extensionUrlMinValue
-    extensionMinValue.setValue(IntegerType(minValue))
-    val extensions =
-      mutableListOf<Extension>().apply {
-        add(extensionMaxValue)
-        add(extensionMinValue)
-      }
-    val validateAggregationFromChildValidators = applyScenario(extensions, answerValue)
-    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
-    assertThat(validateAggregationFromChildValidators.validationMessages.size == 1).isTrue()
-  }
-
-  @Test
-  fun questionnaireResponseItemValidator_validate_shouldReturnValidationResultAsNotValidAndReturnAValidationMessageForMinValueViolation() {
-    val extensionUrlMaxValue = "http://hl7.org/fhir/StructureDefinition/maxValue"
-    val extensionUrlMinValue = "http://hl7.org/fhir/StructureDefinition/minValue"
-    val extensionMaxValue = Extension()
-    val extensionMinValue = Extension()
-    val minValue = 250
-    val maxValue = 200000
-    val answerValue = 249
-    extensionMaxValue.url = extensionUrlMaxValue
-    extensionMaxValue.setValue(IntegerType(maxValue))
-    extensionMinValue.url = extensionUrlMinValue
-    extensionMinValue.setValue(IntegerType(minValue))
-    val extensions =
-      mutableListOf<Extension>().apply {
-        add(extensionMaxValue)
-        add(extensionMinValue)
-      }
-    val validateAggregationFromChildValidators = applyScenario(extensions, answerValue)
-    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
-    assertThat(validateAggregationFromChildValidators.validationMessages.size == 1).isTrue()
-  }
-
-  @Test
-  fun questionnaireResponseItemValidator_validate_shouldReturnValidationResultAsValidAndReturnEmptyValidationMessageList() {
+  fun questionnaireResponseItemValidator_validate_shouldReturnValidResult() {
     val extensionUrlMaxValue = "http://hl7.org/fhir/StructureDefinition/maxValue"
     val extensionUrlMinValue = "http://hl7.org/fhir/StructureDefinition/minValue"
     val extensionMaxValue = Extension()
@@ -95,12 +49,6 @@ class QuestionnaireResponseItemValidatorTest {
         add(extensionMaxValue)
         add(extensionMinValue)
       }
-    val validateAggregationFromChildValidators = applyScenario(extensions, answerValue)
-    assertThat(validateAggregationFromChildValidators.isValid).isTrue()
-    assertThat(validateAggregationFromChildValidators.validationMessages.isEmpty()).isTrue()
-  }
-
-  private fun applyScenario(extensions: List<Extension>, answerValue: Int): ValidationResult {
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
     val questionnaireResponseItemAnswerComponent =
@@ -108,6 +56,38 @@ class QuestionnaireResponseItemValidatorTest {
     questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
     questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
     questionnaireItem.apply { extensions.forEach { addExtension(it) } }
-    return QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
+    val validateAggregationFromChildValidators = QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
+    assertThat(validateAggregationFromChildValidators.isValid).isTrue()
+    assertThat(validateAggregationFromChildValidators.validationMessages.isEmpty()).isTrue()
+  }
+
+  @Test
+  fun questionnaireResponseItemValidator_validate_shouldReturnInvalidResultWithValidationMessageListNonEmpty() {
+    val extensionUrlMaxValue = "http://hl7.org/fhir/StructureDefinition/maxValue"
+    val extensionUrlMinValue = "http://hl7.org/fhir/StructureDefinition/minValue"
+    val extensionMaxValue = Extension()
+    val extensionMinValue = Extension()
+    val minValue = 200000
+    val maxValue = 250
+    val answerValue = 10000
+    extensionMaxValue.url = extensionUrlMaxValue
+    extensionMaxValue.setValue(IntegerType(maxValue))
+    extensionMinValue.url = extensionUrlMinValue
+    extensionMinValue.setValue(IntegerType(minValue))
+    val extensions =
+      mutableListOf<Extension>().apply {
+        add(extensionMaxValue)
+        add(extensionMinValue)
+      }
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    val questionnaireResponseItemAnswerComponent =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+    questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
+    questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
+    questionnaireItem.apply { extensions.forEach { addExtension(it) } }
+    val validateAggregationFromChildValidators = QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
+    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
+    assertThat(validateAggregationFromChildValidators.validationMessages.size == 2).isTrue()
   }
 }

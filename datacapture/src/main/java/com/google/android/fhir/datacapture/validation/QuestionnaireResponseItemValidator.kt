@@ -29,7 +29,7 @@ internal object QuestionnaireResponseItemValidator {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ): ValidationResult {
     if (questionnaireResponseItem.answer.isEmpty()) {
-      return ValidationResult(true, mutableListOf())
+      return ValidationResult(true, listOf())
     }
     val validationResults = mutableListOf<ConstraintValidator.ConstraintValidationResult>()
     validators.forEach {

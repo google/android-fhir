@@ -16,13 +16,14 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal open class ValueConstraintValidator(
   val url: String,
-  val predicate: (Int, Int) -> Boolean,
-  val messageGenerator: (allowedValue: String) -> String
+  val predicate: (Extension, QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> Boolean,
+  val messageGenerator: (Extension, QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> String
 ) : ConstraintValidator {
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -31,16 +32,11 @@ internal open class ValueConstraintValidator(
     if (questionnaireItem.hasExtension(url)) {
       val extension = questionnaireItem.getExtensionByUrl(url)
       val answer = questionnaireResponseItem.answer[0]
-      when {
-        extension.value.fhirType().equals("integer") && answer.hasValueIntegerType() -> {
-          val answeredValue = answer.valueIntegerType.value
-          if (predicate(answeredValue, extension.value.primitiveValue().toInt())) {
-            return ConstraintValidator.ConstraintValidationResult(
-              false,
-              messageGenerator(extension.value.primitiveValue().toInt().toString())
-            )
-          }
-        }
+      if (predicate(extension, answer)) {
+        return ConstraintValidator.ConstraintValidationResult(
+          false,
+          messageGenerator(extension, answer)
+        )
       }
     }
     return ConstraintValidator.ConstraintValidationResult(true, null)

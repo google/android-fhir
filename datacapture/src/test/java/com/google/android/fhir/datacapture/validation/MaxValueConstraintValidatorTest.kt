@@ -33,44 +33,46 @@ class MaxValueConstraintValidatorTest {
 
   /** Scenario 1 - answerValue is greater than maxValue */
   @Test
-  fun maxValueValidator_validate_shouldValidateScenarioWhereAnswerValueIsGreaterThanMaxValue() {
-    val extensionUrl = "http://hl7.org/fhir/StructureDefinition/maxValue"
-    val maxValue = 200000
-    val answerValue = 200001
-    val validationMessage = "Maximum value allowed is:$maxValue"
+  fun shouldReturnInvalidResult() {
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply {
+      addExtension(
+        Extension().apply {
+          this.url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+          this.setValue(IntegerType(200000))
+        }
+      )
+    }
+    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+      value = IntegerType(200001)
+      questionnaireResponseItem.addAnswer(this)
+    }
     val maxValueValidatorScenarioOne =
-      maxValueValidatorScenarioTester(answerValue, maxValue, extensionUrl)
+      MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
     Truth.assertThat(maxValueValidatorScenarioOne.isValid).isFalse()
-    Truth.assertThat(maxValueValidatorScenarioOne.message.equals(validationMessage)).isTrue()
+    Truth.assertThat(maxValueValidatorScenarioOne.message.equals("Maximum value allowed is:200000"))
+      .isTrue()
   }
 
-  /** Scenario 2 - answerValue is greater than maxValue */
+  /** Scenario 2 - answerValue is less than maxValue */
   @Test
-  fun maxValueValidator_validate_shouldValidateScenarioWhereAnswerValueIsSmallerThanMaxValue() {
-    val maxValue = 200000
-    val answerValue = 199999
-    val extensionUrl = "http://hl7.org/fhir/StructureDefinition/maxValue"
+  fun shouldReturnValidResult() {
+    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply {
+      addExtension(
+        Extension().apply {
+          this.url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+          this.setValue(IntegerType(200000))
+        }
+      )
+    }
+    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+      value = IntegerType(199999)
+      questionnaireResponseItem.addAnswer(this)
+    }
     val maxValueValidatorScenarioTwo =
-      maxValueValidatorScenarioTester(answerValue, maxValue, extensionUrl)
+      MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
     Truth.assertThat(maxValueValidatorScenarioTwo.isValid).isTrue()
     Truth.assertThat(maxValueValidatorScenarioTwo.message.isNullOrBlank()).isTrue()
-  }
-
-  private fun maxValueValidatorScenarioTester(
-    answerValue: Int,
-    maxValue: Int,
-    extensionUrl: String
-  ): ConstraintValidator.ConstraintValidationResult {
-    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
-    val extension = Extension()
-    val questionnaireResponseItemAnswerComponent =
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-    questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
-    questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
-    extension.url = extensionUrl
-    extension.setValue(IntegerType(maxValue))
-    questionnaireItem.apply { addExtension(extension) }
-    return MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
   }
 }

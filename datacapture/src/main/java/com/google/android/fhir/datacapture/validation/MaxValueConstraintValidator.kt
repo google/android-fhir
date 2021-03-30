@@ -16,9 +16,26 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.QuestionnaireResponse
+
 internal object MaxValueConstraintValidator :
   ValueConstraintValidator(
     url = "http://hl7.org/fhir/StructureDefinition/maxValue",
-    predicate = { a: Int, b: Int -> a > b },
-    { allowedValue: String -> "Maximum value allowed is:$allowedValue" }
+    predicate = { extension: Extension, answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
+      when {
+        extension.value.fhirType().equals("integer") && answer.hasValueIntegerType() -> {
+          answer.valueIntegerType.value > extension.value.primitiveValue().toInt()
+        }
+        else -> false
+      }
+    },
+    { extension: Extension, answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
+      when {
+        extension.value.fhirType().equals("integer") && answer.hasValueIntegerType() -> {
+          "Maximum value allowed is:" + extension.value.primitiveValue().toInt().toString()
+        }
+        else -> ""
+      }
+    }
   )
