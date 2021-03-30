@@ -48,7 +48,8 @@ class MinValueConstraintValidatorTest {
     extension.url = extensionUrl
     extension.setValue(IntegerType(minValue))
     questionnaireItem.apply { addExtension(extension) }
-    val minValueValidatorScenarioOne = MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
+    val minValueValidatorScenarioOne =
+      MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
     assertThat(minValueValidatorScenarioOne.isValid).isFalse()
     assertThat(minValueValidatorScenarioOne.message.equals(validationMessage)).isTrue()
   }
@@ -68,7 +69,8 @@ class MinValueConstraintValidatorTest {
     extension.url = extensionUrl
     extension.setValue(IntegerType(minValue))
     questionnaireItem.apply { addExtension(extension) }
-    val minValueValidatorScenarioTwo = MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
+    val minValueValidatorScenarioTwo =
+      MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
     assertThat(minValueValidatorScenarioTwo.isValid).isTrue()
     assertThat(minValueValidatorScenarioTwo.message.isNullOrBlank()).isTrue()
   }

@@ -22,7 +22,9 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal object MaxValueConstraintValidator :
   ValueConstraintValidator(
     url = "http://hl7.org/fhir/StructureDefinition/maxValue",
-    predicate = { extension: Extension, answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
+    predicate = {
+      extension: Extension,
+      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
       when {
         extension.value.fhirType().equals("integer") && answer.hasValueIntegerType() -> {
           answer.valueIntegerType.value > extension.value.primitiveValue().toInt()
@@ -30,7 +32,8 @@ internal object MaxValueConstraintValidator :
         else -> false
       }
     },
-    { extension: Extension, answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
+    { extension: Extension, answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+      ->
       when {
         extension.value.fhirType().equals("integer") && answer.hasValueIntegerType() -> {
           "Maximum value allowed is:" + extension.value.primitiveValue().toInt().toString()

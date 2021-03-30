@@ -35,14 +35,15 @@ class MaxValueConstraintValidatorTest {
   @Test
   fun shouldReturnInvalidResult() {
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply {
-      addExtension(
-        Extension().apply {
-          this.url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-          this.setValue(IntegerType(200000))
-        }
-      )
-    }
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            this.url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            this.setValue(IntegerType(200000))
+          }
+        )
+      }
     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
       value = IntegerType(200001)
       questionnaireResponseItem.addAnswer(this)
@@ -58,14 +59,15 @@ class MaxValueConstraintValidatorTest {
   @Test
   fun shouldReturnValidResult() {
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply {
-      addExtension(
-        Extension().apply {
-          this.url = "http://hl7.org/fhir/StructureDefinition/maxValue"
-          this.setValue(IntegerType(200000))
-        }
-      )
-    }
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            this.url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            this.setValue(IntegerType(200000))
+          }
+        )
+      }
     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
       value = IntegerType(199999)
       questionnaireResponseItem.addAnswer(this)

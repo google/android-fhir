@@ -56,7 +56,8 @@ class QuestionnaireResponseItemValidatorTest {
     questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
     questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
     questionnaireItem.apply { extensions.forEach { addExtension(it) } }
-    val validateAggregationFromChildValidators = QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
+    val validateAggregationFromChildValidators =
+      QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
     assertThat(validateAggregationFromChildValidators.isValid).isTrue()
     assertThat(validateAggregationFromChildValidators.validationMessages.isEmpty()).isTrue()
   }
@@ -86,7 +87,8 @@ class QuestionnaireResponseItemValidatorTest {
     questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
     questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
     questionnaireItem.apply { extensions.forEach { addExtension(it) } }
-    val validateAggregationFromChildValidators = QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
+    val validateAggregationFromChildValidators =
+      QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
     assertThat(validateAggregationFromChildValidators.isValid).isFalse()
     assertThat(validateAggregationFromChildValidators.validationMessages.size == 2).isTrue()
   }
