@@ -26,28 +26,12 @@ import org.hl7.fhir.r4.model.ResourceType
 /** The interface for the FHIR resource database. */
 interface Database {
   /**
-   * Inserts the local origin `resource` into the FHIR resource database. If the resource already
-   * exists, it will be overwritten.
-   *
-   * @param <R> The resource type
-   */
-  suspend fun <R : Resource> insert(resource: R)
-
-  /**
-   * Inserts the remote origin `resource` into the FHIR resource database. If the resource already
-   * exists, it will be overwritten.
-   *
-   * @param <R> The resource type
-   */
-  suspend fun <R : Resource> insertRemote(resource: R)
-
-  /**
    * Inserts a list of local `resources` into the FHIR resource database. If any of the resources
    * already exists, it will be overwritten.
    *
    * @param <R> The resource type
    */
-  suspend fun <R : Resource> insertAll(resources: List<R>)
+  suspend fun <R : Resource> insert(vararg resource: R)
 
   /**
    * Inserts a list of remote `resources` into the FHIR resource database. If any of the resources
@@ -55,7 +39,7 @@ interface Database {
    *
    * @param <R> The resource type
    */
-  suspend fun <R : Resource> insertAllRemote(resources: List<R>)
+  suspend fun <R : Resource> insertRemote(vararg resource: R)
 
   /**
    * Updates the `resource` in the FHIR resource database. If the resource does not already exist,
