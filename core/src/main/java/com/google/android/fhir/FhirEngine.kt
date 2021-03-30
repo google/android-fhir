@@ -25,7 +25,7 @@ import org.hl7.fhir.r4.model.Resource
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface FhirEngine {
   /**
-   * Saves a list of FHIR `resource` in the local storage. If any of the resources already exist,
+   * Saves one or more FHIR `resource`s in the local storage. If any of the resources already exist,
    * they will be overwritten.
    *
    * @param <R> The resource type which should be a subtype of [Resource].
