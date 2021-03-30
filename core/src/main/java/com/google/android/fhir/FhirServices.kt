@@ -22,7 +22,6 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
-import com.google.android.fhir.search.impl.SearchImpl
 import com.google.android.fhir.sync.FhirDataSource
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
 
@@ -49,7 +48,6 @@ internal data class FhirServices(
       val engine =
         FhirEngineImpl(
           database = db,
-          search = SearchImpl(db),
           periodicSyncConfiguration = periodicSyncConfiguration,
           dataSource = dataSource,
           context = context

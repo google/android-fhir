@@ -16,43 +16,11 @@
 
 package com.google.android.fhir.search
 
-import com.google.android.fhir.search.filter.FilterCriterion
-import com.google.android.fhir.search.sort.SortCriterion
+import com.google.android.fhir.FhirEngine
 import org.hl7.fhir.r4.model.Resource
 
-/**
- * The interface that acts as an entry point for search.
- *
- * Example usage:
- * ```
- * search
- *   .of(...resource type...)        // Mandatory, must be the first function call, specify type
- *   .filter(...search criteria...)  // Optional, specify search criteria
- *   .sorted(...sorting criteria...) // Optional, specify sorting criteria
- *   .skip(...number of results to skip...)     // Optional, specify number of resources to skip
- *   .limit(...number of results to return...)  // Optional, specify number of resources to return
- *   .run();                         // Mandatory, must be the last function call
- * ```
- */
-interface Search {
-  /** Returns a [SearchSpecifications] object with the given [clazz]. */
-  fun <R : Resource> of(clazz: Class<R>): SearchSpecifications
-
-  /** The interface to specify the search criteria and to execute the search. */
-  interface SearchSpecifications {
-    /** Returns a [SearchSpecifications] object with the [filterCriterion]. */
-    fun filter(filterCriterion: FilterCriterion): SearchSpecifications
-
-    /** Returns a [SearchSpecifications] object with the [sortCriterion]. */
-    fun sort(sortCriterion: SortCriterion): SearchSpecifications
-
-    /** Returns a [SearchSpecifications] object that only includes the first [limit] results. */
-    fun limit(limit: Int): SearchSpecifications
-
-    /** Returns a [SearchSpecifications] object that skips the first [skip] results. */
-    fun skip(skip: Int): SearchSpecifications
-
-    /** Runs a search with the [SearchSpecifications]. */
-    suspend fun <R : Resource> run(): List<R>
-  }
+suspend inline fun <reified R : Resource> FhirEngine.search(init: Search.() -> Unit): List<R> {
+  val search = Search(type = R::class.java.newInstance().resourceType)
+  search.init()
+  return this.search(search)
 }
