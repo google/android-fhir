@@ -87,7 +87,7 @@ constructor(
     setupNextDownload(syncConfig)
   }
 
-  override suspend fun <R : Resource> searchImpl(search: Search): List<R> {
+  override suspend fun <R : Resource> search(search: Search): List<R> {
     return search.execute(database)
   }
 

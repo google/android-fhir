@@ -22,5 +22,5 @@ import org.hl7.fhir.r4.model.Resource
 suspend inline fun <reified R : Resource> FhirEngine.search(init: Search.() -> Unit): List<R> {
   val search = Search(type = R::class.java.newInstance().resourceType)
   search.init()
-  return this.searchImpl(search)
+  return this.search(search)
 }
