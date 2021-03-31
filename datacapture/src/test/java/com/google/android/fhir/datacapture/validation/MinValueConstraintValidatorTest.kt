@@ -47,8 +47,10 @@ class MinValueConstraintValidatorTest {
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
         addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = IntegerType(9) })
       }
+
     val validationResult =
       MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
+
     assertThat(validationResult.isValid).isFalse()
     assertThat(validationResult.message).isEqualTo("Minimum value allowed is:10")
   }
@@ -68,8 +70,10 @@ class MinValueConstraintValidatorTest {
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
         addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = IntegerType(501) })
       }
+
     val validationResult =
       MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
+
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.message.isNullOrBlank()).isTrue()
   }

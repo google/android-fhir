@@ -56,10 +56,12 @@ class QuestionnaireResponseItemValidatorTest {
           }
         )
       }
+
     val validateAggregationFromChildValidators =
       QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
+
     assertThat(validateAggregationFromChildValidators.isValid).isTrue()
-    assertThat(validateAggregationFromChildValidators.validationMessages.isEmpty()).isTrue()
+    assertThat(validateAggregationFromChildValidators.validationMessages).isEmpty()
   }
 
   @Test
@@ -87,9 +89,11 @@ class QuestionnaireResponseItemValidatorTest {
           }
         )
       }
+
     val validateAggregationFromChildValidators =
       QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
+
     assertThat(validateAggregationFromChildValidators.isValid).isFalse()
-    assertThat(validateAggregationFromChildValidators.validationMessages.size == 2).isTrue()
+    assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(2)
   }
 }
