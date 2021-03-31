@@ -22,11 +22,8 @@ import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
-import org.hl7.fhir.r4.model.DecimalType
-import org.hl7.fhir.r4.model.IntegerType
-import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
 
 internal abstract class QuestionnaireItemEditTextViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_edit_text_view) {
@@ -68,39 +65,20 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     if (questionnaireItemViewItem.singleAnswerOrNull != null || initialValue.isEmpty()) {
       textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
     } else if (initialValue.isNotEmpty()) {
-      when (questionnaireItemViewItem.questionnaireItem.type.toCode()) {
-        "integer" -> {
+      when (questionnaireItemViewItem.questionnaireItem.type) {
+        Questionnaire.QuestionnaireItemType.INTEGER -> {
           textInputEditText.setText(initialValue[0].valueIntegerType?.value?.toString() ?: "")
-          initialValue[0].valueIntegerType?.value?.let {
-            questionnaireItemViewItem.singleAnswerOrNull =
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                .setValue(IntegerType(it))
-          }
         }
-        "string" -> {
+        Questionnaire.QuestionnaireItemType.STRING -> {
           textInputEditText.setText(initialValue[0].valueStringType?.value ?: "")
-          initialValue[0].valueStringType?.value?.let {
-            questionnaireItemViewItem.singleAnswerOrNull =
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                .setValue(StringType(it))
-          }
         }
-        "decimal" -> {
+        Questionnaire.QuestionnaireItemType.DECIMAL -> {
           textInputEditText.setText(initialValue[0].valueDecimalType?.value?.toString() ?: "")
-          initialValue[0].valueDecimalType?.value?.let {
-            questionnaireItemViewItem.singleAnswerOrNull =
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                .setValue(DecimalType(it))
-          }
         }
-        "quantity" -> {
+        Questionnaire.QuestionnaireItemType.QUANTITY -> {
           textInputEditText.setText(initialValue[0].valueQuantity?.value?.toString() ?: "")
-          initialValue[0].valueQuantity?.value?.toDouble()?.let {
-            questionnaireItemViewItem.singleAnswerOrNull =
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                .setValue(Quantity(it))
-          }
         }
+        else -> textInputEditText.setText("")
       }
     }
   }
