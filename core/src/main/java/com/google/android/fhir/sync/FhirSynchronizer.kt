@@ -16,7 +16,9 @@
 
 package com.google.android.fhir.sync
 
+import android.util.Log
 import com.google.android.fhir.db.Database
+import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
@@ -43,6 +45,28 @@ class FhirSynchronizer(
         exceptions.add(ResourceSyncException(syncData.resourceType, exception))
       }
     }
+    if (exceptions.isEmpty()) {
+      return Result.Success
+    } else {
+      return Result.Error(exceptions)
+    }
+  }
+
+  suspend fun upload(): Result {
+    val exceptions = mutableListOf<ResourceSyncException>()
+    database.getAllLocalChanges().forEach {
+      val resourceUploader = ResourceUploader(dataSource)
+      try {
+        val opOutcome: OperationOutcome = resourceUploader.upload(it.localChange)
+        Log.v("upload", opOutcome.toString())
+        database.deleteUpdates(it.token)
+      } catch (exception: Exception) {
+        exceptions.add(
+          ResourceSyncException(ResourceType.valueOf(it.localChange.resourceType), exception)
+        )
+      }
+    }
+
     if (exceptions.isEmpty()) {
       return Result.Success
     } else {

@@ -56,12 +56,17 @@ interface FhirEngine {
   suspend fun <R : Resource> remove(clazz: Class<R>, id: String)
 
   /**
-   * One time sync.
+   * One time download of resources.
    *
    * @param syncConfiguration
    * - configuration of data that needs to be synchronised
    */
   suspend fun sync(syncConfiguration: SyncConfiguration): Result
+
+  /**
+   * Attempts to upload locally created and modified resources based on the supplied configuration.
+   */
+  suspend fun syncUpload(): Result
 
   suspend fun periodicSync(): Result
 
