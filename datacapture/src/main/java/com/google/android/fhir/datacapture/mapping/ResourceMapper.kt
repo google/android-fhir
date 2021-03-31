@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import com.google.android.fhir.datacapture.getValueForType
-import java.util.Locale
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateTimeType
@@ -27,8 +25,10 @@ import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
+import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UrlType
 
 /**
@@ -55,57 +55,115 @@ internal object ResourceMapper {
    * This method assumes there is only one FHIR resource to be extracted from the given
    * `questionnaire` and `questionnaireResponse`.
    */
-  fun extract(questionnaire: Questionnaire, questionnaireResponse: QuestionnaireResponse): Base {
-    return questionnaire
-      .itemContextNameToExpressionMap
-      .values
-      .first()
-      .let { Class.forName("org.hl7.fhir.r4.model.$it").newInstance() as Base }
-      .apply { extractFields(questionnaire.item, questionnaireResponse.item) }
+  fun extract(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse
+  ): Resource {
+    val className = questionnaire.itemContextNameToExpressionMap.values.first()
+    val resource =
+      Class.forName("com.google.android.fhir.datacapture.model.$className").newInstance() as
+        Resource
+
+    var questionnaireItemListIterator = questionnaire.item.iterator()
+    var questionnaireResponseItemListIterator = questionnaireResponse.item.iterator()
+    while (questionnaireItemListIterator.hasNext() &&
+      questionnaireResponseItemListIterator.hasNext()) {
+      val questionnaireItem = questionnaireItemListIterator.next()
+      val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
+
+      if (questionnaireItem.definition == null) {
+        questionnaireItemListIterator = questionnaireItem.item.iterator()
+        questionnaireResponseItemListIterator = questionnaireResponseItem.item.iterator()
+        continue
+      }
+
+      val targetFieldName = questionnaireItem.definition.substringAfterLast(".")
+      if (targetFieldName.isEmpty()) {
+        questionnaireItemListIterator = questionnaireItem.item.iterator()
+        questionnaireResponseItemListIterator = questionnaireResponseItem.item.iterator()
+        continue
+      }
+
+      if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
+        var innerClass: Class<*>
+        try {
+          innerClass =
+            Class.forName(
+              "com.google.android.fhir.datacapture.model.${questionnaireItem.itemComponentContextNameToExpressionMap.values.first()}"
+            )
+        } catch (e: ClassNotFoundException) {
+          innerClass =
+            Class.forName(
+              "org.hl7.fhir.r4.model.${questionnaireItem.itemComponentContextNameToExpressionMap.values.first()}"
+            )
+        }
+
+        val type: Type = innerClass.newInstance() as Type
+
+        createInnerClassObject(type, questionnaireItem.item, questionnaireResponseItem.item)
+
+        resource
+          .javaClass
+          .getMethod("add${targetFieldName.capitalize()}", innerClass)
+          .invoke(resource, type)
+        continue
+      }
+
+      questionnaireItem.type.getClass()?.let {
+        resource
+          .javaClass
+          .getMethod("set${targetFieldName.capitalize()}Element", it)
+          .invoke(resource, questionnaireResponseItem.answer.first().value)
+      }
+    }
+
+    return resource
   }
 }
 
 /**
- * Extracts values for fields in the builder from the corresponding questions and answers in
- * [questionnaireItemList] and [questionnaireResponseItemList].
+ * Creates an object of Type and Extracts values for fields from the corresponding questions and
+ * answers in [questionnaireItemList] and [questionnaireResponseItemList] and invokes setters on the
+ * object.
  */
-private fun Base.extractFields(
-  questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
-  questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+private fun createInnerClassObject(
+  type: Type,
+  questionnaireItemComponent: MutableList<Questionnaire.QuestionnaireItemComponent>,
+  questionnaireResponseItemComponent:
+    MutableList<QuestionnaireResponse.QuestionnaireResponseItemComponent>
 ) {
-  val questionnaireItemListIterator = questionnaireItemList.iterator()
-  val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
+  val questionnaireItemListIterator = questionnaireItemComponent.iterator()
+  val questionnaireResponseItemListIterator = questionnaireResponseItemComponent.iterator()
+
   while (questionnaireItemListIterator.hasNext() &&
     questionnaireResponseItemListIterator.hasNext()) {
     val questionnaireItem = questionnaireItemListIterator.next()
-    val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
-    this.extractField(questionnaireItem, questionnaireResponseItem)
-    extractFields(questionnaireItem.item, questionnaireResponseItem.item)
-  }
-}
+    val questionnaireResponseItem2 = questionnaireResponseItemListIterator.next()
 
-/**
- * Extracts value for field in the builder from the corresponding question and answer in
- * [questionnaireItem] and [questionnaireResponseItem].
- *
- * NOTE: Nested fields are not handled. See https://github.com/google/android-fhir/issues/240.
- */
-private fun Base.extractField(
-  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-  questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
-) {
-  val targetFieldName = questionnaireItem.definitionFieldName ?: return
-  if (targetFieldName.isEmpty()) {
-    return
-  }
+    val targetFieldName2 = questionnaireItem.definition.substringAfterLast(".")
 
-  questionnaireItem.type.getClass()?.let {
-    this.javaClass
-      .getMethod("set${targetFieldName.capitalize(Locale.ROOT)}Element", it)
-      .invoke(
-        this,
-        questionnaireResponseItem.answer.single().getValueForType(questionnaireItem.type)
-      )
+    try {
+      questionnaireItem.type.getClass()?.let {
+        type
+          .javaClass
+          .getMethod("set${targetFieldName2.capitalize()}Element", it)
+          .invoke(type, questionnaireResponseItem2.answer.first().value)
+      }
+    } catch (e: NoSuchMethodException) {
+      questionnaireItem.type.getClass()?.let {
+        type
+          .javaClass
+          .getMethod("set${targetFieldName2.capitalize()}", List::class.java)
+          .invoke(type, listOf(questionnaireResponseItem2.answer.first().value))
+      }
+    } catch (e: NoSuchElementException) {
+      questionnaireItem.type.getClass()?.let {
+        type
+          .javaClass
+          .getMethod("set${targetFieldName2.capitalize()}Element", it)
+          .invoke(type, questionnaireItem.initial.first().value)
+      }
+    }
   }
 }
 
@@ -144,6 +202,19 @@ private fun Questionnaire.QuestionnaireItemType.getClass(): Class<out Base>? =
  * s.
  */
 private val Questionnaire.itemContextNameToExpressionMap: Map<String, String>
+  get() {
+    return this.extension
+      .filter { it.url == ITEM_CONTEXT_EXTENSION_URL }
+      .map {
+        val expression = it.value as Expression
+        expression.name to expression.expression
+      }
+      .toMap()
+  }
+
+/** Extract Type for a group questionnaire item from the extension field */
+private val Questionnaire.QuestionnaireItemComponent.itemComponentContextNameToExpressionMap:
+  Map<String, String>
   get() {
     return this.extension
       .filter { it.url == ITEM_CONTEXT_EXTENSION_URL }
