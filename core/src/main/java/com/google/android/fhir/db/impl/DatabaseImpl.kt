@@ -19,6 +19,7 @@ package com.google.android.fhir.db.impl
 import android.content.Context
 import androidx.room.Room
 import androidx.room.Transaction
+import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
@@ -27,7 +28,7 @@ import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.getResourceType
-import com.google.android.fhir.search.impl.Query
+import com.google.android.fhir.search.SearchQuery
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -35,6 +36,7 @@ import org.hl7.fhir.r4.model.ResourceType
  * The implementation for the persistence layer using Room. See docs for
  * [com.google.android.fhir.db.Database] for the API docs.
  */
+@Suppress("UNCHECKED_CAST")
 internal class DatabaseImpl(context: Context, private val iParser: IParser, databaseName: String?) :
   com.google.android.fhir.db.Database {
   constructor(
@@ -54,28 +56,18 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
       //  don't allow main thread queries
       .allowMainThreadQueries()
       .build()
-  val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
-  val syncedResourceDao = db.syncedResourceDao()
-  val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
+  private val resourceDao by lazy { db.resourceDao().also { it.iParser = iParser } }
+  private val syncedResourceDao = db.syncedResourceDao()
+  private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 
   @Transaction
-  override suspend fun <R : Resource> insert(resource: R) {
-    resourceDao.insert(resource)
-    localChangeDao.addInsert(resource)
+  override suspend fun <R : Resource> insert(vararg resources: R) {
+    resourceDao.insertAll(resources.toList())
+    localChangeDao.addInsertAll(resources.toList())
   }
 
-  override suspend fun <R : Resource> insertRemote(resource: R) {
-    resourceDao.insert(resource)
-  }
-
-  @Transaction
-  override suspend fun <R : Resource> insertAll(resources: List<R>) {
-    resourceDao.insertAll(resources)
-    localChangeDao.addInsertAll(resources)
-  }
-
-  override suspend fun <R : Resource> insertAllRemote(resources: List<R>) {
-    resourceDao.insertAll(resources)
+  override suspend fun <R : Resource> insertRemote(vararg resources: R) {
+    resourceDao.insertAll(resources.toList())
   }
 
   @Transaction
@@ -103,7 +95,7 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
     resources: List<Resource>
   ) {
     syncedResourceDao.insert(syncedResourceEntity)
-    insertAllRemote(resources)
+    insertRemote(*resources.toTypedArray())
   }
 
   @Transaction
@@ -162,8 +154,10 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
     return searchByCode(clazz, code, codeSystem, codeValue).filter { refs.contains(it.logicalId) }
   }
 
-  override suspend fun <R : Resource> search(query: Query): List<R> =
-    resourceDao.getResources(query.getSupportSQLiteQuery()).map { iParser.parseResource(it) as R }
+  override suspend fun <R : Resource> search(query: SearchQuery): List<R> =
+    resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).map {
+      iParser.parseResource(it) as R
+    }
 
   /**
    * @returns a list of pairs. Each pair is a token + squashed local change. Each token is a list of
@@ -171,7 +165,8 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
    */
   // TODO: create a data class for squashed local change and merge token in to it.
   override suspend fun getAllLocalChanges(): List<Pair<LocalChangeToken, LocalChangeEntity>> =
-    localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
+    localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map { it
+      ->
       LocalChangeToken(it.map { it.id }) to LocalChangeUtils.squash(it)
     }
 
