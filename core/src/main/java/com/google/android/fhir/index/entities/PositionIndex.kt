@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.search.sort
-
-import ca.uhn.fhir.rest.gclient.StringClientParam
-import com.google.android.fhir.search.filter.FilterCriterion
+package com.google.android.fhir.index.entities
 
 /**
- * [FilterCriterion] on a string value.
+ * An index record for a position value in a location resource.
  *
- * For example:
- * * name that matches 'Tom'
- * * address that includes 'London'
+ * See https://www.hl7.org/fhir/search.html#special.
  */
-data class StringSortCriterion
-constructor(val stringParam: StringClientParam, override val ascending: Boolean) : SortCriterion {
-  override val table: String = "StringIndexEntity"
-  override val param = stringParam.paramName
-}
-
-fun stringSort(param: StringClientParam, ascending: Boolean) = StringSortCriterion(param, ascending)
+data class PositionIndex(val latitude: Double, val longitude: Double)

@@ -25,27 +25,19 @@ import org.hl7.fhir.r4.model.Resource
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface FhirEngine {
   /**
-   * Saves a FHIR `resource` in the local storage. If the resource already exists, it will be
-   * overwritten
-   *
-   * @param <R> The resource type which should be a subtype of [Resource].
-   */
-  fun <R : Resource> save(resource: R)
-
-  /**
-   * Saves a list of FHIR `resource` in the local storage. If any of the resources already exist,
+   * Saves one or more FHIR `resource`s in the local storage. If any of the resources already exist,
    * they will be overwritten.
    *
    * @param <R> The resource type which should be a subtype of [Resource].
    */
-  fun <R : Resource> saveAll(resources: List<R>)
+  suspend fun <R : Resource> save(vararg resource: R)
 
   /**
    * Updates a FHIR `resource` in the local storage.
    *
    * @param <R> The resource type which should be a subtype of [Resource].
    */
-  fun <R : Resource> update(resource: R)
+  suspend fun <R : Resource> update(resource: R)
 
   /**
    * Returns a FHIR resource of type `clazz` with `id` from the local storage.
@@ -53,17 +45,15 @@ interface FhirEngine {
    * @param <R> The resource type which should be a subtype of [Resource].
    * @throws ResourceNotFoundException if the resource is not found
    */
-  @Throws(ResourceNotFoundException::class) fun <R : Resource> load(clazz: Class<R>, id: String): R
+  @Throws(ResourceNotFoundException::class)
+  suspend fun <R : Resource> load(clazz: Class<R>, id: String): R
 
   /**
    * Removes a FHIR resource of type `clazz` with `id` from the local storage.
    *
    * @param <R> The resource type which should be a subtype of [Resource].
    */
-  fun <R : Resource> remove(clazz: Class<R>, id: String)
-
-  /** Returns the entry point for [Search]. */
-  fun search(): Search
+  suspend fun <R : Resource> remove(clazz: Class<R>, id: String)
 
   /**
    * One time sync.
@@ -76,4 +66,6 @@ interface FhirEngine {
   suspend fun periodicSync(): Result
 
   fun updatePeriodicSyncConfiguration(syncConfig: PeriodicSyncConfiguration)
+
+  suspend fun <R : Resource> search(search: Search): List<R>
 }

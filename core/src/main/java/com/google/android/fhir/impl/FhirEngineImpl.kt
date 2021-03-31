@@ -26,6 +26,7 @@ import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.Search
+import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.FhirDataSource
 import com.google.android.fhir.sync.FhirSynchronizer
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
@@ -38,7 +39,6 @@ import org.hl7.fhir.r4.model.Resource
 class FhirEngineImpl
 constructor(
   private val database: Database,
-  private val search: Search,
   private var periodicSyncConfiguration: PeriodicSyncConfiguration?,
   private val dataSource: FhirDataSource,
   private val context: Context
@@ -48,20 +48,16 @@ constructor(
     periodicSyncConfiguration?.let { config -> triggerInitialDownload(config) }
   }
 
-  override fun <R : Resource> save(resource: R) {
-    database.insert(resource)
+  override suspend fun <R : Resource> save(vararg resource: R) {
+    database.insert(*resource)
   }
 
-  override fun <R : Resource> saveAll(resources: List<R>) {
-    database.insertAll(resources)
-  }
-
-  override fun <R : Resource> update(resource: R) {
+  override suspend fun <R : Resource> update(resource: R) {
     database.update(resource)
   }
 
   @Throws(ResourceNotFoundException::class)
-  override fun <R : Resource> load(clazz: Class<R>, id: String): R {
+  override suspend fun <R : Resource> load(clazz: Class<R>, id: String): R {
     return try {
       database.select(clazz, id)
     } catch (e: ResourceNotFoundInDbException) {
@@ -69,12 +65,8 @@ constructor(
     }
   }
 
-  override fun <R : Resource> remove(clazz: Class<R>, id: String) {
+  override suspend fun <R : Resource> remove(clazz: Class<R>, id: String) {
     database.delete(clazz, id)
-  }
-
-  override fun search(): Search {
-    return search
   }
 
   override suspend fun sync(syncConfiguration: SyncConfiguration): Result {
@@ -93,6 +85,10 @@ constructor(
   override fun updatePeriodicSyncConfiguration(syncConfig: PeriodicSyncConfiguration) {
     periodicSyncConfiguration = syncConfig
     setupNextDownload(syncConfig)
+  }
+
+  override suspend fun <R : Resource> search(search: Search): List<R> {
+    return search.execute(database)
   }
 
   private fun setupNextDownload(syncConfig: PeriodicSyncConfiguration) {

@@ -19,35 +19,19 @@ package com.google.android.fhir.db
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.search.impl.Query
+import com.google.android.fhir.search.SearchQuery
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /** The interface for the FHIR resource database. */
 interface Database {
   /**
-   * Inserts the local origin `resource` into the FHIR resource database. If the resource already
-   * exists, it will be overwritten.
-   *
-   * @param <R> The resource type
-   */
-  fun <R : Resource> insert(resource: R)
-
-  /**
-   * Inserts the remote origin `resource` into the FHIR resource database. If the resource already
-   * exists, it will be overwritten.
-   *
-   * @param <R> The resource type
-   */
-  fun <R : Resource> insertRemote(resource: R)
-
-  /**
    * Inserts a list of local `resources` into the FHIR resource database. If any of the resources
    * already exists, it will be overwritten.
    *
    * @param <R> The resource type
    */
-  fun <R : Resource> insertAll(resources: List<R>)
+  suspend fun <R : Resource> insert(vararg resource: R)
 
   /**
    * Inserts a list of remote `resources` into the FHIR resource database. If any of the resources
@@ -55,7 +39,7 @@ interface Database {
    *
    * @param <R> The resource type
    */
-  fun <R : Resource> insertAllRemote(resources: List<R>)
+  suspend fun <R : Resource> insertRemote(vararg resource: R)
 
   /**
    * Updates the `resource` in the FHIR resource database. If the resource does not already exist,
@@ -63,7 +47,7 @@ interface Database {
    *
    * @param <R> The resource type
    */
-  fun <R : Resource> update(resource: R)
+  suspend fun <R : Resource> update(resource: R)
 
   /**
    * Selects the FHIR resource of type `clazz` with `id`.
@@ -72,7 +56,7 @@ interface Database {
    * @throws ResourceNotFoundInDbException if the resource is not found in the database
    */
   @Throws(ResourceNotFoundInDbException::class)
-  fun <R : Resource> select(clazz: Class<R>, id: String): R
+  suspend fun <R : Resource> select(clazz: Class<R>, id: String): R
 
   /**
    * Return the last update data of a resource based on the resource type. If no resource of
@@ -96,7 +80,7 @@ interface Database {
    *
    * @param <R> The resource type
    */
-  fun <R : Resource> delete(clazz: Class<R>, id: String)
+  suspend fun <R : Resource> delete(clazz: Class<R>, id: String)
 
   /**
    * Returns a [List] of [Resource] s that are of type `clazz` and have `reference` with `value`.
@@ -104,7 +88,11 @@ interface Database {
    * For example, a search for [org.hl7.fhir.r4.model.Observation] s with `reference` 'subject' and
    * `value` 'Patient/1' will return all observations associated with the particular patient.
    */
-  fun <R : Resource> searchByReference(clazz: Class<R>, reference: String, value: String): List<R>
+  suspend fun <R : Resource> searchByReference(
+    clazz: Class<R>,
+    reference: String,
+    value: String
+  ): List<R>
 
   /**
    * Returns a [List] of [Resource] s that are of type `clazz` and have `string` with `value`.
@@ -112,7 +100,7 @@ interface Database {
    * For example, a search for [org.hl7.fhir.r4.model.Patient] s with `string` 'given' and `value`
    * 'Tom' will return all patients with a given name Tom.
    */
-  fun <R : Resource> searchByString(clazz: Class<R>, string: String, value: String): List<R>
+  suspend fun <R : Resource> searchByString(clazz: Class<R>, string: String, value: String): List<R>
 
   /**
    * Returns a [List] of [Resource] s that are of type `clazz` and have `code` with `system` and
@@ -122,7 +110,7 @@ interface Database {
    * 'http://openmrs.org/concepts' and `value` '1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' will return
    * all observations with the given code.
    */
-  fun <R : Resource> searchByCode(
+  suspend fun <R : Resource> searchByCode(
     clazz: Class<R>,
     code: String,
     system: String,
@@ -138,7 +126,7 @@ interface Database {
    * `value` '1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' will return all observations associated with the
    * particular patient by reference and with the given code.
    */
-  fun <R : Resource> searchByReferenceAndCode(
+  suspend fun <R : Resource> searchByReferenceAndCode(
     clazz: Class<R>,
     reference: String,
     referenceValue: String,
@@ -147,16 +135,15 @@ interface Database {
     codeValue: String
   ): List<R>
 
-  fun <R : Resource> search(query: Query): List<R>
+  suspend fun <R : Resource> search(query: SearchQuery): List<R>
 
   /**
    * Retrieves all [LocalChangeEntity] s for all [Resource] s, which can be used to update the
    * remote FHIR server. Each [resource] will have at most one
-   * [LocalChangeEntity](multiple changes
-   * are squashed).
+   * [LocalChangeEntity](multiple changes are squashed).
    */
-  fun getAllLocalChanges(): List<Pair<LocalChangeToken, LocalChangeEntity>>
+  suspend fun getAllLocalChanges(): List<Pair<LocalChangeToken, LocalChangeEntity>>
 
   /** Remove the [LocalChangeEntity] s with given ids. Call this after a successful sync. */
-  fun deleteUpdates(token: LocalChangeToken)
+  suspend fun deleteUpdates(token: LocalChangeToken)
 }
