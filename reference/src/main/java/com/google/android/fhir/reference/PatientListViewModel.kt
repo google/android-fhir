@@ -24,7 +24,8 @@ import androidx.lifecycle.liveData
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.data.SamplePatients
-import com.google.android.fhir.search.filter.string
+import com.google.android.fhir.search.Order
+import com.google.android.fhir.search.search
 import org.hl7.fhir.r4.model.Patient
 
 /**
@@ -39,13 +40,17 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   val liveSearchedPatients = liveData { emit(getSearchResults()) }
 
   private suspend fun getSearchResults(): List<PatientItem> {
-    return samplePatients.getPatientItems(
-      fhirEngine
-        .search()
-        .of(Patient::class.java)
-        .filter(string(Patient.ADDRESS_CITY, ParamPrefixEnum.EQUAL, "NAIROBI"))
-        .run()
-    )
+    val searchResults: List<Patient> =
+      fhirEngine.search {
+        filter(Patient.ADDRESS_CITY) {
+          prefix = ParamPrefixEnum.EQUAL
+          value = "NAIROBI"
+        }
+        sort(Patient.GIVEN, Order.ASCENDING)
+        count = 100
+        from = 0
+      }
+    return samplePatients.getPatientItems(searchResults)
   }
 
   /** The Patient's details for display purposes. */
