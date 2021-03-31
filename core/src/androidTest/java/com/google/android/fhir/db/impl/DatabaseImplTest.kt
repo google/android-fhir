@@ -74,7 +74,7 @@ class DatabaseImplTest {
     val patients = ArrayList<Patient>()
     patients.add(TEST_PATIENT_1)
     patients.add(TEST_PATIENT_2)
-    database.insertAll(patients)
+    database.insert(*patients.toTypedArray())
     testingUtils.assertResourceEquals(
       TEST_PATIENT_1,
       database.select(Patient::class.java, TEST_PATIENT_1_ID)
@@ -220,7 +220,7 @@ class DatabaseImplTest {
   @Test
   fun insertAll_remoteResources_shouldNotInsertAnyLocalChange() = runBlocking {
     val patient: Patient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
-    database.insertAllRemote(listOf(patient, TEST_PATIENT_2))
+    database.insertRemote(patient, TEST_PATIENT_2)
     assertThat(
         database.getAllLocalChanges().map { it.second }.none {
           it.resourceId in listOf(patient.logicalId, TEST_PATIENT_2_ID)

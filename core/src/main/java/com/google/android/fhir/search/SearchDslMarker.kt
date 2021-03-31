@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.search.sort
+package com.google.android.fhir.search
 
-/** Interface to specify filtering criteria for search. */
-interface SortCriterion {
-  val table: String
-  val param: String
-  val ascending: Boolean
-}
+@DslMarker annotation class SearchDslMarker
