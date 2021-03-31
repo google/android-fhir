@@ -22,7 +22,6 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.enablement.QuestionnaireItemWithResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItemProperty
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
