@@ -22,7 +22,6 @@ import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
-import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal abstract class QuestionnaireItemEditTextViewHolderFactory :
@@ -61,26 +60,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
       prefixTextView.visibility = View.GONE
     }
     textQuestion.text = questionnaireItemViewItem.questionnaireItem.text
-    val initialValue = questionnaireItemViewItem.questionnaireItem.initial
-    if (questionnaireItemViewItem.singleAnswerOrNull != null || initialValue.isEmpty()) {
-      textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
-    } else if (initialValue.isNotEmpty()) {
-      when (questionnaireItemViewItem.questionnaireItem.type) {
-        Questionnaire.QuestionnaireItemType.INTEGER -> {
-          textInputEditText.setText(initialValue[0].valueIntegerType?.value?.toString() ?: "")
-        }
-        Questionnaire.QuestionnaireItemType.STRING -> {
-          textInputEditText.setText(initialValue[0].valueStringType?.value ?: "")
-        }
-        Questionnaire.QuestionnaireItemType.DECIMAL -> {
-          textInputEditText.setText(initialValue[0].valueDecimalType?.value?.toString() ?: "")
-        }
-        Questionnaire.QuestionnaireItemType.QUANTITY -> {
-          textInputEditText.setText(initialValue[0].valueQuantity?.value?.toString() ?: "")
-        }
-        else -> textInputEditText.setText("")
-      }
-    }
+    textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
   }
 
   /** Returns the answer that should be recorded given the text input by the user. */

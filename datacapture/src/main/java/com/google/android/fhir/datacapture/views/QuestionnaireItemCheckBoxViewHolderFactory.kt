@@ -58,14 +58,8 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
           prefixTextView.visibility = View.GONE
         }
         checkBox.text = questionnaireItemViewItem.questionnaireItem.text
-        val initialValue = questionnaireItemViewItem.questionnaireItem.initial
-        if (questionnaireItemViewItem.singleAnswerOrNull != null || initialValue.isEmpty()) {
-          checkBox.isChecked =
-            questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value ?: false
-        } else if (initialValue.isNotEmpty()) {
-          checkBox.isChecked =
-            questionnaireItemViewItem.questionnaireItem.initial[0].valueBooleanType.value
-        }
+        checkBox.isChecked =
+          questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value ?: false
       }
     }
 }

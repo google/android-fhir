@@ -49,7 +49,6 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
           prefixTextView.visibility = View.GONE
         }
         val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
-        val initialValue = this.questionnaireItemViewItem.questionnaireItem.initial
         val answer = questionnaireResponseItem.answer.singleOrNull()?.valueCoding
         radioHeader.text = questionnaireItem.text
         radioGroup.removeAllViews()
@@ -64,11 +63,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
                   ViewGroup.LayoutParams.MATCH_PARENT,
                   ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-              if (answer != null || initialValue.isEmpty()) {
-                isChecked = it.valueCoding.equalsDeep(answer)
-              } else if (initialValue.isNotEmpty()) {
-                isChecked = initialValue[0].valueCoding.equalsDeep(it.valueCoding)
-              }
+              isChecked = it.valueCoding.equalsDeep(answer)
             }
           )
         }
