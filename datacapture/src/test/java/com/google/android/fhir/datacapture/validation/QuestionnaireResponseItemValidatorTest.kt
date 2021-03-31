@@ -33,20 +33,21 @@ class QuestionnaireResponseItemValidatorTest {
 
   @Test
   fun shouldReturnValidResult() {
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply {
-      addExtension(
-        Extension().apply {
-          url = MIN_VALUE_EXTENSION_URL
-          this.setValue(IntegerType(250))
-        }
-      )
-      addExtension(
-        Extension().apply {
-          url = MAX_VALUE_EXTENSION_URL
-          this.setValue(IntegerType(300))
-        }
-      )
-    }
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            url = MIN_VALUE_EXTENSION_URL
+            this.setValue(IntegerType(250))
+          }
+        )
+        addExtension(
+          Extension().apply {
+            url = MAX_VALUE_EXTENSION_URL
+            this.setValue(IntegerType(300))
+          }
+        )
+      }
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
         addAnswer(
@@ -63,20 +64,21 @@ class QuestionnaireResponseItemValidatorTest {
 
   @Test
   fun shouldReturnInvalidResultWithMessages() {
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply {
-      addExtension(
-        Extension().apply {
-          url = MIN_VALUE_EXTENSION_URL
-          this.setValue(IntegerType(600))
-        }
-      )
-      addExtension(
-        Extension().apply {
-          url = MAX_VALUE_EXTENSION_URL
-          this.setValue(IntegerType(500))
-        }
-      )
-    }
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            url = MIN_VALUE_EXTENSION_URL
+            this.setValue(IntegerType(600))
+          }
+        )
+        addExtension(
+          Extension().apply {
+            url = MAX_VALUE_EXTENSION_URL
+            this.setValue(IntegerType(500))
+          }
+        )
+      }
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
         addAnswer(

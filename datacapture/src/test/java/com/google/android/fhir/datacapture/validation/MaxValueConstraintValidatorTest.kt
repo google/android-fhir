@@ -53,8 +53,7 @@ class MaxValueConstraintValidatorTest {
     val validationResult =
       MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
     assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.message.equals("Maximum value allowed is:200000"))
-      .isTrue()
+    assertThat(validationResult.message.equals("Maximum value allowed is:200000")).isTrue()
   }
 
   @Test

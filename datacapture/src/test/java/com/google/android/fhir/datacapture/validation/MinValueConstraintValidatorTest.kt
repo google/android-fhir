@@ -34,21 +34,18 @@ class MinValueConstraintValidatorTest {
 
   @Test
   fun shouldReturnInvalidResult() {
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply {
-      addExtension(
-        Extension().apply {
-          url = MIN_VALUE_EXTENSION_URL
-          this.setValue(IntegerType(10))
-        }
-      )
-    }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponseItemAnswerComponent().apply {
-            value = IntegerType(9)
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            url = MIN_VALUE_EXTENSION_URL
+            this.setValue(IntegerType(10))
           }
         )
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = IntegerType(9) })
       }
     val validationResult =
       MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
@@ -58,21 +55,18 @@ class MinValueConstraintValidatorTest {
 
   @Test
   fun shouldReturnValidResult() {
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply {
-      addExtension(
-        Extension().apply {
-          url = MIN_VALUE_EXTENSION_URL
-          this.setValue(IntegerType(500))
-        }
-      )
-    }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponseItemAnswerComponent().apply {
-            value = IntegerType(501)
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            url = MIN_VALUE_EXTENSION_URL
+            this.setValue(IntegerType(500))
           }
         )
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = IntegerType(501) })
       }
     val validationResult =
       MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
