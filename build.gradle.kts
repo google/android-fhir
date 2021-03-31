@@ -31,7 +31,11 @@ subprojects {
       ktfmt().googleStyle()
       licenseHeaderFile("${project.rootProject.projectDir}/license-header.txt")
     }
-
+    kotlinGradle {
+      target("*.gradle.kts")
+      ktlint().userData(mapOf("indent_size" to "2", "continuation_indent_size" to "2"))
+      ktfmt().googleStyle()
+    }
     format("xml") {
       target("**/*.xml")
       prettier(mapOf("prettier" to "2.0.5", "@prettier/plugin-xml" to "0.13.0"))
