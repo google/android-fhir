@@ -19,7 +19,7 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 
 fun Project.configureSpotless() {
-  apply(plugin = "com.diffplug.spotless")
+  apply(plugin = Plugins.BuildPlugins.spotless)
   configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     kotlin {
       target("**/*.kt")

@@ -9,7 +9,5 @@ repositories {
 }
 
 dependencies {
-//  implementation(Plugins.kotlinGradlePlugin)
   implementation("com.diffplug.spotless:spotless-plugin-gradle:5.11.0")
 }
-

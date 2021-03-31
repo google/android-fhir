@@ -18,8 +18,8 @@ allprojects {
     mavenCentral()
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
     gradlePluginPortal()
-    configureSpotless()
   }
+  configureSpotless()
 }
 
 // Create a CI repository and also change versions to include the build number
