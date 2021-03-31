@@ -85,7 +85,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
               )
             }
           }
-          if (questionnaireItemViewItem.questionnaireItemViewItemProperty.canModifyStructure) {
+          if (questionnaireItemViewItem.questionnaireItem.canModifyStructure) {
             questionnaireItemViewItem.questionnaireResponseItemAnsweredCallback(
               questionnaireItemViewItem.questionnaireItem.linkId
             )

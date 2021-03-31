@@ -154,8 +154,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
             questionnaireItem,
             questionnaireResponseItem,
             questionnaireResponseItemChangedCallback,
-            questionnaireResponseItemAnsweredCallback,
-            questionnaireItem.createQuestionnaireItemViewItemProperty()
+            questionnaireResponseItemAnsweredCallback
           )
         )
         if (questionnaireResponseItem.item.isEmpty() &&
@@ -285,19 +284,6 @@ private fun Questionnaire.QuestionnaireItemComponent.createListOfItemInAnswer():
   val listOfNestedItems = mutableListOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
   this.item.forEach { listOfNestedItems.add(it.createQuestionnaireResponseItem()) }
   return listOfNestedItems
-}
-
-/**
- * Creates an instance of [QuestionnaireItemViewItemProperty] from the provided
- * [Questionnaire.QuestionnaireItemComponent].
- */
-private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireItemViewItemProperty():
-  QuestionnaireItemViewItemProperty {
-  val questionnaireItemViewItemProperty = QuestionnaireItemViewItemProperty()
-  if (this.item.isNotEmpty() && this.type != Questionnaire.QuestionnaireItemType.GROUP) {
-    questionnaireItemViewItemProperty.canModifyStructure = true
-  }
-  return questionnaireItemViewItemProperty
 }
 
 /**

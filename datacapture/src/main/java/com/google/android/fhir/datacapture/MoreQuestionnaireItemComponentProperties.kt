@@ -16,7 +16,8 @@
 
 package com.google.android.fhir.datacapture.views
 
-/** Class which contains properties related to a [QuestionnaireItemViewItem] */
-class QuestionnaireItemViewItemProperty() {
-  var canModifyStructure: Boolean = false
-}
+import org.hl7.fhir.r4.model.Questionnaire
+
+/** More [Questionnaire.QuestionnaireItemComponent] properties */
+val Questionnaire.QuestionnaireItemComponent.canModifyStructure : Boolean
+  get() = item.isNotEmpty() && type != Questionnaire.QuestionnaireItemType.GROUP
