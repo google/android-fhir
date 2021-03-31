@@ -32,46 +32,53 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class MinValueConstraintValidatorTest {
 
-  /** Scenario 1 - answerValue is less than minValue */
+  //Scenario 1 - answerValue is less than minValue
   @Test
-  fun minValueValidator_validate_shouldValidateScenarioWhereAnswerValueIsLessThanMinValue() {
-    val extensionUrl = "http://hl7.org/fhir/StructureDefinition/minValue"
-    val minValue = 10
-    val answerValue = 9
-    val validationMessage = "Minimum value allowed is:$minValue"
-    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
-    val extension = Extension()
-    val questionnaireResponseItemAnswerComponent = QuestionnaireResponseItemAnswerComponent()
-    questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
-    questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
-    extension.url = extensionUrl
-    extension.setValue(IntegerType(minValue))
-    questionnaireItem.apply { addExtension(extension) }
-    val minValueValidatorScenarioOne =
+  fun shouldReturnInvalidResult() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply {
+      addExtension(
+        Extension().apply {
+          url = "http://hl7.org/fhir/StructureDefinition/minValue"
+          this.setValue(IntegerType(10))
+        }
+      )
+    }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponseItemAnswerComponent().apply {
+            value = IntegerType(9)
+          }
+        )
+      }
+    val validationResult =
       MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
-    assertThat(minValueValidatorScenarioOne.isValid).isFalse()
-    assertThat(minValueValidatorScenarioOne.message.equals(validationMessage)).isTrue()
+    assertThat(validationResult.isValid).isFalse()
+    assertThat(validationResult.message.equals("Minimum value allowed is:10")).isTrue()
   }
 
-  /** Scenario 2 - answerValue is greater than maxValue */
+  // Scenario 2 - answerValue is greater than minValue
   @Test
-  fun minValueValidator_validate_shouldValidateScenarioWhereAnswerValueIsGreaterThanMinValue() {
-    val extensionUrl = "http://hl7.org/fhir/StructureDefinition/minValue"
-    val minValue = 500
-    val answerValue = 501
-    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
-    val extension = Extension()
-    val questionnaireResponseItemAnswerComponent = QuestionnaireResponseItemAnswerComponent()
-    questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
-    questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
-    extension.url = extensionUrl
-    extension.setValue(IntegerType(minValue))
-    questionnaireItem.apply { addExtension(extension) }
-    val minValueValidatorScenarioTwo =
+  fun shouldReturnValidResult() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply {
+      addExtension(
+        Extension().apply {
+          url = "http://hl7.org/fhir/StructureDefinition/minValue"
+          this.setValue(IntegerType(500))
+        }
+      )
+    }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponseItemAnswerComponent().apply {
+            value = IntegerType(501)
+          }
+        )
+      }
+    val validationResult =
       MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
-    assertThat(minValueValidatorScenarioTwo.isValid).isTrue()
-    assertThat(minValueValidatorScenarioTwo.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.isValid).isTrue()
+    assertThat(validationResult.message.isNullOrBlank()).isTrue()
   }
 }

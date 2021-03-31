@@ -31,10 +31,9 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class MaxValueConstraintValidatorTest {
 
-  /** Scenario 1 - answerValue is greater than maxValue */
+  // Scenario 1 - answerValue is greater than maxValue
   @Test
   fun shouldReturnInvalidResult() {
-    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -44,21 +43,24 @@ class MaxValueConstraintValidatorTest {
           }
         )
       }
-    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-      value = IntegerType(200001)
-      questionnaireResponseItem.addAnswer(this)
-    }
-    val maxValueValidatorScenarioOne =
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = IntegerType(200001)
+          }
+        )
+      }
+    val validationResult =
       MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
-    Truth.assertThat(maxValueValidatorScenarioOne.isValid).isFalse()
-    Truth.assertThat(maxValueValidatorScenarioOne.message.equals("Maximum value allowed is:200000"))
+    Truth.assertThat(validationResult.isValid).isFalse()
+    Truth.assertThat(validationResult.message.equals("Maximum value allowed is:200000"))
       .isTrue()
   }
 
-  /** Scenario 2 - answerValue is less than maxValue */
+  // Scenario 2 - answerValue is less than maxValue
   @Test
   fun shouldReturnValidResult() {
-    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -68,13 +70,17 @@ class MaxValueConstraintValidatorTest {
           }
         )
       }
-    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-      value = IntegerType(199999)
-      questionnaireResponseItem.addAnswer(this)
-    }
-    val maxValueValidatorScenarioTwo =
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = IntegerType(501)
+          }
+        )
+      }
+    val validationResult =
       MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
-    Truth.assertThat(maxValueValidatorScenarioTwo.isValid).isTrue()
-    Truth.assertThat(maxValueValidatorScenarioTwo.message.isNullOrBlank()).isTrue()
+    Truth.assertThat(validationResult.isValid).isTrue()
+    Truth.assertThat(validationResult.message.isNullOrBlank()).isTrue()
   }
 }

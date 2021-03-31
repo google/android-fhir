@@ -32,7 +32,7 @@ import org.robolectric.annotation.Config
 class QuestionnaireResponseItemValidatorTest {
 
   @Test
-  fun questionnaireResponseItemValidator_validate_shouldReturnValidResult() {
+  fun shouldReturnValidResult() {
     val extensionUrlMaxValue = "http://hl7.org/fhir/StructureDefinition/maxValue"
     val extensionUrlMinValue = "http://hl7.org/fhir/StructureDefinition/minValue"
     val extensionMaxValue = Extension()
@@ -63,7 +63,7 @@ class QuestionnaireResponseItemValidatorTest {
   }
 
   @Test
-  fun questionnaireResponseItemValidator_validate_shouldReturnInvalidResultWithValidationMessageListNonEmpty() {
+  fun shouldReturnInvalidResultWithMessages() {
     val extensionUrlMaxValue = "http://hl7.org/fhir/StructureDefinition/maxValue"
     val extensionUrlMinValue = "http://hl7.org/fhir/StructureDefinition/minValue"
     val extensionMaxValue = Extension()

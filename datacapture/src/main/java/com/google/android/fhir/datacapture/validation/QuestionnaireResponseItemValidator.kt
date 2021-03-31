@@ -35,16 +35,11 @@ internal object QuestionnaireResponseItemValidator {
     validators.forEach {
       validationResults.add(it.validate(questionnaireItem, questionnaireResponseItem))
     }
-    return packConstraintValidationResults(validationResults)
-  }
-
-  private fun packConstraintValidationResults(
-    validationResults: List<ConstraintValidator.ConstraintValidationResult>
-  ) =
-    ValidationResult(
+    return ValidationResult(
       validationResults.all { it.isValid },
       validationResults.mapNotNull { it.message }.toList()
     )
+  }
 }
 
 internal data class ValidationResult(var isValid: Boolean, val validationMessages: List<String>)
