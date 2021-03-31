@@ -138,29 +138,29 @@ private fun createInnerClassObject(
   while (questionnaireItemListIterator.hasNext() &&
     questionnaireResponseItemListIterator.hasNext()) {
     val questionnaireItem = questionnaireItemListIterator.next()
-    val questionnaireResponseItem2 = questionnaireResponseItemListIterator.next()
+    val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
 
-    val targetFieldName2 = questionnaireItem.definition.substringAfterLast(".")
+    val targetFieldName = questionnaireItem.definition.substringAfterLast(".")
 
     try {
       questionnaireItem.type.getClass()?.let {
         type
           .javaClass
-          .getMethod("set${targetFieldName2.capitalize()}Element", it)
-          .invoke(type, questionnaireResponseItem2.answer.first().value)
+          .getMethod("set${targetFieldName.capitalize()}Element", it)
+          .invoke(type, questionnaireResponseItem.answer.first().value)
       }
     } catch (e: NoSuchMethodException) {
       questionnaireItem.type.getClass()?.let {
         type
           .javaClass
-          .getMethod("set${targetFieldName2.capitalize()}", List::class.java)
-          .invoke(type, listOf(questionnaireResponseItem2.answer.first().value))
+          .getMethod("set${targetFieldName.capitalize()}", List::class.java)
+          .invoke(type, listOf(questionnaireResponseItem.answer.first().value))
       }
     } catch (e: NoSuchElementException) {
       questionnaireItem.type.getClass()?.let {
         type
           .javaClass
-          .getMethod("set${targetFieldName2.capitalize()}Element", it)
+          .getMethod("set${targetFieldName.capitalize()}Element", it)
           .invoke(type, questionnaireItem.initial.first().value)
       }
     }
