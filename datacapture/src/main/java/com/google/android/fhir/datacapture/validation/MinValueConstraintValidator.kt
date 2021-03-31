@@ -21,10 +21,9 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object MinValueConstraintValidator :
   ValueConstraintValidator(
-    url = "http://hl7.org/fhir/StructureDefinition/minValue",
-    predicate = {
-      extension: Extension,
-      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
+    url = MIN_VALUE_EXTENSION_URL,
+    predicate = { extension: Extension,
+                  answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
       when {
         extension.value.fhirType().equals("integer") && answer.hasValueIntegerType() -> {
           answer.valueIntegerType.value < extension.value.primitiveValue().toInt()
@@ -42,3 +41,6 @@ internal object MinValueConstraintValidator :
       }
     }
   )
+
+internal const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"
+

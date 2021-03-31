@@ -21,7 +21,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object MaxValueConstraintValidator :
   ValueConstraintValidator(
-    url = "http://hl7.org/fhir/StructureDefinition/maxValue",
+    url = MAX_VALUE_EXTENSION_URL,
     predicate = {
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
@@ -42,3 +42,5 @@ internal object MaxValueConstraintValidator :
       }
     }
   )
+
+internal const val MAX_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/maxValue"

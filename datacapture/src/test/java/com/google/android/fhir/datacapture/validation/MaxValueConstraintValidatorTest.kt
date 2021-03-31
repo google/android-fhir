@@ -17,7 +17,7 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.os.Build
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -31,14 +31,13 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class MaxValueConstraintValidatorTest {
 
-  // Scenario 1 - answerValue is greater than maxValue
   @Test
   fun shouldReturnInvalidResult() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
           Extension().apply {
-            this.url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            this.url = MAX_VALUE_EXTENSION_URL
             this.setValue(IntegerType(200000))
           }
         )
@@ -53,19 +52,18 @@ class MaxValueConstraintValidatorTest {
       }
     val validationResult =
       MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
-    Truth.assertThat(validationResult.isValid).isFalse()
-    Truth.assertThat(validationResult.message.equals("Maximum value allowed is:200000"))
+    assertThat(validationResult.isValid).isFalse()
+    assertThat(validationResult.message.equals("Maximum value allowed is:200000"))
       .isTrue()
   }
 
-  // Scenario 2 - answerValue is less than maxValue
   @Test
   fun shouldReturnValidResult() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
           Extension().apply {
-            this.url = "http://hl7.org/fhir/StructureDefinition/maxValue"
+            this.url = MAX_VALUE_EXTENSION_URL
             this.setValue(IntegerType(200000))
           }
         )
@@ -80,7 +78,7 @@ class MaxValueConstraintValidatorTest {
       }
     val validationResult =
       MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
-    Truth.assertThat(validationResult.isValid).isTrue()
-    Truth.assertThat(validationResult.message.isNullOrBlank()).isTrue()
+    assertThat(validationResult.isValid).isTrue()
+    assertThat(validationResult.message.isNullOrBlank()).isTrue()
   }
 }

@@ -32,13 +32,12 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class MinValueConstraintValidatorTest {
 
-  //Scenario 1 - answerValue is less than minValue
   @Test
   fun shouldReturnInvalidResult() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply {
       addExtension(
         Extension().apply {
-          url = "http://hl7.org/fhir/StructureDefinition/minValue"
+          url = MIN_VALUE_EXTENSION_URL
           this.setValue(IntegerType(10))
         }
       )
@@ -54,16 +53,15 @@ class MinValueConstraintValidatorTest {
     val validationResult =
       MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
     assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.message.equals("Minimum value allowed is:10")).isTrue()
+    assertThat(validationResult.message).isEqualTo("Minimum value allowed is:10")
   }
 
-  // Scenario 2 - answerValue is greater than minValue
   @Test
   fun shouldReturnValidResult() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply {
       addExtension(
         Extension().apply {
-          url = "http://hl7.org/fhir/StructureDefinition/minValue"
+          url = MIN_VALUE_EXTENSION_URL
           this.setValue(IntegerType(500))
         }
       )

@@ -33,29 +33,28 @@ class QuestionnaireResponseItemValidatorTest {
 
   @Test
   fun shouldReturnValidResult() {
-    val extensionUrlMaxValue = "http://hl7.org/fhir/StructureDefinition/maxValue"
-    val extensionUrlMinValue = "http://hl7.org/fhir/StructureDefinition/minValue"
-    val extensionMaxValue = Extension()
-    val extensionMinValue = Extension()
-    val minValue = 250
-    val maxValue = 200000
-    val answerValue = 251
-    extensionMaxValue.url = extensionUrlMaxValue
-    extensionMaxValue.setValue(IntegerType(maxValue))
-    extensionMinValue.url = extensionUrlMinValue
-    extensionMinValue.setValue(IntegerType(minValue))
-    val extensions =
-      mutableListOf<Extension>().apply {
-        add(extensionMaxValue)
-        add(extensionMinValue)
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply {
+      addExtension(
+        Extension().apply {
+          url = MIN_VALUE_EXTENSION_URL
+          this.setValue(IntegerType(250))
+        }
+      )
+      addExtension(
+        Extension().apply {
+          url = MAX_VALUE_EXTENSION_URL
+          this.setValue(IntegerType(300))
+        }
+      )
+    }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = IntegerType(275)
+          }
+        )
       }
-    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
-    val questionnaireResponseItemAnswerComponent =
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-    questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
-    questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
-    questionnaireItem.apply { extensions.forEach { addExtension(it) } }
     val validateAggregationFromChildValidators =
       QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
     assertThat(validateAggregationFromChildValidators.isValid).isTrue()
@@ -64,29 +63,28 @@ class QuestionnaireResponseItemValidatorTest {
 
   @Test
   fun shouldReturnInvalidResultWithMessages() {
-    val extensionUrlMaxValue = "http://hl7.org/fhir/StructureDefinition/maxValue"
-    val extensionUrlMinValue = "http://hl7.org/fhir/StructureDefinition/minValue"
-    val extensionMaxValue = Extension()
-    val extensionMinValue = Extension()
-    val minValue = 200000
-    val maxValue = 250
-    val answerValue = 10000
-    extensionMaxValue.url = extensionUrlMaxValue
-    extensionMaxValue.setValue(IntegerType(maxValue))
-    extensionMinValue.url = extensionUrlMinValue
-    extensionMinValue.setValue(IntegerType(minValue))
-    val extensions =
-      mutableListOf<Extension>().apply {
-        add(extensionMaxValue)
-        add(extensionMinValue)
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply {
+      addExtension(
+        Extension().apply {
+          url = MIN_VALUE_EXTENSION_URL
+          this.setValue(IntegerType(600))
+        }
+      )
+      addExtension(
+        Extension().apply {
+          url = MAX_VALUE_EXTENSION_URL
+          this.setValue(IntegerType(500))
+        }
+      )
+    }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = IntegerType(550)
+          }
+        )
       }
-    val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
-    val questionnaireResponseItemAnswerComponent =
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-    questionnaireResponseItemAnswerComponent.value = IntegerType(answerValue)
-    questionnaireResponseItem.addAnswer(questionnaireResponseItemAnswerComponent)
-    questionnaireItem.apply { extensions.forEach { addExtension(it) } }
     val validateAggregationFromChildValidators =
       QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
     assertThat(validateAggregationFromChildValidators.isValid).isFalse()
