@@ -23,4 +23,9 @@
 
     <!-- For display observations in brief, for a patient -->
     <string name="observation_brief_text">%1$s: %2$s\nEffective: %3$s</string>
+    <string name="add_test_resources">Add test resources</string>
+    <string name="delete_test_resources">Delete test resources</string>
+    <string
+        name="random_updates_to_resource"
+    >Random updates to resource</string>
 </resources>

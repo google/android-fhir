@@ -18,15 +18,16 @@ package com.google.android.fhir.reference.api
 
 import ca.uhn.fhir.parser.IParser
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import okhttp3.logging.HttpLoggingInterceptor
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
+import org.hl7.fhir.r4.model.Resource
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.Headers
 import retrofit2.http.PATCH
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -40,14 +41,13 @@ interface HapiFhirService {
   suspend fun insertResource(
     @Path("type") type: String,
     @Path("id") id: String,
-    @Body body: String
-  ): OperationOutcome
-  @Headers("Content-type: application/json-patch+json")
+    @Body body: RequestBody
+  ): Resource
   @PATCH("{type}/{id}")
   suspend fun updateResource(
     @Path("type") type: String,
     @Path("id") id: String,
-    @Body body: String
+    @Body body: RequestBody
   ): OperationOutcome
   @DELETE("{type}/{id}")
   suspend fun deleteResource(@Path("type") type: String, @Path("id") id: String): OperationOutcome

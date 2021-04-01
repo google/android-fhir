@@ -18,6 +18,7 @@ package com.google.android.fhir.sync
 
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
+import org.hl7.fhir.r4.model.Resource
 
 /**
  * Interface for an abstraction of retrieving static data from a network source. The data can be
@@ -37,7 +38,7 @@ interface FhirDataSource {
    *
    * @param payload is the Resource in JSON form.
    */
-  suspend fun insert(resourceType: String, resourceId: String, payload: String): OperationOutcome
+  suspend fun insert(resourceType: String, resourceId: String, payload: String): Resource
 
   /**
    * Implement this method to update an existing resource on the remote server. See

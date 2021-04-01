@@ -25,4 +25,22 @@
         android:icon="@android:drawable/stat_notify_sync"
         android:title="@string/menu_sync_resources"
     />
+    <item
+        android:id="@+id/insert_test_resources"
+        app:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="@string/add_test_resources"
+    />
+    <item
+        android:id="@+id/delete_test_resources"
+        app:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="@string/delete_test_resources"
+    />
+    <item
+        android:id="@+id/update_test_resources"
+        app:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="@string/random_updates_to_resource"
+    />
 </menu>

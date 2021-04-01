@@ -16,9 +16,12 @@
 
 package com.google.android.fhir.sync
 
-import android.util.Log
 import com.google.android.fhir.db.Database
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.logicalId
+import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.OperationOutcome
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
@@ -55,11 +58,21 @@ class FhirSynchronizer(
   suspend fun upload(): Result {
     val exceptions = mutableListOf<ResourceSyncException>()
     database.getAllLocalChanges().forEach {
-      val resourceUploader = ResourceUploader(dataSource)
       try {
-        val opOutcome: OperationOutcome = resourceUploader.upload(it.localChange)
-        Log.v("upload", opOutcome.toString())
-        database.deleteUpdates(it.token)
+        val response: Resource = doUpload(it.localChange, dataSource)
+        if (response.logicalId.equals(it.localChange.resourceId) || response.isSuccess()) {
+          database.deleteUpdates(it.token)
+        } else {
+          // TODO improve exception message
+          exceptions.add(
+            ResourceSyncException(
+              ResourceType.valueOf(it.localChange.resourceType),
+              FHIRException(
+                "Could not infer response \"${response.resourceType}/${response.logicalId}\" as success."
+              )
+            )
+          )
+        }
       } catch (exception: Exception) {
         exceptions.add(
           ResourceSyncException(ResourceType.valueOf(it.localChange.resourceType), exception)
@@ -72,5 +85,25 @@ class FhirSynchronizer(
     } else {
       return Result.Error(exceptions)
     }
+  }
+
+  private suspend fun doUpload(
+    localChange: LocalChangeEntity,
+    datasource: FhirDataSource
+  ): Resource =
+    when (localChange.type) {
+      LocalChangeEntity.Type.INSERT ->
+        datasource.insert(localChange.resourceType, localChange.resourceId, localChange.payload)
+      LocalChangeEntity.Type.UPDATE ->
+        datasource.update(localChange.resourceType, localChange.resourceId, localChange.payload)
+      LocalChangeEntity.Type.DELETE ->
+        datasource.delete(localChange.resourceType, localChange.resourceId)
+    }
+
+  private fun Resource.isSuccess(): Boolean {
+    if (!this.resourceType.equals(ResourceType.OperationOutcome)) return false
+    val outcome: OperationOutcome = this as OperationOutcome
+    return outcome.hasIssue() &&
+      issue.all { it.severity.equals(OperationOutcome.IssueSeverity.INFORMATION) }
   }
 }
