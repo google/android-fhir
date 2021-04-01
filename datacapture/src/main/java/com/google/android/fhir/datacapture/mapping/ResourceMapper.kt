@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.mapping
 
+import java.lang.reflect.Method
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateTimeType
@@ -60,9 +61,7 @@ internal object ResourceMapper {
     questionnaireResponse: QuestionnaireResponse
   ): Resource {
     val className = questionnaire.itemContextNameToExpressionMap.values.first()
-    val resource =
-      Class.forName("com.google.android.fhir.datacapture.model.$className").newInstance() as
-        Resource
+    val resource = Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Resource
 
     var questionnaireItemListIterator = questionnaire.item.iterator()
     var questionnaireResponseItemListIterator = questionnaireResponse.item.iterator()
@@ -85,19 +84,10 @@ internal object ResourceMapper {
       }
 
       if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
-        var innerClass: Class<*>
-        try {
-          innerClass =
-            Class.forName(
-              "com.google.android.fhir.datacapture.model.${questionnaireItem.itemComponentContextNameToExpressionMap.values.first()}"
-            )
-        } catch (e: ClassNotFoundException) {
-          innerClass =
-            Class.forName(
-              "org.hl7.fhir.r4.model.${questionnaireItem.itemComponentContextNameToExpressionMap.values.first()}"
-            )
-        }
-
+        val innerClass: Class<*> =
+          Class.forName(
+            "org.hl7.fhir.r4.model.${questionnaireItem.itemComponentContextNameToExpressionMap.values.first()}"
+          )
         val type: Type = innerClass.newInstance() as Type
 
         createInnerClassObject(type, questionnaireItem.item, questionnaireResponseItem.item)
@@ -109,14 +99,38 @@ internal object ResourceMapper {
         continue
       }
 
-      questionnaireItem.type.getClass()?.let {
+      // get answer from questionnaireResponse or from initial value in questionnaire
+      val ans =
+        if (questionnaireResponseItem.answer.isEmpty()) questionnaireItem.initial.first().value
+        else questionnaireResponseItem.answer.first().value
+
+      val itemComponentClassNameToExpressionMap =
+        questionnaireItem.itemComponentContextNameToExpressionMap
+      if (itemComponentClassNameToExpressionMap.isEmpty()) {
+        questionnaireItem.type.getClass()?.let {
+          resource
+            .javaClass
+            .getMethod("set${targetFieldName.capitalize()}Element", it)
+            .invoke(resource, ans)
+        }
+      } else {
+        val dataTypeClass: Class<*> =
+          Class.forName(
+            "org.hl7.fhir.r4.model." + itemComponentClassNameToExpressionMap.values.first()
+          )
+        val fromCodeMethod: Method = dataTypeClass.getDeclaredMethod("fromCode", String::class.java)
+
         resource
           .javaClass
-          .getMethod("set${targetFieldName.capitalize()}Element", it)
-          .invoke(resource, questionnaireResponseItem.answer.first().value)
+          .getMethod(
+            "set${targetFieldName.capitalize()}",
+            Class.forName(
+              "org.hl7.fhir.r4.model." + itemComponentClassNameToExpressionMap.values.first()
+            )
+          )
+          .invoke(resource, fromCodeMethod.invoke(dataTypeClass, ans.toString()))
       }
     }
-
     return resource
   }
 }
@@ -142,27 +156,49 @@ private fun createInnerClassObject(
 
     val targetFieldName = questionnaireItem.definition.substringAfterLast(".")
 
-    try {
-      questionnaireItem.type.getClass()?.let {
-        type
-          .javaClass
-          .getMethod("set${targetFieldName.capitalize()}Element", it)
-          .invoke(type, questionnaireResponseItem.answer.first().value)
+    // get answer from questionnaireResponse or from initial value in questionnaire
+    val answer =
+      if (questionnaireResponseItem.answer.isEmpty()) questionnaireItem.initial.first().value
+      else questionnaireResponseItem.answer.first().value
+
+    val itemComponentClassNameToExpressionMap =
+      questionnaireItem.itemComponentContextNameToExpressionMap
+    if (itemComponentClassNameToExpressionMap.isEmpty()) {
+      // call the set methods by providing the low level data types: StringType, DateType etc
+      try {
+        questionnaireItem.type.getClass()?.let {
+          type
+            .javaClass
+            .getMethod("set${targetFieldName.capitalize()}Element", it)
+            .invoke(type, answer)
+        }
+      } catch (e: NoSuchMethodException) {
+        // some set methods expect a list of objects
+        questionnaireItem.type.getClass()?.let {
+          type
+            .javaClass
+            .getMethod("set${targetFieldName.capitalize()}", List::class.java)
+            .invoke(type, listOf(answer))
+        }
       }
-    } catch (e: NoSuchMethodException) {
-      questionnaireItem.type.getClass()?.let {
-        type
-          .javaClass
-          .getMethod("set${targetFieldName.capitalize()}", List::class.java)
-          .invoke(type, listOf(questionnaireResponseItem.answer.first().value))
-      }
-    } catch (e: NoSuchElementException) {
-      questionnaireItem.type.getClass()?.let {
-        type
-          .javaClass
-          .getMethod("set${targetFieldName.capitalize()}Element", it)
-          .invoke(type, questionnaireItem.initial.first().value)
-      }
+    } else {
+      // call the set methods by providing data type defined defined for the field e.g.
+      // AdministrativeGender
+      val dataTypeClass: Class<*> =
+        Class.forName(
+          "org.hl7.fhir.r4.model." + itemComponentClassNameToExpressionMap.values.first()
+        )
+      val fromCodeMethod: Method = dataTypeClass.getDeclaredMethod("fromCode", String::class.java)
+
+      type
+        .javaClass
+        .getMethod(
+          "set${targetFieldName.capitalize()}",
+          Class.forName(
+            "org.hl7.fhir.r4.model." + itemComponentClassNameToExpressionMap.values.first()
+          )
+        )
+        .invoke(type, fromCodeMethod.invoke(dataTypeClass, answer.toString()))
     }
   }
 }

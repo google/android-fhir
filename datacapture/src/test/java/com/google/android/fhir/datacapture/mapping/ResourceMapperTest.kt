@@ -19,9 +19,9 @@ package com.google.android.fhir.datacapture.mapping
 import android.os.Build
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.datacapture.model.Patient
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
+import org.hl7.fhir.r4.model.Patient
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -95,9 +95,72 @@ class ResourceMapperTest {
                 },
                 {
                   "linkId": "patient-0-gender",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
+                      "valueExpression": {
+                        "language": "application/x-fhir-query",
+                        "expression": "Enumerations$""" +
+        """AdministrativeGender",
+                        "name": "administrativeGender"
+                      }
+                    }
+                  ],
                   "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
                   "type": "string",
                   "text": "Gender"
+                },
+                {
+                  "linkId": "PR-telecom",
+                  "type": "group",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
+                      "valueExpression": {
+                        "language": "application/x-fhir-query",
+                        "expression": "ContactPoint",
+                        "name": "contactPoint"
+                      }
+                    }
+                  ],
+                  "item": [
+                    {
+                      "linkId": "PR-telecom-system",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
+                          "valueExpression": {
+                            "language": "application/x-fhir-query",
+                            "expression": "ContactPoint$""" +
+        """ContactPointSystem",
+                            "name": "contactPointSystem"
+                          }
+                        }
+                      ],
+                      "type": "string",
+                      "text": "system",
+                      "initial": [
+                        {
+                          "valueString": "phone"
+                        }
+                      ],
+                      "enableWhen": [
+                        {
+                          "question": "patient-0-gender",
+                          "operator": "=",
+                          "answerString": "ok"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "PR-telecom-value",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.value",
+                      "type": "string",
+                      "text": "Phone Number"
+                    }
+                  ]
                 },
                 {
                   "linkId": "PR-active",
@@ -127,7 +190,7 @@ class ResourceMapperTest {
                       "linkId": "PR-name-given",
                       "answer": [
                         {
-                          "valueString": "John"
+                          "valueString": "Rodgers"
                         }
                       ]
                     },
@@ -135,7 +198,7 @@ class ResourceMapperTest {
                       "linkId": "PR-name-family",
                       "answer": [
                         {
-                          "valueString": "Doe"
+                          "valueString": "Andati"
                         }
                       ]
                     }
@@ -154,6 +217,22 @@ class ResourceMapperTest {
                   "answer": [
                     {
                       "valueString": "male"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-telecom",
+                  "item": [
+                    {
+                      "linkId": "PR-telecom-system"
+                    },
+                    {
+                      "linkId": "PR-telecom-value",
+                      "answer": [
+                        {
+                          "valueString": "+254711001122"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -184,12 +263,11 @@ class ResourceMapperTest {
       ) as
         org.hl7.fhir.r4.model.QuestionnaireResponse
 
-    val patient =
-      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) as Patient
+    val patient = ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse)
 
-    assertThat(patient.birthDate).isEqualTo(Date(1609448400000))
+    assertThat((patient as Patient).birthDate).isEqualTo(Date(1609448400000))
     assertThat(patient.active).isTrue()
-    assertThat(patient.name.first().given.first().toString()).isEqualTo("John")
-    assertThat(patient.name.first().family).isEqualTo("Doe")
+    assertThat(patient.name.first().given.first().toString()).isEqualTo("Rodgers")
+    assertThat(patient.name.first().family).isEqualTo("Andati")
   }
 }
