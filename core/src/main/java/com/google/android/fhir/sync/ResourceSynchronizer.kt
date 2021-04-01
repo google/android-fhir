@@ -16,11 +16,11 @@
 
 package com.google.android.fhir.sync
 
+import com.google.android.fhir.Constant.LAST_UPDATED_ASC_VALUE
+import com.google.android.fhir.Constant.LAST_UPDATED_KEY
+import com.google.android.fhir.Constant.SORT_KEY
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.sync.SyncData.Companion.LAST_UPDATED_ASC_VALUE
-import com.google.android.fhir.sync.SyncData.Companion.LAST_UPDATED_KEY
-import com.google.android.fhir.sync.SyncData.Companion.SORT_KEY
 import com.google.android.fhir.toTimeZoneString
 import java.io.IOException
 import org.hl7.fhir.r4.model.Bundle

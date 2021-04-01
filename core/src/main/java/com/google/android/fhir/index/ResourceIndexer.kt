@@ -19,6 +19,7 @@ package com.google.android.fhir.index
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
+import com.google.android.fhir.Constant.FHIR_CURRENCY_CODE_SYSTEM
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.NumberIndex
 import com.google.android.fhir.index.entities.PositionIndex
@@ -218,10 +219,4 @@ internal object ResourceIndexer {
       else -> null
     }
   }
-
-  /**
-   * The FHIR currency code system. See: https://bit.ly/30YB3ML. See:
-   * https://www.hl7.org/fhir/valueset-currencies.html.
-   */
-  private const val FHIR_CURRENCY_CODE_SYSTEM = "urn:iso:std:iso:4217"
 }

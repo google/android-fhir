@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.Constant.DEFAULT_DATABASE_NAME
 import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
@@ -168,9 +169,5 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
 
   override suspend fun deleteUpdates(token: LocalChangeToken) {
     localChangeDao.discardLocalChanges(token)
-  }
-
-  companion object {
-    private const val DEFAULT_DATABASE_NAME = "ResourceDatabase"
   }
 }

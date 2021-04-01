@@ -16,12 +16,10 @@
 
 package com.google.android.fhir.resource
 
+import com.google.android.fhir.Constant.R4_RESOURCE_PACKAGE_PREFIX
 import java.lang.reflect.InvocationTargetException
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-
-/** The HAPI Fhir package prefix for R4 resources. */
-internal val R4_RESOURCE_PACKAGE_PREFIX = "org.hl7.fhir.r4.model."
 
 /** Returns the FHIR resource type. */
 internal fun <R : Resource> getResourceType(clazz: Class<R>): ResourceType {

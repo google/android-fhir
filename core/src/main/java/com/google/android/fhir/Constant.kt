@@ -17,4 +17,24 @@
 package com.google.android.fhir
 
 object Constant {
+
+  //From db/impl/DatabaseImpl.kt
+  const val DEFAULT_DATABASE_NAME = "ResourceDatabase"
+
+  //From sync/SyncData.kt
+  const val SORT_KEY = "_sort"
+  const val LAST_UPDATED_KEY = "_lastUpdated"
+  const val ADDRESS_COUNTRY_KEY = "address-country"
+  const val LAST_UPDATED_ASC_VALUE = "_lastUpdated"
+
+  //From index/ResourceIndexer.kt
+  /**
+   * The FHIR currency code system. See: https://bit.ly/30YB3ML. See:
+   * https://www.hl7.org/fhir/valueset-currencies.html.
+   */
+  const val FHIR_CURRENCY_CODE_SYSTEM = "urn:iso:std:iso:4217"
+
+  //From resource/Resources.kt
+  /** The HAPI Fhir package prefix for R4 resources. */
+  const val R4_RESOURCE_PACKAGE_PREFIX = "org.hl7.fhir.r4.model."
 }
