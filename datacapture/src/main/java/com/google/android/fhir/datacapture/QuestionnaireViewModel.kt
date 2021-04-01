@@ -176,13 +176,25 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   QuestionnaireResponse.QuestionnaireResponseItemComponent {
   return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
-    if (this@createQuestionnaireResponseItem.initial.isNotEmpty()) {
+    if (this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
+        this@createQuestionnaireResponseItem.initial.isNotEmpty() &&
+        this@createQuestionnaireResponseItem.initial.size == 1
+    ) {
       answer =
         mutableListOf(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
             value = this@createQuestionnaireResponseItem.initial[0].value
           }
         )
+    } else if (initial.isNotEmpty() &&
+        this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.GROUP
+    ) {
+      throw java.lang.IllegalArgumentException("GROUP type can't have initial value")
+    } else if (initial.isNotEmpty() &&
+        initial.size > 1 &&
+        this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP
+    ) {
+      throw java.lang.IllegalArgumentException("Can't set more than 1 initial values")
     }
     this@createQuestionnaireResponseItem.item.forEach {
       this.addItem(it.createQuestionnaireResponseItem())
