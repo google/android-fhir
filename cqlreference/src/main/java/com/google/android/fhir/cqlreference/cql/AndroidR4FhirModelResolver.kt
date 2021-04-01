@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.cqlreference.cql
 
+import com.google.android.fhir.cqlreference.Constant.NAMESPACE_URI_PREFIX
 import org.hl7.fhir.instance.model.api.IBase
 import org.opencds.cqf.cql.model.R4FhirModelResolver
 
@@ -45,13 +46,5 @@ internal class AndroidR4FhirModelResolver : R4FhirModelResolver() {
       .asSequence()
       .mapNotNull { child -> innerGetContextPath(child, type) }
       .firstOrNull()
-  }
-
-  companion object {
-    /**
-     * A prefix that is incorrectly included on Android due to the inconsistency of JSON
-     * deserialization.
-     */
-    const val NAMESPACE_URI_PREFIX = "{http://hl7.org/fhir}"
   }
 }

@@ -17,4 +17,12 @@
 package com.google.android.fhir.cqlreference
 
 object Constant {
+
+  //From cql/AndroidR4FhirModelResolver.kt
+  /**
+   * A prefix that is incorrectly included on Android due to the inconsistency of JSON
+   * deserialization.
+   */
+  const val NAMESPACE_URI_PREFIX = "{http://hl7.org/fhir}"
+
 }
