@@ -329,7 +329,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun hasInitialValue_shouldSetValueInUIAndQuestionResponse() {
+  fun questionnaireHasInitialValue_shouldSetAnswerValueInQuestionnaireResponse() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
