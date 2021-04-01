@@ -176,37 +176,29 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   QuestionnaireResponse.QuestionnaireResponseItemComponent {
   return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
-    if (this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
-        this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.DISPLAY &&
-        this@createQuestionnaireResponseItem.initial.isNotEmpty() &&
-        this@createQuestionnaireResponseItem.initial.size == 1
-    ) {
-      answer =
-        mutableListOf(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = this@createQuestionnaireResponseItem.initial[0].value
-          }
-        )
-    } else if (initial.isNotEmpty() &&
-        this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.GROUP
-    ) {
-      throw IllegalArgumentException(
-        "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} breaks the rule (type!='group' and type!='display') or initial.empty()"
-      )
-    } else if (initial.isNotEmpty() &&
-        this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.DISPLAY
-    ) {
-      throw IllegalArgumentException(
-        "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} breaks the rule (type!='group' and type!='display') or initial.empty()"
-      )
-    } else if (initial.isNotEmpty() &&
-        initial.size > 1 &&
-        this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
-        this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.DISPLAY
-    ) {
-      throw IllegalArgumentException(
-        "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} breaks the rule initial.count() <= 1"
-      )
+    if (this@createQuestionnaireResponseItem.initial.isNotEmpty()) {
+      if (this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
+          this@createQuestionnaireResponseItem.type !=
+            Questionnaire.QuestionnaireItemType.DISPLAY &&
+          this@createQuestionnaireResponseItem.initial.size == 1
+      ) {
+        answer =
+          mutableListOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = this@createQuestionnaireResponseItem.initial[0].value
+            }
+          )
+      } else if (this@createQuestionnaireResponseItem.type ==
+          Questionnaire.QuestionnaireItemType.GROUP ||
+          this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.DISPLAY
+      ) {
+        "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} have initial value whereas it should not"
+      } else if (initial.size > 1 &&
+          this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
+          this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.DISPLAY
+      ) {
+        "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} have more than one initial value which is not allowed"
+      }
     }
     this@createQuestionnaireResponseItem.item.forEach {
       this.addItem(it.createQuestionnaireResponseItem())
