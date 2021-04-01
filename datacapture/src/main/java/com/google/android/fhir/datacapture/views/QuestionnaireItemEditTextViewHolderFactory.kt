@@ -21,6 +21,8 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputEditText
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -48,7 +50,21 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textInputEditText.doAfterTextChanged { editable: Editable? ->
       questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
       questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+      applyValidationResult(
+        QuestionnaireResponseItemValidator.validate(
+          questionnaireItemViewItem.questionnaireItem,
+          questionnaireItemViewItem.questionnaireResponseItem
+        )
+      )
     }
+  }
+
+  private fun applyValidationResult(validationResult: ValidationResult) {
+    val validationMessage =
+      validationResult.validationMessages.joinToString {
+        it.plus(System.getProperty("line.separator"))
+      }
+    textInputEditText.error = if (validationMessage == "") null else validationMessage
   }
 
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
