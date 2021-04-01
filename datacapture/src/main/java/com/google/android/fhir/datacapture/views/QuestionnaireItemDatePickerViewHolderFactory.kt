@@ -24,6 +24,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.FragmentResultListener
+import com.google.android.fhir.datacapture.Constant
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
 import java.time.LocalDate
@@ -56,15 +57,15 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           // from the view's context.
           val context = itemView.context.tryUnwrapContext()!!
           context.supportFragmentManager.setFragmentResultListener(
-            DatePickerFragment.RESULT_REQUEST_KEY,
+            Constant.RESULT_DATE_PICKER_REQUEST_KEY,
             context,
             object : FragmentResultListener {
               // java.time APIs can be used with desugaring
               @SuppressLint("NewApi")
               override fun onFragmentResult(requestKey: String, result: Bundle) {
-                val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
-                val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
-                val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
+                val year = result.getInt(Constant.RESULT_DATE_PICKER_BUNDLE_KEY_YEAR)
+                val month = result.getInt(Constant.RESULT_DATE_PICKER_BUNDLE_KEY_MONTH)
+                val dayOfMonth = result.getInt(Constant.RESULT_DATE_PICKER_BUNDLE_KEY_DAY_OF_MONTH)
                 textInputEditText.setText(
                   LocalDate.of(
                       year,
@@ -85,7 +86,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
               }
             }
           )
-          DatePickerFragment().show(context.supportFragmentManager, DatePickerFragment.TAG)
+          DatePickerFragment().show(context.supportFragmentManager, Constant.TAG_DATE_PICKER)
           // Clear focus so that the user can refocus to open the dialog
           textDateQuestion.clearFocus()
         }

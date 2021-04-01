@@ -24,6 +24,9 @@ import android.widget.TimePicker
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
+import com.google.android.fhir.datacapture.Constant.RESULT_TIME_PICKER_BUNDLE_KEY_HOUR
+import com.google.android.fhir.datacapture.Constant.RESULT_TIME_PICKER_BUNDLE_KEY_MINUTE
+import com.google.android.fhir.datacapture.Constant.RESULT_TIME_PICKER_REQUEST_KEY
 import java.time.LocalTime
 
 internal class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener {
@@ -36,16 +39,9 @@ internal class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSet
 
   override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
     setFragmentResult(
-      RESULT_REQUEST_KEY,
-      bundleOf(RESULT_BUNDLE_KEY_HOUR to hourOfDay, RESULT_BUNDLE_KEY_MINUTE to minute)
+      RESULT_TIME_PICKER_REQUEST_KEY,
+      bundleOf(RESULT_TIME_PICKER_BUNDLE_KEY_HOUR to hourOfDay, RESULT_TIME_PICKER_BUNDLE_KEY_MINUTE to minute)
     )
     dismiss()
-  }
-
-  companion object {
-    const val TAG = "time-picker-fragment"
-    const val RESULT_REQUEST_KEY = "time-picker-request-key"
-    const val RESULT_BUNDLE_KEY_HOUR = "time-picker-bundle-key-hour"
-    const val RESULT_BUNDLE_KEY_MINUTE = "time-picker-bundle-key-minute"
   }
 }

@@ -20,6 +20,7 @@ import android.os.Build
 import androidx.lifecycle.SavedStateHandle
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.datacapture.Constant.BUNDLE_KEY_QUESTIONNAIRE
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertFailsWith
 import kotlinx.coroutines.runBlocking
@@ -48,7 +49,7 @@ class QuestionnaireViewModelTest {
   fun stateHasNoQuestionnaireResponse_shouldCopyQuestionnaireId() {
     val questionnaire = Questionnaire().setId("a-questionnaire")
     val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+    state.set(Constant.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
     val viewModel = QuestionnaireViewModel(state)
 
     assertResourceEquals(
@@ -71,7 +72,7 @@ class QuestionnaireViewModelTest {
         )
       }
     val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+    state.set(Constant.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
     val viewModel = QuestionnaireViewModel(state)
 
     assertResourceEquals(
@@ -106,7 +107,7 @@ class QuestionnaireViewModelTest {
         )
       }
     val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+    state.set(Constant.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
     val viewModel = QuestionnaireViewModel(state)
 
     assertResourceEquals(
@@ -188,9 +189,9 @@ class QuestionnaireViewModelTest {
         )
       }
     val serializedQuestionnaireResponse = printer.encodeResourceToString(questionnaireResponse)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+    state.set(Constant.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
     state.set(
-      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
+      Constant.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
       serializedQuestionnaireResponse
     )
 
@@ -245,9 +246,9 @@ class QuestionnaireViewModelTest {
         )
       }
     val serializedQuestionnaireResponse = printer.encodeResourceToString(questionnaireResponse)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+    state.set(Constant.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
     state.set(
-      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
+      Constant.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
       serializedQuestionnaireResponse
     )
 
@@ -283,9 +284,9 @@ class QuestionnaireViewModelTest {
         )
       }
     val serializedQuestionniareResponse = printer.encodeResourceToString(questionnaireResponse)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+    state.set(Constant.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
     state.set(
-      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
+      Constant.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
       serializedQuestionniareResponse
     )
 
@@ -315,9 +316,9 @@ class QuestionnaireViewModelTest {
     val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
     val questionnaireResponse = QuestionnaireResponse().apply { id = "a-questionnaire-response" }
     val serializedQuestionniareResponse = printer.encodeResourceToString(questionnaireResponse)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+    state.set(Constant.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
     state.set(
-      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
+      Constant.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
       serializedQuestionniareResponse
     )
 
@@ -367,9 +368,9 @@ class QuestionnaireViewModelTest {
         )
       }
     val serializedQuestionniareResponse = printer.encodeResourceToString(questionnaireResponse)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+    state.set(Constant.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
     state.set(
-      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
+      Constant.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
       serializedQuestionniareResponse
     )
 
@@ -403,7 +404,7 @@ class QuestionnaireViewModelTest {
         )
       }
     val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+    state.set(Constant.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
     val viewModel = QuestionnaireViewModel(state)
     var questionnaireItemViewItemList = viewModel.questionnaireItemViewItemList
     questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()

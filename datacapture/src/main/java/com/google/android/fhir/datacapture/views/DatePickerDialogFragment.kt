@@ -24,6 +24,10 @@ import android.widget.DatePicker
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
+import com.google.android.fhir.datacapture.Constant.RESULT_DATE_PICKER_BUNDLE_KEY_DAY_OF_MONTH
+import com.google.android.fhir.datacapture.Constant.RESULT_DATE_PICKER_BUNDLE_KEY_MONTH
+import com.google.android.fhir.datacapture.Constant.RESULT_DATE_PICKER_BUNDLE_KEY_YEAR
+import com.google.android.fhir.datacapture.Constant.RESULT_DATE_PICKER_REQUEST_KEY
 import java.time.LocalDate
 
 internal class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSetListener {
@@ -45,21 +49,13 @@ internal class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSet
 
   override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
     setFragmentResult(
-      RESULT_REQUEST_KEY,
+      RESULT_DATE_PICKER_REQUEST_KEY,
       bundleOf(
-        RESULT_BUNDLE_KEY_YEAR to year,
-        RESULT_BUNDLE_KEY_MONTH to month,
-        RESULT_BUNDLE_KEY_DAY_OF_MONTH to dayOfMonth
+        RESULT_DATE_PICKER_BUNDLE_KEY_YEAR to year,
+        RESULT_DATE_PICKER_BUNDLE_KEY_MONTH to month,
+        RESULT_DATE_PICKER_BUNDLE_KEY_DAY_OF_MONTH to dayOfMonth
       )
     )
     dismiss()
-  }
-
-  companion object {
-    const val TAG = "date-picker-fragment"
-    const val RESULT_REQUEST_KEY = "date-picker-request-key"
-    const val RESULT_BUNDLE_KEY_YEAR = "date-picker-bundle-key-year"
-    const val RESULT_BUNDLE_KEY_MONTH = "date-picker-bundle-key-month"
-    const val RESULT_BUNDLE_KEY_DAY_OF_MONTH = "date-picker-bundle-day-of-month"
   }
 }

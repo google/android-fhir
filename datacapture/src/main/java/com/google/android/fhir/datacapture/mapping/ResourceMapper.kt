@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.mapping
 
+import com.google.android.fhir.datacapture.Constant.ITEM_CONTEXT_EXTENSION_URL
 import com.google.android.fhir.datacapture.getValueForType
 import java.util.Locale
 import org.hl7.fhir.r4.model.Base
@@ -153,11 +154,3 @@ private val Questionnaire.itemContextNameToExpressionMap: Map<String, String>
       }
       .toMap()
   }
-
-/**
- * See
- * [Extension: item extraction context](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemExtractionContext.html)
- * .
- */
-private const val ITEM_CONTEXT_EXTENSION_URL: String =
-  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext"

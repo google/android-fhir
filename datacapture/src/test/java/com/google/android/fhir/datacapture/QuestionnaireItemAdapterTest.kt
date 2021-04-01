@@ -17,6 +17,10 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Build
+import com.google.android.fhir.datacapture.Constant.EXTENSION_ITEM_CONTROL_SYSTEM
+import com.google.android.fhir.datacapture.Constant.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.Constant.ITEM_CONTROL_DROP_DOWN
+import com.google.android.fhir.datacapture.Constant.ITEM_CONTROL_RADIO_BUTTON
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.CodeableConcept

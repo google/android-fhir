@@ -33,7 +33,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   private val questionnaire: Questionnaire
 
   init {
-    val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
+    val questionnaireJson: String = state[Constant.BUNDLE_KEY_QUESTIONNAIRE]!!
     questionnaire =
       FhirContext.forR4().newJsonParser().parseResource(questionnaireJson) as Questionnaire
   }
@@ -43,7 +43,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
   init {
     val questionnaireJsonResponseString: String? =
-      state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
+      state[Constant.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE]
     if (questionnaireJsonResponseString != null) {
       questionnaireResponse =
         FhirContext.forR4().newJsonParser().parseResource(questionnaireJsonResponseString) as

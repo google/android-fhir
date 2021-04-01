@@ -16,15 +16,12 @@
 
 package com.google.android.fhir.datacapture
 
+import com.google.android.fhir.datacapture.Constant.EXTENSION_ITEM_CONTROL_SYSTEM
+import com.google.android.fhir.datacapture.Constant.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.Constant.ITEM_CONTROL_DROP_DOWN
+import com.google.android.fhir.datacapture.Constant.ITEM_CONTROL_RADIO_BUTTON
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
-
-internal const val ITEM_CONTROL_DROP_DOWN = "drop-down"
-internal const val ITEM_CONTROL_RADIO_BUTTON = "radio-button"
-
-internal const val EXTENSION_ITEM_CONTROL_URL =
-  "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
-internal const val EXTENSION_ITEM_CONTROL_SYSTEM = "http://hl7.org/fhir/questionnaire-item-control"
 
 // Item control code as string or null
 internal val Questionnaire.QuestionnaireItemComponent.itemControl: String?

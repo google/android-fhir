@@ -19,6 +19,8 @@ package com.google.android.fhir.datacapture.views
 import android.annotation.SuppressLint
 import android.view.View
 import android.widget.TextView
+import com.google.android.fhir.datacapture.Constant
+import com.google.android.fhir.datacapture.Constant.RESULT_TIME_PICKER_REQUEST_KEY
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.textfield.TextInputEditText
 import java.time.LocalDateTime
@@ -54,12 +56,12 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           // from the view's context.
           val context = itemView.context.tryUnwrapContext()!!
           context.supportFragmentManager.setFragmentResultListener(
-            DatePickerFragment.RESULT_REQUEST_KEY,
+            Constant.RESULT_DATE_PICKER_REQUEST_KEY,
             context
           ) { _, result ->
-            val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
-            val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
-            val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
+            val year = result.getInt(Constant.RESULT_DATE_PICKER_BUNDLE_KEY_YEAR)
+            val month = result.getInt(Constant.RESULT_DATE_PICKER_BUNDLE_KEY_MONTH)
+            val dayOfMonth = result.getInt(Constant.RESULT_DATE_PICKER_BUNDLE_KEY_DAY_OF_MONTH)
             val localDateTime =
               LocalDateTime.of(
                 year,
@@ -74,7 +76,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             updateDateTimeInput(localDateTime)
             updateDateTimeAnswer(localDateTime)
           }
-          DatePickerFragment().show(context.supportFragmentManager, DatePickerFragment.TAG)
+          DatePickerFragment().show(context.supportFragmentManager, Constant.TAG_DATE_PICKER)
           // Clear focus so that the user can refocus to open the dialog
           textDateQuestion.clearFocus()
         }
@@ -93,18 +95,18 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           // from the view's context.
           val context = itemView.context.tryUnwrapContext()!!
           context.supportFragmentManager.setFragmentResultListener(
-            TimePickerFragment.RESULT_REQUEST_KEY,
+            Constant.RESULT_TIME_PICKER_REQUEST_KEY,
             context
           ) { _, result ->
-            val hour = result.getInt(TimePickerFragment.RESULT_BUNDLE_KEY_HOUR)
-            val minute = result.getInt(TimePickerFragment.RESULT_BUNDLE_KEY_MINUTE)
+            val hour = result.getInt(Constant.RESULT_TIME_PICKER_BUNDLE_KEY_HOUR)
+            val minute = result.getInt(Constant.RESULT_TIME_PICKER_BUNDLE_KEY_MINUTE)
             val localDate = questionnaireItemViewItem.singleAnswerOrNull!!.valueDateTimeType
             val localDateTime =
               LocalDateTime.of(localDate.year, localDate.month, localDate.day, hour, minute, 0)
             updateDateTimeInput(localDateTime)
             updateDateTimeAnswer(localDateTime)
           }
-          TimePickerFragment().show(context.supportFragmentManager, TimePickerFragment.TAG)
+          TimePickerFragment().show(context.supportFragmentManager, Constant.TAG_TIME_PICKER)
           // Clear focus so that the user can refocus to open the dialog
           textTimeQuestion.clearFocus()
         }
