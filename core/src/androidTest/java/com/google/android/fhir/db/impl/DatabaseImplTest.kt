@@ -59,8 +59,8 @@ class DatabaseImplTest {
         resourceType: String,
         resourceId: String,
         payload: String
-      ): OperationOutcome {
-        return OperationOutcome()
+      ): Resource {
+        return Patient()
       }
 
       override suspend fun update(
