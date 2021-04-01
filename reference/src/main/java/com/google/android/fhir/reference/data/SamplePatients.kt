@@ -18,12 +18,11 @@ package com.google.android.fhir.reference.data
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.reference.Constant.MAX_RESOURCE_COUNT
 import com.google.android.fhir.reference.PatientListViewModel
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
-
-private const val MAX_RESOURCE_COUNT = 20
 
 /**
  * Helper class for loading a list of sample Fhir Patient Resource objects.
@@ -36,8 +35,6 @@ class SamplePatients {
   private var fhirBundle: Bundle? = null
 
   companion object {
-    val tag = "SamplePatient"
-
     val fhirJsonParser: IParser = FhirContext.forR4().newJsonParser()
   }
   /** Returns list of PatientItem objects based on patients from the json string. */

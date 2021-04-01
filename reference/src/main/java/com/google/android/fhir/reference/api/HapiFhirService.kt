@@ -17,6 +17,7 @@
 package com.google.android.fhir.reference.api
 
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.reference.Constant.HAPI_FHIR_BASE_URL
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.hl7.fhir.r4.model.Bundle
@@ -31,15 +32,13 @@ interface HapiFhirService {
   @GET suspend fun getResource(@Url url: String): Bundle
 
   companion object {
-    const val BASE_URL = "https://hapi.fhir.org/baseR4/"
-
-    fun create(parser: IParser): HapiFhirService {
+      fun create(parser: IParser): HapiFhirService {
       val logger = HttpLoggingInterceptor()
       logger.level = HttpLoggingInterceptor.Level.BODY
 
       val client = OkHttpClient.Builder().addInterceptor(logger).build()
       return Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(HAPI_FHIR_BASE_URL)
         .client(client)
         .addConverterFactory(FhirConverterFactory(parser))
         .addConverterFactory(GsonConverterFactory.create())

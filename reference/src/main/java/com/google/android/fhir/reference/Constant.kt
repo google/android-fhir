@@ -17,4 +17,11 @@
 package com.google.android.fhir.reference
 
 object Constant {
+  //From SamplePatiens.kt
+  const val MAX_RESOURCE_COUNT = 20
+  const val TAG_SAMPLE_PATIENT = "SamplePatient"
+
+  //From api/HapiFhirService.kt
+  const val HAPI_FHIR_BASE_URL = "https://hapi.fhir.org/baseR4/"
+
 }
