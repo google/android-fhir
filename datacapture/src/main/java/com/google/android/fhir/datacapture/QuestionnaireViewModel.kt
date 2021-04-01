@@ -192,12 +192,16 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
           Questionnaire.QuestionnaireItemType.GROUP ||
           this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.DISPLAY
       ) {
-        "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} have initial value whereas it should not"
+        throw IllegalArgumentException(
+          "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} have initial value whereas it should not"
+        )
       } else if (initial.size > 1 &&
           this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
           this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.DISPLAY
       ) {
-        "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} have more than one initial value which is not allowed"
+        throw IllegalArgumentException(
+          "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} have more than one initial value which is not allowed"
+        )
       }
     }
     this@createQuestionnaireResponseItem.item.forEach {

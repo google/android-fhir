@@ -370,6 +370,47 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
+  fun questionnaireHasInitialValueButQuestionnareResponseAsEmpty_shouldSetEmptyAnswer() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            initial =
+              mutableListOf(
+                Questionnaire.QuestionnaireItemInitialComponent().apply { value = valueCoding }
+              )
+          }
+        )
+      }
+    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = StringType("")
+              }
+            )
+          }
+        )
+      }
+    val serializedQuestionniareResponse = printer.encodeResourceToString(questionnaireResponse)
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+    state.set(
+      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
+      serializedQuestionniareResponse
+    )
+    QuestionnaireViewModel(state)
+  }
+
+  @Test
   fun stateHasQuestionnaireResponse_moreItemsInQuestionnaireResponse_shouldThrowError() {
     val questionnaire =
       Questionnaire().apply {
