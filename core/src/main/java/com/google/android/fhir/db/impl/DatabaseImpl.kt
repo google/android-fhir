@@ -19,6 +19,7 @@ package com.google.android.fhir.db.impl
 import android.content.Context
 import androidx.room.Room
 import androidx.room.Transaction
+import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.Constant.DEFAULT_DATABASE_NAME
 import com.google.android.fhir.db.ResourceNotFoundInDbException
@@ -28,7 +29,7 @@ import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.getResourceType
-import com.google.android.fhir.search.impl.Query
+import com.google.android.fhir.search.SearchQuery
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -154,8 +155,10 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
     return searchByCode(clazz, code, codeSystem, codeValue).filter { refs.contains(it.logicalId) }
   }
 
-  override suspend fun <R : Resource> search(query: Query): List<R> =
-    resourceDao.getResources(query.getSupportSQLiteQuery()).map { iParser.parseResource(it) as R }
+  override suspend fun <R : Resource> search(query: SearchQuery): List<R> =
+    resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).map {
+      iParser.parseResource(it) as R
+    }
 
   /**
    * @returns a list of pairs. Each pair is a token + squashed local change. Each token is a list of
@@ -163,7 +166,8 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
    */
   // TODO: create a data class for squashed local change and merge token in to it.
   override suspend fun getAllLocalChanges(): List<Pair<LocalChangeToken, LocalChangeEntity>> =
-    localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
+    localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map { it
+      ->
       LocalChangeToken(it.map { it.id }) to LocalChangeUtils.squash(it)
     }
 

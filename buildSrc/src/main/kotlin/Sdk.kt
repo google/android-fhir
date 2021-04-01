@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.search.impl
-
-import androidx.sqlite.db.SimpleSQLiteQuery
-import androidx.sqlite.db.SupportSQLiteQuery
-
-/** Query that returns a list of resource IDs. */
-abstract class Query {
-  abstract fun getQueryString(): String
-  abstract fun getQueryArgs(): List<Any>
-  fun getSupportSQLiteQuery(): SupportSQLiteQuery =
-    SimpleSQLiteQuery(getQueryString(), getQueryArgs().toTypedArray())
+object Sdk {
+  const val compileSdk = 29
+  const val minSdk = 21
+  const val targetSdk = 29
 }

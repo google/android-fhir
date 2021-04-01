@@ -81,6 +81,11 @@ class QuestionnaireListFragment : Fragment() {
             "HIV-Risk Assessment",
             "iprd-hiv-fhir-questionnaire.json"
           ),
+          QuestionnaireListItem(
+            "HIV-Risk Assessment with Initial Values",
+            "HIV-Risk Assessment with some Initial Values",
+            "iprd-hiv-fhir-questionnaire-initial.json"
+          ),
           // Example taken from
           // https://www.hl7.org/fhir/questionnaire-example-f201-lifelines.json.html &
           // https://www.hl7.org/fhir/questionnaireResponse-example-f201-lifelines.json.html
