@@ -177,6 +177,7 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
     if (this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
+        this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.DISPLAY &&
         this@createQuestionnaireResponseItem.initial.isNotEmpty() &&
         this@createQuestionnaireResponseItem.initial.size == 1
     ) {
@@ -189,12 +190,23 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
     } else if (initial.isNotEmpty() &&
         this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.GROUP
     ) {
-      throw java.lang.IllegalArgumentException("GROUP type can't have initial value")
+      throw IllegalArgumentException(
+        "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} breaks the rule (type!='group' and type!='display') or initial.empty()"
+      )
+    } else if (initial.isNotEmpty() &&
+        this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.DISPLAY
+    ) {
+      throw IllegalArgumentException(
+        "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} breaks the rule (type!='group' and type!='display') or initial.empty()"
+      )
     } else if (initial.isNotEmpty() &&
         initial.size > 1 &&
-        this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP
+        this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
+        this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.DISPLAY
     ) {
-      throw java.lang.IllegalArgumentException("Can't set more than 1 initial values")
+      throw IllegalArgumentException(
+        "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} breaks the rule initial.count() <= 1"
+      )
     }
     this@createQuestionnaireResponseItem.item.forEach {
       this.addItem(it.createQuestionnaireResponseItem())
