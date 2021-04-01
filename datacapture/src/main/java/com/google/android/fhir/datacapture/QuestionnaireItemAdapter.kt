@@ -20,6 +20,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.google.android.fhir.datacapture.Constant.ITEM_CONTROL_DROP_DOWN
+import com.google.android.fhir.datacapture.Constant.ITEM_CONTROL_RADIO_BUTTON
+import com.google.android.fhir.datacapture.Constant.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDateTimePickerViewHolderFactory
@@ -110,11 +112,6 @@ internal class QuestionnaireItemAdapter :
     } else {
       return QuestionnaireItemViewHolderType.RADIO_GROUP
     }
-  }
-
-  internal companion object {
-    // Choice questions are rendered as radio group if number of options less than this constant
-    const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN = 4
   }
 }
 

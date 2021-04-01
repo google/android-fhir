@@ -32,6 +32,9 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.datacapture.gallery.Constant.QUESTIONNAIRE_FILE_PATH_KEY
+import com.google.android.fhir.datacapture.gallery.Constant.QUESTIONNAIRE_FRAGMENT_TAG
+import com.google.android.fhir.datacapture.gallery.Constant.QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY
 import com.google.android.fhir.datacapture.gallery.databinding.FragmentQuestionnaireContainerBinding
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -68,8 +71,8 @@ class QuestionnaireContainerFragment : Fragment() {
       val fragment = QuestionnaireFragment()
       fragment.arguments =
         bundleOf(
-          QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire,
-          QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to viewModel.questionnaireResponse
+          Constant.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire,
+          Constant.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to viewModel.questionnaireResponse
         )
       childFragmentManager.commit { add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG) }
     }
@@ -105,12 +108,6 @@ class QuestionnaireContainerFragment : Fragment() {
     dialogFragment.arguments =
       bundleOf(QuestionnaireResponseDialogFragment.BUNDLE_KEY_CONTENTS to questionnaireResponseJson)
     dialogFragment.show(childFragmentManager, QuestionnaireResponseDialogFragment.TAG)
-  }
-
-  companion object {
-    const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
-    const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
-    const val QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY = "questionnaire-response-file-path-key"
   }
 
   override fun onDestroyView() {

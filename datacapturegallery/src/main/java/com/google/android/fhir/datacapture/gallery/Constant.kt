@@ -17,4 +17,14 @@
 package com.google.android.fhir.datacapture.gallery
 
 object Constant {
+
+  //From<another app> datacapture/QuestionnaireFragment.kt
+  const val BUNDLE_KEY_QUESTIONNAIRE = "questionnaire"
+  const val BUNDLE_KEY_QUESTIONNAIRE_RESPONSE = "questionnaire-response"
+
+  //From QuestionnaireContainerFragment
+  const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
+  const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
+  const val QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY = "questionnaire-response-file-path-key"
+
 }

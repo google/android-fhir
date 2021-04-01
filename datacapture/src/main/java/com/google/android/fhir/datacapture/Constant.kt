@@ -51,6 +51,13 @@ object Constant {
   const val RESULT_TIME_PICKER_BUNDLE_KEY_HOUR = "time-picker-bundle-key-hour"
   const val RESULT_TIME_PICKER_BUNDLE_KEY_MINUTE = "time-picker-bundle-key-minute"
 
+  //From views/QuestionnaireItemDatePickerViewHolder
+  const val NUMBER_OF_MICROSECONDS_PER_SECOND = 1000000
+  const val NUMBER_OF_MICROSECONDS_PER_MILLISECOND = 1000
 
-
+  //From QuestionnaireItemAdapter.kt
+  /**
+   * Choice questions are rendered as radio group if number of options less than this constant
+   */
+  const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN = 4
 }

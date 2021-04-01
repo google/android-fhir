@@ -124,9 +124,6 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
   val LOCAL_DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE!!
 }
 
-const val NUMBER_OF_MICROSECONDS_PER_SECOND = 1000000
-const val NUMBER_OF_MICROSECONDS_PER_MILLISECOND = 1000
-
 /**
  * Returns the [AppCompatActivity] if there exists one wrapped inside [ContextThemeWrapper] s, or
  * `null` otherwise.

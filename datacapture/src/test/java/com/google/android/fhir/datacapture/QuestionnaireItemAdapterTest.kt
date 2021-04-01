@@ -21,6 +21,7 @@ import com.google.android.fhir.datacapture.Constant.EXTENSION_ITEM_CONTROL_SYSTE
 import com.google.android.fhir.datacapture.Constant.EXTENSION_ITEM_CONTROL_URL
 import com.google.android.fhir.datacapture.Constant.ITEM_CONTROL_DROP_DOWN
 import com.google.android.fhir.datacapture.Constant.ITEM_CONTROL_RADIO_BUTTON
+import com.google.android.fhir.datacapture.Constant.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -192,7 +193,7 @@ class QuestionnaireItemAdapterTest {
   @Test
   fun getItemViewType_choiceItemType_moreAnswerOptions_shouldReturnDropDownViewHolderType() {
     val answerOptions =
-      List(QuestionnaireItemAdapter.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN) {
+      List(Constant.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN) {
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
           .setValue(Coding().setCode("test-code").setDisplay("Test Code"))
       }
@@ -215,7 +216,7 @@ class QuestionnaireItemAdapterTest {
   @Test
   fun getItemViewType_choiceItemType_itemControlExtensionWithRadioButton_shouldReturnRadioGroupViewHolder() { // ktlint-disable max-line-length
     val answerOptions =
-      List(QuestionnaireItemAdapter.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN) {
+      List(Constant.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN) {
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
           .setValue(Coding().setCode("test-code").setDisplay("Test Code"))
       }
