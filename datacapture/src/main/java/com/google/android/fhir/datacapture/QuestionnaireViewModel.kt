@@ -193,14 +193,14 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
           this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.DISPLAY
       ) {
         throw IllegalArgumentException(
-          "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} have initial value whereas it should not"
+          "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
         )
       } else if (initial.size > 1 &&
           this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
           this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.DISPLAY
       ) {
         throw IllegalArgumentException(
-          "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} have more than one initial value which is not allowed"
+          "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} has initial value(s). See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
         )
       }
     }
