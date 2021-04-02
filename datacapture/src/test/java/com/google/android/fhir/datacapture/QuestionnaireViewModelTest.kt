@@ -435,7 +435,9 @@ class QuestionnaireViewModelTest {
       assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state) }.localizedMessage
 
     assertThat(errorMessage)
-      .isEqualTo("Questionnaire item a-link-id has initial value(s). See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.")
+      .isEqualTo(
+        "Questionnaire item a-link-id has initial value(s). See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+      )
   }
 
   @Test
@@ -450,7 +452,7 @@ class QuestionnaireViewModelTest {
             type = Questionnaire.QuestionnaireItemType.GROUP
             initial =
               mutableListOf(
-                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true)),
+                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true))
               )
           }
         )
@@ -462,7 +464,9 @@ class QuestionnaireViewModelTest {
       assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state) }.localizedMessage
 
     assertThat(errorMessage)
-      .isEqualTo("Questionnaire item a-link-id has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.")
+      .isEqualTo(
+        "Questionnaire item a-link-id has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+      )
   }
 
   @Test
@@ -477,7 +481,7 @@ class QuestionnaireViewModelTest {
             type = Questionnaire.QuestionnaireItemType.DISPLAY
             initial =
               mutableListOf(
-                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true)),
+                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true))
               )
           }
         )
@@ -489,7 +493,9 @@ class QuestionnaireViewModelTest {
       assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state) }.localizedMessage
 
     assertThat(errorMessage)
-      .isEqualTo("Questionnaire item a-link-id has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.")
+      .isEqualTo(
+        "Questionnaire item a-link-id has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+      )
   }
 
   @Test
