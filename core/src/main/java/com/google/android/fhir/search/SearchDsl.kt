@@ -16,15 +16,18 @@
 
 package com.google.android.fhir.search
 
+import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import org.hl7.fhir.r4.model.ResourceType
+import java.math.BigDecimal
 
 @SearchDslMarker
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
   internal val stringFilters = mutableListOf<StringFilter>()
   internal val referenceFilter = mutableListOf<ReferenceFilter>()
+  internal val dateFilter = mutableListOf<DateFilter>()
   internal var sort: StringClientParam? = null
   internal var order: Order? = null
 
@@ -40,6 +43,12 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     referenceFilter.add(filter)
   }
 
+  fun filter(dateParameter: DateClientParam , init: DateFilter.()-> Unit ){
+    val filter = DateFilter(dateParameter)
+    filter.init()
+    dateFilter.add(filter)
+  }
+
   fun sort(parameter: StringClientParam, order: Order) {
     sort = parameter
     this.order = order
@@ -51,6 +60,13 @@ data class StringFilter(
   val parameter: StringClientParam,
   var prefix: ParamPrefixEnum? = null,
   var value: String? = null
+)
+
+@SearchDslMarker
+data class DateFilter(
+  val parameter: DateClientParam,
+  var prefix : ParamPrefixEnum? = null,
+  var value: BigDecimal? = null
 )
 
 @SearchDslMarker

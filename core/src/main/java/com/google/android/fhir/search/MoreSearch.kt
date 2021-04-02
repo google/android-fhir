@@ -43,7 +43,7 @@ fun Search.getQuery(): SearchQuery {
   var filterStatement = ""
   val filterArgs = mutableListOf<Any>()
   val filterQuery =
-    (stringFilters.map { it.query(type) } + referenceFilter.map { it.query(type) }).intersect()
+    (stringFilters.map { it.query(type) } + referenceFilter.map { it.query(type) } + dateFilter.map { it.query(type) }).intersect()
   if (filterQuery != null) {
     filterStatement =
       """
@@ -99,6 +99,15 @@ fun ReferenceFilter.query(type: ResourceType): SearchQuery {
     """,
     listOf(type.name, parameter!!.paramName, value!!)
   )
+}
+
+fun DateFilter.query(type: ResourceType): SearchQuery {
+  return SearchQuery(
+    """
+    SELECT resourceId form DateIndexEntity 
+    WHERE resourceType = ? AND index_name = ? AND ? BETWEEN index_tsLow AND index_tsHigh
+  """, listOf(type.name, parameter.paramName, value!!))
+
 }
 
 fun List<SearchQuery>.intersect(): SearchQuery? {

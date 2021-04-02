@@ -26,6 +26,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.math.BigDecimal
 
 /** Unit tests for [MoreSearch]. */
 @RunWith(RobolectricTestRunner::class)
@@ -117,6 +118,31 @@ class SearchTest {
           "Jones"
         )
       )
+  }
+
+  @Test
+  fun search_date(){
+    val query =
+      Search(ResourceType.Patient).apply { filter(Patient.BIRTHDATE){
+        prefix = ParamPrefixEnum.APPROXIMATE
+        value = BigDecimal.valueOf(9009090909)
+      } }.getQuery()
+
+    assertThat(query.query).isEqualTo("""
+    SELECT a.serializedResource
+    FROM ResourceEntity a
+    WHERE a.resourceType = ?
+    AND a.resourceId IN (
+    SELECT resourceId form DateIndexEntity
+    WHERE resourceType = ? AND index_name = ? AND ? BETWEEN
+    index_tsHigh AND index_tsLow)
+  """.trimIndent())
+
+    assertThat(query.args).isEqualTo(
+      listOf(ResourceType.Patient ,
+        Patient.BIRTHDATE.paramName,
+        BigDecimal.valueOf(9009090909))
+    )
   }
 
   @Test
