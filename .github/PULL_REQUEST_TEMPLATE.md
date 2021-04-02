@@ -1,4 +1,4 @@
-**IMPORTANT: All PRs must be linked to an issue (except for extremely trivial and straighforward changes).**
+**IMPORTANT: All PRs must be linked to an issue (except for extremely trivial and straightforward changes).**
 
 Fixes #[issue number]
 
@@ -9,12 +9,12 @@ Clear and concise code change description.
 Have you considered any alternatives? And if so, why have you chosen the approach in this PR?
 
 **Type**
-Choose one: (Bug fix | Feature | Documentation | Testing | Code health | Builds | Releases | Other)
+Choose one: (Bugfix | Feature | Documentation | Testing | Code health | Builds | Releases | Other)
 
 **Screenshots (if applicable)**
 
 **Checklist**
-- [ ] I have read and acknowledge the [Code of conduct](https://github.com/google/android-fhir/blob/master/docs/CODE_OF_CONDUCT.md)
+- [ ] I have read and acknowledged the [Code of conduct](https://github.com/google/android-fhir/blob/master/docs/CODE_OF_CONDUCT.md)
 - [ ] I have read [How to Contribute](https://github.com/google/android-fhir/blob/master/docs/contributing.md)
 - [ ] I have read the [Developer's guide](https://github.com/google/android-fhir/wiki/Developer's-Guide)
 - [ ] I have signed the Google [Individual CLA](https://cla.developers.google.com/about/google-individual), or I am covered by my company's [Corporate CLA](https://cla.developers.google.com/about/google-corporate )
