@@ -20,8 +20,8 @@ import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
-import org.hl7.fhir.r4.model.ResourceType
 import java.math.BigDecimal
+import org.hl7.fhir.r4.model.ResourceType
 
 @SearchDslMarker
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
@@ -43,7 +43,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     referenceFilter.add(filter)
   }
 
-  fun filter(dateParameter: DateClientParam , init: DateFilter.()-> Unit ){
+  fun filter(dateParameter: DateClientParam, init: DateFilter.() -> Unit) {
     val filter = DateFilter(dateParameter)
     filter.init()
     dateFilter.add(filter)
@@ -65,7 +65,7 @@ data class StringFilter(
 @SearchDslMarker
 data class DateFilter(
   val parameter: DateClientParam,
-  var prefix : ParamPrefixEnum? = null,
+  var prefix: ParamPrefixEnum? = null,
   var value: BigDecimal? = null
 )
 
