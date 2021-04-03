@@ -70,7 +70,7 @@ fun Search.getQuery(): SearchQuery {
     SELECT a.serializedResource
     FROM ResourceEntity a
     $sortJoinStatement
-    WHERE a.resourceType = ? COLLATE NOCASE
+    WHERE a.resourceType = ?
     $filterStatement
     $sortOrderStatement
     $limitStatement
@@ -85,7 +85,7 @@ fun StringFilter.query(type: ResourceType): SearchQuery {
   return SearchQuery(
     """
     SELECT resourceId FROM StringIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value = ?
+    WHERE resourceType = ? AND index_name = ? AND index_value = ? COLLATE NOCASE
     """,
     listOf(type.name, parameter.paramName, value!!)
   )

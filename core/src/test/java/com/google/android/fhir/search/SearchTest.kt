@@ -40,7 +40,7 @@ class SearchTest {
         """
         SELECT a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ? COLLATE NOCASE
+        WHERE a.resourceType = ?
         """.trimIndent()
       )
     assertThat(query.args).isEqualTo(listOf(ResourceType.Patient.name))
@@ -55,7 +55,7 @@ class SearchTest {
         """
         SELECT a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ? COLLATE NOCASE
+        WHERE a.resourceType = ?
         LIMIT ?
         """.trimIndent()
       )
@@ -77,7 +77,7 @@ class SearchTest {
         """
         SELECT a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ? COLLATE NOCASE
+        WHERE a.resourceType = ?
         LIMIT ? OFFSET ?
         """.trimIndent()
       )
@@ -101,10 +101,10 @@ class SearchTest {
         """
         SELECT a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ? COLLATE NOCASE
+        WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM StringIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        WHERE resourceType = ? AND index_name = ? AND index_value = ? COLLATE NOCASE
         )
         """.trimIndent()
       )
@@ -131,7 +131,7 @@ class SearchTest {
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
-        WHERE a.resourceType = ? COLLATE NOCASE
+        WHERE a.resourceType = ?
         ORDER BY b.index_value ASC
         """.trimIndent()
       )
@@ -150,7 +150,7 @@ class SearchTest {
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
-        WHERE a.resourceType = ? COLLATE NOCASE
+        WHERE a.resourceType = ?
         ORDER BY b.index_value DESC
         """.trimIndent()
       )
@@ -179,10 +179,10 @@ class SearchTest {
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
-        WHERE a.resourceType = ? COLLATE NOCASE
+        WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM StringIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        WHERE resourceType = ? AND index_name = ? AND index_value = ? COLLATE NOCASE
         )
         ORDER BY b.index_value ASC
         LIMIT ? OFFSET ?
