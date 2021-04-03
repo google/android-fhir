@@ -20,7 +20,6 @@ import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
-import java.math.BigDecimal
 import org.hl7.fhir.r4.model.ResourceType
 
 @SearchDslMarker
@@ -66,7 +65,7 @@ data class StringFilter(
 data class DateFilter(
   val parameter: DateClientParam,
   var prefix: ParamPrefixEnum? = null,
-  var value: BigDecimal? = null
+  var value: Long? = null
 )
 
 @SearchDslMarker

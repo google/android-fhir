@@ -19,7 +19,6 @@ package com.google.android.fhir.search
 import android.os.Build
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.common.truth.Truth.assertThat
-import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
@@ -127,7 +126,7 @@ class SearchTest {
         .apply {
           filter(Patient.BIRTHDATE) {
             prefix = ParamPrefixEnum.APPROXIMATE
-            value = BigDecimal.valueOf(9009090909)
+            value = 9009090909
           }
         }
         .getQuery()
@@ -152,7 +151,7 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
-          BigDecimal.valueOf(9009090909)
+          9009090909
         )
       )
   }
