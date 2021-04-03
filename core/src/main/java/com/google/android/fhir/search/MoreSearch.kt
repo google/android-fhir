@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.search
 
+import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.db.Database
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -105,11 +106,24 @@ fun ReferenceFilter.query(type: ResourceType): SearchQuery {
 }
 
 fun DateFilter.query(type: ResourceType): SearchQuery {
+  val condition =
+    when (this.prefix) {
+      ParamPrefixEnum.APPROXIMATE -> "BETWEEN index_tsLow AND index_tsHigh"
+      ParamPrefixEnum.STARTS_AFTER -> " < index_tsLow"
+      ParamPrefixEnum.ENDS_BEFORE -> " > index_tsHigh"
+      ParamPrefixEnum.NOT_EQUAL -> "NOT BETWEEN index_tsLow AND index_tsHigh"
+      ParamPrefixEnum.EQUAL -> "BETWEEN index_tsLow AND index_tsHigh"
+      ParamPrefixEnum.GREATERTHAN -> " > index_tsLow"
+      ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> " >= index_tsLow"
+      ParamPrefixEnum.LESSTHAN -> "< index_tsHigh"
+      ParamPrefixEnum.LESSTHAN_OR_EQUALS -> "<= index_tsHigh"
+      null -> "" // Possibly throw an error or provide a default value?
+    }
   return SearchQuery(
     """
     SELECT resourceId form DateIndexEntity 
     WHERE resourceType = ? AND index_name = ? 
-    AND ? BETWEEN index_tsLow AND index_tsHigh
+    AND ? $condition
   """,
     listOf(type.name, parameter.paramName, value!!)
   )
