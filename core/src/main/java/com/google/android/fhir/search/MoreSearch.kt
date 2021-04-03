@@ -70,7 +70,7 @@ fun Search.getQuery(): SearchQuery {
     SELECT a.serializedResource
     FROM ResourceEntity a
     $sortJoinStatement
-    WHERE a.resourceType collate nocase = ?
+    WHERE a.resourceType = ? COLLATE NOCASE
     $filterStatement
     $sortOrderStatement
     $limitStatement

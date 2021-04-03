@@ -40,7 +40,7 @@ class SearchTest {
         """
         SELECT a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType collate nocase = ?
+        WHERE a.resourceType = ? COLLATE NOCASE
         """.trimIndent()
       )
     assertThat(query.args).isEqualTo(listOf(ResourceType.Patient.name))
@@ -55,7 +55,7 @@ class SearchTest {
         """
         SELECT a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType collate nocase = ?
+        WHERE a.resourceType = ? COLLATE NOCASE
         LIMIT ?
         """.trimIndent()
       )
@@ -77,7 +77,7 @@ class SearchTest {
         """
         SELECT a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType collate nocase = ?
+        WHERE a.resourceType = ? COLLATE NOCASE
         LIMIT ? OFFSET ?
         """.trimIndent()
       )
@@ -101,7 +101,7 @@ class SearchTest {
         """
         SELECT a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType collate nocase = ?
+        WHERE a.resourceType = ? COLLATE NOCASE
         AND a.resourceId IN (
         SELECT resourceId FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
@@ -131,7 +131,7 @@ class SearchTest {
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
-        WHERE a.resourceType collate nocase = ?
+        WHERE a.resourceType = ? COLLATE NOCASE
         ORDER BY b.index_value ASC
         """.trimIndent()
       )
@@ -150,7 +150,7 @@ class SearchTest {
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
-        WHERE a.resourceType collate nocase = ?
+        WHERE a.resourceType = ? COLLATE NOCASE
         ORDER BY b.index_value DESC
         """.trimIndent()
       )
@@ -179,7 +179,7 @@ class SearchTest {
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
-        WHERE a.resourceType collate nocase = ?
+        WHERE a.resourceType = ? COLLATE NOCASE
         AND a.resourceId IN (
         SELECT resourceId FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
