@@ -23,12 +23,13 @@ fun Project.configureSpotless() {
   configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     kotlin {
       target("**/*.kt")
-      targetExclude("**/generated-sources/**")
       ktlint().userData(mapOf("indent_size" to "2", "continuation_indent_size" to "2"))
       ktfmt().googleStyle()
       licenseHeaderFile(
         "${project.rootProject.projectDir}/license-header.txt",
         "package|import|class|object|sealed|open|interface|abstract "
+        // It is necessary to tell spotless the top level of a file in order to apply config to it
+        // See: https://github.com/diffplug/spotless/issues/135
       )
     }
     kotlinGradle {
