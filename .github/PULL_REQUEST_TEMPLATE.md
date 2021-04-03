@@ -9,7 +9,7 @@ Clear and concise code change description.
 Have you considered any alternatives? And if so, why have you chosen the approach in this PR?
 
 **Type**
-Choose one: (Bugfix | Feature | Documentation | Testing | Code health | Builds | Releases | Other)
+Choose one: (Bug fix | Feature | Documentation | Testing | Code health | Builds | Releases | Other)
 
 **Screenshots (if applicable)**
 
