@@ -17,10 +17,7 @@
 package com.google.android.fhir.index
 
 import android.os.Build
-import com.google.android.fhir.index.entities.QuantityIndex
-import com.google.android.fhir.index.entities.ReferenceIndex
-import com.google.android.fhir.index.entities.StringIndex
-import com.google.android.fhir.index.entities.TokenIndex
+import com.google.android.fhir.index.entities.*
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
@@ -34,6 +31,9 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.Identifier
+import org.hl7.fhir.r4.model.Device
+import org.hl7.fhir.r4.model.Substance
+import org.hl7.fhir.r4.model.Quantity
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -46,10 +46,49 @@ import java.math.BigDecimal
 class ResourceIndexerTest {
 
     @Test
+    fun index_device_shouldIndexURI() {
+        val device = Device().apply {
+            id = "someID"
+            url = "www.someDomainName.someDomain"
+        }
+        val resourceIndices = ResourceIndexer.index(device)
+        assertThat(resourceIndices.uriIndices).contains(
+            UriIndex(
+                "url",
+                "Device.url",
+                "www.someDomainName.someDomain"
+            )
+        )
+    }
+
+    @Test
+    fun index_device_emptyURI_shouldNotIndexURI() {
+        val device = Device().apply {
+            id = "someID"
+            url = ""
+        }
+        val resourceIndices = ResourceIndexer.index(device)
+        assertThat(resourceIndices.uriIndices.any { index -> index.name == "url" }).isFalse()
+    }
+
+    @Test
+    fun index_device_nullURI_shouldNotIndexURI() {
+        val device = Device().apply {
+            id = "someID"
+            url = null
+        }
+        val resourceIndices = ResourceIndexer.index(device)
+        assertThat(resourceIndices.uriIndices.any { index -> index.name == "url" }).isFalse()
+    }
+
+    // Handles Money,Quantity
+    @Test
     fun index_invoice_shouldIndexMoney() {
-        val testInvoice = Invoice()
-        testInvoice.id = "some_Non_Null_ID"
-        testInvoice.totalNet = Money().setCurrency("EU").setValue(300)
+        val testInvoice = Invoice().apply {
+            id = "some_Non_NULL_ID"
+            totalNet = Money().setCurrency("EU").setValue(300)
+        }
+
         val resourceIndices = ResourceIndexer.index(testInvoice)
         assertThat(resourceIndices.quantityIndices).contains(
             QuantityIndex(
@@ -61,12 +100,29 @@ class ResourceIndexerTest {
     }
 
     @Test
+    fun index_substance_shouldIndexQuantity() {
+        val substance = Substance().apply {
+            id = "someID"
+            instance.add(Substance.SubstanceInstanceComponent().setQuantity(Quantity(1000)))
+        }
+
+        val resourceIndices = ResourceIndexer.index(substance)
+
+        assertThat(resourceIndices.quantityIndices)
+            .contains(QuantityIndex("quantity", "Substance.instance.quantity", "", "",
+                BigDecimal.valueOf(1000)))
+
+    }
+
+    //Handles String
+    @Test
     fun index_patient_shouldIndexGivenName() {
         val resourceIndices = ResourceIndexer.index(TEST_PATIENT_1)
         assertThat(resourceIndices.stringIndices)
             .contains(StringIndex("given", "Patient.name.given", TEST_PATIENT_1_GIVEN_NAME_1))
     }
 
+    // handles reference index
     @Test
     fun index_patient_shouldIndexManagingOrganization() {
         val resourceIndices = ResourceIndexer.index(TEST_PATIENT_1)
@@ -80,6 +136,7 @@ class ResourceIndexerTest {
             )
     }
 
+    // handles reference
     @Test
     fun index_observation_shouldIndexSubject() {
         val resourceIndices = ResourceIndexer.index(TEST_OBSERVATION_1)
@@ -93,6 +150,7 @@ class ResourceIndexerTest {
             )
     }
 
+    // handles token CodeableConcept , references
     @Test
     fun index_observation_shouldIndexCode() {
         val resourceIndices = ResourceIndexer.index(TEST_OBSERVATION_1)
@@ -100,6 +158,7 @@ class ResourceIndexerTest {
             .contains(TokenIndex("code", "Observation.code", TEST_CODE_SYSTEM_1, TEST_CODE_VALUE_1))
     }
 
+    // Negative test case of string
     @Test
     fun index_patient_nullGivenName_shouldNotIndexGivenName() {
         val resourceIndices = ResourceIndexer.index(TEST_PATIENT_NULL_FIELDS)
@@ -115,6 +174,7 @@ class ResourceIndexerTest {
             .isFalse()
     }
 
+    // Negative test case of reference indices
     @Test
     fun index_patient_nullOrganisation_shouldNotIndexOrganisation() {
         val resourceIndices = ResourceIndexer.index(TEST_PATIENT_NULL_FIELDS)
@@ -131,9 +191,10 @@ class ResourceIndexerTest {
         )
     }
 
+    // Negative case of string
     @Test
     fun index_patient_emptyGivenName_shouldNotIndexGivenName() {
-        val resourceIndices = ResourceIndexer.index(TEST_PATIENT_NULL_FIELDS)
+        val resourceIndices = ResourceIndexer.index(TEST_PATIENT_EMPTY_FIELDS)
         assertThat(
             resourceIndices.stringIndices.any { stringIndex ->
                 stringIndex.path.equals("Patient.name.given")
@@ -145,6 +206,7 @@ class ResourceIndexerTest {
         )
     }
 
+    // Negative case of reference
     @Test
     fun index_patient_emptyOrganisation_shouldNotIndexOrganisation() {
         val resourceIndices = ResourceIndexer.index(TEST_PATIENT_EMPTY_FIELDS)
@@ -162,6 +224,7 @@ class ResourceIndexerTest {
             .isFalse()
     }
 
+    // Negative case of codeableConcept
     @Test
     fun index_observation_nullCode_shouldNotIndexCode() {
         val resourceIndices = ResourceIndexer.index(TEST_OBSERVATION_NULL_CODE)
@@ -175,6 +238,7 @@ class ResourceIndexerTest {
             .isFalse()
     }
 
+    // Negative case of codeableConcept
     @Test
     fun index_observation_emptyCode_shouldNotIndexCode() {
         val resourceIndices = ResourceIndexer.index(TEST_OBSERVATION_EMPTY_CODE)
@@ -188,7 +252,6 @@ class ResourceIndexerTest {
             .isFalse()
     }
 
-    // TODO: improve the tests further.
 
     private companion object {
         const val TEST_CODE_SYSTEM_1 = "http://openmrs.org/concepts"
