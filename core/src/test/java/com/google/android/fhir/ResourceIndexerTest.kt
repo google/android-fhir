@@ -19,12 +19,10 @@ package com.google.android.fhir
 import android.os.Build
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.index.ResourceIndexer
-import com.google.android.fhir.index.entities.DateIndex
-import com.google.android.fhir.index.entities.NumberIndex
-import com.google.android.fhir.index.entities.QuantityIndex
-import com.google.android.fhir.index.entities.UriIndex
+import com.google.android.fhir.index.entities.*
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.ChargeItem
 import org.hl7.fhir.r4.model.Invoice
@@ -43,7 +41,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class ResourceIndexerTest {
   private lateinit var qtyTestSubstance: Substance
-  private lateinit var qtyTestInvoice: Invoice
+  private lateinit var testInvoice: Invoice
   private lateinit var uriTestQuestionnaire: Questionnaire
   private lateinit var dateTestPatient: Patient
   private lateinit var lastUpdatedTestPatient: Patient
@@ -57,7 +55,7 @@ class ResourceIndexerTest {
     // one file name is mistyped.
     qtyTestSubstance =
       testingUtils.readFromFile(Substance::class.java, "/quantity_test_substance.json")
-    qtyTestInvoice = testingUtils.readFromFile(Invoice::class.java, "/quantity_test_invoice.json")
+    testInvoice = testingUtils.readFromFile(Invoice::class.java, "/quantity_test_invoice.json")
     uriTestQuestionnaire =
       testingUtils.readFromFile(Questionnaire::class.java, "/uri_test_questionnaire.json")
     dateTestPatient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
@@ -73,10 +71,10 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_invoice_shouldIndexMoneyQuantity() {
-    val resourceIndices = ResourceIndexer.index(qtyTestInvoice)
-    Truth.assertThat(resourceIndices.quantityIndices)
-      .containsAtLeast(
+  fun index_invoice() {
+    val resourceIndices = ResourceIndexer.index(testInvoice)
+    assertThat(resourceIndices.quantityIndices)
+      .containsExactly(
         // Search parameter names flatten camel case so "totalGross" becomes "totalgross"
         QuantityIndex(
           "totalgross",
@@ -93,6 +91,14 @@ class ResourceIndexerTest {
           BigDecimal("40.22")
         )
       )
+
+    assertThat(resourceIndices.numberIndices).isEmpty()
+    assertThat(resourceIndices.tokenIndices).containsExactly(TokenIndex("identifier" , "Invoice.identifier", "http://myHospital.org/Invoices","654321"),TokenIndex("participant-role", "Invoice.participant.role", "http://snomed.info/sct", "17561000"))
+    assertThat(resourceIndices.uriIndices).isEmpty()
+    assertThat(resourceIndices.dateIndices).isEmpty()
+    assertThat(resourceIndices.referenceIndices).containsExactly(ReferenceIndex("subject", "Invoice.subject", "Patient/example"), ReferenceIndex("participant", "Invoice.participant.actor", "Practitioner/example"), ReferenceIndex("account", "Invoice.account", "Account/example"))
+    assertThat(resourceIndices.stringIndices).isEmpty()
+
   }
 
   @Test
@@ -181,3 +187,11 @@ class ResourceIndexerTest {
     const val FHIR_CURRENCY_SYSTEM = "urn:iso:std:iso:4217"
   }
 }
+/*
+*   assertThat(resourceIndices.numberIndices).isEmpty()
+    assertThat(resourceIndices.tokenIndices).isEmpty()
+    assertThat(resourceIndices.uriIndices).isEmpty()
+    assertThat(resourceIndices.dateIndices).isEmpty()
+    assertThat(resourceIndices.referenceIndices).isEmpty()
+    assertThat(resourceIndices.stringIndices).isEmpty()
+* */
