@@ -176,6 +176,14 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   QuestionnaireResponse.QuestionnaireResponseItemComponent {
   return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
+    if (this@createQuestionnaireResponseItem.initial.isNotEmpty()) {
+      answer =
+        mutableListOf(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = this@createQuestionnaireResponseItem.initial[0].value
+          }
+        )
+    }
     this@createQuestionnaireResponseItem.item.forEach {
       this.addItem(it.createQuestionnaireResponseItem())
     }

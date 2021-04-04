@@ -23,6 +23,7 @@ import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.sync.FhirDataSource
 import com.google.common.truth.Truth
+import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Patient
@@ -47,13 +48,10 @@ class FhirEngineImplTest {
   private val fhirEngine = services.fhirEngine
   private val testingUtils = TestingUtils(services.parser)
 
-  @Before
-  fun setUp() {
-    fhirEngine.save(TEST_PATIENT_1)
-  }
+  @Before fun setUp() = runBlocking { fhirEngine.save(TEST_PATIENT_1) }
 
   @Test
-  fun save_shouldSaveResource() {
+  fun save_shouldSaveResource() = runBlocking {
     fhirEngine.save(TEST_PATIENT_2)
     testingUtils.assertResourceEquals(
       TEST_PATIENT_2,
@@ -62,9 +60,8 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun saveAll_shouldSaveResource() {
-    val patients = listOf(TEST_PATIENT_1, TEST_PATIENT_2)
-    fhirEngine.saveAll(patients)
+  fun saveAll_shouldSaveResource() = runBlocking {
+    fhirEngine.save(TEST_PATIENT_1, TEST_PATIENT_2)
     testingUtils.assertResourceEquals(
       TEST_PATIENT_1,
       fhirEngine.load(Patient::class.java, TEST_PATIENT_1_ID)
@@ -78,17 +75,17 @@ class FhirEngineImplTest {
   @Test
   fun update_nonexistentResource_shouldNotInsertResource() {
     val exception =
-      assertThrows(ResourceNotFoundInDbException::class.java) { fhirEngine.update(TEST_PATIENT_2) }
-    /* ktlint-disable max-line-length */
+      assertThrows(ResourceNotFoundInDbException::class.java) {
+        runBlocking { fhirEngine.update(TEST_PATIENT_2) }
+      }
     Truth.assertThat(exception.message)
       .isEqualTo(
         "Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!"
       )
-    /* ktlint-enable max-line-length */
   }
 
   @Test
-  fun update_shouldUpdateResource() {
+  fun update_shouldUpdateResource() = runBlocking {
     val patient = Patient()
     patient.id = TEST_PATIENT_1_ID
     patient.gender = Enumerations.AdministrativeGender.FEMALE
@@ -103,18 +100,16 @@ class FhirEngineImplTest {
   fun load_nonexistentResource_shouldThrowResourceNotFoundException() {
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
-        fhirEngine.load(Patient::class.java, "nonexistent_patient")
+        runBlocking { fhirEngine.load(Patient::class.java, "nonexistent_patient") }
       }
-    /* ktlint-disable max-line-length */
     Truth.assertThat(resourceNotFoundException.message)
       .isEqualTo(
         "Resource not found with type ${ResourceType.Patient.name} and id nonexistent_patient!"
       )
-    /* ktlint-enable max-line-length */
   }
 
   @Test
-  fun load_shouldReturnResource() {
+  fun load_shouldReturnResource() = runBlocking {
     testingUtils.assertResourceEquals(
       TEST_PATIENT_1,
       fhirEngine.load(Patient::class.java, TEST_PATIENT_1_ID)
@@ -125,15 +120,15 @@ class FhirEngineImplTest {
     private const val TEST_PATIENT_1_ID = "test_patient_1"
     private var TEST_PATIENT_1 = Patient()
     init {
-      TEST_PATIENT_1.setId(TEST_PATIENT_1_ID)
-      TEST_PATIENT_1.setGender(Enumerations.AdministrativeGender.MALE)
+      TEST_PATIENT_1.id = TEST_PATIENT_1_ID
+      TEST_PATIENT_1.gender = Enumerations.AdministrativeGender.MALE
     }
 
     private const val TEST_PATIENT_2_ID = "test_patient_2"
     private var TEST_PATIENT_2 = Patient()
     init {
-      TEST_PATIENT_2.setId(TEST_PATIENT_2_ID)
-      TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE)
+      TEST_PATIENT_2.id = TEST_PATIENT_2_ID
+      TEST_PATIENT_2.gender = Enumerations.AdministrativeGender.MALE
     }
   }
 }

@@ -26,6 +26,7 @@ import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.annotation.Transaction
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.NumberIndexEntity
+import com.google.android.fhir.db.impl.entities.PositionIndexEntity
 import com.google.android.fhir.db.impl.entities.QuantityIndexEntity
 import com.google.android.fhir.db.impl.entities.ReferenceIndexEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
@@ -34,6 +35,7 @@ import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.ResourceIndices
+import com.google.android.fhir.logicalId
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -45,12 +47,16 @@ internal abstract class ResourceDao {
 
   @Transaction
   open fun update(resource: Resource) {
-    updateResource(resource.id, resource.resourceType, iParser.encodeResourceToString(resource))
+    updateResource(
+      resource.logicalId,
+      resource.resourceType,
+      iParser.encodeResourceToString(resource)
+    )
     val entity =
       ResourceEntity(
         id = 0,
         resourceType = resource.resourceType,
-        resourceId = resource.id,
+        resourceId = resource.logicalId,
         serializedResource = iParser.encodeResourceToString(resource)
       )
     val index = ResourceIndexer.index(resource)
@@ -90,6 +96,9 @@ internal abstract class ResourceDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   abstract fun insertNumberIndex(numberIndexEntity: NumberIndexEntity)
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  abstract fun insertPositionIndex(positionIndexEntity: PositionIndexEntity)
 
   @Query(
     """
@@ -180,7 +189,7 @@ internal abstract class ResourceDao {
       ResourceEntity(
         id = 0,
         resourceType = resource.resourceType,
-        resourceId = resource.id,
+        resourceId = resource.logicalId,
         serializedResource = iParser.encodeResourceToString(resource)
       )
     insertResource(entity)
@@ -257,6 +266,16 @@ internal abstract class ResourceDao {
     index.numberIndices.forEach {
       insertNumberIndex(
         NumberIndexEntity(
+          id = 0,
+          resourceType = resource.resourceType,
+          index = it,
+          resourceId = resource.resourceId
+        )
+      )
+    }
+    index.positionIndices.forEach {
+      insertPositionIndex(
+        PositionIndexEntity(
           id = 0,
           resourceType = resource.resourceType,
           index = it,
