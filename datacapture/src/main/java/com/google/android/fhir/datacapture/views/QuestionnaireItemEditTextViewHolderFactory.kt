@@ -21,6 +21,8 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputEditText
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -34,11 +36,13 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
   private val rawInputType: Int,
   private val isSingleLine: Boolean
 ) : QuestionnaireItemViewHolderDelegate {
+  private lateinit var prefixTextView: TextView
   private lateinit var textQuestion: TextView
   private lateinit var textInputEditText: TextInputEditText
   private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
   override fun init(itemView: View) {
+    prefixTextView = itemView.findViewById(R.id.prefix)
     textQuestion = itemView.findViewById(R.id.question)
     textInputEditText = itemView.findViewById(R.id.textInputEditText)
     textInputEditText.setRawInputType(rawInputType)
@@ -46,11 +50,31 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textInputEditText.doAfterTextChanged { editable: Editable? ->
       questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
       questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+      applyValidationResult(
+        QuestionnaireResponseItemValidator.validate(
+          questionnaireItemViewItem.questionnaireItem,
+          questionnaireItemViewItem.questionnaireResponseItem
+        )
+      )
     }
+  }
+
+  private fun applyValidationResult(validationResult: ValidationResult) {
+    val validationMessage =
+      validationResult.validationMessages.joinToString {
+        it.plus(System.getProperty("line.separator"))
+      }
+    textInputEditText.error = if (validationMessage == "") null else validationMessage
   }
 
   override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     this.questionnaireItemViewItem = questionnaireItemViewItem
+    if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
+      prefixTextView.visibility = View.VISIBLE
+      prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
+    } else {
+      prefixTextView.visibility = View.GONE
+    }
     textQuestion.text = questionnaireItemViewItem.questionnaireItem.text
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
   }

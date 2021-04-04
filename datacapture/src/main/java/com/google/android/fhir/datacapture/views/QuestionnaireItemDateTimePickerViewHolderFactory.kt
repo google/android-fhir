@@ -31,6 +31,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_date_time_picker_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var prefixTextView: TextView
       private lateinit var textDateQuestion: TextView
       private lateinit var dateInputEditText: TextInputEditText
       private lateinit var textTimeQuestion: TextView
@@ -38,6 +39,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
+        prefixTextView = itemView.findViewById(R.id.prefix)
         textDateQuestion = itemView.findViewById(R.id.date_question)
         dateInputEditText = itemView.findViewById(R.id.dateInputEditText)
         // Disable direct text input to only allow input from the date picker dialog
@@ -53,26 +55,25 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           val context = itemView.context.tryUnwrapContext()!!
           context.supportFragmentManager.setFragmentResultListener(
             DatePickerFragment.RESULT_REQUEST_KEY,
-            context,
-            { _, result ->
-              val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
-              val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
-              val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
-              val localDateTime =
-                LocalDateTime.of(
-                  year,
-                  // Month values are 1-12 in java.time but 0-11 in
-                  // DatePickerDialog.
-                  month + 1,
-                  dayOfMonth,
-                  0,
-                  0,
-                  0
-                )
-              updateDateTimeInput(localDateTime)
-              updateDateTimeAnswer(localDateTime)
-            }
-          )
+            context
+          ) { _, result ->
+            val year = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_YEAR)
+            val month = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_MONTH)
+            val dayOfMonth = result.getInt(DatePickerFragment.RESULT_BUNDLE_KEY_DAY_OF_MONTH)
+            val localDateTime =
+              LocalDateTime.of(
+                year,
+                // Month values are 1-12 in java.time but 0-11 in
+                // DatePickerDialog.
+                month + 1,
+                dayOfMonth,
+                0,
+                0,
+                0
+              )
+            updateDateTimeInput(localDateTime)
+            updateDateTimeAnswer(localDateTime)
+          }
           DatePickerFragment().show(context.supportFragmentManager, DatePickerFragment.TAG)
           // Clear focus so that the user can refocus to open the dialog
           textDateQuestion.clearFocus()
@@ -93,17 +94,16 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
           val context = itemView.context.tryUnwrapContext()!!
           context.supportFragmentManager.setFragmentResultListener(
             TimePickerFragment.RESULT_REQUEST_KEY,
-            context,
-            { _, result ->
-              val hour = result.getInt(TimePickerFragment.RESULT_BUNDLE_KEY_HOUR)
-              val minute = result.getInt(TimePickerFragment.RESULT_BUNDLE_KEY_MINUTE)
-              val localDate = questionnaireItemViewItem.singleAnswerOrNull!!.valueDateTimeType
-              val localDateTime =
-                LocalDateTime.of(localDate.year, localDate.month, localDate.day, hour, minute, 0)
-              updateDateTimeInput(localDateTime)
-              updateDateTimeAnswer(localDateTime)
-            }
-          )
+            context
+          ) { _, result ->
+            val hour = result.getInt(TimePickerFragment.RESULT_BUNDLE_KEY_HOUR)
+            val minute = result.getInt(TimePickerFragment.RESULT_BUNDLE_KEY_MINUTE)
+            val localDate = questionnaireItemViewItem.singleAnswerOrNull!!.valueDateTimeType
+            val localDateTime =
+              LocalDateTime.of(localDate.year, localDate.month, localDate.day, hour, minute, 0)
+            updateDateTimeInput(localDateTime)
+            updateDateTimeAnswer(localDateTime)
+          }
           TimePickerFragment().show(context.supportFragmentManager, TimePickerFragment.TAG)
           // Clear focus so that the user can refocus to open the dialog
           textTimeQuestion.clearFocus()
@@ -113,6 +113,12 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
+        if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
+          prefixTextView.visibility = View.VISIBLE
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
+        } else {
+          prefixTextView.visibility = View.GONE
+        }
         textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.text
         textTimeQuestion.text = questionnaireItemViewItem.questionnaireItem.text
         val dateTime = questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType

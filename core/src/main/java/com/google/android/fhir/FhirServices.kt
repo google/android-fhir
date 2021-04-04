@@ -19,13 +19,9 @@ package com.google.android.fhir
 import android.content.Context
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.cql.FhirEngineDataProvider
-import com.google.android.fhir.cql.FhirEngineLibraryLoader
-import com.google.android.fhir.cql.FhirEngineTerminologyProvider
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
-import com.google.android.fhir.search.impl.SearchImpl
 import com.google.android.fhir.sync.FhirDataSource
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
 
@@ -49,15 +45,9 @@ internal data class FhirServices(
     fun build(): FhirServices {
       val parser = FhirContext.forR4().newJsonParser()
       val db = DatabaseImpl(context = context, iParser = parser, databaseName = databaseName)
-
-      val dataProvider = FhirEngineDataProvider.Factory.create(db)
       val engine =
         FhirEngineImpl(
           database = db,
-          search = SearchImpl(db),
-          libraryLoader = FhirEngineLibraryLoader(db),
-          dataProviderMap = mapOf("http://hl7.org/fhir" to dataProvider),
-          terminologyProvider = FhirEngineTerminologyProvider(),
           periodicSyncConfiguration = periodicSyncConfiguration,
           dataSource = dataSource,
           context = context
@@ -67,7 +57,6 @@ internal data class FhirServices(
   }
 
   companion object {
-    @JvmStatic
     fun builder(dataSource: FhirDataSource, context: Context) = Builder(dataSource, context)
   }
 }

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">CqlReference</string>
+    <string name="title_cql_load_activity">CqlLoad</string>
+</resources>

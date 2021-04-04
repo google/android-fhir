@@ -26,32 +26,19 @@ import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.Search
+import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.FhirDataSource
 import com.google.android.fhir.sync.FhirSynchronizer
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.Result
 import com.google.android.fhir.sync.SyncConfiguration
 import com.google.android.fhir.sync.SyncWorkType
-import java.util.EnumSet
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
-import kotlin.collections.set
-import org.cqframework.cql.elm.execution.VersionedIdentifier
 import org.hl7.fhir.r4.model.Resource
-import org.opencds.cqf.cql.data.DataProvider
-import org.opencds.cqf.cql.execution.CqlEngine
-import org.opencds.cqf.cql.execution.EvaluationResult
-import org.opencds.cqf.cql.execution.LibraryLoader
-import org.opencds.cqf.cql.terminology.TerminologyProvider
 
 /** Implementation of [FhirEngine]. */
 class FhirEngineImpl
 constructor(
   private val database: Database,
-  private val search: Search,
-  libraryLoader: LibraryLoader,
-  dataProviderMap: Map<String, @JvmSuppressWildcards DataProvider>,
-  terminologyProvider: TerminologyProvider,
   private var periodicSyncConfiguration: PeriodicSyncConfiguration?,
   private val dataSource: FhirDataSource,
   private val context: Context
@@ -61,28 +48,16 @@ constructor(
     periodicSyncConfiguration?.let { config -> triggerInitialDownload(config) }
   }
 
-  private val cqlEngine: CqlEngine =
-    CqlEngine(
-      libraryLoader,
-      dataProviderMap,
-      terminologyProvider,
-      EnumSet.noneOf(CqlEngine.Options::class.java)
-    )
-
-  override fun <R : Resource> save(resource: R) {
-    database.insert(resource)
+  override suspend fun <R : Resource> save(vararg resource: R) {
+    database.insert(*resource)
   }
 
-  override fun <R : Resource> saveAll(resources: List<R>) {
-    database.insertAll(resources)
-  }
-
-  override fun <R : Resource> update(resource: R) {
+  override suspend fun <R : Resource> update(resource: R) {
     database.update(resource)
   }
 
   @Throws(ResourceNotFoundException::class)
-  override fun <R : Resource> load(clazz: Class<R>, id: String): R {
+  override suspend fun <R : Resource> load(clazz: Class<R>, id: String): R {
     return try {
       database.select(clazz, id)
     } catch (e: ResourceNotFoundInDbException) {
@@ -90,28 +65,8 @@ constructor(
     }
   }
 
-  override fun <R : Resource> remove(clazz: Class<R>, id: String) {
+  override suspend fun <R : Resource> remove(clazz: Class<R>, id: String) {
     database.delete(clazz, id)
-  }
-
-  override fun evaluateCql(
-    libraryVersionId: String,
-    context: String,
-    expression: String
-  ): EvaluationResult {
-    val contextMap: MutableMap<String, Any> = HashMap()
-    val contextSplit = context.split("/").toTypedArray()
-    contextMap[contextSplit[0]] = contextSplit[1]
-    val versionedIdentifier = VersionedIdentifier().withId(libraryVersionId)
-    val expressions: MutableSet<String> = HashSet()
-    expressions.add(expression)
-    val map: MutableMap<VersionedIdentifier, Set<String>> = HashMap()
-    map[versionedIdentifier] = expressions
-    return cqlEngine.evaluate(contextMap, null, map)
-  }
-
-  override fun search(): Search {
-    return search
   }
 
   override suspend fun sync(syncConfiguration: SyncConfiguration): Result {
@@ -130,6 +85,10 @@ constructor(
   override fun updatePeriodicSyncConfiguration(syncConfig: PeriodicSyncConfiguration) {
     periodicSyncConfiguration = syncConfig
     setupNextDownload(syncConfig)
+  }
+
+  override suspend fun <R : Resource> search(search: Search): List<R> {
+    return search.execute(database)
   }
 
   private fun setupNextDownload(syncConfig: PeriodicSyncConfiguration) {

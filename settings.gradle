@@ -1,4 +1,0 @@
-include ':core'
-include ':datacapture'
-include ':datacapturegallery'
-include ':reference'

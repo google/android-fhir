@@ -18,6 +18,7 @@ package com.google.android.fhir.index
 
 import android.os.Build
 import com.google.android.fhir.index.entities.NumberIndex
+import com.google.android.fhir.index.entities.PositionIndex
 import com.google.android.fhir.index.entities.QuantityIndex
 import com.google.android.fhir.index.entities.ReferenceIndex
 import com.google.android.fhir.index.entities.StringIndex
@@ -181,6 +182,8 @@ class ResourceIndexerTest {
           "true"
         )
       )
+    specialTestLocation =
+      testingUtils.readFromFile(Location::class.java, "/location-example-hl7hq.json")
   }
 
   @Test
