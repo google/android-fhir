@@ -63,7 +63,6 @@ dependencies {
 
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)
-  implementation(Dependencies.Androidx.workRuntimeKtx)
   implementation(Dependencies.Cql.cqlEngine)
   implementation(Dependencies.Cql.cqlEngineFhir)
   implementation(Dependencies.Kotlin.androidxCoreKtx)

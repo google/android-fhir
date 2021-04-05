@@ -24,7 +24,7 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /** The interface for the FHIR resource database. */
-interface Database {
+internal interface Database {
   /**
    * Inserts a list of local `resources` into the FHIR resource database. If any of the resources
    * already exists, it will be overwritten.
@@ -71,7 +71,7 @@ interface Database {
    * @param syncedResourceEntity The synced resource
    */
   suspend fun insertSyncedResources(
-    syncedResourceEntity: SyncedResourceEntity,
+    syncedResourceEntity: List<SyncedResourceEntity>,
     resources: List<Resource>
   )
 

@@ -22,25 +22,18 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
-import com.google.android.fhir.sync.FhirDataSource
-import com.google.android.fhir.sync.PeriodicSyncConfiguration
 
 internal data class FhirServices(
   val fhirEngine: FhirEngine,
   val parser: IParser,
   val database: Database
 ) {
-  class Builder(private val dataSource: FhirDataSource, private val context: Context) {
+  class Builder( private val context: Context) {
     private var databaseName: String? = "fhirEngine"
-    private var periodicSyncConfiguration: PeriodicSyncConfiguration? = null
 
     fun inMemory() = apply { databaseName = null }
 
     fun databaseName(name: String) = apply { databaseName = name }
-
-    fun periodicSyncConfiguration(config: PeriodicSyncConfiguration) = apply {
-      periodicSyncConfiguration = config
-    }
 
     fun build(): FhirServices {
       val parser = FhirContext.forR4().newJsonParser()
@@ -48,8 +41,6 @@ internal data class FhirServices(
       val engine =
         FhirEngineImpl(
           database = db,
-          periodicSyncConfiguration = periodicSyncConfiguration,
-          dataSource = dataSource,
           context = context
         )
       return FhirServices(fhirEngine = engine, parser = parser, database = db)
@@ -57,6 +48,6 @@ internal data class FhirServices(
   }
 
   companion object {
-    fun builder(dataSource: FhirDataSource, context: Context) = Builder(dataSource, context)
+    fun builder(context: Context) = Builder(context)
   }
 }

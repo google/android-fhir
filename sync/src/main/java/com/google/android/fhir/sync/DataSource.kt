@@ -16,13 +16,17 @@
 
 package com.google.android.fhir.sync
 
-/** Configuration for synchronization. */
-data class SyncConfiguration(
-  /** Data that needs to be synchronised */
-  val syncData: List<SyncData> = emptyList(),
+import org.hl7.fhir.r4.model.Bundle
+
+/**
+ * Interface for an abstraction of retrieving static data from a network source. The data can be
+ * retrieved in pages and each data retrieval is an expensive operation.
+ */
+interface DataSource {
+
   /**
-   * true if the SDK needs to retry a failed sync attempt, false otherwise If this is set to true,
-   * then the result of the sync will be reported after the retry.
+   * Implement this method to load remote data based on a url [path]. A service base url is of the
+   * form: `http{s}://server/{path}`
    */
-  val retry: Boolean = false
-)
+  suspend fun loadData(path: String): Bundle
+}

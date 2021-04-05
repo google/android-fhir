@@ -17,37 +17,21 @@
 package com.google.android.fhir.impl
 
 import android.content.Context
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.ResourceNotFoundException
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.ResourceNotFoundInDbException
+import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.execute
-import com.google.android.fhir.sync.FhirDataSource
-import com.google.android.fhir.sync.FhirSynchronizer
-import com.google.android.fhir.sync.PeriodicSyncConfiguration
-import com.google.android.fhir.sync.Result
-import com.google.android.fhir.sync.SyncConfiguration
-import com.google.android.fhir.sync.SyncWorkType
+import com.google.android.fhir.toTimeZoneString
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 
 /** Implementation of [FhirEngine]. */
-class FhirEngineImpl
-constructor(
-  private val database: Database,
-  private var periodicSyncConfiguration: PeriodicSyncConfiguration?,
-  private val dataSource: FhirDataSource,
-  private val context: Context
-) : FhirEngine {
-
-  init {
-    periodicSyncConfiguration?.let { config -> triggerInitialDownload(config) }
-  }
-
+internal class FhirEngineImpl
+constructor(private val database: Database, private val context: Context) : FhirEngine {
   override suspend fun <R : Resource> save(vararg resource: R) {
     database.insert(*resource)
   }
@@ -69,49 +53,21 @@ constructor(
     database.delete(clazz, id)
   }
 
-  override suspend fun sync(syncConfiguration: SyncConfiguration): Result {
-    return FhirSynchronizer(syncConfiguration, dataSource, database).sync()
-  }
-
-  override suspend fun periodicSync(): Result {
-    val syncConfig =
-      periodicSyncConfiguration
-        ?: throw java.lang.UnsupportedOperationException("Periodic sync configuration was not set")
-    val syncResult = FhirSynchronizer(syncConfig.syncConfiguration, dataSource, database).sync()
-    setupNextDownload(syncConfig)
-    return syncResult
-  }
-
-  override fun updatePeriodicSyncConfiguration(syncConfig: PeriodicSyncConfiguration) {
-    periodicSyncConfiguration = syncConfig
-    setupNextDownload(syncConfig)
-  }
-
   override suspend fun <R : Resource> search(search: Search): List<R> {
     return search.execute(database)
   }
 
-  private fun setupNextDownload(syncConfig: PeriodicSyncConfiguration) {
-    setupDownload(syncConfig = syncConfig, withInitialDelay = true)
-  }
-
-  private fun triggerInitialDownload(syncConfig: PeriodicSyncConfiguration) {
-    setupDownload(syncConfig = syncConfig, withInitialDelay = false)
-  }
-
-  private fun setupDownload(syncConfig: PeriodicSyncConfiguration, withInitialDelay: Boolean) {
-    val workerClass = syncConfig.periodicSyncWorker
-    val downloadRequest =
-      if (withInitialDelay) {
-        OneTimeWorkRequest.Builder(workerClass)
-          .setConstraints(syncConfig.syncConstraints)
-          .setInitialDelay(syncConfig.repeat.interval, syncConfig.repeat.timeUnit)
-          .build()
-      } else {
-        OneTimeWorkRequest.Builder(workerClass).setConstraints(syncConfig.syncConstraints).build()
+  override suspend fun syncDownload(download: suspend (suspend (ResourceType) -> String?) -> List<Resource>) {
+    val stuff = download(database::lastUpdate)
+    val timeStamps =
+      stuff.groupBy { it.resourceType }.entries.map {
+        SyncedResourceEntity(it.key, it.value.last().meta.lastUpdated.toTimeZoneString())
       }
-
-    WorkManager.getInstance(context)
-      .enqueueUniqueWork(SyncWorkType.DOWNLOAD.workerName, ExistingWorkPolicy.KEEP, downloadRequest)
+    database.insertSyncedResources(timeStamps, stuff)
   }
+
+  override suspend fun syncUpload(upload: (suspend (List<Resource>) -> Unit)?) {
+    TODO("Not yet implemented")
+  }
+
 }

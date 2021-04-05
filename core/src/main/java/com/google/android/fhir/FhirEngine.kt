@@ -17,10 +17,8 @@
 package com.google.android.fhir
 
 import com.google.android.fhir.search.Search
-import com.google.android.fhir.sync.PeriodicSyncConfiguration
-import com.google.android.fhir.sync.Result
-import com.google.android.fhir.sync.SyncConfiguration
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface FhirEngine {
@@ -55,17 +53,9 @@ interface FhirEngine {
    */
   suspend fun <R : Resource> remove(clazz: Class<R>, id: String)
 
-  /**
-   * One time sync.
-   *
-   * @param syncConfiguration
-   * - configuration of data that needs to be synchronised
-   */
-  suspend fun sync(syncConfiguration: SyncConfiguration): Result
-
-  suspend fun periodicSync(): Result
-
-  fun updatePeriodicSyncConfiguration(syncConfig: PeriodicSyncConfiguration)
-
   suspend fun <R : Resource> search(search: Search): List<R>
+
+  suspend fun syncDownload(download: suspend (suspend (ResourceType) -> String?) -> List<Resource>)
+
+  suspend fun syncUpload(upload: (suspend (List<Resource>) -> Unit)?)
 }

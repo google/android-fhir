@@ -48,6 +48,7 @@ configurations {
 }
 
 dependencies {
+  implementation(project(mapOf("path" to ":sync")))
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.Espresso.espressoCore)
 
@@ -74,6 +75,7 @@ dependencies {
   implementation(Dependencies.material)
 
   implementation(project(path = ":core"))
+  implementation(project(path = ":sync"))
 
   testImplementation(Dependencies.junit)
 }

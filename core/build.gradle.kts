@@ -86,7 +86,6 @@ dependencies {
 
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.Room.ktx)
-  implementation(Dependencies.Androidx.workRuntimeKtx)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.caffeine)
   implementation(Dependencies.guava)

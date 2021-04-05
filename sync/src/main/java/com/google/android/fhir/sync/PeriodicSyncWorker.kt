@@ -18,6 +18,12 @@ package com.google.android.fhir.sync
 
 import android.content.Context
 import androidx.work.CoroutineWorker
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.sync.Result.Success
@@ -27,10 +33,12 @@ abstract class PeriodicSyncWorker(appContext: Context, workerParams: WorkerParam
   CoroutineWorker(appContext, workerParams) {
 
   abstract fun getFhirEngine(): FhirEngine
+  abstract fun getDataSource(): DataSource
+  abstract fun getSyncData (): SyncData
 
   override suspend fun doWork(): Result {
     // TODO handle retry
-    val result = getFhirEngine().periodicSync()
+    val result = FhirSynchronizer(getFhirEngine(), getDataSource(), getSyncData()).sync()
     if (result is Success) {
       return Result.success()
     }
