@@ -171,7 +171,8 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     }
     return questionnaireItemViewItemList
   }
-  /*
+
+  /**
    * Add items within [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] from the
    * provided parent [Questionnaire.QuestionnaireItemComponent] with nested items. The hierarchy and
    * order of child items will be retained as specified in the standard. See
@@ -224,6 +225,7 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
       this@createQuestionnaireResponseItem.item.forEach {
         this.addItem(it.createQuestionnaireResponseItem())
       }
+    }
   }
 }
 
