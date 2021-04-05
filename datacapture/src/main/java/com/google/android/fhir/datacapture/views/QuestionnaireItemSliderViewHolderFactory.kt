@@ -60,7 +60,9 @@ internal object QuestionnaireItemSliderViewHolderFactory :
           questionnaireItemViewItem.singleAnswerOrNull =
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(IntegerType(newValue.toInt()))
-          questionnaireItemViewItem.questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
+          questionnaireItemViewItem.questionnaireResponseItemChangedCallback(
+            questionnaireItem.linkId
+          )
         }
       }
     }

@@ -45,7 +45,9 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
               }
           }
 
-          questionnaireItemViewItem.questionnaireResponseItemChangedCallback(questionnaireItemViewItem.questionnaireItem.linkId)
+          questionnaireItemViewItem.questionnaireResponseItemChangedCallback(
+            questionnaireItemViewItem.questionnaireItem.linkId
+          )
         }
       }
 

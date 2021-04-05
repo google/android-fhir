@@ -171,7 +171,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     }
     return questionnaireItemViewItemList
   }
-
+  /*
    * Add items within [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] from the
    * provided parent [Questionnaire.QuestionnaireItemComponent] with nested items. The hierarchy and
    * order of child items will be retained as specified in the standard. See
@@ -182,8 +182,10 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
       linkId = this@addNestedItemsToAnswer.linkId
       answer = this@addNestedItemsToAnswer.answer
-      if (answer.isNotEmpty()){
-        answer.first().item = linkIdToQuestionnaireItemMap[this@addNestedItemsToAnswer.linkId]?.createListOfItemInAnswer()
+      if (answer.isNotEmpty()) {
+        answer.first().item =
+          linkIdToQuestionnaireItemMap[this@addNestedItemsToAnswer.linkId]
+            ?.createListOfItemInAnswer()
       }
     }
   }
