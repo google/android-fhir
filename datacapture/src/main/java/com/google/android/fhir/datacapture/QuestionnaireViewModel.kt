@@ -22,6 +22,7 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.enablement.QuestionnaireItemWithResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.datacapture.views.hasNestedItemsWithinAnswers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -31,7 +32,6 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   /** The current questionnaire as questions are being answered. */
   private val questionnaire: Questionnaire
-  private var questionnaireItemBeingSearched: Questionnaire.QuestionnaireItemComponent? = null
 
   init {
     val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
@@ -74,14 +74,11 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   private val modificationCount = MutableStateFlow(0)
 
   /** Callback function to update the UI. */
-  private val questionnaireResponseItemChangedCallback = { modificationCount.value += 1 }
-
-  /**
-   * Callback function to update the UI. Based on the link Id of the
-   * [Questionnaire.QuestionnaireItemComponent] answered
-   */
-  private val questionnaireResponseItemAnsweredCallback: (String) -> Unit = { linkId ->
-    run { updateQuestionnaireResponseItemComponent(linkId) }
+  private val questionnaireResponseItemChangedCallback: (String) -> Unit = { linkId ->
+    linkIdToQuestionnaireItemMap[linkId]?.hasNestedItemsWithinAnswers.let {
+      linkIdToQuestionnaireResponseItemMap[linkId]?.addNestedItemsToAnswer()
+    }
+    modificationCount.value += 1
   }
   internal val questionnaireItemViewItemList
     get() = getQuestionnaireItemViewItemList(questionnaire.item, questionnaireResponse.item)
@@ -152,8 +149,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
           QuestionnaireItemViewItem(
             questionnaireItem,
             questionnaireResponseItem,
-            questionnaireResponseItemChangedCallback,
-            questionnaireResponseItemAnsweredCallback
+            questionnaireResponseItemChangedCallback as (String?) -> Unit
           )
         )
         if (questionnaireResponseItem.item.isEmpty() &&
@@ -176,57 +172,6 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     return questionnaireItemViewItemList
   }
 
-  private fun updateQuestionnaireResponseItemComponent(linkId: String) {
-    questionnaire.item.getItemWithLinkId(linkId)
-    questionnaireItemBeingSearched?.let {
-      questionnaireResponse.item.addNestedItemsOfItemWithLinkId(linkId)
-    }
-    modificationCount.value += 1
-  }
-
-  /** Traverse (DFS) through the list of questionnaire items and find the item with given linkId */
-  private fun MutableList<Questionnaire.QuestionnaireItemComponent>.getItemWithLinkId(
-    linkId: String
-  ) {
-    val questionnaireItemIterator = this.iterator()
-    while (questionnaireItemIterator.hasNext()) {
-      val questionnaireItem = questionnaireItemIterator.next()
-      if (questionnaireItem.linkId == linkId) {
-        questionnaireItemBeingSearched = questionnaireItem
-      } else if (questionnaireItem.item.isNotEmpty()) {
-        questionnaireItem.item.getItemWithLinkId(linkId)
-      }
-    }
-  }
-
-  /**
-   * Traverse (DFS) through the list of questionnaire response items and add nested items to the
-   * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] of the
-   * [QuestionnaireResponse.QuestionnaireResponseItemComponent] with the given linkId
-   */
-  private fun MutableList<
-    QuestionnaireResponse.QuestionnaireResponseItemComponent>.addNestedItemsOfItemWithLinkId(
-    linkId: String
-  ) {
-    val questionnaireResponseItemIterator = this.iterator()
-    var index = 0
-    while (questionnaireResponseItemIterator.hasNext()) {
-      val questionnaireResponseItem = questionnaireResponseItemIterator.next()
-      if (questionnaireResponseItem.linkId == linkId) {
-        this[index] = this[index].addNestedItemsToAnswer()
-        break
-      } else if (!questionnaireResponseItem.hasItem() && questionnaireResponseItem.hasAnswer()) {
-        if (questionnaireResponseItem.answer.first().hasItem()) {
-          questionnaireResponseItem.answer.first().item.addNestedItemsOfItemWithLinkId(linkId)
-        }
-      } else if (questionnaireResponseItem.hasItem()) {
-        questionnaireResponseItem.item.addNestedItemsOfItemWithLinkId(linkId)
-      }
-      index++
-    }
-  }
-
-  /**
    * Add items within [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] from the
    * provided parent [Questionnaire.QuestionnaireItemComponent] with nested items. The hierarchy and
    * order of child items will be retained as specified in the standard. See
@@ -237,7 +182,9 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
       linkId = this@addNestedItemsToAnswer.linkId
       answer = this@addNestedItemsToAnswer.answer
-      answer.first().item = questionnaireItemBeingSearched?.createListOfItemInAnswer()
+      if (answer.isNotEmpty()){
+        answer.first().item = linkIdToQuestionnaireItemMap[this@addNestedItemsToAnswer.linkId]?.createListOfItemInAnswer()
+      }
     }
   }
 }
