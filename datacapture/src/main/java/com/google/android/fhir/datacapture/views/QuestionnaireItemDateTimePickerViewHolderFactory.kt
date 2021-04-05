@@ -100,7 +100,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
             val minute = result.getInt(TimePickerFragment.RESULT_BUNDLE_KEY_MINUTE)
             val localDate = questionnaireItemViewItem.singleAnswerOrNull!!.valueDateTimeType
             val localDateTime =
-              LocalDateTime.of(localDate.year, localDate.month, localDate.day, hour, minute, 0)
+              LocalDateTime.of(localDate.year, localDate.month, localDate.day, hour+1, minute, 0)
             updateDateTimeInput(localDateTime)
             updateDateTimeAnswer(localDateTime)
           }
