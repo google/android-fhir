@@ -19,13 +19,21 @@ package com.google.android.fhir
 import android.os.Build
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.index.ResourceIndexer
-import com.google.android.fhir.index.entities.*
+import com.google.android.fhir.index.entities.DateIndex
+import com.google.android.fhir.index.entities.NumberIndex
+import com.google.android.fhir.index.entities.PositionIndex
+import com.google.android.fhir.index.entities.QuantityIndex
+import com.google.android.fhir.index.entities.ReferenceIndex
+import com.google.android.fhir.index.entities.StringIndex
+import com.google.android.fhir.index.entities.TokenIndex
+import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.ChargeItem
 import org.hl7.fhir.r4.model.Invoice
+import org.hl7.fhir.r4.model.Location
 import org.hl7.fhir.r4.model.MolecularSequence
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
@@ -43,10 +51,11 @@ class ResourceIndexerTest {
   private lateinit var qtyTestSubstance: Substance
   private lateinit var testInvoice: Invoice
   private lateinit var uriTestQuestionnaire: Questionnaire
-  private lateinit var dateTestPatient: Patient
+  private lateinit var testPatient: Patient
   private lateinit var lastUpdatedTestPatient: Patient
   private lateinit var numberTestChargeItem: ChargeItem
   private lateinit var numberTestMolecularSequence: MolecularSequence
+  private lateinit var specialTestLocation: Location
 
   @Before
   fun setUp() {
@@ -58,7 +67,7 @@ class ResourceIndexerTest {
     testInvoice = testingUtils.readFromFile(Invoice::class.java, "/quantity_test_invoice.json")
     uriTestQuestionnaire =
       testingUtils.readFromFile(Questionnaire::class.java, "/uri_test_questionnaire.json")
-    dateTestPatient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
+    testPatient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     lastUpdatedTestPatient =
       testingUtils.readFromFile(Patient::class.java, "/lastupdated_ts_test_patient.json")
     numberTestChargeItem =
@@ -68,6 +77,8 @@ class ResourceIndexerTest {
         MolecularSequence::class.java,
         "/number_test_molecular_sequence.json"
       )
+    specialTestLocation =
+      testingUtils.readFromFile(Location::class.java, "/location-example-hl7hq.json")
   }
 
   @Test
@@ -80,31 +91,53 @@ class ResourceIndexerTest {
           "totalgross",
           "Invoice.totalGross",
           FHIR_CURRENCY_SYSTEM,
-          "EUR",
-          BigDecimal("48")
+          testInvoice.totalGross.currency,
+          testInvoice.totalGross.value
         ),
         QuantityIndex(
           "totalnet",
           "Invoice.totalNet",
           FHIR_CURRENCY_SYSTEM,
-          "EUR",
-          BigDecimal("40.22")
+          testInvoice.totalNet.currency,
+          testInvoice.totalNet.value
         )
       )
 
     assertThat(resourceIndices.numberIndices).isEmpty()
-    assertThat(resourceIndices.tokenIndices).containsExactly(TokenIndex("identifier" , "Invoice.identifier", "http://myHospital.org/Invoices","654321"),TokenIndex("participant-role", "Invoice.participant.role", "http://snomed.info/sct", "17561000"))
+    assertThat(resourceIndices.tokenIndices)
+      .containsExactly(
+        TokenIndex(
+          "identifier",
+          "Invoice.identifier",
+          testInvoice.identifierFirstRep.system,
+          testInvoice.identifierFirstRep.value
+        ),
+        TokenIndex(
+          "participant-role",
+          "Invoice.participant.role",
+          testInvoice.participantFirstRep.role.codingFirstRep.system,
+          testInvoice.participantFirstRep.role.codingFirstRep.code
+        )
+      )
     assertThat(resourceIndices.uriIndices).isEmpty()
     assertThat(resourceIndices.dateIndices).isEmpty()
-    assertThat(resourceIndices.referenceIndices).containsExactly(ReferenceIndex("subject", "Invoice.subject", "Patient/example"), ReferenceIndex("participant", "Invoice.participant.actor", "Practitioner/example"), ReferenceIndex("account", "Invoice.account", "Account/example"))
+    assertThat(resourceIndices.referenceIndices)
+      .containsExactly(
+        ReferenceIndex("subject", "Invoice.subject", testInvoice.subject.reference),
+        ReferenceIndex(
+          "participant",
+          "Invoice.participant.actor",
+          testInvoice.participantFirstRep.actor.reference
+        ),
+        ReferenceIndex("account", "Invoice.account", testInvoice.account.reference)
+      )
     assertThat(resourceIndices.stringIndices).isEmpty()
-
   }
 
   @Test
   fun index_substance_shouldIndexQuantityQuantity() {
     val resourceIndices = ResourceIndexer.index(qtyTestSubstance)
-    Truth.assertThat(resourceIndices.quantityIndices)
+    assertThat(resourceIndices.quantityIndices)
       .contains(
         QuantityIndex(
           "quantity",
@@ -119,31 +152,89 @@ class ResourceIndexerTest {
   @Test
   fun index_questionnaire_shouldIndexUri() {
     val resourceIndices = ResourceIndexer.index(uriTestQuestionnaire)
-    Truth.assertThat(resourceIndices.uriIndices)
+    assertThat(resourceIndices.uriIndices)
       .contains(UriIndex("url", "Questionnaire.url", "http://hl7.org/fhir/Questionnaire/3141"))
   }
 
   @Test
-  fun index_patient_birthDate_shouldIndexBirthDate() {
-    val resourceIndices = ResourceIndexer.index(dateTestPatient)
-    val birthDateElement = dateTestPatient.getBirthDateElement()
-    Truth.assertThat(resourceIndices.dateIndices)
-      .contains(
+  fun index_patient() {
+    val resourceIndices = ResourceIndexer.index(testPatient)
+    val birthDateElement = testPatient.birthDateElement
+    assertThat(resourceIndices.dateIndices)
+      .containsExactly(
         DateIndex(
           "birthdate",
           "Patient.birthDate",
-          birthDateElement.getValue().getTime(),
-          birthDateElement.getValue().getTime(),
-          birthDateElement.getPrecision()
+          birthDateElement.value.time,
+          birthDateElement.value.time,
+          birthDateElement.precision
         )
       )
+    assertThat(resourceIndices.numberIndices).isEmpty()
+    assertThat(resourceIndices.tokenIndices)
+      .containsExactly(
+        TokenIndex(
+          "identifier",
+          "Patient.identifier",
+          testPatient.identifierFirstRep.system,
+          testPatient.identifierFirstRep.value
+        ),
+        TokenIndex(
+          "deceased",
+          "Patient.deceased.exists() and Patient.deceased != false",
+          null,
+          testPatient.deceased.primitiveValue()
+        ),
+        TokenIndex("active", "Patient.active", null, testPatient.active.toString()),
+        TokenIndex(
+          "language",
+          "Patient.communication.language",
+          testPatient.communicationFirstRep.language.codingFirstRep.system,
+          testPatient.communicationFirstRep.language.codingFirstRep.code
+        )
+      )
+    assertThat(resourceIndices.uriIndices).isEmpty()
+    assertThat(resourceIndices.quantityIndices).isEmpty()
+    assertThat(resourceIndices.referenceIndices)
+      .containsExactly(
+        ReferenceIndex(
+          "organization",
+          "Patient.managingOrganization",
+          testPatient.managingOrganization.reference
+        )
+      )
+    assertThat(resourceIndices.stringIndices)
+      .containsExactly(
+        StringIndex("given", "Patient.name.given", testPatient.nameFirstRep.givenAsSingleString),
+        StringIndex("address", "Patient.address", testPatient.addressFirstRep.toString()),
+        StringIndex(
+          "address-postalcode",
+          "Patient.address.postalCode",
+          testPatient.addressFirstRep.postalCode
+        ),
+        StringIndex(
+          "address-country",
+          "Patient.address.country",
+          testPatient.addressFirstRep.country
+        ),
+        StringIndex("phonetic", "Patient.name", testPatient.nameFirstRep.toString()),
+        StringIndex("name", "Patient.name", testPatient.nameFirstRep.toString()),
+        StringIndex("family", "Patient.name.family", testPatient.nameFirstRep.family),
+        StringIndex("address-city", "Patient.address.city", testPatient.addressFirstRep.city)
+      )
+  }
+
+  @Test
+  fun index_location_shouldIndexPosition() {
+    val resourceIndices = ResourceIndexer.index(specialTestLocation)
+    assertThat(resourceIndices.positionIndices).contains(PositionIndex(-83.69471, 42.2565))
   }
 
   @Test
   fun index_patient_lastUpdated_shouldIndexLastUpdated() {
     val resourceIndices = ResourceIndexer.index(lastUpdatedTestPatient)
-    val lastUpdatedElement = lastUpdatedTestPatient.getMeta().getLastUpdatedElement()
-    Truth.assertThat(resourceIndices.dateIndices)
+    val lastUpdatedElement = lastUpdatedTestPatient.meta.lastUpdatedElement
+    assertThat(resourceIndices.dateIndices)
       .contains(
         DateIndex(
           "_lastUpdated",

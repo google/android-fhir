@@ -37,6 +37,7 @@ import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.Invoice
+import org.hl7.fhir.r4.model.Location
 import org.hl7.fhir.r4.model.Money
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
@@ -182,8 +183,17 @@ class ResourceIndexerTest {
           "true"
         )
       )
-    specialTestLocation =
-      testingUtils.readFromFile(Location::class.java, "/location-example-hl7hq.json")
+  }
+
+  @Test
+  fun index_location_shouldIndexPosition() {
+    val location =
+      Location().apply {
+        id = "someID"
+        position = Location.LocationPositionComponent(DecimalType(90.0), DecimalType(90.0))
+      }
+    val resourceIndices = ResourceIndexer.index(location)
+    assertThat(resourceIndices.positionIndices).contains(PositionIndex(90.0, 90.0))
   }
 
   @Test
