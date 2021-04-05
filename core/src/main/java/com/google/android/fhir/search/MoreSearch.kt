@@ -87,7 +87,8 @@ fun StringFilter.query(type: ResourceType): SearchQuery {
     when {
       modifier?.isContains == true ->
         "LIKE '%' || ? || '%' " // Can be replaced by `CONTAINS` when FTS is enabled
-      else -> "= ?"
+      modifier?.isExact == true -> "= ?"
+      else -> "LIKE ? || '%' "
     }
   return SearchQuery(
     """
