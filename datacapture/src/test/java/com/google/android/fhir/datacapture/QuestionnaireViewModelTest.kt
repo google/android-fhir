@@ -370,6 +370,47 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
+  fun questionnaireHasMultipleInitialValuesForRepeatingCase_shouldSetFirstAnswerValueInQuestionnaireResponse() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            repeats = true
+            initial =
+              mutableListOf(
+                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true)),
+                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true))
+              )
+          }
+        )
+      }
+    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+    val viewModel = QuestionnaireViewModel(state)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        setQuestionnaire("Questionnaire/a-questionnaire")
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
   fun questionnaireHasInitialValueButQuestionnareResponseAsEmpty_shouldSetEmptyAnswer() {
     val questionnaire =
       Questionnaire().apply {
@@ -411,7 +452,7 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun questionnareHasMoreThanOneInitialValues_shouldThrowError() {
+  fun questionnareHasMoreThanOneInitialValuesAndNotRepeating_shouldThrowError() {
     val questionnaire =
       Questionnaire().apply {
         id = "a-questionnaire"
@@ -420,6 +461,7 @@ class QuestionnaireViewModelTest {
             linkId = "a-link-id"
             text = "Basic question"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            repeats = false
             initial =
               mutableListOf(
                 Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true)),

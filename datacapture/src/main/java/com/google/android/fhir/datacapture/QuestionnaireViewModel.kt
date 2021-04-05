@@ -188,6 +188,19 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
               value = this@createQuestionnaireResponseItem.initial[0].value
             }
           )
+      } else if (this@createQuestionnaireResponseItem.type !=
+          Questionnaire.QuestionnaireItemType.GROUP &&
+          this@createQuestionnaireResponseItem.type !=
+            Questionnaire.QuestionnaireItemType.DISPLAY &&
+          this@createQuestionnaireResponseItem.repeats &&
+          initial.size > 1
+      ) {
+        answer =
+          mutableListOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = this@createQuestionnaireResponseItem.initial[0].value
+            }
+          )
       } else if (this@createQuestionnaireResponseItem.type ==
           Questionnaire.QuestionnaireItemType.GROUP ||
           this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.DISPLAY
@@ -196,6 +209,7 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
           "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
         )
       } else if (initial.size > 1 &&
+          !this@createQuestionnaireResponseItem.repeats &&
           this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
           this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.DISPLAY
       ) {
