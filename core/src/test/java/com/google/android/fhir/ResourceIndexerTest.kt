@@ -48,42 +48,31 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class ResourceIndexerTest {
-  private lateinit var qtyTestSubstance: Substance
   private lateinit var testInvoice: Invoice
-  private lateinit var uriTestQuestionnaire: Questionnaire
+  private lateinit var testQuestionnaire: Questionnaire
   private lateinit var testPatient: Patient
-  private lateinit var lastUpdatedTestPatient: Patient
-  private lateinit var numberTestChargeItem: ChargeItem
-  private lateinit var numberTestMolecularSequence: MolecularSequence
-  private lateinit var specialTestLocation: Location
+  private lateinit var testLocation: Location
 
   @Before
   fun setUp() {
     val testingUtils = TestingUtils(FhirContext.forR4().newJsonParser())
     // TODO: Improve sample data reading. Current approach has a downside of failing all tests if
     // one file name is mistyped.
-    qtyTestSubstance =
-      testingUtils.readFromFile(Substance::class.java, "/quantity_test_substance.json")
-    testInvoice = testingUtils.readFromFile(Invoice::class.java, "/quantity_test_invoice.json")
-    uriTestQuestionnaire =
+   testInvoice = testingUtils.readFromFile(Invoice::class.java, "/quantity_test_invoice.json")
+    testQuestionnaire =
       testingUtils.readFromFile(Questionnaire::class.java, "/uri_test_questionnaire.json")
     testPatient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
-    lastUpdatedTestPatient =
-      testingUtils.readFromFile(Patient::class.java, "/lastupdated_ts_test_patient.json")
-    numberTestChargeItem =
-      testingUtils.readFromFile(ChargeItem::class.java, "/number_test_charge_item.json")
-    numberTestMolecularSequence =
-      testingUtils.readFromFile(
-        MolecularSequence::class.java,
-        "/number_test_molecular_sequence.json"
-      )
-    specialTestLocation =
+    testLocation =
       testingUtils.readFromFile(Location::class.java, "/location-example-hl7hq.json")
   }
 
   @Test
   fun index_invoice() {
     val resourceIndices = ResourceIndexer.index(testInvoice)
+
+    assertThat(resourceIndices.resourceId).isEqualTo(testInvoice.logicalId)
+    assertThat(resourceIndices.resourceType).isEqualTo(testInvoice.resourceType)
+
     assertThat(resourceIndices.quantityIndices)
       .containsExactly(
         // Search parameter names flatten camel case so "totalGross" becomes "totalgross"
@@ -132,33 +121,33 @@ class ResourceIndexerTest {
         ReferenceIndex("account", "Invoice.account", testInvoice.account.reference)
       )
     assertThat(resourceIndices.stringIndices).isEmpty()
+    assertThat(resourceIndices.positionIndices).isEmpty()
   }
 
-  @Test
-  fun index_substance_shouldIndexQuantityQuantity() {
-    val resourceIndices = ResourceIndexer.index(qtyTestSubstance)
-    assertThat(resourceIndices.quantityIndices)
-      .contains(
-        QuantityIndex(
-          "quantity",
-          "Substance.instance.quantity",
-          "http://unitsofmeasure.org",
-          "mL",
-          BigDecimal("100")
-        )
-      )
-  }
 
   @Test
-  fun index_questionnaire_shouldIndexUri() {
-    val resourceIndices = ResourceIndexer.index(uriTestQuestionnaire)
+  fun index_questionnaire() {
+    val resourceIndices = ResourceIndexer.index(testQuestionnaire)
+
+    assertThat(resourceIndices.resourceType).isEqualTo(testQuestionnaire.resourceType)
+    assertThat(resourceIndices.resourceId).isEqualTo(testQuestionnaire.logicalId)
+
     assertThat(resourceIndices.uriIndices)
-      .contains(UriIndex("url", "Questionnaire.url", "http://hl7.org/fhir/Questionnaire/3141"))
+      .containsExactly(UriIndex("url", "Questionnaire.url", "http://hl7.org/fhir/Questionnaire/3141"))
+    assertThat(resourceIndices.numberIndices).isEmpty()
+    assertThat(resourceIndices.tokenIndices).isEmpty()
+    assertThat(resourceIndices.dateIndices).isEmpty()
+    assertThat(resourceIndices.referenceIndices).isEmpty()
+    assertThat(resourceIndices.stringIndices).containsExactly(StringIndex("title","Questionnaire.title",testQuestionnaire.title))
+    assertThat(resourceIndices.positionIndices).isEmpty()
+    assertThat(resourceIndices.quantityIndices).isEmpty()
   }
 
   @Test
   fun index_patient() {
     val resourceIndices = ResourceIndexer.index(testPatient)
+    assertThat(resourceIndices.resourceType).isEqualTo(testPatient.resourceType)
+    assertThat(resourceIndices.resourceId).isEqualTo(testPatient.logicalId)
     val birthDateElement = testPatient.birthDateElement
     assertThat(resourceIndices.dateIndices)
       .containsExactly(
@@ -222,58 +211,49 @@ class ResourceIndexerTest {
         StringIndex("family", "Patient.name.family", testPatient.nameFirstRep.family),
         StringIndex("address-city", "Patient.address.city", testPatient.addressFirstRep.city)
       )
+    assertThat(resourceIndices.positionIndices).isEmpty()
   }
 
   @Test
   fun index_location_shouldIndexPosition() {
-    val resourceIndices = ResourceIndexer.index(specialTestLocation)
-    assertThat(resourceIndices.positionIndices).contains(PositionIndex(-83.69471, 42.2565))
-  }
-
-  @Test
-  fun index_patient_lastUpdated_shouldIndexLastUpdated() {
-    val resourceIndices = ResourceIndexer.index(lastUpdatedTestPatient)
-    val lastUpdatedElement = lastUpdatedTestPatient.meta.lastUpdatedElement
-    assertThat(resourceIndices.dateIndices)
-      .contains(
-        DateIndex(
-          "_lastUpdated",
-          "Patient.meta.lastUpdated",
-          lastUpdatedElement.value.getTime(),
-          lastUpdatedElement.getValue().getTime(),
-          lastUpdatedElement.getPrecision()
+    val resourceIndices = ResourceIndexer.index(testLocation)
+    assertThat(resourceIndices.resourceType).isEqualTo(testLocation.resourceType)
+    assertThat(resourceIndices.resourceId).isEqualTo(testLocation.logicalId)
+    assertThat(resourceIndices.positionIndices).containsExactly(PositionIndex(-83.69471, 42.2565))
+    assertThat(resourceIndices.numberIndices).isEmpty()
+    assertThat(resourceIndices.tokenIndices)
+      .containsExactly(
+        TokenIndex(
+          "type",
+          "Location.type",
+          testLocation.typeFirstRep.codingFirstRep.system,
+          testLocation.typeFirstRep.codingFirstRep.code
         )
       )
-  }
-
-  @Test
-  fun index_chargeItem_shouldIndexFactorOverride() {
-    val resourceIndices = ResourceIndexer.index(numberTestChargeItem)
-    Truth.assertThat(resourceIndices.numberIndices)
-      .contains(NumberIndex("factor-override", "ChargeItem.factorOverride", BigDecimal("0.8")))
-  }
-
-  @Test
-  fun index_molecularSequence_shouldIndexWindowAndVariant() {
-    val resourceIndices = ResourceIndexer.index(numberTestMolecularSequence)
-    Truth.assertThat(resourceIndices.numberIndices)
-      .containsAtLeast(
-        NumberIndex(
-          "window-end",
-          "MolecularSequence.referenceSeq.windowEnd",
-          BigDecimal("22125510")
+    assertThat(resourceIndices.uriIndices).isEmpty()
+    assertThat(resourceIndices.dateIndices).isEmpty()
+    assertThat(resourceIndices.referenceIndices).isEmpty()
+    assertThat(resourceIndices.quantityIndices).isEmpty()
+    assertThat(resourceIndices.stringIndices)
+      .containsExactly(
+        StringIndex("address", "Location.address", testLocation.address.toString()),
+        StringIndex("address-state", "Location.address.state", testLocation.address.state),
+        StringIndex(
+          "address-postalcode",
+          "Location.address.postalCode",
+          testLocation.address.postalCode
         ),
-        NumberIndex(
-          "window-start",
-          "MolecularSequence.referenceSeq.windowStart",
-          BigDecimal("22125500")
+        StringIndex(
+          "address-country",
+          "Location.address.country",
+          testLocation.address.country
         ),
-        NumberIndex("variant-end", "MolecularSequence.variant.end", BigDecimal("22125504")),
-        NumberIndex("variant-start", "MolecularSequence.variant.start", BigDecimal("22125503"))
+        StringIndex("name", "Location.name | Location.alias", testLocation.name),
+        StringIndex("address-city", "Location.address.city", testLocation.address.city)
       )
   }
 
-  private companion object {
+   private companion object {
     // See: https://www.hl7.org/fhir/valueset-currencies.html
     const val FHIR_CURRENCY_SYSTEM = "urn:iso:std:iso:4217"
   }
