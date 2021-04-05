@@ -65,7 +65,7 @@ class SearchTest {
     WHERE a.resourceType = ?
     AND a.resourceId IN (
     SELECT resourceId FROM StringIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value LIKE '%' || ? || '%'  COLLATE NOCASE
+    WHERE resourceType = ? AND index_name = ? AND index_value LIKE '%' || ? || '%' COLLATE NOCASE
     )
         """.trimIndent()
       )
@@ -129,7 +129,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM StringIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? COLLATE NOCASE
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
         )
         """.trimIndent()
       )
@@ -204,7 +204,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM StringIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? COLLATE NOCASE
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
         )
         ORDER BY b.index_value ASC
         LIMIT ? OFFSET ?
