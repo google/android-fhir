@@ -17,7 +17,14 @@
 package com.google.android.fhir.datacapture.views
 
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-/** More [Questionnaire.QuestionnaireItemComponent] properties */
-val Questionnaire.QuestionnaireItemComponent.canModifyStructure: Boolean
+/**
+ * If a [Questionnaire.QuestionnaireItemComponent] has nested items and is not of type group, its
+ * corresponding [QuestionnaireResponse.QuestionnaireResponseItemComponent] will have the nested
+ * items within its [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]
+ *
+ * The property below is used to identify such [Questionnaire.QuestionnaireItemComponent]
+ */
+val Questionnaire.QuestionnaireItemComponent.hasNestedItemsWithinAnswers: Boolean
   get() = item.isNotEmpty() && type != Questionnaire.QuestionnaireItemType.GROUP
