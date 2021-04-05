@@ -18,7 +18,7 @@ package com.google.android.fhir.search
 
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
-import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import ca.uhn.fhir.rest.param.StringParam
 import org.hl7.fhir.r4.model.ResourceType
 
 @SearchDslMarker
@@ -49,7 +49,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
 @SearchDslMarker
 data class StringFilter(
   val parameter: StringClientParam,
-  var prefix: ParamPrefixEnum? = null,
+  var modifier: StringParam? = null,
   var value: String? = null
 )
 

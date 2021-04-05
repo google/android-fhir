@@ -17,7 +17,7 @@
 package com.google.android.fhir.search
 
 import android.os.Build
-import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import ca.uhn.fhir.rest.param.StringParam
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Patient
@@ -44,6 +44,38 @@ class SearchTest {
         """.trimIndent()
       )
     assertThat(query.args).isEqualTo(listOf(ResourceType.Patient.name))
+  }
+  @Test
+  fun search_string_contains() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.ADDRESS) {
+            modifier = StringParam().setContains(true)
+            value = "someValue"
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+    SELECT a.serializedResource
+    FROM ResourceEntity a
+    WHERE a.resourceType = ?
+    AND a.resourceId IN (
+    SELECT resourceId FROM StringIndexEntity
+    WHERE resourceType = ? AND index_name = ? AND index_value LIKE '%' || ? || '%'  COLLATE NOCASE
+    )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .containsExactly(
+        ResourceType.Patient.name,
+        ResourceType.Patient.name,
+        Patient.ADDRESS.paramName,
+        "someValue"
+      )
   }
 
   @Test
@@ -87,14 +119,7 @@ class SearchTest {
   @Test
   fun search_filter() {
     val query =
-      Search(ResourceType.Patient)
-        .apply {
-          filter(Patient.FAMILY) {
-            prefix = ParamPrefixEnum.EQUAL
-            value = "Jones"
-          }
-        }
-        .getQuery()
+      Search(ResourceType.Patient).apply { filter(Patient.FAMILY) { value = "Jones" } }.getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -162,10 +187,7 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient)
         .apply {
-          filter(Patient.FAMILY) {
-            prefix = ParamPrefixEnum.EQUAL
-            value = "Jones"
-          }
+          filter(Patient.FAMILY) { value = "Jones" }
           sort(Patient.GIVEN, Order.ASCENDING)
           count = 10
           from = 20

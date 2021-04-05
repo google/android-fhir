@@ -21,7 +21,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.liveData
-import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.data.SamplePatients
 import com.google.android.fhir.search.Order
@@ -43,7 +42,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val searchResults: List<Patient> =
       fhirEngine.search {
         filter(Patient.ADDRESS_CITY) {
-          prefix = ParamPrefixEnum.EQUAL
+          modifier = null
           value = "NAIROBI"
         }
         sort(Patient.GIVEN, Order.ASCENDING)
