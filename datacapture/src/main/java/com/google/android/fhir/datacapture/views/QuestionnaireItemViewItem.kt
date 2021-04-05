@@ -39,8 +39,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
   val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-  val questionnaireResponseItemChangedCallback: () -> Unit,
-  val questionnaireResponseItemAnsweredCallback: (linkId: String) -> Unit
+  val questionnaireResponseItemChangedCallback: (linkId: String?) -> Unit,
 ) {
   /**
    * The single answer to the [QuestionnaireResponse.QuestionnaireResponseItemComponent], or `null`

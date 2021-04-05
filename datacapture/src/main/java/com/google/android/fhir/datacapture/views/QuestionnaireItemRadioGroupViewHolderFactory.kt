@@ -85,13 +85,8 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
               )
             }
           }
-          if (questionnaireItemViewItem.questionnaireItem.canModifyStructure) {
-            questionnaireItemViewItem.questionnaireResponseItemAnsweredCallback(
-              questionnaireItemViewItem.questionnaireItem.linkId
-            )
-            return@setOnCheckedChangeListener
-          }
-          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+
+          questionnaireItemViewItem.questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
         }
       }
     }

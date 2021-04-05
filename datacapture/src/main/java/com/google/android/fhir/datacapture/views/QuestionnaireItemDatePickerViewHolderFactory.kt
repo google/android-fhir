@@ -81,7 +81,7 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                     value = date
                   }
-                questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+                questionnaireItemViewItem.questionnaireResponseItemChangedCallback(questionnaireItemViewItem.questionnaireItem.linkId)
               }
             }
           )
