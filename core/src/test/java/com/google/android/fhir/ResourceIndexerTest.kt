@@ -20,7 +20,6 @@ import android.os.Build
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.entities.DateIndex
-import com.google.android.fhir.index.entities.NumberIndex
 import com.google.android.fhir.index.entities.PositionIndex
 import com.google.android.fhir.index.entities.QuantityIndex
 import com.google.android.fhir.index.entities.ReferenceIndex
@@ -28,16 +27,11 @@ import com.google.android.fhir.index.entities.StringIndex
 import com.google.android.fhir.index.entities.TokenIndex
 import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.resource.TestingUtils
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
-import java.math.BigDecimal
-import org.hl7.fhir.r4.model.ChargeItem
 import org.hl7.fhir.r4.model.Invoice
 import org.hl7.fhir.r4.model.Location
-import org.hl7.fhir.r4.model.MolecularSequence
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.Substance
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -58,12 +52,11 @@ class ResourceIndexerTest {
     val testingUtils = TestingUtils(FhirContext.forR4().newJsonParser())
     // TODO: Improve sample data reading. Current approach has a downside of failing all tests if
     // one file name is mistyped.
-   testInvoice = testingUtils.readFromFile(Invoice::class.java, "/quantity_test_invoice.json")
+    testInvoice = testingUtils.readFromFile(Invoice::class.java, "/quantity_test_invoice.json")
     testQuestionnaire =
       testingUtils.readFromFile(Questionnaire::class.java, "/uri_test_questionnaire.json")
     testPatient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
-    testLocation =
-      testingUtils.readFromFile(Location::class.java, "/location-example-hl7hq.json")
+    testLocation = testingUtils.readFromFile(Location::class.java, "/location-example-hl7hq.json")
   }
 
   @Test
@@ -93,6 +86,7 @@ class ResourceIndexerTest {
       )
 
     assertThat(resourceIndices.numberIndices).isEmpty()
+
     assertThat(resourceIndices.tokenIndices)
       .containsExactly(
         TokenIndex(
@@ -108,8 +102,11 @@ class ResourceIndexerTest {
           testInvoice.participantFirstRep.role.codingFirstRep.code
         )
       )
+
     assertThat(resourceIndices.uriIndices).isEmpty()
+
     assertThat(resourceIndices.dateIndices).isEmpty()
+
     assertThat(resourceIndices.referenceIndices)
       .containsExactly(
         ReferenceIndex("subject", "Invoice.subject", testInvoice.subject.reference),
@@ -120,10 +117,11 @@ class ResourceIndexerTest {
         ),
         ReferenceIndex("account", "Invoice.account", testInvoice.account.reference)
       )
+
     assertThat(resourceIndices.stringIndices).isEmpty()
+
     assertThat(resourceIndices.positionIndices).isEmpty()
   }
-
 
   @Test
   fun index_questionnaire() {
@@ -133,33 +131,46 @@ class ResourceIndexerTest {
     assertThat(resourceIndices.resourceId).isEqualTo(testQuestionnaire.logicalId)
 
     assertThat(resourceIndices.uriIndices)
-      .containsExactly(UriIndex("url", "Questionnaire.url", "http://hl7.org/fhir/Questionnaire/3141"))
+      .containsExactly(
+        UriIndex("url", "Questionnaire.url", "http://hl7.org/fhir/Questionnaire/3141")
+      )
+
     assertThat(resourceIndices.numberIndices).isEmpty()
+
     assertThat(resourceIndices.tokenIndices).isEmpty()
+
     assertThat(resourceIndices.dateIndices).isEmpty()
+
     assertThat(resourceIndices.referenceIndices).isEmpty()
-    assertThat(resourceIndices.stringIndices).containsExactly(StringIndex("title","Questionnaire.title",testQuestionnaire.title))
+
+    assertThat(resourceIndices.stringIndices)
+      .containsExactly(StringIndex("title", "Questionnaire.title", testQuestionnaire.title))
+
     assertThat(resourceIndices.positionIndices).isEmpty()
+
     assertThat(resourceIndices.quantityIndices).isEmpty()
   }
 
   @Test
   fun index_patient() {
     val resourceIndices = ResourceIndexer.index(testPatient)
+
     assertThat(resourceIndices.resourceType).isEqualTo(testPatient.resourceType)
     assertThat(resourceIndices.resourceId).isEqualTo(testPatient.logicalId)
-    val birthDateElement = testPatient.birthDateElement
+
     assertThat(resourceIndices.dateIndices)
       .containsExactly(
         DateIndex(
           "birthdate",
           "Patient.birthDate",
-          birthDateElement.value.time,
-          birthDateElement.value.time,
-          birthDateElement.precision
+          testPatient.birthDateElement.value.time,
+          testPatient.birthDateElement.value.time,
+          testPatient.birthDateElement.precision
         )
       )
+
     assertThat(resourceIndices.numberIndices).isEmpty()
+
     assertThat(resourceIndices.tokenIndices)
       .containsExactly(
         TokenIndex(
@@ -182,8 +193,11 @@ class ResourceIndexerTest {
           testPatient.communicationFirstRep.language.codingFirstRep.code
         )
       )
+
     assertThat(resourceIndices.uriIndices).isEmpty()
+
     assertThat(resourceIndices.quantityIndices).isEmpty()
+
     assertThat(resourceIndices.referenceIndices)
       .containsExactly(
         ReferenceIndex(
@@ -192,6 +206,7 @@ class ResourceIndexerTest {
           testPatient.managingOrganization.reference
         )
       )
+
     assertThat(resourceIndices.stringIndices)
       .containsExactly(
         StringIndex("given", "Patient.name.given", testPatient.nameFirstRep.givenAsSingleString),
@@ -211,6 +226,7 @@ class ResourceIndexerTest {
         StringIndex("family", "Patient.name.family", testPatient.nameFirstRep.family),
         StringIndex("address-city", "Patient.address.city", testPatient.addressFirstRep.city)
       )
+
     assertThat(resourceIndices.positionIndices).isEmpty()
   }
 
@@ -219,8 +235,11 @@ class ResourceIndexerTest {
     val resourceIndices = ResourceIndexer.index(testLocation)
     assertThat(resourceIndices.resourceType).isEqualTo(testLocation.resourceType)
     assertThat(resourceIndices.resourceId).isEqualTo(testLocation.logicalId)
+
     assertThat(resourceIndices.positionIndices).containsExactly(PositionIndex(-83.69471, 42.2565))
+
     assertThat(resourceIndices.numberIndices).isEmpty()
+
     assertThat(resourceIndices.tokenIndices)
       .containsExactly(
         TokenIndex(
@@ -230,10 +249,15 @@ class ResourceIndexerTest {
           testLocation.typeFirstRep.codingFirstRep.code
         )
       )
+
     assertThat(resourceIndices.uriIndices).isEmpty()
+
     assertThat(resourceIndices.dateIndices).isEmpty()
+
     assertThat(resourceIndices.referenceIndices).isEmpty()
+
     assertThat(resourceIndices.quantityIndices).isEmpty()
+
     assertThat(resourceIndices.stringIndices)
       .containsExactly(
         StringIndex("address", "Location.address", testLocation.address.toString()),
@@ -243,26 +267,14 @@ class ResourceIndexerTest {
           "Location.address.postalCode",
           testLocation.address.postalCode
         ),
-        StringIndex(
-          "address-country",
-          "Location.address.country",
-          testLocation.address.country
-        ),
         StringIndex("name", "Location.name | Location.alias", testLocation.name),
+        StringIndex("address-country", "Location.address.country", testLocation.address.country),
         StringIndex("address-city", "Location.address.city", testLocation.address.city)
       )
   }
 
-   private companion object {
+  private companion object {
     // See: https://www.hl7.org/fhir/valueset-currencies.html
     const val FHIR_CURRENCY_SYSTEM = "urn:iso:std:iso:4217"
   }
 }
-/*
-*   assertThat(resourceIndices.numberIndices).isEmpty()
-    assertThat(resourceIndices.tokenIndices).isEmpty()
-    assertThat(resourceIndices.uriIndices).isEmpty()
-    assertThat(resourceIndices.dateIndices).isEmpty()
-    assertThat(resourceIndices.referenceIndices).isEmpty()
-    assertThat(resourceIndices.stringIndices).isEmpty()
-* */
