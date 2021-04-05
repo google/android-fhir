@@ -202,6 +202,14 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   QuestionnaireResponse.QuestionnaireResponseItemComponent {
   return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
+    if (this@createQuestionnaireResponseItem.initial.isNotEmpty()) {
+      answer =
+        mutableListOf(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = this@createQuestionnaireResponseItem.initial[0].value
+          }
+        )
+    }
     if (this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
         this@createQuestionnaireResponseItem.item.count() > 0
     ) {
@@ -216,7 +224,6 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
       this@createQuestionnaireResponseItem.item.forEach {
         this.addItem(it.createQuestionnaireResponseItem())
       }
-    }
   }
 }
 
