@@ -29,6 +29,15 @@ internal object MaxValueConstraintValidator :
         extension.value.fhirType().equals("integer") && answer.hasValueIntegerType() -> {
           answer.valueIntegerType.value > extension.value.primitiveValue().toInt()
         }
+        extension.value.fhirType().equals("decimal") && answer.hasValueDecimalType() -> {
+          answer.valueDecimalType.value > extension.value.primitiveValue().toBigDecimal()
+        }
+        extension.value.fhirType().equals("date") && answer.hasValueDateType() -> {
+          answer.valueDateType.value > extension.value.dateTimeValue().value
+        }
+        extension.value.fhirType().equals("dateTime") && answer.hasValueDateTimeType() -> {
+          answer.valueDateTimeType.value > extension.value.dateTimeValue().value
+        }
         else -> false
       }
     },
@@ -36,7 +45,16 @@ internal object MaxValueConstraintValidator :
       ->
       when {
         extension.value.fhirType().equals("integer") && answer.hasValueIntegerType() -> {
-          "Maximum value allowed is:" + extension.value.primitiveValue().toInt().toString()
+          "Maximum value allowed is:" + extension.value.primitiveValue()
+        }
+        extension.value.fhirType().equals("decimal") && answer.hasValueDecimalType() -> {
+          "Maximum value allowed is:" + extension.value.primitiveValue()
+        }
+        extension.value.fhirType().equals("date") && answer.hasValueDateType() -> {
+          "Maximum date allowed is:" + extension.value.primitiveValue()
+        }
+        extension.value.fhirType().equals("dateTime") && answer.hasValueDateTimeType() -> {
+          "Maximum date & time allowed is:" + extension.value.primitiveValue()
         }
         else -> ""
       }
