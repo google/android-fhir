@@ -176,52 +176,60 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   QuestionnaireResponse.QuestionnaireResponseItemComponent {
   return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
-    if (this@createQuestionnaireResponseItem.initial.isNotEmpty()) {
-      if (this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
-          this@createQuestionnaireResponseItem.type !=
-            Questionnaire.QuestionnaireItemType.DISPLAY &&
-          this@createQuestionnaireResponseItem.initial.size == 1
-      ) {
-        answer =
-          mutableListOf(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = this@createQuestionnaireResponseItem.initial[0].value
-            }
-          )
-      } else if (this@createQuestionnaireResponseItem.type !=
-          Questionnaire.QuestionnaireItemType.GROUP &&
-          this@createQuestionnaireResponseItem.type !=
-            Questionnaire.QuestionnaireItemType.DISPLAY &&
-          this@createQuestionnaireResponseItem.repeats &&
-          initial.size > 1
-      ) {
-        answer =
-          mutableListOf(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = this@createQuestionnaireResponseItem.initial[0].value
-            }
-          )
-      } else if (this@createQuestionnaireResponseItem.type ==
-          Questionnaire.QuestionnaireItemType.GROUP ||
-          this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.DISPLAY
-      ) {
-        throw IllegalArgumentException(
-          "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
-        )
-      } else if (initial.size > 1 &&
-          !this@createQuestionnaireResponseItem.repeats &&
-          this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
-          this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.DISPLAY
-      ) {
-        throw IllegalArgumentException(
-          "Questionnaire item ${this@createQuestionnaireResponseItem.linkId} has initial value(s). See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
-        )
-      }
-    }
+    answer = createQuestionnaireResponseWithInitialItem()
     this@createQuestionnaireResponseItem.item.forEach {
       this.addItem(it.createQuestionnaireResponseItem())
     }
   }
+}
+
+private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseWithInitialItem():
+  MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? {
+  if (this@createQuestionnaireResponseWithInitialItem.initial.isNotEmpty()) {
+    if (this@createQuestionnaireResponseWithInitialItem.type !=
+        Questionnaire.QuestionnaireItemType.GROUP &&
+        this@createQuestionnaireResponseWithInitialItem.type !=
+          Questionnaire.QuestionnaireItemType.DISPLAY &&
+        this@createQuestionnaireResponseWithInitialItem.initial.size == 1
+    ) {
+      return mutableListOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = this@createQuestionnaireResponseWithInitialItem.initial[0].value
+        }
+      )
+    } else if (this@createQuestionnaireResponseWithInitialItem.type !=
+        Questionnaire.QuestionnaireItemType.GROUP &&
+        this@createQuestionnaireResponseWithInitialItem.type !=
+          Questionnaire.QuestionnaireItemType.DISPLAY &&
+        this@createQuestionnaireResponseWithInitialItem.repeats &&
+        initial.size > 1
+    ) {
+      return mutableListOf(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = this@createQuestionnaireResponseWithInitialItem.initial[0].value
+        }
+      )
+    } else if (this@createQuestionnaireResponseWithInitialItem.type ==
+        Questionnaire.QuestionnaireItemType.GROUP ||
+        this@createQuestionnaireResponseWithInitialItem.type ==
+          Questionnaire.QuestionnaireItemType.DISPLAY
+    ) {
+      throw IllegalArgumentException(
+        "Questionnaire item ${this@createQuestionnaireResponseWithInitialItem.linkId} has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+      )
+    } else if (initial.size > 1 &&
+        !this@createQuestionnaireResponseWithInitialItem.repeats &&
+        this@createQuestionnaireResponseWithInitialItem.type !=
+          Questionnaire.QuestionnaireItemType.GROUP &&
+        this@createQuestionnaireResponseWithInitialItem.type !=
+          Questionnaire.QuestionnaireItemType.DISPLAY
+    ) {
+      throw IllegalArgumentException(
+        "Questionnaire item ${this@createQuestionnaireResponseWithInitialItem.linkId} has initial value(s). See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+      )
+    }
+  }
+  return null
 }
 
 /**
