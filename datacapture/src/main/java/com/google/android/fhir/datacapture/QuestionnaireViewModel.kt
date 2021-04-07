@@ -188,50 +188,35 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? {
   if (initial.isEmpty()) {
     return null
-  } else if (initial.isNotEmpty()) {
-
-    if (type == Questionnaire.QuestionnaireItemType.GROUP ||
-        type == Questionnaire.QuestionnaireItemType.DISPLAY
-    ) {
-      throw IllegalArgumentException(
-        "Questionnaire item $linkId has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
-      )
-    }
-
-    if (initial.size > 1 &&
-        !repeats &&
-        type != Questionnaire.QuestionnaireItemType.GROUP &&
-        type != Questionnaire.QuestionnaireItemType.DISPLAY
-    ) {
-      throw IllegalArgumentException(
-        "Questionnaire item $linkId can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
-      )
-    }
-
-    if (type != Questionnaire.QuestionnaireItemType.GROUP &&
-        type != Questionnaire.QuestionnaireItemType.DISPLAY &&
-        initial.size == 1
-    ) {
-      return mutableListOf(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          value = initial[0].value
-        }
-      )
-    }
-
-    if (type != Questionnaire.QuestionnaireItemType.GROUP &&
-        type != Questionnaire.QuestionnaireItemType.DISPLAY &&
-        repeats &&
-        initial.size > 1
-    ) {
-      return mutableListOf(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          value = initial[0].value
-        }
-      )
-    }
   }
-  return null
+
+  if (type == Questionnaire.QuestionnaireItemType.GROUP ||
+      type == Questionnaire.QuestionnaireItemType.DISPLAY
+  ) {
+    throw IllegalArgumentException(
+      "Questionnaire item $linkId has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+    )
+  }
+
+  if (initial.size > 1 && !repeats) {
+    throw IllegalArgumentException(
+      "Questionnaire item $linkId can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+    )
+  }
+
+  if (initial.size == 1) {
+    return mutableListOf(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        value = initial[0].value
+      }
+    )
+  }
+
+  return mutableListOf(
+    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+      value = initial[0].value
+    }
+  )
 }
 
 /**
