@@ -106,55 +106,6 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
     if (rowsDeleted > 0) localChangeDao.addDelete(resourceId = id, resourceType = type)
   }
 
-  override suspend fun <R : Resource> searchByReference(
-    clazz: Class<R>,
-    reference: String,
-    value: String
-  ): List<R> {
-    return resourceDao.getResourceByReferenceIndex(getResourceType(clazz).name, reference, value)
-      .map { iParser.parseResource(it) as R }
-  }
-
-  override suspend fun <R : Resource> searchByString(
-    clazz: Class<R>,
-    string: String,
-    value: String
-  ): List<R> {
-    return resourceDao.getResourceByStringIndex(
-        resourceType = getResourceType(clazz).name,
-        indexPath = string,
-        indexValue = value
-      )
-      .map { iParser.parseResource(it) as R }
-  }
-
-  override suspend fun <R : Resource> searchByCode(
-    clazz: Class<R>,
-    code: String,
-    system: String,
-    value: String
-  ): List<R> {
-    return resourceDao.getResourceByCodeIndex(
-        resourceType = getResourceType(clazz).name,
-        indexPath = code,
-        indexSystem = system,
-        indexValue = value
-      )
-      .map { iParser.parseResource(it) as R }
-  }
-
-  override suspend fun <R : Resource> searchByReferenceAndCode(
-    clazz: Class<R>,
-    reference: String,
-    referenceValue: String,
-    code: String,
-    codeSystem: String,
-    codeValue: String
-  ): List<R> {
-    val refs = searchByReference(clazz, reference, referenceValue).map { it.logicalId }
-    return searchByCode(clazz, code, codeSystem, codeValue).filter { refs.contains(it.logicalId) }
-  }
-
   override suspend fun <R : Resource> search(query: SearchQuery): List<R> =
     resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).map {
       iParser.parseResource(it) as R
