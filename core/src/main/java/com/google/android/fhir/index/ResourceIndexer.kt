@@ -32,6 +32,7 @@ import java.math.BigDecimal
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Identifier
@@ -39,9 +40,11 @@ import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Location
 import org.hl7.fhir.r4.model.Money
+import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.model.codesystems.SearchParamType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
@@ -125,6 +128,16 @@ internal object ResourceIndexer {
           date.precision
         )
       }
+      "dateTime" -> {
+        val dateTime = value as DateTimeType
+        DateIndex(
+          searchParam.name,
+          searchParam.path,
+          dateTime.value.time,
+          dateTime.value.time,
+          dateTime.precision
+        )
+      }
       "instant" -> {
         val instant = value as InstantType
         DateIndex(
@@ -133,6 +146,32 @@ internal object ResourceIndexer {
           instant.value.time,
           instant.value.time,
           instant.precision
+        )
+      }
+      "Period" -> {
+        val period = value as Period
+        DateIndex(
+          searchParam.name,
+          searchParam.path,
+          if (period.hasEnd()) period.end.time else Long.MAX_VALUE,
+          if (period.hasStart()) period.start.time else Long.MIN_VALUE,
+          when {
+            (period.hasEnd() and period.hasStart()) ->
+              maxOf(period.startElement.precision, period.endElement.precision)
+            (period.hasEnd()) -> period.endElement.precision
+            (period.hasStart()) -> period.startElement.precision
+            else -> DateTimeType.DEFAULT_PRECISION
+          }
+        )
+      }
+      "Timing" -> {
+        val timing = value as Timing
+        DateIndex(
+          searchParam.name,
+          searchParam.path,
+          timing.event.maxOf { it.value.time },
+          timing.event.minOf { it.value.time },
+          timing.event.maxOf { it.precision }
         )
       }
       else -> null
