@@ -18,10 +18,7 @@ package com.google.android.fhir.datacapture.validation
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.Extension
-import org.hl7.fhir.r4.model.IntegerType
-import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.*
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -56,6 +53,29 @@ class MinValueConstraintValidatorTest {
   }
 
   @Test
+  fun shouldReturnInvalidResultForDecimal() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            url = MIN_VALUE_EXTENSION_URL
+            this.setValue(DecimalType(0.1))
+          }
+        )
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = DecimalType(0.09) })
+      }
+
+    val validationResult =
+      MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
+
+    assertThat(validationResult.isValid).isFalse()
+    assertThat(validationResult.message).isEqualTo("Minimum value allowed is:0.1")
+  }
+
+  @Test
   fun shouldReturnValidResult() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
@@ -69,6 +89,29 @@ class MinValueConstraintValidatorTest {
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
         addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = IntegerType(501) })
+      }
+
+    val validationResult =
+      MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
+
+    assertThat(validationResult.isValid).isTrue()
+    assertThat(validationResult.message.isNullOrBlank()).isTrue()
+  }
+
+  @Test
+  fun shouldReturnValidResultForDecimal() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            url = MIN_VALUE_EXTENSION_URL
+            this.setValue(DecimalType(0.1))
+          }
+        )
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = DecimalType(0.11) })
       }
 
     val validationResult =
