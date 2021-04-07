@@ -176,56 +176,51 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   QuestionnaireResponse.QuestionnaireResponseItemComponent {
   return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
-    answer = createQuestionnaireResponseWithInitialItem()
+    answer = createQuestionnaireResponseItemAnswers()
     this@createQuestionnaireResponseItem.item.forEach {
       this.addItem(it.createQuestionnaireResponseItem())
     }
   }
 }
 
-private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseWithInitialItem():
+/** Here we are setting initial value as an Answer to a Question */
+private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
   MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? {
-  if (this@createQuestionnaireResponseWithInitialItem.initial.isNotEmpty()) {
-    if (this@createQuestionnaireResponseWithInitialItem.type !=
-        Questionnaire.QuestionnaireItemType.GROUP &&
-        this@createQuestionnaireResponseWithInitialItem.type !=
-          Questionnaire.QuestionnaireItemType.DISPLAY &&
-        this@createQuestionnaireResponseWithInitialItem.initial.size == 1
+  if (initial.isEmpty()) {
+    return null
+  } else if (initial.isNotEmpty()) {
+    if (type == Questionnaire.QuestionnaireItemType.GROUP ||
+        type == Questionnaire.QuestionnaireItemType.DISPLAY
+    ) {
+      throw IllegalArgumentException(
+        "Questionnaire item $linkId has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+      )
+    } else if (initial.size > 1 &&
+        !repeats &&
+        type != Questionnaire.QuestionnaireItemType.GROUP &&
+        type != Questionnaire.QuestionnaireItemType.DISPLAY
+    ) {
+      throw IllegalArgumentException(
+        "Questionnaire item $linkId can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+      )
+    } else if (type != Questionnaire.QuestionnaireItemType.GROUP &&
+        type != Questionnaire.QuestionnaireItemType.DISPLAY &&
+        initial.size == 1
     ) {
       return mutableListOf(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          value = this@createQuestionnaireResponseWithInitialItem.initial[0].value
+          value = initial[0].value
         }
       )
-    } else if (this@createQuestionnaireResponseWithInitialItem.type !=
-        Questionnaire.QuestionnaireItemType.GROUP &&
-        this@createQuestionnaireResponseWithInitialItem.type !=
-          Questionnaire.QuestionnaireItemType.DISPLAY &&
-        this@createQuestionnaireResponseWithInitialItem.repeats &&
+    } else if (type != Questionnaire.QuestionnaireItemType.GROUP &&
+        type != Questionnaire.QuestionnaireItemType.DISPLAY &&
+        repeats &&
         initial.size > 1
     ) {
       return mutableListOf(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          value = this@createQuestionnaireResponseWithInitialItem.initial[0].value
+          value = initial[0].value
         }
-      )
-    } else if (this@createQuestionnaireResponseWithInitialItem.type ==
-        Questionnaire.QuestionnaireItemType.GROUP ||
-        this@createQuestionnaireResponseWithInitialItem.type ==
-          Questionnaire.QuestionnaireItemType.DISPLAY
-    ) {
-      throw IllegalArgumentException(
-        "Questionnaire item ${this@createQuestionnaireResponseWithInitialItem.linkId} has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
-      )
-    } else if (initial.size > 1 &&
-        !this@createQuestionnaireResponseWithInitialItem.repeats &&
-        this@createQuestionnaireResponseWithInitialItem.type !=
-          Questionnaire.QuestionnaireItemType.GROUP &&
-        this@createQuestionnaireResponseWithInitialItem.type !=
-          Questionnaire.QuestionnaireItemType.DISPLAY
-    ) {
-      throw IllegalArgumentException(
-        "Questionnaire item ${this@createQuestionnaireResponseWithInitialItem.linkId} has initial value(s). See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
       )
     }
   }

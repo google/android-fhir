@@ -478,7 +478,7 @@ class QuestionnaireViewModelTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "Questionnaire item a-link-id has initial value(s). See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+        "Questionnaire item a-link-id can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
       )
   }
 
