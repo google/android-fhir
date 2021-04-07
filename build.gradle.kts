@@ -39,7 +39,7 @@ allprojects {
       ktfmt().googleStyle()
     }
     format("xml") {
-      target(".idea/jarRepositories.xml", "**/*.xml")
+      target("**/*.xml")
       prettier(mapOf("prettier" to "2.0.5", "@prettier/plugin-xml" to "0.13.0"))
         .config(mapOf("parser" to "xml", "tabWidth" to 4))
     }
