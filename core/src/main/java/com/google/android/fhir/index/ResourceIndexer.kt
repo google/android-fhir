@@ -128,6 +128,16 @@ internal object ResourceIndexer {
           date.precision
         )
       }
+      "dateTime" -> {
+        val dateTime = value as DateTimeType
+        DateIndex(
+          searchParam.name,
+          searchParam.path,
+          dateTime.value.time,
+          dateTime.value.time,
+          dateTime.precision
+        )
+      }
       "instant" -> {
         val instant = value as InstantType
         DateIndex(
@@ -154,7 +164,7 @@ internal object ResourceIndexer {
           }
         )
       }
-      "Timing", "Timing.repeat" -> {
+      "Timing" -> {
         val timing = value as Timing
         DateIndex(
           searchParam.name,
@@ -162,16 +172,6 @@ internal object ResourceIndexer {
           timing.event.maxOf { it.value.time },
           timing.event.minOf { it.value.time },
           timing.event.maxOf { it.precision }
-        )
-      }
-      "dateTime" -> {
-        val dateTime = value as DateTimeType
-        DateIndex(
-          searchParam.name,
-          searchParam.path,
-          dateTime.value.time,
-          dateTime.value.time,
-          dateTime.precision
         )
       }
       else -> null
