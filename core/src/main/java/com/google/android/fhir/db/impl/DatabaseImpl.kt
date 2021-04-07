@@ -24,6 +24,7 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
+import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
@@ -163,11 +164,9 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
    * @returns a list of pairs. Each pair is a token + squashed local change. Each token is a list of
    * [LocalChangeEntity.id] s of rows of the [LocalChangeEntity].
    */
-  // TODO: create a data class for squashed local change and merge token in to it.
-  override suspend fun getAllLocalChanges(): List<Pair<LocalChangeToken, LocalChangeEntity>> =
-    localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map { it
-      ->
-      LocalChangeToken(it.map { it.id }) to LocalChangeUtils.squash(it)
+  override suspend fun getAllLocalChanges(): List<SquashedLocalChange> =
+    localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
+      SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
     }
 
   override suspend fun deleteUpdates(token: LocalChangeToken) {

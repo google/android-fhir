@@ -17,6 +17,7 @@
 package com.google.android.fhir.db
 
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.search.SearchQuery
@@ -142,7 +143,7 @@ interface Database {
    * remote FHIR server. Each [resource] will have at most one
    * [LocalChangeEntity](multiple changes are squashed).
    */
-  suspend fun getAllLocalChanges(): List<Pair<LocalChangeToken, LocalChangeEntity>>
+  suspend fun getAllLocalChanges(): List<SquashedLocalChange>
 
   /** Remove the [LocalChangeEntity] s with given ids. Call this after a successful sync. */
   suspend fun deleteUpdates(token: LocalChangeToken)
