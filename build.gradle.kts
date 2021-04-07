@@ -40,6 +40,7 @@ allprojects {
     }
     format("xml") {
       target("**/*.xml")
+      targetExclude("**/build/", ".idea/")
       prettier(mapOf("prettier" to "2.0.5", "@prettier/plugin-xml" to "0.13.0"))
         .config(mapOf("parser" to "xml", "tabWidth" to 4))
     }
