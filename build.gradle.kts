@@ -20,6 +20,30 @@ allprojects {
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
     gradlePluginPortal()
   }
+  configureSpotless()
+}
+
+// Create a CI repository and also change versions to include the build number
+afterEvaluate {
+  val buildNumber = System.getenv("GITHUB_RUN_ID")
+  if (buildNumber != null) {
+    subprojects {
+      apply(plugin = Plugins.BuildPlugins.mavenPublish)
+      configure<PublishingExtension> {
+        repositories {
+          maven {
+            name = "CI"
+            url = uri("file://${rootProject.buildDir}/ci-repo")
+          }
+        }
+        // update version to have suffix of build id
+        project.version = "${project.version}-build_$buildNumber"
+      }
+    }
+  }
+}
+
+fun Project.configureSpotless() {
   apply(plugin = Plugins.BuildPlugins.spotless)
   configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     kotlin {
@@ -40,29 +64,8 @@ allprojects {
     }
     format("xml") {
       target("**/*.xml")
-      targetExclude("**/build/", ".idea/")
       prettier(mapOf("prettier" to "2.0.5", "@prettier/plugin-xml" to "0.13.0"))
         .config(mapOf("parser" to "xml", "tabWidth" to 4))
-    }
-  }
-}
-
-// Create a CI repository and also change versions to include the build number
-afterEvaluate {
-  val buildNumber = System.getenv("GITHUB_RUN_ID")
-  if (buildNumber != null) {
-    subprojects {
-      apply(plugin = Plugins.BuildPlugins.mavenPublish)
-      configure<PublishingExtension> {
-        repositories {
-          maven {
-            name = "CI"
-            url = uri("file://${rootProject.buildDir}/ci-repo")
-          }
-        }
-        // update version to have suffix of build id
-        project.version = "${project.version}-build_$buildNumber"
-      }
     }
   }
 }
