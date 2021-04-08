@@ -228,13 +228,12 @@ private fun Questionnaire.QuestionnaireItemComponent.createListOfItemInAnswer():
   val listOfNestedItems = mutableListOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
   this.item.forEach { listOfNestedItems.add(it.createQuestionnaireResponseItem()) }
   return listOfNestedItems
-  }
+}
 
 /**
  * Returns a list of answers from the initial values of the questionnaire item. `null` if no intial
  * value.
  */
-
 private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
   MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? {
   if (initial.isEmpty()) {
