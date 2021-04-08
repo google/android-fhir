@@ -183,7 +183,10 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   }
 }
 
-/** Here we are setting initial value as an Answer to a Question */
+/**
+ * Returns a list of answers from the initial values of the questionnaire item. `null` if no intial
+ * value.
+ */
 private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
   MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? {
   if (initial.isEmpty()) {
@@ -201,14 +204,6 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   if (initial.size > 1 && !repeats) {
     throw IllegalArgumentException(
       "Questionnaire item $linkId can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
-    )
-  }
-
-  if (initial.size == 1) {
-    return mutableListOf(
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-        value = initial[0].value
-      }
     )
   }
 
