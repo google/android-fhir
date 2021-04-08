@@ -123,7 +123,7 @@ internal object ResourceIndexer {
         DateIndex(
           searchParam.name,
           searchParam.path,
-          date.value.time,
+          date.precision.add(date.value, 1).time,
           date.value.time,
           date.precision
         )
@@ -133,11 +133,12 @@ internal object ResourceIndexer {
         DateIndex(
           searchParam.name,
           searchParam.path,
-          dateTime.value.time,
+          dateTime.precision.add(dateTime.value, 1).time,
           dateTime.value.time,
           dateTime.precision
         )
       }
+      // No need to add precision because an instant is meant to have zero width
       "instant" -> {
         val instant = value as InstantType
         DateIndex(
@@ -153,7 +154,8 @@ internal object ResourceIndexer {
         DateIndex(
           searchParam.name,
           searchParam.path,
-          if (period.hasEnd()) period.end.time else Long.MAX_VALUE,
+          if (period.hasEnd()) period.endElement.precision.add(period.end, 1).time
+          else Long.MAX_VALUE,
           if (period.hasStart()) period.start.time else Long.MIN_VALUE,
           when {
             (period.hasEnd() and period.hasStart()) ->
@@ -169,7 +171,7 @@ internal object ResourceIndexer {
         DateIndex(
           searchParam.name,
           searchParam.path,
-          timing.event.maxOf { it.value.time },
+          timing.event.maxOf { it.precision.add(it.value, 1).time },
           timing.event.minOf { it.value.time },
           timing.event.maxOf { it.precision }
         )
