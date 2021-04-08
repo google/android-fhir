@@ -75,8 +75,10 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
   /** Callback function to update the UI. */
   private val questionnaireResponseItemChangedCallback: (String) -> Unit = { linkId ->
-    linkIdToQuestionnaireItemMap[linkId]?.hasNestedItemsWithinAnswers.let {
-      linkIdToQuestionnaireResponseItemMap[linkId]?.addNestedItemsToAnswer()
+    if (linkIdToQuestionnaireItemMap[linkId]?.hasNestedItemsWithinAnswers == true) {
+      linkIdToQuestionnaireResponseItemMap[linkId]?.addNestedItemsToAnswer(
+        linkIdToQuestionnaireItemMap[linkId]
+      )
     }
     modificationCount.value += 1
   }
@@ -152,42 +154,36 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
             questionnaireResponseItemChangedCallback as (String?) -> Unit
           )
         )
-        if (questionnaireResponseItem.item.isEmpty() &&
-            questionnaireItem.item.isNotEmpty() &&
-            questionnaireResponseItem.answer.isNotEmpty()
-        ) {
-          questionnaireItemViewItemList.addAll(
-            getQuestionnaireItemViewItemList(
-              questionnaireItem.item,
+        questionnaireItemViewItemList.addAll(
+          getQuestionnaireItemViewItemList(
+            questionnaireItem.item,
+            if (questionnaireResponseItem.answer.isEmpty()) {
+              questionnaireResponseItem.item
+            } else {
               questionnaireResponseItem.answer.first().item
-            )
+            }
           )
-        } else {
-          questionnaireItemViewItemList.addAll(
-            getQuestionnaireItemViewItemList(questionnaireItem.item, questionnaireResponseItem.item)
-          )
-        }
+        )
       }
     }
     return questionnaireItemViewItemList
   }
+}
 
-  /**
-   * Add items within [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] from the
-   * provided parent [Questionnaire.QuestionnaireItemComponent] with nested items. The hierarchy and
-   * order of child items will be retained as specified in the standard. See
-   * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
-   */
-  private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAnswer():
-    QuestionnaireResponse.QuestionnaireResponseItemComponent {
-    return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-      linkId = this@addNestedItemsToAnswer.linkId
-      answer = this@addNestedItemsToAnswer.answer
-      if (answer.isNotEmpty()) {
-        answer.first().item =
-          linkIdToQuestionnaireItemMap[this@addNestedItemsToAnswer.linkId]
-            ?.createListOfItemInAnswer()
-      }
+/**
+ * Add items within [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] from the
+ * provided parent [Questionnaire.QuestionnaireItemComponent] with nested items. The hierarchy and
+ * order of child items will be retained as specified in the standard. See
+ * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
+ */
+private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAnswer(
+  questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent?
+) {
+  this.apply {
+    linkId = linkId
+    answer = answer
+    if (answer.isNotEmpty()) {
+      answer.first().item = questionnaireItemComponent?.createListOfItemInAnswer()
     }
   }
 }
@@ -215,9 +211,7 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
         this@createQuestionnaireResponseItem.item.count() > 0
     ) {
       if (this.answer.isNotEmpty()) {
-        this@createQuestionnaireResponseItem.createListOfItemInAnswer().forEach {
-          this.answer.first().addItem(it)
-        }
+        this.addNestedItemsToAnswer(this@createQuestionnaireResponseItem)
       }
     } else if (this@createQuestionnaireResponseItem.type ==
         Questionnaire.QuestionnaireItemType.GROUP
