@@ -111,3 +111,7 @@ object LocalChangeUtils {
       .toMutableMap()
   }
 }
+
+data class LocalChangeToken(val ids: List<Long>)
+
+data class SquashedLocalChange(val token: LocalChangeToken, val localChange: LocalChangeEntity)

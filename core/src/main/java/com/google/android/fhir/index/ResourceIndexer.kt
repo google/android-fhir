@@ -21,6 +21,7 @@ import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.NumberIndex
+import com.google.android.fhir.index.entities.PositionIndex
 import com.google.android.fhir.index.entities.QuantityIndex
 import com.google.android.fhir.index.entities.ReferenceIndex
 import com.google.android.fhir.index.entities.StringIndex
@@ -31,15 +32,19 @@ import java.math.BigDecimal
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Location
 import org.hl7.fhir.r4.model.Money
+import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.model.codesystems.SearchParamType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
@@ -81,8 +86,8 @@ internal object ResourceIndexer {
           SearchParamType.QUANTITY ->
             quantityIndex(searchParam, value)?.also { indexBuilder.addQuantityIndex(it) }
           SearchParamType.URI -> uriIndex(searchParam, value)?.also { indexBuilder.addUriIndex(it) }
+          SearchParamType.SPECIAL -> specialIndex(value)?.also { indexBuilder.addPositionIndex(it) }
         // TODO: Handle composite type https://github.com/google/android-fhir/issues/292.
-        // TODO: Handle special type https://github.com/google/android-fhir/issues/293.
         }
       }
 
@@ -123,6 +128,16 @@ internal object ResourceIndexer {
           date.precision
         )
       }
+      "dateTime" -> {
+        val dateTime = value as DateTimeType
+        DateIndex(
+          searchParam.name,
+          searchParam.path,
+          dateTime.value.time,
+          dateTime.value.time,
+          dateTime.precision
+        )
+      }
       "instant" -> {
         val instant = value as InstantType
         DateIndex(
@@ -131,6 +146,32 @@ internal object ResourceIndexer {
           instant.value.time,
           instant.value.time,
           instant.precision
+        )
+      }
+      "Period" -> {
+        val period = value as Period
+        DateIndex(
+          searchParam.name,
+          searchParam.path,
+          if (period.hasEnd()) period.end.time else Long.MAX_VALUE,
+          if (period.hasStart()) period.start.time else Long.MIN_VALUE,
+          when {
+            (period.hasEnd() and period.hasStart()) ->
+              maxOf(period.startElement.precision, period.endElement.precision)
+            (period.hasEnd()) -> period.endElement.precision
+            (period.hasStart()) -> period.startElement.precision
+            else -> DateTimeType.DEFAULT_PRECISION
+          }
+        )
+      }
+      "Timing" -> {
+        val timing = value as Timing
+        DateIndex(
+          searchParam.name,
+          searchParam.path,
+          timing.event.maxOf { it.value.time },
+          timing.event.minOf { it.value.time },
+          timing.event.maxOf { it.precision }
         )
       }
       else -> null
@@ -204,6 +245,16 @@ internal object ResourceIndexer {
       UriIndex(searchParam.name, searchParam.path, uri)
     } else {
       null
+    }
+  }
+
+  private fun specialIndex(value: Base?): PositionIndex? {
+    return when (value?.fhirType()) {
+      "Location.position" -> {
+        val location = (value as Location.LocationPositionComponent)
+        return PositionIndex(location.latitude.toDouble(), location.longitude.toDouble())
+      }
+      else -> null
     }
   }
 

@@ -17,37 +17,22 @@
 package com.google.android.fhir.db
 
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.search.impl.Query
+import com.google.android.fhir.search.SearchQuery
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /** The interface for the FHIR resource database. */
 interface Database {
   /**
-   * Inserts the local origin `resource` into the FHIR resource database. If the resource already
-   * exists, it will be overwritten.
-   *
-   * @param <R> The resource type
-   */
-  suspend fun <R : Resource> insert(resource: R)
-
-  /**
-   * Inserts the remote origin `resource` into the FHIR resource database. If the resource already
-   * exists, it will be overwritten.
-   *
-   * @param <R> The resource type
-   */
-  suspend fun <R : Resource> insertRemote(resource: R)
-
-  /**
    * Inserts a list of local `resources` into the FHIR resource database. If any of the resources
    * already exists, it will be overwritten.
    *
    * @param <R> The resource type
    */
-  suspend fun <R : Resource> insertAll(resources: List<R>)
+  suspend fun <R : Resource> insert(vararg resource: R)
 
   /**
    * Inserts a list of remote `resources` into the FHIR resource database. If any of the resources
@@ -55,7 +40,7 @@ interface Database {
    *
    * @param <R> The resource type
    */
-  suspend fun <R : Resource> insertAllRemote(resources: List<R>)
+  suspend fun <R : Resource> insertRemote(vararg resource: R)
 
   /**
    * Updates the `resource` in the FHIR resource database. If the resource does not already exist,
@@ -98,67 +83,14 @@ interface Database {
    */
   suspend fun <R : Resource> delete(clazz: Class<R>, id: String)
 
-  /**
-   * Returns a [List] of [Resource] s that are of type `clazz` and have `reference` with `value`.
-   *
-   * For example, a search for [org.hl7.fhir.r4.model.Observation] s with `reference` 'subject' and
-   * `value` 'Patient/1' will return all observations associated with the particular patient.
-   */
-  suspend fun <R : Resource> searchByReference(
-    clazz: Class<R>,
-    reference: String,
-    value: String
-  ): List<R>
-
-  /**
-   * Returns a [List] of [Resource] s that are of type `clazz` and have `string` with `value`.
-   *
-   * For example, a search for [org.hl7.fhir.r4.model.Patient] s with `string` 'given' and `value`
-   * 'Tom' will return all patients with a given name Tom.
-   */
-  suspend fun <R : Resource> searchByString(clazz: Class<R>, string: String, value: String): List<R>
-
-  /**
-   * Returns a [List] of [Resource] s that are of type `clazz` and have `code` with `system` and
-   * `value`.
-   *
-   * For example, a search for [org.hl7.fhir.r4.model.Observation] s with `code` 'code', `system`
-   * 'http://openmrs.org/concepts' and `value` '1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' will return
-   * all observations with the given code.
-   */
-  suspend fun <R : Resource> searchByCode(
-    clazz: Class<R>,
-    code: String,
-    system: String,
-    value: String
-  ): List<R>
-
-  /**
-   * Returns a [List] of [Resource] s that are of type `clazz` and have `reference` with `value` and
-   * `code` with `system` and `value`.
-   *
-   * For example, a search for [org.hl7.fhir.r4.model.Observation] s with `reference` 'subject' and
-   * `value` 'Patient/1' as well as with `code` 'code', `system` 'http://openmrs.org/concepts' and
-   * `value` '1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' will return all observations associated with the
-   * particular patient by reference and with the given code.
-   */
-  suspend fun <R : Resource> searchByReferenceAndCode(
-    clazz: Class<R>,
-    reference: String,
-    referenceValue: String,
-    code: String,
-    codeSystem: String,
-    codeValue: String
-  ): List<R>
-
-  suspend fun <R : Resource> search(query: Query): List<R>
+  suspend fun <R : Resource> search(query: SearchQuery): List<R>
 
   /**
    * Retrieves all [LocalChangeEntity] s for all [Resource] s, which can be used to update the
    * remote FHIR server. Each [resource] will have at most one
    * [LocalChangeEntity](multiple changes are squashed).
    */
-  suspend fun getAllLocalChanges(): List<Pair<LocalChangeToken, LocalChangeEntity>>
+  suspend fun getAllLocalChanges(): List<SquashedLocalChange>
 
   /** Remove the [LocalChangeEntity] s with given ids. Call this after a successful sync. */
   suspend fun deleteUpdates(token: LocalChangeToken)

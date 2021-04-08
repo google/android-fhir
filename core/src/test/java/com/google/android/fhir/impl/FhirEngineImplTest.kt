@@ -26,7 +26,9 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Assert.assertThrows
 import org.junit.Before
@@ -41,6 +43,26 @@ class FhirEngineImplTest {
     object : FhirDataSource {
       override suspend fun loadData(path: String): Bundle {
         return Bundle()
+      }
+
+      override suspend fun insert(
+        resourceType: String,
+        resourceId: String,
+        payload: String
+      ): Resource {
+        return Patient()
+      }
+
+      override suspend fun update(
+        resourceType: String,
+        resourceId: String,
+        payload: String
+      ): OperationOutcome {
+        return OperationOutcome()
+      }
+
+      override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
+        return OperationOutcome()
       }
     }
   private val services =
@@ -61,8 +83,7 @@ class FhirEngineImplTest {
 
   @Test
   fun saveAll_shouldSaveResource() = runBlocking {
-    val patients = listOf(TEST_PATIENT_1, TEST_PATIENT_2)
-    fhirEngine.saveAll(patients)
+    fhirEngine.save(TEST_PATIENT_1, TEST_PATIENT_2)
     testingUtils.assertResourceEquals(
       TEST_PATIENT_1,
       fhirEngine.load(Patient::class.java, TEST_PATIENT_1_ID)
@@ -121,15 +142,15 @@ class FhirEngineImplTest {
     private const val TEST_PATIENT_1_ID = "test_patient_1"
     private var TEST_PATIENT_1 = Patient()
     init {
-      TEST_PATIENT_1.setId(TEST_PATIENT_1_ID)
-      TEST_PATIENT_1.setGender(Enumerations.AdministrativeGender.MALE)
+      TEST_PATIENT_1.id = TEST_PATIENT_1_ID
+      TEST_PATIENT_1.gender = Enumerations.AdministrativeGender.MALE
     }
 
     private const val TEST_PATIENT_2_ID = "test_patient_2"
     private var TEST_PATIENT_2 = Patient()
     init {
-      TEST_PATIENT_2.setId(TEST_PATIENT_2_ID)
-      TEST_PATIENT_2.setGender(Enumerations.AdministrativeGender.MALE)
+      TEST_PATIENT_2.id = TEST_PATIENT_2_ID
+      TEST_PATIENT_2.gender = Enumerations.AdministrativeGender.MALE
     }
   }
 }

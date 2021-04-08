@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.db.impl.dao
+package com.google.android.fhir.search
 
-data class LocalChangeToken(val ids: List<Long>)
+data class SearchQuery(val query: String, val args: List<Any>)
