@@ -83,59 +83,6 @@ interface Database {
    */
   suspend fun <R : Resource> delete(clazz: Class<R>, id: String)
 
-  /**
-   * Returns a [List] of [Resource] s that are of type `clazz` and have `reference` with `value`.
-   *
-   * For example, a search for [org.hl7.fhir.r4.model.Observation] s with `reference` 'subject' and
-   * `value` 'Patient/1' will return all observations associated with the particular patient.
-   */
-  suspend fun <R : Resource> searchByReference(
-    clazz: Class<R>,
-    reference: String,
-    value: String
-  ): List<R>
-
-  /**
-   * Returns a [List] of [Resource] s that are of type `clazz` and have `string` with `value`.
-   *
-   * For example, a search for [org.hl7.fhir.r4.model.Patient] s with `string` 'given' and `value`
-   * 'Tom' will return all patients with a given name Tom.
-   */
-  suspend fun <R : Resource> searchByString(clazz: Class<R>, string: String, value: String): List<R>
-
-  /**
-   * Returns a [List] of [Resource] s that are of type `clazz` and have `code` with `system` and
-   * `value`.
-   *
-   * For example, a search for [org.hl7.fhir.r4.model.Observation] s with `code` 'code', `system`
-   * 'http://openmrs.org/concepts' and `value` '1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' will return
-   * all observations with the given code.
-   */
-  suspend fun <R : Resource> searchByCode(
-    clazz: Class<R>,
-    code: String,
-    system: String,
-    value: String
-  ): List<R>
-
-  /**
-   * Returns a [List] of [Resource] s that are of type `clazz` and have `reference` with `value` and
-   * `code` with `system` and `value`.
-   *
-   * For example, a search for [org.hl7.fhir.r4.model.Observation] s with `reference` 'subject' and
-   * `value` 'Patient/1' as well as with `code` 'code', `system` 'http://openmrs.org/concepts' and
-   * `value` '1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' will return all observations associated with the
-   * particular patient by reference and with the given code.
-   */
-  suspend fun <R : Resource> searchByReferenceAndCode(
-    clazz: Class<R>,
-    reference: String,
-    referenceValue: String,
-    code: String,
-    codeSystem: String,
-    codeValue: String
-  ): List<R>
-
   suspend fun <R : Resource> search(query: SearchQuery): List<R>
 
   /**
