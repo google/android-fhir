@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!--
  Copyright 2020 Google LLC
 
@@ -14,7 +14,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
 <project version="4">
   <component name="RemoteRepositoriesConfiguration">
     <remote-repository>
@@ -25,7 +24,10 @@
     <remote-repository>
       <option name="id" value="jboss.community" />
       <option name="name" value="JBoss Community repository" />
-      <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
+      <option
+          name="url"
+          value="https://repository.jboss.org/nexus/content/repositories/public/"
+      />
     </remote-repository>
     <remote-repository>
       <option name="id" value="BintrayJCenter" />
@@ -45,7 +47,10 @@
     <remote-repository>
       <option name="id" value="maven" />
       <option name="name" value="maven" />
-      <option name="url" value="https://oss.sonatype.org/content/repositories/snapshots" />
+      <option
+          name="url"
+          value="https://oss.sonatype.org/content/repositories/snapshots"
+      />
     </remote-repository>
     <remote-repository>
       <option name="id" value="Gradle Central Plugin Repository" />
