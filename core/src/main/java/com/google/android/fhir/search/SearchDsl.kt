@@ -16,15 +16,18 @@
 
 package com.google.android.fhir.search
 
+import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import java.math.BigDecimal
 import org.hl7.fhir.r4.model.ResourceType
 
 @SearchDslMarker
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
   internal val stringFilters = mutableListOf<StringFilter>()
   internal val referenceFilter = mutableListOf<ReferenceFilter>()
+  internal val numberFilter = mutableListOf<NumberFilter>()
   internal var sort: StringClientParam? = null
   internal var order: Order? = null
 
@@ -38,6 +41,12 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     val filter = ReferenceFilter(referenceParameter)
     filter.init()
     referenceFilter.add(filter)
+  }
+
+  fun filter(numberParameter: NumberClientParam, init: NumberFilter.() -> Unit) {
+    val filter = NumberFilter(numberParameter)
+    filter.init()
+    numberFilter.add(filter)
   }
 
   fun sort(parameter: StringClientParam, order: Order) {
@@ -55,6 +64,13 @@ data class StringFilter(
 
 @SearchDslMarker
 data class ReferenceFilter(val parameter: ReferenceClientParam?, var value: String? = null)
+
+@SearchDslMarker
+data class NumberFilter(
+  val parameter: NumberClientParam,
+  var prefix: ParamPrefixEnum? = null,
+  var value: BigDecimal? = null
+)
 
 enum class Order {
   ASCENDING,

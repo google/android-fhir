@@ -16,7 +16,9 @@
 
 package com.google.android.fhir.search
 
+import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.db.Database
+import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -43,7 +45,10 @@ fun Search.getQuery(): SearchQuery {
   var filterStatement = ""
   val filterArgs = mutableListOf<Any>()
   val filterQuery =
-    (stringFilters.map { it.query(type) } + referenceFilter.map { it.query(type) }).intersect()
+    (stringFilters.map { it.query(type) } +
+        referenceFilter.map { it.query(type) } +
+        numberFilter.map { it.query(type) })
+      .intersect()
   if (filterQuery != null) {
     filterStatement =
       """
@@ -87,6 +92,44 @@ fun StringFilter.query(type: ResourceType): SearchQuery {
     SELECT resourceId FROM StringIndexEntity
     WHERE resourceType = ? AND index_name = ? AND index_value = ? COLLATE NOCASE
     """,
+    listOf(type.name, parameter.paramName, value!!)
+  )
+}
+
+fun NumberFilter.query(type: ResourceType): SearchQuery {
+  val precision = value!!.divide(BigDecimal(10).pow(value!!.precision()))
+  val condition =
+    when (this.prefix) {
+      ParamPrefixEnum.APPROXIMATE -> TODO("Handle this case")
+      ParamPrefixEnum.ENDS_BEFORE -> TODO("Handle this case")
+      ParamPrefixEnum.EQUAL ->
+        return SearchQuery(
+          """
+            SELECT resourceId FROM NumberIndexEntity
+            WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value < ?
+            """,
+          listOf(type.name, parameter.paramName, value!! - precision, value!! + precision)
+        ) // TODO should not include value+precision record
+      ParamPrefixEnum.GREATERTHAN -> "> ?"
+      ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ">= ?"
+      ParamPrefixEnum.LESSTHAN -> " < "
+      ParamPrefixEnum.LESSTHAN_OR_EQUALS -> "<= ?"
+      ParamPrefixEnum.NOT_EQUAL ->
+        return SearchQuery(
+          """
+            SELECT resourceId FROM NumberIndexEntity
+            WHERE resourceType = ? AND index_name = ? AND index_value < ? AND index_value >= ?
+            """,
+          listOf(type.name, parameter.paramName, value!! - precision, value!! + precision)
+        )
+      ParamPrefixEnum.STARTS_AFTER -> TODO("Handle this case")
+      null -> "="
+    }
+  return SearchQuery(
+    """
+     SELECT resourceId FROM NumberIndexEntity
+     WHERE resourceType = ? AND index_name = ? AND index_value $condition
+       """,
     listOf(type.name, parameter.paramName, value!!)
   )
 }
