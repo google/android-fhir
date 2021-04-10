@@ -86,14 +86,14 @@ fun StringFilter.query(type: ResourceType): SearchQuery {
   val condition =
     when {
       modifier?.isContains == true ->
-        "LIKE '%' || ? || '%'" // Can be replaced by `CONTAINS` when FTS is enabled
+        "LIKE '%' || ? || '%' COLLATE NOCASE" // Can be replaced by `CONTAINS` when FTS is enabled
       modifier?.isExact == true -> "= ?"
-      else -> "LIKE ? || '%'"
+      else -> "LIKE ? || '%' COLLATE NOCASE"
     }
   return SearchQuery(
     """
     SELECT resourceId FROM StringIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value $condition COLLATE NOCASE
+    WHERE resourceType = ? AND index_name = ? AND index_value $condition 
     """,
     listOf(type.name, parameter.paramName, value!!)
   )
