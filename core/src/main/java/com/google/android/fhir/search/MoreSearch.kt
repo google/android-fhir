@@ -97,7 +97,7 @@ fun StringFilter.query(type: ResourceType): SearchQuery {
 }
 
 fun NumberFilter.query(type: ResourceType): SearchQuery {
-  val precision = value!!.divide(BigDecimal(10).pow(value!!.precision()))
+  val precision = value!!.divide(BigDecimal(10).pow(value!!.precision())).divide(BigDecimal(2))
   val condition =
     when (this.prefix) {
       ParamPrefixEnum.APPROXIMATE -> TODO("Handle this case")

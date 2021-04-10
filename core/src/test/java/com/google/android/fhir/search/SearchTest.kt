@@ -19,9 +19,11 @@ package com.google.android.fhir.search
 import android.os.Build
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.common.truth.Truth.assertThat
+import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.RiskAssessment
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -198,6 +200,42 @@ class SearchTest {
           "Jones",
           10,
           20
+        )
+      )
+  }
+
+  @Test
+  fun search_number_equals() {
+    val query =
+      Search(ResourceType.RiskAssessment)
+        .apply {
+          filter(RiskAssessment.PROBABILITY) {
+            prefix = ParamPrefixEnum.EQUAL
+            value = BigDecimal.valueOf(100.00)
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """ 
+            SELECT a.serializedResource
+            FROM ResourceEntity a
+            WHERE a.resourceType = ?
+            AND a.resourceId IN (
+            SELECT resourceId FROM NumberIndexEntity
+            WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value < ?
+            )
+    """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.RiskAssessment.name,
+          ResourceType.RiskAssessment.name,
+          RiskAssessment.PROBABILITY.paramName,
+          BigDecimal.valueOf(99.995),
+          BigDecimal.valueOf(100.005)
         )
       )
   }
