@@ -27,7 +27,7 @@ internal data class DateIndex(
   /** The path of the date index, e.g. "Patient.birthdate". */
   val path: String,
   /** The high timestamp. */
-  val tsHigh: Long,
+  val to: Long,
   /** The low timestamp. */
-  val tsLow: Long
+  val from: Long
 )

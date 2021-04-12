@@ -98,8 +98,8 @@ internal object ResourceIndexer {
         DateIndex(
           name = "_lastUpdated",
           path = arrayOf(resource.fhirType(), "meta", "lastUpdated").joinToString(separator = "."),
-          tsHigh = lastUpdatedElement.precision.add(lastUpdatedElement.value, 1).time - 1,
-          tsLow = lastUpdatedElement.value.time
+          to = lastUpdatedElement.value.time,
+          from = lastUpdatedElement.precision.add(lastUpdatedElement.value, 1).time - 1
         )
       )
     }
@@ -122,8 +122,8 @@ internal object ResourceIndexer {
         DateIndex(
           searchParam.name,
           searchParam.path,
-          date.precision.add(date.value, 1).time - 1,
-          date.value.time
+          date.value.time,
+          date.precision.add(date.value, 1).time - 1
         )
       }
       "dateTime" -> {
@@ -131,8 +131,8 @@ internal object ResourceIndexer {
         DateIndex(
           searchParam.name,
           searchParam.path,
-          dateTime.precision.add(dateTime.value, 1).time - 1,
-          dateTime.value.time
+          dateTime.value.time,
+          dateTime.precision.add(dateTime.value, 1).time - 1
         )
       }
       // No need to add precision because an instant is meant to have zero width
@@ -145,9 +145,9 @@ internal object ResourceIndexer {
         DateIndex(
           searchParam.name,
           searchParam.path,
+          if (period.hasStart()) period.start.time else 0,
           if (period.hasEnd()) period.endElement.precision.add(period.end, 1).time - 1
-          else Long.MAX_VALUE,
-          if (period.hasStart()) period.start.time else 0
+          else Long.MAX_VALUE
         )
       }
       "Timing" -> {
@@ -155,8 +155,8 @@ internal object ResourceIndexer {
         DateIndex(
           searchParam.name,
           searchParam.path,
-          timing.event.maxOf { it.precision.add(it.value, 1).time } - 1,
-          timing.event.minOf { it.value.time }
+          timing.event.minOf { it.value.time },
+          timing.event.maxOf { it.precision.add(it.value, 1).time } - 1
         )
       }
       else -> null

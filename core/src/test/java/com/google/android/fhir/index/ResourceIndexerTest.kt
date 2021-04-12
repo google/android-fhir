@@ -218,8 +218,8 @@ class ResourceIndexerTest {
         DateIndex(
           "date",
           "Observation.effective",
-          periodElement.endElement.precision.add(periodElement.end, 1).time - 1,
-          periodElement.start.time
+          periodElement.start.time,
+          periodElement.endElement.precision.add(periodElement.end, 1).time - 1
         )
       )
   }
@@ -233,8 +233,8 @@ class ResourceIndexerTest {
         DateIndex(
           "date",
           "Observation.effective",
-          dateTimeTypeElement.precision.add(dateTimeTypeElement.value, 1).time - 1,
-          dateTimeTypeElement.value.time
+          dateTimeTypeElement.value.time,
+          dateTimeTypeElement.precision.add(dateTimeTypeElement.value, 1).time - 1
         )
       )
   }
@@ -248,8 +248,8 @@ class ResourceIndexerTest {
         DateIndex(
           "date",
           "Observation.effective",
-          timingElement.event.maxOf { it.precision.add(it.value, 1).time } - 1,
-          timingElement.event.minOf { it.value.time }
+          timingElement.event.minOf { it.value.time },
+          timingElement.event.maxOf { it.precision.add(it.value, 1).time } - 1
         )
       )
   }
@@ -329,8 +329,8 @@ class ResourceIndexerTest {
         DateIndex(
           "birthdate",
           "Patient.birthDate",
-          birthDateElement.precision.add(birthDateElement.value, 1).time - 1,
-          birthDateElement.value.time
+          birthDateElement.value.time,
+          birthDateElement.precision.add(birthDateElement.value, 1).time - 1
         )
       )
   }
@@ -344,8 +344,8 @@ class ResourceIndexerTest {
         DateIndex(
           "_lastUpdated",
           "Patient.meta.lastUpdated",
-          lastUpdatedElement.precision.add(lastUpdatedElement.getValue(), 1).time - 1,
-          lastUpdatedElement.getValue().getTime()
+          lastUpdatedElement.getValue().getTime(),
+          lastUpdatedElement.precision.add(lastUpdatedElement.getValue(), 1).time - 1
         )
       )
   }
