@@ -98,9 +98,8 @@ internal object ResourceIndexer {
         DateIndex(
           name = "_lastUpdated",
           path = arrayOf(resource.fhirType(), "meta", "lastUpdated").joinToString(separator = "."),
-          tsHigh = lastUpdatedElement.value.time,
-          tsLow = lastUpdatedElement.value.time,
-          temporalPrecision = lastUpdatedElement.precision
+          tsHigh = lastUpdatedElement.precision.add(lastUpdatedElement.value, 1).time - 1,
+          tsLow = lastUpdatedElement.value.time
         )
       )
     }
@@ -123,9 +122,8 @@ internal object ResourceIndexer {
         DateIndex(
           searchParam.name,
           searchParam.path,
-          date.precision.add(date.value, 1).time,
-          date.value.time,
-          date.precision
+          date.precision.add(date.value, 1).time - 1,
+          date.value.time
         )
       }
       "dateTime" -> {
@@ -133,37 +131,23 @@ internal object ResourceIndexer {
         DateIndex(
           searchParam.name,
           searchParam.path,
-          dateTime.precision.add(dateTime.value, 1).time,
-          dateTime.value.time,
-          dateTime.precision
+          dateTime.precision.add(dateTime.value, 1).time - 1,
+          dateTime.value.time
         )
       }
       // No need to add precision because an instant is meant to have zero width
       "instant" -> {
         val instant = value as InstantType
-        DateIndex(
-          searchParam.name,
-          searchParam.path,
-          instant.value.time,
-          instant.value.time,
-          instant.precision
-        )
+        DateIndex(searchParam.name, searchParam.path, instant.value.time, instant.value.time)
       }
       "Period" -> {
         val period = value as Period
         DateIndex(
           searchParam.name,
           searchParam.path,
-          if (period.hasEnd()) period.endElement.precision.add(period.end, 1).time
+          if (period.hasEnd()) period.endElement.precision.add(period.end, 1).time - 1
           else Long.MAX_VALUE,
-          if (period.hasStart()) period.start.time else Long.MIN_VALUE,
-          when {
-            (period.hasEnd() and period.hasStart()) ->
-              maxOf(period.startElement.precision, period.endElement.precision)
-            (period.hasEnd()) -> period.endElement.precision
-            (period.hasStart()) -> period.startElement.precision
-            else -> DateTimeType.DEFAULT_PRECISION
-          }
+          if (period.hasStart()) period.start.time else 0
         )
       }
       "Timing" -> {
@@ -171,9 +155,8 @@ internal object ResourceIndexer {
         DateIndex(
           searchParam.name,
           searchParam.path,
-          timing.event.maxOf { it.precision.add(it.value, 1).time },
-          timing.event.minOf { it.value.time },
-          timing.event.maxOf { it.precision }
+          timing.event.maxOf { it.precision.add(it.value, 1).time } - 1,
+          timing.event.minOf { it.value.time }
         )
       }
       else -> null

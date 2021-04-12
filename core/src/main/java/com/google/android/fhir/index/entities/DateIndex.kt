@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.index.entities
 
-import ca.uhn.fhir.model.api.TemporalPrecisionEnum
-
 /**
  * An index record for a date value in a resource.
  *
@@ -31,10 +29,5 @@ internal data class DateIndex(
   /** The high timestamp. */
   val tsHigh: Long,
   /** The low timestamp. */
-  val tsLow: Long,
-  /**
-   * The smallest value we can unambiguously resolve the date to. This is an indication to clients
-   * that any part of the timestamp smaller than the [temporalPrecision] should be ignored.
-   */
-  val temporalPrecision: TemporalPrecisionEnum
+  val tsLow: Long
 )
