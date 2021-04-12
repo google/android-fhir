@@ -36,5 +36,7 @@ internal fun Date.toTimeZoneString(): String {
  * The logical (unqualified) part of the ID. For example, if the ID is
  * "http://example.com/fhir/Patient/123/_history/456", then this value would be "123".
  */
-internal val Resource.logicalId: String
-  get() = this.idElement.idPart
+val Resource.logicalId: String
+  get() {
+    return if (this.hasIdElement() && this.idElement.hasIdPart()) this.idElement.idPart else ""
+  }

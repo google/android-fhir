@@ -17,6 +17,11 @@
 package com.google.android.fhir.sync
 
 import com.google.android.fhir.db.Database
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.logicalId
+import org.hl7.fhir.exceptions.FHIRException
+import org.hl7.fhir.r4.model.OperationOutcome
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
@@ -48,5 +53,64 @@ class FhirSynchronizer(
     } else {
       return Result.Error(exceptions)
     }
+  }
+
+  suspend fun upload(): Result {
+    val exceptions = mutableListOf<ResourceSyncException>()
+    database.getAllLocalChanges().forEach {
+      try {
+        val response: Resource = doUpload(it.localChange, dataSource)
+        if (response.logicalId.equals(it.localChange.resourceId) || response.isSuccess()) {
+          database.deleteUpdates(it.token)
+        } else {
+          // TODO improve exception message
+          exceptions.add(
+            ResourceSyncException(
+              ResourceType.valueOf(it.localChange.resourceType),
+              FHIRException(
+                "Could not infer response \"${response.resourceType}/${response.logicalId}\" as success."
+              )
+            )
+          )
+        }
+      } catch (exception: Exception) {
+        exceptions.add(
+          ResourceSyncException(ResourceType.valueOf(it.localChange.resourceType), exception)
+        )
+      }
+    }
+
+    if (exceptions.isEmpty()) {
+      return Result.Success
+    } else {
+      return Result.Error(exceptions)
+    }
+  }
+
+  private suspend fun doUpload(
+    localChange: LocalChangeEntity,
+    datasource: FhirDataSource
+  ): Resource =
+    when (localChange.type) {
+      LocalChangeEntity.Type.INSERT ->
+        datasource.insert(localChange.resourceType, localChange.resourceId, localChange.payload)
+      LocalChangeEntity.Type.UPDATE ->
+        datasource.update(localChange.resourceType, localChange.resourceId, localChange.payload)
+      LocalChangeEntity.Type.DELETE ->
+        datasource.delete(localChange.resourceType, localChange.resourceId)
+    }
+
+  /**
+   * Determines if the upload operation was successful or not.
+   *
+   * Current HAPI FHIR implementation does not give any signal other than 'severity' level for
+   * operation success/failure. TODO: pass along the HTTP result (or any other signal) to determine
+   * the outcome of an instance level RESTful operation.
+   */
+  private fun Resource.isSuccess(): Boolean {
+    if (!this.resourceType.equals(ResourceType.OperationOutcome)) return false
+    val outcome: OperationOutcome = this as OperationOutcome
+    return outcome.hasIssue() &&
+      issue.all { it.severity.equals(OperationOutcome.IssueSeverity.INFORMATION) }
   }
 }
