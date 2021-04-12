@@ -23,7 +23,7 @@ import org.hl7.fhir.r4.model.ResourceType
 
 @SearchDslMarker
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
-  internal val stringFilters = mutableListOf<StringFilter>()
+  internal val stringFilters = mutableListOf<List<StringFilter>>()
   internal val referenceFilter = mutableListOf<ReferenceFilter>()
   internal var sort: StringClientParam? = null
   internal var order: Order? = null
@@ -31,7 +31,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   fun filter(stringParameter: StringClientParam, init: StringFilter.() -> Unit) {
     val filter = StringFilter(stringParameter)
     filter.init()
-    stringFilters.add(filter)
+    stringFilters.add(listOf(filter))
   }
 
   fun filter(referenceParameter: ReferenceClientParam, init: ReferenceFilter.() -> Unit) {

@@ -43,7 +43,7 @@ fun Search.getQuery(): SearchQuery {
   var filterStatement = ""
   val filterArgs = mutableListOf<Any>()
   val filterQuery =
-    (stringFilters.map { it.query(type) } + referenceFilter.map { it.query(type) }).intersect()
+    (stringFilters.map { pairs -> pairs.map { it.query(type) }.union()!! } + referenceFilter.map { it.query(type) }).intersect()
   if (filterQuery != null) {
     filterStatement =
       """
@@ -105,7 +105,15 @@ fun List<SearchQuery>.intersect(): SearchQuery? {
   return if (isEmpty()) {
     null
   } else {
-    SearchQuery(joinToString("\nINTERSECT\n") { it.query }, flatMap { it.args })
+    SearchQuery(joinToString(separator = "\nINTERSECT\n", prefix = "\n(" , postfix = "\n)") { it.query }, flatMap { it.args })
+  }
+}
+
+fun List<SearchQuery>.union(): SearchQuery? {
+  return if (isEmpty()) {
+    null
+  } else {
+    SearchQuery(joinToString("\nUNION\n", prefix = "\n(" , postfix = "\n)") { it.query }, flatMap { it.args })
   }
 }
 
