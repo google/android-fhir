@@ -121,7 +121,7 @@ fun DateFilter.query(type: ResourceType): SearchQuery {
     }
   return SearchQuery(
     """
-    SELECT resourceId form DateIndexEntity 
+    SELECT resourceId FROM DateIndexEntity 
     WHERE resourceType = ? AND index_name = ? 
     AND ? $condition
   """,

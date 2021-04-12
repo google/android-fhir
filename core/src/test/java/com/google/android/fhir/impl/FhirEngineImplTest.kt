@@ -17,14 +17,17 @@
 package com.google.android.fhir.impl
 
 import androidx.test.core.app.ApplicationProvider
+import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.ResourceNotFoundException
 import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.resource.TestingUtils
+import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.FhirDataSource
 import com.google.common.truth.Truth
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
@@ -108,6 +111,27 @@ class FhirEngineImplTest {
       )
   }
 
+  @Test
+  fun search_date_shouldReturnResource() {
+    val patient =
+      Patient().apply {
+        id = "1"
+        birthDate = DateType("2001-03-04").value
+      }
+
+    val res = runBlocking {
+      fhirEngine.save(patient)
+      fhirEngine.search<Patient>(
+        Search(ResourceType.Patient).apply {
+          filter(Patient.BIRTHDATE) {
+            value = DateType("2001-03-04").value.time
+            prefix = ParamPrefixEnum.EQUAL
+          }
+        }
+      )
+    }
+    Truth.assertThat(res[0].birthDate).isEqualTo(DateType("2001-03-04").value)
+  }
   @Test
   fun load_shouldReturnResource() = runBlocking {
     testingUtils.assertResourceEquals(

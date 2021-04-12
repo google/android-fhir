@@ -138,7 +138,7 @@ class SearchTest {
     FROM ResourceEntity a
     WHERE a.resourceType = ?
     AND a.resourceId IN (
-    SELECT resourceId form DateIndexEntity
+    SELECT resourceId FROM DateIndexEntity
     WHERE resourceType = ? AND index_name = ?
     AND ? BETWEEN index_tsLow AND index_tsHigh
     )
