@@ -2,6 +2,33 @@ plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.kotlinKapt)
+  id(Plugins.BuildPlugins.mavenPublish)
+}
+
+val artifactGroup = "com.google.android.fhir"
+val artifactVersion = "0.1.0-alpha01"
+
+afterEvaluate {
+  publishing {
+    publications {
+      register("release", MavenPublication::class) {
+        from(components["release"])
+        artifactId = "core"
+        groupId = artifactGroup
+        version = artifactVersion
+        // Also publish source code for developers" convenience
+        pom {
+          name.set("Android FHIR Core Library")
+          licenses {
+            license {
+              name.set("The Apache License, Version 2.0")
+              url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 android {
