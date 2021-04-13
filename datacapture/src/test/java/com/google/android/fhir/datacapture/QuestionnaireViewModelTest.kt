@@ -329,6 +329,218 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
+  fun questionnaireHasInitialValue_shouldSetAnswerValueInQuestionnaireResponse() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            initial =
+              mutableListOf(
+                Questionnaire.QuestionnaireItemInitialComponent().apply {
+                  value = BooleanType(false)
+                }
+              )
+          }
+        )
+      }
+    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+    val viewModel = QuestionnaireViewModel(state)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        setQuestionnaire("Questionnaire/a-questionnaire")
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(false)
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun questionnaireHasMultipleInitialValuesForRepeatingCase_shouldSetFirstAnswerValueInQuestionnaireResponse() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            repeats = true
+            initial =
+              mutableListOf(
+                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true)),
+                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true))
+              )
+          }
+        )
+      }
+    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+    val viewModel = QuestionnaireViewModel(state)
+
+    assertResourceEquals(
+      viewModel.getQuestionnaireResponse(),
+      QuestionnaireResponse().apply {
+        setQuestionnaire("Questionnaire/a-questionnaire")
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+
+  @Test
+  fun questionnaireHasInitialValueButQuestionnareResponseAsEmpty_shouldSetEmptyAnswer() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            initial =
+              mutableListOf(
+                Questionnaire.QuestionnaireItemInitialComponent().apply { value = valueCoding }
+              )
+          }
+        )
+      }
+    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        id = "a-questionnaire-response"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-link-id"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = StringType("")
+              }
+            )
+          }
+        )
+      }
+    val serializedQuestionniareResponse = printer.encodeResourceToString(questionnaireResponse)
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+    state.set(
+      QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE,
+      serializedQuestionniareResponse
+    )
+    QuestionnaireViewModel(state)
+  }
+
+  @Test
+  fun questionnareHasMoreThanOneInitialValuesAndNotRepeating_shouldThrowError() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            repeats = false
+            initial =
+              mutableListOf(
+                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true)),
+                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true))
+              )
+          }
+        )
+      }
+    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state) }.localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "Questionnaire item a-link-id can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+      )
+  }
+
+  @Test
+  fun questionnareHasInitialValueAndGroupType_shouldThrowError() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            initial =
+              mutableListOf(
+                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true))
+              )
+          }
+        )
+      }
+    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state) }.localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "Questionnaire item a-link-id has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+      )
+  }
+
+  @Test
+  fun questionnareHasInitialValueAndDisplayType_shouldThrowError() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            text = "Basic question"
+            type = Questionnaire.QuestionnaireItemType.DISPLAY
+            initial =
+              mutableListOf(
+                Questionnaire.QuestionnaireItemInitialComponent().setValue(BooleanType(true))
+              )
+          }
+        )
+      }
+    val serializedQuestionniare = printer.encodeResourceToString(questionnaire)
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionniare)
+
+    val errorMessage =
+      assertFailsWith<IllegalArgumentException> { QuestionnaireViewModel(state) }.localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "Questionnaire item a-link-id has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+      )
+  }
+
+  @Test
   fun stateHasQuestionnaireResponse_moreItemsInQuestionnaireResponse_shouldThrowError() {
     val questionnaire =
       Questionnaire().apply {
