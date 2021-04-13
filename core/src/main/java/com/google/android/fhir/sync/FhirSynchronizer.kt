@@ -17,6 +17,11 @@
 package com.google.android.fhir.sync
 
 import com.google.android.fhir.db.Database
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.isUploadSuccess
+import com.google.android.fhir.logicalId
+import org.hl7.fhir.exceptions.FHIRException
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
@@ -49,4 +54,49 @@ class FhirSynchronizer(
       return Result.Error(exceptions)
     }
   }
+
+  suspend fun upload(): Result {
+    val exceptions = mutableListOf<ResourceSyncException>()
+    database.getAllLocalChanges().forEach {
+      try {
+        val response: Resource = doUpload(it.localChange, dataSource)
+        if (response.logicalId.equals(it.localChange.resourceId) || response.isUploadSuccess()) {
+          database.deleteUpdates(it.token)
+        } else {
+          // TODO improve exception message
+          exceptions.add(
+            ResourceSyncException(
+              ResourceType.valueOf(it.localChange.resourceType),
+              FHIRException(
+                "Could not infer response \"${response.resourceType}/${response.logicalId}\" as success."
+              )
+            )
+          )
+        }
+      } catch (exception: Exception) {
+        exceptions.add(
+          ResourceSyncException(ResourceType.valueOf(it.localChange.resourceType), exception)
+        )
+      }
+    }
+
+    if (exceptions.isEmpty()) {
+      return Result.Success
+    } else {
+      return Result.Error(exceptions)
+    }
+  }
+
+  private suspend fun doUpload(
+    localChange: LocalChangeEntity,
+    datasource: FhirDataSource
+  ): Resource =
+    when (localChange.type) {
+      LocalChangeEntity.Type.INSERT ->
+        datasource.insert(localChange.resourceType, localChange.resourceId, localChange.payload)
+      LocalChangeEntity.Type.UPDATE ->
+        datasource.update(localChange.resourceType, localChange.resourceId, localChange.payload)
+      LocalChangeEntity.Type.DELETE ->
+        datasource.delete(localChange.resourceType, localChange.resourceId)
+    }
 }
