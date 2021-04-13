@@ -20,7 +20,8 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /**
- * Whether the corresponding [QuestionnaireResponse.QuestionnaireResponseItemComponent] should have nested items within [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent](s).
+ * Whether the corresponding [QuestionnaireResponse.QuestionnaireResponseItemComponent] should have
+ * nested items within [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent](s).
  */
 val Questionnaire.QuestionnaireItemComponent.hasNestedItemsWithinAnswers: Boolean
   get() = item.isNotEmpty() && type != Questionnaire.QuestionnaireItemType.GROUP

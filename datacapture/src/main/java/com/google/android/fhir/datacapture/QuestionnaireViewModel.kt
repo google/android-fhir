@@ -180,9 +180,9 @@ private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedIt
   questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
 ) {
 
-    if (answer.isNotEmpty()) {
-      answer.first().item = questionnaireItemComponent.createListOfItemInAnswer()
-    }
+  if (answer.isNotEmpty()) {
+    answer.first().item = questionnaireItemComponent.createListOfItemInAnswer()
+  }
 }
 
 /**
