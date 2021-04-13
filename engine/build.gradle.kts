@@ -13,12 +13,12 @@ afterEvaluate {
     publications {
       register("release", MavenPublication::class) {
         from(components["release"])
-        artifactId = "core"
+        artifactId = "engine"
         groupId = artifactGroup
         version = artifactVersion
         // Also publish source code for developers" convenience
         pom {
-          name.set("Android FHIR Core Library")
+          name.set("Android FHIR Engine Library")
           licenses {
             license {
               name.set("The Apache License, Version 2.0")
