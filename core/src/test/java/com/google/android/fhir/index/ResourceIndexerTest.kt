@@ -35,20 +35,28 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Device
+import java.text.SimpleDateFormat
+import org.hl7.fhir.r4.model.ContactPoint
+import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Identifier
+import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.Invoice
 import org.hl7.fhir.r4.model.Location
 import org.hl7.fhir.r4.model.Money
 import org.hl7.fhir.r4.model.Observation
-import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Period
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Substance
 import org.hl7.fhir.r4.model.UriType
+import org.hl7.fhir.r4.model.Timing
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -617,8 +625,114 @@ class ResourceIndexerTest {
       .isFalse()
   }
 
+  @Test
+  fun index_observation_effectivePeriod_shouldIndexPeriod() {
+    val observation = Observation().apply {
+      id = "non-null ID"
+      effective =
+        Period().apply {
+          startElement = DateTimeType(dateTimeTypeFormat.parse("2001-09-08T20:30:09+0530"))
+          endElement = DateTimeType(dateTimeTypeFormat.parse("2001-10-01T21:39:09+0530"))
+        }
+    }
+    val resourceIndices = ResourceIndexer.index(observation)
+    val periodElement =observation.effectivePeriod
+    assertThat(resourceIndices.dateIndices)
+      .contains(
+        DateIndex(
+          "date",
+          "Observation.effective",
+          periodElement.end.time,
+          periodElement.start.time,
+          periodElement.startElement.precision
+        )
+      )
+  }
+
+  @Test
+  fun index_observation_effectiveDateTimeType_shouldIndexDateTimeType() {
+    val observation = Observation().apply {
+      id = "non-null ID"
+      effective = DateTimeType(dateTimeTypeFormat.parse("2001-12-29T12:20:30+0700"))
+
+    }
+    val resourceIndices = ResourceIndexer.index(observation)
+    val dateTimeTypeElement = observation.effectiveDateTimeType
+    assertThat(resourceIndices.dateIndices)
+      .contains(
+        DateIndex(
+          "date",
+          "Observation.effective",
+          dateTimeTypeElement.value.time,
+          dateTimeTypeElement.value.time,
+          dateTimeTypeElement.precision
+        )
+      )
+  }
+
+  @Test
+  fun index_observation_effectiveTiming_shouldIndexTiming() {
+    val observation = Observation().apply {
+      id = "non-null ID"
+      effective =
+        Timing().apply {
+          addEvent(dateTimeTypeFormat.parse("2001-11-05T21:53:10+0900"))
+          addEvent(dateTimeTypeFormat.parse("2002-09-01T20:30:18+0900"))
+          addEvent(dateTimeTypeFormat.parse("2003-10-24T18:30:40+0900"))
+        }
+    }
+    val resourceIndices = ResourceIndexer.index(observation)
+    val timingElement = observation.effectiveTiming
+    assertThat(resourceIndices.dateIndices)
+      .contains(
+        DateIndex(
+          "date",
+          "Observation.effective",
+          timingElement.event.maxOf { it.value.time },
+          timingElement.event.minOf { it.value.time },
+          timingElement.event.maxOf { it.precision }
+        )
+      )
+  }
+  @Test
+  fun index_observation_effectiveInstantType_shouldIndexInstant() {
+    val observation = Observation().apply {
+      id = "non-null ID"
+      effective = InstantType(instantFormat.parse("2001-03-04T23:30:00.910+0530"))
+    }
+    val resourceIndices = ResourceIndexer.index(observation)
+    val instantElement = observation.effectiveInstantType
+    assertThat(resourceIndices.dateIndices)
+      .contains(
+        DateIndex(
+          "date",
+          "Observation.effective",
+          instantElement.value.time,
+          instantElement.value.time,
+          instantElement.precision
+        )
+      )
+  }
+
+  @Test
+  fun index_observation_effectiveNull_shouldNotIndex() {
+    val observation = Observation().apply {
+      id = "non-null-id"
+      effective = null
+    }
+    val resourceIndices = ResourceIndexer.index(observation)
+    assertThat(resourceIndices.dateIndices.any { it.name == "date" }).isFalse()
+    assertThat(resourceIndices.dateIndices.any { it.path == "Observation.effective" }).isFalse()
+  }
+
+
+  // TODO: improve the tests further.
+
   private companion object {
+    val dateTimeTypeFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+    val instantFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+
     // See: https://www.hl7.org/fhir/valueset-currencies.html
     const val FHIR_CURRENCY_SYSTEM = "urn:iso:std:iso:4217"
-  }
+    }
 }
