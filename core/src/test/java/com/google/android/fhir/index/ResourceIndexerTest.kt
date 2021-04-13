@@ -32,16 +32,19 @@ import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.MolecularSequence
 import org.hl7.fhir.r4.model.Device
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.Invoice
 import org.hl7.fhir.r4.model.Location
+import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Money
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
@@ -315,13 +318,48 @@ class ResourceIndexerTest {
 
   /** Unit tests for resource indexer */
   @Test
-  fun index_riskAssessment_ShouldIndexProbabilityDecimalNumber() {
+  fun index_Patient_shouldIndexLastUpdatedDate() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setLastUpdated(InstantType("2001-09-01T23:09:09.000+05:30").value)
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.dateIndices)
+      .contains(
+        DateIndex(
+          "_lastUpdated",
+          "Patient.meta.lastUpdated",
+          InstantType("2001-09-01T23:09:09.000+05:30").value.time,
+          InstantType("2001-09-01T23:09:09.000+05:30").value.time,
+          InstantType("2001-09-01T23:09:09.000+05:30").precision
+        )
+      )
+  }
+@Test
+fun index_molecularSequence_shouldIndexWindowStartNumber(){
+  val value = 22125510
+  val molecularSequence = MolecularSequence().apply {
+    id = "non-null-ID"
+    referenceSeq.windowStart = value
+  }
+  val resourceIndices = ResourceIndexer.index(molecularSequence)
+  assertThat(resourceIndices.numberIndices).contains(
+    NumberIndex(
+      "window-start" ,
+      "MolecularSequence.referenceSeq.windowStart",
+      BigDecimal.valueOf(value.toLong()))
+  )
+}
+  @Test
+  fun index_riskAssessment_shouldIndexProbabilityDecimalNumber() {
+    val value = BigDecimal.valueOf(0.9)
     val riskAssessment =
       RiskAssessment().apply {
         id = "someID"
         prediction =
           mutableListOf(
-            RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(0.9))
+            RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(value))
           )
       }
 
@@ -329,99 +367,121 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.numberIndices)
       .contains(
-        NumberIndex("probability", "RiskAssessment.prediction.probability", BigDecimal.valueOf(0.9))
+        NumberIndex("probability", "RiskAssessment.prediction.probability", value)
+      )
+  }
+
+  @Test
+  fun index_patient_birthDate_shouldIndexBirthDateDate() {
+    val date = DateType("2001-09-01")
+    val patient =
+      Patient().apply {
+        id = "non-null ID"
+        birthDate = date.value
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.dateIndices)
+      .contains(
+        DateIndex(
+          "birthdate",
+          "Patient.birthDate",
+          date.value.time,
+         date.value.time,
+          date.precision
+        )
       )
   }
 
   @Test
   fun index_observation_effectiveDateTimeType_shouldIndexDateTimeDate() {
+   val dateTime = DateTimeType("2001-12-29T12:20:30+07:00")
     val observation =
       Observation().apply {
         id = "non-null ID"
-        effective = DateTimeType(dateTimeTypeFormat.parse("2001-12-29T12:20:30+0700"))
+        effective = dateTime
       }
     val resourceIndices = ResourceIndexer.index(observation)
-    val dateTimeTypeElement = observation.effectiveDateTimeType
+    observation.effectiveDateTimeType
     assertThat(resourceIndices.dateIndices)
       .contains(
         DateIndex(
           "date",
           "Observation.effective",
-          dateTimeTypeElement.value.time,
-          dateTimeTypeElement.value.time,
-          dateTimeTypeElement.precision
+          dateTime.value.time,
+          dateTime.value.time,
+          dateTime.precision
         )
       )
   }
 
   @Test
   fun index_observation_effectiveInstantType_shouldIndexInstantDate() {
+    val instant = InstantType("2001-03-04T23:30:00.910+05:30")
     val observation =
       Observation().apply {
         id = "non-null ID"
-        effective = InstantType(instantFormat.parse("2001-03-04T23:30:00.910+0530"))
+        effective = instant
       }
     val resourceIndices = ResourceIndexer.index(observation)
-    val instantElement = observation.effectiveInstantType
     assertThat(resourceIndices.dateIndices)
       .contains(
         DateIndex(
           "date",
           "Observation.effective",
-          instantElement.value.time,
-          instantElement.value.time,
-          instantElement.precision
+          instant.value.time,
+          instant.value.time,
+          instant.precision
         )
       )
   }
 
   @Test
   fun index_observation_effectivePeriod_shouldIndexPeriodDate() {
+    val period = Period().apply {
+      startElement = DateTimeType("2001-09-08T20:30:09+05:30")
+      endElement = DateTimeType("2001-10-01T21:39:09+05:30")
+    }
     val observation =
       Observation().apply {
         id = "non-null ID"
-        effective =
-          Period().apply {
-            startElement = DateTimeType(dateTimeTypeFormat.parse("2001-09-08T20:30:09+0530"))
-            endElement = DateTimeType(dateTimeTypeFormat.parse("2001-10-01T21:39:09+0530"))
-          }
+        effective = period
       }
     val resourceIndices = ResourceIndexer.index(observation)
-    val periodElement = observation.effectivePeriod
     assertThat(resourceIndices.dateIndices)
       .contains(
         DateIndex(
           "date",
           "Observation.effective",
-          periodElement.end.time,
-          periodElement.start.time,
-          periodElement.startElement.precision
+          period.end.time,
+          period.start.time,
+          period.startElement.precision
         )
       )
   }
 
   @Test
   fun index_observation_effectiveTiming_shouldIndexTimingDate() {
+    val timing = Timing().apply {
+      addEvent(DateTimeType("2001-11-05T21:53:10+09:00").value)
+      addEvent(DateTimeType("2002-09-01T20:30:18+09:00").value)
+      addEvent(DateTimeType("2003-10-24T18:30:40+09:00").value)
+    }
+
     val observation =
       Observation().apply {
         id = "non-null ID"
-        effective =
-          Timing().apply {
-            addEvent(dateTimeTypeFormat.parse("2001-11-05T21:53:10+0900"))
-            addEvent(dateTimeTypeFormat.parse("2002-09-01T20:30:18+0900"))
-            addEvent(dateTimeTypeFormat.parse("2003-10-24T18:30:40+0900"))
-          }
+        effective = timing
+
       }
     val resourceIndices = ResourceIndexer.index(observation)
-    val timingElement = observation.effectiveTiming
     assertThat(resourceIndices.dateIndices)
       .contains(
         DateIndex(
           "date",
           "Observation.effective",
-          timingElement.event.maxOf { it.value.time },
-          timingElement.event.minOf { it.value.time },
-          timingElement.event.maxOf { it.precision }
+          timing.event.maxOf { it.value.time },
+          timing.event.minOf { it.value.time },
+          timing.event.maxOf { it.precision }
         )
       )
   }
@@ -440,23 +500,23 @@ class ResourceIndexerTest {
 
   @Test
   fun index_patient_shouldIndexGivenNameString() {
-
+  val nameString = "John"
     val patient =
       Patient().apply {
-        id = "someID"
-        addName(HumanName().addGiven("some name"))
+        id = "non-null-ID"
+        addName(HumanName().addGiven(nameString))
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
     assertThat(resourceIndices.stringIndices)
-      .contains(StringIndex("given", "Patient.name.given", "some name"))
+      .contains(StringIndex("given", "Patient.name.given", nameString))
   }
 
   @Test
   fun index_patient_nullGivenName_shouldNotIndexGivenNameNullString() {
     val patient =
       Patient().apply {
-        id = "someID"
+        id = "non-null-ID"
         addName(HumanName().addGiven(null))
       }
 
@@ -478,7 +538,7 @@ class ResourceIndexerTest {
   fun index_patient_emptyGivenName_shouldNotIndexGivenNameEmptyString() {
     val patient =
       Patient().apply {
-        id = "someID"
+        id = "non_null_ID"
         addName(HumanName().addGiven(""))
       }
 
@@ -498,7 +558,7 @@ class ResourceIndexerTest {
   fun index_Patient_ShouldIndexDeceasedBooleanToken() {
     val patient =
       Patient().apply {
-        id = "someID"
+        id = "non_null_ID"
         deceased = BooleanType(true)
       }
 
@@ -517,32 +577,37 @@ class ResourceIndexerTest {
 
   @Test
   fun index_Invoice_shouldIndexIdentifierToken() {
+    val system = "someSystem"
+    val value = "someValue"
     val invoice =
       Invoice().apply {
         id = "someid"
         identifier =
           mutableListOf(
             Identifier()
-              .setSystemElement(UriType("someSystem"))
-              .setValueElement(StringType("someValue"))
+              .setSystemElement(UriType(system))
+              .setValueElement(StringType(value))
           )
       }
     val resourceIndices = ResourceIndexer.index(invoice)
     assertThat(resourceIndices.tokenIndices)
-      .contains(TokenIndex("identifier", "Invoice.identifier", "someSystem", "someValue"))
+      .contains(TokenIndex("identifier", "Invoice.identifier", system, value))
   }
 
   @Test
   fun index_observation_shouldIndexCodeableConceptToken() {
+    val codeString = "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    val systemString = "http://openmrs.org/concepts"
+
     val observation =
       Observation().apply {
-        id = "someID"
+        id = "non-null-ID"
         code =
           CodeableConcept()
             .addCoding(
               Coding()
-                .setCode("1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-                .setSystem("http://openmrs.org/concepts")
+                .setCode(codeString)
+                .setSystem(systemString)
             )
       }
     val resourceIndices = ResourceIndexer.index(observation)
@@ -551,8 +616,8 @@ class ResourceIndexerTest {
         TokenIndex(
           "code",
           "Observation.code",
-          "http://openmrs.org/concepts",
-          "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+          systemString,
+          codeString
         )
       )
   }
@@ -561,7 +626,7 @@ class ResourceIndexerTest {
   fun index_observation_nullCode_shouldNotIndexCodeNullToken() {
     val observation =
       Observation().apply {
-        id = "someID"
+        id = "non-null-ID"
         code = null
       }
     val resourceIndices = ResourceIndexer.index(observation)
@@ -595,21 +660,22 @@ class ResourceIndexerTest {
 
   @Test
   fun index_patient_shouldIndexManagingOrganizationReference() {
+    val organizationString = "someOrganization"
     val patient =
       Patient().apply {
         id = "someID"
-        managingOrganization = Reference().setReference("some organization")
+        managingOrganization = Reference().setReference(organizationString)
       }
     val resourceIndices = ResourceIndexer.index(patient)
     assertThat(resourceIndices.referenceIndices)
-      .contains(ReferenceIndex("organization", "Patient.managingOrganization", "some organization"))
+      .contains(ReferenceIndex("organization", "Patient.managingOrganization", organizationString))
   }
 
   @Test
   fun index_patient_nullOrganisation_shouldNotIndexOrganisationNullReference() {
     val patient =
       Patient().apply {
-        id = "someID"
+        id = "non-null-ID"
         managingOrganization = null
       }
 
@@ -652,10 +718,12 @@ class ResourceIndexerTest {
 
   @Test
   fun index_invoice_shouldIndexMoneyQuantity() {
+    val currency = "EU"
+    val value = BigDecimal.valueOf(300)
     val testInvoice =
       Invoice().apply {
-        id = "some_Non_NULL_ID"
-        totalNet = Money().setCurrency("EU").setValue(300)
+        id = "non_NULL_ID"
+        totalNet = Money().setCurrency(currency).setValue(value)
       }
 
     val resourceIndices = ResourceIndexer.index(testInvoice)
@@ -665,25 +733,26 @@ class ResourceIndexerTest {
           "totalnet",
           "Invoice.totalNet",
           FHIR_CURRENCY_SYSTEM,
-          "EU",
-          BigDecimal.valueOf(300)
+          currency,
+          value
         )
       )
   }
 
   @Test
   fun index_substance_shouldIndexQuantityQuantity() {
+    val value  = (100).toLong()
     val substance =
       Substance().apply {
-        id = "someID"
-        instance.add(Substance.SubstanceInstanceComponent().setQuantity(Quantity(1000)))
+        id = "non-null-ID"
+        instance.add(Substance.SubstanceInstanceComponent().setQuantity(Quantity(value)))
       }
 
     val resourceIndices = ResourceIndexer.index(substance)
 
     assertThat(resourceIndices.quantityIndices)
       .contains(
-        QuantityIndex("quantity", "Substance.instance.quantity", "", "", BigDecimal.valueOf(1000))
+        QuantityIndex("quantity", "Substance.instance.quantity", "", "", BigDecimal.valueOf(value))
       )
   }
 
@@ -691,7 +760,7 @@ class ResourceIndexerTest {
   fun index_substance_shouldNotIndexNullQuantity() {
     val substance =
       Substance().apply {
-        id = "someID"
+        id = "non-null-ID"
         instance.add(Substance.SubstanceInstanceComponent().setQuantity(null))
       }
     val resourceIndices = ResourceIndexer.index(substance)
@@ -709,21 +778,22 @@ class ResourceIndexerTest {
 
   @Test
   fun index_device_shouldIndexURI() {
+    val urlString = "www.someDomainName.someDomain"
     val device =
       Device().apply {
-        id = "someID"
-        url = "www.someDomainName.someDomain"
+        id = "non-null-ID"
+        url = urlString
       }
     val resourceIndices = ResourceIndexer.index(device)
     assertThat(resourceIndices.uriIndices)
-      .contains(UriIndex("url", "Device.url", "www.someDomainName.someDomain"))
+      .contains(UriIndex("url", "Device.url", urlString))
   }
 
   @Test
   fun index_device_nullURI_shouldNotIndexNullURI() {
     val device =
       Device().apply {
-        id = "someID"
+        id = "non-null-ID"
         url = null
       }
     val resourceIndices = ResourceIndexer.index(device)
@@ -734,7 +804,7 @@ class ResourceIndexerTest {
   fun index_device_emptyURI_shouldNotIndexEmptyURI() {
     val device =
       Device().apply {
-        id = "someID"
+        id = "non-null-ID"
         url = ""
       }
     val resourceIndices = ResourceIndexer.index(device)
@@ -743,19 +813,21 @@ class ResourceIndexerTest {
 
   @Test
   fun index_location_shouldIndexPositionSpecial() {
+    val latitude = 90.0
+    val longitude = 90.0
     val location =
       Location().apply {
         id = "someID"
-        position = Location.LocationPositionComponent(DecimalType(90.0), DecimalType(90.0))
+        position = Location.LocationPositionComponent(DecimalType(latitude), DecimalType(longitude))
       }
     val resourceIndices = ResourceIndexer.index(location)
-    assertThat(resourceIndices.positionIndices).contains(PositionIndex(90.0, 90.0))
+    assertThat(resourceIndices.positionIndices).contains(PositionIndex(latitude, longitude))
   }
   @Test
   fun index_location_shouldNotIndexPositionNullSpecial() {
     val location =
       Location().apply {
-        id = "someID"
+        id = "non-null-ID"
         position = null
       }
     val resourceIndices = ResourceIndexer.index(location)
@@ -765,9 +837,6 @@ class ResourceIndexerTest {
   // TODO: improve the tests further.
 
   private companion object {
-    val dateTimeTypeFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-    val instantFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-
     // See: https://www.hl7.org/fhir/valueset-currencies.html
     const val FHIR_CURRENCY_SYSTEM = "urn:iso:std:iso:4217"
   }
