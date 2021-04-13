@@ -38,5 +38,5 @@ internal fun Date.toTimeZoneString(): String {
  */
 val Resource.logicalId: String
   get() {
-    return if (this.hasIdElement() && this.idElement.hasIdPart()) this.idElement.idPart else ""
+    return this.idElement?.idPart.orEmpty()
   }
