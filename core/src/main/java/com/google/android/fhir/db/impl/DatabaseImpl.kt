@@ -24,6 +24,7 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
+import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
@@ -105,55 +106,6 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
     if (rowsDeleted > 0) localChangeDao.addDelete(resourceId = id, resourceType = type)
   }
 
-  override suspend fun <R : Resource> searchByReference(
-    clazz: Class<R>,
-    reference: String,
-    value: String
-  ): List<R> {
-    return resourceDao.getResourceByReferenceIndex(getResourceType(clazz).name, reference, value)
-      .map { iParser.parseResource(it) as R }
-  }
-
-  override suspend fun <R : Resource> searchByString(
-    clazz: Class<R>,
-    string: String,
-    value: String
-  ): List<R> {
-    return resourceDao.getResourceByStringIndex(
-        resourceType = getResourceType(clazz).name,
-        indexPath = string,
-        indexValue = value
-      )
-      .map { iParser.parseResource(it) as R }
-  }
-
-  override suspend fun <R : Resource> searchByCode(
-    clazz: Class<R>,
-    code: String,
-    system: String,
-    value: String
-  ): List<R> {
-    return resourceDao.getResourceByCodeIndex(
-        resourceType = getResourceType(clazz).name,
-        indexPath = code,
-        indexSystem = system,
-        indexValue = value
-      )
-      .map { iParser.parseResource(it) as R }
-  }
-
-  override suspend fun <R : Resource> searchByReferenceAndCode(
-    clazz: Class<R>,
-    reference: String,
-    referenceValue: String,
-    code: String,
-    codeSystem: String,
-    codeValue: String
-  ): List<R> {
-    val refs = searchByReference(clazz, reference, referenceValue).map { it.logicalId }
-    return searchByCode(clazz, code, codeSystem, codeValue).filter { refs.contains(it.logicalId) }
-  }
-
   override suspend fun <R : Resource> search(query: SearchQuery): List<R> =
     resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).map {
       iParser.parseResource(it) as R
@@ -163,11 +115,9 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
    * @returns a list of pairs. Each pair is a token + squashed local change. Each token is a list of
    * [LocalChangeEntity.id] s of rows of the [LocalChangeEntity].
    */
-  // TODO: create a data class for squashed local change and merge token in to it.
-  override suspend fun getAllLocalChanges(): List<Pair<LocalChangeToken, LocalChangeEntity>> =
-    localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map { it
-      ->
-      LocalChangeToken(it.map { it.id }) to LocalChangeUtils.squash(it)
+  override suspend fun getAllLocalChanges(): List<SquashedLocalChange> =
+    localChangeDao.getAllLocalChanges().groupBy { it.resourceId to it.resourceType }.values.map {
+      SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
     }
 
   override suspend fun deleteUpdates(token: LocalChangeToken) {
