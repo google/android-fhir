@@ -24,7 +24,6 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
-import com.google.android.material.textfield.TextInputEditText
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -118,18 +117,5 @@ class QuestionnaireItemDatePickerViewHolderFactoryInstrumentedTest {
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString())
       .isEqualTo("2020-01-01")
-  }
-
-  @Test
-  @UiThreadTest
-  fun clickOnEditTextShouldDisplayDatePicker() {
-    viewHolder.bind(
-      QuestionnaireItemViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
-      ) {}
-    )
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.textInputEditText).performClick()
-    assertThat(DatePickerFragment().isVisible)
   }
 }
