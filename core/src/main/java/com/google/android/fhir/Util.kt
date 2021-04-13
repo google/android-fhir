@@ -21,7 +21,9 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
+import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 
 /** Utility function to format a [Date] object using the system's default locale. */
 @SuppressLint("NewApi")
@@ -40,3 +42,17 @@ val Resource.logicalId: String
   get() {
     return this.idElement?.idPart.orEmpty()
   }
+
+/**
+ * Determines if the upload operation was successful or not.
+ *
+ * Current HAPI FHIR implementation does not give any signal other than 'severity' level for
+ * operation success/failure. TODO: pass along the HTTP result (or any other signal) to determine
+ * the outcome of an instance level RESTful operation.
+ */
+fun Resource.isUploadSuccess(): Boolean {
+  if (!this.resourceType.equals(ResourceType.OperationOutcome)) return false
+  val outcome: OperationOutcome = this as OperationOutcome
+  return outcome.issue.isNotEmpty() &&
+    outcome.issue.all { it.severity.equals(OperationOutcome.IssueSeverity.INFORMATION) }
+}

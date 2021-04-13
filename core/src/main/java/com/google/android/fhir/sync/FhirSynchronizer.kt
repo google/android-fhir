@@ -18,9 +18,9 @@ package com.google.android.fhir.sync
 
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.isUploadSuccess
 import com.google.android.fhir.logicalId
 import org.hl7.fhir.exceptions.FHIRException
-import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -60,7 +60,7 @@ class FhirSynchronizer(
     database.getAllLocalChanges().forEach {
       try {
         val response: Resource = doUpload(it.localChange, dataSource)
-        if (response.logicalId.equals(it.localChange.resourceId) || response.isSuccess()) {
+        if (response.logicalId.equals(it.localChange.resourceId) || response.isUploadSuccess()) {
           database.deleteUpdates(it.token)
         } else {
           // TODO improve exception message
@@ -99,18 +99,4 @@ class FhirSynchronizer(
       LocalChangeEntity.Type.DELETE ->
         datasource.delete(localChange.resourceType, localChange.resourceId)
     }
-
-  /**
-   * Determines if the upload operation was successful or not.
-   *
-   * Current HAPI FHIR implementation does not give any signal other than 'severity' level for
-   * operation success/failure. TODO: pass along the HTTP result (or any other signal) to determine
-   * the outcome of an instance level RESTful operation.
-   */
-  private fun Resource.isSuccess(): Boolean {
-    if (!this.resourceType.equals(ResourceType.OperationOutcome)) return false
-    val outcome: OperationOutcome = this as OperationOutcome
-    return outcome.hasIssue() &&
-      issue.all { it.severity.equals(OperationOutcome.IssueSeverity.INFORMATION) }
-  }
 }
