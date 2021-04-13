@@ -618,9 +618,7 @@ class QuestionnaireViewModelTest {
     state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
     val viewModel = QuestionnaireViewModel(state)
     var questionnaireItemViewItemList = viewModel.questionnaireItemViewItemList
-    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback(
-      questionnaireItemViewItemList[0].questionnaireItem.linkId
-    )
+    questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
     assertThat(questionnaireItemViewItemList.size).isEqualTo(2)
     val firstQuestionnaireItemViewItem = questionnaireItemViewItemList[0]
     val firstQuestionnaireItem = firstQuestionnaireItemViewItem.questionnaireItem
@@ -686,9 +684,7 @@ class QuestionnaireViewModelTest {
         this.value = valueBooleanType.setValue(false)
       }
     )
-    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback(
-      viewModel.questionnaireItemViewItemList[0].questionnaireItem.linkId
-    )
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
 
     assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
   }
@@ -747,9 +743,7 @@ class QuestionnaireViewModelTest {
         this.value = valueBooleanType.setValue(false)
       }
     )
-    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback(
-      viewModel.questionnaireItemViewItemList[0].questionnaireItem.linkId
-    )
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
     viewModel.questionnaireItemViewItemList[0].questionnaireResponseItem.answer[0].item[0]
       .addAnswer(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {

@@ -150,9 +150,8 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
         questionnaireItemViewItemList.add(
           QuestionnaireItemViewItem(
             questionnaireItem,
-            questionnaireResponseItem,
-            questionnaireResponseItemChangedCallback as (String?) -> Unit
-          )
+            questionnaireResponseItem
+          ) { questionnaireResponseItemChangedCallback(questionnaireItem.linkId) }
         )
         questionnaireItemViewItemList.addAll(
           getQuestionnaireItemViewItemList(

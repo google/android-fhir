@@ -86,9 +86,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
             }
           }
 
-          questionnaireItemViewItem.questionnaireResponseItemChangedCallback(
-            questionnaireItem.linkId
-          )
+          questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
         }
       }
     }

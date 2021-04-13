@@ -152,9 +152,7 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
                 )
               )
             )
-        questionnaireItemViewItem.questionnaireResponseItemChangedCallback(
-          questionnaireItemViewItem.questionnaireItem.linkId
-        )
+        questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
       }
     }
 

@@ -49,9 +49,7 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textInputEditText.isSingleLine = isSingleLine
     textInputEditText.doAfterTextChanged { editable: Editable? ->
       questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
-      questionnaireItemViewItem.questionnaireResponseItemChangedCallback(
-        questionnaireItemViewItem.questionnaireItem.linkId
-      )
+      questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
       applyValidationResult(
         QuestionnaireResponseItemValidator.validate(
           questionnaireItemViewItem.questionnaireItem,
