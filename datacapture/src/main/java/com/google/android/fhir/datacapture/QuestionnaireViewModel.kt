@@ -75,10 +75,10 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
   /** Callback function to update the UI. */
   private val questionnaireResponseItemChangedCallback: (String) -> Unit = { linkId ->
-    if (linkIdToQuestionnaireItemMap[linkId]?.hasNestedItemsWithinAnswers == true) {
-      linkIdToQuestionnaireResponseItemMap[linkId]?.addNestedItemsToAnswer(
-        linkIdToQuestionnaireItemMap[linkId]
-      )
+    linkIdToQuestionnaireItemMap[linkId]?.let {
+      if (it.hasNestedItemsWithinAnswers) {
+        linkIdToQuestionnaireResponseItemMap[linkId]!!.addNestedItemsToAnswer(it)
+      }
     }
     modificationCount.value += 1
   }
