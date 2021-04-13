@@ -177,15 +177,12 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
 private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAnswer(
-  questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent?
+  questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
 ) {
-  this.apply {
-    linkId = linkId
-    answer = answer
+
     if (answer.isNotEmpty()) {
-      answer.first().item = questionnaireItemComponent?.createListOfItemInAnswer()
+      answer.first().item = questionnaireItemComponent.createListOfItemInAnswer()
     }
-  }
 }
 
 /**
@@ -203,7 +200,7 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
     if (this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
         this@createQuestionnaireResponseItem.item.count() > 0
     ) {
-      if (this.answer.isNotEmpty()) {
+      if (hasNestedItemsWithinAnswers && answer.isNotEmpty()) {
         this.addNestedItemsToAnswer(this@createQuestionnaireResponseItem)
       }
     } else if (this@createQuestionnaireResponseItem.type ==
