@@ -26,8 +26,14 @@ internal data class DateIndex(
   val name: String,
   /** The path of the date index, e.g. "Patient.birthdate". */
   val path: String,
-  /** The high timestamp. */
-  val to: Long,
-  /** The low timestamp. */
-  val from: Long
+  /**
+   * The lower bound or start time of the date value. This is a closed interval and the value is
+   * included
+   */
+  val from: Long,
+  /**
+   * The upper bound or end time of the date value. This is an open interval and the value is
+   * excluded
+   */
+  val to: Long
 )
