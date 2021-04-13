@@ -148,10 +148,9 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
         }
       if (enabled) {
         questionnaireItemViewItemList.add(
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            questionnaireResponseItem
-          ) { questionnaireResponseItemChangedCallback(questionnaireItem.linkId) }
+          QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
+            questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
+          }
         )
         questionnaireItemViewItemList.addAll(
           getQuestionnaireItemViewItemList(
@@ -180,7 +179,7 @@ private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedIt
 ) {
 
   if (answer.isNotEmpty()) {
-    answer.first().item = questionnaireItemComponent.createListOfItemInAnswer()
+    answer.first().item = questionnaireItemComponent.listOfItemInAnswer
   }
 }
 
@@ -219,12 +218,14 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
  * The hierarchy and order of child items will be retained as specified in the standard. See
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
-private fun Questionnaire.QuestionnaireItemComponent.createListOfItemInAnswer():
-  List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
-  val listOfNestedItems = mutableListOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
-  this.item.forEach { listOfNestedItems.add(it.createQuestionnaireResponseItem()) }
-  return listOfNestedItems
-}
+private inline val Questionnaire.QuestionnaireItemComponent.listOfItemInAnswer:
+  List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+  get() {
+    val listOfNestedItems =
+      mutableListOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
+    this.item.forEach { listOfNestedItems.add(it.createQuestionnaireResponseItem()) }
+    return listOfNestedItems
+  }
 
 /**
  * Returns a list of answers from the initial values of the questionnaire item. `null` if no intial
