@@ -28,8 +28,8 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Enumerations
-import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
