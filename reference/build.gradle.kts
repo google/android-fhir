@@ -72,8 +72,7 @@ dependencies {
   implementation(Dependencies.Retrofit.retrofitMock)
   implementation(Dependencies.httpInterceptor)
   implementation(Dependencies.material)
-
-  implementation(project(path = ":core"))
+  implementation(project(":engine"))
 
   testImplementation(Dependencies.junit)
 }
