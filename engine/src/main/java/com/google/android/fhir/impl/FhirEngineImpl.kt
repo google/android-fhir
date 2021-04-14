@@ -73,6 +73,10 @@ constructor(
     return FhirSynchronizer(syncConfiguration, dataSource, database).sync()
   }
 
+  override suspend fun syncUpload(): Result {
+    return FhirSynchronizer(SyncConfiguration(), dataSource, database).upload()
+  }
+
   override suspend fun periodicSync(): Result {
     val syncConfig =
       periodicSyncConfiguration
