@@ -30,14 +30,12 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
-import java.text.SimpleDateFormat
 import org.hl7.fhir.r4.model.BooleanType
-import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
-import org.hl7.fhir.r4.model.MolecularSequence
 import org.hl7.fhir.r4.model.Device
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Identifier
@@ -45,6 +43,7 @@ import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.Invoice
 import org.hl7.fhir.r4.model.Location
 import org.hl7.fhir.r4.model.Meta
+import org.hl7.fhir.r4.model.MolecularSequence
 import org.hl7.fhir.r4.model.Money
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
@@ -72,6 +71,7 @@ class ResourceIndexerTest {
   private lateinit var testQuestionnaire: Questionnaire
   private lateinit var testPatient: Patient
   private lateinit var testLocation: Location
+
   @Before
   fun setUp() {
     val testingUtils = TestingUtils(FhirContext.forR4().newJsonParser())
@@ -83,6 +83,7 @@ class ResourceIndexerTest {
     testPatient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
     testLocation = testingUtils.readFromFile(Location::class.java, "/location-example-hl7hq.json")
   }
+
   /** Integration tests for ResourceIndexer. */
   @Test
   fun index_invoice() {
@@ -336,21 +337,26 @@ class ResourceIndexerTest {
         )
       )
   }
-@Test
-fun index_molecularSequence_shouldIndexWindowStartNumber(){
-  val value = 22125510
-  val molecularSequence = MolecularSequence().apply {
-    id = "non-null-ID"
-    referenceSeq.windowStart = value
+
+  @Test
+  fun index_molecularSequence_shouldIndexWindowStartNumber() {
+    val value = 22125510
+    val molecularSequence =
+      MolecularSequence().apply {
+        id = "non-null-ID"
+        referenceSeq.windowStart = value
+      }
+    val resourceIndices = ResourceIndexer.index(molecularSequence)
+    assertThat(resourceIndices.numberIndices)
+      .contains(
+        NumberIndex(
+          "window-start",
+          "MolecularSequence.referenceSeq.windowStart",
+          BigDecimal.valueOf(value.toLong())
+        )
+      )
   }
-  val resourceIndices = ResourceIndexer.index(molecularSequence)
-  assertThat(resourceIndices.numberIndices).contains(
-    NumberIndex(
-      "window-start" ,
-      "MolecularSequence.referenceSeq.windowStart",
-      BigDecimal.valueOf(value.toLong()))
-  )
-}
+
   @Test
   fun index_riskAssessment_shouldIndexProbabilityDecimalNumber() {
     val value = BigDecimal.valueOf(0.9)
@@ -366,9 +372,7 @@ fun index_molecularSequence_shouldIndexWindowStartNumber(){
     val resourceIndices = ResourceIndexer.index(riskAssessment)
 
     assertThat(resourceIndices.numberIndices)
-      .contains(
-        NumberIndex("probability", "RiskAssessment.prediction.probability", value)
-      )
+      .contains(NumberIndex("probability", "RiskAssessment.prediction.probability", value))
   }
 
   @Test
@@ -386,7 +390,7 @@ fun index_molecularSequence_shouldIndexWindowStartNumber(){
           "birthdate",
           "Patient.birthDate",
           date.value.time,
-         date.value.time,
+          date.value.time,
           date.precision
         )
       )
@@ -394,7 +398,7 @@ fun index_molecularSequence_shouldIndexWindowStartNumber(){
 
   @Test
   fun index_observation_effectiveDateTimeType_shouldIndexDateTimeDate() {
-   val dateTime = DateTimeType("2001-12-29T12:20:30+07:00")
+    val dateTime = DateTimeType("2001-12-29T12:20:30+07:00")
     val observation =
       Observation().apply {
         id = "non-null ID"
@@ -437,10 +441,11 @@ fun index_molecularSequence_shouldIndexWindowStartNumber(){
 
   @Test
   fun index_observation_effectivePeriod_shouldIndexPeriodDate() {
-    val period = Period().apply {
-      startElement = DateTimeType("2001-09-08T20:30:09+05:30")
-      endElement = DateTimeType("2001-10-01T21:39:09+05:30")
-    }
+    val period =
+      Period().apply {
+        startElement = DateTimeType("2001-09-08T20:30:09+05:30")
+        endElement = DateTimeType("2001-10-01T21:39:09+05:30")
+      }
     val observation =
       Observation().apply {
         id = "non-null ID"
@@ -461,17 +466,17 @@ fun index_molecularSequence_shouldIndexWindowStartNumber(){
 
   @Test
   fun index_observation_effectiveTiming_shouldIndexTimingDate() {
-    val timing = Timing().apply {
-      addEvent(DateTimeType("2001-11-05T21:53:10+09:00").value)
-      addEvent(DateTimeType("2002-09-01T20:30:18+09:00").value)
-      addEvent(DateTimeType("2003-10-24T18:30:40+09:00").value)
-    }
+    val timing =
+      Timing().apply {
+        addEvent(DateTimeType("2001-11-05T21:53:10+09:00").value)
+        addEvent(DateTimeType("2002-09-01T20:30:18+09:00").value)
+        addEvent(DateTimeType("2003-10-24T18:30:40+09:00").value)
+      }
 
     val observation =
       Observation().apply {
         id = "non-null ID"
         effective = timing
-
       }
     val resourceIndices = ResourceIndexer.index(observation)
     assertThat(resourceIndices.dateIndices)
@@ -500,7 +505,7 @@ fun index_molecularSequence_shouldIndexWindowStartNumber(){
 
   @Test
   fun index_patient_shouldIndexGivenNameString() {
-  val nameString = "John"
+    val nameString = "John"
     val patient =
       Patient().apply {
         id = "non-null-ID"
@@ -584,9 +589,7 @@ fun index_molecularSequence_shouldIndexWindowStartNumber(){
         id = "someid"
         identifier =
           mutableListOf(
-            Identifier()
-              .setSystemElement(UriType(system))
-              .setValueElement(StringType(value))
+            Identifier().setSystemElement(UriType(system)).setValueElement(StringType(value))
           )
       }
     val resourceIndices = ResourceIndexer.index(invoice)
@@ -602,24 +605,11 @@ fun index_molecularSequence_shouldIndexWindowStartNumber(){
     val observation =
       Observation().apply {
         id = "non-null-ID"
-        code =
-          CodeableConcept()
-            .addCoding(
-              Coding()
-                .setCode(codeString)
-                .setSystem(systemString)
-            )
+        code = CodeableConcept().addCoding(Coding().setCode(codeString).setSystem(systemString))
       }
     val resourceIndices = ResourceIndexer.index(observation)
     assertThat(resourceIndices.tokenIndices)
-      .contains(
-        TokenIndex(
-          "code",
-          "Observation.code",
-          systemString,
-          codeString
-        )
-      )
+      .contains(TokenIndex("code", "Observation.code", systemString, codeString))
   }
 
   @Test
@@ -694,6 +684,7 @@ fun index_molecularSequence_shouldIndexWindowStartNumber(){
       }
     )
   }
+
   @Test
   fun index_patient_emptyOrganisation_shouldNotIndexOrganisationEmptyReference() {
     val patient =
@@ -729,19 +720,13 @@ fun index_molecularSequence_shouldIndexWindowStartNumber(){
     val resourceIndices = ResourceIndexer.index(testInvoice)
     assertThat(resourceIndices.quantityIndices)
       .contains(
-        QuantityIndex(
-          "totalnet",
-          "Invoice.totalNet",
-          FHIR_CURRENCY_SYSTEM,
-          currency,
-          value
-        )
+        QuantityIndex("totalnet", "Invoice.totalNet", FHIR_CURRENCY_SYSTEM, currency, value)
       )
   }
 
   @Test
   fun index_substance_shouldIndexQuantityQuantity() {
-    val value  = (100).toLong()
+    val value = (100).toLong()
     val substance =
       Substance().apply {
         id = "non-null-ID"
@@ -785,8 +770,7 @@ fun index_molecularSequence_shouldIndexWindowStartNumber(){
         url = urlString
       }
     val resourceIndices = ResourceIndexer.index(device)
-    assertThat(resourceIndices.uriIndices)
-      .contains(UriIndex("url", "Device.url", urlString))
+    assertThat(resourceIndices.uriIndices).contains(UriIndex("url", "Device.url", urlString))
   }
 
   @Test
@@ -823,6 +807,7 @@ fun index_molecularSequence_shouldIndexWindowStartNumber(){
     val resourceIndices = ResourceIndexer.index(location)
     assertThat(resourceIndices.positionIndices).contains(PositionIndex(latitude, longitude))
   }
+
   @Test
   fun index_location_shouldNotIndexPositionNullSpecial() {
     val location =
