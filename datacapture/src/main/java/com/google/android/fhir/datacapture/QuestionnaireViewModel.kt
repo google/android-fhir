@@ -176,10 +176,42 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   QuestionnaireResponse.QuestionnaireResponseItemComponent {
   return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
+    answer = createQuestionnaireResponseItemAnswers()
     this@createQuestionnaireResponseItem.item.forEach {
       this.addItem(it.createQuestionnaireResponseItem())
     }
   }
+}
+
+/**
+ * Returns a list of answers from the initial values of the questionnaire item. `null` if no intial
+ * value.
+ */
+private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
+  MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? {
+  if (initial.isEmpty()) {
+    return null
+  }
+
+  if (type == Questionnaire.QuestionnaireItemType.GROUP ||
+      type == Questionnaire.QuestionnaireItemType.DISPLAY
+  ) {
+    throw IllegalArgumentException(
+      "Questionnaire item $linkId has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+    )
+  }
+
+  if (initial.size > 1 && !repeats) {
+    throw IllegalArgumentException(
+      "Questionnaire item $linkId can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+    )
+  }
+
+  return mutableListOf(
+    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+      value = initial[0].value
+    }
+  )
 }
 
 /**
