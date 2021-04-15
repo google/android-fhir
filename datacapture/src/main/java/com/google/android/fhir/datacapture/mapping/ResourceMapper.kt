@@ -48,7 +48,7 @@ import org.hl7.fhir.r4.model.UrlType
  *
  * WARNING: This is not production-ready.
  */
-internal object ResourceMapper {
+object ResourceMapper {
 
   /**
    * Extract a FHIR resource from the `questionnaire` and `questionnaireResponse`.
@@ -84,6 +84,7 @@ internal object ResourceMapper {
       }
 
       if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
+        // create a class for questionnaire item of type group and add to the resource
         val innerClass: Class<*> =
           Class.forName(
             "org.hl7.fhir.r4.model.${questionnaireItem.itemComponentContextNameToExpressionMap.values.first()}"
@@ -105,8 +106,11 @@ internal object ResourceMapper {
         else questionnaireResponseItem.answer.first().value
 
       val itemComponentClassNameToExpressionMap =
-        questionnaireItem.itemComponentContextNameToExpressionMap
+        questionnaireItem
+          .itemComponentContextNameToExpressionMap // gets item type e.g. AdministrativeGender for
+      // gender
       if (itemComponentClassNameToExpressionMap.isEmpty()) {
+        // this is a low level type e.g. StringType
         questionnaireItem.type.getClass()?.let {
           resource
             .javaClass
@@ -114,6 +118,7 @@ internal object ResourceMapper {
             .invoke(resource, ans)
         }
       } else {
+        // this is a high level type e.g. AdministrativeGender
         val dataTypeClass: Class<*> =
           Class.forName(
             "org.hl7.fhir.r4.model." + itemComponentClassNameToExpressionMap.values.first()
@@ -183,7 +188,7 @@ private fun createInnerClassObject(
       }
     } else {
       // call the set methods by providing data type defined defined for the field e.g.
-      // AdministrativeGender
+      // ContactPointSystem
       val dataTypeClass: Class<*> =
         Class.forName(
           "org.hl7.fhir.r4.model." + itemComponentClassNameToExpressionMap.values.first()

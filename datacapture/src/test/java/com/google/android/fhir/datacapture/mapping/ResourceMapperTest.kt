@@ -190,7 +190,7 @@ class ResourceMapperTest {
                       "linkId": "PR-name-given",
                       "answer": [
                         {
-                          "valueString": "Rodgers"
+                          "valueString": "John"
                         }
                       ]
                     },
@@ -198,7 +198,7 @@ class ResourceMapperTest {
                       "linkId": "PR-name-family",
                       "answer": [
                         {
-                          "valueString": "Andati"
+                          "valueString": "Doe"
                         }
                       ]
                     }
@@ -263,11 +263,12 @@ class ResourceMapperTest {
       ) as
         org.hl7.fhir.r4.model.QuestionnaireResponse
 
-    val patient = ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse)
+    val patient =
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) as Patient
 
-    assertThat((patient as Patient).birthDate).isEqualTo(Date(1609448400000))
+    assertThat(patient.birthDate).isEqualTo(Date(1609448400000))
     assertThat(patient.active).isTrue()
-    assertThat(patient.name.first().given.first().toString()).isEqualTo("Rodgers")
-    assertThat(patient.name.first().family).isEqualTo("Andati")
+    assertThat(patient.name.first().given.first().toString()).isEqualTo("John")
+    assertThat(patient.name.first().family).isEqualTo("Doe")
   }
 }
