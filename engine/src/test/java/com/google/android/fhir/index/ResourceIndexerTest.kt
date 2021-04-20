@@ -56,7 +56,6 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Substance
 import org.hl7.fhir.r4.model.Timing
 import org.hl7.fhir.r4.model.UriType
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -66,23 +65,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class ResourceIndexerTest {
-
-  private lateinit var testInvoice: Invoice
-  private lateinit var testQuestionnaire: Questionnaire
-  private lateinit var testPatient: Patient
-  private lateinit var testLocation: Location
-
-  @Before
-  fun setUp() {
-    val testingUtils = TestingUtils(FhirContext.forR4().newJsonParser())
-    // TODO: Improve sample data reading. Current approach has a downside of failing all tests if
-    // one file name is mistyped.
-    testInvoice = testingUtils.readFromFile(Invoice::class.java, "/quantity_test_invoice.json")
-    testQuestionnaire =
-      testingUtils.readFromFile(Questionnaire::class.java, "/uri_test_questionnaire.json")
-    testPatient = testingUtils.readFromFile(Patient::class.java, "/date_test_patient.json")
-    testLocation = testingUtils.readFromFile(Location::class.java, "/location-example-hl7hq.json")
-  }
 
   /** Unit tests for resource indexer */
   @Test
@@ -576,6 +558,9 @@ class ResourceIndexerTest {
   /** Integration tests for ResourceIndexer. */
   @Test
   fun index_invoice() {
+    val testInvoice =
+      TestingUtils(FhirContext.forR4().newJsonParser())
+        .readFromFile(Invoice::class.java, "/quantity_test_invoice.json")
     val resourceIndices = ResourceIndexer.index(testInvoice)
 
     assertThat(resourceIndices.resourceId).isEqualTo(testInvoice.logicalId)
@@ -648,6 +633,9 @@ class ResourceIndexerTest {
 
   @Test
   fun index_questionnaire() {
+    val testQuestionnaire =
+      TestingUtils(FhirContext.forR4().newJsonParser())
+        .readFromFile(Questionnaire::class.java, "/uri_test_questionnaire.json")
     val resourceIndices = ResourceIndexer.index(testQuestionnaire)
 
     assertThat(resourceIndices.resourceType).isEqualTo(testQuestionnaire.resourceType)
@@ -684,6 +672,10 @@ class ResourceIndexerTest {
 
   @Test
   fun index_patient() {
+    val testPatient =
+      TestingUtils(FhirContext.forR4().newJsonParser())
+        .readFromFile(Patient::class.java, "/date_test_patient.json")
+
     val resourceIndices = ResourceIndexer.index(testPatient)
 
     assertThat(resourceIndices.resourceType).isEqualTo(testPatient.resourceType)
@@ -762,6 +754,10 @@ class ResourceIndexerTest {
 
   @Test
   fun index_location() {
+    val testLocation =
+      TestingUtils(FhirContext.forR4().newJsonParser())
+        .readFromFile(Location::class.java, "/location-example-hl7hq.json")
+
     val resourceIndices = ResourceIndexer.index(testLocation)
     assertThat(resourceIndices.resourceType).isEqualTo(testLocation.resourceType)
     assertThat(resourceIndices.resourceId).isEqualTo(testLocation.logicalId)
