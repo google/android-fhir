@@ -16,32 +16,37 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import java.util.Calendar
+import java.util.Date
 import org.hl7.fhir.r4.model.Type
 
 operator fun Type.compareTo(value: Type?): Int {
   if (value != null) {
     when {
       this.fhirType().equals("integer") && value.fhirType().equals("integer") -> {
-        if (value.primitiveValue().toInt() > this.primitiveValue().toInt()) return 1
-        if (value.primitiveValue().toInt() < this.primitiveValue().toInt()) return -1
-        if (value.primitiveValue().toInt() == this.primitiveValue().toInt()) return 0
+        return this.primitiveValue().toInt().compareTo(value.primitiveValue().toInt())
       }
       this.fhirType().equals("decimal") && value.fhirType().equals("decimal") -> {
-        if (value.primitiveValue().toBigDecimal() > this.primitiveValue().toBigDecimal()) return 1
-        if (value.primitiveValue().toBigDecimal() < this.primitiveValue().toBigDecimal()) return -1
-        if (value.primitiveValue().toBigDecimal() == this.primitiveValue().toBigDecimal()) return 0
+        return this.primitiveValue().toBigDecimal().compareTo(value.primitiveValue().toBigDecimal())
       }
       this.fhirType().equals("date") && value.fhirType().equals("date") -> {
-        if (value.dateTimeValue().value > this.dateTimeValue().value) return 1
-        if (value.dateTimeValue().value < this.dateTimeValue().value) return -1
-        if (value.dateTimeValue().value == this.dateTimeValue().value) return 0
+        return clearTimeFromDateValue(this.dateTimeValue().value)
+          .compareTo(clearTimeFromDateValue(value.dateTimeValue().value))
       }
       this.fhirType().equals("dateTime") && value.fhirType().equals("dateTime") -> {
-        if (value.dateTimeValue().value > this.dateTimeValue().value) return 1
-        if (value.dateTimeValue().value < this.dateTimeValue().value) return -1
-        if (value.dateTimeValue().value == this.dateTimeValue().value) return 0
+        return this.dateTimeValue().value.compareTo(value.dateTimeValue().value)
       }
     }
   }
   return 0
+}
+
+private fun clearTimeFromDateValue(dateValue: Date): Date {
+  val calendarValue = Calendar.getInstance()
+  calendarValue.time = dateValue
+  calendarValue.set(Calendar.HOUR_OF_DAY, 0)
+  calendarValue.set(Calendar.MINUTE, 0)
+  calendarValue.set(Calendar.SECOND, 0)
+  calendarValue.set(Calendar.MILLISECOND, 0)
+  return calendarValue.time
 }

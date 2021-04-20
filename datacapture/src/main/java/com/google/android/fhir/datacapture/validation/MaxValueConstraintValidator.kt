@@ -25,7 +25,7 @@ internal object MaxValueConstraintValidator :
     predicate = {
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
-      extension.value > answer.value
+      answer.value > extension.value
     },
     { extension: Extension, answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
       ->
