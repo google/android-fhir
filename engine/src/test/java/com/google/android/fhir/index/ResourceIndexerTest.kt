@@ -137,8 +137,7 @@ class ResourceIndexerTest {
           "date",
           "Invoice.date",
           testInvoice.date.time,
-          testInvoice.date.time,
-          testInvoice.dateElement.precision
+          testInvoice.date.time
         )
       )
 
@@ -180,8 +179,7 @@ class ResourceIndexerTest {
           "date",
           "Questionnaire.date",
           testQuestionnaire.date.time,
-          testQuestionnaire.date.time,
-          testQuestionnaire.dateElement.precision
+          testQuestionnaire.date.time
         )
       )
 
@@ -208,8 +206,7 @@ class ResourceIndexerTest {
           "birthdate",
           "Patient.birthDate",
           testPatient.birthDateElement.value.time,
-          testPatient.birthDateElement.value.time,
-          testPatient.birthDateElement.precision
+          testPatient.birthDateElement.value.time
         )
       )
 
@@ -332,8 +329,7 @@ class ResourceIndexerTest {
           "_lastUpdated",
           "Patient.meta.lastUpdated",
           InstantType("2001-09-01T23:09:09.000+05:30").value.time,
-          InstantType("2001-09-01T23:09:09.000+05:30").value.time,
-          InstantType("2001-09-01T23:09:09.000+05:30").precision
+          InstantType("2001-09-01T23:09:09.000+05:30").value.time
         )
       )
   }
@@ -390,8 +386,7 @@ class ResourceIndexerTest {
           "birthdate",
           "Patient.birthDate",
           date.value.time,
-          date.value.time,
-          date.precision
+          date.precision.add(date.value,1).time
         )
       )
   }
@@ -412,8 +407,8 @@ class ResourceIndexerTest {
           "date",
           "Observation.effective",
           dateTime.value.time,
-          dateTime.value.time,
-          dateTime.precision
+         dateTime.precision.add(dateTime.value, 1).time
+
         )
       )
   }
@@ -433,8 +428,7 @@ class ResourceIndexerTest {
           "date",
           "Observation.effective",
           instant.value.time,
-          instant.value.time,
-          instant.precision
+          instant.value.time
         )
       )
   }
@@ -457,9 +451,8 @@ class ResourceIndexerTest {
         DateIndex(
           "date",
           "Observation.effective",
-          period.end.time,
           period.start.time,
-          period.startElement.precision
+          period.endElement.precision.add(period.end,1).time
         )
       )
   }
@@ -484,9 +477,8 @@ class ResourceIndexerTest {
         DateIndex(
           "date",
           "Observation.effective",
-          timing.event.maxOf { it.value.time },
           timing.event.minOf { it.value.time },
-          timing.event.maxOf { it.precision }
+          timing.event.maxOf { it.precision.add(it.value,1).time }
         )
       )
   }
