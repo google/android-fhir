@@ -132,7 +132,14 @@ class ResourceIndexerTest {
     assertThat(resourceIndices.uriIndices).isEmpty()
 
     assertThat(resourceIndices.dateIndices)
-      .contains(DateIndex("date", "Invoice.date", testInvoice.date.time, testInvoice.date.time))
+      .contains(
+        DateIndex(
+          "date",
+          "Invoice.date",
+          testInvoice.date.time,
+          testInvoice.dateElement.precision.add(testInvoice.date, 1).time - 1
+        )
+      )
 
     assertThat(resourceIndices.referenceIndices)
       .containsExactly(
@@ -172,7 +179,7 @@ class ResourceIndexerTest {
           "date",
           "Questionnaire.date",
           testQuestionnaire.date.time,
-          testQuestionnaire.date.time
+          testQuestionnaire.dateElement.precision.add(testQuestionnaire.date, 1).time - 1
         )
       )
 
@@ -199,7 +206,7 @@ class ResourceIndexerTest {
           "birthdate",
           "Patient.birthDate",
           testPatient.birthDateElement.value.time,
-          testPatient.birthDateElement.value.time
+          testPatient.birthDateElement.precision.add(testPatient.birthDateElement.value, 1).time - 1
         )
       )
 
@@ -379,7 +386,7 @@ class ResourceIndexerTest {
           "birthdate",
           "Patient.birthDate",
           date.value.time,
-          date.precision.add(date.value, 1).time
+          date.precision.add(date.value, 1).time - 1
         )
       )
   }
@@ -400,7 +407,7 @@ class ResourceIndexerTest {
           "date",
           "Observation.effective",
           dateTime.value.time,
-          dateTime.precision.add(dateTime.value, 1).time
+          dateTime.precision.add(dateTime.value, 1).time - 1
         )
       )
   }
@@ -437,7 +444,7 @@ class ResourceIndexerTest {
           "date",
           "Observation.effective",
           period.start.time,
-          period.endElement.precision.add(period.end, 1).time
+          period.endElement.precision.add(period.end, 1).time - 1
         )
       )
   }
@@ -463,7 +470,7 @@ class ResourceIndexerTest {
           "date",
           "Observation.effective",
           timing.event.minOf { it.value.time },
-          timing.event.maxOf { it.precision.add(it.value, 1).time }
+          timing.event.maxOf { it.precision.add(it.value, 1).time } - 1
         )
       )
   }

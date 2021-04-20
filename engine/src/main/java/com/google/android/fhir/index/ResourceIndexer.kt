@@ -99,7 +99,7 @@ internal object ResourceIndexer {
           name = "_lastUpdated",
           path = arrayOf(resource.fhirType(), "meta", "lastUpdated").joinToString(separator = "."),
           from = lastUpdatedElement.value.time,
-          to = lastUpdatedElement.precision.add(lastUpdatedElement.value, 1).time
+          to = lastUpdatedElement.value.time
         )
       )
     }
@@ -123,7 +123,7 @@ internal object ResourceIndexer {
           searchParam.name,
           searchParam.path,
           date.value.time,
-          date.precision.add(date.value, 1).time
+          date.precision.add(date.value, 1).time - 1
         )
       }
       "dateTime" -> {
@@ -132,7 +132,7 @@ internal object ResourceIndexer {
           searchParam.name,
           searchParam.path,
           dateTime.value.time,
-          dateTime.precision.add(dateTime.value, 1).time
+          dateTime.precision.add(dateTime.value, 1).time - 1
         )
       }
       // No need to add precision because an instant is meant to have zero width
@@ -146,7 +146,7 @@ internal object ResourceIndexer {
           searchParam.name,
           searchParam.path,
           if (period.hasStart()) period.start.time else 0,
-          if (period.hasEnd()) period.endElement.precision.add(period.end, 1).time
+          if (period.hasEnd()) period.endElement.precision.add(period.end, 1).time - 1
           else Long.MAX_VALUE
         )
       }
@@ -156,7 +156,7 @@ internal object ResourceIndexer {
           searchParam.name,
           searchParam.path,
           timing.event.minOf { it.value.time },
-          timing.event.maxOf { it.precision.add(it.value, 1).time }
+          timing.event.maxOf { it.precision.add(it.value, 1).time } - 1
         )
       }
       else -> null
