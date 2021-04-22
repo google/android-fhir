@@ -237,7 +237,7 @@ internal object ResourceIndexer {
     return when (value?.fhirType()) {
       "Location.position" -> {
         val location = (value as Location.LocationPositionComponent)
-        return PositionIndex(location.latitude.toDouble(), location.longitude.toDouble())
+        PositionIndex(location.latitude.toDouble(), location.longitude.toDouble())
       }
       else -> null
     }
