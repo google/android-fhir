@@ -218,9 +218,8 @@ class ResourceIndexerTest {
         DateIndex(
           "date",
           "Observation.effective",
-          periodElement.end.time,
           periodElement.start.time,
-          periodElement.startElement.precision
+          periodElement.endElement.precision.add(periodElement.end, 1).time
         )
       )
   }
@@ -235,8 +234,7 @@ class ResourceIndexerTest {
           "date",
           "Observation.effective",
           dateTimeTypeElement.value.time,
-          dateTimeTypeElement.value.time,
-          dateTimeTypeElement.precision
+          dateTimeTypeElement.precision.add(dateTimeTypeElement.value, 1).time
         )
       )
   }
@@ -250,9 +248,8 @@ class ResourceIndexerTest {
         DateIndex(
           "date",
           "Observation.effective",
-          timingElement.event.maxOf { it.value.time },
           timingElement.event.minOf { it.value.time },
-          timingElement.event.maxOf { it.precision }
+          timingElement.event.maxOf { it.precision.add(it.value, 1).time }
         )
       )
   }
@@ -266,8 +263,7 @@ class ResourceIndexerTest {
           "date",
           "Observation.effective",
           instantElement.value.time,
-          instantElement.value.time,
-          instantElement.precision
+          instantElement.value.time
         )
       )
   }
@@ -333,9 +329,8 @@ class ResourceIndexerTest {
         DateIndex(
           "birthdate",
           "Patient.birthDate",
-          birthDateElement.getValue().getTime(),
-          birthDateElement.getValue().getTime(),
-          birthDateElement.getPrecision()
+          birthDateElement.value.time,
+          birthDateElement.precision.add(birthDateElement.value, 1).time
         )
       )
   }
@@ -350,8 +345,7 @@ class ResourceIndexerTest {
           "_lastUpdated",
           "Patient.meta.lastUpdated",
           lastUpdatedElement.getValue().getTime(),
-          lastUpdatedElement.getValue().getTime(),
-          lastUpdatedElement.getPrecision()
+          lastUpdatedElement.precision.add(lastUpdatedElement.getValue(), 1).time
         )
       )
   }
