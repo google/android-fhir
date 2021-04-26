@@ -101,9 +101,7 @@ object ResourceMapper {
       }
 
       // get answer from questionnaireResponse or from initial value in questionnaire
-      val ans =
-        if (questionnaireResponseItem.answer.isEmpty()) questionnaireItem.initial.first().value
-        else questionnaireResponseItem.answer.first().value
+      val ans = extractQuestionAnswer(questionnaireResponseItem, questionnaireItem) ?: continue
 
       val itemComponentClassNameToExpressionMap =
         questionnaireItem
@@ -162,9 +160,7 @@ private fun createInnerClassObject(
     val targetFieldName = questionnaireItem.definition.substringAfterLast(".")
 
     // get answer from questionnaireResponse or from initial value in questionnaire
-    val answer =
-      if (questionnaireResponseItem.answer.isEmpty()) questionnaireItem.initial.first().value
-      else questionnaireResponseItem.answer.first().value
+    val answer = extractQuestionAnswer(questionnaireResponseItem, questionnaireItem) ?: continue
 
     val itemComponentClassNameToExpressionMap =
       questionnaireItem.itemComponentContextNameToExpressionMap
@@ -207,6 +203,11 @@ private fun createInnerClassObject(
     }
   }
 }
+
+private fun extractQuestionAnswer(questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent, questionnaireItem: Questionnaire.QuestionnaireItemComponent) =
+        if (!questionnaireResponseItem.answer.isEmpty()) questionnaireResponseItem.answer.first().value
+        else if (!questionnaireItem.initial.isEmpty()) questionnaireItem.initial.first().value
+        else null
 
 /**
  * Returns the field name for the [Questionnaire.Item]'s definition.
