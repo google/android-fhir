@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.mapping
 
+import android.text.TextUtils
 import java.lang.reflect.Method
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
@@ -31,6 +32,7 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UrlType
+import java.lang.reflect.ParameterizedType
 
 /**
  * Maps [QuestionnaireResponse] s to FHIR resources and vice versa.
@@ -87,7 +89,7 @@ object ResourceMapper {
         // create a class for questionnaire item of type group and add to the resource
         val innerClass: Class<*> =
           Class.forName(
-            "org.hl7.fhir.r4.model.${questionnaireItem.itemComponentContextNameToExpressionMap.values.first()}"
+            "${questionnaireItem.inferPropertyResourceClass}"
           )
         val type: Type = innerClass.newInstance() as Type
 
@@ -268,6 +270,22 @@ private val Questionnaire.QuestionnaireItemComponent.itemComponentContextNameToE
       }
       .toMap()
   }
+
+private val Questionnaire.QuestionnaireItemComponent.inferPropertyResourceClass: String? get() {
+  val pathParts = this.definition.split("#")
+  if (pathParts.size >= 2) {
+    val modelAndField = pathParts[1].split(".")
+    if (modelAndField.size >= 2 && !TextUtils.isEmpty(modelAndField[0]) && !TextUtils.isEmpty(modelAndField[1])) {
+      val declaredFields = Class.forName("org.hl7.fhir.r4.model.${modelAndField.get(0)}")
+              .declaredFields
+
+      for (declaredField in declaredFields)
+        if (declaredField.name.equals(modelAndField[1])) return (declaredField.genericType as ParameterizedType).actualTypeArguments[0].typeName
+    }
+  }
+
+  return null
+}
 
 /**
  * See
