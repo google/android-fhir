@@ -204,10 +204,12 @@ private fun createInnerClassObject(
   }
 }
 
-private fun extractQuestionAnswer(questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent, questionnaireItem: Questionnaire.QuestionnaireItemComponent) =
-        if (!questionnaireResponseItem.answer.isEmpty()) questionnaireResponseItem.answer.first().value
-        else if (!questionnaireItem.initial.isEmpty()) questionnaireItem.initial.first().value
-        else null
+private fun extractQuestionAnswer(
+  questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent
+) =
+  if (!questionnaireResponseItem.answer.isEmpty()) questionnaireResponseItem.answer.first().value
+  else if (!questionnaireItem.initial.isEmpty()) questionnaireItem.initial.first().value else null
 
 /**
  * Returns the field name for the [Questionnaire.Item]'s definition.
