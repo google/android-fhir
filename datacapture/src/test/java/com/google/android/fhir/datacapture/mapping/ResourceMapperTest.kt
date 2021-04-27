@@ -20,6 +20,7 @@ import android.os.Build
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import com.google.common.truth.Truth.assertThat
+import java.text.SimpleDateFormat
 import java.util.Date
 import org.hl7.fhir.r4.model.Patient
 import org.junit.Test
@@ -266,7 +267,7 @@ class ResourceMapperTest {
     val patient =
       ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) as Patient
 
-    assertThat(patient.birthDate).isEqualTo(Date(1609448400000))
+    assertThat(patient.birthDate).isEqualTo("2021-01-01".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isTrue()
     assertThat(patient.name.first().given.first().toString()).isEqualTo("John")
     assertThat(patient.name.first().family).isEqualTo("Doe")
@@ -522,11 +523,14 @@ class ResourceMapperTest {
 
     val patient =
       ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) as Patient
-
-    assertThat(patient.birthDate).isEqualTo(Date(1455138000000))
+    assertThat(patient.birthDate).isEqualTo("2016-02-11".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isFalse()
     assertThat(patient.telecom.get(0).value).isNull()
     assertThat(patient.name.first().given.first().toString()).isEqualTo("Simon")
     assertThat(patient.name.first().family).isEqualTo("Crawford")
+  }
+
+  private fun String.toDateFromFormatYyyyMmDd(): Date? {
+    return SimpleDateFormat("yyyy-MM-dd").parse(this)
   }
 }
