@@ -18,11 +18,13 @@ package com.google.android.fhir.datacapture.mapping
 
 import android.text.TextUtils
 import java.lang.reflect.Method
+import java.lang.reflect.ParameterizedType
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -32,7 +34,6 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UrlType
-import java.lang.reflect.ParameterizedType
 
 /**
  * Maps [QuestionnaireResponse] s to FHIR resources and vice versa.
@@ -87,53 +88,47 @@ object ResourceMapper {
 
       if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
         // create a class for questionnaire item of type group and add to the resource
-        val innerClass: Class<*> =
-          Class.forName(
-            "${questionnaireItem.inferPropertyResourceClass}"
-          )
-        val type: Type = innerClass.newInstance() as Type
+        val propertyType = questionnaireItem.inferPropertyResourceClass
+        if (propertyType != null) {
+          val innerClass: Class<*> = Class.forName("${propertyType.name}")
+          val type: Type = innerClass.newInstance() as Type
 
-        createInnerClassObject(type, questionnaireItem.item, questionnaireResponseItem.item)
+          createInnerClassObject(type, questionnaireItem.item, questionnaireResponseItem.item)
 
-        resource
-          .javaClass
-          .getMethod("add${targetFieldName.capitalize()}", innerClass)
-          .invoke(resource, type)
-        continue
+          resource
+            .javaClass
+            .getMethod("add${targetFieldName.capitalize()}", innerClass)
+            .invoke(resource, type)
+          continue
+        }
       }
 
       // get answer from questionnaireResponse or from initial value in questionnaire
       val ans = extractQuestionAnswer(questionnaireResponseItem, questionnaireItem) ?: continue
 
-      val itemComponentClassNameToExpressionMap =
-        questionnaireItem
-          .itemComponentContextNameToExpressionMap // gets item type e.g. AdministrativeGender for
-      // gender
-      if (itemComponentClassNameToExpressionMap.isEmpty()) {
-        // this is a low level type e.g. StringType
-        questionnaireItem.type.getClass()?.let {
+      var propertyType = questionnaireItem.inferPropertyResourceClass
+
+      /*
+      We have a org.hl7.fhir.r4.model.Enumerations class which contains inner classes of code-names and
+      re-implements the classes in the org.hl7.fhir.r4.model.codesystems package
+      The inner-classes in the Enumerations package are valid and not dependent on the classes in the codesystems package
+      All enum classes in the org.hl7.fhir.r4.model package implement the fromCode(), toCode() methods among others
+       */
+      if (propertyType != null) {
+        if (!propertyType.mainType.isEnum()) {
+          // this is a low level type e.g. StringType
+          updateResourceWithAnswer(resource, ans, questionnaireItem, targetFieldName, propertyType)
+        } else {
+          // this is a high level type e.g. AdministrativeGender
+          val dataTypeClass: Class<*> = Class.forName(propertyType.name)
+          val fromCodeMethod: Method =
+            dataTypeClass.getDeclaredMethod("fromCode", String::class.java)
+
           resource
             .javaClass
-            .getMethod("set${targetFieldName.capitalize()}Element", it)
-            .invoke(resource, ans)
+            .getMethod("set${targetFieldName.capitalize()}", Class.forName(propertyType.name))
+            .invoke(resource, fromCodeMethod.invoke(dataTypeClass, ans.toString()))
         }
-      } else {
-        // this is a high level type e.g. AdministrativeGender
-        val dataTypeClass: Class<*> =
-          Class.forName(
-            "org.hl7.fhir.r4.model." + itemComponentClassNameToExpressionMap.values.first()
-          )
-        val fromCodeMethod: Method = dataTypeClass.getDeclaredMethod("fromCode", String::class.java)
-
-        resource
-          .javaClass
-          .getMethod(
-            "set${targetFieldName.capitalize()}",
-            Class.forName(
-              "org.hl7.fhir.r4.model." + itemComponentClassNameToExpressionMap.values.first()
-            )
-          )
-          .invoke(resource, fromCodeMethod.invoke(dataTypeClass, ans.toString()))
       }
     }
     return resource
@@ -164,44 +159,79 @@ private fun createInnerClassObject(
     // get answer from questionnaireResponse or from initial value in questionnaire
     val answer = extractQuestionAnswer(questionnaireResponseItem, questionnaireItem) ?: continue
 
-    val itemComponentClassNameToExpressionMap =
-      questionnaireItem.itemComponentContextNameToExpressionMap
-    if (itemComponentClassNameToExpressionMap.isEmpty()) {
-      // call the set methods by providing the low level data types: StringType, DateType etc
-      try {
-        questionnaireItem.type.getClass()?.let {
-          type
-            .javaClass
-            .getMethod("set${targetFieldName.capitalize()}Element", it)
-            .invoke(type, answer)
-        }
-      } catch (e: NoSuchMethodException) {
-        // some set methods expect a list of objects
-        questionnaireItem.type.getClass()?.let {
-          type
-            .javaClass
-            .getMethod("set${targetFieldName.capitalize()}", List::class.java)
-            .invoke(type, listOf(answer))
-        }
-      }
-    } else {
-      // call the set methods by providing data type defined defined for the field e.g.
-      // ContactPointSystem
-      val dataTypeClass: Class<*> =
-        Class.forName(
-          "org.hl7.fhir.r4.model." + itemComponentClassNameToExpressionMap.values.first()
-        )
-      val fromCodeMethod: Method = dataTypeClass.getDeclaredMethod("fromCode", String::class.java)
+    val propertyType = questionnaireItem.inferPropertyResourceClass
+    if (propertyType != null) {
+      if (!propertyType.mainType.isEnum()) {
+        // call the set methods by providing the low level data types: StringType, DateType etc
 
+        // TODO: Implement searching for the method based on the field type
+        updateTypeWithAnswer(type, answer, questionnaireItem, targetFieldName, propertyType)
+      } else {
+        // call the set methods by providing data type defined defined for the field e.g.
+        // ContactPointSystem
+        val dataTypeClass: Class<*> = Class.forName(propertyType.name)
+        val fromCodeMethod: Method = dataTypeClass.getDeclaredMethod("fromCode", String::class.java)
+
+        type
+          .javaClass
+          .getMethod("set${targetFieldName.capitalize()}", Class.forName(propertyType.name))
+          .invoke(type, fromCodeMethod.invoke(dataTypeClass, answer.toString()))
+      }
+    }
+  }
+}
+
+private fun updateTypeWithAnswer(
+  type: Type,
+  answer: Type,
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+  targetFieldName: String,
+  fieldType: FieldType
+) {
+  try {
+    questionnaireItem.type.getClass()?.let {
       type
         .javaClass
-        .getMethod(
-          "set${targetFieldName.capitalize()}",
-          Class.forName(
-            "org.hl7.fhir.r4.model." + itemComponentClassNameToExpressionMap.values.first()
-          )
-        )
-        .invoke(type, fromCodeMethod.invoke(dataTypeClass, answer.toString()))
+        .getMethod("set${targetFieldName.capitalize()}Element", fieldType.getMethodParam())
+        .invoke(type, answer)
+    }
+  } catch (e: NoSuchMethodException) {
+    // some set methods expect a list of objects
+    /*
+    TODO: Eliminate dependence on code to convert a single item to list
+      - But depend on the parameterized type
+      - Use addField method where the answer is single i.e. does not match the collection type
+     */
+    questionnaireItem.type.getClass()?.let {
+      type
+        .javaClass
+        .getMethod("set${targetFieldName.capitalize()}", fieldType.getMethodParam())
+        .invoke(type, listOf(answer))
+    }
+  }
+}
+
+private fun updateResourceWithAnswer(
+  resource: Resource,
+  answer: Type,
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+  targetFieldName: String,
+  fieldType: FieldType
+) {
+  try {
+    questionnaireItem.type.getClass()?.let {
+      resource
+        .javaClass
+        .getMethod("set${targetFieldName.capitalize()}Element", fieldType.getMethodParam())
+        .invoke(resource, answer)
+    }
+  } catch (e: NoSuchMethodException) {
+    // some set methods expect a list of objects
+    questionnaireItem.type.getClass()?.let {
+      resource
+        .javaClass
+        .getMethod("set${targetFieldName.capitalize()}", fieldType.getMethodParam())
+        .invoke(resource, listOf(answer))
     }
   }
 }
@@ -259,7 +289,7 @@ private val Questionnaire.itemContextNameToExpressionMap: Map<String, String>
   }
 
 /** Extract Type for a group questionnaire item from the extension field */
-private val Questionnaire.QuestionnaireItemComponent.itemComponentContextNameToExpressionMap:
+private val Questionnaire.QuestionnaireItemComponent.itemComponentContextNameToExpressionMa:
   Map<String, String>
   get() {
     return this.extension
@@ -271,21 +301,40 @@ private val Questionnaire.QuestionnaireItemComponent.itemComponentContextNameToE
       .toMap()
   }
 
-private val Questionnaire.QuestionnaireItemComponent.inferPropertyResourceClass: String? get() {
-  val pathParts = this.definition.split("#")
-  if (pathParts.size >= 2) {
-    val modelAndField = pathParts[1].split(".")
-    if (modelAndField.size >= 2 && !TextUtils.isEmpty(modelAndField[0]) && !TextUtils.isEmpty(modelAndField[1])) {
-      val declaredFields = Class.forName("org.hl7.fhir.r4.model.${modelAndField.get(0)}")
-              .declaredFields
+private val Questionnaire.QuestionnaireItemComponent.inferPropertyResourceClass: FieldType?
+  get() {
+    val pathParts = this.definition.split("#")
+    if (pathParts.size >= 2) {
+      val modelAndField = pathParts[1].split(".")
+      if (modelAndField.size >= 2 &&
+          !TextUtils.isEmpty(modelAndField[0]) &&
+          !TextUtils.isEmpty(modelAndField[1])
+      ) {
+        var currentClass: Class<*> = Class.forName("org.hl7.fhir.r4.model.${modelAndField.get(0)}")
+        var parameterizedClass: Class<*>? = null
 
-      for (declaredField in declaredFields)
-        if (declaredField.name.equals(modelAndField[1])) return (declaredField.genericType as ParameterizedType).actualTypeArguments[0].typeName
+        for (i in 1 until modelAndField.size) {
+          val declaredFields = currentClass.declaredFields
+          for (declaredField in declaredFields) if (declaredField.name.equals(modelAndField[i])) {
+            if (declaredField.genericType is ParameterizedType) {
+              currentClass =
+                (declaredField.genericType as ParameterizedType).actualTypeArguments[0] as Class<*>
+              parameterizedClass = declaredField.type
+            } else {
+              currentClass = declaredField.type
+              parameterizedClass = null
+            }
+
+            break
+          }
+        }
+
+        return FieldType(currentClass, parameterizedClass, currentClass.name)
+      }
     }
-  }
 
-  return null
-}
+    return null
+  }
 
 /**
  * See
@@ -294,3 +343,14 @@ private val Questionnaire.QuestionnaireItemComponent.inferPropertyResourceClass:
  */
 private const val ITEM_CONTEXT_EXTENSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext"
+
+data class FieldType(val mainType: Class<*>, val parameterizedType: Class<*>?, val name: String)
+
+fun FieldType.isList(): Boolean = parameterizedType?.name.equals(List<*>::javaClass.name)
+
+fun FieldType.isEnumeration(): Boolean =
+  parameterizedType?.name.equals(Enumeration<*>::javaClass.name) // Enumeration::class.java.name
+
+fun FieldType.isParameterized(): Boolean = parameterizedType != null
+
+fun FieldType.getMethodParam(): Class<*> = if (isParameterized()) parameterizedType!! else mainType

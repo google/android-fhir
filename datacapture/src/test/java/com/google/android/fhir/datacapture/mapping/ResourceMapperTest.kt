@@ -63,16 +63,6 @@ class ResourceMapperTest {
                   "linkId": "PR-name",
                   "type": "group",
                   "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
-                  "extension": [
-                    {
-                      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
-                      "valueExpression": {
-                        "language": "application/x-fhir-query",
-                        "expression": "HumanName",
-                        "name": "humanName"
-                      }
-                    }
-                  ],
                   "item": [
                     {
                       "linkId": "PR-name-text",
@@ -96,17 +86,6 @@ class ResourceMapperTest {
                 },
                 {
                   "linkId": "patient-0-gender",
-                  "extension": [
-                    {
-                      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
-                      "valueExpression": {
-                        "language": "application/x-fhir-query",
-                        "expression": "Enumerations$""" +
-        """AdministrativeGender",
-                        "name": "administrativeGender"
-                      }
-                    }
-                  ],
                   "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
                   "type": "string",
                   "text": "Gender"
@@ -115,31 +94,10 @@ class ResourceMapperTest {
                   "linkId": "PR-telecom",
                   "type": "group",
                   "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom",
-                  "extension": [
-                    {
-                      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
-                      "valueExpression": {
-                        "language": "application/x-fhir-query",
-                        "expression": "ContactPoint",
-                        "name": "contactPoint"
-                      }
-                    }
-                  ],
                   "item": [
                     {
                       "linkId": "PR-telecom-system",
                       "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
-                      "extension": [
-                        {
-                          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
-                          "valueExpression": {
-                            "language": "application/x-fhir-query",
-                            "expression": "ContactPoint$""" +
-        """ContactPointSystem",
-                            "name": "contactPointSystem"
-                          }
-                        }
-                      ],
                       "type": "string",
                       "text": "system",
                       "initial": [
