@@ -288,19 +288,6 @@ private val Questionnaire.itemContextNameToExpressionMap: Map<String, String>
       .toMap()
   }
 
-/** Extract Type for a group questionnaire item from the extension field */
-private val Questionnaire.QuestionnaireItemComponent.itemComponentContextNameToExpressionMa:
-  Map<String, String>
-  get() {
-    return this.extension
-      .filter { it.url == ITEM_CONTEXT_EXTENSION_URL }
-      .map {
-        val expression = it.value as Expression
-        expression.name to expression.expression
-      }
-      .toMap()
-  }
-
 private val Questionnaire.QuestionnaireItemComponent.inferPropertyResourceClass: FieldType?
   get() {
     val pathParts = this.definition.split("#")
