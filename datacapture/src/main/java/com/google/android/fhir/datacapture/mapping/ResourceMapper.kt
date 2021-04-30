@@ -206,7 +206,7 @@ private fun updateTypeWithAnswer(
       type
         .javaClass
         .getMethod("set${targetFieldName.capitalize()}", fieldType.getMethodParam())
-        .invoke(type, listOf(answer))
+        .invoke(type, if (fieldType.isParameterized() && fieldType.isList()) listOf(answer) else answer)
     }
   }
 }
@@ -227,11 +227,16 @@ private fun updateResourceWithAnswer(
     }
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
+    /*
+    TODO: Eliminate dependence on code to convert a single item to list
+      - But depend on the parameterized type
+      - Use addField method where the answer is single i.e. does not match the collection type
+     */
     questionnaireItem.type.getClass()?.let {
       resource
         .javaClass
         .getMethod("set${targetFieldName.capitalize()}", fieldType.getMethodParam())
-        .invoke(resource, listOf(answer))
+        .invoke(resource, if (fieldType.isParameterized() && fieldType.isList()) listOf(answer) else answer)
     }
   }
 }
@@ -333,7 +338,7 @@ private const val ITEM_CONTEXT_EXTENSION_URL: String =
 
 data class FieldType(val mainType: Class<*>, val parameterizedType: Class<*>?, val name: String)
 
-fun FieldType.isList(): Boolean = parameterizedType?.name.equals(List<*>::javaClass.name)
+fun FieldType.isList(): Boolean = parameterizedType?.simpleName.equals(List::class.java.simpleName)
 
 fun FieldType.isEnumeration(): Boolean =
   parameterizedType?.name.equals(Enumeration<*>::javaClass.name) // Enumeration::class.java.name

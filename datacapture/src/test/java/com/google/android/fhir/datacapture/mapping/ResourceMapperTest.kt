@@ -20,6 +20,7 @@ import android.os.Build
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.IntegerType
 import java.text.SimpleDateFormat
 import java.util.Date
 import org.hl7.fhir.r4.model.Patient
@@ -126,6 +127,12 @@ class ResourceMapperTest {
                   "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.active",
                   "type": "boolean",
                   "text": "Is Active?"
+                },
+                {
+                  "linkId": "PR-multiple-birth",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.multipleBirth",
+                  "type": "integer",
+                  "text": "Multiple birth integer i.e. 1 is first-born, 2 is second-born"
                 }
               ]
             }
@@ -202,6 +209,14 @@ class ResourceMapperTest {
                       "valueBoolean": true
                     }
                   ]
+                },
+                {
+                  "linkId": "PR-multiple-birth",
+                  "answer": [
+                    {
+                      "valueInteger": 2
+                    }
+                  ]
                 }
               ]
             }
@@ -229,6 +244,7 @@ class ResourceMapperTest {
     assertThat(patient.active).isTrue()
     assertThat(patient.name.first().given.first().toString()).isEqualTo("John")
     assertThat(patient.name.first().family).isEqualTo("Doe")
+      assertThat(patient.multipleBirthIntegerType.value).isEqualTo(2)
   }
 
   @Test
