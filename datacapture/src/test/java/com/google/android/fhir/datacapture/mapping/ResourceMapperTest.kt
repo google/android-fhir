@@ -20,7 +20,6 @@ import android.os.Build
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.IntegerType
 import java.text.SimpleDateFormat
 import java.util.Date
 import org.hl7.fhir.r4.model.Patient
@@ -244,7 +243,7 @@ class ResourceMapperTest {
     assertThat(patient.active).isTrue()
     assertThat(patient.name.first().given.first().toString()).isEqualTo("John")
     assertThat(patient.name.first().family).isEqualTo("Doe")
-      assertThat(patient.multipleBirthIntegerType.value).isEqualTo(2)
+    assertThat(patient.multipleBirthIntegerType.value).isEqualTo(2)
   }
 
   @Test
