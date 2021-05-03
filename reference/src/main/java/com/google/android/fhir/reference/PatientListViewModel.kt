@@ -41,9 +41,9 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
 
   val liveSearchedPatients = liveData { emit(getSearchResults()) }
 
-  val patientCount = liveData { emit(searchCount()) }
+  val patientCount = liveData { emit(count()) }
 
-  private suspend fun searchCount(): Long {
+  private suspend fun count(): Long {
     return fhirEngine.count(
       Search(type = ResourceType.Patient).apply {
         filter(Patient.ADDRESS_CITY) {

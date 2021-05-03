@@ -85,7 +85,7 @@ interface Database {
 
   suspend fun <R : Resource> search(query: SearchQuery): List<R>
 
-  suspend fun searchCount(query: SearchQuery): Long
+  suspend fun count(query: SearchQuery): Long
 
   /**
    * Retrieves all [LocalChangeEntity] s for all [Resource] s, which can be used to update the

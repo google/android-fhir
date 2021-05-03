@@ -27,7 +27,7 @@ import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.execute
-import com.google.android.fhir.search.executeCount
+import com.google.android.fhir.search.count
 import com.google.android.fhir.sync.FhirDataSource
 import com.google.android.fhir.sync.FhirSynchronizer
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
@@ -97,7 +97,7 @@ constructor(
   }
 
   override suspend fun count(search: Search): Long {
-    return search.executeCount(database)
+    return search.count(database)
   }
 
   private fun setupNextDownload(syncConfig: PeriodicSyncConfiguration) {

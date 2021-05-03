@@ -111,7 +111,7 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
       iParser.parseResource(it) as R
     }
 
-  override suspend fun searchCount(query: SearchQuery): Long =
+  override suspend fun count(query: SearchQuery): Long =
     resourceDao.countResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
 
   /**

@@ -47,6 +47,21 @@ class SearchTest {
   }
 
   @Test
+  fun count_search() = runBlocking {
+    val query = Search(ResourceType.Patient).getQuery(true)
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT count(*)
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        """.trimIndent()
+      )
+    assertThat(query.args).isEqualTo(listOf(ResourceType.Patient.name))
+  }
+
+  @Test
   fun search_size() {
     val query = Search(ResourceType.Patient).apply { count = 10 }.getQuery()
 

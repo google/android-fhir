@@ -24,8 +24,8 @@ suspend fun <R : Resource> Search.execute(database: Database): List<R> {
   return database.search(getQuery())
 }
 
-suspend fun Search.executeCount(database: Database): Long {
-  return database.searchCount(getQuery(true))
+suspend fun Search.count(database: Database): Long {
+  return database.count(getQuery(true))
 }
 
 fun Search.getQuery(isCount: Boolean = false): SearchQuery {
