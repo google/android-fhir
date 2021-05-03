@@ -95,10 +95,12 @@ object ResourceMapper {
 
           createInnerClassObject(type, questionnaireItem.item, questionnaireResponseItem.item)
 
-          resource
-            .javaClass
-            .getMethod("add${targetFieldName.capitalize()}", innerClass)
-            .invoke(resource, type)
+          /*
+          TODO: Update the methods to use add${targetFieldName} also for cases where the propertyType is
+            parameterized. For cases where it's not, we should strictly use set${targetFieldName}Element
+            or set${targetFieldName}
+           */
+          updateResourceWithAnswer(resource, type, questionnaireItem, targetFieldName, propertyType)
           continue
         }
       }
@@ -189,12 +191,11 @@ private fun updateTypeWithAnswer(
   fieldType: FieldType
 ) {
   try {
-    questionnaireItem.type.getClass()?.let {
-      type
-        .javaClass
-        .getMethod("set${targetFieldName.capitalize()}Element", fieldType.getMethodParam())
-        .invoke(type, answer)
-    }
+
+    type
+      .javaClass
+      .getMethod("set${targetFieldName.capitalize()}Element", fieldType.getMethodParam())
+      .invoke(type, answer)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
     /*
@@ -202,12 +203,13 @@ private fun updateTypeWithAnswer(
       - But depend on the parameterized type
       - Use addField method where the answer is single i.e. does not match the collection type
      */
-    questionnaireItem.type.getClass()?.let {
-      type
-        .javaClass
-        .getMethod("set${targetFieldName.capitalize()}", fieldType.getMethodParam())
-        .invoke(type, if (fieldType.isParameterized() && fieldType.isList()) listOf(answer) else answer)
-    }
+    type
+      .javaClass
+      .getMethod("set${targetFieldName.capitalize()}", fieldType.getMethodParam())
+      .invoke(
+        type,
+        if (fieldType.isParameterized() && fieldType.isList()) listOf(answer) else answer
+      )
   }
 }
 
@@ -219,12 +221,10 @@ private fun updateResourceWithAnswer(
   fieldType: FieldType
 ) {
   try {
-    questionnaireItem.type.getClass()?.let {
-      resource
-        .javaClass
-        .getMethod("set${targetFieldName.capitalize()}Element", fieldType.getMethodParam())
-        .invoke(resource, answer)
-    }
+    resource
+      .javaClass
+      .getMethod("set${targetFieldName.capitalize()}Element", fieldType.getMethodParam())
+      .invoke(resource, answer)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
     /*
@@ -232,12 +232,13 @@ private fun updateResourceWithAnswer(
       - But depend on the parameterized type
       - Use addField method where the answer is single i.e. does not match the collection type
      */
-    questionnaireItem.type.getClass()?.let {
-      resource
-        .javaClass
-        .getMethod("set${targetFieldName.capitalize()}", fieldType.getMethodParam())
-        .invoke(resource, if (fieldType.isParameterized() && fieldType.isList()) listOf(answer) else answer)
-    }
+    resource
+      .javaClass
+      .getMethod("set${targetFieldName.capitalize()}", fieldType.getMethodParam())
+      .invoke(
+        resource,
+        if (fieldType.isParameterized() && fieldType.isList()) listOf(answer) else answer
+      )
   }
 }
 
