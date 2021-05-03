@@ -25,8 +25,10 @@ import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.data.SamplePatients
 import com.google.android.fhir.search.Order
+import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.search
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * The ViewModel helper class for PatientItemRecyclerViewAdapter, that is responsible for preparing
@@ -38,6 +40,19 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   private val samplePatients = SamplePatients()
 
   val liveSearchedPatients = liveData { emit(getSearchResults()) }
+
+  val patientCount = liveData { emit(searchCount()) }
+
+  private suspend fun searchCount(): Long {
+    return fhirEngine.count(
+      Search(type = ResourceType.Patient).apply {
+        filter(Patient.ADDRESS_CITY) {
+          prefix = ParamPrefixEnum.EQUAL
+          value = "NAIROBI"
+        }
+      }
+    )
+  }
 
   private suspend fun getSearchResults(): List<PatientItem> {
     val searchResults: List<Patient> =

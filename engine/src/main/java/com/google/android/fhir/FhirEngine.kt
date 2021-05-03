@@ -71,4 +71,12 @@ interface FhirEngine {
   fun updatePeriodicSyncConfiguration(syncConfig: PeriodicSyncConfiguration)
 
   suspend fun <R : Resource> search(search: Search): List<R>
+
+  /**
+   * One time download of resources.
+   *
+   * @param syncConfiguration
+   * - configuration of data that needs to be synchronised
+   */
+  suspend fun count(search: Search): Long
 }

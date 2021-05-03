@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.Toolbar
@@ -60,6 +61,11 @@ class PatientListActivity() : AppCompatActivity() {
         Log.d("PatientListActivity", "Submitting ${it.count()} patient records")
         adapter.submitList(it)
       }
+    )
+
+    patientListViewModel.patientCount.observe(
+      this,
+      { findViewById<TextView>(R.id.patient_count).text = it.toString() + " Patients" }
     )
   }
 

@@ -53,7 +53,7 @@ interface HapiFhirService {
   suspend fun deleteResource(@Path("type") type: String, @Path("id") id: String): OperationOutcome
 
   companion object {
-    const val BASE_URL = "https://hapi.fhir.org/baseR4/"
+    const val BASE_URL = "https://fhir.labs.smartregister.org/fhir/"
 
     fun create(parser: IParser): HapiFhirService {
       val logger = HttpLoggingInterceptor()
