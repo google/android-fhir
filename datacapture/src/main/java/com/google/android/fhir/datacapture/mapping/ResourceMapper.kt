@@ -100,7 +100,7 @@ object ResourceMapper {
             parameterized. For cases where it's not, we should strictly use set${targetFieldName}Element
             or set${targetFieldName}
            */
-          updateResourceWithAnswer(resource, type, questionnaireItem, targetFieldName, propertyType)
+          updateResourceWithAnswer(resource, type, targetFieldName, propertyType)
           continue
         }
       }
@@ -119,7 +119,7 @@ object ResourceMapper {
       if (propertyType != null) {
         if (!propertyType.mainType.isEnum()) {
           // this is a low level type e.g. StringType
-          updateResourceWithAnswer(resource, ans, questionnaireItem, targetFieldName, propertyType)
+          updateResourceWithAnswer(resource, ans, targetFieldName, propertyType)
         } else {
           // this is a high level type e.g. AdministrativeGender
           val dataTypeClass: Class<*> = Class.forName(propertyType.name)
@@ -167,7 +167,7 @@ private fun createInnerClassObject(
         // call the set methods by providing the low level data types: StringType, DateType etc
 
         // TODO: Implement searching for the method based on the field type
-        updateTypeWithAnswer(type, answer, questionnaireItem, targetFieldName, propertyType)
+        updateTypeWithAnswer(type, answer, targetFieldName, propertyType)
       } else {
         // call the set methods by providing data type defined defined for the field e.g.
         // ContactPointSystem
@@ -186,7 +186,6 @@ private fun createInnerClassObject(
 private fun updateTypeWithAnswer(
   type: Type,
   answer: Type,
-  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
   targetFieldName: String,
   fieldType: FieldType
 ) {
@@ -216,7 +215,6 @@ private fun updateTypeWithAnswer(
 private fun updateResourceWithAnswer(
   resource: Resource,
   answer: Type,
-  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
   targetFieldName: String,
   fieldType: FieldType
 ) {
