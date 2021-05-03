@@ -46,6 +46,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
           prefix = ParamPrefixEnum.EQUAL
           value = "NAIROBI"
         }
+        filter(Patient.ACTIVE) { value = true }
         sort(Patient.GIVEN, Order.ASCENDING)
         count = 100
         from = 0

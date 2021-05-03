@@ -18,6 +18,7 @@ package com.google.android.fhir.search
 
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
+import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -25,6 +26,7 @@ import org.hl7.fhir.r4.model.ResourceType
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
   internal val stringFilters = mutableListOf<StringFilter>()
   internal val referenceFilter = mutableListOf<ReferenceFilter>()
+  internal val tokenFilter = mutableListOf<TokenFilter>()
   internal var sort: StringClientParam? = null
   internal var order: Order? = null
 
@@ -38,6 +40,12 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     val filter = ReferenceFilter(referenceParameter)
     filter.init()
     referenceFilter.add(filter)
+  }
+
+  fun filter(tokenParameter: TokenClientParam, init: TokenFilter.() -> Unit) {
+    val filter = TokenFilter(tokenParameter)
+    filter.init()
+    tokenFilter.add(filter)
   }
 
   fun sort(parameter: StringClientParam, order: Order) {
@@ -55,6 +63,13 @@ data class StringFilter(
 
 @SearchDslMarker
 data class ReferenceFilter(val parameter: ReferenceClientParam?, var value: String? = null)
+
+@SearchDslMarker
+data class TokenFilter(
+  val parameter: TokenClientParam?,
+  var value: Any? = null,
+  var system: String? = null
+)
 
 enum class Order {
   ASCENDING,

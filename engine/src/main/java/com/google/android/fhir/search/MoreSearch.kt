@@ -43,7 +43,10 @@ fun Search.getQuery(): SearchQuery {
   var filterStatement = ""
   val filterArgs = mutableListOf<Any>()
   val filterQuery =
-    (stringFilters.map { it.query(type) } + referenceFilter.map { it.query(type) }).intersect()
+    (stringFilters.map { it.query(type) } +
+        referenceFilter.map { it.query(type) } +
+        tokenFilter.map { it.query(type) })
+      .intersect()
   if (filterQuery != null) {
     filterStatement =
       """
@@ -98,6 +101,17 @@ fun ReferenceFilter.query(type: ResourceType): SearchQuery {
     WHERE resourceType = ? AND index_name = ? AND index_value = ?
     """,
     listOf(type.name, parameter!!.paramName, value!!)
+  )
+}
+
+fun TokenFilter.query(type: ResourceType): SearchQuery {
+  return SearchQuery(
+    """
+    SELECT resourceId FROM TokenIndexEntity
+    WHERE resourceType = ? AND index_name = ? AND index_value = ?
+    AND ${if (system == null) "index_system is null" else "index_system = ?"} 
+    """,
+    listOfNotNull(type.name, parameter!!.paramName, value!!.toString(), system)
   )
 }
 

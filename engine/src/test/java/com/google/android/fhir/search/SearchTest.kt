@@ -120,6 +120,72 @@ class SearchTest {
   }
 
   @Test
+  fun search_token_filter() {
+    val query =
+      Search(ResourceType.Patient).apply { filter(Patient.ACTIVE) { value = true } }.getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND index_system is null
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.ACTIVE.paramName,
+          "true"
+        )
+      )
+  }
+
+  @Test
+  fun search_token_filter_with_system() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.IDENTIFIER) {
+            value = "12345"
+            system = "http://acme.org/patient"
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND index_system = ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.IDENTIFIER.paramName,
+          "12345",
+          "http://acme.org/patient"
+        )
+      )
+  }
+
+  @Test
   fun search_sort_ascending() {
     val query =
       Search(ResourceType.Patient).apply { sort(Patient.GIVEN, Order.ASCENDING) }.getQuery()
