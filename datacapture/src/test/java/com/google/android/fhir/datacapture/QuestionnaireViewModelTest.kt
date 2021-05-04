@@ -636,6 +636,124 @@ class QuestionnaireViewModelTest {
       .isEqualTo("another-link-id")
   }
 
+  @Test
+  fun questionnaireHasNestedItem_ofTypeGroup_shouldNestItemWithinItem() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-group-item"
+            text = "Group question"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "a-nested-item"
+                text = "Basic question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+      }
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        this.questionnaire = "Questionnaire/a-questionnaire"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-group-item"
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                linkId = "a-nested-item"
+                addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    this.value = valueBooleanType.setValue(false)
+                  }
+                )
+              }
+            )
+          }
+        )
+      }
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+    val viewModel = QuestionnaireViewModel(state)
+
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItem.item[0].addAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        this.value = valueBooleanType.setValue(false)
+      }
+    )
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
+
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+  }
+
+  @Test
+  fun questionnaireHasNestedItem_notOfTypeGroup_shouldNestItemWithinAnswerItem() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-boolean-item"
+            text = "Parent question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "a-nested-boolean-item"
+                text = "Nested question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+      }
+
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        this.questionnaire = "Questionnaire/a-questionnaire"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-boolean-item"
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                this.value = valueBooleanType.setValue(false)
+                addItem(
+                  QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                    linkId = "a-nested-boolean-item"
+                    addAnswer(
+                      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                        this.value = valueBooleanType.setValue(false)
+                      }
+                    )
+                  }
+                )
+              }
+            )
+          }
+        )
+      }
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+    val viewModel = QuestionnaireViewModel(state)
+
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItem.addAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        this.value = valueBooleanType.setValue(false)
+      }
+    )
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItem.answer[0].item[0]
+      .addAnswer(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          this.value = valueBooleanType.setValue(false)
+        }
+      )
+
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+  }
+
   private companion object {
     val printer: IParser = FhirContext.forR4().newJsonParser()
     fun assertResourceEquals(r1: IBaseResource, r2: IBaseResource) {
