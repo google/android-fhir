@@ -179,7 +179,7 @@ private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedIt
 ) {
 
   if (answer.isNotEmpty()) {
-    answer.first().item = questionnaireItemComponent.listOfItemInAnswer
+    answer.first().item = questionnaireItemComponent.listOfItemInAnswer()
   }
 }
 
@@ -195,12 +195,9 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
     answer = createQuestionnaireResponseItemAnswers()
-    if (this@createQuestionnaireResponseItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
-        this@createQuestionnaireResponseItem.item.count() > 0
-    ) {
-      if (hasNestedItemsWithinAnswers && answer.isNotEmpty()) {
-        this.addNestedItemsToAnswer(this@createQuestionnaireResponseItem)
-      }
+
+    if (hasNestedItemsWithinAnswers && answer.isNotEmpty()) {
+      this.addNestedItemsToAnswer(this@createQuestionnaireResponseItem)
     } else if (this@createQuestionnaireResponseItem.type ==
         Questionnaire.QuestionnaireItemType.GROUP
     ) {
@@ -218,8 +215,10 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
  * The hierarchy and order of child items will be retained as specified in the standard. See
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
-private inline val Questionnaire.QuestionnaireItemComponent.listOfItemInAnswer =
-    item.map { it.createQuestionnaireResponseItem() }.toList()
+private inline fun Questionnaire.QuestionnaireItemComponent.listOfItemInAnswer():
+  List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+  return item.map { it.createQuestionnaireResponseItem() }.toList()
+}
 
 /**
  * Returns a list of answers from the initial values of the questionnaire item. `null` if no intial
