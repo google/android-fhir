@@ -26,7 +26,7 @@ on:
   pull_request:
     branches: [ master ]
     paths-ignore: 
-      - '*.md'
+      - '**.md'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
