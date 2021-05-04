@@ -195,7 +195,6 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
     answer = createQuestionnaireResponseItemAnswers()
-
     if (hasNestedItemsWithinAnswers && answer.isNotEmpty()) {
       this.addNestedItemsToAnswer(this@createQuestionnaireResponseItem)
     } else if (this@createQuestionnaireResponseItem.type ==
