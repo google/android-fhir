@@ -214,10 +214,7 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
  * The hierarchy and order of child items will be retained as specified in the standard. See
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
-private inline fun Questionnaire.QuestionnaireItemComponent.listOfItemInAnswer():
-  List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
-  return item.map { it.createQuestionnaireResponseItem() }.toList()
-}
+private inline fun Questionnaire.QuestionnaireItemComponent.listOfItemInAnswer = item.map { it.createQuestionnaireResponseItem() }.toList()
 
 /**
  * Returns a list of answers from the initial values of the questionnaire item. `null` if no intial
