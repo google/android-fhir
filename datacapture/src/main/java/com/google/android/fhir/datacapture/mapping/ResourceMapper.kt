@@ -21,6 +21,7 @@ import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
@@ -126,10 +127,12 @@ object ResourceMapper {
           val fromCodeMethod: Method =
             dataTypeClass.getDeclaredMethod("fromCode", String::class.java)
 
+          val stringValue = if (ans is Coding) ans.code else ans
+
           resource
             .javaClass
             .getMethod("set${targetFieldName.capitalize()}", Class.forName(propertyType.name))
-            .invoke(resource, fromCodeMethod.invoke(dataTypeClass, ans.toString()))
+            .invoke(resource, fromCodeMethod.invoke(dataTypeClass, stringValue))
         }
       }
     }

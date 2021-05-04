@@ -87,8 +87,35 @@ class ResourceMapperTest {
                 {
                   "linkId": "patient-0-gender",
                   "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
-                  "type": "string",
-                  "text": "Gender"
+                  "type": "choice",
+                  "text": "Gender:",
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "female",
+                        "display": "Female"
+                      },
+                      "initialSelected": true
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "male",
+                        "display": "Male"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "other",
+                        "display": "Other"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "unknown",
+                        "display": "Unknown"
+                      }
+                    }
+                  ]
                 },
                 {
                   "linkId": "PR-telecom",
@@ -181,7 +208,10 @@ class ResourceMapperTest {
                   "linkId": "patient-0-gender",
                   "answer": [
                     {
-                      "valueString": "male"
+                      "valueCoding": {
+                        "code": "male",
+                        "display": "Male"
+                      }
                     }
                   ]
                 },
