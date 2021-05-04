@@ -20,7 +20,7 @@ on:
   push:
     branches: [ master ]
     paths-ignore: 
-      - '*.md'
+      - '**.md'
     tags:
       run_ci*
   pull_request:
