@@ -21,6 +21,7 @@ import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
@@ -127,7 +128,7 @@ object ResourceMapper {
           val fromCodeMethod: Method =
             dataTypeClass.getDeclaredMethod("fromCode", String::class.java)
 
-          val stringValue = if (ans is Coding) ans.code else ans
+          val stringValue = if (ans is Coding) ans.code else ans.toString()
 
           resource
             .javaClass
@@ -192,11 +193,13 @@ private fun updateTypeOrResourceWithAnswer(
   targetFieldName: String,
   fieldType: FieldType
 ) {
+  val paramAns = generateAnswerWithCorrectType(answer, fieldType)
+
   try {
     typeOrResource
       .javaClass
       .getMethod("set${targetFieldName.capitalize()}Element", fieldType.getMethodParam())
-      .invoke(typeOrResource, answer)
+      .invoke(typeOrResource, paramAns)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
     /*
@@ -209,9 +212,30 @@ private fun updateTypeOrResourceWithAnswer(
       .getMethod("set${targetFieldName.capitalize()}", fieldType.getMethodParam())
       .invoke(
         typeOrResource,
-        if (fieldType.isParameterized() && fieldType.isList()) listOf(answer) else answer
+        if (fieldType.isParameterized() && fieldType.isList()) listOf(paramAns) else paramAns
       )
   }
+}
+
+/**
+ * This method enables us to perform an extra step to wrap the answer using the correct
+ * type. This is useful in cases where a single question maps to a CompositeType such as CodeableConcept.
+ * Normally, composite types are mapped using group questions which provide direct alignment
+ * to the type elements in the group questions
+ */
+fun generateAnswerWithCorrectType(answer: Type, fieldType: FieldType): Type {
+  when (fieldType.mainType) {
+    CodeableConcept::class.java -> {
+      if (answer is Coding) {
+        val codeableConcept = CodeableConcept(answer)
+        codeableConcept.setText(answer.display)
+
+        return codeableConcept
+      }
+    }
+  }
+
+  return answer
 }
 
 private fun extractQuestionAnswer(

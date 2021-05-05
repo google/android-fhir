@@ -86,6 +86,21 @@ class ResourceMapperTest {
                 },
                 {
                   "linkId": "patient-0-gender",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "radio-button",
+                            "display": "Radio Button"
+                          }
+                        ],
+                        "text": "A control where choices are listed with a button beside them. The button can be toggled to select or de-select a given choice. Selecting one item deselects all others."
+                      }
+                    }
+                  ],
                   "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
                   "type": "choice",
                   "text": "Gender:",
@@ -112,6 +127,96 @@ class ResourceMapperTest {
                     {
                       "valueCoding": {
                         "code": "unknown",
+                        "display": "Unknown"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "linkId": "patient-0-marital-status",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "check",
+                            "display": "Check-box"
+                          }
+                        ],
+                        "text": "A control where choices are listed with a button beside them. The button can be toggled to select or de-select a given choice. Selecting one item deselects all others."
+                      }
+                    }
+                  ],
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.maritalStatus",
+                  "type": "choice",
+                  "text": "Marital Status:",
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "A",
+                        "display": "Annulled"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "D",
+                        "display": "Divorced"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "I",
+                        "display": "Interlocutory"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "L",
+                        "display": "Legally Separated"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "M",
+                        "display": "Married"
+                      },
+                      "initialSelected": true
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "P",
+                        "display": "Polygamous"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "S",
+                        "display": "Never Married"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "T",
+                        "display": "Domestic Partner"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "U",
+                        "display": "Unmarried"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "W",
+                        "display": "Widowed"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "UNK",
                         "display": "Unknown"
                       }
                     }
@@ -211,6 +316,17 @@ class ResourceMapperTest {
                       "valueCoding": {
                         "code": "male",
                         "display": "Male"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "linkId": "patient-0-marital-status",
+                  "answer": [
+                    {
+                      "valueCoding": {
+                        "code": "S",
+                        "display": "Never Married"
                       }
                     }
                   ]
