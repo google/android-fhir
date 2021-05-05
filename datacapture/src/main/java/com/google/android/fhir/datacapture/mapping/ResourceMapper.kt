@@ -100,7 +100,7 @@ object ResourceMapper {
             parameterized. For cases where it's not, we should strictly use set${targetFieldName}Element
             or set${targetFieldName}
            */
-          updateResourceWithAnswer(resource, type, targetFieldName, propertyType)
+          updateTypeOrResourceWithAnswer(resource, type, targetFieldName, propertyType)
           continue
         }
       }
@@ -119,7 +119,7 @@ object ResourceMapper {
       if (propertyType != null) {
         if (!propertyType.mainType.isEnum()) {
           // this is a low level type e.g. StringType
-          updateResourceWithAnswer(resource, ans, targetFieldName, propertyType)
+          updateTypeOrResourceWithAnswer(resource, ans, targetFieldName, propertyType)
         } else {
           // this is a high level type e.g. AdministrativeGender
           val dataTypeClass: Class<*> = Class.forName(propertyType.name)
@@ -167,7 +167,7 @@ private fun createInnerClassObject(
         // call the set methods by providing the low level data types: StringType, DateType etc
 
         // TODO: Implement searching for the method based on the field type
-        updateTypeWithAnswer(type, answer, targetFieldName, propertyType)
+        updateTypeOrResourceWithAnswer(type, answer, targetFieldName, propertyType)
       } else {
         // call the set methods by providing data type defined defined for the field e.g.
         // ContactPointSystem
@@ -183,18 +183,17 @@ private fun createInnerClassObject(
   }
 }
 
-private fun updateTypeWithAnswer(
-  type: Type,
+private fun updateTypeOrResourceWithAnswer(
+  typeOrResource: Base,
   answer: Type,
   targetFieldName: String,
   fieldType: FieldType
 ) {
   try {
-
-    type
+    typeOrResource
       .javaClass
       .getMethod("set${targetFieldName.capitalize()}Element", fieldType.getMethodParam())
-      .invoke(type, answer)
+      .invoke(typeOrResource, answer)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
     /*
@@ -202,39 +201,11 @@ private fun updateTypeWithAnswer(
       - But depend on the parameterized type
       - Use addField method where the answer is single i.e. does not match the collection type
      */
-    type
+    typeOrResource
       .javaClass
       .getMethod("set${targetFieldName.capitalize()}", fieldType.getMethodParam())
       .invoke(
-        type,
-        if (fieldType.isParameterized() && fieldType.isList()) listOf(answer) else answer
-      )
-  }
-}
-
-private fun updateResourceWithAnswer(
-  resource: Resource,
-  answer: Type,
-  targetFieldName: String,
-  fieldType: FieldType
-) {
-  try {
-    resource
-      .javaClass
-      .getMethod("set${targetFieldName.capitalize()}Element", fieldType.getMethodParam())
-      .invoke(resource, answer)
-  } catch (e: NoSuchMethodException) {
-    // some set methods expect a list of objects
-    /*
-    TODO: Eliminate dependence on code to convert a single item to list
-      - But depend on the parameterized type
-      - Use addField method where the answer is single i.e. does not match the collection type
-     */
-    resource
-      .javaClass
-      .getMethod("set${targetFieldName.capitalize()}", fieldType.getMethodParam())
-      .invoke(
-        resource,
+        typeOrResource,
         if (fieldType.isParameterized() && fieldType.isList()) listOf(answer) else answer
       )
   }
