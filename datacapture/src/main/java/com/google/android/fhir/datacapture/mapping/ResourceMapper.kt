@@ -124,21 +124,29 @@ object ResourceMapper {
           updateTypeOrResourceWithAnswer(resource, ans, targetFieldName, propertyType)
         } else {
           // this is a high level type e.g. AdministrativeGender
-          val dataTypeClass: Class<*> = Class.forName(propertyType.name)
-          val fromCodeMethod: Method =
-            dataTypeClass.getDeclaredMethod("fromCode", String::class.java)
-
-          val stringValue = if (ans is Coding) ans.code else ans.toString()
-
-          resource
-            .javaClass
-            .getMethod("set${targetFieldName.capitalize()}", Class.forName(propertyType.name))
-            .invoke(resource, fromCodeMethod.invoke(dataTypeClass, stringValue))
+          invokeSpecificMethodOfTypeOrResource(propertyType, targetFieldName, ans, resource)
         }
       }
     }
     return resource
   }
+}
+
+private fun invokeSpecificMethodOfTypeOrResource(
+  propertyType: FieldType,
+  targetFieldName: String,
+  ans: Type,
+  typeOrResource: Base
+) {
+  val dataTypeClass: Class<*> = Class.forName(propertyType.name)
+  val fromCodeMethod: Method = dataTypeClass.getDeclaredMethod("fromCode", String::class.java)
+
+  val stringValue = if (ans is Coding) ans.code else ans.toString()
+
+  typeOrResource
+    .javaClass
+    .getMethod("set${targetFieldName.capitalize()}", Class.forName(propertyType.name))
+    .invoke(typeOrResource, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
 
 /**
@@ -175,13 +183,7 @@ private fun createInnerClassObject(
       } else {
         // call the set methods by providing data type defined defined for the field e.g.
         // ContactPointSystem
-        val dataTypeClass: Class<*> = Class.forName(propertyType.name)
-        val fromCodeMethod: Method = dataTypeClass.getDeclaredMethod("fromCode", String::class.java)
-
-        type
-          .javaClass
-          .getMethod("set${targetFieldName.capitalize()}", Class.forName(propertyType.name))
-          .invoke(type, fromCodeMethod.invoke(dataTypeClass, answer.toString()))
+        invokeSpecificMethodOfTypeOrResource(propertyType, targetFieldName, answer, type)
       }
     }
   }
