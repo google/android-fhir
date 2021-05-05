@@ -70,21 +70,37 @@ object ResourceMapper {
 
     var questionnaireItemListIterator = questionnaire.item.iterator()
     var questionnaireResponseItemListIterator = questionnaireResponse.item.iterator()
-    while (questionnaireItemListIterator.hasNext() &&
-      questionnaireResponseItemListIterator.hasNext()) {
-      val questionnaireItem = questionnaireItemListIterator.next()
-      val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
+    processItemIterator(
+      questionnaireItemListIterator,
+      questionnaireResponseItemListIterator,
+      resource
+    )
+    return resource
+  }
+
+  private fun processItemIterator(
+    questionnaireItemListIterator: MutableIterator<Questionnaire.QuestionnaireItemComponent>,
+    questionnaireResponseItemListIterator:
+      MutableIterator<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+    resource: Base
+  ) {
+    var questionnaireItemListIterator1 = questionnaireItemListIterator
+    var questionnaireResponseItemListIterator1 = questionnaireResponseItemListIterator
+    while (questionnaireItemListIterator1.hasNext() &&
+      questionnaireResponseItemListIterator1.hasNext()) {
+      val questionnaireItem = questionnaireItemListIterator1.next()
+      val questionnaireResponseItem = questionnaireResponseItemListIterator1.next()
 
       if (questionnaireItem.definition == null) {
-        questionnaireItemListIterator = questionnaireItem.item.iterator()
-        questionnaireResponseItemListIterator = questionnaireResponseItem.item.iterator()
+        questionnaireItemListIterator1 = questionnaireItem.item.iterator()
+        questionnaireResponseItemListIterator1 = questionnaireResponseItem.item.iterator()
         continue
       }
 
       val targetFieldName = questionnaireItem.definition.substringAfterLast(".")
       if (targetFieldName.isEmpty()) {
-        questionnaireItemListIterator = questionnaireItem.item.iterator()
-        questionnaireResponseItemListIterator = questionnaireResponseItem.item.iterator()
+        questionnaireItemListIterator1 = questionnaireItem.item.iterator()
+        questionnaireResponseItemListIterator1 = questionnaireResponseItem.item.iterator()
         continue
       }
 
@@ -93,9 +109,16 @@ object ResourceMapper {
         val propertyType = questionnaireItem.inferPropertyResourceClass
         if (propertyType != null) {
           val innerClass: Class<*> = Class.forName("${propertyType.name}")
-          val type: Type = innerClass.newInstance() as Type
+          val type: Base = innerClass.newInstance() as Base
 
-          createInnerClassObject(type, questionnaireItem.item, questionnaireResponseItem.item)
+          // TODO: Check for null on item for both the questionnaireItem and
+          //    questionnaireResponseItem
+          processItemIterator(
+            questionnaireItem.item.iterator(),
+            questionnaireResponseItem.item.iterator(),
+            type
+          )
+          // createInnerClassObject(type, questionnaireItem.item, questionnaireResponseItem.item)
 
           /*
           TODO: Update the methods to use add${targetFieldName} also for cases where the propertyType is
@@ -128,7 +151,6 @@ object ResourceMapper {
         }
       }
     }
-    return resource
   }
 }
 
@@ -149,49 +171,9 @@ private fun invokeSpecificMethodOfTypeOrResource(
     .invoke(typeOrResource, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
 
-/**
- * Creates an object of Type and Extracts values for fields from the corresponding questions and
- * answers in [questionnaireItemList] and [questionnaireResponseItemList] and invokes setters on the
- * object.
- */
-private fun createInnerClassObject(
-  type: Type,
-  questionnaireItemComponent: MutableList<Questionnaire.QuestionnaireItemComponent>,
-  questionnaireResponseItemComponent:
-    MutableList<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-) {
-  val questionnaireItemListIterator = questionnaireItemComponent.iterator()
-  val questionnaireResponseItemListIterator = questionnaireResponseItemComponent.iterator()
-
-  while (questionnaireItemListIterator.hasNext() &&
-    questionnaireResponseItemListIterator.hasNext()) {
-    val questionnaireItem = questionnaireItemListIterator.next()
-    val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
-
-    val targetFieldName = questionnaireItem.definition.substringAfterLast(".")
-
-    // get answer from questionnaireResponse or from initial value in questionnaire
-    val answer = extractQuestionAnswer(questionnaireResponseItem, questionnaireItem) ?: continue
-
-    val propertyType = questionnaireItem.inferPropertyResourceClass
-    if (propertyType != null) {
-      if (!propertyType.mainType.isEnum()) {
-        // call the set methods by providing the low level data types: StringType, DateType etc
-
-        // TODO: Implement searching for the method based on the field type
-        updateTypeOrResourceWithAnswer(type, answer, targetFieldName, propertyType)
-      } else {
-        // call the set methods by providing data type defined defined for the field e.g.
-        // ContactPointSystem
-        invokeSpecificMethodOfTypeOrResource(propertyType, targetFieldName, answer, type)
-      }
-    }
-  }
-}
-
 private fun updateTypeOrResourceWithAnswer(
   typeOrResource: Base,
-  answer: Type,
+  answer: Base,
   targetFieldName: String,
   fieldType: FieldType
 ) {
@@ -220,12 +202,12 @@ private fun updateTypeOrResourceWithAnswer(
 }
 
 /**
- * This method enables us to perform an extra step to wrap the answer using the correct
- * type. This is useful in cases where a single question maps to a CompositeType such as CodeableConcept.
- * Normally, composite types are mapped using group questions which provide direct alignment
- * to the type elements in the group questions
+ * This method enables us to perform an extra step to wrap the answer using the correct type. This
+ * is useful in cases where a single question maps to a CompositeType such as CodeableConcept.
+ * Normally, composite types are mapped using group questions which provide direct alignment to the
+ * type elements in the group questions
  */
-fun generateAnswerWithCorrectType(answer: Type, fieldType: FieldType): Type {
+fun generateAnswerWithCorrectType(answer: Base, fieldType: FieldType): Base {
   when (fieldType.mainType) {
     CodeableConcept::class.java -> {
       if (answer is Coding) {

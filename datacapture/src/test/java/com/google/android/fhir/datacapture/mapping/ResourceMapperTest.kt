@@ -254,6 +254,32 @@ class ResourceMapperTest {
                   ]
                 },
                 {
+                  "linkId": "PR-contact-party",
+                  "type": "group",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.contact",
+                  "item": [
+                    {
+                      "linkId": "PR-contact-party-name",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.contact.name",
+                      "type": "group",
+                      "item": [
+                        {
+                          "linkId": "PR-contact-party-name-given",
+                          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.contact.name.given",
+                          "type": "string",
+                          "text": "First Name"
+                        },
+                        {
+                          "linkId": "PR-contact-party-name-family",
+                          "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#Patient.contact.name.family",
+                          "type": "string",
+                          "text": "Family Name"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
                   "linkId": "PR-active",
                   "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.active",
                   "type": "boolean",
@@ -348,6 +374,32 @@ class ResourceMapperTest {
                   ]
                 },
                 {
+                  "linkId": "PR-contact-party",
+                  "item": [
+                    {
+                      "linkId": "PR-contact-party-name",
+                      "item": [
+                        {
+                          "linkId": "PR-contact-party-name-given",
+                          "answer": [
+                            {
+                              "valueString": "Brenda"
+                            }
+                          ]
+                        },
+                        {
+                          "linkId": "PR-contact-party-name-family",
+                          "answer": [
+                            {
+                              "valueString": "Penman"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
                   "linkId": "PR-active",
                   "answer": [
                     {
@@ -390,6 +442,8 @@ class ResourceMapperTest {
     assertThat(patient.name.first().given.first().toString()).isEqualTo("John")
     assertThat(patient.name.first().family).isEqualTo("Doe")
     assertThat(patient.multipleBirthIntegerType.value).isEqualTo(2)
+    assertThat(patient.contact[0].name.given.first()).isEqualTo("Brenda")
+    assertThat(patient.contact[0].name.family).isEqualTo("Penman")
   }
 
   @Test
@@ -423,16 +477,6 @@ class ResourceMapperTest {
                   "linkId": "PR-name",
                   "type": "group",
                   "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
-                  "extension": [
-                    {
-                      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
-                      "valueExpression": {
-                        "language": "application/x-fhir-query",
-                        "expression": "HumanName",
-                        "name": "humanName"
-                      }
-                    }
-                  ],
                   "item": [
                     {
                       "linkId": "PR-name-text",
@@ -458,12 +502,16 @@ class ResourceMapperTest {
                   "linkId": "patient-0-gender",
                   "extension": [
                     {
-                      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
-                      "valueExpression": {
-                        "language": "application/x-fhir-query",
-                        "expression": "Enumerations$""" +
-        """AdministrativeGender",
-                        "name": "administrativeGender"
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "radio-button",
+                            "display": "Radio Button"
+                          }
+                        ],
+                        "text": "A control where choices are listed with a button beside them. The button can be toggled to select or de-select a given choice. Selecting one item deselects all others."
                       }
                     }
                   ],
