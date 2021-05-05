@@ -12,7 +12,7 @@ afterEvaluate {
         from(components["release"])
         artifactId = "engine"
         groupId = "com.google.android.fhir"
-        version = "0.1.0-alpha01"
+        version = "0.1.0-alpha02"
         // Also publish source code for developers' convenience
         artifact(
           tasks.create<Jar>("androidSourcesJar") {
@@ -109,7 +109,6 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.truth)
 
-  api(Dependencies.Cql.cqlEngine)
   api(Dependencies.hapiFhirStructuresR4) { exclude(module = "junit") }
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
