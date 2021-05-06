@@ -60,8 +60,8 @@ fun Resource.isUploadSuccess(): Boolean {
 }
 
 /**
- * Extension to expresses [HumanName]  as a separated string using [separator].
- *  See https://www.hl7.org/fhir/patient.html#search
+ * Extension to expresses [HumanName] as a separated string using [separator]. See
+ * https://www.hl7.org/fhir/patient.html#search
  */
 fun HumanName.asString(separator: CharSequence = ", "): String {
   return listOfNotNull(
@@ -81,8 +81,8 @@ fun HumanName.asString(separator: CharSequence = ", "): String {
     .joinToString(separator)
 }
 /**
- * Extension to expresses [Address]  as a string using [separator].
- * See https://www.hl7.org/fhir/patient.html#search
+ * Extension to expresses [Address] as a string using [separator]. See
+ * https://www.hl7.org/fhir/patient.html#search
  */
 fun Address.asString(separator: CharSequence = ", "): String {
   return listOfNotNull(
