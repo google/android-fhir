@@ -74,7 +74,9 @@ class ResourceIndexerTest {
         id = "non-null-ID"
         meta = Meta().setLastUpdated(InstantType("2001-09-01T23:09:09.000+05:30").value)
       }
+
     val resourceIndices = ResourceIndexer.index(patient)
+
     assertThat(resourceIndices.dateIndices)
       .contains(
         DateIndex(
@@ -94,7 +96,9 @@ class ResourceIndexerTest {
         id = "non-null-ID"
         referenceSeq.windowStart = value
       }
+
     val resourceIndices = ResourceIndexer.index(molecularSequence)
+
     assertThat(resourceIndices.numberIndices)
       .contains(
         NumberIndex(
@@ -131,9 +135,10 @@ class ResourceIndexerTest {
         id = "non-null-ID"
         referenceSeq = value
       }
-    val resourceIndices = ResourceIndexer.index(molecularSequence)
-    assertThat(resourceIndices.numberIndices.any { it.name == "window-start" }).isFalse()
 
+    val resourceIndices = ResourceIndexer.index(molecularSequence)
+
+    assertThat(resourceIndices.numberIndices.any { it.name == "window-start" }).isFalse()
     assertThat(
         resourceIndices.numberIndices.any {
           it.path == "MolecularSequence.referenceSeq.windowStart"
@@ -150,7 +155,9 @@ class ResourceIndexerTest {
         id = "non-null ID"
         birthDate = date.value
       }
+
     val resourceIndices = ResourceIndexer.index(patient)
+
     assertThat(resourceIndices.dateIndices)
       .contains(
         DateIndex(
@@ -170,7 +177,9 @@ class ResourceIndexerTest {
         id = "non-null ID"
         effective = dateTime
       }
+
     val resourceIndices = ResourceIndexer.index(observation)
+
     observation.effectiveDateTimeType
     assertThat(resourceIndices.dateIndices)
       .contains(
@@ -191,7 +200,9 @@ class ResourceIndexerTest {
         id = "non-null ID"
         effective = instant
       }
+
     val resourceIndices = ResourceIndexer.index(observation)
+
     assertThat(resourceIndices.dateIndices)
       .contains(DateIndex("date", "Observation.effective", instant.value.time, instant.value.time))
   }
@@ -208,7 +219,9 @@ class ResourceIndexerTest {
         id = "non-null ID"
         effective = period
       }
+
     val resourceIndices = ResourceIndexer.index(observation)
+
     assertThat(resourceIndices.dateIndices)
       .contains(
         DateIndex(
@@ -232,7 +245,9 @@ class ResourceIndexerTest {
         id = "non-null ID"
         effective = period
       }
+
     val resourceIndices = ResourceIndexer.index(observation)
+
     assertThat(resourceIndices.dateIndices)
       .contains(
         DateIndex(
@@ -244,6 +259,7 @@ class ResourceIndexerTest {
       )
   }
 
+  @Test
   fun index_date_period_noEnd() {
     val period = Period().apply { startElement = DateTimeType("2001-09-08T20:30:09+05:30") }
     val observation =
@@ -251,7 +267,9 @@ class ResourceIndexerTest {
         id = "non-null ID"
         effective = period
       }
+
     val resourceIndices = ResourceIndexer.index(observation)
+
     assertThat(resourceIndices.dateIndices)
       .contains(DateIndex("date", "Observation.effective", period.start.time, Long.MAX_VALUE))
   }
@@ -263,13 +281,14 @@ class ResourceIndexerTest {
         addEvent(DateTimeType("2002-09-01T20:30:18+09:00").value)
         addEvent(DateTimeType("2003-10-24T18:30:40+09:00").value)
       }
-
     val observation =
       Observation().apply {
         id = "non-null ID"
         effective = timing
       }
+
     val resourceIndices = ResourceIndexer.index(observation)
+
     assertThat(resourceIndices.dateIndices)
       .contains(
         DateIndex(
@@ -289,6 +308,7 @@ class ResourceIndexerTest {
         effective = null
       }
     val resourceIndices = ResourceIndexer.index(observation)
+
     assertThat(resourceIndices.dateIndices.any { it.name == "date" }).isFalse()
     assertThat(resourceIndices.dateIndices.any { it.path == "Observation.effective" }).isFalse()
   }
@@ -303,6 +323,7 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
+
     assertThat(resourceIndices.stringIndices)
       .contains(StringIndex("given", "Patient.name.given", nameString))
   }
@@ -316,6 +337,7 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
+
     assertThat(
         resourceIndices.stringIndices.any { stringIndex ->
           stringIndex.path == "Patient.name.given"
@@ -336,6 +358,7 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
+
     assertThat(
         resourceIndices.stringIndices.any { stringIndex ->
           stringIndex.path == "Patient.name.given"
@@ -379,7 +402,9 @@ class ResourceIndexerTest {
             Identifier().setSystemElement(UriType(system)).setValueElement(StringType(value))
           )
       }
+
     val resourceIndices = ResourceIndexer.index(invoice)
+
     assertThat(resourceIndices.tokenIndices)
       .contains(TokenIndex("identifier", "Invoice.identifier", system, value))
   }
@@ -388,13 +413,14 @@ class ResourceIndexerTest {
   fun index_token_codableConcept() {
     val codeString = "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
     val systemString = "http://openmrs.org/concepts"
-
     val observation =
       Observation().apply {
         id = "non-null-ID"
         code = CodeableConcept().addCoding(Coding().setCode(codeString).setSystem(systemString))
       }
+
     val resourceIndices = ResourceIndexer.index(observation)
+
     assertThat(resourceIndices.tokenIndices)
       .contains(TokenIndex("code", "Observation.code", systemString, codeString))
   }
@@ -406,7 +432,9 @@ class ResourceIndexerTest {
         id = "non-null-ID"
         code = null
       }
+
     val resourceIndices = ResourceIndexer.index(observation)
+
     assertThat(
         resourceIndices.tokenIndices.any { tokenIndex -> tokenIndex.path == "Observation.code" }
       )
@@ -422,7 +450,9 @@ class ResourceIndexerTest {
         id = "someID"
         code = CodeableConcept().addCoding(Coding())
       }
+
     val resourceIndices = ResourceIndexer.index(observation)
+
     assertThat(
         resourceIndices.tokenIndices.any { tokenIndex -> tokenIndex.path == "Observation.code" }
       )
@@ -439,7 +469,9 @@ class ResourceIndexerTest {
         id = "someID"
         managingOrganization = Reference().setReference(organizationString)
       }
+
     val resourceIndices = ResourceIndexer.index(patient)
+
     assertThat(resourceIndices.referenceIndices)
       .contains(ReferenceIndex("organization", "Patient.managingOrganization", organizationString))
   }
@@ -476,7 +508,9 @@ class ResourceIndexerTest {
         id = "someID"
         managingOrganization = Reference().setReference("")
       }
+
     val resourceIndices = ResourceIndexer.index(patient)
+
     assertThat(
         resourceIndices.referenceIndices.any { referenceIndex ->
           referenceIndex.path == "Patient.managingOrganization"
@@ -502,6 +536,7 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(testInvoice)
+
     assertThat(resourceIndices.quantityIndices)
       .contains(
         QuantityIndex("totalnet", "Invoice.totalNet", FHIR_CURRENCY_SYSTEM, currency, value)
@@ -532,7 +567,9 @@ class ResourceIndexerTest {
         id = "non-null-ID"
         instance.add(Substance.SubstanceInstanceComponent().setQuantity(null))
       }
+
     val resourceIndices = ResourceIndexer.index(substance)
+
     assertThat(
         resourceIndices.quantityIndices.any { quantityIndex -> quantityIndex.name == "quantity" }
       )
@@ -553,7 +590,9 @@ class ResourceIndexerTest {
         id = "non-null-ID"
         url = urlString
       }
+
     val resourceIndices = ResourceIndexer.index(device)
+
     assertThat(resourceIndices.uriIndices).contains(UriIndex("url", "Device.url", urlString))
   }
 
@@ -564,7 +603,9 @@ class ResourceIndexerTest {
         id = "non-null-ID"
         url = null
       }
+
     val resourceIndices = ResourceIndexer.index(device)
+
     assertThat(resourceIndices.uriIndices.any { index -> index.name == "url" }).isFalse()
   }
 
@@ -575,7 +616,9 @@ class ResourceIndexerTest {
         id = "non-null-ID"
         url = ""
       }
+
     val resourceIndices = ResourceIndexer.index(device)
+
     assertThat(resourceIndices.uriIndices.any { index -> index.name == "url" }).isFalse()
   }
 
@@ -588,7 +631,9 @@ class ResourceIndexerTest {
         id = "someID"
         position = Location.LocationPositionComponent(DecimalType(latitude), DecimalType(longitude))
       }
+
     val resourceIndices = ResourceIndexer.index(location)
+
     assertThat(resourceIndices.positionIndices).contains(PositionIndex(latitude, longitude))
   }
 
@@ -599,7 +644,9 @@ class ResourceIndexerTest {
         id = "non-null-ID"
         position = null
       }
+
     val resourceIndices = ResourceIndexer.index(location)
+
     assertThat(resourceIndices.positionIndices).isEmpty()
   }
 
@@ -609,9 +656,11 @@ class ResourceIndexerTest {
     val testInvoice =
       TestingUtils(FhirContext.forR4().newJsonParser())
         .readFromFile(Invoice::class.java, "/quantity_test_invoice.json")
+
     val resourceIndices = ResourceIndexer.index(testInvoice)
 
     assertThat(resourceIndices.resourceId).isEqualTo(testInvoice.logicalId)
+
     assertThat(resourceIndices.resourceType).isEqualTo(testInvoice.resourceType)
 
     assertThat(resourceIndices.quantityIndices)
@@ -684,9 +733,11 @@ class ResourceIndexerTest {
     val testQuestionnaire =
       TestingUtils(FhirContext.forR4().newJsonParser())
         .readFromFile(Questionnaire::class.java, "/uri_test_questionnaire.json")
+
     val resourceIndices = ResourceIndexer.index(testQuestionnaire)
 
     assertThat(resourceIndices.resourceType).isEqualTo(testQuestionnaire.resourceType)
+
     assertThat(resourceIndices.resourceId).isEqualTo(testQuestionnaire.logicalId)
 
     assertThat(resourceIndices.uriIndices)
@@ -727,6 +778,7 @@ class ResourceIndexerTest {
     val resourceIndices = ResourceIndexer.index(testPatient)
 
     assertThat(resourceIndices.resourceType).isEqualTo(testPatient.resourceType)
+
     assertThat(resourceIndices.resourceId).isEqualTo(testPatient.logicalId)
 
     assertThat(resourceIndices.dateIndices)
@@ -807,7 +859,9 @@ class ResourceIndexerTest {
         .readFromFile(Location::class.java, "/location-example-hl7hq.json")
 
     val resourceIndices = ResourceIndexer.index(testLocation)
+
     assertThat(resourceIndices.resourceType).isEqualTo(testLocation.resourceType)
+
     assertThat(resourceIndices.resourceId).isEqualTo(testLocation.logicalId)
 
     assertThat(resourceIndices.positionIndices).containsExactly(PositionIndex(-83.69471, 42.2565))
@@ -846,8 +900,6 @@ class ResourceIndexerTest {
         StringIndex("address-city", "Location.address.city", testLocation.address.city)
       )
   }
-
-  // TODO: improve the tests further.
 
   private companion object {
     // See: https://www.hl7.org/fhir/valueset-currencies.html
