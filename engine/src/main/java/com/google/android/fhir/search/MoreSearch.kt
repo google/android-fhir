@@ -108,15 +108,15 @@ fun ReferenceFilter.query(type: ResourceType): SearchQuery {
 fun DateFilter.query(type: ResourceType): SearchQuery {
   val condition =
     when (this.prefix) {
-      ParamPrefixEnum.APPROXIMATE -> "BETWEEN index_tsLow AND index_tsHigh"
-      ParamPrefixEnum.STARTS_AFTER -> " < index_tsLow"
-      ParamPrefixEnum.ENDS_BEFORE -> " > index_tsHigh"
-      ParamPrefixEnum.NOT_EQUAL -> "NOT BETWEEN index_tsLow AND index_tsHigh"
-      ParamPrefixEnum.EQUAL -> "BETWEEN index_tsLow AND index_tsHigh"
-      ParamPrefixEnum.GREATERTHAN -> " > index_tsLow"
-      ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> " >= index_tsLow"
-      ParamPrefixEnum.LESSTHAN -> "< index_tsHigh"
-      ParamPrefixEnum.LESSTHAN_OR_EQUALS -> "<= index_tsHigh"
+      ParamPrefixEnum.APPROXIMATE -> "BETWEEN index_from AND index_to"
+      ParamPrefixEnum.STARTS_AFTER -> " < index_from"
+      ParamPrefixEnum.ENDS_BEFORE -> " > index_to"
+      ParamPrefixEnum.NOT_EQUAL -> "NOT BETWEEN index_from AND index_to"
+      ParamPrefixEnum.EQUAL -> "BETWEEN index_from AND index_to"
+      ParamPrefixEnum.GREATERTHAN -> " > index_from"
+      ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> " >= index_from"
+      ParamPrefixEnum.LESSTHAN -> "< index_to"
+      ParamPrefixEnum.LESSTHAN_OR_EQUALS -> "<= index_to"
       null -> "" // Possibly throw an error or provide a default value?
     }
   return SearchQuery(

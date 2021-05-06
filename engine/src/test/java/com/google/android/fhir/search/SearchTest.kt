@@ -140,7 +140,7 @@ class SearchTest {
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
     WHERE resourceType = ? AND index_name = ?
-    AND ? BETWEEN index_tsLow AND index_tsHigh
+    AND ? BETWEEN index_from AND index_to
     )
     """.trimIndent()
       )
