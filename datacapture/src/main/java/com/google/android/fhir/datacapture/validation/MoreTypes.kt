@@ -36,6 +36,9 @@ operator fun Type.compareTo(value: Type?): Int {
       this.fhirType().equals("dateTime") && value.fhirType().equals("dateTime") -> {
         return this.dateTimeValue().value.compareTo(value.dateTimeValue().value)
       }
+      else -> {
+        throw NotImplementedError()
+      }
     }
   }
   return 0

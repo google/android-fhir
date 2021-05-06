@@ -27,24 +27,7 @@ internal object MaxValueConstraintValidator :
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
       answer.value > extension.value
     },
-    { extension: Extension, answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
-      ->
-      when {
-        extension.value.fhirType().equals("integer") && answer.hasValueIntegerType() -> {
-          "Maximum value allowed is:" + extension.value.primitiveValue()
-        }
-        extension.value.fhirType().equals("decimal") && answer.hasValueDecimalType() -> {
-          "Maximum value allowed is:" + extension.value.primitiveValue()
-        }
-        extension.value.fhirType().equals("date") && answer.hasValueDateType() -> {
-          "Maximum date allowed is:" + extension.value.primitiveValue()
-        }
-        extension.value.fhirType().equals("dateTime") && answer.hasValueDateTimeType() -> {
-          "Maximum date & time allowed is:" + extension.value.primitiveValue()
-        }
-        else -> ""
-      }
-    }
+    { extension: Extension -> "Maximum value allowed is:" + extension.value.primitiveValue() }
   )
 
 internal const val MAX_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/maxValue"

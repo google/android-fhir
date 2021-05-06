@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.validation
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
-import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -60,33 +59,6 @@ class MaxValueConstraintValidatorTest {
   }
 
   @Test
-  fun shouldReturnInvalidResultForDecimal() {
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        addExtension(
-          Extension().apply {
-            this.url = MAX_VALUE_EXTENSION_URL
-            this.setValue(DecimalType(20.5))
-          }
-        )
-      }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = DecimalType(20.51)
-          }
-        )
-      }
-
-    val validationResult =
-      MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
-
-    assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.message.equals("Maximum value allowed is:20.5")).isTrue()
-  }
-
-  @Test
   fun shouldReturnValidResult() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
@@ -102,33 +74,6 @@ class MaxValueConstraintValidatorTest {
         addAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
             value = IntegerType(501)
-          }
-        )
-      }
-
-    val validationResult =
-      MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
-
-    assertThat(validationResult.isValid).isTrue()
-    assertThat(validationResult.message.isNullOrBlank()).isTrue()
-  }
-
-  @Test
-  fun shouldReturnValidResultForDecimal() {
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        addExtension(
-          Extension().apply {
-            this.url = MAX_VALUE_EXTENSION_URL
-            this.setValue(DecimalType(19.5))
-          }
-        )
-      }
-    val questionnaireResponseItem =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = DecimalType(19.4)
           }
         )
       }

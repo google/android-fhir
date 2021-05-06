@@ -27,24 +27,7 @@ internal object MinValueConstraintValidator :
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
       answer.value < extension.value
     },
-    { extension: Extension, answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
-      ->
-      when {
-        extension.value.fhirType().equals("integer") && answer.hasValueIntegerType() -> {
-          "Minimum value allowed is:" + extension.value.primitiveValue()
-        }
-        extension.value.fhirType().equals("decimal") && answer.hasValueDecimalType() -> {
-          "Minimum value allowed is:" + extension.value.primitiveValue()
-        }
-        extension.value.fhirType().equals("date") && answer.hasValueDateType() -> {
-          "Minimum date allowed is:" + extension.value.primitiveValue()
-        }
-        extension.value.fhirType().equals("dateTime") && answer.hasValueDateTimeType() -> {
-          "Minimum date & time allowed is:" + extension.value.primitiveValue()
-        }
-        else -> ""
-      }
-    }
+    { extension: Extension -> "Minimum value allowed is:" + extension.value.primitiveValue() }
   )
 
 internal const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"
