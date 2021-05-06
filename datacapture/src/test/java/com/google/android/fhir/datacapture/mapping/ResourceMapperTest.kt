@@ -442,7 +442,7 @@ class ResourceMapperTest {
     assertThat(patient.name.first().given.first().toString()).isEqualTo("John")
     assertThat(patient.name.first().family).isEqualTo("Doe")
     assertThat(patient.multipleBirthIntegerType.value).isEqualTo(2)
-    assertThat(patient.contact[0].name.given.first()).isEqualTo("Brenda")
+    assertThat(patient.contact[0].name.given.first().toString()).isEqualTo("Brenda")
     assertThat(patient.contact[0].name.family).isEqualTo("Penman")
   }
 
