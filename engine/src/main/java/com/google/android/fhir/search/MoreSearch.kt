@@ -35,7 +35,7 @@ fun Search.getQuery(): SearchQuery {
       when (sort) {
         is StringClientParam -> "StringIndexEntity"
         is NumberClientParam -> "NumberIndexEntity"
-        else -> error("Unhandled sort parameter of type ${sort::class}: $sort")
+        else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
       }
     sortJoinStatement =
       """
