@@ -18,6 +18,7 @@ package com.google.android.fhir.index
 
 import android.os.Build
 import ca.uhn.fhir.context.FhirContext
+import com.google.android.fhir.asString
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.NumberIndex
 import com.google.android.fhir.index.entities.PositionIndex
@@ -832,7 +833,7 @@ class ResourceIndexerTest {
     assertThat(resourceIndices.stringIndices)
       .containsExactly(
         StringIndex("given", "Patient.name.given", testPatient.nameFirstRep.givenAsSingleString),
-        StringIndex("address", "Patient.address", testPatient.addressFirstRep.toString()),
+        StringIndex("address", "Patient.address", testPatient.addressFirstRep.asString()),
         StringIndex(
           "address-postalcode",
           "Patient.address.postalCode",
@@ -843,8 +844,8 @@ class ResourceIndexerTest {
           "Patient.address.country",
           testPatient.addressFirstRep.country
         ),
-        StringIndex("phonetic", "Patient.name", testPatient.nameFirstRep.toString()),
-        StringIndex("name", "Patient.name", testPatient.nameFirstRep.toString()),
+        StringIndex("phonetic", "Patient.name", testPatient.nameFirstRep.asString()),
+        StringIndex("name", "Patient.name", testPatient.nameFirstRep.asString()),
         StringIndex("family", "Patient.name.family", testPatient.nameFirstRep.family),
         StringIndex("address-city", "Patient.address.city", testPatient.addressFirstRep.city)
       )
@@ -888,7 +889,7 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.stringIndices)
       .containsExactly(
-        StringIndex("address", "Location.address", testLocation.address.toString()),
+        StringIndex("address", "Location.address", testLocation.address.asString()),
         StringIndex("address-state", "Location.address.state", testLocation.address.state),
         StringIndex(
           "address-postalcode",

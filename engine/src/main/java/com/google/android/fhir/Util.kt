@@ -21,6 +21,8 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
+import org.hl7.fhir.r4.model.Address
+import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -55,4 +57,45 @@ fun Resource.isUploadSuccess(): Boolean {
   val outcome: OperationOutcome = this as OperationOutcome
   return outcome.issue.isNotEmpty() &&
     outcome.issue.all { it.severity.equals(OperationOutcome.IssueSeverity.INFORMATION) }
+}
+
+/**
+ * Extension to expresses [HumanName]  as a separated string using [separator].
+ *  See https://www.hl7.org/fhir/patient.html#search
+ */
+fun HumanName.asString(separator: CharSequence = ", "): String {
+  return listOfNotNull(
+      prefix?.filter { it.value.isNotBlank() }?.joinToString(separator = separator) {
+        it.valueNotNull
+      },
+      given?.filter { it.value.isNotBlank() }?.joinToString(separator = separator) {
+        it.valueNotNull
+      },
+      family,
+      suffix?.filter { it.value.isNotBlank() }?.joinToString(separator = separator) {
+        it.valueNotNull
+      },
+      text
+    )
+    .filter { it.isNotBlank() }
+    .joinToString(separator)
+}
+/**
+ * Extension to expresses [Address]  as a string using [separator].
+ * See https://www.hl7.org/fhir/patient.html#search
+ */
+fun Address.asString(separator: CharSequence = ", "): String {
+  return listOfNotNull(
+      line?.filter { it.value.isNotBlank() }?.joinToString(separator = separator) {
+        it.valueNotNull
+      },
+      city,
+      district,
+      state,
+      country,
+      postalCode,
+      text
+    )
+    .filter { it.isNotBlank() }
+    .joinToString(separator)
 }

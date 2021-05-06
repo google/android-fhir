@@ -19,6 +19,7 @@ package com.google.android.fhir.index
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
+import com.google.android.fhir.asString
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.NumberIndex
 import com.google.android.fhir.index.entities.PositionIndex
@@ -30,11 +31,13 @@ import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.logicalId
 import java.math.BigDecimal
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
+import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
@@ -164,7 +167,11 @@ internal object ResourceIndexer {
 
   private fun stringIndex(searchParam: SearchParamDefinition, value: Base): StringIndex? =
     if (!value.isEmpty) {
-      StringIndex(searchParam.name, searchParam.path, value.toString())
+      when (value) {
+        is HumanName -> StringIndex(searchParam.name, searchParam.path, value.asString())
+        is Address -> StringIndex(searchParam.name, searchParam.path, value.asString())
+        else -> StringIndex(searchParam.name, searchParam.path, value.toString())
+      }
     } else {
       null
     }
