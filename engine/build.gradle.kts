@@ -5,18 +5,21 @@ plugins {
   id(Plugins.BuildPlugins.mavenPublish)
 }
 
-val artifactGroup = "com.google.android.fhir"
-val artifactVersion = "0.1.0-alpha01"
-
 afterEvaluate {
   publishing {
     publications {
       register("release", MavenPublication::class) {
         from(components["release"])
         artifactId = "engine"
-        groupId = artifactGroup
-        version = artifactVersion
-        // Also publish source code for developers" convenience
+        groupId = "com.google.android.fhir"
+        version = "0.1.0-alpha02"
+        // Also publish source code for developers' convenience
+        artifact(
+          tasks.create<Jar>("androidSourcesJar") {
+            archiveClassifier.set("sources")
+            from(android.sourceSets.getByName("main").java.srcDirs)
+          }
+        )
         pom {
           name.set("Android FHIR Engine Library")
           licenses {
@@ -106,7 +109,6 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.truth)
 
-  api(Dependencies.Cql.cqlEngine)
   api(Dependencies.hapiFhirStructuresR4) { exclude(module = "junit") }
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
