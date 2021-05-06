@@ -654,7 +654,7 @@ class ResourceIndexerTest {
     assertThat(resourceIndices.uriIndices).isEmpty()
 
     assertThat(resourceIndices.dateIndices)
-      .contains(
+      .containsExactly(
         DateIndex(
           "date",
           "Invoice.date",
