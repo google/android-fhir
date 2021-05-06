@@ -69,8 +69,9 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         }
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
           // if-else block to prevent over-writing of "items" nested within "answer"
-          if (questionnaireResponseItem.answer.size > 0) {
-            val tmpItems = questionnaireResponseItem.answer.first().item
+          if (questionnaireResponseItem.answer.size > 0 &&
+              questionnaireResponseItem.answer.first().hasValue()
+          ) {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = questionnaireItem.answerOption[checkedId].value
             }
@@ -84,6 +85,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
               )
             }
           }
+
           questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
         }
       }
