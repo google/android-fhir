@@ -128,10 +128,10 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
             (value!! + precision).toDouble()
           )
         )
-      ParamPrefixEnum.GREATERTHAN -> "> ?"
-      ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ">= ?"
-      ParamPrefixEnum.LESSTHAN -> " < "
-      ParamPrefixEnum.LESSTHAN_OR_EQUALS -> "<= ?"
+      ParamPrefixEnum.GREATERTHAN -> ">"
+      ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ">="
+      ParamPrefixEnum.LESSTHAN -> "<"
+      ParamPrefixEnum.LESSTHAN_OR_EQUALS -> "<="
       ParamPrefixEnum.NOT_EQUAL ->
         return SearchQuery(
           """
@@ -153,7 +153,7 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
      SELECT resourceId FROM NumberIndexEntity
      WHERE resourceType = ? AND index_name = ? AND index_value $condition ?
        """,
-    listOf(type.name, parameter.paramName, value!!)
+    listOf(type.name, parameter.paramName, value!!.toDouble())
   )
 }
 
