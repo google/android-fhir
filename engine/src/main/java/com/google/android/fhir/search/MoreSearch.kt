@@ -20,6 +20,7 @@ import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.db.Database
+import java.lang.IllegalArgumentException
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -113,8 +114,6 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
     }
   val condition =
     when (this.prefix) {
-      ParamPrefixEnum.APPROXIMATE -> TODO("Handle this case")
-      ParamPrefixEnum.ENDS_BEFORE -> TODO("Handle this case")
       ParamPrefixEnum.EQUAL ->
         return SearchQuery(
           """
@@ -145,8 +144,8 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
             (value!! + precision).toDouble()
           )
         )
-      ParamPrefixEnum.STARTS_AFTER -> TODO("Handle this case")
       null -> "="
+      else -> throw IllegalArgumentException("Prefix not allowed for Number type")
     }
   return SearchQuery(
     """
