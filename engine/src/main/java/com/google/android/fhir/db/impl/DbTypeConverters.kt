@@ -42,9 +42,11 @@ internal object DbTypeConverters {
   fun stringToResourceType(data: String) =
     resourceTypeLookup[data] ?: throw IllegalArgumentException("invalid resource type: $data")
 
-  @JvmStatic @TypeConverter fun bigDecimalToString(value: BigDecimal): String = value.toString()
+  // Since we're narrowing BigDecimal to double, search/sort precision is limited.
+  // Search/sort for values that are close enough to resolve to the same double will be undefined.
+  @JvmStatic @TypeConverter fun bigDecimalToDouble(value: BigDecimal): Double = value.toDouble()
 
-  @JvmStatic @TypeConverter fun stringToBigDecimal(value: String): BigDecimal = value.toBigDecimal()
+  @JvmStatic @TypeConverter fun doubleToBigDecimal(value: Double): BigDecimal = value.toBigDecimal()
 
   @JvmStatic
   @TypeConverter

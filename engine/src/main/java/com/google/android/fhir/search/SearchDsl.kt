@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.search
 
+import ca.uhn.fhir.rest.gclient.IParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
@@ -28,7 +29,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   internal val stringFilters = mutableListOf<StringFilter>()
   internal val referenceFilter = mutableListOf<ReferenceFilter>()
   internal val numberFilter = mutableListOf<NumberFilter>()
-  internal var sort: StringClientParam? = null
+  internal var sort: IParam? = null
   internal var order: Order? = null
 
   fun filter(stringParameter: StringClientParam, init: StringFilter.() -> Unit) {
@@ -50,6 +51,11 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   }
 
   fun sort(parameter: StringClientParam, order: Order) {
+    sort = parameter
+    this.order = order
+  }
+
+  fun sort(parameter: NumberClientParam, order: Order) {
     sort = parameter
     this.order = order
   }

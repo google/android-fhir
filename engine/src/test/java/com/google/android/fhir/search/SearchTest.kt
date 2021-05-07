@@ -122,7 +122,7 @@ class SearchTest {
   }
 
   @Test
-  fun search_sort_ascending() {
+  fun search_sort_string_ascending() {
     val query =
       Search(ResourceType.Patient).apply { sort(Patient.GIVEN, Order.ASCENDING) }.getQuery()
 
@@ -141,7 +141,7 @@ class SearchTest {
   }
 
   @Test
-  fun search_sort_descending() {
+  fun search_sort_string_descending() {
     val query =
       Search(ResourceType.Patient).apply { sort(Patient.GIVEN, Order.DESCENDING) }.getQuery()
 
@@ -157,6 +157,26 @@ class SearchTest {
         """.trimIndent()
       )
     assertThat(query.args).isEqualTo(listOf(Patient.GIVEN.paramName, ResourceType.Patient.name))
+  }
+
+  @Test
+  fun search_sort_numbers_ascending() {
+    val query =
+      Search(ResourceType.RiskAssessment)
+        .apply { sort(RiskAssessment.PROBABILITY, Order.ASCENDING) }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+      SELECT a.serializedResource
+      FROM ResourceEntity a
+      LEFT JOIN NumberIndexEntity b
+      ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
+      WHERE a.resourceType = ?
+      ORDER BY b.index_value ASC
+      """.trimIndent()
+      )
   }
 
   @Test
