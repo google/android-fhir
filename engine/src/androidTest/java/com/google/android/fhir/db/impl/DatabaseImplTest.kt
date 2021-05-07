@@ -23,15 +23,22 @@ import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
+import com.google.android.fhir.search.Order
+import com.google.android.fhir.search.Search
+import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.sync.FhirDataSource
 import com.google.common.truth.Truth.assertThat
+import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.RiskAssessment
 import org.json.JSONArray
 import org.junit.Assert.assertThrows
 import org.junit.Before
@@ -330,6 +337,39 @@ class DatabaseImplTest {
     assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
     assertThat(payload).isEmpty()
   }
+
+  @Test
+  fun search_sortDescending_twoVeryCloseFloatingPointNumbers_orderedCorrectly() = runBlocking {
+    val smallerId = "risk_assessment_1"
+    val largerId = "risk_assessment_2"
+    database.insert(
+      riskAssessment(id = smallerId, probability = BigDecimal("0.3")),
+      riskAssessment(id = largerId, probability = BigDecimal("0.30000000001"))
+    )
+
+    val results =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply { sort(RiskAssessment.PROBABILITY, Order.DESCENDING) }
+          .getQuery()
+      )
+
+    val ids = results.map { it.id }
+    assertThat(ids)
+      .containsExactly("RiskAssessment/$largerId", "RiskAssessment/$smallerId")
+      .inOrder()
+  }
+
+  private fun riskAssessment(id: String, probability: BigDecimal) =
+    RiskAssessment().apply {
+      setId(id)
+      prediction =
+        listOf(
+          RiskAssessment.RiskAssessmentPredictionComponent().apply {
+            setProbability(DecimalType(probability))
+          }
+        )
+    }
 
   private companion object {
     const val TEST_PATIENT_1_ID = "test_patient_1"
