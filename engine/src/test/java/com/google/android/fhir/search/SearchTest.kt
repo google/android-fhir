@@ -231,7 +231,7 @@ class SearchTest {
         .apply {
           filter(RiskAssessment.PROBABILITY) {
             prefix = ParamPrefixEnum.EQUAL
-            value = BigDecimal.valueOf(100.00)
+            value = BigDecimal("100.00")
           }
         }
         .getQuery()
@@ -254,8 +254,8 @@ class SearchTest {
           ResourceType.RiskAssessment.name,
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
-          BigDecimal.valueOf(99.995),
-          BigDecimal.valueOf(100.005)
+          BigDecimal.valueOf(99.995).toDouble(),
+          BigDecimal.valueOf(100.005).toDouble()
         )
       )
   }

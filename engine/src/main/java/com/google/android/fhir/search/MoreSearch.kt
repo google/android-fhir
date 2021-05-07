@@ -16,9 +16,9 @@
 
 package com.google.android.fhir.search
 
-import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
+import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.db.Database
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Resource
@@ -105,7 +105,12 @@ fun StringFilter.query(type: ResourceType): SearchQuery {
 }
 
 fun NumberFilter.query(type: ResourceType): SearchQuery {
-  val precision = value!!.divide(BigDecimal(10).pow(value!!.precision())).divide(BigDecimal(2))
+  val precision =
+    when {
+      value!!.scale() >= 0 ->
+        BigDecimal(1).divide(BigDecimal(10).pow(value!!.scale())).divide(BigDecimal(2))
+      else -> BigDecimal(5)
+    }
   val condition =
     when (this.prefix) {
       ParamPrefixEnum.APPROXIMATE -> TODO("Handle this case")
@@ -116,8 +121,13 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
             SELECT resourceId FROM NumberIndexEntity
             WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value < ?
             """,
-          listOf(type.name, parameter.paramName, value!! - precision, value!! + precision)
-        ) // TODO should not include value+precision record
+          listOf(
+            type.name,
+            parameter.paramName,
+            (value!! - precision).toDouble(),
+            (value!! + precision).toDouble()
+          )
+        )
       ParamPrefixEnum.GREATERTHAN -> "> ?"
       ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ">= ?"
       ParamPrefixEnum.LESSTHAN -> " < "
@@ -128,7 +138,12 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
             SELECT resourceId FROM NumberIndexEntity
             WHERE resourceType = ? AND index_name = ? AND index_value < ? AND index_value >= ?
             """,
-          listOf(type.name, parameter.paramName, value!! - precision, value!! + precision)
+          listOf(
+            type.name,
+            parameter.paramName,
+            (value!! - precision).toDouble(),
+            (value!! + precision).toDouble()
+          )
         )
       ParamPrefixEnum.STARTS_AFTER -> TODO("Handle this case")
       null -> "="
@@ -136,7 +151,7 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
   return SearchQuery(
     """
      SELECT resourceId FROM NumberIndexEntity
-     WHERE resourceType = ? AND index_name = ? AND index_value $condition
+     WHERE resourceType = ? AND index_name = ? AND index_value $condition ?
        """,
     listOf(type.name, parameter.paramName, value!!)
   )
