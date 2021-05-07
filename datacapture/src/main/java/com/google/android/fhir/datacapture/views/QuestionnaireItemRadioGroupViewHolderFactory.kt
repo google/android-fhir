@@ -48,7 +48,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         } else {
           prefixTextView.visibility = View.GONE
         }
-        val (questionnaireItem, questionnaireResponseItem) = this.questionnaireItemViewItem
+        val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
         val answer = questionnaireResponseItem.answer.singleOrNull()?.valueCoding
         radioHeader.text = questionnaireItem.text
         radioGroup.removeAllViews()
