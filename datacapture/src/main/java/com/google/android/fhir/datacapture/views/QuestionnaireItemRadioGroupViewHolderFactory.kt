@@ -52,6 +52,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         val answer = questionnaireResponseItem.answer.singleOrNull()?.valueCoding
         radioHeader.text = questionnaireItem.text
         radioGroup.removeAllViews()
+        radioGroup.setOnCheckedChangeListener(null)
         var index = 0
         questionnaireItem.answerOption.forEach {
           radioGroup.addView(
@@ -67,12 +68,12 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
             }
           )
         }
-        radioGroup.setOnCheckedChangeListener { _, checkedId ->
+
+        radioGroup.setOnCheckedChangeListener { group, checkedId ->
           // if-else block to prevent over-writing of "items" nested within "answer"
           if (questionnaireResponseItem.answer.size > 0) {
-            val tmpItems = questionnaireResponseItem.answer.first().item
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              value = questionnaireItem.answerOption[checkedId].value
+            questionnaireResponseItem.answer.apply {
+              this[0].value = questionnaireItem.answerOption[checkedId].value
             }
           } else {
             questionnaireResponseItem.answer.apply {
@@ -84,6 +85,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
               )
             }
           }
+
           questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
         }
       }
