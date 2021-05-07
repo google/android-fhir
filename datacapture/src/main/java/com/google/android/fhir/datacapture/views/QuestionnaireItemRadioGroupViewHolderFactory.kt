@@ -71,7 +71,6 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
 
         radioGroup.setOnCheckedChangeListener { group, checkedId ->
           // if-else block to prevent over-writing of "items" nested within "answer"
-
           if (questionnaireResponseItem.answer.size > 0) {
             questionnaireResponseItem.answer.apply {
               this[0].value = questionnaireItem.answerOption[checkedId].value
@@ -86,6 +85,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
               )
             }
           }
+
           questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
         }
       }

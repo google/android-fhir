@@ -32,8 +32,8 @@ internal data class DateIndex(
    */
   val from: Long,
   /**
-   * The upper bound or end time of the date value. This is an open interval and the value is
-   * excluded
+   * The upper bound or end time of the date value. This is a closed interval and the value is
+   * included
    */
   val to: Long
 )
