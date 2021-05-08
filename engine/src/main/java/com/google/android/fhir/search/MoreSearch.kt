@@ -114,7 +114,7 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
     }
   val condition =
     when (this.prefix) {
-      ParamPrefixEnum.EQUAL ->
+      ParamPrefixEnum.EQUAL, null ->
         return SearchQuery(
           """
             SELECT resourceId FROM NumberIndexEntity
@@ -144,8 +144,31 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
             (value!! + precision).toDouble()
           )
         )
-      null -> "="
-      else -> throw IllegalArgumentException("Prefix not allowed for Number type")
+      // Ends_Before and Starts_After are not used with integer values.
+      ParamPrefixEnum.ENDS_BEFORE ->
+        if (value!!.scale() <= 0)
+          throw IllegalArgumentException("Prefix not allowed for Integer type")
+        else "<"
+      ParamPrefixEnum.STARTS_AFTER ->
+        if (value!!.scale() <= 0)
+          throw IllegalArgumentException("Prefix not allowed for Integer type")
+        else ">"
+      // Approximate to a 10% range
+      ParamPrefixEnum.APPROXIMATE -> {
+        val range = value!!.divide(BigDecimal(10))
+        return SearchQuery(
+          """
+            SELECT resourceId FROM NumberIndexEntity
+            WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value <= ?
+            """,
+          listOf(
+            type.name,
+            parameter.paramName,
+            (value!! - range).toDouble(),
+            (value!! + range).toDouble()
+          )
+        )
+      }
     }
   return SearchQuery(
     """
