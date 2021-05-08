@@ -279,7 +279,7 @@ class SearchTest {
             WHERE a.resourceType = ?
             AND a.resourceId IN (
             SELECT resourceId FROM NumberIndexEntity
-            WHERE resourceType = ? AND index_name = ? AND index_value < ? AND index_value >= ?
+            WHERE resourceType = ? AND index_name = ? AND index_value < ? OR index_value >= ?
             )
     """.trimIndent()
       )

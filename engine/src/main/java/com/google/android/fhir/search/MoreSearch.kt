@@ -135,7 +135,7 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
         return SearchQuery(
           """
             SELECT resourceId FROM NumberIndexEntity
-            WHERE resourceType = ? AND index_name = ? AND index_value < ? AND index_value >= ?
+            WHERE resourceType = ? AND index_name = ? AND index_value < ? OR index_value >= ?
             """,
           listOf(
             type.name,
