@@ -128,19 +128,19 @@ fun DateFilter.query(type: ResourceType): SearchQuery {
           listOf(type.name, parameter.paramName, rangeLow, rangeHigh, rangeLow, rangeHigh)
         )
       }
-      ParamPrefixEnum.STARTS_AFTER -> ">= index_from".also { useHigh = true }
-      ParamPrefixEnum.ENDS_BEFORE -> "<= index_to"
+      ParamPrefixEnum.STARTS_AFTER -> "<= index_from".also { useHigh = true }
+      ParamPrefixEnum.ENDS_BEFORE -> ">= index_to"
       ParamPrefixEnum.NOT_EQUAL ->
         return SearchQuery(
           """SELECT resourceId FROM DateIndexEntity
               WHERE resourceType = ? AND index_name = ?
-              AND index_from NOT BETWEEN ? AND ? AND index_to NOT BETWEEN ? AND ?""",
+              AND index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?""",
           listOf(
             type.name,
             parameter.paramName,
             value!!.value.time,
-            tsHigh,
-            value!!.value.time,
+            tsHigh - 1,
+            value!!.value.time - 1,
             tsHigh
           )
         )
