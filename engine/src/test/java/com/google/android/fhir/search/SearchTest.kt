@@ -182,7 +182,7 @@ class SearchTest {
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
     WHERE resourceType = ? AND index_name = ?
-    AND ? >= index_from
+    AND ? <= index_from
     )
     """.trimIndent()
       )
@@ -219,7 +219,7 @@ class SearchTest {
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
     WHERE resourceType = ? AND index_name = ?
-    AND ? <= index_to
+    AND ? >= index_to
     )
     """.trimIndent()
       )
@@ -256,7 +256,7 @@ class SearchTest {
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
     WHERE resourceType = ? AND index_name = ?
-    AND index_from NOT BETWEEN ? AND ? AND index_to NOT BETWEEN ? AND ?
+    AND index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?
     )
     """.trimIndent()
       )
@@ -268,9 +268,9 @@ class SearchTest {
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateTimeType("2013-03-14").value.time,
-          DateTimeType("2013-03-15").value.time,
+          DateTimeType("2013-03-15").value.time - 1,
           DateTimeType("2013-03-14").value.time,
-          DateTimeType("2013-03-15").value.time
+          DateTimeType("2013-03-15").value.time - 1
         )
       )
   }
@@ -308,9 +308,9 @@ class SearchTest {
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateTimeType("2013-03-14").value.time,
-          DateTimeType("2013-03-15").value.time,
+          DateTimeType("2013-03-15").value.time - 1,
           DateTimeType("2013-03-14").value.time,
-          DateTimeType("2013-03-15").value.time
+          DateTimeType("2013-03-15").value.time - 1
         )
       )
   }

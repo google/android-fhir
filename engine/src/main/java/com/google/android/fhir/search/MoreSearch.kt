@@ -140,8 +140,8 @@ fun DateFilter.query(type: ResourceType): SearchQuery {
             parameter.paramName,
             value!!.value.time,
             tsHigh - 1,
-            value!!.value.time - 1,
-            tsHigh
+            value!!.value.time,
+            tsHigh - 1
           )
         )
       ParamPrefixEnum.EQUAL, null ->
@@ -153,9 +153,9 @@ fun DateFilter.query(type: ResourceType): SearchQuery {
             type.name,
             parameter.paramName,
             value!!.value.time,
-            tsHigh,
+            tsHigh - 1,
             value!!.value.time,
-            tsHigh
+            tsHigh - 1
           )
         )
       ParamPrefixEnum.GREATERTHAN -> "<= index_from".also { useHigh = true }
