@@ -16,6 +16,8 @@
 
 package com.google.android.fhir.search
 
+import ca.uhn.fhir.rest.gclient.NumberClientParam
+import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.db.Database
 import org.hl7.fhir.r4.model.Resource
@@ -29,16 +31,22 @@ fun Search.getQuery(): SearchQuery {
   var sortJoinStatement = ""
   var sortOrderStatement = ""
   val sortArgs = mutableListOf<Any>()
-  if (sort != null) {
+  sort?.let { sort ->
+    val sortTableName =
+      when (sort) {
+        is StringClientParam -> "StringIndexEntity"
+        is NumberClientParam -> "NumberIndexEntity"
+        else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
+      }
     sortJoinStatement =
       """
-      LEFT JOIN StringIndexEntity b
+      LEFT JOIN $sortTableName b
       ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
       """.trimIndent()
     sortOrderStatement = """
       ORDER BY b.index_value ${order.sqlString}
       """.trimIndent()
-    sortArgs += sort!!.paramName
+    sortArgs += sort.paramName
   }
 
   var filterStatement = ""
@@ -106,26 +114,62 @@ fun ReferenceFilter.query(type: ResourceType): SearchQuery {
 }
 
 fun DateFilter.query(type: ResourceType): SearchQuery {
+  val tsHigh = value!!.precision.add(value!!.value, 1).time
+  var useHigh = false
   val condition =
     when (this.prefix) {
-      ParamPrefixEnum.APPROXIMATE -> "BETWEEN index_from AND index_to"
-      ParamPrefixEnum.STARTS_AFTER -> " < index_from"
-      ParamPrefixEnum.ENDS_BEFORE -> " > index_to"
-      ParamPrefixEnum.NOT_EQUAL -> "NOT BETWEEN index_from AND index_to"
-      ParamPrefixEnum.EQUAL -> "BETWEEN index_from AND index_to"
-      ParamPrefixEnum.GREATERTHAN -> " > index_from"
-      ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> " >= index_from"
-      ParamPrefixEnum.LESSTHAN -> "< index_to"
-      ParamPrefixEnum.LESSTHAN_OR_EQUALS -> "<= index_to"
-      null -> "" // Possibly throw an error or provide a default value?
+      ParamPrefixEnum.APPROXIMATE -> {
+        val rangeHigh = value!!.precision.add(value!!.value, 10).time
+        val rangeLow = value!!.precision.add(value!!.value, -10).time
+        return SearchQuery(
+          """SELECT resourceId FROM DateIndexEntity
+              WHERE resourceType = ? AND index_name = ?
+              AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?""",
+          listOf(type.name, parameter.paramName, rangeLow, rangeHigh, rangeLow, rangeHigh)
+        )
+      }
+      ParamPrefixEnum.STARTS_AFTER -> ">= index_from".also { useHigh = true }
+      ParamPrefixEnum.ENDS_BEFORE -> "<= index_to"
+      ParamPrefixEnum.NOT_EQUAL ->
+        return SearchQuery(
+          """SELECT resourceId FROM DateIndexEntity
+              WHERE resourceType = ? AND index_name = ?
+              AND index_from NOT BETWEEN ? AND ? AND index_to NOT BETWEEN ? AND ?""",
+          listOf(
+            type.name,
+            parameter.paramName,
+            value!!.value.time,
+            tsHigh,
+            value!!.value.time,
+            tsHigh
+          )
+        )
+      ParamPrefixEnum.EQUAL, null ->
+        return SearchQuery(
+          """SELECT resourceId FROM DateIndexEntity
+              WHERE resourceType = ? AND index_name = ?
+              AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?""",
+          listOf(
+            type.name,
+            parameter.paramName,
+            value!!.value.time,
+            tsHigh,
+            value!!.value.time,
+            tsHigh
+          )
+        )
+      ParamPrefixEnum.GREATERTHAN -> "<= index_from".also { useHigh = true }
+      ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> "<= index_from"
+      ParamPrefixEnum.LESSTHAN -> ">= index_to"
+      ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ">= index_to".also { useHigh = true }
     }
   return SearchQuery(
     """
     SELECT resourceId FROM DateIndexEntity 
     WHERE resourceType = ? AND index_name = ? 
-    AND ? $condition
+    AND ? $condition 
   """,
-    listOf(type.name, parameter.paramName, value!!)
+    listOf(type.name, parameter.paramName, if (!useHigh) value!!.value.time else tsHigh)
   )
 }
 
