@@ -26,15 +26,12 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
-import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
-import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UrlType
 
 /**
@@ -61,118 +58,120 @@ object ResourceMapper {
    * This method assumes there is only one FHIR resource to be extracted from the given
    * `questionnaire` and `questionnaireResponse`.
    */
-  fun extract(
-    questionnaire: Questionnaire,
-    questionnaireResponse: QuestionnaireResponse
-  ): Resource {
+  fun extract(questionnaire: Questionnaire, questionnaireResponse: QuestionnaireResponse): Base {
     val className = questionnaire.itemContextNameToExpressionMap.values.first()
-    val resource = Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Resource
-
-    var questionnaireItemListIterator = questionnaire.item.iterator()
-    var questionnaireResponseItemListIterator = questionnaireResponse.item.iterator()
-    processItemIterator(
-      questionnaireItemListIterator,
-      questionnaireResponseItemListIterator,
-      resource
-    )
-    return resource
+    val base = Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Base
+    base.extractFields(questionnaire.item, questionnaireResponse.item)
+    return base
   }
 
-  private fun processItemIterator(
-    questionnaireItemListIterator: MutableIterator<Questionnaire.QuestionnaireItemComponent>,
-    questionnaireResponseItemListIterator:
-      MutableIterator<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
-    resource: Base
+  /**
+   * Extracts value for fields in the QuestionnaireResponse from the corresponding questions and
+   * answers in [questionnaireItemList] and [questionnaireResponseItemList] and updates it on the
+   * Base object target property. This method handles nested fields in the Questionnaire
+   */
+  private fun Base.extractFields(
+    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
   ) {
-    var questionnaireItemListIterator1 = questionnaireItemListIterator
-    var questionnaireResponseItemListIterator1 = questionnaireResponseItemListIterator
-    while (questionnaireItemListIterator1.hasNext() &&
-      questionnaireResponseItemListIterator1.hasNext()) {
-      val questionnaireItem = questionnaireItemListIterator1.next()
-      val questionnaireResponseItem = questionnaireResponseItemListIterator1.next()
+    val questionnaireItemListIterator = questionnaireItemList.iterator()
+    val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
+    while (questionnaireItemListIterator.hasNext() &&
+      questionnaireResponseItemListIterator.hasNext()) {
+      val questionnaireItem = questionnaireItemListIterator.next()
+      val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
 
-      if (questionnaireItem.definition == null) {
-        questionnaireItemListIterator1 = questionnaireItem.item.iterator()
-        questionnaireResponseItemListIterator1 = questionnaireResponseItem.item.iterator()
-        continue
+      extractField(questionnaireItem, questionnaireResponseItem)
+    }
+  }
+
+  /**
+   * Extracts value for field in the QuestionnaireResponse from the corresponding question and
+   * answer in [questionnaireItem] and [questionnaireResponseItem] and updates it on the Base object
+   * target property. This method handles nested fields in the Questionnaire
+   */
+  private fun Base.extractField(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+  ) {
+    if (questionnaireItem.definition == null) {
+      if (questionnaireItem.item != null && questionnaireResponseItem.item != null) {
+        this.extractFields(questionnaireItem.item, questionnaireResponseItem.item)
       }
+      return
+    }
 
-      val targetFieldName = questionnaireItem.definition.substringAfterLast(".")
-      if (targetFieldName.isEmpty()) {
-        questionnaireItemListIterator1 = questionnaireItem.item.iterator()
-        questionnaireResponseItemListIterator1 = questionnaireResponseItem.item.iterator()
-        continue
-      }
+    val targetFieldName = questionnaireItem.definitionFieldName ?: return
+    if (targetFieldName.isEmpty()) {
+      return
+    }
 
-      if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
-        // create a class for questionnaire item of type group and add to the resource
-        val propertyType = questionnaireItem.inferPropertyResourceClass
-        if (propertyType != null) {
-          val innerClass: Class<*> = Class.forName("${propertyType.name}")
-          val type: Base = innerClass.newInstance() as Base
+    if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
+      // create a class for questionnaire item of type group and add to the resource
+      val propertyType = questionnaireItem.inferPropertyResourceClass
+      if (propertyType != null) {
+        val base: Base = Class.forName(propertyType.name).newInstance() as Base
 
-          // TODO: Check for null on item for both the questionnaireItem and
-          //    questionnaireResponseItem
-          processItemIterator(
-            questionnaireItem.item.iterator(),
-            questionnaireResponseItem.item.iterator(),
-            type
-          )
-          // createInnerClassObject(type, questionnaireItem.item, questionnaireResponseItem.item)
+        if (questionnaireItem.item != null && questionnaireResponseItem.item != null) {
+          base.extractFields(questionnaireItem.item, questionnaireResponseItem.item)
 
           /*
           TODO: Update the methods to use add${targetFieldName} also for cases where the propertyType is
             parameterized. For cases where it's not, we should strictly use set${targetFieldName}Element
             or set${targetFieldName}
            */
-          updateTypeOrResourceWithAnswer(resource, type, targetFieldName, propertyType)
-          continue
+          this.updateFieldWithAnswer(base, targetFieldName, propertyType)
         }
       }
-
+    } else {
       // get answer from questionnaireResponse or from initial value in questionnaire
-      val ans = extractQuestionAnswer(questionnaireResponseItem, questionnaireItem) ?: continue
+      val ans = extractQuestionAnswer(questionnaireResponseItem, questionnaireItem) ?: return
+      val propertyType = questionnaireItem.inferPropertyResourceClass
 
-      var propertyType = questionnaireItem.inferPropertyResourceClass
-
-      /*
-      We have a org.hl7.fhir.r4.model.Enumerations class which contains inner classes of code-names and
-      re-implements the classes in the org.hl7.fhir.r4.model.codesystems package
-      The inner-classes in the Enumerations package are valid and not dependent on the classes in the codesystems package
-      All enum classes in the org.hl7.fhir.r4.model package implement the fromCode(), toCode() methods among others
-       */
       if (propertyType != null) {
         if (!propertyType.mainType.isEnum()) {
           // this is a low level type e.g. StringType
-          updateTypeOrResourceWithAnswer(resource, ans, targetFieldName, propertyType)
+          this.updateFieldWithAnswer(ans, targetFieldName, propertyType)
         } else {
           // this is a high level type e.g. AdministrativeGender
-          invokeSpecificMethodOfTypeOrResource(propertyType, targetFieldName, ans, resource)
+          this.updateFieldWithEnum(propertyType, targetFieldName, ans)
         }
       }
     }
   }
 }
 
-private fun invokeSpecificMethodOfTypeOrResource(
+/**
+ * Updates a field of name [targetFieldName] on this object with the generated enum from [ans] using
+ * the declared setter. [propertyType] helps to determine the field class type. The enum is
+ * generated by calling fromCode method on the enum class
+ */
+private fun Base.updateFieldWithEnum(
   propertyType: FieldType,
   targetFieldName: String,
-  ans: Type,
-  typeOrResource: Base
+  ans: Base,
 ) {
+  /*
+  We have a org.hl7.fhir.r4.model.Enumerations class which contains inner classes of code-names and
+  re-implements the classes in the org.hl7.fhir.r4.model.codesystems package
+  The inner-classes in the Enumerations package are valid and not dependent on the classes in the codesystems package
+  All enum classes in the org.hl7.fhir.r4.model package implement the fromCode(), toCode() methods among others
+   */
   val dataTypeClass: Class<*> = Class.forName(propertyType.name)
   val fromCodeMethod: Method = dataTypeClass.getDeclaredMethod("fromCode", String::class.java)
 
   val stringValue = if (ans is Coding) ans.code else ans.toString()
 
-  typeOrResource
-    .javaClass
+  this.javaClass
     .getMethod("set${targetFieldName.capitalize()}", Class.forName(propertyType.name))
-    .invoke(typeOrResource, fromCodeMethod.invoke(dataTypeClass, stringValue))
+    .invoke(this, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
 
-private fun updateTypeOrResourceWithAnswer(
-  typeOrResource: Base,
+/**
+ * Updates a field of name [targetFieldName] on this object with the value from [ans] using the
+ * declared setter. [propertyType] helps to determine the field class type.
+ */
+private fun Base.updateFieldWithAnswer(
   answer: Base,
   targetFieldName: String,
   fieldType: FieldType
@@ -180,10 +179,9 @@ private fun updateTypeOrResourceWithAnswer(
   val paramAns = generateAnswerWithCorrectType(answer, fieldType)
 
   try {
-    typeOrResource
-      .javaClass
+    this.javaClass
       .getMethod("set${targetFieldName.capitalize()}Element", fieldType.getMethodParam())
-      .invoke(typeOrResource, paramAns)
+      .invoke(this, paramAns)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
     /*
@@ -191,21 +189,20 @@ private fun updateTypeOrResourceWithAnswer(
       - But depend on the parameterized type
       - Use addField method where the answer is single i.e. does not match the collection type
      */
-    typeOrResource
-      .javaClass
+    this.javaClass
       .getMethod("set${targetFieldName.capitalize()}", fieldType.getMethodParam())
       .invoke(
-        typeOrResource,
-        if (fieldType.isParameterized() && fieldType.isList()) listOf(paramAns) else paramAns
+        this,
+        if (fieldType.isParameterized && fieldType.isList) listOf(paramAns) else paramAns
       )
   }
 }
 
 /**
  * This method enables us to perform an extra step to wrap the answer using the correct type. This
- * is useful in cases where a single question maps to a CompositeType such as CodeableConcept.
- * Normally, composite types are mapped using group questions which provide direct alignment to the
- * type elements in the group questions
+ * is useful in cases where a single question maps to a CompositeType such as [CodeableConcept] or
+ * enum. Normally, composite types are mapped using group questions which provide direct alignment
+ * to the type elements in the group questions
  */
 fun generateAnswerWithCorrectType(answer: Base, fieldType: FieldType): Base {
   when (fieldType.mainType) {
@@ -222,6 +219,10 @@ fun generateAnswerWithCorrectType(answer: Base, fieldType: FieldType): Base {
   return answer
 }
 
+/**
+ * Retrieve's the answer from [QuestionnaireResponse.answer] if it exists or alternatively uses the
+ * initial value set in the [Questionnaire.QuestionnaireItemComponent.initial]
+ */
 private fun extractQuestionAnswer(
   questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   questionnaireItem: Questionnaire.QuestionnaireItemComponent
@@ -274,7 +275,13 @@ private val Questionnaire.itemContextNameToExpressionMap: Map<String, String>
       .toMap()
   }
 
-private val Questionnaire.QuestionnaireItemComponent.inferPropertyResourceClass: FieldType?
+/**
+ * Extracts the Resource name and resource property name from the definition eg. extracts
+ * http://hl7.org/fhir/StructureDefinition/Patient#Patient.name into list("Patient", "name")
+ *
+ * @return list of resource-name and resource-element-name
+ */
+private val Questionnaire.QuestionnaireItemComponent.targetResourceAndElement: List<String>?
   get() {
     val pathParts = this.definition.split("#")
     if (pathParts.size >= 2) {
@@ -283,27 +290,42 @@ private val Questionnaire.QuestionnaireItemComponent.inferPropertyResourceClass:
           !TextUtils.isEmpty(modelAndField[0]) &&
           !TextUtils.isEmpty(modelAndField[1])
       ) {
-        var currentClass: Class<*> = Class.forName("org.hl7.fhir.r4.model.${modelAndField.get(0)}")
-        var parameterizedClass: Class<*>? = null
-
-        for (i in 1 until modelAndField.size) {
-          val declaredFields = currentClass.declaredFields
-          for (declaredField in declaredFields) if (declaredField.name.equals(modelAndField[i])) {
-            if (declaredField.genericType is ParameterizedType) {
-              currentClass =
-                (declaredField.genericType as ParameterizedType).actualTypeArguments[0] as Class<*>
-              parameterizedClass = declaredField.type
-            } else {
-              currentClass = declaredField.type
-              parameterizedClass = null
-            }
-
-            break
-          }
-        }
-
-        return FieldType(currentClass, parameterizedClass, currentClass.name)
+        return modelAndField
       }
+    }
+
+    return null
+  }
+
+/**
+ * Retrieve details about the target field defined in
+ * [org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent.definition] for easier searching
+ * of the setter methods and converting the answer to the expected parameter type
+ */
+private val Questionnaire.QuestionnaireItemComponent.inferPropertyResourceClass: FieldType?
+  get() {
+    val modelAndField = this.targetResourceAndElement
+    if (modelAndField != null) {
+      var currentClass: Class<*> = Class.forName("org.hl7.fhir.r4.model.${modelAndField.get(0)}")
+      var parameterizedClass: Class<*>? = null
+
+      for (i in 1 until modelAndField.size) {
+        val declaredFields = currentClass.declaredFields
+        for (declaredField in declaredFields) if (declaredField.name.equals(modelAndField[i])) {
+          if (declaredField.genericType is ParameterizedType) {
+            currentClass =
+              (declaredField.genericType as ParameterizedType).actualTypeArguments[0] as Class<*>
+            parameterizedClass = declaredField.type
+          } else {
+            currentClass = declaredField.type
+            parameterizedClass = null
+          }
+
+          break
+        }
+      }
+
+      return FieldType(currentClass, parameterizedClass, currentClass.name)
     }
 
     return null
@@ -317,13 +339,23 @@ private val Questionnaire.QuestionnaireItemComponent.inferPropertyResourceClass:
 private const val ITEM_CONTEXT_EXTENSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext"
 
+/**
+ * Holds information on a {@code Base} field .
+ *
+ * This data class holds the parameterized type, main type and the field name. For example, with
+ * {@code org.hl7.fhir.r4.Patient#telecom} field, the parameterized type is {@code List}, main type
+ * is {@code ContactPoint} and the field name is "telecom" since the field is a list of {@code
+ * ContactPoint}. This class facilitates the use of reflection to retrieve the method and update the
+ * field. Other examples:
+ * - Patient#name = FieldType(String::javaClass, null, "name")
+ * - Patient#identifer = FieldType(Identifier::javaClass, List::javaClass, "identifier)
+ */
 data class FieldType(val mainType: Class<*>, val parameterizedType: Class<*>?, val name: String)
 
-fun FieldType.isList(): Boolean = parameterizedType?.simpleName.equals(List::class.java.simpleName)
+private val FieldType.isList: Boolean
+  get() = parameterizedType?.simpleName.equals(List::class.java.simpleName)
 
-fun FieldType.isEnumeration(): Boolean =
-  parameterizedType?.name.equals(Enumeration<*>::javaClass.name) // Enumeration::class.java.name
+private val FieldType.isParameterized: Boolean
+  get() = parameterizedType != null
 
-fun FieldType.isParameterized(): Boolean = parameterizedType != null
-
-fun FieldType.getMethodParam(): Class<*> = if (isParameterized()) parameterizedType!! else mainType
+fun FieldType.getMethodParam(): Class<*> = if (isParameterized) parameterizedType!! else mainType
