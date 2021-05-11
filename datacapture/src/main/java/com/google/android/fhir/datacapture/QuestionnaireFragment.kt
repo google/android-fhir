@@ -29,8 +29,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.collect
 
-class QuestionnaireFragment : Fragment() {
+class QuestionnaireFragment() : Fragment() {
   private val viewModel: QuestionnaireViewModel by viewModels()
+  private var mapper: ViewPicker? = null
+
+  constructor(mapper: ViewPicker): this() {
+    this.mapper = mapper
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -53,7 +58,7 @@ class QuestionnaireFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-    val adapter = QuestionnaireItemAdapter()
+    val adapter = QuestionnaireItemAdapter(mapper)
     recyclerView.adapter = adapter
     recyclerView.layoutManager = LinearLayoutManager(view.context)
 
