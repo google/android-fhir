@@ -34,7 +34,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * `questionnaireResponseItemBuilder` is changed to inform the rest of the questionnaire to be
  * updated
  */
-internal data class QuestionnaireItemViewItem(
+data class QuestionnaireItemViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
   val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   val questionnaireResponseItemChangedCallback: () -> Unit

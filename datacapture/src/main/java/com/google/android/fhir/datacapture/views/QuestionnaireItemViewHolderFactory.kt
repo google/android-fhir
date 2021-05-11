@@ -47,7 +47,7 @@ abstract class QuestionnaireItemViewHolderFactory(@LayoutRes val resId: Int) {
  *
  * This is used by [QuestionnaireItemAdapter] to initialize views and bind items in [RecyclerView].
  */
-internal class QuestionnaireItemViewHolder(
+open class QuestionnaireItemViewHolder(
   itemView: View,
   private val delegate: QuestionnaireItemViewHolderDelegate
 ) : RecyclerView.ViewHolder(itemView) {
@@ -55,7 +55,7 @@ internal class QuestionnaireItemViewHolder(
     delegate.init(itemView)
   }
 
-  fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+  open fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     delegate.bind(questionnaireItemViewItem)
   }
 }
@@ -70,7 +70,7 @@ internal class QuestionnaireItemViewHolder(
  * is a unique [QuestionnaireItemViewHolderDelegate] for each [QuestionnaireItemViewHolder]. This is
  * critical for the correctness of the recycler view.
  */
-internal interface QuestionnaireItemViewHolderDelegate {
+interface QuestionnaireItemViewHolderDelegate {
   /**
    * Initializes the view in [QuestionnaireItemViewHolder]. Any listeners to record user input
    * should be set in this function.
