@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import com.google.android.fhir.datacapture.views.QuestionnaireItemBarCodeReaderViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDateTimePickerViewHolderFactory
@@ -51,7 +52,7 @@ internal class QuestionnaireItemAdapter :
         QuestionnaireItemViewHolderType.DATE_TIME_PICKER ->
           QuestionnaireItemDateTimePickerViewHolderFactory
         QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE ->
-          QuestionnaireItemEditTextSingleLineViewHolderFactory
+          QuestionnaireItemBarCodeReaderViewHolderFactory
         QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE ->
           QuestionnaireItemEditTextMultiLineViewHolderFactory
         QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER ->

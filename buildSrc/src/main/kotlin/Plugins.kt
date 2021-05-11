@@ -24,6 +24,7 @@ object Plugins {
     const val mavenPublish = "maven-publish"
     const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
     const val spotless = "com.diffplug.spotless"
+    const val parcelize = "kotlin-parcelize"
   }
 
   // classpath plugins
@@ -34,7 +35,7 @@ object Plugins {
     "androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.Versions.Androidx.navigation}"
 
   object Versions {
-    const val androidGradlePlugin = "4.2.0-beta06"
+    const val androidGradlePlugin = "4.2.0"
     const val buildTools = "30.0.2"
   }
 }
