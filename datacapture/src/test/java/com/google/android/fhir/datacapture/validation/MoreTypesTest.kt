@@ -33,56 +33,87 @@ import org.robolectric.annotation.Config
 class MoreTypesTest {
 
   @Test
-  fun shouldReturnValidResult() {
+  fun compareTo_int_shouldReturnPositiveValue() {
     val integerValue = IntegerType()
     integerValue.value = 20
     val integerValueToBeCompared = IntegerType()
     integerValueToBeCompared.value = 19
-    assertThat(integerValue > integerValueToBeCompared).isTrue()
+    assertThat(integerValue.compareTo(integerValueToBeCompared)).isEqualTo(1)
   }
 
   @Test
-  fun shouldReturnValidResultForDecimal() {
+  fun compareTo_int_shouldReturnZero() {
+    val integerValue = IntegerType()
+    integerValue.value = 20
+    val integerValueToBeCompared = IntegerType()
+    integerValueToBeCompared.value = 20
+    assertThat(integerValue.compareTo(integerValueToBeCompared)).isEqualTo(0)
+  }
+
+  @Test
+  fun compareTo_int_shouldReturnNegativeValue() {
+    val integerValue = IntegerType()
+    integerValue.value = 19
+    val integerValueToBeCompared = IntegerType()
+    integerValueToBeCompared.value = 20
+    assertThat(integerValue.compareTo(integerValueToBeCompared)).isEqualTo(-1)
+  }
+
+  @Test
+  fun compareTo_decimal_shouldReturnPositiveValue() {
     val decimalValue = DecimalType()
     decimalValue.setValue(20.2)
     val decimalValueToBeCompared = DecimalType()
     decimalValueToBeCompared.setValue(19.21)
-    assertThat(decimalValue > decimalValueToBeCompared).isTrue()
+    assertThat(decimalValue.compareTo(decimalValueToBeCompared)).isEqualTo(1)
   }
 
   @Test
-  fun shouldReturnValidResultForDateTimeType() {
-    val dateValue = DateType()
-    dateValue.value = Calendar.getInstance().time
-    val dateValueToBeCompared = DateType()
-    dateValueToBeCompared.value = Date(94, 5, 6)
-    assertThat(dateValue > dateValueToBeCompared).isTrue()
+  fun compareTo_decimal_shouldReturnZero() {
+    val decimalValue = DecimalType()
+    decimalValue.setValue(20.2)
+    val decimalValueToBeCompared = DecimalType()
+    decimalValueToBeCompared.setValue(20.2)
+    assertThat(decimalValue.compareTo(decimalValueToBeCompared)).isEqualTo(0)
   }
 
   @Test
-  fun shouldReturnInvalidValidResult() {
-    val integerValue = IntegerType()
-    integerValue.value = 20
-    val integerValueToBeCompared = IntegerType()
-    integerValueToBeCompared.value = 19
-    assertThat(integerValue < integerValueToBeCompared).isFalse()
-  }
-
-  @Test
-  fun shouldReturnInvalidResultForDecimal() {
+  fun compareTo_decimal_shouldReturnNegativeValue() {
     val decimalValue = DecimalType()
     decimalValue.setValue(19.21)
     val decimalValueToBeCompared = DecimalType()
     decimalValueToBeCompared.setValue(20.2)
-    assertThat(decimalValue > decimalValueToBeCompared).isFalse()
+    assertThat(decimalValue.compareTo(decimalValueToBeCompared)).isEqualTo(-1)
   }
 
   @Test
-  fun shouldReturnInvalidResultForDateTimeType() {
+  fun compareTo_dateTime_shouldReturnPositiveValue() {
     val dateValue = DateType()
-    dateValue.value = Date(94, 5, 6)
+    dateValue.value = Calendar.getInstance().time
+    val dateValueToBeCompared = DateType()
+    val calendarInstance = Calendar.getInstance()
+    calendarInstance.set(1994, 5, 6)
+    dateValueToBeCompared.value = calendarInstance.time
+    assertThat(dateValue.compareTo(dateValueToBeCompared)).isEqualTo(1)
+  }
+
+  @Test
+  fun compareTo_dateTime_shouldReturnZero() {
+    val dateValue = DateType()
+    dateValue.value = Calendar.getInstance().time
     val dateValueToBeCompared = DateType()
     dateValueToBeCompared.value = Calendar.getInstance().time
-    assertThat(dateValue > dateValueToBeCompared).isFalse()
+    assertThat(dateValue.compareTo(dateValueToBeCompared)).isEqualTo(0)
+  }
+
+  @Test
+  fun compareTo_dateTime_shouldReturnNegativeValue() {
+    val dateValue = DateType()
+    val calendarInstance = Calendar.getInstance()
+    calendarInstance.set(1994, 5, 6)
+    dateValue.value = calendarInstance.time
+    val dateValueToBeCompared = DateType()
+    dateValueToBeCompared.value = Calendar.getInstance().time
+    assertThat(dateValue.compareTo(dateValueToBeCompared)).isEqualTo(-1)
   }
 }
