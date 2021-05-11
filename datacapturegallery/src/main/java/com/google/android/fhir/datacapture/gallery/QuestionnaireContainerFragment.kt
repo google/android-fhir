@@ -65,7 +65,7 @@ class QuestionnaireContainerFragment : Fragment() {
     }
     // Only add the fragment once, when this fragment is first created.
     if (savedInstanceState == null) {
-      val fragment = QuestionnaireFragment()
+      val fragment = QuestionnaireFragment(CustomViewPicker)
       fragment.arguments =
         bundleOf(
           QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire,

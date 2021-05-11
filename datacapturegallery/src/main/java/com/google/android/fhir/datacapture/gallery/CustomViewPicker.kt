@@ -8,9 +8,6 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFact
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire
 
-/**
- * Created by Vincent Karuri on 11/05/2021
- */
 object CustomViewPicker: ViewPicker {
 
     override fun pick(viewType: Int): QuestionnaireItemViewHolderFactory? {
