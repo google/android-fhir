@@ -19,7 +19,6 @@ package com.google.android.fhir.index
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
-import com.google.android.fhir.asString
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.NumberIndex
 import com.google.android.fhir.index.entities.PositionIndex
@@ -165,13 +164,59 @@ internal object ResourceIndexer {
       else -> null
     }
 
+  /**
+   * Extension to expresses [HumanName] as a separated string using [separator]. See
+   * https://www.hl7.org/fhir/patient.html#search
+   */
+  private fun HumanName.asString(separator: CharSequence = " "): String {
+    return listOfNotNull(
+        prefix
+          ?.filter { it != null && !it.value.isNullOrBlank() }
+          ?.joinToString(separator = separator),
+        given
+          ?.filter { it != null && !it.value.isNullOrBlank() }
+          ?.joinToString(separator = separator),
+        family,
+        suffix
+          ?.filter { it != null && !it.value.isNullOrBlank() }
+          ?.joinToString(separator = separator),
+        text
+      )
+      .filter { it.isNotBlank() }
+      .joinToString(separator)
+  }
+  /**
+   * Extension to expresses [Address] as a string using [separator]. See
+   * https://www.hl7.org/fhir/patient.html#search
+   */
+  private fun Address.asString(separator: CharSequence = ", "): String {
+    return listOfNotNull(
+        line
+          ?.filter { it != null && !it.value.isNullOrBlank() }
+          ?.joinToString(separator = separator),
+        city,
+        district,
+        state,
+        country,
+        postalCode,
+        text
+      )
+      .filter { it.isNotBlank() }
+      .joinToString(separator)
+  }
+
   private fun stringIndex(searchParam: SearchParamDefinition, value: Base): StringIndex? =
     if (!value.isEmpty) {
-      when (value) {
-        is HumanName -> StringIndex(searchParam.name, searchParam.path, value.asString())
-        is Address -> StringIndex(searchParam.name, searchParam.path, value.asString())
-        else -> StringIndex(searchParam.name, searchParam.path, value.toString())
-      }
+      StringIndex(
+        searchParam.name,
+        searchParam.path,
+        value =
+          when (value) {
+            is HumanName -> value.asString()
+            is Address -> value.asString()
+            else -> value.toString()
+          }
+      )
     } else {
       null
     }
