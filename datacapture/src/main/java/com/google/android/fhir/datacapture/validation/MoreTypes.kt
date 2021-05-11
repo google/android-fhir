@@ -22,18 +22,21 @@ import org.hl7.fhir.r4.model.Type
 
 operator fun Type.compareTo(value: Type?): Int {
   if (value != null) {
+    if (!this.fhirType().equals(value.fhirType())) {
+      throw IllegalArgumentException("FHIR data types do not match")
+    }
     when {
-      this.fhirType().equals("integer") && value.fhirType().equals("integer") -> {
+      this.fhirType().equals("integer") -> {
         return this.primitiveValue().toInt().compareTo(value.primitiveValue().toInt())
       }
-      this.fhirType().equals("decimal") && value.fhirType().equals("decimal") -> {
+      this.fhirType().equals("decimal") -> {
         return this.primitiveValue().toBigDecimal().compareTo(value.primitiveValue().toBigDecimal())
       }
-      this.fhirType().equals("date") && value.fhirType().equals("date") -> {
+      this.fhirType().equals("date") -> {
         return clearTimeFromDateValue(this.dateTimeValue().value)
           .compareTo(clearTimeFromDateValue(value.dateTimeValue().value))
       }
-      this.fhirType().equals("dateTime") && value.fhirType().equals("dateTime") -> {
+      this.fhirType().equals("dateTime") -> {
         return this.dateTimeValue().value.compareTo(value.dateTimeValue().value)
       }
       else -> {

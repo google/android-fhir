@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.validation
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
-import java.util.Date
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.IntegerType
@@ -115,5 +114,14 @@ class MoreTypesTest {
     val dateValueToBeCompared = DateType()
     dateValueToBeCompared.value = Calendar.getInstance().time
     assertThat(dateValue.compareTo(dateValueToBeCompared)).isEqualTo(-1)
+  }
+
+  @Test(expected = IllegalArgumentException::class)
+  fun compareTo_shouldThrowExceptionInCaseOfTypeMismatch() {
+    val decimalValue = DecimalType()
+    decimalValue.setValue(19.21)
+    val integerValue = IntegerType()
+    integerValue.value = 19
+    assertThat(decimalValue > integerValue)
   }
 }
