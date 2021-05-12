@@ -25,22 +25,9 @@ internal object MaxValueConstraintValidator :
     predicate = {
       extension: Extension,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
-      when {
-        extension.value.fhirType().equals("integer") && answer.hasValueIntegerType() -> {
-          answer.valueIntegerType.value > extension.value.primitiveValue().toInt()
-        }
-        else -> false
-      }
+      answer.value > extension.value
     },
-    { extension: Extension, answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
-      ->
-      when {
-        extension.value.fhirType().equals("integer") && answer.hasValueIntegerType() -> {
-          "Maximum value allowed is:" + extension.value.primitiveValue().toInt().toString()
-        }
-        else -> ""
-      }
-    }
+    { extension: Extension -> "Maximum value allowed is:" + extension.value.primitiveValue() }
   )
 
 internal const val MAX_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/maxValue"
