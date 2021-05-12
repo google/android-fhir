@@ -33,6 +33,8 @@ import androidx.navigation.fragment.navArgs
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.gallery.databinding.FragmentQuestionnaireContainerBinding
+import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 class QuestionnaireContainerFragment : Fragment() {
@@ -65,7 +67,17 @@ class QuestionnaireContainerFragment : Fragment() {
     }
     // Only add the fragment once, when this fragment is first created.
     if (savedInstanceState == null) {
-      val fragment = QuestionnaireFragment(CustomViewPicker)
+
+      val fragment = object : QuestionnaireFragment() {
+        override fun pick(viewType: Int): QuestionnaireItemViewHolderFactory? {
+          return CustomViewPicker.pick(viewType)
+        }
+
+        override fun getType(questionnaireItem: Questionnaire.QuestionnaireItemComponent): Int? {
+          return CustomViewPicker.getType(questionnaireItem)
+        }
+      }
+
       fragment.arguments =
         bundleOf(
           QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire,
