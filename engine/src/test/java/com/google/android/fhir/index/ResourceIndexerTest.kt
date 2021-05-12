@@ -907,7 +907,7 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_string_humanname() {
+  fun index_string_humanName() {
     val patient =
       Patient().apply {
         id = "non-null-ID"
@@ -922,33 +922,28 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientName = "Mr. Pieter van de Heuvel MSc"
     assertThat(resourceIndices.stringIndices)
       .containsAtLeast(
-        StringIndex("name", "Patient.name", patientName),
-        StringIndex("phonetic", "Patient.name", patientName)
+        StringIndex("name", "Patient.name", "Mr. Pieter van de Heuvel MSc"),
+        StringIndex("phonetic", "Patient.name", "Mr. Pieter van de Heuvel MSc")
       )
   }
 
   @Test
-  fun index_string_humanname_all_null() {
+  fun index_string_humanName_null_shouldNotIndexHumanName() {
     val patient =
       Patient().apply {
         id = "non-null-ID"
-        addName(HumanName().apply {})
+        addName(HumanName())
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientName = "Mr. Pieter van de Heuvel MSc"
-    assertThat(resourceIndices.stringIndices)
-      .containsNoneOf(
-        StringIndex("name", "Patient.name", patientName),
-        StringIndex("phonetic", "Patient.name", patientName)
-      )
+    assertThat(resourceIndices.stringIndices.any { it.name == "name" }).isFalse()
+    assertThat(resourceIndices.stringIndices.any { it.name == "phonetic" }).isFalse()
   }
 
   @Test
-  fun index_string_humanname_all_empty() {
+  fun index_string_humanName_empty_shouldNotIndexHumanName() {
     val patient =
       Patient().apply {
         id = "non-null-ID"
@@ -963,39 +958,12 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientName = "Mr. Pieter van de Heuvel MSc"
-    assertThat(resourceIndices.stringIndices)
-      .containsNoneOf(
-        StringIndex("name", "Patient.name", patientName),
-        StringIndex("phonetic", "Patient.name", patientName)
-      )
+    assertThat(resourceIndices.stringIndices.any { it.path == "name" }).isFalse()
+    assertThat(resourceIndices.stringIndices.any { it.name == "phonetic" }).isFalse()
   }
 
   @Test
-  fun index_string_humanname_null_prefix() {
-    val patient =
-      Patient().apply {
-        id = "non-null-ID"
-        addName(
-          HumanName().apply {
-            given = listOf(StringType("Pieter"))
-            family = "van de Heuvel"
-            suffix = listOf(StringType("MSc"))
-          }
-        )
-      }
-
-    val resourceIndices = ResourceIndexer.index(patient)
-    val patientName = "Pieter van de Heuvel MSc"
-    assertThat(resourceIndices.stringIndices)
-      .containsAtLeast(
-        StringIndex("name", "Patient.name", patientName),
-        StringIndex("phonetic", "Patient.name", patientName)
-      )
-  }
-
-  @Test
-  fun index_string_humanname_multiple_prefix() {
+  fun index_string_humanName_multipleListValues() {
     val patient =
       Patient().apply {
         id = "non-null-ID"
@@ -1003,71 +971,68 @@ class ResourceIndexerTest {
           HumanName().apply {
             prefix =
               listOf(null, StringType(null), StringType(""), StringType(" "), StringType("Mr."))
-            given = listOf(StringType("Pieter"))
-            family = "van de Heuvel"
-            suffix = listOf(StringType("MSc"))
-          }
-        )
-      }
-
-    val resourceIndices = ResourceIndexer.index(patient)
-    val patientName = "Mr. Pieter van de Heuvel MSc"
-    assertThat(resourceIndices.stringIndices)
-      .containsAtLeast(
-        StringIndex("name", "Patient.name", patientName),
-        StringIndex("phonetic", "Patient.name", patientName)
-      )
-  }
-
-  @Test
-  fun index_string_humanname_null_given() {
-    val patient =
-      Patient().apply {
-        id = "non-null-ID"
-        addName(
-          HumanName().apply {
-            prefix = listOf(StringType("Mr."))
-            family = "van de Heuvel"
-            suffix = listOf(StringType("MSc"))
-          }
-        )
-      }
-
-    val resourceIndices = ResourceIndexer.index(patient)
-    val patientName = "Mr. van de Heuvel MSc"
-    assertThat(resourceIndices.stringIndices)
-      .containsAtLeast(
-        StringIndex("name", "Patient.name", patientName),
-        StringIndex("phonetic", "Patient.name", patientName)
-      )
-  }
-
-  @Test
-  fun index_string_humanname_multiple_given() {
-    val patient =
-      Patient().apply {
-        id = "non-null-ID"
-        addName(
-          HumanName().apply {
-            prefix = listOf(StringType("Mr."))
             given =
               listOf(null, StringType(null), StringType(""), StringType(" "), StringType("Pieter"))
             family = "van de Heuvel"
+            suffix =
+              listOf(null, StringType(null), StringType(""), StringType(" "), StringType("MSc"))
+          }
+        )
+      }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.stringIndices)
+      .containsAtLeast(
+        StringIndex("name", "Patient.name", "Mr. Pieter van de Heuvel MSc"),
+        StringIndex("phonetic", "Patient.name", "Mr. Pieter van de Heuvel MSc")
+      )
+  }
+
+  @Test
+  fun index_string_humanName_null_prefix() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        addName(
+          HumanName().apply {
+            given = listOf(StringType("Pieter"))
+            family = "van de Heuvel"
             suffix = listOf(StringType("MSc"))
           }
         )
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientName = "Mr. Pieter van de Heuvel MSc"
     assertThat(resourceIndices.stringIndices)
       .containsAtLeast(
-        StringIndex("name", "Patient.name", patientName),
-        StringIndex("phonetic", "Patient.name", patientName)
+        StringIndex("name", "Patient.name", "Pieter van de Heuvel MSc"),
+        StringIndex("phonetic", "Patient.name", "Pieter van de Heuvel MSc")
       )
   }
 
-  fun index_string_humanname_null_family() {
+  @Test
+  fun index_string_humanName_null_given() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        addName(
+          HumanName().apply {
+            prefix = listOf(StringType("Mr."))
+            family = "van de Heuvel"
+            suffix = listOf(StringType("MSc"))
+          }
+        )
+      }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.stringIndices)
+      .containsAtLeast(
+        StringIndex("name", "Patient.name", "Mr. van de Heuvel MSc"),
+        StringIndex("phonetic", "Patient.name", "Mr. van de Heuvel MSc")
+      )
+  }
+
+  fun index_string_humanName_null_family() {
     val patient =
       Patient().apply {
         id = "non-null-ID"
@@ -1081,16 +1046,15 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientName = "Mr. Pieter MSc"
     assertThat(resourceIndices.stringIndices)
       .containsAtLeast(
-        StringIndex("name", "Patient.name", patientName),
-        StringIndex("phonetic", "Patient.name", patientName)
+        StringIndex("name", "Patient.name", "Mr. Pieter MSc"),
+        StringIndex("phonetic", "Patient.name", "Mr. Pieter MSc")
       )
   }
 
   @Test
-  fun index_string_humanname_empty_family() {
+  fun index_string_humanName_empty_family() {
     val patient =
       Patient().apply {
         id = "non-null-ID"
@@ -1105,16 +1069,15 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientName = "Mr. Pieter MSc"
     assertThat(resourceIndices.stringIndices)
       .containsAtLeast(
-        StringIndex("name", "Patient.name", patientName),
-        StringIndex("phonetic", "Patient.name", patientName)
+        StringIndex("name", "Patient.name", "Mr. Pieter MSc"),
+        StringIndex("phonetic", "Patient.name", "Mr. Pieter MSc")
       )
   }
 
   @Test
-  fun index_string_humanname_null_suffix() {
+  fun index_string_humanName_null_suffix() {
     val patient =
       Patient().apply {
         id = "non-null-ID"
@@ -1128,36 +1091,10 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientName = "Mr. Pieter van de Heuvel"
     assertThat(resourceIndices.stringIndices)
       .containsAtLeast(
-        StringIndex("name", "Patient.name", patientName),
-        StringIndex("phonetic", "Patient.name", patientName)
-      )
-  }
-
-  @Test
-  fun index_string_humanname_multiple_suffix() {
-    val patient =
-      Patient().apply {
-        id = "non-null-ID"
-        addName(
-          HumanName().apply {
-            prefix = listOf(StringType("Mr."))
-            given = listOf(StringType("Pieter"))
-            family = "van de Heuvel"
-            suffix =
-              listOf(null, StringType(null), StringType(""), StringType(" "), StringType("MSc"))
-          }
-        )
-      }
-
-    val resourceIndices = ResourceIndexer.index(patient)
-    val patientName = "Mr. Pieter van de Heuvel MSc"
-    assertThat(resourceIndices.stringIndices)
-      .containsAtLeast(
-        StringIndex("name", "Patient.name", patientName),
-        StringIndex("phonetic", "Patient.name", patientName)
+        StringIndex("name", "Patient.name", "Mr. Pieter van de Heuvel"),
+        StringIndex("phonetic", "Patient.name", "Mr. Pieter van de Heuvel")
       )
   }
 
@@ -1179,13 +1116,18 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientAddress = "Van Egmondkade 23, Amsterdam, Amsterdam, NLD, 1024 RJ"
     assertThat(resourceIndices.stringIndices)
-      .contains(StringIndex("address", "Patient.address", patientAddress))
+      .contains(
+        StringIndex(
+          "address",
+          "Patient.address",
+          "Van Egmondkade 23, Amsterdam, Amsterdam, NLD, 1024 RJ"
+        )
+      )
   }
 
   @Test
-  fun index_string_null_address() {
+  fun index_string_address_null_shouldNotIndexAddress() {
     val patient =
       Patient().apply {
         id = "non-null-ID"
@@ -1197,7 +1139,7 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_string_empty_address() {
+  fun index_string_address_empty_shouldNotIndexAddress() {
     val patient =
       Patient().apply {
         id = "non-null-ID"
@@ -1235,9 +1177,8 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientAddress = "Amsterdam, Amsterdam, NLD, 1024 RJ"
     assertThat(resourceIndices.stringIndices)
-      .contains(StringIndex("address", "Patient.address", patientAddress))
+      .contains(StringIndex("address", "Patient.address", "Amsterdam, Amsterdam, NLD, 1024 RJ"))
   }
 
   @Test
@@ -1258,9 +1199,10 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientAddress = "Van Egmondkade 23, Amsterdam, NLD, 1024 RJ"
     assertThat(resourceIndices.stringIndices)
-      .contains(StringIndex("address", "Patient.address", patientAddress))
+      .contains(
+        StringIndex("address", "Patient.address", "Van Egmondkade 23, Amsterdam, NLD, 1024 RJ")
+      )
   }
 
   @Test
@@ -1281,9 +1223,10 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientAddress = "Van Egmondkade 23, Amsterdam, NLD, 1024 RJ"
     assertThat(resourceIndices.stringIndices)
-      .contains(StringIndex("address", "Patient.address", patientAddress))
+      .contains(
+        StringIndex("address", "Patient.address", "Van Egmondkade 23, Amsterdam, NLD, 1024 RJ")
+      )
   }
 
   @Test
@@ -1304,13 +1247,18 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientAddress = "Van Egmondkade 23, Amsterdam, Amsterdam, 1024 RJ"
     assertThat(resourceIndices.stringIndices)
-      .contains(StringIndex("address", "Patient.address", patientAddress))
+      .contains(
+        StringIndex(
+          "address",
+          "Patient.address",
+          "Van Egmondkade 23, Amsterdam, Amsterdam, 1024 RJ"
+        )
+      )
   }
 
   @Test
-  fun index_string_address_null_postalcode() {
+  fun index_string_address_null_postalCode() {
     val patient =
       Patient().apply {
         id = "non-null-ID"
@@ -1327,9 +1275,10 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientAddress = "Van Egmondkade 23, Amsterdam, Amsterdam, NLD"
     assertThat(resourceIndices.stringIndices)
-      .contains(StringIndex("address", "Patient.address", patientAddress))
+      .contains(
+        StringIndex("address", "Patient.address", "Van Egmondkade 23, Amsterdam, Amsterdam, NLD")
+      )
   }
 
   @Test
@@ -1350,9 +1299,8 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientAddress = "Amsterdam, Amsterdam, NLD, 1024 RJ"
     assertThat(resourceIndices.stringIndices)
-      .contains(StringIndex("address", "Patient.address", patientAddress))
+      .contains(StringIndex("address", "Patient.address", "Amsterdam, Amsterdam, NLD, 1024 RJ"))
   }
 
   @Test
@@ -1373,9 +1321,10 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientAddress = "Van Egmondkade 23, Amsterdam, NLD, 1024 RJ"
     assertThat(resourceIndices.stringIndices)
-      .contains(StringIndex("address", "Patient.address", patientAddress))
+      .contains(
+        StringIndex("address", "Patient.address", "Van Egmondkade 23, Amsterdam, NLD, 1024 RJ")
+      )
   }
 
   @Test
@@ -1396,9 +1345,10 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientAddress = "Van Egmondkade 23, Amsterdam, NLD, 1024 RJ"
     assertThat(resourceIndices.stringIndices)
-      .contains(StringIndex("address", "Patient.address", patientAddress))
+      .contains(
+        StringIndex("address", "Patient.address", "Van Egmondkade 23, Amsterdam, NLD, 1024 RJ")
+      )
   }
 
   @Test
@@ -1419,13 +1369,18 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientAddress = "Van Egmondkade 23, Amsterdam, Amsterdam, 1024 RJ"
     assertThat(resourceIndices.stringIndices)
-      .contains(StringIndex("address", "Patient.address", patientAddress))
+      .contains(
+        StringIndex(
+          "address",
+          "Patient.address",
+          "Van Egmondkade 23, Amsterdam, Amsterdam, 1024 RJ"
+        )
+      )
   }
 
   @Test
-  fun index_string_address_empty_postalcode() {
+  fun index_string_address_empty_postalCode() {
     val patient =
       Patient().apply {
         id = "non-null-ID"
@@ -1442,9 +1397,10 @@ class ResourceIndexerTest {
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
-    val patientAddress = "Van Egmondkade 23, Amsterdam, Amsterdam, NLD"
     assertThat(resourceIndices.stringIndices)
-      .contains(StringIndex("address", "Patient.address", patientAddress))
+      .contains(
+        StringIndex("address", "Patient.address", "Van Egmondkade 23, Amsterdam, Amsterdam, NLD")
+      )
   }
 
   private companion object {

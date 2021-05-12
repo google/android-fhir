@@ -169,38 +169,29 @@ internal object ResourceIndexer {
    * https://www.hl7.org/fhir/patient.html#search
    */
   private fun HumanName.asString(separator: CharSequence = " "): String {
-    return listOfNotNull(
-        prefix
-          ?.filter { it != null && !it.value.isNullOrBlank() }
-          ?.joinToString(separator = separator),
-        given
-          ?.filter { it != null && !it.value.isNullOrBlank() }
-          ?.joinToString(separator = separator),
-        family,
-        suffix
-          ?.filter { it != null && !it.value.isNullOrBlank() }
-          ?.joinToString(separator = separator),
-        text
-      )
+    return (prefix.filterNotNull().map { it.value } +
+        given.filterNotNull().map { it.value } +
+        family +
+        suffix.filterNotNull().map { it.value } +
+        text)
+      .filterNotNull()
       .filter { it.isNotBlank() }
       .joinToString(separator)
   }
+
   /**
    * Extension to expresses [Address] as a string using [separator]. See
    * https://www.hl7.org/fhir/patient.html#search
    */
   private fun Address.asString(separator: CharSequence = ", "): String {
-    return listOfNotNull(
-        line
-          ?.filter { it != null && !it.value.isNullOrBlank() }
-          ?.joinToString(separator = separator),
-        city,
-        district,
-        state,
-        country,
-        postalCode,
-        text
-      )
+    return (line.filterNotNull().map { it.value } +
+        city +
+        district +
+        state +
+        country +
+        postalCode +
+        text)
+      .filterNotNull()
       .filter { it.isNotBlank() }
       .joinToString(separator)
   }
