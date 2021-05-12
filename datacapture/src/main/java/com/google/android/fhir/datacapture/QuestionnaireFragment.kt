@@ -74,7 +74,7 @@ open class QuestionnaireFragment : Fragment(), ViewPicker {
   }
 
   override fun pick(viewType: Int): QuestionnaireItemViewHolderFactory? {
-     return null
+    return null
   }
 
   override fun getType(questionnaireItem: Questionnaire.QuestionnaireItemComponent): Int? {

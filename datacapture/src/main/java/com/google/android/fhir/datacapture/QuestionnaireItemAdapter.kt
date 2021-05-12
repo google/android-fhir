@@ -19,7 +19,20 @@ package com.google.android.fhir.datacapture
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.google.android.fhir.datacapture.views.*
+import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemDateTimePickerViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemDisplayViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemDropDownViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextDecimalViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextIntegerViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextMultiLineViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextQuantityViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextSingleLineViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
+import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
@@ -74,8 +87,12 @@ internal open class QuestionnaireItemAdapter(val mapper: ViewPicker?) :
     return getItemViewTypeMapping(getItem(position).questionnaireItem)
   }
 
-  internal fun getItemViewTypeMapping(questionnaireItem: Questionnaire.QuestionnaireItemComponent): Int {
-    mapper?.getType(questionnaireItem)?.let { return it }
+  internal fun getItemViewTypeMapping(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent
+  ): Int {
+    mapper?.getType(questionnaireItem)?.let {
+      return it
+    }
     return when (val type = questionnaireItem.type) {
       QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP
       QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX

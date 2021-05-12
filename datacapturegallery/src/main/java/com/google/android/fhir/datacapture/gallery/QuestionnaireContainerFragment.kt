@@ -33,8 +33,6 @@ import androidx.navigation.fragment.navArgs
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.gallery.databinding.FragmentQuestionnaireContainerBinding
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
-import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 class QuestionnaireContainerFragment : Fragment() {
