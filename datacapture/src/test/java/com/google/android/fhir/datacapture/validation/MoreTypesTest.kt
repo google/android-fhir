@@ -124,9 +124,8 @@ class MoreTypesTest {
     val integerValue = IntegerType()
     integerValue.value = 19
     val exception =
-      assertThrows(IllegalArgumentException::class.java) {
-        decimalValue > integerValue
-      }
-    assertThat(exception.message).isEqualTo("Cannot compare different data types: decimal and integer")
+      assertThrows(IllegalArgumentException::class.java) { decimalValue > integerValue }
+    assertThat(exception.message)
+      .isEqualTo("Cannot compare different data types: decimal and integer")
   }
 }
