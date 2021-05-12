@@ -23,7 +23,7 @@ import com.google.android.fhir.datacapture.views.*
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
-internal class QuestionnaireItemAdapter(val mapper: ViewPicker?) :
+internal class QuestionnaireItemAdapter(val mapper: ViewPicker) :
   ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
   /**
    * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
@@ -31,7 +31,7 @@ internal class QuestionnaireItemAdapter(val mapper: ViewPicker?) :
    */
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
 
-    mapper?.pick(viewType)?.let {
+    mapper.pick(viewType)?.let {
       return it.create(parent)
     }
 
@@ -72,7 +72,7 @@ internal class QuestionnaireItemAdapter(val mapper: ViewPicker?) :
    */
   override fun getItemViewType(position: Int): Int {
     val questionnaireItem = getItem(position).questionnaireItem
-    mapper?.getType(questionnaireItem)?.let { return it }
+    mapper.getType(questionnaireItem)?.let { return it }
     return when (val type = questionnaireItem.type) {
       QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP
       QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX

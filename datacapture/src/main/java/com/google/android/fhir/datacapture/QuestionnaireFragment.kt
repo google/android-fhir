@@ -27,15 +27,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import kotlinx.coroutines.flow.collect
+import org.hl7.fhir.r4.model.Questionnaire
 
-class QuestionnaireFragment() : Fragment() {
+open class QuestionnaireFragment : Fragment(), ViewPicker {
   private val viewModel: QuestionnaireViewModel by viewModels()
-  private var mapper: ViewPicker? = null
-
-  constructor(mapper: ViewPicker): this() {
-    this.mapper = mapper
-  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -58,7 +55,7 @@ class QuestionnaireFragment() : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-    val adapter = QuestionnaireItemAdapter(mapper)
+    val adapter = QuestionnaireItemAdapter(this)
     recyclerView.adapter = adapter
     recyclerView.layoutManager = LinearLayoutManager(view.context)
 
@@ -74,5 +71,13 @@ class QuestionnaireFragment() : Fragment() {
   companion object {
     const val BUNDLE_KEY_QUESTIONNAIRE = "questionnaire"
     const val BUNDLE_KEY_QUESTIONNAIRE_RESPONSE = "questionnaire-response"
+  }
+
+  override fun pick(viewType: Int): QuestionnaireItemViewHolderFactory? {
+     return null
+  }
+
+  override fun getType(questionnaireItem: Questionnaire.QuestionnaireItemComponent): Int? {
+    return null
   }
 }
