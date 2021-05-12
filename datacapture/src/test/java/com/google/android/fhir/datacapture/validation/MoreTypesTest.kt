@@ -22,6 +22,7 @@ import java.util.Calendar
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.IntegerType
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -116,12 +117,16 @@ class MoreTypesTest {
     assertThat(dateValue.compareTo(dateValueToBeCompared)).isEqualTo(-1)
   }
 
-  @Test(expected = IllegalArgumentException::class)
+  @Test
   fun compareTo_shouldThrowExceptionInCaseOfTypeMismatch() {
     val decimalValue = DecimalType()
     decimalValue.setValue(19.21)
     val integerValue = IntegerType()
     integerValue.value = 19
-    assertThat(decimalValue > integerValue)
+    val exception =
+      assertThrows(IllegalArgumentException::class.java) {
+        decimalValue > integerValue
+      }
+    assertThat(exception.message).isEqualTo("Cannot compare different data types: decimal and integer")
   }
 }

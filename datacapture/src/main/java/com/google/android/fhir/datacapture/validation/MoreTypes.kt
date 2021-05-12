@@ -23,7 +23,7 @@ import org.hl7.fhir.r4.model.Type
 operator fun Type.compareTo(value: Type?): Int {
   if (value != null) {
     if (!this.fhirType().equals(value.fhirType())) {
-      throw IllegalArgumentException("FHIR data types do not match")
+      throw IllegalArgumentException("Cannot compare different data types: ${this.fhirType()} and ${value.fhirType()}")
     }
     when {
       this.fhirType().equals("integer") -> {
