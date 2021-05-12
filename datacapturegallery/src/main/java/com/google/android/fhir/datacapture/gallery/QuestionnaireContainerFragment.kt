@@ -53,7 +53,7 @@ class QuestionnaireContainerFragment : Fragment() {
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? {
+  ): View {
     super.onCreate(savedInstanceState)
     _binding = FragmentQuestionnaireContainerBinding.inflate(inflater, container, false)
     arguments =
@@ -68,15 +68,7 @@ class QuestionnaireContainerFragment : Fragment() {
     // Only add the fragment once, when this fragment is first created.
     if (savedInstanceState == null) {
 
-      val fragment = object : QuestionnaireFragment() {
-        override fun pick(viewType: Int): QuestionnaireItemViewHolderFactory? {
-          return CustomViewPicker.pick(viewType)
-        }
-
-        override fun getType(questionnaireItem: Questionnaire.QuestionnaireItemComponent): Int? {
-          return CustomViewPicker.getType(questionnaireItem)
-        }
-      }
+      val fragment = CustomQuestionnaireFragment()
 
       fragment.arguments =
         bundleOf(
