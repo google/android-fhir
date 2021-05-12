@@ -25,6 +25,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputEditText
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -82,6 +84,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                     value = date
                   }
                 questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+                applyValidationResult(
+                  QuestionnaireResponseItemValidator.validate(
+                    questionnaireItemViewItem.questionnaireItem,
+                    questionnaireItemViewItem.questionnaireResponseItem
+                  )
+                )
               }
             }
           )
@@ -89,6 +97,14 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
           // Clear focus so that the user can refocus to open the dialog
           textDateQuestion.clearFocus()
         }
+      }
+
+      private fun applyValidationResult(validationResult: ValidationResult) {
+        val validationMessage =
+          validationResult.validationMessages.joinToString {
+            it.plus(System.getProperty("line.separator"))
+          }
+        textInputEditText.error = if (validationMessage == "") null else validationMessage
       }
 
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
