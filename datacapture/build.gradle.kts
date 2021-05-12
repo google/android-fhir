@@ -95,4 +95,5 @@ dependencies {
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.roboelectric)
   testImplementation(Dependencies.truth)
+  testImplementation(Dependencies.mockK)
 }
