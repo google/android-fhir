@@ -25,6 +25,7 @@ import org.hl7.fhir.r4.model.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyInt
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -366,17 +367,14 @@ class QuestionnaireItemAdapterTest {
   }
 
 
-//  @Test
-//  fun getItemViewType_customViewType_shouldReturnCustomType() {
-//    val viewPicker : ViewPicker = mock()
-//    val expectedQuestionnaireItemViewHolderFactory: QuestionnaireItemViewHolderFactory = mock()
-//    val questionnaireItemViewHolder: QuestionnaireItemViewHolder = mock()
-//    whenever(expectedQuestionnaireItemViewHolderFactory.create(any())).thenReturn(questionnaireItemViewHolder)
-//    whenever(viewPicker.getType(any())).thenReturn(1)
-//    whenever(viewPicker.pick(anyInt())).thenReturn(expectedQuestionnaireItemViewHolderFactory)
-//
-//    val questionnaireItemAdapter = QuestionnaireItemAdapter(viewPicker)
-//    val actualQuestionnaireItemViewHolderFactory = questionnaireItemAdapter.onCreateViewHolder(mock(), 40)
-//    assertEquals(expectedQuestionnaireItemViewHolderFactory, actualQuestionnaireItemViewHolderFactory)
-//  }
+  @Test
+  fun getItemViewTypeMapping_customViewType_shouldReturnCustomType() {
+    val viewPicker : ViewPicker = mock()
+    val expectedItemViewType = 1
+    whenever(viewPicker.getType(any())).thenReturn(expectedItemViewType)
+
+    val questionnaireItemAdapter = QuestionnaireItemAdapter(viewPicker)
+    val actualItemViewType = questionnaireItemAdapter.getItemViewTypeMapping(mock())
+    assertEquals(expectedItemViewType, actualItemViewType)
+  }
 }
