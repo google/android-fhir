@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import org.hl7.fhir.r4.model.Questionnaire
 
+/** An interface that provides support for defining custom Questionnaire widget UIs */
 interface ViewPicker {
   /**
    * Returns the {@link QuestionnaireItemViewHolderFactory} that should be used to create the
