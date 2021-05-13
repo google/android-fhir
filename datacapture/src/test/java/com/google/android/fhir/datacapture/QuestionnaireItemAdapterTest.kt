@@ -361,7 +361,8 @@ class QuestionnaireItemAdapterTest {
     val viewPicker: ViewPicker = mock()
     val questionnaireItemViewHolderFactory: QuestionnaireItemViewHolderFactory = mock()
     val expectedQuestionnaireItemViewHolder: QuestionnaireItemViewHolder = mock()
-    whenever(viewPicker.pick(anyInt())).thenReturn(questionnaireItemViewHolderFactory)
+    whenever(viewPicker.getQuestionnaireItemViewHolderFactory(anyInt()))
+      .thenReturn(questionnaireItemViewHolderFactory)
     whenever(questionnaireItemViewHolderFactory.create(any()))
       .thenReturn(expectedQuestionnaireItemViewHolder)
 
@@ -374,7 +375,7 @@ class QuestionnaireItemAdapterTest {
   fun getItemViewTypeMapping_customViewType_shouldReturnCustomType() {
     val viewPicker: ViewPicker = mock()
     val expectedItemViewType = 1
-    whenever(viewPicker.getType(any())).thenReturn(expectedItemViewType)
+    whenever(viewPicker.getQuestionnaireItemViewHolderType(any())).thenReturn(expectedItemViewType)
 
     val questionnaireItemAdapter = QuestionnaireItemAdapter(viewPicker)
     val actualItemViewType = questionnaireItemAdapter.getItemViewTypeMapping(mock())

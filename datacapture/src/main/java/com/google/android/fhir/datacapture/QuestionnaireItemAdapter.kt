@@ -44,7 +44,7 @@ internal open class QuestionnaireItemAdapter(val mapper: ViewPicker?) :
    */
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
 
-    mapper?.pick(viewType)?.let {
+    mapper?.getQuestionnaireItemViewHolderFactory(viewType)?.let {
       return it.create(parent)
     }
 
@@ -90,7 +90,7 @@ internal open class QuestionnaireItemAdapter(val mapper: ViewPicker?) :
   internal fun getItemViewTypeMapping(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
   ): Int {
-    mapper?.getType(questionnaireItem)?.let {
+    mapper?.getQuestionnaireItemViewHolderType(questionnaireItem)?.let {
       return it
     }
     return when (val type = questionnaireItem.type) {

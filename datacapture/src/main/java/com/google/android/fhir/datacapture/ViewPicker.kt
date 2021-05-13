@@ -20,6 +20,19 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFact
 import org.hl7.fhir.r4.model.Questionnaire
 
 interface ViewPicker {
-  fun pick(viewType: Int): QuestionnaireItemViewHolderFactory?
-  fun getType(questionnaireItem: Questionnaire.QuestionnaireItemComponent): Int?
+  /**
+   * Returns the {@link QuestionnaireItemViewHolderFactory} that should be used to create the
+   * {@param questionnaireItemViewHolderType}
+   */
+  fun getQuestionnaireItemViewHolderFactory(
+    questionnaireItemViewHolderType: Int
+  ): QuestionnaireItemViewHolderFactory?
+
+  /**
+   * Returns the integer value of the {@link QuestionnaireItemViewHolderType} that should be used to
+   * render the {@param questionnaireItem}
+   */
+  fun getQuestionnaireItemViewHolderType(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent
+  ): Int?
 }

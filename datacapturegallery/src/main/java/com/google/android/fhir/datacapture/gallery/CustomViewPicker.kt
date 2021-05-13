@@ -26,14 +26,18 @@ import org.hl7.fhir.r4.model.Questionnaire
 
 object CustomViewPicker : ViewPicker {
 
-  override fun pick(viewType: Int): QuestionnaireItemViewHolderFactory? {
-    return when (viewType) {
+  override fun getQuestionnaireItemViewHolderFactory(
+    questionnaireItemViewHolderType: Int
+  ): QuestionnaireItemViewHolderFactory? {
+    return when (questionnaireItemViewHolderType) {
       1000 -> CustomFactory
       else -> null
     }
   }
 
-  override fun getType(questionnaireItem: Questionnaire.QuestionnaireItemComponent): Int? {
+  override fun getQuestionnaireItemViewHolderType(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent
+  ): Int? {
     return if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATE) 1000 else null
   }
 }

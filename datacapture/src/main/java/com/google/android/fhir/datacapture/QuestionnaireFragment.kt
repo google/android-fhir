@@ -73,11 +73,15 @@ open class QuestionnaireFragment : Fragment(), ViewPicker {
     const val BUNDLE_KEY_QUESTIONNAIRE_RESPONSE = "questionnaire-response"
   }
 
-  override fun pick(viewType: Int): QuestionnaireItemViewHolderFactory? {
+  override fun getQuestionnaireItemViewHolderFactory(
+    questionnaireItemViewHolderType: Int
+  ): QuestionnaireItemViewHolderFactory? {
     return null
   }
 
-  override fun getType(questionnaireItem: Questionnaire.QuestionnaireItemComponent): Int? {
+  override fun getQuestionnaireItemViewHolderType(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent
+  ): Int? {
     return null
   }
 }
