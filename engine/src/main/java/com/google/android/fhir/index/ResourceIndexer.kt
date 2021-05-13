@@ -30,11 +30,13 @@ import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.logicalId
 import java.math.BigDecimal
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
+import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
@@ -162,9 +164,50 @@ internal object ResourceIndexer {
       else -> null
     }
 
+  /**
+   * Extension to expresses [HumanName] as a separated string using [separator]. See
+   * https://www.hl7.org/fhir/patient.html#search
+   */
+  private fun HumanName.asString(separator: CharSequence = " "): String {
+    return (prefix.filterNotNull().map { it.value } +
+        given.filterNotNull().map { it.value } +
+        family +
+        suffix.filterNotNull().map { it.value } +
+        text)
+      .filterNotNull()
+      .filter { it.isNotBlank() }
+      .joinToString(separator)
+  }
+
+  /**
+   * Extension to expresses [Address] as a string using [separator]. See
+   * https://www.hl7.org/fhir/patient.html#search
+   */
+  private fun Address.asString(separator: CharSequence = ", "): String {
+    return (line.filterNotNull().map { it.value } +
+        city +
+        district +
+        state +
+        country +
+        postalCode +
+        text)
+      .filterNotNull()
+      .filter { it.isNotBlank() }
+      .joinToString(separator)
+  }
+
   private fun stringIndex(searchParam: SearchParamDefinition, value: Base): StringIndex? =
     if (!value.isEmpty) {
-      StringIndex(searchParam.name, searchParam.path, value.toString())
+      StringIndex(
+        searchParam.name,
+        searchParam.path,
+        value =
+          when (value) {
+            is HumanName -> value.asString()
+            is Address -> value.asString()
+            else -> value.toString()
+          }
+      )
     } else {
       null
     }
