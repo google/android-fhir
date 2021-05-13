@@ -109,7 +109,7 @@ fun TokenFilter.query(type: ResourceType): SearchQuery {
     """
     SELECT resourceId FROM TokenIndexEntity
     WHERE resourceType = ? AND index_name = ? AND index_value = ?
-    AND ${if (system == null) "index_system is null" else "index_system = ?"} 
+    AND index_system ${if (system == null) "IS NULL" else "= ?"} 
     """,
     listOfNotNull(type.name, parameter!!.paramName, value!!.toString(), system)
   )
