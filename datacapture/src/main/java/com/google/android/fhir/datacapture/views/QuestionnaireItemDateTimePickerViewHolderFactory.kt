@@ -20,6 +20,8 @@ import android.annotation.SuppressLint
 import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputEditText
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -153,6 +155,21 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               )
             )
         questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+        applyValidationResult(
+          QuestionnaireResponseItemValidator.validate(
+            questionnaireItemViewItem.questionnaireItem,
+            questionnaireItemViewItem.questionnaireResponseItem
+          )
+        )
+      }
+
+      private fun applyValidationResult(validationResult: ValidationResult) {
+        val validationMessage =
+          validationResult.validationMessages.joinToString {
+            it.plus(System.getProperty("line.separator"))
+          }
+        dateInputEditText.error = if (validationMessage == "") null else validationMessage
+        timeInputEditText.error = if (validationMessage == "") null else validationMessage
       }
     }
 
