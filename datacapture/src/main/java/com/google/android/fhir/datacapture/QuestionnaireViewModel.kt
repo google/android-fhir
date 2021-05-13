@@ -22,6 +22,7 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.enablement.QuestionnaireItemWithResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.datacapture.views.hasNestedItemsWithinAnswers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -73,8 +74,14 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   private val modificationCount = MutableStateFlow(0)
 
   /** Callback function to update the UI. */
-  private val questionnaireResponseItemChangedCallback = { modificationCount.value += 1 }
-
+  private val questionnaireResponseItemChangedCallback: (String) -> Unit = { linkId ->
+    linkIdToQuestionnaireItemMap[linkId]?.let {
+      if (it.hasNestedItemsWithinAnswers) {
+        linkIdToQuestionnaireResponseItemMap[linkId]!!.addNestedItemsToAnswer(it)
+      }
+    }
+    modificationCount.value += 1
+  }
   internal val questionnaireItemViewItemList
     get() = getQuestionnaireItemViewItemList(questionnaire.item, questionnaireResponse.item)
 
@@ -141,27 +148,37 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
         }
       if (enabled) {
         questionnaireItemViewItemList.add(
-          QuestionnaireItemViewItem(
-            questionnaireItem,
-            questionnaireResponseItem,
-            questionnaireResponseItemChangedCallback
-          )
+          QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
+            questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
+          }
         )
         questionnaireItemViewItemList.addAll(
-          getQuestionnaireItemViewItemList(questionnaireItem.item, questionnaireResponseItem.item)
-        )
-        if (!questionnaireItem.type.equals(Questionnaire.QuestionnaireItemType.GROUP)) {
-          questionnaireResponseItem.answer?.forEach {
-            if (it.item.size > 0) {
-              questionnaireItemViewItemList.addAll(
-                getQuestionnaireItemViewItemList(questionnaireItem.item, it.item)
-              )
+          getQuestionnaireItemViewItemList(
+            questionnaireItem.item,
+            if (questionnaireResponseItem.answer.isEmpty()) {
+              questionnaireResponseItem.item
+            } else {
+              questionnaireResponseItem.answer.first().item
             }
-          }
-        }
+          )
+        )
       }
     }
     return questionnaireItemViewItemList
+  }
+}
+
+/**
+ * Add items within [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] from the
+ * provided parent [Questionnaire.QuestionnaireItemComponent] with nested items. The hierarchy and
+ * order of child items will be retained as specified in the standard. See
+ * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
+ */
+private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAnswer(
+  questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
+) {
+  if (answer.isNotEmpty()) {
+    answer.first().item = questionnaireItemComponent.listOfItemInAnswer()
   }
 }
 
@@ -176,18 +193,58 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   QuestionnaireResponse.QuestionnaireResponseItemComponent {
   return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
-    if (this@createQuestionnaireResponseItem.initial.isNotEmpty()) {
-      answer =
-        mutableListOf(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = this@createQuestionnaireResponseItem.initial[0].value
-          }
-        )
-    }
-    this@createQuestionnaireResponseItem.item.forEach {
-      this.addItem(it.createQuestionnaireResponseItem())
+    answer = createQuestionnaireResponseItemAnswers()
+    if (hasNestedItemsWithinAnswers && answer.isNotEmpty()) {
+      this.addNestedItemsToAnswer(this@createQuestionnaireResponseItem)
+    } else if (this@createQuestionnaireResponseItem.type ==
+        Questionnaire.QuestionnaireItemType.GROUP
+    ) {
+      this@createQuestionnaireResponseItem.item.forEach {
+        this.addItem(it.createQuestionnaireResponseItem())
+      }
     }
   }
+}
+
+/**
+ * Creates a List of [QuestionnaireResponse.QuestionnaireResponseItemComponent] from the provided
+ * [Questionnaire.QuestionnaireItemComponent].
+ *
+ * The hierarchy and order of child items will be retained as specified in the standard. See
+ * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
+ */
+private inline fun Questionnaire.QuestionnaireItemComponent.listOfItemInAnswer() =
+  item.map { it.createQuestionnaireResponseItem() }.toList()
+
+/**
+ * Returns a list of answers from the initial values of the questionnaire item. `null` if no intial
+ * value.
+ */
+private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
+  MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? {
+  if (initial.isEmpty()) {
+    return null
+  }
+
+  if (type == Questionnaire.QuestionnaireItemType.GROUP ||
+      type == Questionnaire.QuestionnaireItemType.DISPLAY
+  ) {
+    throw IllegalArgumentException(
+      "Questionnaire item $linkId has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+    )
+  }
+
+  if (initial.size > 1 && !repeats) {
+    throw IllegalArgumentException(
+      "Questionnaire item $linkId can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+    )
+  }
+
+  return mutableListOf(
+    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+      value = initial[0].value
+    }
+  )
 }
 
 /**

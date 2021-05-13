@@ -95,6 +95,26 @@
           ]
         },
         {
+          "linkId": "PR-11",
+          "text": "Haemoglobin",
+          "type": "decimal",
+          "maxLength": 8,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction",
+              "valueString": "Haemoglobin"
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+              "valueDecimal": 19.5
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+              "valueDecimal": 2.5
+            }
+          ]
+        },
+        {
           "linkId": "PR-7",
           "text": "Address",
           "type": "text",

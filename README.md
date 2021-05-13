@@ -12,13 +12,14 @@ This is currently in **Early Access** for Developers ONLY and is NOT production-
 The SDK is designed to support Android 21 (lollipop) and above. Android Studio 4.0 is required for [Java 8 library desugaring](https://developer.android.com/studio/preview/features#j8-desugar).
 
 ## Libraries
-The repository is organised into two main libraries, *core* and *structured data capture*.
+The repository is organised into two main libraries, *engine* and *structured data capture*.
 
-### Core library
+### FHIR engine library  [![Google Maven](https://badgen.net/maven/v/metadata-url/dl.google.com/dl/android/maven2/com/google/android/fhir/engine/maven-metadata.xml)](https://maven.google.com/web/index.html?#com.google.android.fhir:engine)
 This is the main library for building a mobile based clinical data repository using FHIR. It provides:
 - SQLite database for FHIR resources
 - APIs for accessing (create, read, update, and delete) FHIR resources in the database
 - APIs for searching FHIR resources in the database
+- Sync API for sychnronisation of resources with a FHIR server
 
 ### Structured data capture (SDC) library  [![Google Maven](https://badgen.net/maven/v/metadata-url/dl.google.com/dl/android/maven2/com/google/android/fhir/data-capture/maven-metadata.xml)](https://maven.google.com/web/index.html?#com.google.android.fhir:data-capture)
 This library is a partial implementation of the [Structured Data Capture FHIR IG](http://build.fhir.org/ig/HL7/sdc/) on Android. It includes the UI components and APIs to capture healthcare data using FHIR questionnaires. 

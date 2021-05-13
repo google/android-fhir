@@ -19,10 +19,18 @@ name: CI
 on:
   push:
     branches: [ master ]
+    paths-ignore: 
+      - '**.md'
+      - 'CODEOWNERS'
+      - 'LICENSE'
     tags:
       run_ci*
   pull_request:
     branches: [ master ]
+    paths-ignore: 
+      - '**.md'
+      - 'CODEOWNERS'
+      - 'LICENSE'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -50,10 +58,10 @@ jobs:
         java-version: "11"
 
     - name: Make files executable
-      run: chmod +x ./gradlew && chmod +x ./core/checksum.sh
+      run: chmod +x ./gradlew && chmod +x ./engine/checksum.sh
 
     - name: Generate cache key
-      run: ./core/checksum.sh checksum.txt
+      run: ./engine/checksum.sh checksum.txt
 
     - name: Copy CI gradle.properties
       run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
@@ -102,13 +110,13 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: build-reports
-        path: core/build/reports
+        path: engine/build/reports
     - name: Upload build dir # this is good to diagnose issues
       if: always()
       uses: actions/upload-artifact@v2
       with:
         name: build-out
-        path: core/build
+        path: engine/build
    
     - name: Copy test results
       if: always()

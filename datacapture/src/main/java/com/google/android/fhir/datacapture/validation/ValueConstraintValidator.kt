@@ -24,8 +24,7 @@ internal open class ValueConstraintValidator(
   val url: String,
   val predicate:
     (Extension, QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> Boolean,
-  val messageGenerator:
-    (Extension, QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> String
+  val messageGenerator: (Extension) -> String
 ) : ConstraintValidator {
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -35,10 +34,7 @@ internal open class ValueConstraintValidator(
       val extension = questionnaireItem.getExtensionByUrl(url)
       val answer = questionnaireResponseItem.answer[0]
       if (predicate(extension, answer)) {
-        return ConstraintValidator.ConstraintValidationResult(
-          false,
-          messageGenerator(extension, answer)
-        )
+        return ConstraintValidator.ConstraintValidationResult(false, messageGenerator(extension))
       }
     }
     return ConstraintValidator.ConstraintValidationResult(true, null)
