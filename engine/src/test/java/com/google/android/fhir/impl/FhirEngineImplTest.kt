@@ -17,18 +17,15 @@
 package com.google.android.fhir.impl
 
 import androidx.test.core.app.ApplicationProvider
-import ca.uhn.fhir.rest.param.StringParam
 import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.ResourceNotFoundException
 import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.resource.TestingUtils
-import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.FhirDataSource
 import com.google.common.truth.Truth
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Enumerations
-import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
@@ -139,106 +136,6 @@ class FhirEngineImplTest {
       TEST_PATIENT_1,
       fhirEngine.load(Patient::class.java, TEST_PATIENT_1_ID)
     )
-  }
-
-  @Test
-  fun search_String_Exact_shouldReturnExactResource() {
-    val patient1 =
-      Patient().apply {
-        id = "test_1"
-        addName(HumanName().addGiven("Eve"))
-      }
-    val patient2 =
-      Patient().apply {
-        id = "test_2"
-        addName(HumanName().addGiven("EVE"))
-      }
-    val patient3 =
-      Patient().apply {
-        id = "test_3"
-        addName(HumanName().addGiven("eve"))
-      }
-    val res = runBlocking {
-      fhirEngine.save(patient1, patient2, patient3)
-      fhirEngine.search<Patient>(
-        Search(ResourceType.Patient).apply {
-          filter(Patient.GIVEN) {
-            value = "Eve"
-            modifier = StringParam().setExact(true)
-          }
-        }
-      )
-    }
-    Truth.assertThat(res).hasSize(1)
-    Truth.assertThat(res[0].id).isEqualTo("Patient/${patient1.id}")
-    Truth.assertThat(res[0].nameFirstRep.given.any { it.toString() == "Eve" }).isTrue()
-  }
-
-  @Test
-  fun search_String_Contains_shouldReturnContainsResource() {
-    val patient1 =
-      Patient().apply {
-        id = "test_1"
-        addName(HumanName().addGiven("Severine"))
-      }
-    val patient2 =
-      Patient().apply {
-        id = "test_2"
-        addName(HumanName().addGiven("Evelyn"))
-      }
-    val patient3 =
-      Patient().apply {
-        id = "test_3"
-        addName(HumanName().addGiven("Eve"))
-      }
-    val res = runBlocking {
-      fhirEngine.save(patient1, patient2, patient3)
-      fhirEngine.search<Patient>(
-        Search(ResourceType.Patient).apply {
-          filter(Patient.GIVEN) {
-            value = "eve"
-            modifier = StringParam().setContains(true)
-          }
-        }
-      )
-    }
-    Truth.assertThat(res).hasSize(3)
-    Truth.assertThat(
-        res.all { patient ->
-          patient.nameFirstRep.given.any { it.toString().toLowerCase().contains("eve") }
-        }
-      )
-      .isTrue()
-  }
-
-  @Test
-  fun search_String_Default_shouldReturnDefaultResource() {
-    val patient1 =
-      Patient().apply {
-        id = "test_1"
-        addName(HumanName().addGiven("Doe").addGiven("Eve"))
-      }
-    val patient2 =
-      Patient().apply {
-        id = "test_2"
-        addName(HumanName().addGiven("Evelyn"))
-      }
-    val patient3 =
-      Patient().apply {
-        id = "test_3"
-        addName(HumanName().setFamily("Severine"))
-      }
-    val res = runBlocking {
-      fhirEngine.save(patient1, patient2, patient3)
-      fhirEngine.search<Patient>(
-        Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { value = "eve" } }
-      )
-    }
-    Truth.assertThat(res).hasSize(2)
-    Truth.assertThat(
-        res.all { patient -> patient.nameFirstRep.given.any { it.toString().startsWith("Eve") } }
-      )
-      .isTrue()
   }
 
   companion object {
