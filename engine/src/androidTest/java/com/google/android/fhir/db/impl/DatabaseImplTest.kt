@@ -18,6 +18,7 @@ package com.google.android.fhir.db.impl
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirServices
 import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -431,6 +432,7 @@ class DatabaseImplTest {
     assertThat(res).hasSize(1)
     assertThat(res[0].id).isEqualTo("Patient/${patient.id}")
   }
+
   @Test
   fun search_string_exact_no_match() {
     val patient =
@@ -503,6 +505,402 @@ class DatabaseImplTest {
     }
 
     assertThat(res).hasSize(0)
+  }
+
+  @Test
+  fun search_number_equal() {
+    val riskAssessment1 =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+        )
+      }
+    val riskAssessment2 =
+      RiskAssessment().apply {
+        id = "2"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100.5))
+        )
+      }
+    val riskAssessment3 =
+      RiskAssessment().apply {
+        id = "3"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0))
+        )
+      }
+
+    val res = runBlocking {
+      database.insert(riskAssessment1, riskAssessment2, riskAssessment3)
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.EQUAL
+              value = BigDecimal("100")
+            }
+          }
+          .getQuery()
+      )
+    }
+
+    assertThat(res).hasSize(1)
+    assertThat(res[0].predictionFirstRep.probabilityDecimalType.valueAsString).isEqualTo("99.5")
+  }
+
+  @Test
+  fun search_number_notEqual() {
+    val riskAssessment1 =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+        )
+      }
+    val riskAssessment2 =
+      RiskAssessment().apply {
+        id = "2"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100.5))
+        )
+      }
+    val riskAssessment3 =
+      RiskAssessment().apply {
+        id = "3"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0))
+        )
+      }
+
+    val res = runBlocking {
+      database.insert(riskAssessment1, riskAssessment2, riskAssessment3)
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.NOT_EQUAL
+              value = BigDecimal("100")
+            }
+          }
+          .getQuery()
+      )
+    }
+
+    assertThat(res).hasSize(2)
+    assertThat(
+        res.all {
+          it.predictionFirstRep.probabilityDecimalType < DecimalType(99.5) ||
+            it.predictionFirstRep.probabilityDecimalType >= DecimalType(100.5)
+        }
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun search_number_Greater() {
+    val riskAssessment1 =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+        )
+      }
+    val riskAssessment2 =
+      RiskAssessment().apply {
+        id = "2"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100.5))
+        )
+      }
+    val riskAssessment3 =
+      RiskAssessment().apply {
+        id = "3"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0))
+        )
+      }
+
+    val res = runBlocking {
+      database.insert(riskAssessment1, riskAssessment2, riskAssessment3)
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.GREATERTHAN
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+    }
+
+    assertThat(res).hasSize(1)
+    assertThat(res.all { it.predictionFirstRep.probabilityDecimalType > DecimalType(99.5) })
+      .isTrue()
+  }
+
+  @Test
+  fun search_number_GreaterThanEqual() {
+    val riskAssessment1 =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+        )
+      }
+    val riskAssessment2 =
+      RiskAssessment().apply {
+        id = "2"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100.5))
+        )
+      }
+    val riskAssessment3 =
+      RiskAssessment().apply {
+        id = "3"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0))
+        )
+      }
+
+    val res = runBlocking {
+      database.insert(riskAssessment1, riskAssessment2, riskAssessment3)
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+    }
+
+    assertThat(res).hasSize(2)
+    assertThat(res.all { it.predictionFirstRep.probabilityDecimalType >= DecimalType(99.5) })
+      .isTrue()
+  }
+
+  @Test
+  fun search_number_Less() {
+    val riskAssessment1 =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+        )
+      }
+    val riskAssessment2 =
+      RiskAssessment().apply {
+        id = "2"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100.5))
+        )
+      }
+    val riskAssessment3 =
+      RiskAssessment().apply {
+        id = "3"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0))
+        )
+      }
+
+    val res = runBlocking {
+      database.insert(riskAssessment1, riskAssessment2, riskAssessment3)
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.LESSTHAN
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+    }
+
+    assertThat(res).hasSize(1)
+    assertThat(res.all { it.predictionFirstRep.probabilityDecimalType < DecimalType(99.5) })
+      .isTrue()
+  }
+
+  @Test
+  fun search_number_LessThanEquals() {
+    val riskAssessment1 =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+        )
+      }
+    val riskAssessment2 =
+      RiskAssessment().apply {
+        id = "2"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100.5))
+        )
+      }
+    val riskAssessment3 =
+      RiskAssessment().apply {
+        id = "3"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0))
+        )
+      }
+
+    val res = runBlocking {
+      database.insert(riskAssessment1, riskAssessment2, riskAssessment3)
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+    }
+
+    assertThat(res).hasSize(2)
+    assertThat(res.all { it.predictionFirstRep.probabilityDecimalType <= DecimalType(99.5) })
+      .isTrue()
+  }
+
+  @Test
+  fun search_decimal_EndsBefore() {
+    val riskAssessment1 =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+        )
+      }
+    val riskAssessment2 =
+      RiskAssessment().apply {
+        id = "2"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100.5))
+        )
+      }
+    val riskAssessment3 =
+      RiskAssessment().apply {
+        id = "3"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0))
+        )
+      }
+
+    val res = runBlocking {
+      database.insert(riskAssessment1, riskAssessment2, riskAssessment3)
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+    }
+
+    assertThat(res).hasSize(1)
+    assertThat(res.all { it.predictionFirstRep.probabilityDecimalType < DecimalType(99.5) })
+      .isTrue()
+  }
+
+  @Test
+  fun search_decimal_StartAfter() {
+    val riskAssessment1 =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+        )
+      }
+    val riskAssessment2 =
+      RiskAssessment().apply {
+        id = "2"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100.5))
+        )
+      }
+    val riskAssessment3 =
+      RiskAssessment().apply {
+        id = "3"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0))
+        )
+      }
+
+    val res = runBlocking {
+      database.insert(riskAssessment1, riskAssessment2, riskAssessment3)
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.STARTS_AFTER
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+    }
+
+    assertThat(res).hasSize(1)
+    assertThat(res.all { it.predictionFirstRep.probabilityDecimalType > DecimalType(99.5) })
+      .isTrue()
+  }
+
+  @Test
+  fun search_number_Approximate() {
+    val riskAssessment1 =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(89.5))
+        )
+      }
+    val riskAssessment2 =
+      RiskAssessment().apply {
+        id = "2"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(110.0))
+        )
+      }
+    val riskAssessment3 =
+      RiskAssessment().apply {
+        id = "3"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(90.0))
+        )
+      }
+
+    val res = runBlocking {
+      database.insert(riskAssessment1, riskAssessment2, riskAssessment3)
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.APPROXIMATE
+              value = BigDecimal("100")
+            }
+          }
+          .getQuery()
+      )
+    }
+
+    assertThat(res).hasSize(2)
+    assertThat(
+        res.all {
+          it.predictionFirstRep.probabilityDecimalType <= DecimalType(110) &&
+            it.predictionFirstRep.probabilityDecimalType >= DecimalType(90)
+        }
+      )
+      .isTrue()
   }
 
   private companion object {
