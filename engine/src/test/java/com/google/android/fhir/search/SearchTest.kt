@@ -17,7 +17,7 @@
 package com.google.android.fhir.search
 
 import android.os.Build
-import ca.uhn.fhir.rest.param.StringParam
+import com.google.android.fhir.search.params.StringSearchModifier
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Patient
@@ -52,7 +52,7 @@ class SearchTest {
       Search(ResourceType.Patient)
         .apply {
           filter(Patient.ADDRESS) {
-            modifier = StringParam().setContains(true)
+            modifier = StringSearchModifier.CONTAINS
             value = "someValue"
           }
         }
@@ -67,6 +67,67 @@ class SearchTest {
     AND a.resourceId IN (
     SELECT resourceId FROM StringIndexEntity
     WHERE resourceType = ? AND index_name = ? AND index_value LIKE '%' || ? || '%' COLLATE NOCASE
+    )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .containsExactly(
+        ResourceType.Patient.name,
+        ResourceType.Patient.name,
+        Patient.ADDRESS.paramName,
+        "someValue"
+      )
+  }
+
+  @Test
+  fun search_string_exact() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.ADDRESS) {
+            modifier = StringSearchModifier.EXACT
+            value = "someValue"
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+    SELECT a.serializedResource
+    FROM ResourceEntity a
+    WHERE a.resourceType = ?
+    AND a.resourceId IN (
+    SELECT resourceId FROM StringIndexEntity
+    WHERE resourceType = ? AND index_name = ? AND index_value = ?
+    )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .containsExactly(
+        ResourceType.Patient.name,
+        ResourceType.Patient.name,
+        Patient.ADDRESS.paramName,
+        "someValue"
+      )
+  }
+
+  @Test
+  fun search_string_default() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply { filter(Patient.ADDRESS) { value = "someValue" } }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+    SELECT a.serializedResource
+    FROM ResourceEntity a
+    WHERE a.resourceType = ?
+    AND a.resourceId IN (
+    SELECT resourceId FROM StringIndexEntity
+    WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
     )
         """.trimIndent()
       )
