@@ -96,10 +96,17 @@ fun Search.getQuery(): SearchQuery {
 }
 
 fun StringFilter.query(type: ResourceType): SearchQuery {
+
+  val condition =
+    when (modifier) {
+      StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
+      StringFilterModifier.MATCHES_EXACTLY -> "= ?"
+      StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
+    }
   return SearchQuery(
     """
     SELECT resourceId FROM StringIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value = ? COLLATE NOCASE
+    WHERE resourceType = ? AND index_name = ? AND index_value $condition 
     """,
     listOf(type.name, parameter.paramName, value!!)
   )

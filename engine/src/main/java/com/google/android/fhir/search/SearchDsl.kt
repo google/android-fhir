@@ -64,7 +64,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
 @SearchDslMarker
 data class StringFilter(
   val parameter: StringClientParam,
-  var prefix: ParamPrefixEnum? = null,
+  var modifier: StringFilterModifier = StringFilterModifier.STARTS_WITH,
   var value: String? = null
 )
 
@@ -81,4 +81,10 @@ data class NumberFilter(
 enum class Order {
   ASCENDING,
   DESCENDING
+}
+
+enum class StringFilterModifier {
+  STARTS_WITH,
+  MATCHES_EXACTLY,
+  CONTAINS
 }
