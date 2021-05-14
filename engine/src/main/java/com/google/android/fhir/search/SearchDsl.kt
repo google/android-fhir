@@ -20,7 +20,6 @@ import ca.uhn.fhir.rest.gclient.IParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
-import com.google.android.fhir.search.params.StringSearchModifier
 import org.hl7.fhir.r4.model.ResourceType
 
 @SearchDslMarker
@@ -56,7 +55,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
 @SearchDslMarker
 data class StringFilter(
   val parameter: StringClientParam,
-  var modifier: StringSearchModifier? = null,
+  var modifier: StringFilterModifier = StringFilterModifier.STARTS_WITH,
   var value: String? = null
 )
 
@@ -66,4 +65,10 @@ data class ReferenceFilter(val parameter: ReferenceClientParam?, var value: Stri
 enum class Order {
   ASCENDING,
   DESCENDING
+}
+
+enum class StringFilterModifier {
+  STARTS_WITH,
+  MATCHES_EXACTLY,
+  CONTAINS
 }

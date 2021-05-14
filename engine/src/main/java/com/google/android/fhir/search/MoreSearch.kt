@@ -19,7 +19,6 @@ package com.google.android.fhir.search
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import com.google.android.fhir.db.Database
-import com.google.android.fhir.search.params.StringSearchModifier
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -94,9 +93,9 @@ fun StringFilter.query(type: ResourceType): SearchQuery {
 
   val condition =
     when (modifier) {
-      StringSearchModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
-      StringSearchModifier.EXACT -> "= ?"
-      else -> "LIKE ? || '%' COLLATE NOCASE"
+      StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
+      StringFilterModifier.MATCHES_EXACTLY -> "= ?"
+      StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
     }
   return SearchQuery(
     """

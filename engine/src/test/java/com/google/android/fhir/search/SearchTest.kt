@@ -17,7 +17,6 @@
 package com.google.android.fhir.search
 
 import android.os.Build
-import com.google.android.fhir.search.params.StringSearchModifier
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Patient
@@ -46,28 +45,24 @@ class SearchTest {
       )
     assertThat(query.args).isEqualTo(listOf(ResourceType.Patient.name))
   }
+
   @Test
-  fun search_string_contains() {
+  fun search_string_default() {
     val query =
       Search(ResourceType.Patient)
-        .apply {
-          filter(Patient.ADDRESS) {
-            modifier = StringSearchModifier.CONTAINS
-            value = "someValue"
-          }
-        }
+        .apply { filter(Patient.ADDRESS) { value = "someValue" } }
         .getQuery()
 
     assertThat(query.query)
       .isEqualTo(
         """
-    SELECT a.serializedResource
-    FROM ResourceEntity a
-    WHERE a.resourceType = ?
-    AND a.resourceId IN (
-    SELECT resourceId FROM StringIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value LIKE '%' || ? || '%' COLLATE NOCASE
-    )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
+        )
         """.trimIndent()
       )
     assertThat(query.args)
@@ -85,7 +80,7 @@ class SearchTest {
       Search(ResourceType.Patient)
         .apply {
           filter(Patient.ADDRESS) {
-            modifier = StringSearchModifier.EXACT
+            modifier = StringFilterModifier.MATCHES_EXACTLY
             value = "someValue"
           }
         }
@@ -94,13 +89,13 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-    SELECT a.serializedResource
-    FROM ResourceEntity a
-    WHERE a.resourceType = ?
-    AND a.resourceId IN (
-    SELECT resourceId FROM StringIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value = ?
-    )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        )
         """.trimIndent()
       )
     assertThat(query.args)
@@ -113,22 +108,27 @@ class SearchTest {
   }
 
   @Test
-  fun search_string_default() {
+  fun search_string_contains() {
     val query =
       Search(ResourceType.Patient)
-        .apply { filter(Patient.ADDRESS) { value = "someValue" } }
+        .apply {
+          filter(Patient.ADDRESS) {
+            modifier = StringFilterModifier.CONTAINS
+            value = "someValue"
+          }
+        }
         .getQuery()
 
     assertThat(query.query)
       .isEqualTo(
         """
-    SELECT a.serializedResource
-    FROM ResourceEntity a
-    WHERE a.resourceType = ?
-    AND a.resourceId IN (
-    SELECT resourceId FROM StringIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
-    )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE '%' || ? || '%' COLLATE NOCASE
+        )
         """.trimIndent()
       )
     assertThat(query.args)

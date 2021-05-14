@@ -25,8 +25,8 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
+import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
-import com.google.android.fhir.search.params.StringSearchModifier
 import com.google.android.fhir.sync.FhirDataSource
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -373,107 +373,138 @@ class DatabaseImplTest {
     }
 
   @Test
-  fun search_String_Exact() {
-    val patient1 =
+  fun search_String_default() {
+    val patient =
+      Patient().apply {
+        id = "test_1"
+        addName(HumanName().addGiven("Evelyn"))
+      }
+    val res = runBlocking {
+      database.insert(patient)
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { value = "eve" } }.getQuery()
+      )
+    }
+    assertThat(res).hasSize(1)
+    assertThat(
+        res.all { patient -> patient.nameFirstRep.given.any { it.toString().startsWith("Eve") } }
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun search_String_default_no_match() {
+    val patient =
+      Patient().apply {
+        id = "test_1"
+        addName(HumanName().addGiven("Severine"))
+      }
+    val res = runBlocking {
+      database.insert(patient)
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { value = "eve" } }.getQuery()
+      )
+    }
+    assertThat(res).hasSize(0)
+  }
+
+  @Test
+  fun search_String_exact() {
+    val patient =
       Patient().apply {
         id = "test_1"
         addName(HumanName().addGiven("Eve"))
       }
-    val patient2 =
-      Patient().apply {
-        id = "test_2"
-        addName(HumanName().addGiven("EVE"))
-      }
-    val patient3 =
-      Patient().apply {
-        id = "test_3"
-        addName(HumanName().addGiven("eve"))
-      }
     val res = runBlocking {
-      database.insert(patient1, patient2, patient3)
+      database.insert(patient)
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
             filter(Patient.GIVEN) {
               value = "Eve"
-              modifier = StringSearchModifier.EXACT
+              modifier = StringFilterModifier.MATCHES_EXACTLY
             }
           }
           .getQuery()
       )
     }
     assertThat(res).hasSize(1)
-    assertThat(res[0].id).isEqualTo("Patient/${patient1.id}")
     assertThat(res[0].nameFirstRep.given.any { it.toString() == "Eve" }).isTrue()
   }
-
   @Test
-  fun search_String_Contains() {
-    val patient1 =
+  fun search_String_exact_no_match() {
+    val patient =
       Patient().apply {
         id = "test_1"
-        addName(HumanName().addGiven("Severine"))
-      }
-    val patient2 =
-      Patient().apply {
-        id = "test_2"
-        addName(HumanName().addGiven("Evelyn"))
-      }
-    val patient3 =
-      Patient().apply {
-        id = "test_3"
-        addName(HumanName().addGiven("Eve"))
+        addName(HumanName().addGiven("EVE"))
       }
     val res = runBlocking {
-      database.insert(patient1, patient2, patient3)
+      database.insert(patient)
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
             filter(Patient.GIVEN) {
-              value = "eve"
-              modifier = StringSearchModifier.CONTAINS
+              value = "Eve"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
             }
           }
           .getQuery()
       )
     }
-    assertThat(res).hasSize(3)
+    assertThat(res).hasSize(0)
+  }
+
+  @Test
+  fun search_String_contains() {
+    val patient =
+      Patient().apply {
+        id = "test_1"
+        addName(HumanName().addGiven("Severine"))
+      }
+
+    val res = runBlocking {
+      database.insert(patient)
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.GIVEN) {
+              value = "Eve"
+              modifier = StringFilterModifier.CONTAINS
+            }
+          }
+          .getQuery()
+      )
+    }
+    assertThat(res).hasSize(1)
     assertThat(
-        res.all { patient ->
-          patient.nameFirstRep.given.any { it.toString().toLowerCase().contains("eve") }
+        res.all { result ->
+          result.nameFirstRep.given.any { it.toString().toLowerCase().contains("eve") }
         }
       )
       .isTrue()
   }
 
   @Test
-  fun search_String_Default() {
-    val patient1 =
+  fun search_String_contains_no_match() {
+    val patient =
       Patient().apply {
         id = "test_1"
-        addName(HumanName().addGiven("Doe").addGiven("Eve"))
-      }
-    val patient2 =
-      Patient().apply {
-        id = "test_2"
-        addName(HumanName().addGiven("Evelyn"))
-      }
-    val patient3 =
-      Patient().apply {
-        id = "test_3"
-        addName(HumanName().addGiven("Severine"))
+        addName(HumanName().addGiven("John"))
       }
     val res = runBlocking {
-      database.insert(patient1, patient2, patient3)
+      database.insert(patient)
       database.search<Patient>(
-        Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { value = "eve" } }.getQuery()
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.GIVEN) {
+              value = "eve"
+              modifier = StringFilterModifier.CONTAINS
+            }
+          }
+          .getQuery()
       )
     }
-    assertThat(res).hasSize(2)
-    assertThat(
-        res.all { patient -> patient.nameFirstRep.given.any { it.toString().startsWith("Eve") } }
-      )
-      .isTrue()
+    assertThat(res).hasSize(0)
   }
 
   private companion object {

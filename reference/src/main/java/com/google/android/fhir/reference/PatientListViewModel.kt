@@ -24,7 +24,7 @@ import androidx.lifecycle.liveData
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.data.SamplePatients
 import com.google.android.fhir.search.Order
-import com.google.android.fhir.search.params.StringSearchModifier
+import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.search
 import org.hl7.fhir.r4.model.Patient
 
@@ -43,7 +43,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val searchResults: List<Patient> =
       fhirEngine.search {
         filter(Patient.ADDRESS_CITY) {
-          modifier = StringSearchModifier.EXACT
+          modifier = StringFilterModifier.MATCHES_EXACTLY
           value = "NAIROBI"
         }
         sort(Patient.GIVEN, Order.ASCENDING)
