@@ -373,7 +373,7 @@ class DatabaseImplTest {
     }
 
   @Test
-  fun search_String_default() {
+  fun search_string_default() {
     val patient =
       Patient().apply {
         id = "test_1"
@@ -385,15 +385,13 @@ class DatabaseImplTest {
         Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { value = "eve" } }.getQuery()
       )
     }
+
     assertThat(res).hasSize(1)
-    assertThat(
-        res.all { patient -> patient.nameFirstRep.given.any { it.toString().startsWith("Eve") } }
-      )
-      .isTrue()
+    assertThat(res[0].id).isEqualTo("Patient/${patient.id}")
   }
 
   @Test
-  fun search_String_default_no_match() {
+  fun search_string_default_no_match() {
     val patient =
       Patient().apply {
         id = "test_1"
@@ -405,11 +403,12 @@ class DatabaseImplTest {
         Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { value = "eve" } }.getQuery()
       )
     }
+
     assertThat(res).hasSize(0)
   }
 
   @Test
-  fun search_String_exact() {
+  fun search_string_exact() {
     val patient =
       Patient().apply {
         id = "test_1"
@@ -428,11 +427,12 @@ class DatabaseImplTest {
           .getQuery()
       )
     }
+
     assertThat(res).hasSize(1)
-    assertThat(res[0].nameFirstRep.given.any { it.toString() == "Eve" }).isTrue()
+    assertThat(res[0].id).isEqualTo("Patient/${patient.id}")
   }
   @Test
-  fun search_String_exact_no_match() {
+  fun search_string_exact_no_match() {
     val patient =
       Patient().apply {
         id = "test_1"
@@ -451,11 +451,12 @@ class DatabaseImplTest {
           .getQuery()
       )
     }
+
     assertThat(res).hasSize(0)
   }
 
   @Test
-  fun search_String_contains() {
+  fun search_string_contains() {
     val patient =
       Patient().apply {
         id = "test_1"
@@ -475,17 +476,13 @@ class DatabaseImplTest {
           .getQuery()
       )
     }
+
     assertThat(res).hasSize(1)
-    assertThat(
-        res.all { result ->
-          result.nameFirstRep.given.any { it.toString().toLowerCase().contains("eve") }
-        }
-      )
-      .isTrue()
+    assertThat(res[0].id).isEqualTo("Patient/${patient.id}")
   }
 
   @Test
-  fun search_String_contains_no_match() {
+  fun search_string_contains_no_match() {
     val patient =
       Patient().apply {
         id = "test_1"
@@ -504,6 +501,7 @@ class DatabaseImplTest {
           .getQuery()
       )
     }
+
     assertThat(res).hasSize(0)
   }
 
