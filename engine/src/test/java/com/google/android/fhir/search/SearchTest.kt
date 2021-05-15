@@ -17,6 +17,7 @@
 package com.google.android.fhir.search
 
 import android.os.Build
+import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
@@ -321,13 +322,13 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """ 
-            SELECT a.serializedResource
-            FROM ResourceEntity a
-            WHERE a.resourceType = ?
-            AND a.resourceId IN (
-            SELECT resourceId FROM NumberIndexEntity
-            WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value < ?
-            )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value < ?
+        )
     """.trimIndent()
       )
 
@@ -357,13 +358,13 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """ 
-            SELECT a.serializedResource
-            FROM ResourceEntity a
-            WHERE a.resourceType = ?
-            AND a.resourceId IN (
-            SELECT resourceId FROM NumberIndexEntity
-            WHERE resourceType = ? AND index_name = ? AND index_value < ? OR index_value >= ?
-            )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value < ? OR index_value >= ?
+        )
     """.trimIndent()
       )
 
@@ -378,6 +379,7 @@ class SearchTest {
         )
       )
   }
+
   @Test
   fun search_number_greater() {
     val query =
@@ -392,13 +394,13 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """ 
-            SELECT a.serializedResource
-            FROM ResourceEntity a
-            WHERE a.resourceType = ?
-            AND a.resourceId IN (
-            SELECT resourceId FROM NumberIndexEntity
-            WHERE resourceType = ? AND index_name = ? AND index_value > ?
-            )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value > ?
+        )
     """.trimIndent()
       )
 
@@ -426,13 +428,13 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """ 
-            SELECT a.serializedResource
-            FROM ResourceEntity a
-            WHERE a.resourceType = ?
-            AND a.resourceId IN (
-            SELECT resourceId FROM NumberIndexEntity
-            WHERE resourceType = ? AND index_name = ? AND index_value >= ?
-            )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value >= ?
+        )
     """.trimIndent()
       )
 
@@ -460,13 +462,13 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """ 
-            SELECT a.serializedResource
-            FROM ResourceEntity a
-            WHERE a.resourceType = ?
-            AND a.resourceId IN (
-            SELECT resourceId FROM NumberIndexEntity
-            WHERE resourceType = ? AND index_name = ? AND index_value < ?
-            )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value < ?
+        )
     """.trimIndent()
       )
 
@@ -494,13 +496,13 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """ 
-            SELECT a.serializedResource
-            FROM ResourceEntity a
-            WHERE a.resourceType = ?
-            AND a.resourceId IN (
-            SELECT resourceId FROM NumberIndexEntity
-            WHERE resourceType = ? AND index_name = ? AND index_value <= ?
-            )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value <= ?
+        )
     """.trimIndent()
       )
 
@@ -516,7 +518,7 @@ class SearchTest {
   }
 
   @Test(expected = java.lang.IllegalArgumentException::class)
-  fun search_Integer_EndsBefore_Error() {
+  fun search_integer_endsBefore_error() {
     Search(ResourceType.RiskAssessment)
       .apply {
         filter(RiskAssessment.PROBABILITY) {
@@ -528,7 +530,7 @@ class SearchTest {
   }
 
   @Test
-  fun search_Decimal_EndsBefore() {
+  fun search_decimal_endsBefore() {
     val query =
       Search(ResourceType.RiskAssessment)
         .apply {
@@ -541,13 +543,13 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """ 
-            SELECT a.serializedResource
-            FROM ResourceEntity a
-            WHERE a.resourceType = ?
-            AND a.resourceId IN (
-            SELECT resourceId FROM NumberIndexEntity
-            WHERE resourceType = ? AND index_name = ? AND index_value < ?
-            )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value < ?
+        )
     """.trimIndent()
       )
 
@@ -563,7 +565,7 @@ class SearchTest {
   }
 
   @Test(expected = java.lang.IllegalArgumentException::class)
-  fun search_Integer_StartsAfter_Error() {
+  fun search_integer_startsAfter_error() {
     Search(ResourceType.RiskAssessment)
       .apply {
         filter(RiskAssessment.PROBABILITY) {
@@ -575,7 +577,7 @@ class SearchTest {
   }
 
   @Test
-  fun search_Decimal_StartsAfter() {
+  fun search_decimal_startsAfter() {
     val query =
       Search(ResourceType.RiskAssessment)
         .apply {
@@ -588,13 +590,13 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """ 
-            SELECT a.serializedResource
-            FROM ResourceEntity a
-            WHERE a.resourceType = ?
-            AND a.resourceId IN (
-            SELECT resourceId FROM NumberIndexEntity
-            WHERE resourceType = ? AND index_name = ? AND index_value > ?
-            )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value > ?
+        )
     """.trimIndent()
       )
 
@@ -622,13 +624,13 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """ 
-            SELECT a.serializedResource
-            FROM ResourceEntity a
-            WHERE a.resourceType = ?
-            AND a.resourceId IN (
-            SELECT resourceId FROM NumberIndexEntity
-            WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value <= ?
-            )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value <= ?
+        )
     """.trimIndent()
       )
 

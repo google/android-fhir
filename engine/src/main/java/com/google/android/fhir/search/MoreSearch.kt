@@ -119,6 +119,7 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
         BigDecimal(1).divide(BigDecimal(10).pow(value!!.scale())).divide(BigDecimal(2))
       else -> BigDecimal(5)
     }
+
   val condition =
     when (this.prefix) {
       ParamPrefixEnum.EQUAL, null ->
