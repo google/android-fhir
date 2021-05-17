@@ -30,6 +30,7 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
+import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -832,7 +833,7 @@ class ResourceIndexerTest {
     assertThat(resourceIndices.stringIndices)
       .containsExactly(
         StringIndex("given", "Patient.name.given", testPatient.nameFirstRep.givenAsSingleString),
-        StringIndex("address", "Patient.address", testPatient.addressFirstRep.toString()),
+        StringIndex("address", "Patient.address", "Van Egmondkade 23, Amsterdam, NLD, 1024 RJ"),
         StringIndex(
           "address-postalcode",
           "Patient.address.postalCode",
@@ -843,8 +844,8 @@ class ResourceIndexerTest {
           "Patient.address.country",
           testPatient.addressFirstRep.country
         ),
-        StringIndex("phonetic", "Patient.name", testPatient.nameFirstRep.toString()),
-        StringIndex("name", "Patient.name", testPatient.nameFirstRep.toString()),
+        StringIndex("phonetic", "Patient.name", "Pieter van de Heuvel MSc"),
+        StringIndex("name", "Patient.name", "Pieter van de Heuvel MSc"),
         StringIndex("family", "Patient.name.family", testPatient.nameFirstRep.family),
         StringIndex("address-city", "Patient.address.city", testPatient.addressFirstRep.city)
       )
@@ -888,7 +889,11 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.stringIndices)
       .containsExactly(
-        StringIndex("address", "Location.address", testLocation.address.toString()),
+        StringIndex(
+          "address",
+          "Location.address",
+          "3300 Washtenaw Avenue, Suite 227, Ann Arbor, MI, USA, 48104"
+        ),
         StringIndex("address-state", "Location.address.state", testLocation.address.state),
         StringIndex(
           "address-postalcode",
@@ -899,6 +904,163 @@ class ResourceIndexerTest {
         StringIndex("address-country", "Location.address.country", testLocation.address.country),
         StringIndex("address-city", "Location.address.city", testLocation.address.city)
       )
+  }
+
+  @Test
+  fun index_string_humanName() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        addName(
+          HumanName().apply {
+            prefix = listOf(StringType("Mr."))
+            given = listOf(StringType("Pieter"))
+            family = "van de Heuvel"
+            suffix = listOf(StringType("MSc"))
+          }
+        )
+      }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.stringIndices)
+      .containsAtLeast(
+        StringIndex("name", "Patient.name", "Mr. Pieter van de Heuvel MSc"),
+        StringIndex("phonetic", "Patient.name", "Mr. Pieter van de Heuvel MSc")
+      )
+  }
+
+  @Test
+  fun index_string_humanName_nullValues_shouldNotIndexHumanName() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        addName(HumanName())
+      }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.stringIndices.any { it.name == "name" }).isFalse()
+    assertThat(resourceIndices.stringIndices.any { it.name == "phonetic" }).isFalse()
+  }
+
+  @Test
+  fun index_string_humanName_emptyValues_shouldNotIndexHumanName() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        addName(
+          HumanName().apply {
+            prefix = listOf()
+            given = listOf()
+            family = ""
+            suffix = listOf()
+          }
+        )
+      }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.stringIndices.any { it.path == "name" }).isFalse()
+    assertThat(resourceIndices.stringIndices.any { it.name == "phonetic" }).isFalse()
+  }
+
+  @Test
+  fun index_string_humanName_multipleListValues() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        addName(
+          HumanName().apply {
+            prefix =
+              listOf(
+                null,
+                StringType(null),
+                StringType(""),
+                StringType(" "),
+                StringType("Prof."),
+                StringType("Dr.")
+              )
+            given =
+              listOf(null, StringType(null), StringType(""), StringType(" "), StringType("Pieter"))
+            family = "van de Heuvel"
+            suffix =
+              listOf(
+                null,
+                StringType(null),
+                StringType(""),
+                StringType(" "),
+                StringType("MSc"),
+                StringType("Phd")
+              )
+          }
+        )
+      }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.stringIndices)
+      .containsAtLeast(
+        StringIndex("name", "Patient.name", "Prof. Dr. Pieter van de Heuvel MSc Phd"),
+        StringIndex("phonetic", "Patient.name", "Prof. Dr. Pieter van de Heuvel MSc Phd")
+      )
+  }
+
+  @Test
+  fun index_string_address() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        address =
+          listOf(
+            Address().apply {
+              line = listOf(StringType("Van Egmondkade 23"))
+              district = "Amsterdam"
+              city = "Amsterdam"
+              postalCode = "1024 RJ"
+              country = "NLD"
+            }
+          )
+      }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.stringIndices)
+      .contains(
+        StringIndex(
+          "address",
+          "Patient.address",
+          "Van Egmondkade 23, Amsterdam, Amsterdam, NLD, 1024 RJ"
+        )
+      )
+  }
+
+  @Test
+  fun index_string_address_nullValues_shouldNotIndexAddress() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        address = listOf(Address())
+      }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.stringIndices.any { it.name == "address" }).isFalse()
+  }
+
+  @Test
+  fun index_string_address_emptyValues_shouldNotIndexAddress() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        address =
+          listOf(
+            Address().apply {
+              line = listOf()
+              district = ""
+              city = ""
+              postalCode = ""
+              country = ""
+            }
+          )
+      }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.stringIndices.any { it.name == "address" }).isFalse()
   }
 
   private companion object {
