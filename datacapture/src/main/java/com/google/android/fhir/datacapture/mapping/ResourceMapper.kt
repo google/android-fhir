@@ -106,11 +106,11 @@ object ResourceMapper {
       return
     }
 
+    val propertyType = questionnaireItem.inferPropertyResourceClass
     if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
       // create a class for questionnaire item of type group and add to the resource
-      val propertyType = questionnaireItem.inferPropertyResourceClass
       if (propertyType != null) {
-        val base: Base = Class.forName(propertyType.name).newInstance() as Base
+        val base: Base = propertyType.mainType.newInstance() as Base
 
         if (questionnaireItem.item != null && questionnaireResponseItem.item != null) {
           base.extractFields(questionnaireItem.item, questionnaireResponseItem.item)
@@ -125,8 +125,10 @@ object ResourceMapper {
       }
     } else {
       // get answer from questionnaireResponse or from initial value in questionnaire
-      val ans = extractQuestionAnswer(questionnaireResponseItem, questionnaireItem) ?: return
-      val propertyType = questionnaireItem.inferPropertyResourceClass
+      val ans =
+        if (!questionnaireResponseItem.answer.isEmpty())
+          questionnaireResponseItem.answer.first().value
+        else return
 
       if (propertyType != null) {
         if (!propertyType.mainType.isEnum) {
@@ -153,13 +155,13 @@ private fun Base.updateFieldWithEnum(propertyType: FieldType, targetFieldName: S
   The inner-classes in the Enumerations package are valid and not dependent on the classes in the codesystems package
   All enum classes in the org.hl7.fhir.r4.model package implement the fromCode(), toCode() methods among others
    */
-  val dataTypeClass: Class<*> = Class.forName(propertyType.name)
+  val dataTypeClass: Class<*> = propertyType.mainType
   val fromCodeMethod: Method = dataTypeClass.getDeclaredMethod("fromCode", String::class.java)
 
   val stringValue = if (ans is Coding) ans.code else ans.toString()
 
   this.javaClass
-    .getMethod("set${targetFieldName.capitalize()}", Class.forName(propertyType.name))
+    .getMethod("set${targetFieldName.capitalize()}", propertyType.mainType)
     .invoke(this, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
 
@@ -200,7 +202,7 @@ private fun Base.updateFieldWithAnswer(
  * enum. Normally, composite types are mapped using group questions which provide direct alignment
  * to the type elements in the group questions
  */
-fun generateAnswerWithCorrectType(answer: Base, fieldType: FieldType): Base {
+private fun generateAnswerWithCorrectType(answer: Base, fieldType: FieldType): Base {
   when (fieldType.mainType) {
     CodeableConcept::class.java -> {
       if (answer is Coding) {
@@ -214,19 +216,6 @@ fun generateAnswerWithCorrectType(answer: Base, fieldType: FieldType): Base {
 
   return answer
 }
-
-/**
- * Retrieve's the answer from
- * [org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent.answer] if it
- * exists or alternatively uses the initial value set in the
- * [Questionnaire.QuestionnaireItemComponent.initial]
- */
-private fun extractQuestionAnswer(
-  questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-  questionnaireItem: Questionnaire.QuestionnaireItemComponent
-) =
-  if (!questionnaireResponseItem.answer.isEmpty()) questionnaireResponseItem.answer.first().value
-  else if (!questionnaireItem.initial.isEmpty()) questionnaireItem.initial.first().value else null
 
 /**
  * Returns the field name for the [Questionnaire.Item]'s definition.
@@ -323,7 +312,7 @@ private val Questionnaire.QuestionnaireItemComponent.inferPropertyResourceClass:
         }
       }
 
-      return FieldType(currentClass, parameterizedClass, currentClass.name)
+      return FieldType(currentClass, parameterizedClass)
     }
 
     return null
@@ -340,15 +329,14 @@ private const val ITEM_CONTEXT_EXTENSION_URL: String =
 /**
  * Holds information on a {@code Base} field .
  *
- * This data class holds the parameterized type, main type and the field name. For example, with
- * {@code org.hl7.fhir.r4.Patient#telecom} field, the parameterized type is {@code List}, main type
- * is {@code ContactPoint} and the field name is "telecom" since the field is a list of {@code
- * ContactPoint}. This class facilitates the use of reflection to retrieve the method and update the
- * field. Other examples:
- * - Patient#name = FieldType(String::javaClass, null, "name")
- * - Patient#identifer = FieldType(Identifier::javaClass, List::javaClass, "identifier)
+ * This data class holds the parameterized type and main type. For example, with {@code
+ * org.hl7.fhir.r4.Patient#telecom} field, the parameterized type is {@code List} and the main type
+ * is {@code ContactPoint} since the field is a list of {@code ContactPoint}. This class facilitates
+ * the use of reflection to retrieve the method and update the field. Other examples:
+ * - Patient#name = FieldType(String::javaClass, null)
+ * - Patient#identifer = FieldType(Identifier::javaClass, List::javaClass)
  */
-data class FieldType(val mainType: Class<*>, val parameterizedType: Class<*>?, val name: String)
+private data class FieldType(val mainType: Class<*>, val parameterizedType: Class<*>?)
 
 private val FieldType.isList: Boolean
   get() = parameterizedType?.simpleName.equals(List::class.java.simpleName)
@@ -356,4 +344,5 @@ private val FieldType.isList: Boolean
 private val FieldType.isParameterized: Boolean
   get() = parameterizedType != null
 
-fun FieldType.getMethodParam(): Class<*> = if (isParameterized) parameterizedType!! else mainType
+private fun FieldType.getMethodParam(): Class<*> =
+  if (isParameterized) parameterizedType!! else mainType
