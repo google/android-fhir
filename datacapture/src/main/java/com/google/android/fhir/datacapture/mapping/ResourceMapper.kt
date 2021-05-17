@@ -106,22 +106,20 @@ object ResourceMapper {
       return
     }
 
-    val propertyType = questionnaireItem.inferPropertyResourceClass
+    val propertyType = questionnaireItem.inferPropertyResourceClass ?: return
     if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
       // create a class for questionnaire item of type group and add to the resource
-      if (propertyType != null) {
-        val base: Base = propertyType.mainType.newInstance() as Base
+      val base: Base = propertyType.mainType.newInstance() as Base
 
-        if (questionnaireItem.item != null && questionnaireResponseItem.item != null) {
-          base.extractFields(questionnaireItem.item, questionnaireResponseItem.item)
+      if (questionnaireItem.item != null && questionnaireResponseItem.item != null) {
+        base.extractFields(questionnaireItem.item, questionnaireResponseItem.item)
 
-          /*
-          TODO: Update the methods to use add${targetFieldName} also for cases where the propertyType is
-            parameterized. For cases where it's not, we should strictly use set${targetFieldName}Element
-            or set${targetFieldName}
-           */
-          this.updateFieldWithAnswer(base, targetFieldName, propertyType)
-        }
+        /*
+        TODO: Update the methods to use add${targetFieldName} also for cases where the propertyType is
+          parameterized. For cases where it's not, we should strictly use set${targetFieldName}Element
+          or set${targetFieldName}
+         */
+        this.updateFieldWithAnswer(base, targetFieldName, propertyType)
       }
     } else {
       // get answer from questionnaireResponse or from initial value in questionnaire
@@ -130,14 +128,12 @@ object ResourceMapper {
           questionnaireResponseItem.answer.first().value
         else return
 
-      if (propertyType != null) {
-        if (!propertyType.mainType.isEnum) {
-          // this is a low level type e.g. StringType
-          this.updateFieldWithAnswer(ans, targetFieldName, propertyType)
-        } else {
-          // this is a high level type e.g. AdministrativeGender
-          this.updateFieldWithEnum(propertyType, targetFieldName, ans)
-        }
+      if (!propertyType.mainType.isEnum) {
+        // this is a low level type e.g. StringType
+        this.updateFieldWithAnswer(ans, targetFieldName, propertyType)
+      } else {
+        // this is a high level type e.g. AdministrativeGender
+        this.updateFieldWithEnum(propertyType, targetFieldName, ans)
       }
     }
   }
