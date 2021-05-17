@@ -19,6 +19,8 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.localizedPrefix
+import com.google.android.fhir.datacapture.localizedText
 
 internal object QuestionnaireItemGroupViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_group_header_view) {
@@ -35,11 +37,11 @@ internal object QuestionnaireItemGroupViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix()
         } else {
           prefixTextView.visibility = View.GONE
         }
-        groupHeader.text = questionnaireItemViewItem.questionnaireItem.text
+        groupHeader.text = questionnaireItemViewItem.questionnaireItem.localizedText()
         groupHeader.visibility =
           if (groupHeader.text.isEmpty()) {
             View.GONE

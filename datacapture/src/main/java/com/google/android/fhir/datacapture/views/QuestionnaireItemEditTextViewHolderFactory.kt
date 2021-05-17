@@ -21,6 +21,8 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.localizedPrefix
+import com.google.android.fhir.datacapture.localizedText
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputEditText
@@ -71,11 +73,11 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     this.questionnaireItemViewItem = questionnaireItemViewItem
     if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
       prefixTextView.visibility = View.VISIBLE
-      prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
+      prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix()
     } else {
       prefixTextView.visibility = View.GONE
     }
-    textQuestion.text = questionnaireItemViewItem.questionnaireItem.text
+    textQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText()
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
   }
 

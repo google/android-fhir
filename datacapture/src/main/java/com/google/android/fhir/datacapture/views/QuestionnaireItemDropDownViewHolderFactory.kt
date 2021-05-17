@@ -24,6 +24,8 @@ import android.widget.AutoCompleteTextView
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.localizedPrefix
+import com.google.android.fhir.datacapture.localizedText
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemDropDownViewHolderFactory :
@@ -47,11 +49,11 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix()
         } else {
           prefixTextView.visibility = View.GONE
         }
-        textView.text = questionnaireItemViewItem.questionnaireItem.text
+        textView.text = questionnaireItemViewItem.questionnaireItem.localizedText()
         val answerOptionString =
           this.questionnaireItemViewItem.questionnaireItem.answerOption.map { it.displayString }
         val adapter =

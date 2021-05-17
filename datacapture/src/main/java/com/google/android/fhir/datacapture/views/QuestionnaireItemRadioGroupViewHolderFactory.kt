@@ -23,6 +23,8 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
+import com.google.android.fhir.datacapture.localizedPrefix
+import com.google.android.fhir.datacapture.localizedText
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemRadioGroupViewHolderFactory :
@@ -44,13 +46,13 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix()
         } else {
           prefixTextView.visibility = View.GONE
         }
         val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
         val answer = questionnaireResponseItem.answer.singleOrNull()?.valueCoding
-        radioHeader.text = questionnaireItem.text
+        radioHeader.text = questionnaireItem.localizedText()
         radioGroup.removeAllViews()
         radioGroup.setOnCheckedChangeListener(null)
         var index = 0
