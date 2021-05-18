@@ -60,9 +60,8 @@ object ResourceMapper {
    */
   fun extract(questionnaire: Questionnaire, questionnaireResponse: QuestionnaireResponse): Base {
     val className = questionnaire.itemContextNameToExpressionMap.values.first()
-    val base = Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Base
-    base.extractFields(questionnaire.item, questionnaireResponse.item)
-    return base
+    return (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Base)
+      .apply { extractFields(questionnaire.item, questionnaireResponse.item) }
   }
 
   /**
