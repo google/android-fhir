@@ -75,10 +75,7 @@ object ResourceMapper {
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
     while (questionnaireItemListIterator.hasNext() &&
       questionnaireResponseItemListIterator.hasNext()) {
-      val questionnaireItem = questionnaireItemListIterator.next()
-      val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
-
-      extractField(questionnaireItem, questionnaireResponseItem)
+      extractField(questionnaireItemListIterator.next(), questionnaireResponseItemListIterator.next())
     }
   }
 
