@@ -60,12 +60,14 @@ object ResourceMapper {
    */
   fun extract(questionnaire: Questionnaire, questionnaireResponse: QuestionnaireResponse): Base {
     val className = questionnaire.itemContextNameToExpressionMap.values.first()
-    return (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Base)
-      .apply { extractFields(questionnaire.item, questionnaireResponse.item) }
+    return (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Base).apply {
+      extractFields(questionnaire.item, questionnaireResponse.item)
+    }
   }
 
   /**
-   * Extracts answer values from [questionnaireResponseItemList] and updates the fields defined in the corresponding questions in [questionnaireItemList]. This method handles nested fields.
+   * Extracts answer values from [questionnaireResponseItemList] and updates the fields defined in
+   * the corresponding questions in [questionnaireItemList]. This method handles nested fields.
    */
   private fun Base.extractFields(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
@@ -75,22 +77,23 @@ object ResourceMapper {
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
     while (questionnaireItemListIterator.hasNext() &&
       questionnaireResponseItemListIterator.hasNext()) {
-      extractField(questionnaireItemListIterator.next(), questionnaireResponseItemListIterator.next())
+      extractField(
+        questionnaireItemListIterator.next(),
+        questionnaireResponseItemListIterator.next()
+      )
     }
   }
 
   /**
-   * Extracts the answer value from [questionnaireResponseItem] and updates the field defined in [questionnaireItem]. This method handles nested fields.
-
+   * Extracts the answer value from [questionnaireResponseItem] and updates the field defined in
+   * [questionnaireItem]. This method handles nested fields.
    */
   private fun Base.extractField(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ) {
     if (questionnaireItem.definition == null) {
-      if (questionnaireItem.item != null && questionnaireResponseItem.item != null) {
-        this.extractFields(questionnaireItem.item, questionnaireResponseItem.item)
-      }
+      this.extractFields(questionnaireItem.item, questionnaireResponseItem.item)
       return
     }
 
@@ -104,16 +107,14 @@ object ResourceMapper {
       // create a class for questionnaire item of type group and add to the resource
       val base: Base = propertyType.mainType.newInstance() as Base
 
-      if (questionnaireItem.item != null && questionnaireResponseItem.item != null) {
-        base.extractFields(questionnaireItem.item, questionnaireResponseItem.item)
+      base.extractFields(questionnaireItem.item, questionnaireResponseItem.item)
 
-        /*
-        TODO: Update the methods to use add${targetFieldName} also for cases where the propertyType is
-          parameterized. For cases where it's not, we should strictly use set${targetFieldName}Element
-          or set${targetFieldName}
-         */
-        this.updateFieldWithAnswer(base, targetFieldName, propertyType)
-      }
+      /*
+      TODO: Update the methods to use add${targetFieldName} also for cases where the propertyType is
+        parameterized. For cases where it's not, we should strictly use set${targetFieldName}Element
+        or set${targetFieldName}
+       */
+      this.updateFieldWithAnswer(base, targetFieldName, propertyType)
     } else {
       // get answer from questionnaireResponse or from initial value in questionnaire
       val ans =
