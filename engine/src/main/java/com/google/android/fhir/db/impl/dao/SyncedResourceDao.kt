@@ -20,6 +20,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -27,6 +28,11 @@ import org.hl7.fhir.r4.model.ResourceType
 interface SyncedResourceDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun insert(entity: SyncedResourceEntity)
+
+  @Transaction
+  suspend fun insertAll(resources: List<SyncedResourceEntity>) {
+      resources.forEach { resource -> insert(resource) }
+  }
 
   /**
    * We will always have 1 entry for each [ResourceType] as it's the primary key, so we can limit

@@ -21,7 +21,6 @@ import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.ResourceNotFoundException
 import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.resource.TestingUtils
-import com.google.android.fhir.sync.FhirDataSource
 import com.google.common.truth.Truth
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle

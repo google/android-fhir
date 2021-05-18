@@ -27,10 +27,12 @@ abstract class PeriodicSyncWorker(appContext: Context, workerParams: WorkerParam
   CoroutineWorker(appContext, workerParams) {
 
   abstract fun getFhirEngine(): FhirEngine
+  abstract fun getDataSource(): DataSource
+  abstract fun getSyncData(): ResourceSyncParams
 
   override suspend fun doWork(): Result {
     // TODO handle retry
-    val result = getFhirEngine().periodicSync()
+    val result = FhirSynchronizer(getFhirEngine(), getDataSource(), getSyncData()).download()
     if (result is Success) {
       return Result.success()
     }

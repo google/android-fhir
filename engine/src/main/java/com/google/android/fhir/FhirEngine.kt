@@ -16,11 +16,12 @@
 
 package com.google.android.fhir
 
+import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.search.Search
-import com.google.android.fhir.sync.PeriodicSyncConfiguration
-import com.google.android.fhir.sync.Result
-import com.google.android.fhir.sync.SyncConfiguration
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface FhirEngine {
@@ -55,20 +56,13 @@ interface FhirEngine {
    */
   suspend fun <R : Resource> remove(clazz: Class<R>, id: String)
 
-  /**
-   * One time download of resources.
-   *
-   * @param syncConfiguration
-   * - configuration of data that needs to be synchronised
-   */
-  suspend fun sync(syncConfiguration: SyncConfiguration): Result
-
-  /** Attempts to upload locally created and modified resources. */
-  suspend fun syncUpload(): Result
-
-  suspend fun periodicSync(): Result
-
-  fun updatePeriodicSyncConfiguration(syncConfig: PeriodicSyncConfiguration)
-
   suspend fun <R : Resource> search(search: Search): List<R>
+
+  suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>)
+
+  suspend fun syncUpload(upload: (suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>))
+}
+
+interface SyncDownloadContext {
+  suspend fun getLatestTimestamptFor(type:ResourceType):String?
 }
