@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import android.text.TextUtils
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import org.hl7.fhir.r4.model.Base
@@ -262,15 +261,15 @@ private val Questionnaire.QuestionnaireItemComponent.targetResourceAndElement: L
   get() {
     val pathParts = this.definition.split("#")
     if (pathParts.size >= 2) {
-      val modelAndField = pathParts[1].split(".")
-      if (modelAndField.size >= 2 &&
-          !TextUtils.isEmpty(modelAndField[0]) &&
-          !TextUtils.isEmpty(modelAndField[1])
-      ) {
-        return modelAndField
+      val regex = "[a-z]*(.[a-z]+)+".toRegex()
+      pathParts.filterNot { it.isEmpty() }[1].apply {
+        return if (regex.matches(this)) {
+          this.split(".")
+        } else {
+          null
+        }
       }
     }
-
     return null
   }
 
