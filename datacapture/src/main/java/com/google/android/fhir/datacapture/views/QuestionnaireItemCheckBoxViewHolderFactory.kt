@@ -55,11 +55,11 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix()
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
         } else {
           prefixTextView.visibility = View.GONE
         }
-        checkBox.text = questionnaireItemViewItem.questionnaireItem.localizedText()
+        checkBox.text = questionnaireItemViewItem.questionnaireItem.localizedText
         checkBox.isChecked =
           questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value ?: false
       }

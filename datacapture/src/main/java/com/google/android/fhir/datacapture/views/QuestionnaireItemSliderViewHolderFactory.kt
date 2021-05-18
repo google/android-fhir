@@ -44,13 +44,13 @@ internal object QuestionnaireItemSliderViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix()
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
         } else {
           prefixTextView.visibility = View.GONE
         }
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         val answer = questionnaireItemViewItem.singleAnswerOrNull
-        sliderHeader.text = questionnaireItem.localizedText()
+        sliderHeader.text = questionnaireItem.localizedText
         slider.valueFrom = 0.0F
         slider.valueTo = 100.0F
         slider.stepSize = 10.0F

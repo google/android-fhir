@@ -73,11 +73,11 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     this.questionnaireItemViewItem = questionnaireItemViewItem
     if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
       prefixTextView.visibility = View.VISIBLE
-      prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix()
+      prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
     } else {
       prefixTextView.visibility = View.GONE
     }
-    textQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText()
+    textQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
     textInputEditText.setText(getText(questionnaireItemViewItem.singleAnswerOrNull))
   }
 

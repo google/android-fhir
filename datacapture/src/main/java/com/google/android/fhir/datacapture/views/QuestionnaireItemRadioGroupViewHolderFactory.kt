@@ -46,13 +46,13 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix()
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
         } else {
           prefixTextView.visibility = View.GONE
         }
         val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
         val answer = questionnaireResponseItem.answer.singleOrNull()?.valueCoding
-        radioHeader.text = questionnaireItem.localizedText()
+        radioHeader.text = questionnaireItem.localizedText
         radioGroup.removeAllViews()
         radioGroup.setOnCheckedChangeListener(null)
         var index = 0

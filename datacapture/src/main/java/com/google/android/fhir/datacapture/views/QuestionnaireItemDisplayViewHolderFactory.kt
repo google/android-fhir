@@ -37,11 +37,11 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix()
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
         } else {
           prefixTextView.visibility = View.GONE
         }
-        textView.text = questionnaireItemViewItem.questionnaireItem.localizedText()
+        textView.text = questionnaireItemViewItem.questionnaireItem.localizedText
         textView.visibility =
           if (textView.text.isEmpty()) {
             View.GONE
