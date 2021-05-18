@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.datacapture
 
-import java.util.*
+import java.util.Locale
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -46,19 +46,22 @@ internal val Questionnaire.QuestionnaireItemComponent.itemControl: String?
 val Questionnaire.QuestionnaireItemComponent.hasNestedItemsWithinAnswers: Boolean
   get() = item.isNotEmpty() && type != Questionnaire.QuestionnaireItemType.GROUP
 
-private fun StringType.getLocalizedText(lang: String = Locale.getDefault().toLanguageTag()) : String?{
-  return getTranslation(lang)
-    ?: getTranslation(lang.split("-").first()) ?: value
+private fun StringType.getLocalizedText(
+  lang: String = Locale.getDefault().toLanguageTag()
+): String? {
+  return getTranslation(lang) ?: getTranslation(lang.split("-").first()) ?: value
 }
 
 /**
- * Localized value of [Questionnaire.QuestionnaireItemComponent.text] if translation is present. Default value otherwise.
+ * Localized value of [Questionnaire.QuestionnaireItemComponent.text] if translation is present.
+ * Default value otherwise.
  */
-internal val Questionnaire.QuestionnaireItemComponent.localizedText : String?
+internal val Questionnaire.QuestionnaireItemComponent.localizedText: String?
   get() = textElement?.getLocalizedText()
 
 /**
- * Localized value of [Questionnaire.QuestionnaireItemComponent.prefix] if translation is present. Default value otherwise.
+ * Localized value of [Questionnaire.QuestionnaireItemComponent.prefix] if translation is present.
+ * Default value otherwise.
  */
-internal val Questionnaire.QuestionnaireItemComponent.localizedPrefix : String?
+internal val Questionnaire.QuestionnaireItemComponent.localizedPrefix: String?
   get() = prefixElement?.getLocalizedText()

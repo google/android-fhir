@@ -124,9 +124,7 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun localizedText_default() {
     val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        text = "Patient Information"
-      }
+      Questionnaire.QuestionnaireItemComponent().apply { text = "Patient Information" }
     Locale.setDefault(Locale.US)
 
     assertThat(questionnaireItem.localizedText).isEqualTo("Patient Information")
@@ -134,10 +132,7 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun localizedPrefix_default() {
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        prefix = "One"
-      }
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { prefix = "One" }
     Locale.setDefault(Locale.US)
 
     assertThat(questionnaireItem.localizedPrefix).isEqualTo("One")
