@@ -83,9 +83,8 @@ object ResourceMapper {
   }
 
   /**
-   * Extracts value for field in the QuestionnaireResponse from the corresponding question and
-   * answer in [questionnaireItem] and [questionnaireResponseItem] and updates it on the Base object
-   * target property. This method handles nested fields in the Questionnaire
+   * Extracts the answer value from [questionnaireResponseItem] and updates the field defined in [questionnaireItem]. This method handles nested fields.
+
    */
   private fun Base.extractField(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
