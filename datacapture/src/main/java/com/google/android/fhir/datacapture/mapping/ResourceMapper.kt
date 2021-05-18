@@ -328,7 +328,7 @@ private const val ITEM_CONTEXT_EXTENSION_URL: String =
 private data class FieldType(val mainType: Class<*>, val parameterizedType: Class<*>?)
 
 private val FieldType.isList: Boolean
-  get() = parameterizedType?.simpleName.equals(List::class.java.simpleName)
+  get() = parameterizedType?.name.equals(List::class.java.name)
 
 private val FieldType.isParameterized: Boolean
   get() = parameterizedType != null
