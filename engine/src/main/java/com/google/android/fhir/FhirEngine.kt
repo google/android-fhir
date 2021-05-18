@@ -18,7 +18,6 @@ package com.google.android.fhir
 
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.search.Search
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -64,5 +63,5 @@ interface FhirEngine {
 }
 
 interface SyncDownloadContext {
-  suspend fun getLatestTimestamptFor(type:ResourceType):String?
+  suspend fun getLatestTimestamptFor(type: ResourceType): String?
 }

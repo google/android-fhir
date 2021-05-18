@@ -31,7 +31,7 @@ interface SyncedResourceDao {
 
   @Transaction
   suspend fun insertAll(resources: List<SyncedResourceEntity>) {
-      resources.forEach { resource -> insert(resource) }
+    resources.forEach { resource -> insert(resource) }
   }
 
   /**

@@ -38,11 +38,7 @@ internal data class FhirServices(
     fun build(): FhirServices {
       val parser = FhirContext.forR4().newJsonParser()
       val db = DatabaseImpl(context = context, iParser = parser, databaseName = databaseName)
-      val engine =
-        FhirEngineImpl(
-          database = db,
-          context = context
-        )
+      val engine = FhirEngineImpl(database = db, context = context)
       return FhirServices(fhirEngine = engine, parser = parser, database = db)
     }
   }
