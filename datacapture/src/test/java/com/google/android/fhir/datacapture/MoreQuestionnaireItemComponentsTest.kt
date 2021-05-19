@@ -57,7 +57,6 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun itemControl_shouldReturnItemControlCodeRadioButton() {
-
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
     questionnaireItem.addExtension(
@@ -79,7 +78,6 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun itemControl_wrongExtensionUrl_shouldReturnNull() {
-
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
     questionnaireItem.addExtension(
@@ -101,7 +99,6 @@ class MoreQuestionnaireItemComponentsTest {
 
   @Test
   fun itemControl_wrongExtensionCoding_shouldReturnNull() {
-
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
     questionnaireItem.addExtension(
