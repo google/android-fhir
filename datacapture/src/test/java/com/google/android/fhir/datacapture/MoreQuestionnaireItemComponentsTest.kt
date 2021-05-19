@@ -158,6 +158,7 @@ class MoreQuestionnaireItemComponentsTest {
   fun localizedPrefix_vietnameseTranslation_usLocale_shouldReturnDefault() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
+        prefix = "One"
         prefixElement.apply {
           addExtension(
             Extension(ToolingExtensions.EXT_TRANSLATION).apply {
