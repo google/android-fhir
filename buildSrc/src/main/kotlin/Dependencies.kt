@@ -42,14 +42,14 @@ object Dependencies {
   }
 
   object Lifecycle {
-    const val extensions = "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecyle}"
+    const val extensions = "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
     const val liveDataCoreKtx =
-      "androidx.lifecycle:lifecycle-livedata-core-ktx:${Versions.Androidx.lifecyle}"
+      "androidx.lifecycle:lifecycle-livedata-core-ktx:${Versions.Androidx.lifecycle}"
     const val liveDataKtx =
-      "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.Androidx.lifecyle}"
-    const val runtime = "androidx.lifecycle:lifecycle-runtime:${Versions.Androidx.lifecyle}"
+      "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.Androidx.lifecycle}"
+    const val runtime = "androidx.lifecycle:lifecycle-runtime:${Versions.Androidx.lifecycle}"
     const val viewModelKtx =
-      "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.Androidx.lifecyle}"
+      "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.Androidx.lifecycle}"
   }
 
   object Navigation {
@@ -94,7 +94,7 @@ object Dependencies {
 
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
   const val junit = "junit:junit:${Versions.junit}"
-  const val roboelectric = "org.robolectric:robolectric:${Versions.roboelectric}"
+  const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
 
   object Versions {
@@ -103,7 +103,7 @@ object Dependencies {
       const val appCompat = "1.1.0"
       const val constraintLayout = "1.1.3"
       const val fragmentKtx = "1.3.1"
-      const val lifecyle = "2.2.0"
+      const val lifecycle = "2.2.0"
       const val navigation = "2.3.4"
       const val recyclerView = "1.1.0"
       const val room = "2.2.5"
@@ -139,6 +139,6 @@ object Dependencies {
 
     const val espresso = "3.3.0"
     const val junit = "4.13"
-    const val roboelectric = "4.3.1"
+    const val robolectric = "4.3.1"
   }
 }
