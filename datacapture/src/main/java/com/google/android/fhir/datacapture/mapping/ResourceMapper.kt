@@ -92,7 +92,7 @@ object ResourceMapper {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ) {
     if (questionnaireItem.definition == null) {
-      this.extractFields(questionnaireItem.item, questionnaireResponseItem.item)
+      extractFields(questionnaireItem.item, questionnaireResponseItem.item)
       return
     }
 
@@ -108,25 +108,19 @@ object ResourceMapper {
 
       base.extractFields(questionnaireItem.item, questionnaireResponseItem.item)
 
-      /*
-      TODO: Update the methods to use add${targetFieldName} also for cases where the propertyType is
-        parameterized. For cases where it's not, we should strictly use set${targetFieldName}Element
-        or set${targetFieldName}
-       */
-      this.updateFieldWithAnswer(base, targetFieldName, propertyType)
+      updateFieldWithAnswer(base, targetFieldName, propertyType)
     } else {
-      // get answer from questionnaireResponse or from initial value in questionnaire
-      val ans =
+      val answer =
         if (!questionnaireResponseItem.answer.isEmpty())
           questionnaireResponseItem.answer.first().value
         else return
 
       if (!propertyType.mainType.isEnum) {
         // this is a low level type e.g. StringType
-        this.updateFieldWithAnswer(ans, targetFieldName, propertyType)
+        updateFieldWithAnswer(answer, targetFieldName, propertyType)
       } else {
         // this is a high level type e.g. AdministrativeGender
-        this.updateFieldWithEnum(propertyType, targetFieldName, ans)
+        updateFieldWithEnum(propertyType, targetFieldName, answer)
       }
     }
   }
@@ -149,7 +143,7 @@ private fun Base.updateFieldWithEnum(propertyType: FieldType, targetFieldName: S
 
   val stringValue = if (ans is Coding) ans.code else ans.toString()
 
-  this.javaClass
+  javaClass
     .getMethod("set${targetFieldName.capitalize()}", propertyType.mainType)
     .invoke(this, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
@@ -166,18 +160,13 @@ private fun Base.updateFieldWithAnswer(
   val paramAns = generateAnswerWithCorrectType(answer, fieldType)
 
   try {
-    this.javaClass
-      .getMethod("set${targetFieldName.capitalize()}Element", fieldType.getMethodParam())
+    javaClass
+      .getMethod("set${targetFieldName.capitalize()}Element", fieldType.getSetterMethodParam())
       .invoke(this, paramAns)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
-    /*
-    TODO: Eliminate dependence on code to convert a single item to list
-      - But depend on the parameterized type
-      - Use addField method where the answer is single i.e. does not match the collection type
-     */
-    this.javaClass
-      .getMethod("set${targetFieldName.capitalize()}", fieldType.getMethodParam())
+    javaClass
+      .getMethod("set${targetFieldName.capitalize()}", fieldType.getSetterMethodParam())
       .invoke(
         this,
         if (fieldType.isParameterized && fieldType.isList) listOf(paramAns) else paramAns
@@ -195,10 +184,7 @@ private fun generateAnswerWithCorrectType(answer: Base, fieldType: FieldType): B
   when (fieldType.mainType) {
     CodeableConcept::class.java -> {
       if (answer is Coding) {
-        val codeableConcept = CodeableConcept(answer)
-        codeableConcept.setText(answer.display)
-
-        return codeableConcept
+        return CodeableConcept(answer).apply { text = answer.display }
       }
     }
   }
@@ -252,42 +238,40 @@ private val Questionnaire.itemContextNameToExpressionMap: Map<String, String>
   }
 
 /**
- * Extracts the Resource name and resource property name from the definition eg. extracts
- * http://hl7.org/fhir/StructureDefinition/Patient#Patient.name into list("Patient", "name")
+ * Extracts a list containing the resource name followed by field names leading to the destination
+ * field defined in the [definition] field, or `null` if the [definition] field is empty or invalid.
  *
- * @return list of resource-name and resource-element-name
+ * For example, if the [definition] field is
+ * "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name", `listOf("Patient", "name")` will
+ * be returned.
  */
 private val Questionnaire.QuestionnaireItemComponent.targetResourceAndElement: List<String>?
   get() {
-    val pathParts = this.definition.split("#")
-    if (pathParts.size >= 2) {
-      val regex = "[a-z]*(.[a-z]+)+".toRegex()
-      pathParts.filterNot { it.isEmpty() }[1].apply {
-        return if (regex.matches(this)) {
-          this.split(".")
-        } else {
-          null
-        }
-      }
-    }
-    return null
+    val pathParts = definition.split("#")
+    if (pathParts.size < 2) return null
+
+    val snapshotPath = pathParts.last()
+    if (!"[a-zA-Z]+(\\.[a-zA-Z]+)+".toRegex().matches(snapshotPath)) return null
+
+    return snapshotPath.split(".")
   }
 
 /**
- * Retrieve details about the target field defined in
+ * Retrieves details about the target field defined in
  * [org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent.definition] for easier searching
- * of the setter methods and converting the answer to the expected parameter type
+ * of the setter methods and converting the answer to the expected parameter type.
  */
 private val Questionnaire.QuestionnaireItemComponent.inferPropertyResourceClass: FieldType?
   get() {
-    val modelAndField = this.targetResourceAndElement
-    if (modelAndField != null) {
-      var currentClass: Class<*> = Class.forName("org.hl7.fhir.r4.model.${modelAndField.get(0)}")
-      var parameterizedClass: Class<*>? = null
+    val modelAndField = targetResourceAndElement ?: return null
+    var currentClass: Class<*> = Class.forName("org.hl7.fhir.r4.model.${modelAndField.get(0)}")
+    var parameterizedClass: Class<*>? = null
 
-      for (i in 1 until modelAndField.size) {
-        val declaredFields = currentClass.declaredFields
-        for (declaredField in declaredFields) if (declaredField.name.equals(modelAndField[i])) {
+    modelAndField.forEachIndexed loop@{ index, fieldName ->
+      if (index == 0) return@loop
+
+      currentClass.declaredFields.forEach { declaredField ->
+        if (declaredField.name == fieldName) {
           if (declaredField.genericType is ParameterizedType) {
             currentClass =
               (declaredField.genericType as ParameterizedType).actualTypeArguments[0] as Class<*>
@@ -297,14 +281,12 @@ private val Questionnaire.QuestionnaireItemComponent.inferPropertyResourceClass:
             parameterizedClass = null
           }
 
-          break
+          return@loop
         }
       }
-
-      return FieldType(currentClass, parameterizedClass)
     }
 
-    return null
+    return FieldType(currentClass, parameterizedClass)
   }
 
 /**
@@ -322,8 +304,9 @@ private const val ITEM_CONTEXT_EXTENSION_URL: String =
  * org.hl7.fhir.r4.Patient#telecom} field, the parameterized type is {@code List} and the main type
  * is {@code ContactPoint} since the field is a list of {@code ContactPoint}. This class facilitates
  * the use of reflection to retrieve the method and update the field. Other examples:
- * - Patient#name = FieldType(String::javaClass, null)
+ * - Patient#name = FieldType(HumanName::javaClass, null)
  * - Patient#identifer = FieldType(Identifier::javaClass, List::javaClass)
+ * - Patient#gender = FieldType(AdministrativeGender::javaClass, Enumeration::javaClass)
  */
 private data class FieldType(val mainType: Class<*>, val parameterizedType: Class<*>?)
 
@@ -333,5 +316,9 @@ private val FieldType.isList: Boolean
 private val FieldType.isParameterized: Boolean
   get() = parameterizedType != null
 
-private fun FieldType.getMethodParam(): Class<*> =
+/**
+ * Retrieves the actual method param as declared on the method signature. This is used when
+ * retrieving the setter method using reflection
+ */
+private fun FieldType.getSetterMethodParam(): Class<*> =
   if (isParameterized) parameterizedType!! else mainType
