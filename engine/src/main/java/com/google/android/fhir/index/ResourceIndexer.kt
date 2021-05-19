@@ -141,6 +141,13 @@ internal object ResourceIndexer {
       }
     }
 
+    if (resource.hasLanguage()) {
+      // See IAnyResource.java
+      if (resource.language.isNotBlank()) {
+        indexBuilder.addStringIndex(StringIndex("_language", "", resource.language))
+      }
+    }
+
     return indexBuilder.build()
   }
 

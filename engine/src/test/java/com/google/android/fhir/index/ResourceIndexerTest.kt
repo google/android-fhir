@@ -103,11 +103,11 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_profile_null() {
+  fun index_profile_empty() {
     val patient =
       Patient().apply {
         id = "non-null-ID"
-        meta = Meta().setProfile(null)
+        meta = Meta().setProfile(mutableListOf(CanonicalType("")))
       }
     val resourceIndices = ResourceIndexer.index(patient)
     assertThat(resourceIndices.referenceIndices.any { it.name == "_profile" }).isFalse()
@@ -129,11 +129,11 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_tag_null() {
+  fun index_tag_empty() {
     val patient =
       Patient().apply {
         id = "non-null-ID"
-        meta = Meta().setTag(null)
+        meta = Meta().setTag(mutableListOf(Coding("", "", "")))
       }
     val resourceIndices = ResourceIndexer.index(patient)
 
@@ -158,16 +158,40 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_security_null() {
+  fun index_security_empty() {
     val patient =
       Patient().apply {
         id = "non-null-ID"
-        meta = Meta().setSecurity(null)
+        meta = Meta().setSecurity(mutableListOf(Coding("", "", "")))
       }
 
     val resourceIndices = ResourceIndexer.index(patient)
 
     assertThat(resourceIndices.tokenIndices.any { it.name == "_security" }).isFalse()
+  }
+
+  @Test
+  fun index_language() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        language = "EN"
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.stringIndices).contains(StringIndex("_language", "", "EN"))
+  }
+
+  @Test
+  fun index_language_empty() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        language = ""
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.stringIndices.any { it.name == "_language" }).isFalse()
   }
 
   @Test
