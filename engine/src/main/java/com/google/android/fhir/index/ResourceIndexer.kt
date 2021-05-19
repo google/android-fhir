@@ -106,6 +106,41 @@ internal object ResourceIndexer {
       )
     }
 
+    if (resource.meta.hasProfile()) {
+      resource.meta.profile.filter { it.value != null && it.value.isNotEmpty() }.forEach {
+        ReferenceIndex(
+            "_profile",
+            arrayOf(resource.fhirType(), "meta", "profile").joinToString(separator = "."),
+            it.value
+          )
+          .also { index -> indexBuilder.addReferenceIndex(index) }
+      }
+    }
+
+    if (resource.meta.hasTag()) {
+      resource.meta.tag.filter { it.code != null && it.code!!.isNotEmpty() }.forEach {
+        TokenIndex(
+            "_tag",
+            arrayOf(resource.fhirType(), "meta", "tag").joinToString(separator = "."),
+            it.system ?: "",
+            it.code
+          )
+          .also { index -> indexBuilder.addTokenIndex(index) }
+      }
+    }
+
+    if (resource.meta.hasSecurity()) {
+      resource.meta.security.filter { it.code != null && it.code!!.isNotEmpty() }.forEach {
+        TokenIndex(
+            "_security",
+            arrayOf(resource.fhirType(), "meta", "security").joinToString(separator = "."),
+            it.system ?: "",
+            it.code
+          )
+          .also { index -> indexBuilder.addTokenIndex(index) }
+      }
+    }
+
     return indexBuilder.build()
   }
 
