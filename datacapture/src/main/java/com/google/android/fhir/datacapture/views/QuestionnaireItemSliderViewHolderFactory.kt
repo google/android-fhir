@@ -19,6 +19,8 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.localizedPrefix
+import com.google.android.fhir.datacapture.localizedText
 import com.google.android.material.slider.Slider
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -42,13 +44,13 @@ internal object QuestionnaireItemSliderViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
         } else {
           prefixTextView.visibility = View.GONE
         }
         val questionnaireItem = questionnaireItemViewItem.questionnaireItem
         val answer = questionnaireItemViewItem.singleAnswerOrNull
-        sliderHeader.text = questionnaireItem.text
+        sliderHeader.text = questionnaireItem.localizedText
         slider.valueFrom = 0.0F
         slider.valueTo = 100.0F
         slider.stepSize = 10.0F
