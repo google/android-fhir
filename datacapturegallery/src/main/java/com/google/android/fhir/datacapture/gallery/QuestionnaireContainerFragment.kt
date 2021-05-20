@@ -54,11 +54,10 @@ class QuestionnaireContainerFragment : Fragment() {
   ): View? {
     super.onCreate(savedInstanceState)
     _binding = FragmentQuestionnaireContainerBinding.inflate(inflater, container, false)
-    arguments =
-      bundleOf(
-        QUESTIONNAIRE_FILE_PATH_KEY to args.questionnaireFilePathKey,
-        QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY to args.questionnaireResponseFilePathKey
-      )
+    requireArguments().putString(QUESTIONNAIRE_FILE_PATH_KEY, args.questionnaireFilePathKey)
+    requireArguments()
+      .putString(QUESTIONNAIRE_RESPONSE_FILE_PATH_KEY, args.questionnaireResponseFilePathKey)
+
     (requireActivity() as AppCompatActivity).supportActionBar?.apply {
       title = args.questionnaireTitleKey
       setDisplayHomeAsUpEnabled(true)
