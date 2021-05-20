@@ -1,9 +1,11 @@
 package com.google.android.fhir.datacapture.views
 
-import android.R.attr.button
+import android.R.color
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -45,12 +47,11 @@ internal object QuestionnaireItemBarCodeReaderViewHolderFactory :
 
                               val black = context.getColor(R.color.black)
                               barcodeTextView.setTextColor(black)
-
-                              var drawable = ContextCompat.getDrawable(context, R.drawable.ic_barcode)
-                              drawable = DrawableCompat.wrap(drawable!!)
-                              DrawableCompat.setTint(drawable.mutate(), black)
-                              drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
-                              barcodeTextView.setCompoundDrawables(drawable, null, null, null)
+                              for (drawable in barcodeTextView.compoundDrawables) {
+                                  if (drawable != null) {
+                                      drawable.colorFilter = PorterDuffColorFilter(black, PorterDuff.Mode.SRC_IN)
+                                  }
+                              }
 
                               itemView.findViewById<TextView>(R.id.tv_rescan).visibility = View.VISIBLE
                           }
