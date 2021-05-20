@@ -19,6 +19,7 @@ package com.google.android.fhir.search
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
@@ -207,10 +208,8 @@ class SearchTest {
   }
 
   @Test
-<<<<<<< HEAD
   fun search_token_filter() {
-    val query =
-      Search(ResourceType.Patient).apply { filter(Patient.ACTIVE) { value = true } }.getQuery()
+    val query = Search(ResourceType.Patient).apply { filter(Patient.ACTIVE, true) }.getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -238,16 +237,12 @@ class SearchTest {
 
   @Test
   fun search_token_filter_with_system() {
-    val query =
-      Search(ResourceType.Patient)
-        .apply {
-          filter(Patient.IDENTIFIER) {
-            value = "12345"
-            system = "http://acme.org/patient"
-          }
-        }
-        .getQuery()
+    val identifier = Identifier()
+    identifier.value = "12345"
+    identifier.system = "http://acme.org/patient"
 
+    val query =
+      Search(ResourceType.Patient).apply { filter(Patient.IDENTIFIER, identifier) }.getQuery()
     assertThat(query.query)
       .isEqualTo(
         """
@@ -274,10 +269,7 @@ class SearchTest {
   }
 
   @Test
-  fun search_sort_ascending() {
-=======
   fun search_sort_string_ascending() {
->>>>>>> 1bf222c099d168fa8457868fb9cd108650a69c02
     val query =
       Search(ResourceType.Patient).apply { sort(Patient.GIVEN, Order.ASCENDING) }.getQuery()
 

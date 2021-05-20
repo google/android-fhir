@@ -21,7 +21,11 @@ import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.ContactPoint
+import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.UriType
 
 @SearchDslMarker
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
@@ -44,11 +48,23 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     referenceFilter.add(filter)
   }
 
-  fun filter(tokenParameter: TokenClientParam, init: TokenFilter.() -> Unit) {
-    val filter = TokenFilter(tokenParameter)
-    filter.init()
-    tokenFilter.add(filter)
-  }
+  fun filter(filter: TokenClientParam, coding: Coding) =
+    tokenFilter.add(TokenFilter(filter, coding.code, coding.system))
+
+  fun filter(filter: TokenClientParam, identifier: Identifier) =
+    tokenFilter.add(TokenFilter(filter, identifier.value, identifier.system))
+
+  fun filter(filter: TokenClientParam, contactPoint: ContactPoint) =
+    tokenFilter.add(TokenFilter(filter, contactPoint.value))
+
+  fun filter(filter: TokenClientParam, boolean: Boolean) =
+    tokenFilter.add(TokenFilter(filter, boolean.toString()))
+
+  fun filter(filter: TokenClientParam, uriType: UriType) =
+    tokenFilter.add(TokenFilter(filter, uriType.value))
+
+  fun filter(filter: TokenClientParam, string: String) =
+    tokenFilter.add(TokenFilter(filter, string))
 
   fun sort(parameter: StringClientParam, order: Order) {
     sort = parameter
@@ -74,7 +90,7 @@ data class ReferenceFilter(val parameter: ReferenceClientParam?, var value: Stri
 @SearchDslMarker
 data class TokenFilter(
   val parameter: TokenClientParam?,
-  var value: Any? = null,
+  var value: String?,
   var system: String? = null
 )
 

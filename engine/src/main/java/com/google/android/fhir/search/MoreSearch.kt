@@ -126,7 +126,7 @@ fun TokenFilter.query(type: ResourceType): SearchQuery {
     WHERE resourceType = ? AND index_name = ? AND index_value = ?
     AND index_system ${if (system == null) "IS NULL" else "= ?"} 
     """,
-    listOfNotNull(type.name, parameter!!.paramName, value!!.toString(), system)
+    listOfNotNull(type.name, parameter!!.paramName, value!!, system)
   )
 }
 
