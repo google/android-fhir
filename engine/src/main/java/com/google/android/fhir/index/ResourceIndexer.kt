@@ -30,11 +30,13 @@ import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.logicalId
 import java.math.BigDecimal
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
+import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
@@ -99,7 +101,7 @@ internal object ResourceIndexer {
           name = "_lastUpdated",
           path = arrayOf(resource.fhirType(), "meta", "lastUpdated").joinToString(separator = "."),
           from = lastUpdatedElement.value.time,
-          to = lastUpdatedElement.precision.add(lastUpdatedElement.value, 1).time
+          to = lastUpdatedElement.value.time
         )
       )
     }
@@ -123,7 +125,7 @@ internal object ResourceIndexer {
           searchParam.name,
           searchParam.path,
           date.value.time,
-          date.precision.add(date.value, 1).time
+          date.precision.add(date.value, 1).time - 1
         )
       }
       "dateTime" -> {
@@ -132,7 +134,7 @@ internal object ResourceIndexer {
           searchParam.name,
           searchParam.path,
           dateTime.value.time,
-          dateTime.precision.add(dateTime.value, 1).time
+          dateTime.precision.add(dateTime.value, 1).time - 1
         )
       }
       // No need to add precision because an instant is meant to have zero width
@@ -146,7 +148,7 @@ internal object ResourceIndexer {
           searchParam.name,
           searchParam.path,
           if (period.hasStart()) period.start.time else 0,
-          if (period.hasEnd()) period.endElement.precision.add(period.end, 1).time
+          if (period.hasEnd()) period.endElement.precision.add(period.end, 1).time - 1
           else Long.MAX_VALUE
         )
       }
@@ -156,15 +158,56 @@ internal object ResourceIndexer {
           searchParam.name,
           searchParam.path,
           timing.event.minOf { it.value.time },
-          timing.event.maxOf { it.precision.add(it.value, 1).time }
+          timing.event.maxOf { it.precision.add(it.value, 1).time } - 1
         )
       }
       else -> null
     }
 
+  /**
+   * Extension to expresses [HumanName] as a separated string using [separator]. See
+   * https://www.hl7.org/fhir/patient.html#search
+   */
+  private fun HumanName.asString(separator: CharSequence = " "): String {
+    return (prefix.filterNotNull().map { it.value } +
+        given.filterNotNull().map { it.value } +
+        family +
+        suffix.filterNotNull().map { it.value } +
+        text)
+      .filterNotNull()
+      .filter { it.isNotBlank() }
+      .joinToString(separator)
+  }
+
+  /**
+   * Extension to expresses [Address] as a string using [separator]. See
+   * https://www.hl7.org/fhir/patient.html#search
+   */
+  private fun Address.asString(separator: CharSequence = ", "): String {
+    return (line.filterNotNull().map { it.value } +
+        city +
+        district +
+        state +
+        country +
+        postalCode +
+        text)
+      .filterNotNull()
+      .filter { it.isNotBlank() }
+      .joinToString(separator)
+  }
+
   private fun stringIndex(searchParam: SearchParamDefinition, value: Base): StringIndex? =
     if (!value.isEmpty) {
-      StringIndex(searchParam.name, searchParam.path, value.toString())
+      StringIndex(
+        searchParam.name,
+        searchParam.path,
+        value =
+          when (value) {
+            is HumanName -> value.asString()
+            is Address -> value.asString()
+            else -> value.toString()
+          }
+      )
     } else {
       null
     }
@@ -237,7 +280,7 @@ internal object ResourceIndexer {
     return when (value?.fhirType()) {
       "Location.position" -> {
         val location = (value as Location.LocationPositionComponent)
-        return PositionIndex(location.latitude.toDouble(), location.longitude.toDouble())
+        PositionIndex(location.latitude.toDouble(), location.longitude.toDouble())
       }
       else -> null
     }

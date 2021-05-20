@@ -17,11 +17,11 @@
 package com.google.android.fhir.search
 
 import android.os.Build
-import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.RiskAssessment
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -44,6 +44,100 @@ class SearchTest {
         """.trimIndent()
       )
     assertThat(query.args).isEqualTo(listOf(ResourceType.Patient.name))
+  }
+
+  @Test
+  fun search_string_default() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply { filter(Patient.ADDRESS) { value = "someValue" } }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .containsExactly(
+        ResourceType.Patient.name,
+        ResourceType.Patient.name,
+        Patient.ADDRESS.paramName,
+        "someValue"
+      )
+  }
+
+  @Test
+  fun search_string_exact() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.ADDRESS) {
+            modifier = StringFilterModifier.MATCHES_EXACTLY
+            value = "someValue"
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .containsExactly(
+        ResourceType.Patient.name,
+        ResourceType.Patient.name,
+        Patient.ADDRESS.paramName,
+        "someValue"
+      )
+  }
+
+  @Test
+  fun search_string_contains() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.ADDRESS) {
+            modifier = StringFilterModifier.CONTAINS
+            value = "someValue"
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE '%' || ? || '%' COLLATE NOCASE
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .containsExactly(
+        ResourceType.Patient.name,
+        ResourceType.Patient.name,
+        Patient.ADDRESS.paramName,
+        "someValue"
+      )
   }
 
   @Test
@@ -87,14 +181,7 @@ class SearchTest {
   @Test
   fun search_filter() {
     val query =
-      Search(ResourceType.Patient)
-        .apply {
-          filter(Patient.FAMILY) {
-            prefix = ParamPrefixEnum.EQUAL
-            value = "Jones"
-          }
-        }
-        .getQuery()
+      Search(ResourceType.Patient).apply { filter(Patient.FAMILY) { value = "Jones" } }.getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -104,7 +191,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM StringIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? COLLATE NOCASE
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
         )
         """.trimIndent()
       )
@@ -120,6 +207,7 @@ class SearchTest {
   }
 
   @Test
+<<<<<<< HEAD
   fun search_token_filter() {
     val query =
       Search(ResourceType.Patient).apply { filter(Patient.ACTIVE) { value = true } }.getQuery()
@@ -187,6 +275,9 @@ class SearchTest {
 
   @Test
   fun search_sort_ascending() {
+=======
+  fun search_sort_string_ascending() {
+>>>>>>> 1bf222c099d168fa8457868fb9cd108650a69c02
     val query =
       Search(ResourceType.Patient).apply { sort(Patient.GIVEN, Order.ASCENDING) }.getQuery()
 
@@ -205,7 +296,7 @@ class SearchTest {
   }
 
   @Test
-  fun search_sort_descending() {
+  fun search_sort_string_descending() {
     val query =
       Search(ResourceType.Patient).apply { sort(Patient.GIVEN, Order.DESCENDING) }.getQuery()
 
@@ -224,14 +315,31 @@ class SearchTest {
   }
 
   @Test
+  fun search_sort_numbers_ascending() {
+    val query =
+      Search(ResourceType.RiskAssessment)
+        .apply { sort(RiskAssessment.PROBABILITY, Order.ASCENDING) }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+      SELECT a.serializedResource
+      FROM ResourceEntity a
+      LEFT JOIN NumberIndexEntity b
+      ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
+      WHERE a.resourceType = ?
+      ORDER BY b.index_value ASC
+      """.trimIndent()
+      )
+  }
+
+  @Test
   fun search_filter_sort_size_from() {
     val query =
       Search(ResourceType.Patient)
         .apply {
-          filter(Patient.FAMILY) {
-            prefix = ParamPrefixEnum.EQUAL
-            value = "Jones"
-          }
+          filter(Patient.FAMILY) { value = "Jones" }
           sort(Patient.GIVEN, Order.ASCENDING)
           count = 10
           from = 20
@@ -248,7 +356,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM StringIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ? COLLATE NOCASE
+        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
         )
         ORDER BY b.index_value ASC
         LIMIT ? OFFSET ?

@@ -16,6 +16,8 @@
 
 package com.google.android.fhir.search
 
+import ca.uhn.fhir.rest.gclient.NumberClientParam
+import ca.uhn.fhir.rest.gclient.StringClientParam
 import com.google.android.fhir.db.Database
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -28,16 +30,22 @@ fun Search.getQuery(): SearchQuery {
   var sortJoinStatement = ""
   var sortOrderStatement = ""
   val sortArgs = mutableListOf<Any>()
-  if (sort != null) {
+  sort?.let { sort ->
+    val sortTableName =
+      when (sort) {
+        is StringClientParam -> "StringIndexEntity"
+        is NumberClientParam -> "NumberIndexEntity"
+        else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
+      }
     sortJoinStatement =
       """
-      LEFT JOIN StringIndexEntity b
+      LEFT JOIN $sortTableName b
       ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
       """.trimIndent()
     sortOrderStatement = """
       ORDER BY b.index_value ${order.sqlString}
       """.trimIndent()
-    sortArgs += sort!!.paramName
+    sortArgs += sort.paramName
   }
 
   var filterStatement = ""
@@ -85,10 +93,17 @@ fun Search.getQuery(): SearchQuery {
 }
 
 fun StringFilter.query(type: ResourceType): SearchQuery {
+
+  val condition =
+    when (modifier) {
+      StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
+      StringFilterModifier.MATCHES_EXACTLY -> "= ?"
+      StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
+    }
   return SearchQuery(
     """
     SELECT resourceId FROM StringIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value = ? COLLATE NOCASE
+    WHERE resourceType = ? AND index_name = ? AND index_value $condition 
     """,
     listOf(type.name, parameter.paramName, value!!)
   )

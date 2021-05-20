@@ -23,15 +23,23 @@ import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
+import com.google.android.fhir.search.Order
+import com.google.android.fhir.search.Search
+import com.google.android.fhir.search.StringFilterModifier
+import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.sync.FhirDataSource
 import com.google.common.truth.Truth.assertThat
+import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.RiskAssessment
 import org.json.JSONArray
 import org.junit.Assert.assertThrows
 import org.junit.Before
@@ -329,6 +337,172 @@ class DatabaseImplTest {
     assertThat(resourceId).isEqualTo(TEST_PATIENT_2_ID)
     assertThat(resourceType).isEqualTo(TEST_PATIENT_2.resourceType.name)
     assertThat(payload).isEmpty()
+  }
+
+  @Test
+  fun search_sortDescending_twoVeryCloseFloatingPointNumbers_orderedCorrectly() = runBlocking {
+    val smallerId = "risk_assessment_1"
+    val largerId = "risk_assessment_2"
+    database.insert(
+      riskAssessment(id = smallerId, probability = BigDecimal("0.3")),
+      riskAssessment(id = largerId, probability = BigDecimal("0.30000000001"))
+    )
+
+    val results =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply { sort(RiskAssessment.PROBABILITY, Order.DESCENDING) }
+          .getQuery()
+      )
+
+    val ids = results.map { it.id }
+    assertThat(ids)
+      .containsExactly("RiskAssessment/$largerId", "RiskAssessment/$smallerId")
+      .inOrder()
+  }
+
+  private fun riskAssessment(id: String, probability: BigDecimal) =
+    RiskAssessment().apply {
+      setId(id)
+      prediction =
+        listOf(
+          RiskAssessment.RiskAssessmentPredictionComponent().apply {
+            setProbability(DecimalType(probability))
+          }
+        )
+    }
+
+  @Test
+  fun search_string_default() {
+    val patient =
+      Patient().apply {
+        id = "test_1"
+        addName(HumanName().addGiven("Evelyn"))
+      }
+    val res = runBlocking {
+      database.insert(patient)
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { value = "eve" } }.getQuery()
+      )
+    }
+
+    assertThat(res).hasSize(1)
+    assertThat(res[0].id).isEqualTo("Patient/${patient.id}")
+  }
+
+  @Test
+  fun search_string_default_no_match() {
+    val patient =
+      Patient().apply {
+        id = "test_1"
+        addName(HumanName().addGiven("Severine"))
+      }
+    val res = runBlocking {
+      database.insert(patient)
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { value = "eve" } }.getQuery()
+      )
+    }
+
+    assertThat(res).hasSize(0)
+  }
+
+  @Test
+  fun search_string_exact() {
+    val patient =
+      Patient().apply {
+        id = "test_1"
+        addName(HumanName().addGiven("Eve"))
+      }
+    val res = runBlocking {
+      database.insert(patient)
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.GIVEN) {
+              value = "Eve"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            }
+          }
+          .getQuery()
+      )
+    }
+
+    assertThat(res).hasSize(1)
+    assertThat(res[0].id).isEqualTo("Patient/${patient.id}")
+  }
+  @Test
+  fun search_string_exact_no_match() {
+    val patient =
+      Patient().apply {
+        id = "test_1"
+        addName(HumanName().addGiven("EVE"))
+      }
+    val res = runBlocking {
+      database.insert(patient)
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.GIVEN) {
+              value = "Eve"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            }
+          }
+          .getQuery()
+      )
+    }
+
+    assertThat(res).hasSize(0)
+  }
+
+  @Test
+  fun search_string_contains() {
+    val patient =
+      Patient().apply {
+        id = "test_1"
+        addName(HumanName().addGiven("Severine"))
+      }
+
+    val res = runBlocking {
+      database.insert(patient)
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.GIVEN) {
+              value = "Eve"
+              modifier = StringFilterModifier.CONTAINS
+            }
+          }
+          .getQuery()
+      )
+    }
+
+    assertThat(res).hasSize(1)
+    assertThat(res[0].id).isEqualTo("Patient/${patient.id}")
+  }
+
+  @Test
+  fun search_string_contains_no_match() {
+    val patient =
+      Patient().apply {
+        id = "test_1"
+        addName(HumanName().addGiven("John"))
+      }
+    val res = runBlocking {
+      database.insert(patient)
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.GIVEN) {
+              value = "eve"
+              modifier = StringFilterModifier.CONTAINS
+            }
+          }
+          .getQuery()
+      )
+    }
+
+    assertThat(res).hasSize(0)
   }
 
   private companion object {
