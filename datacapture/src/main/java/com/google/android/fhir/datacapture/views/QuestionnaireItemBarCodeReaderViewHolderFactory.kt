@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -15,6 +16,8 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
 import com.google.mlkit.md.LiveBarcodeScanningFragment
+import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 
 
 internal object QuestionnaireItemBarCodeReaderViewHolderFactory :
@@ -43,10 +46,12 @@ internal object QuestionnaireItemBarCodeReaderViewHolderFactory :
                       context,
                       object : FragmentResultListener {
                           override fun onFragmentResult(requestKey: String, result: Bundle) {
-                              barcodeTextView.text = result.getString("result")
+                              val barcode = result.getString("result")?.trim()
+                              barcodeTextView.text = barcode
 
                               val black = context.getColor(R.color.black)
                               barcodeTextView.setTextColor(black)
+                              barcodeTextView.typeface = Typeface.create(barcodeTextView.typeface, Typeface.NORMAL)
                               for (drawable in barcodeTextView.compoundDrawables) {
                                   if (drawable != null) {
                                       drawable.colorFilter = PorterDuffColorFilter(black, PorterDuff.Mode.SRC_IN)
@@ -54,6 +59,16 @@ internal object QuestionnaireItemBarCodeReaderViewHolderFactory :
                               }
 
                               itemView.findViewById<TextView>(R.id.tv_rescan).visibility = View.VISIBLE
+
+                              questionnaireItemViewItem.singleAnswerOrNull = barcode.let {
+                                  if (it!!.isEmpty()) {
+                                      null
+                                  } else {
+                                      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(StringType(it))
+                                  }
+                              }
+
+                              questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
                           }
                       }
               )
@@ -61,7 +76,9 @@ internal object QuestionnaireItemBarCodeReaderViewHolderFactory :
           }
       }
 
-      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {}
+      override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
+          this.questionnaireItemViewItem = questionnaireItemViewItem
+      }
     }
 }
 
