@@ -17,19 +17,9 @@
 package com.google.android.fhir.datacapture.mapping
 
 import com.google.android.fhir.datacapture.getValueForType
+import org.apache.commons.lang3.ClassUtils.getClass
+import org.hl7.fhir.r4.model.*
 import java.util.Locale
-import org.hl7.fhir.r4.model.Base
-import org.hl7.fhir.r4.model.BooleanType
-import org.hl7.fhir.r4.model.DateTimeType
-import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.DecimalType
-import org.hl7.fhir.r4.model.Expression
-import org.hl7.fhir.r4.model.IntegerType
-import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
-import org.hl7.fhir.r4.model.TimeType
-import org.hl7.fhir.r4.model.UrlType
 
 /**
  * Maps [QuestionnaireResponse] s to FHIR resources and vice versa.
@@ -101,10 +91,11 @@ private fun Base.extractField(
 
   questionnaireItem.type.getClass()?.let {
     this.javaClass
-      .getMethod("set${targetFieldName.capitalize(Locale.ROOT)}Element", it)
+      .getMethod("set${targetFieldName.capitalize(Locale.ROOT)}Element",
+              if (targetFieldName.toLowerCase() == "id") IdType::class.java else it)
       .invoke(
-        this,
-        questionnaireResponseItem.answer.single().getValueForType(questionnaireItem.type)
+        this, if (targetFieldName.toLowerCase() == "id") IdType(questionnaireResponseItem.answer.single().getValueForType(questionnaireItem.type).toString())
+        else questionnaireResponseItem.answer.single().getValueForType(questionnaireItem.type)
       )
   }
 }
