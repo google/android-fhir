@@ -262,14 +262,8 @@ private val Questionnaire.QuestionnaireItemComponent.inferPropertyResourceClass:
     modelAndField.forEachIndexed loop@{ index, fieldName ->
       if (index == 0) return@loop
 
-      resourceClass.declaredFields.forEach { declaredField ->
-        if (declaredField.name == fieldName) {
-          resourceClass = declaredField.mainType
-          resourceField = declaredField
-
-          return@loop
-        }
-      }
+      resourceField = resourceClass.getFieldOrNull(fieldName) ?: return null
+      resourceClass = resourceField!!.mainType
     }
 
     return resourceField
@@ -303,3 +297,11 @@ private fun Field.retrieveNonParameterizedType(): Class<*> =
  */
 private val Field.mainType: Class<*>
   get() = if (isParameterized) retrieveNonParameterizedType() else type
+
+private fun Class<*>.getFieldOrNull(name: String): Field? {
+  return try {
+    getDeclaredField(name)
+  } catch (ex: NoSuchFieldException) {
+    return null
+  }
+}
