@@ -46,18 +46,35 @@
 
     </LinearLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
+    <LinearLayout
         android:id="@+id/textInputLayout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-    >
+        android:layout_height="wrap_content">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <TextView
             android:id="@+id/textInputEditText"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-        />
+            android:text="scan barcode"
+            android:textAllCaps="true"
+            android:textColor="#006CBB"
+            android:drawableStart="@drawable/ic_barcode"
+            android:drawableTint="#006CBB"
+            android:drawablePadding="10dp"
+            android:textSize="21sp"
+            android:textStyle="bold" />
 
-    </com.google.android.material.textfield.TextInputLayout>
+        <TextView
+            android:id="@+id/tv_rescan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RE-SCAN"
+            android:textColor="#006CBB"
+            android:layout_marginLeft="10dp"
+            android:textSize="21sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
 </LinearLayout>

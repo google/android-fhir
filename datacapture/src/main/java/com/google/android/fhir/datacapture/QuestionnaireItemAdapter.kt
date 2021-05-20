@@ -52,9 +52,9 @@ internal class QuestionnaireItemAdapter :
         QuestionnaireItemViewHolderType.DATE_TIME_PICKER ->
           QuestionnaireItemDateTimePickerViewHolderFactory
         QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE ->
-          QuestionnaireItemBarCodeReaderViewHolderFactory
+          QuestionnaireItemEditTextSingleLineViewHolderFactory
         QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE ->
-          QuestionnaireItemEditTextMultiLineViewHolderFactory
+          QuestionnaireItemBarCodeReaderViewHolderFactory
         QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER ->
           QuestionnaireItemEditTextIntegerViewHolderFactory
         QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL ->
