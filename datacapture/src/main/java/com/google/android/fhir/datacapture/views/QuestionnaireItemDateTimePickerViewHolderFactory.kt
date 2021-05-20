@@ -20,6 +20,10 @@ import android.annotation.SuppressLint
 import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.localizedPrefix
+import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputEditText
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -115,12 +119,12 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
         } else {
           prefixTextView.visibility = View.GONE
         }
-        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.text
-        textTimeQuestion.text = questionnaireItemViewItem.questionnaireItem.text
+        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
+        textTimeQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
         val dateTime = questionnaireItemViewItem.singleAnswerOrNull?.valueDateTimeType
         updateDateTimeInput(
           dateTime?.let {
@@ -153,6 +157,21 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               )
             )
         questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+        applyValidationResult(
+          QuestionnaireResponseItemValidator.validate(
+            questionnaireItemViewItem.questionnaireItem,
+            questionnaireItemViewItem.questionnaireResponseItem
+          )
+        )
+      }
+
+      private fun applyValidationResult(validationResult: ValidationResult) {
+        val validationMessage =
+          validationResult.validationMessages.joinToString {
+            it.plus(System.getProperty("line.separator"))
+          }
+        dateInputEditText.error = if (validationMessage == "") null else validationMessage
+        timeInputEditText.error = if (validationMessage == "") null else validationMessage
       }
     }
 
