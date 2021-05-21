@@ -102,24 +102,24 @@ object ResourceMapper {
       return
     }
 
-    val propertyType = questionnaireItem.inferPropertyResourceClass ?: return
+    val definitionField = questionnaireItem.getDefinitionField ?: return
     if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      // create a class for questionnaire item of type group and add to the resource
-      val base: Base = propertyType.mainType.newInstance() as Base
+      val value: Base =
+        (definitionField.nonParameterizedType.newInstance() as Base).apply {
+          extractFields(questionnaireItem.item, questionnaireResponseItem.item)
+        }
 
-      base.extractFields(questionnaireItem.item, questionnaireResponseItem.item)
-
-      updateFieldWithAnswer(base, targetFieldName, propertyType)
+      updateField(definitionField, value)
     } else {
       if (questionnaireResponseItem.answer.isEmpty()) return
       val answer = questionnaireResponseItem.answer.first().value
 
-      if (!propertyType.mainType.isEnum) {
+      if (!definitionField.nonParameterizedType.isEnum) {
         // this is a low level type e.g. StringType
-        updateFieldWithAnswer(answer, targetFieldName, propertyType)
+        updateField(definitionField, answer)
       } else {
         // this is a high level type e.g. AdministrativeGender
-        updateFieldWithEnum(propertyType, targetFieldName, answer)
+        updateFieldWithEnum(definitionField, targetFieldName, answer)
       }
     }
   }
@@ -137,35 +137,32 @@ private fun Base.updateFieldWithEnum(propertyType: Field, targetFieldName: Strin
   The inner-classes in the Enumerations package are valid and not dependent on the classes in the codesystems package
   All enum classes in the org.hl7.fhir.r4.model package implement the fromCode(), toCode() methods among others
    */
-  val dataTypeClass: Class<*> = propertyType.mainType
+  val dataTypeClass: Class<*> = propertyType.nonParameterizedType
   val fromCodeMethod: Method = dataTypeClass.getDeclaredMethod("fromCode", String::class.java)
 
   val stringValue = if (answer is Coding) answer.code else answer.toString()
 
   javaClass
-    .getMethod("set${targetFieldName.capitalize()}", propertyType.mainType)
+    .getMethod("set${targetFieldName.capitalize()}", propertyType.nonParameterizedType)
     .invoke(this, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
 
 /**
- * Updates a field of name [targetFieldName] on this object with the value from [answer] using the
- * declared setter. [fieldType] helps to determine the field class type.
+ * Updates a field of name [field.n] on this object with the value from [value] using the declared
+ * setter. [field] helps to determine the field class type.
  */
-private fun Base.updateFieldWithAnswer(answer: Base, targetFieldName: String, fieldType: Field) {
-  val paramAns = generateAnswerWithCorrectType(answer, fieldType)
+private fun Base.updateField(field: Field, value: Base) {
+  val answerValue = generateAnswerWithCorrectType(value, field)
 
   try {
     javaClass
-      .getMethod("set${targetFieldName.capitalize()}Element", fieldType.setterParamType)
-      .invoke(this, paramAns)
+      .getMethod("set${field.name.capitalize()}Element", field.type)
+      .invoke(this, answerValue)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
     javaClass
-      .getMethod("set${targetFieldName.capitalize()}", fieldType.setterParamType)
-      .invoke(
-        this,
-        if (fieldType.isParameterized && fieldType.isList) listOf(paramAns) else paramAns
-      )
+      .getMethod("set${field.name.capitalize()}", field.type)
+      .invoke(this, if (field.isParameterized && field.isList) listOf(answerValue) else answerValue)
   }
 }
 
@@ -176,7 +173,7 @@ private fun Base.updateFieldWithAnswer(answer: Base, targetFieldName: String, fi
  * to the type elements in the group questions
  */
 private fun generateAnswerWithCorrectType(answer: Base, fieldType: Field): Base {
-  when (fieldType.mainType) {
+  when (fieldType.nonParameterizedType) {
     CodeableConcept::class.java -> {
       if (answer is Coding) {
         return CodeableConcept(answer).apply { text = answer.display }
@@ -240,7 +237,7 @@ private val Questionnaire.itemContextNameToExpressionMap: Map<String, String>
  * "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name", `listOf("Patient", "name")` will
  * be returned.
  */
-private val Questionnaire.QuestionnaireItemComponent.targetResourceAndElement: List<String>?
+private val Questionnaire.QuestionnaireItemComponent.definitionPath: List<String>?
   get() {
     val snapshotPath = definition.substringAfter('#', "")
     if (!"[a-zA-Z]+(\\.[a-zA-Z]+)+".toRegex().matches(snapshotPath)) return null
@@ -253,20 +250,16 @@ private val Questionnaire.QuestionnaireItemComponent.targetResourceAndElement: L
  * [org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent.definition] for easier searching
  * of the setter methods and converting the answer to the expected parameter type.
  */
-private val Questionnaire.QuestionnaireItemComponent.inferPropertyResourceClass: Field?
+private val Questionnaire.QuestionnaireItemComponent.getDefinitionField: Field?
   get() {
-    val modelAndField = targetResourceAndElement ?: return null
-    var resourceClass: Class<*> = Class.forName("org.hl7.fhir.r4.model.${modelAndField.get(0)}")
-    var resourceField: Field? = null
+    val path = definitionPath ?: return null
+    if (path.size < 2) return null
+    val resourceClass: Class<*> = Class.forName("org.hl7.fhir.r4.model.${path[0]}")
+    val field: Field = resourceClass.getFieldOrNull(path[1]) ?: return null
 
-    modelAndField.forEachIndexed loop@{ index, fieldName ->
-      if (index == 0) return@loop
-
-      resourceField = resourceClass.getFieldOrNull(fieldName) ?: return null
-      resourceClass = resourceField!!.mainType
+    return path.drop(2).fold(field) { field: Field?, nestedFieldName: String ->
+      field?.nonParameterizedType?.getFieldOrNull(nestedFieldName)
     }
-
-    return resourceField
   }
 
 /**
@@ -283,20 +276,11 @@ private val Field.isList: Boolean
 private val Field.isParameterized: Boolean
   get() = genericType is ParameterizedType
 
-/* The type of the parameter in the setter for this field. */
-private val Field.setterParamType: Class<*>
-  get() = type
-
-private fun Field.retrieveNonParameterizedType(): Class<*> =
-  (genericType as ParameterizedType).actualTypeArguments[0] as Class<*>
-
-/**
- * The non-parameterized type in this field.
- *
- * For example a Field of List<String> should give [String] as the [mainType]
- */
-private val Field.mainType: Class<*>
-  get() = if (isParameterized) retrieveNonParameterizedType() else type
+/** The non-parameterized type of this field (e.g. `String` for a field of type `List<String>`). */
+private val Field.nonParameterizedType: Class<*>
+  get() =
+    if (isParameterized) (genericType as ParameterizedType).actualTypeArguments[0] as Class<*>
+    else type
 
 private fun Class<*>.getFieldOrNull(name: String): Field? {
   return try {
