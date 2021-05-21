@@ -27,6 +27,7 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -180,6 +181,12 @@ private fun generateAnswerWithCorrectType(answer: Base, fieldType: Field): Base 
     CodeableConcept::class.java -> {
       if (answer is Coding) {
         return CodeableConcept(answer).apply { text = answer.display }
+      }
+    }
+
+    IdType::class.java -> {
+      if (answer is StringType) {
+        return IdType(answer.value)
       }
     }
   }
