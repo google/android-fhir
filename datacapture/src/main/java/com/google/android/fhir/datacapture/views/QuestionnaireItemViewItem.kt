@@ -65,4 +65,10 @@ internal data class QuestionnaireItemViewItem(
       it.value == questionnaireResponseItemAnswerComponent.value
     }
   }
+
+  fun hasAnswerOption(
+    answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent
+  ): Boolean {
+    return questionnaireResponseItem.answer.find { it.value == answerOption.value } != null
+  }
 }
