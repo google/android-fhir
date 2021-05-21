@@ -49,22 +49,24 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   }
 
   fun filter(filter: TokenClientParam, coding: Coding) =
-    tokenFilter.add(TokenFilter(filter, coding.code, coding.system))
+    tokenFilter.add(TokenFilter(parameter = filter, code = coding.code, system = coding.system))
 
   fun filter(filter: TokenClientParam, identifier: Identifier) =
-    tokenFilter.add(TokenFilter(filter, identifier.value, identifier.system))
+    tokenFilter.add(
+      TokenFilter(parameter = filter, code = identifier.value, system = identifier.system)
+    )
 
   fun filter(filter: TokenClientParam, contactPoint: ContactPoint) =
-    tokenFilter.add(TokenFilter(filter, contactPoint.value))
+    tokenFilter.add(TokenFilter(parameter = filter, code = contactPoint.value))
 
   fun filter(filter: TokenClientParam, boolean: Boolean) =
-    tokenFilter.add(TokenFilter(filter, boolean.toString()))
+    tokenFilter.add(TokenFilter(parameter = filter, code = boolean.toString()))
 
   fun filter(filter: TokenClientParam, uriType: UriType) =
-    tokenFilter.add(TokenFilter(filter, uriType.value))
+    tokenFilter.add(TokenFilter(parameter = filter, code = uriType.value))
 
   fun filter(filter: TokenClientParam, string: String) =
-    tokenFilter.add(TokenFilter(filter, string))
+    tokenFilter.add(TokenFilter(parameter = filter, code = string))
 
   fun sort(parameter: StringClientParam, order: Order) {
     sort = parameter
@@ -90,8 +92,8 @@ data class ReferenceFilter(val parameter: ReferenceClientParam?, var value: Stri
 @SearchDslMarker
 data class TokenFilter(
   val parameter: TokenClientParam?,
-  var value: String?,
-  var system: String? = null
+  var system: String? = null,
+  var code: String?
 )
 
 enum class Order {
