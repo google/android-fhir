@@ -66,9 +66,7 @@ internal data class QuestionnaireItemViewItem(
     }
   }
 
-  fun hasAnswerOption(
-    answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent
-  ): Boolean {
+  fun hasAnswerOption(answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent): Boolean {
     return questionnaireResponseItem.answer.find { it.value == answerOption.value } != null
   }
 }

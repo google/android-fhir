@@ -57,7 +57,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           val prefix = TextView(checkboxGroup.context)
           val checkbox = CheckBox(checkboxGroup.context)
           val linearLayout = LinearLayout(checkboxGroup.context)
-          if(questionnaireItemViewItem.hasAnswerOption(answerOption)){
+          if (questionnaireItemViewItem.hasAnswerOption(answerOption)) {
             checkbox.isChecked = true
           }
           linearLayout.addView(checkbox)
