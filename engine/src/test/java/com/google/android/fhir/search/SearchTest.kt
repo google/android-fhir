@@ -220,7 +220,7 @@ class SearchTest {
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
-        AND index_system is null
+        AND index_system IS NULL
         )
         """.trimIndent()
       )
