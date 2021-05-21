@@ -22,6 +22,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
+internal const val ITEM_CONTROL_CHECK_BOX = "check-box"
 internal const val ITEM_CONTROL_DROP_DOWN = "drop-down"
 internal const val ITEM_CONTROL_RADIO_BUTTON = "radio-button"
 
@@ -36,7 +37,8 @@ internal val Questionnaire.QuestionnaireItemComponent.itemControl: String?
       this.extension.firstOrNull { it.url == EXTENSION_ITEM_CONTROL_URL }?.value as CodeableConcept?
     val code =
       codeableConcept?.coding?.firstOrNull { it.system == EXTENSION_ITEM_CONTROL_SYSTEM }?.code
-    return listOf(ITEM_CONTROL_DROP_DOWN, ITEM_CONTROL_RADIO_BUTTON).firstOrNull { it == code }
+    return listOf(ITEM_CONTROL_DROP_DOWN, ITEM_CONTROL_RADIO_BUTTON, ITEM_CONTROL_CHECK_BOX)
+      .firstOrNull { it == code }
   }
 
 /**
