@@ -46,4 +46,18 @@ internal class QuestionnaireItemEditTextStringViewHolderDelegate(isSingleLine: B
   ): String {
     return answer?.valueStringType?.value ?: ""
   }
+
+  override fun addAnswer(
+    questionnaireResponseItemAnswerComponent:
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+  ) {
+    TODO("Not yet implemented")
+  }
+
+  override fun removeAnswer(
+    questionnaireResponseItemAnswerComponent:
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+  ) {
+    TODO("Not yet implemented")
+  }
 }

@@ -42,5 +42,19 @@ internal object QuestionnaireItemEditTextDecimalViewHolderFactory :
       ): String {
         return answer?.valueDecimalType?.value?.toString() ?: ""
       }
+
+      override fun addAnswer(
+        questionnaireResponseItemAnswerComponent:
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+      ) {
+        TODO("Not yet implemented")
+      }
+
+      override fun removeAnswer(
+        questionnaireResponseItemAnswerComponent:
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+      ) {
+        TODO("Not yet implemented")
+      }
     }
 }

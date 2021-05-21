@@ -45,5 +45,19 @@ internal object QuestionnaireItemEditTextQuantityViewHolderFactory :
       ): String {
         return answer?.valueQuantity?.value?.toString() ?: ""
       }
+
+      override fun addAnswer(
+        questionnaireResponseItemAnswerComponent:
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+      ) {
+        TODO("Not yet implemented")
+      }
+
+      override fun removeAnswer(
+        questionnaireResponseItemAnswerComponent:
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+      ) {
+        TODO("Not yet implemented")
+      }
     }
 }

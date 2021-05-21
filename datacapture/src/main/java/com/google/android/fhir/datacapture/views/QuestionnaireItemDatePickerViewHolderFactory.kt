@@ -135,6 +135,20 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
             ?: ""
         )
       }
+
+      override fun addAnswer(
+        questionnaireResponseItemAnswerComponent:
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+      ) {
+        TODO("Not yet implemented")
+      }
+
+      override fun removeAnswer(
+        questionnaireResponseItemAnswerComponent:
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+      ) {
+        TODO("Not yet implemented")
+      }
     }
 
   @SuppressLint("NewApi") // java.time APIs can be used due to desugaring

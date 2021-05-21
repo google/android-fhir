@@ -133,6 +133,20 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         )
       }
 
+      override fun addAnswer(
+        questionnaireResponseItemAnswerComponent:
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+      ) {
+        TODO("Not yet implemented")
+      }
+
+      override fun removeAnswer(
+        questionnaireResponseItemAnswerComponent:
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+      ) {
+        TODO("Not yet implemented")
+      }
+
       /** Update the date and time input fields in the UI. */
       fun updateDateTimeInput(localDateTime: LocalDateTime?) {
         timeInputEditText.isEnabled = localDateTime != null
