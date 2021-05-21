@@ -49,4 +49,20 @@ internal data class QuestionnaireItemViewItem(
       questionnaireResponseItem.answer.clear()
       value?.let { questionnaireResponseItem.addAnswer(it) }
     }
+
+  internal fun addAnswer(
+    questionnaireResponseItemAnswerComponent:
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+  ) {
+    questionnaireResponseItem.answer.add(questionnaireResponseItemAnswerComponent)
+  }
+
+  internal fun removeAnswer(
+    questionnaireResponseItemAnswerComponent:
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+  ) {
+    questionnaireResponseItem.answer.removeIf {
+      it.value == questionnaireResponseItemAnswerComponent.value
+    }
+  }
 }
