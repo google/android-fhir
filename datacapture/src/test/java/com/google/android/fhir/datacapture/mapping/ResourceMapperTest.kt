@@ -20,9 +20,9 @@ import android.os.Build
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import com.google.common.truth.Truth.assertThat
+import java.text.SimpleDateFormat
+import java.util.Date
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -36,85 +36,678 @@ class ResourceMapperTest {
     // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
     val questionnaireJson =
       """
+        {
+          "resourceType": "Questionnaire",
+          "id": "client-registration-sample",
+          "status": "active",
+          "date": "2020-11-18T07:24:47.111Z",
+          "subjectType": [
+            "Patient"
+          ],
+          "extension": [
             {
-              "resourceType": "Questionnaire",
-              "subjectType": [
-                "Patient"
-              ],
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
-                  "valueExpression": {
-                    "language": "application/x-fhir-query",
-                    "expression": "Patient",
-                    "name": "patient"
-                  }
-                }
-              ],
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Patient",
+                "name": "patient"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "PR",
+              "type": "group",
               "item": [
                 {
-                  "linkId": "patient-0",
+                  "linkId": "PR-name",
                   "type": "group",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
                   "item": [
                     {
-                      "linkId": "patient-0-birth-date",
-                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate",
-                      "type": "date"
+                      "linkId": "PR-name-text",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
+                      "type": "string",
+                      "text": "First Name"
                     },
                     {
-                      "linkId": "patient-0-active",
-                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.active",
-                      "type": "boolean"
+                      "linkId": "PR-name-family",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#Patient.name.family",
+                      "type": "string",
+                      "text": "Family Name"
                     }
                   ]
+                },
+                {
+                  "linkId": "patient-0-birth-date",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate",
+                  "type": "date",
+                  "text": "Date of Birth"
+                },
+        {
+          "linkId": "PR-name-id",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Resource#Resource.id",
+          "type": "string",
+          "text": "Patient Id"
+        },
+                {
+                  "linkId": "patient-0-gender",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "radio-button",
+                            "display": "Radio Button"
+                          }
+                        ],
+                        "text": "A control where choices are listed with a button beside them. The button can be toggled to select or de-select a given choice. Selecting one item deselects all others."
+                      }
+                    }
+                  ],
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
+                  "type": "choice",
+                  "text": "Gender:",
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "female",
+                        "display": "Female"
+                      },
+                      "initialSelected": true
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "male",
+                        "display": "Male"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "other",
+                        "display": "Other"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "unknown",
+                        "display": "Unknown"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "linkId": "patient-0-marital-status",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "check",
+                            "display": "Check-box"
+                          }
+                        ],
+                        "text": "A control where choices are listed with a button beside them. The button can be toggled to select or de-select a given choice. Selecting one item deselects all others."
+                      }
+                    }
+                  ],
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.maritalStatus",
+                  "type": "choice",
+                  "text": "Marital Status:",
+                  "answerOption": [
+                    {
+                      "valueCoding": {
+                        "code": "A",
+                        "display": "Annulled"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "D",
+                        "display": "Divorced"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "I",
+                        "display": "Interlocutory"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "L",
+                        "display": "Legally Separated"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "M",
+                        "display": "Married"
+                      },
+                      "initialSelected": true
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "P",
+                        "display": "Polygamous"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "S",
+                        "display": "Never Married"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "T",
+                        "display": "Domestic Partner"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "U",
+                        "display": "Unmarried"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "W",
+                        "display": "Widowed"
+                      }
+                    },
+                    {
+                      "valueCoding": {
+                        "code": "UNK",
+                        "display": "Unknown"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-telecom",
+                  "type": "group",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom",
+                  "item": [
+                    {
+                      "linkId": "PR-telecom-system",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
+                      "type": "string",
+                      "text": "system",
+                      "initial": [
+                        {
+                          "valueString": "phone"
+                        }
+                      ],
+                      "enableWhen": [
+                        {
+                          "question": "patient-0-gender",
+                          "operator": "=",
+                          "answerString": "ok"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "PR-telecom-value",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.value",
+                      "type": "string",
+                      "text": "Phone Number"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-contact-party",
+                  "type": "group",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.contact",
+                  "item": [
+                    {
+                      "linkId": "PR-contact-party-name",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.contact.name",
+                      "type": "group",
+                      "item": [
+                        {
+                          "linkId": "PR-contact-party-name-given",
+                          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.contact.name.given",
+                          "type": "string",
+                          "text": "First Name"
+                        },
+                        {
+                          "linkId": "PR-contact-party-name-family",
+                          "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#Patient.contact.name.family",
+                          "type": "string",
+                          "text": "Family Name"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-active",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.active",
+                  "type": "boolean",
+                  "text": "Is Active?"
+                },
+                {
+                  "linkId": "PR-multiple-birth",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.multipleBirth",
+                  "type": "integer",
+                  "text": "Multiple birth integer i.e. 1 is first-born, 2 is second-born"
                 }
               ]
             }
+          ]
+        }
         """.trimIndent()
-    val questionnaire = parser.parseResource(questionnaireJson) as Questionnaire
 
     val questionnaireResponseJson =
       """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "questionnaire": "client-registration-sample",
+          "item": [
             {
-              "resourceType": "QuestionnaireResponse",
+              "linkId": "PR",
               "item": [
                 {
-                  "linkId": "patient-0",
+                  "linkId": "PR-name",
                   "item": [
                     {
-                      "linkId": "patient-0-birth-date",
+                      "linkId": "PR-name-given",
                       "answer": [
                         {
-                          "valueDate": "2021-01-01"
+                          "valueString": "John"
                         }
                       ]
                     },
                     {
-                      "linkId": "patient-0-active",
+                      "linkId": "PR-name-family",
                       "answer": [
                         {
-                          "valueBoolean": true
+                          "valueString": "Doe"
                         }
                       ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "patient-0-birth-date",
+                  "answer": [
+                    {
+                      "valueDate": "2021-01-01"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-name-id",
+                  "answer": [{ "valueString": "98238-adsfsa-23rfdsf" }]
+                },
+                {
+                  "linkId": "patient-0-gender",
+                  "answer": [
+                    {
+                      "valueCoding": {
+                        "code": "male",
+                        "display": "Male"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "linkId": "patient-0-marital-status",
+                  "answer": [
+                    {
+                      "valueCoding": {
+                        "code": "S",
+                        "display": "Never Married"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-telecom",
+                  "item": [
+                    {
+                      "linkId": "PR-telecom-system"
+                    },
+                    {
+                      "linkId": "PR-telecom-value",
+                      "answer": [
+                        {
+                          "valueString": "+254711001122"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-contact-party",
+                  "item": [
+                    {
+                      "linkId": "PR-contact-party-name",
+                      "item": [
+                        {
+                          "linkId": "PR-contact-party-name-given",
+                          "answer": [
+                            {
+                              "valueString": "Brenda"
+                            }
+                          ]
+                        },
+                        {
+                          "linkId": "PR-contact-party-name-family",
+                          "answer": [
+                            {
+                              "valueString": "Penman"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-active",
+                  "answer": [
+                    {
+                      "valueBoolean": true
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-multiple-birth",
+                  "answer": [
+                    {
+                      "valueInteger": 2
                     }
                   ]
                 }
               ]
             }
+          ]
+        }
         """.trimIndent()
-    val questionnaireResponse =
-      parser.parseResource(questionnaireResponseJson) as QuestionnaireResponse
 
-    val patient = ResourceMapper.extract(questionnaire, questionnaireResponse) as Patient
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
 
-    val birthDate = patient.birthDateElement
-    assertThat(birthDate.year).isEqualTo(2021)
-    assertThat(birthDate.month).isEqualTo(0)
-    assertThat(birthDate.day).isEqualTo(1)
+    val uriTestQuestionnaire =
+      iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
+        org.hl7.fhir.r4.model.Questionnaire
+
+    val uriTestQuestionnaireResponse =
+      iParser.parseResource(
+        org.hl7.fhir.r4.model.QuestionnaireResponse::class.java,
+        questionnaireResponseJson
+      ) as
+        org.hl7.fhir.r4.model.QuestionnaireResponse
+
+    val patient =
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) as Patient
+
+    assertThat(patient.birthDate).isEqualTo("2021-01-01".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isTrue()
+    assertThat(patient.name.first().given.first().toString()).isEqualTo("John")
+    assertThat(patient.name.first().family).isEqualTo("Doe")
+    assertThat(patient.multipleBirthIntegerType.value).isEqualTo(2)
+    assertThat(patient.contact[0].name.given.first().toString()).isEqualTo("Brenda")
+    assertThat(patient.contact[0].name.family).isEqualTo("Penman")
   }
 
-  companion object {
-    val parser: IParser = FhirContext.forR4().newJsonParser()
+  @Test
+  fun `extract() should allow extracting with unanswered questions`() {
+    val questionnaireJson =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "id": "client-registration-sample",
+          "status": "active",
+          "date": "2020-11-18T07:24:47.111Z",
+          "subjectType": [
+            "Patient"
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Patient",
+                "name": "patient"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "PR",
+              "type": "group",
+              "item": [
+                {
+                  "linkId": "PR-name",
+                  "type": "group",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
+                  "item": [
+                    {
+                      "linkId": "PR-name-text",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
+                      "type": "string",
+                      "text": "First Name"
+                    },
+                    {
+                      "linkId": "PR-name-family",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#Patient.name.family",
+                      "type": "string",
+                      "text": "Family Name"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "patient-0-birth-date",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate",
+                  "type": "date",
+                  "text": "Date of Birth"
+                },
+                {
+                  "linkId": "patient-0-gender",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "radio-button",
+                            "display": "Radio Button"
+                          }
+                        ],
+                        "text": "A control where choices are listed with a button beside them. The button can be toggled to select or de-select a given choice. Selecting one item deselects all others."
+                      }
+                    }
+                  ],
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
+                  "type": "string",
+                  "text": "Gender"
+                },
+                {
+                  "linkId": "PR-telecom",
+                  "type": "group",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
+                      "valueExpression": {
+                        "language": "application/x-fhir-query",
+                        "expression": "ContactPoint",
+                        "name": "contactPoint"
+                      }
+                    }
+                  ],
+                  "item": [
+                    {
+                      "linkId": "PR-telecom-system",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
+                          "valueExpression": {
+                            "language": "application/x-fhir-query",
+                            "expression": "ContactPoint$""" +
+        """ContactPointSystem",
+                            "name": "contactPointSystem"
+                          }
+                        }
+                      ],
+                      "type": "string",
+                      "text": "system",
+                      "initial": [
+                        {
+                          "valueString": "phone"
+                        }
+                      ],
+                      "enableWhen": [
+                        {
+                          "question": "patient-0-gender",
+                          "operator": "=",
+                          "answerString": "ok"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "PR-telecom-value",
+                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.value",
+                      "type": "string",
+                      "text": "Phone Number"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-active",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.active",
+                  "type": "boolean",
+                  "text": "Is Active?"
+                }
+              ]
+            }
+          ]
+        }
+        """.trimIndent()
+
+    val questionnaireResponseJson =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "questionnaire": "Questionnaire/client-registration-sample",
+          "item": [
+            {
+              "linkId": "PR",
+              "item": [
+                {
+                  "linkId": "PR-name",
+                  "item": [
+                    {
+                      "linkId": "PR-name-text",
+                      "answer": [
+                        {
+                          "valueString": "Simon"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "PR-name-family",
+                      "answer": [
+                        {
+                          "valueString": "Crawford"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "patient-0-birth-date",
+                  "answer": [
+                    {
+                      "valueDate": "2016-02-11"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "patient-0-gender",
+                  "answer": [
+                    {
+                      "valueString": "female"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-telecom",
+                  "item": [
+                    {
+                      "linkId": "PR-telecom-system",
+                      "answer": [
+                        {
+                          "valueString": "phone"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "PR-telecom-value"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-address",
+                  "item": [
+                    {
+                      "linkId": "PR-address-city",
+                      "answer": [
+                        {
+                          "valueString": "Nairobi"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "PR-address-country",
+                      "answer": [
+                        {
+                          "valueString": "Kenya"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-active"
+                }
+              ]
+            }
+          ]
+        }
+        """.trimIndent()
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+
+    val uriTestQuestionnaire =
+      iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
+        org.hl7.fhir.r4.model.Questionnaire
+
+    val uriTestQuestionnaireResponse =
+      iParser.parseResource(
+        org.hl7.fhir.r4.model.QuestionnaireResponse::class.java,
+        questionnaireResponseJson
+      ) as
+        org.hl7.fhir.r4.model.QuestionnaireResponse
+
+    val patient =
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) as Patient
+    assertThat(patient.birthDate).isEqualTo("2016-02-11".toDateFromFormatYyyyMmDd())
+    assertThat(patient.active).isFalse()
+    assertThat(patient.telecom.get(0).value).isNull()
+    assertThat(patient.name.first().given.first().toString()).isEqualTo("Simon")
+    assertThat(patient.name.first().family).isEqualTo("Crawford")
+  }
+
+  private fun String.toDateFromFormatYyyyMmDd(): Date? {
+    return SimpleDateFormat("yyyy-MM-dd").parse(this)
   }
 }
