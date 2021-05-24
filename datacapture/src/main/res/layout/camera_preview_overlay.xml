@@ -1,17 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<?xml version="1.0" encoding="utf-8" ?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+>
 
     <com.google.mlkit.md.camera.GraphicOverlay
         android:id="@+id/camera_preview_graphic_overlay"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+    />
 
     <FrameLayout
         android:id="@+id/static_overlay_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/transparent">
+        android:background="@color/transparent"
+    >
 
         <ProgressBar
             android:id="@+id/search_progress_bar"
@@ -21,7 +25,8 @@
             android:indeterminate="true"
             android:indeterminateTint="@color/white"
             android:indeterminateTintMode="src_in"
-            android:visibility="gone"/>
+            android:visibility="gone"
+        />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/bottom_prompt_chip"
@@ -38,7 +43,8 @@
             android:visibility="gone"
             app:chipCornerRadius="@dimen/bottom_prompt_chip_corner_radius"
             app:chipSurfaceColor="@color/dark"
-            app:closeIconVisible="false"/>
+            app:closeIconVisible="false"
+        />
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/product_search_button"
@@ -52,7 +58,8 @@
             android:textColor="@color/black"
             android:textSize="@dimen/search_button_text_size"
             android:visibility="gone"
-            app:iconTint="@color/black"/>
+            app:iconTint="@color/black"
+        />
     </FrameLayout>
 
 </merge>

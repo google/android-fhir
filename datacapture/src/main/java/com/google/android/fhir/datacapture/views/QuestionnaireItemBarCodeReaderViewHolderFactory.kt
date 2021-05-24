@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.datacapture.views
 
 import android.R.color
@@ -11,14 +27,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContract
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
 import com.google.mlkit.md.LiveBarcodeScanningFragment
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
-
 
 internal object QuestionnaireItemBarCodeReaderViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_bar_code_reader_view) {
@@ -33,51 +46,54 @@ internal object QuestionnaireItemBarCodeReaderViewHolderFactory :
         prefixTextView = itemView.findViewById(R.id.prefix)
         textQuestion = itemView.findViewById(R.id.question)
         barcodeTextView = itemView.findViewById(R.id.textInputEditText)
-          itemView.findViewById<View>(R.id.textInputLayout).setOnClickListener {
+        itemView.findViewById<View>(R.id.textInputLayout).setOnClickListener {
 
-              // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
-              // and again in TextInputEditText during layout inflation. As a result, it is
-              // necessary to access the base context twice to retrieve the application object
-              // from the view's context.
-              val context = itemView.context.tryUnwrapContext()!!
+          // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
+          // and again in TextInputEditText during layout inflation. As a result, it is
+          // necessary to access the base context twice to retrieve the application object
+          // from the view's context.
+          val context = itemView.context.tryUnwrapContext()!!
 
-              context.supportFragmentManager.setFragmentResultListener(
-                      "result",
-                      context,
-                      object : FragmentResultListener {
-                          override fun onFragmentResult(requestKey: String, result: Bundle) {
-                              val barcode = result.getString("result")?.trim()
-                              barcodeTextView.text = barcode
+          context.supportFragmentManager.setFragmentResultListener(
+            "result",
+            context,
+            object : FragmentResultListener {
+              override fun onFragmentResult(requestKey: String, result: Bundle) {
+                val barcode = result.getString("result")?.trim()
+                barcodeTextView.text = barcode
 
-                              val black = context.getColor(R.color.black)
-                              barcodeTextView.setTextColor(black)
-                              barcodeTextView.typeface = Typeface.create(barcodeTextView.typeface, Typeface.NORMAL)
-                              for (drawable in barcodeTextView.compoundDrawables) {
-                                  if (drawable != null) {
-                                      drawable.colorFilter = PorterDuffColorFilter(black, PorterDuff.Mode.SRC_IN)
-                                  }
-                              }
+                val black = context.getColor(R.color.black)
+                barcodeTextView.setTextColor(black)
+                barcodeTextView.typeface =
+                  Typeface.create(barcodeTextView.typeface, Typeface.NORMAL)
+                for (drawable in barcodeTextView.compoundDrawables) {
+                  if (drawable != null) {
+                    drawable.colorFilter = PorterDuffColorFilter(black, PorterDuff.Mode.SRC_IN)
+                  }
+                }
 
-                              itemView.findViewById<TextView>(R.id.tv_rescan).visibility = View.VISIBLE
+                itemView.findViewById<TextView>(R.id.tv_rescan).visibility = View.VISIBLE
 
-                              questionnaireItemViewItem.singleAnswerOrNull = barcode.let {
-                                  if (it!!.isEmpty()) {
-                                      null
-                                  } else {
-                                      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(StringType(it))
-                                  }
-                              }
+                questionnaireItemViewItem.singleAnswerOrNull =
+                  barcode.let {
+                    if (it!!.isEmpty()) {
+                      null
+                    } else {
+                      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                        .setValue(StringType(it))
+                    }
+                  }
 
-                              questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-                          }
-                      }
-              )
-              LiveBarcodeScanningFragment().show(context.supportFragmentManager, "TAG")
-          }
+                questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+              }
+            }
+          )
+          LiveBarcodeScanningFragment().show(context.supportFragmentManager, "TAG")
+        }
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
-          this.questionnaireItemViewItem = questionnaireItemViewItem
+        this.questionnaireItemViewItem = questionnaireItemViewItem
       }
     }
 }

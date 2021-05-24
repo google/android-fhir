@@ -24,7 +24,7 @@ fun Project.configureSpotless() {
     kotlin {
       target("**/*.kt")
       targetExclude("**/build/")
-      ktlint().userData(mapOf("indent_size" to "2", "continuation_indent_size" to "2"))
+      ktlint("0.40.0").userData(mapOf("indent_size" to "2", "continuation_indent_size" to "2"))
       ktfmt().googleStyle()
       licenseHeaderFile(
         "${project.rootProject.projectDir}/license-header.txt",
@@ -35,7 +35,7 @@ fun Project.configureSpotless() {
     }
     kotlinGradle {
       target("*.gradle.kts")
-      ktlint().userData(mapOf("indent_size" to "2", "continuation_indent_size" to "2"))
+      ktlint("0.40.0").userData(mapOf("indent_size" to "2", "continuation_indent_size" to "2"))
       ktfmt().googleStyle()
     }
     format("xml") {

@@ -1,16 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:keepScreenOn="true">
+    android:keepScreenOn="true"
+>
 
     <com.google.mlkit.md.camera.CameraSourcePreview
         android:id="@+id/camera_preview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+    >
 
-        <include layout="@layout/camera_preview_overlay"/>
+        <include layout="@layout/camera_preview_overlay" />
 
     </com.google.mlkit.md.camera.CameraSourcePreview>
 
@@ -18,6 +20,7 @@
         layout="@layout/top_action_bar_in_live_camera"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"/>
+        android:layout_gravity="top"
+    />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

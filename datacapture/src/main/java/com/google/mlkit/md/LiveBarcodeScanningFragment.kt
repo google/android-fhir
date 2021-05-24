@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     https://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,24 +27,19 @@ import android.view.View.OnClickListener
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.views.DatePickerFragment
 import com.google.android.material.chip.Chip
 import com.google.common.base.Objects
-import com.google.mlkit.md.barcodedetection.BarcodeField
 import com.google.mlkit.md.barcodedetection.BarcodeProcessor
-import com.google.mlkit.md.barcodedetection.BarcodeResultFragment
 import com.google.mlkit.md.camera.CameraSource
 import com.google.mlkit.md.camera.CameraSourcePreview
 import com.google.mlkit.md.camera.GraphicOverlay
 import com.google.mlkit.md.camera.WorkflowModel
 import com.google.mlkit.md.camera.WorkflowModel.WorkflowState
 import java.io.IOException
-import java.util.ArrayList
 
 /** Demonstrates the barcode scanning workflow using camera preview. */
 class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
@@ -204,9 +199,10 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
       viewLifecycleOwner,
       Observer { barcode ->
         if (barcode != null) {
-//          val barcodeFieldList = ArrayList<BarcodeField>()
-//          barcodeFieldList.add(BarcodeField("Raw Value", barcode.rawValue ?: ""))
-//          BarcodeResultFragment.show(requireActivity().supportFragmentManager, barcodeFieldList)
+          //          val barcodeFieldList = ArrayList<BarcodeField>()
+          //          barcodeFieldList.add(BarcodeField("Raw Value", barcode.rawValue ?: ""))
+          //          BarcodeResultFragment.show(requireActivity().supportFragmentManager,
+          // barcodeFieldList)
 
           setFragmentResult(
             "result",

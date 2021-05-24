@@ -49,7 +49,8 @@
     <LinearLayout
         android:id="@+id/textInputLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+    >
 
         <TextView
             android:id="@+id/textInputEditText"
@@ -62,7 +63,8 @@
             android:drawableTint="#006CBB"
             android:drawablePadding="10dp"
             android:textSize="21sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+        />
 
         <TextView
             android:id="@+id/tv_rescan"
@@ -73,7 +75,8 @@
             android:layout_marginLeft="10dp"
             android:textSize="21sp"
             android:textStyle="bold"
-            android:visibility="gone" />
+            android:visibility="gone"
+        />
 
     </LinearLayout>
 

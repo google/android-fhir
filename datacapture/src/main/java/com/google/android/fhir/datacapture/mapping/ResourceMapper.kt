@@ -16,10 +16,6 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import com.google.android.fhir.datacapture.getValueForType
-import org.apache.commons.lang3.ClassUtils.getClass
-import org.hl7.fhir.r4.model.*
-import java.util.Locale
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -187,7 +183,6 @@ private fun generateAnswerWithCorrectType(answer: Base, fieldType: Field): Base 
         return CodeableConcept(answer).apply { text = answer.display }
       }
     }
-
     IdType::class.java -> {
       if (answer is StringType) {
         return IdType(answer.value)

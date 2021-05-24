@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     https://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,44 +24,42 @@ import androidx.lifecycle.MutableLiveData
 import com.google.mlkit.vision.barcode.Barcode
 import java.util.HashSet
 
-/** View model for handling application workflow based on camera preview.  */
+/** View model for handling application workflow based on camera preview. */
 class WorkflowModel(application: Application) : AndroidViewModel(application) {
 
-    val workflowState = MutableLiveData<WorkflowState>()
-    val detectedBarcode = MutableLiveData<Barcode>()
+  val workflowState = MutableLiveData<WorkflowState>()
+  val detectedBarcode = MutableLiveData<Barcode>()
 
-    private val objectIdsToSearch = HashSet<Int>()
+  private val objectIdsToSearch = HashSet<Int>()
 
-    var isCameraLive = false
-        private set
+  var isCameraLive = false
+    private set
 
-    private val context: Context
-        get() = getApplication<Application>().applicationContext
+  private val context: Context
+    get() = getApplication<Application>().applicationContext
 
-    /**
-     * State set of the application workflow.
-     */
-    enum class WorkflowState {
-        NOT_STARTED,
-        DETECTING,
-        DETECTED,
-        CONFIRMING,
-        CONFIRMED,
-        SEARCHING,
-        SEARCHED
-    }
+  /** State set of the application workflow. */
+  enum class WorkflowState {
+    NOT_STARTED,
+    DETECTING,
+    DETECTED,
+    CONFIRMING,
+    CONFIRMED,
+    SEARCHING,
+    SEARCHED
+  }
 
-    @MainThread
-    fun setWorkflowState(workflowState: WorkflowState) {
-        this.workflowState.value = workflowState
-    }
+  @MainThread
+  fun setWorkflowState(workflowState: WorkflowState) {
+    this.workflowState.value = workflowState
+  }
 
-    fun markCameraLive() {
-        isCameraLive = true
-        objectIdsToSearch.clear()
-    }
+  fun markCameraLive() {
+    isCameraLive = true
+    objectIdsToSearch.clear()
+  }
 
-    fun markCameraFrozen() {
-        isCameraLive = false
-    }
+  fun markCameraFrozen() {
+    isCameraLive = false
+  }
 }

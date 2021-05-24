@@ -12,7 +12,7 @@ afterEvaluate {
         from(components["release"])
         artifactId = "datacapture"
         groupId = "com.google.android.fhir"
-        version = "0.0.7-covax"
+        version = "0.0.7"
         // Also publish source code for developers' convenience
         artifact(
           tasks.create<Jar>("androidSourcesJar") {
