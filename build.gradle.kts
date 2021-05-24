@@ -9,6 +9,7 @@ buildscript {
     classpath(Plugins.androidGradlePlugin)
     classpath(Plugins.kotlinGradlePlugin)
     classpath(Plugins.navSafeArgsGradlePlugin)
+    classpath("com.android.tools.build:gradle:4.2.1")
   }
 }
 
