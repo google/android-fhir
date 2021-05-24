@@ -82,14 +82,14 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         }
       }
 
-      override fun addAnswer(
+      fun addAnswer(
         questionnaireResponseItemAnswerComponent:
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
       ) {
         questionnaireItemViewItem.addAnswer(questionnaireResponseItemAnswerComponent)
       }
 
-      override fun removeAnswer(
+      fun removeAnswer(
         questionnaireResponseItemAnswerComponent:
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
       ) {

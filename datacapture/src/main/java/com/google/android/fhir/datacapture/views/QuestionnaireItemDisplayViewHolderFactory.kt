@@ -21,7 +21,6 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemDisplayViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.questionnaire_item_display_view) {
@@ -49,20 +48,6 @@ internal object QuestionnaireItemDisplayViewHolderFactory :
           } else {
             View.VISIBLE
           }
-      }
-
-      override fun addAnswer(
-        questionnaireResponseItemAnswerComponent:
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
-      ) {
-        TODO("Not yet implemented")
-      }
-
-      override fun removeAnswer(
-        questionnaireResponseItemAnswerComponent:
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
-      ) {
-        TODO("Not yet implemented")
       }
     }
 }

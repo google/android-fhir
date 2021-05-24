@@ -21,7 +21,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /**
  * Factory for [QuestionnaireItemViewHolder].
@@ -59,20 +58,6 @@ internal class QuestionnaireItemViewHolder(
   fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
     delegate.bind(questionnaireItemViewItem)
   }
-
-  fun addAnswer(
-    questionnaireResponseItemAnswerComponent:
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
-  ) {
-    delegate.addAnswer(questionnaireResponseItemAnswerComponent)
-  }
-
-  fun removeAnswer(
-    questionnaireResponseItemAnswerComponent:
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
-  ) {
-    delegate.removeAnswer(questionnaireResponseItemAnswerComponent)
-  }
 }
 
 /**
@@ -94,16 +79,4 @@ internal interface QuestionnaireItemViewHolderDelegate {
 
   /** Binds a [QuestionnaireItemViewItem] to the view. */
   fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem)
-
-  /** Adds an answer to [QuestionnaireItemViewItem.questionnaireResponseItem] */
-  fun addAnswer(
-    questionnaireResponseItemAnswerComponent:
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
-  )
-
-  /** Removes the answer from [QuestionnaireItemViewItem.questionnaireResponseItem] */
-  fun removeAnswer(
-    questionnaireResponseItemAnswerComponent:
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
-  )
 }
