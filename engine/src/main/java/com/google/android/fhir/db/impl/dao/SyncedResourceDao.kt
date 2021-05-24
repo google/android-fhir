@@ -29,10 +29,8 @@ interface SyncedResourceDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun insert(entity: SyncedResourceEntity)
 
-  @Transaction
-  suspend fun insertAll(resources: List<SyncedResourceEntity>) {
-    resources.forEach { resource -> insert(resource) }
-  }
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertAll(resources: List<SyncedResourceEntity>)
 
   /**
    * We will always have 1 entry for each [ResourceType] as it's the primary key, so we can limit
