@@ -93,7 +93,7 @@ data class ReferenceFilter(val parameter: ReferenceClientParam?, var value: Stri
 data class TokenFilter(
   val parameter: TokenClientParam?,
   var system: String? = null,
-  var code: String?
+  var code: String
 )
 
 enum class Order {
