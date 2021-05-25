@@ -61,7 +61,7 @@ class FhirSynchronizer(
 
   private suspend fun download(resourceType: ResourceType, params: ParamMap) {
     fhirEngine.syncDownload {
-      var nextUrl = getInitialUrl(resourceType, params, it.getLatestTimestamptFor(resourceType))
+      var nextUrl = getInitialUrl(resourceType, params, it.getLatestTimestampFor(resourceType))
       val result = mutableListOf<Resource>()
       try {
         while (nextUrl != null) {

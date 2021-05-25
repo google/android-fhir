@@ -21,6 +21,7 @@ import androidx.room.Room
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
@@ -30,6 +31,7 @@ import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.SearchQuery
+import com.google.android.fhir.toTimeZoneString
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -126,6 +128,34 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
 
   override suspend fun deleteUpdates(token: LocalChangeToken) {
     localChangeDao.discardLocalChanges(token)
+  }
+
+  override suspend fun syncUpload(
+    upload: suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>
+  ) {
+    db.withTransaction {
+      var localChanges = getAllLocalChanges()
+      while (localChanges.isNotEmpty()) {
+        upload(localChanges).forEach { deleteUpdates(it) }
+      }
+    }
+  }
+
+  override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {
+    db.withTransaction {
+      val resources =
+        download(
+          object : SyncDownloadContext {
+            override suspend fun getLatestTimestampFor(type: ResourceType) = lastUpdate(type)
+          }
+        )
+
+      val timeStamps =
+        resources.groupBy { it.resourceType }.entries.map {
+          SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+        }
+      insertSyncedResources(timeStamps, resources)
+    }
   }
 
   companion object {

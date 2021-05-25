@@ -25,7 +25,7 @@ import org.hl7.fhir.r4.model.ResourceType
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface FhirEngine {
   /**
-   * Saves one or more FHIR `resource`s in the local storage. If any of the resources already exist,
+   * Saves one or more FHIR [resource]s in the local storage. If any of the resources already exist,
    * they will be overwritten.
    *
    * @param <R> The resource type which should be a subtype of [Resource].
@@ -33,14 +33,14 @@ interface FhirEngine {
   suspend fun <R : Resource> save(vararg resource: R)
 
   /**
-   * Updates a FHIR `resource` in the local storage.
+   * Updates a FHIR [resource] in the local storage.
    *
    * @param <R> The resource type which should be a subtype of [Resource].
    */
   suspend fun <R : Resource> update(resource: R)
 
   /**
-   * Returns a FHIR resource of type `clazz` with `id` from the local storage.
+   * Returns a FHIR resource of type [clazz] with [id] from the local storage.
    *
    * @param <R> The resource type which should be a subtype of [Resource].
    * @throws ResourceNotFoundException if the resource is not found
@@ -49,19 +49,30 @@ interface FhirEngine {
   suspend fun <R : Resource> load(clazz: Class<R>, id: String): R
 
   /**
-   * Removes a FHIR resource of type `clazz` with `id` from the local storage.
+   * Removes a FHIR resource of type [clazz] with [id] from the local storage.
    *
    * @param <R> The resource type which should be a subtype of [Resource].
    */
   suspend fun <R : Resource> remove(clazz: Class<R>, id: String)
 
+  /**
+   * Searches the database and returns a list resources according to the [search] specifications.
+   */
   suspend fun <R : Resource> search(search: Search): List<R>
 
-  suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>)
-
+  /**
+   * Synchronizes the [upload] result in the database. The database will be updated to reflect the
+   * result of the [upload] operation.
+   */
   suspend fun syncUpload(upload: (suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>))
+
+  /**
+   * Synchronizes the [download] result in the database. The database will be updated to reflect the
+   * result of the [download] operation.
+   */
+  suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>)
 }
 
 interface SyncDownloadContext {
-  suspend fun getLatestTimestamptFor(type: ResourceType): String?
+  suspend fun getLatestTimestampFor(type: ResourceType): String?
 }
