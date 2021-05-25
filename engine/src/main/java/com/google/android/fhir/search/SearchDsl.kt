@@ -30,7 +30,7 @@ import org.hl7.fhir.r4.model.UriType
 @SearchDslMarker
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
   internal val stringFilters = mutableListOf<StringFilter>()
-  internal val referenceFilter = mutableListOf<ReferenceFilter>()
+  internal val referenceFilters = mutableListOf<ReferenceFilter>()
 
   internal val tokenFilter = mutableListOf<TokenFilter>()
   internal var sort: IParam? = null
