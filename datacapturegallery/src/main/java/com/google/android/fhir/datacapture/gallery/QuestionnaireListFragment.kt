@@ -58,6 +58,12 @@ class QuestionnaireListFragment : Fragment() {
             "Example authored by Fred Hersch",
             "patient-registration.json"
           ),
+          // Derived by kmost@google.com, from fredhersch@google.com's example.
+          QuestionnaireListItem(
+            "Patient registration, paginated",
+            "Example authored by Fred Hersch + Kevin Most",
+            "patient-registration-paginated.json"
+          ),
           // Example taken from
           // https://openhie.github.io/hiv-ig/Questionnaire-hiv-case-report-questionnaire.json.html
           QuestionnaireListItem(

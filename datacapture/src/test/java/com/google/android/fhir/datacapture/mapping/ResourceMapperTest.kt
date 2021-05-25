@@ -22,7 +22,10 @@ import ca.uhn.fhir.parser.IParser
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
 import java.util.Date
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Questionnaire
+import org.intellij.lang.annotations.Language
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -34,6 +37,7 @@ class ResourceMapperTest {
   @Test
   fun extract() {
     // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
+    @Language("JSON")
     val questionnaireJson =
       """
         {
@@ -303,6 +307,7 @@ class ResourceMapperTest {
         }
       """.trimIndent()
 
+    @Language("JSON")
     val questionnaireResponseJson =
       """
         {
@@ -462,6 +467,7 @@ class ResourceMapperTest {
 
   @Test
   fun `extract() should allow extracting with unanswered questions`() {
+    @Language("JSON")
     val questionnaireJson =
       """
         {
@@ -597,6 +603,7 @@ class ResourceMapperTest {
         }
         """.trimIndent()
 
+    @Language("JSON")
     val questionnaireResponseJson =
       """
         {
@@ -711,7 +718,70 @@ class ResourceMapperTest {
     assertThat(patient.name.first().family).isEqualTo("Crawford")
   }
 
+  @Test
+  fun paginated() {
+    @Language("JSON")
+    val questionnaireJson =
+      """
+      {
+        "resourceType": "Questionnaire",
+        "id": "client-registration-sample-paginated",
+        "status": "active",
+        "date": "2021-05-18T07:24:47.111Z",
+        "item": [
+          {
+            "linkId": "1",
+            "text": "Page 1",
+            "type": "group",
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://hl7.org/fhir/questionnaire-item-control",
+                      "code": "page",
+                      "display": "Page"
+                    }
+                  ],
+                  "text": "Page"
+                }
+              }
+            ],
+            "item": [
+              {
+                "linkId": "1.1",
+                "text": "ANC ID",
+                "type": "string",
+                "required": true,
+                "maxLength": 8,
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction",
+                    "valueString": "Unique ANC ID"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+      """.trimIndent()
+    val questionnaire = parser.parseResource(questionnaireJson) as Questionnaire
+    assertThat(questionnaire.item).hasSize(1)
+
+    val extension = questionnaire.item[0].extension
+    assertThat(extension).hasSize(1)
+
+    val code = extension[0].value as CodeableConcept
+    assertThat(code.coding.map { it.code }).containsExactly("page")
+  }
+
   private fun String.toDateFromFormatYyyyMmDd(): Date? {
     return SimpleDateFormat("yyyy-MM-dd").parse(this)
+  }
+
+  companion object {
+    val parser: IParser = FhirContext.forR4().newJsonParser()
   }
 }
