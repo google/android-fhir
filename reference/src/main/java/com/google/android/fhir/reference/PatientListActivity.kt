@@ -26,22 +26,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.Constraints
-import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.FhirApplication.Companion.fhirEngine
-import com.google.android.fhir.reference.api.HapiFhirService
 import com.google.android.fhir.reference.data.FhirPeriodicSyncWorker
-import com.google.android.fhir.reference.data.HapiFhirResourceDataSource
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.RepeatInterval
 import com.google.android.fhir.sync.Sync
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import org.hl7.fhir.r4.model.ResourceType
 
 /** An activity representing a list of Patients. */
 class PatientListActivity() : AppCompatActivity() {
