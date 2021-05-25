@@ -295,7 +295,7 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+      """.trimIndent()
 
     val questionnaireResponseJson =
       """
@@ -419,7 +419,7 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+      """.trimIndent()
 
     val iParser: IParser = FhirContext.forR4().newJsonParser()
 
@@ -673,7 +673,7 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+      """.trimIndent()
 
     val iParser: IParser = FhirContext.forR4().newJsonParser()
 
