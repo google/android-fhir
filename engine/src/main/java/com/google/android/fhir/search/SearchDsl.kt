@@ -32,7 +32,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   internal val stringFilters = mutableListOf<StringFilter>()
   internal val referenceFilters = mutableListOf<ReferenceFilter>()
 
-  internal val tokenFilter = mutableListOf<TokenFilter>()
+  internal val tokenFilters = mutableListOf<TokenFilter>()
   internal var sort: IParam? = null
   internal var order: Order? = null
 
