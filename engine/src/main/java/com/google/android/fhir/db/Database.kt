@@ -88,7 +88,7 @@ internal interface Database {
 
   /**
    * Retrieves all [LocalChangeEntity] s for all [Resource] s, which can be used to update the
-   * remote FHIR server. Each [resource] will have at most one
+   * remote FHIR server. Each resource will have at most one
    * [LocalChangeEntity](multiple changes are squashed).
    */
   suspend fun getAllLocalChanges(): List<SquashedLocalChange>

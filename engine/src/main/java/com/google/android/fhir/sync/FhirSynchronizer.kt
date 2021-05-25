@@ -21,7 +21,6 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.isUploadSuccess
 import com.google.android.fhir.logicalId
-import java.io.IOException
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
@@ -47,7 +46,7 @@ class FhirSynchronizer(
 
     resourceSyncParams.forEach {
       try {
-        download(it.key, it.value)
+        downloadResourceType(it.key, it.value)
       } catch (exception: Exception) {
         exceptions.add(ResourceSyncException(it.key, exception))
       }
@@ -59,20 +58,17 @@ class FhirSynchronizer(
     }
   }
 
-  private suspend fun download(resourceType: ResourceType, params: ParamMap) {
-    fhirEngine.syncDownload {
+  private suspend fun downloadResourceType(resourceType: ResourceType, params: ParamMap) {
+    fhirEngine.syncDownload { it ->
       var nextUrl = getInitialUrl(resourceType, params, it.getLatestTimestampFor(resourceType))
       val result = mutableListOf<Resource>()
-      try {
-        while (nextUrl != null) {
-          val bundle = dataSource.loadData(nextUrl)
-          nextUrl = bundle.link.firstOrNull { component -> component.relation == "next" }?.url
-          if (bundle.type == Bundle.BundleType.SEARCHSET) {
-            result.addAll(bundle.entry.map { it.resource })
-          }
+      while (nextUrl != null) {
+        val bundle = dataSource.loadData(nextUrl)
+        nextUrl = bundle.link.firstOrNull { component -> component.relation == "next" }?.url
+        if (bundle.type == Bundle.BundleType.SEARCHSET) {
+          result.addAll(bundle.entry.map { it.resource })
         }
-      } catch (e: IOException) {}
-
+      }
       return@syncDownload result
     }
   }
@@ -100,7 +96,7 @@ class FhirSynchronizer(
       list.forEach {
         try {
           val response: Resource = doUpload(it.localChange)
-          if (response.logicalId.equals(it.localChange.resourceId) || response.isUploadSuccess()) {
+          if (response.logicalId == it.localChange.resourceId || response.isUploadSuccess()) {
             tokens.add(it.token)
           } else {
             // TODO improve exception message
