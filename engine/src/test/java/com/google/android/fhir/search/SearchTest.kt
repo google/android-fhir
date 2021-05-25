@@ -315,8 +315,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.TELECOM.paramName,
-          ContactPoint.ContactPointUse.HOME.toCode(),
-          "test@gmail.com"
+          "test@gmail.com",
+          ContactPoint.ContactPointUse.HOME.toCode()
         )
       )
   }
