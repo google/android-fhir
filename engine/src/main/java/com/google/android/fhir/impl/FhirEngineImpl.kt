@@ -61,7 +61,7 @@ constructor(private val database: Database, private val context: Context) : Fhir
   }
 
   override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {
-    val stuff =
+    val resources =
       download(
         object : SyncDownloadContext {
           override suspend fun getLatestTimestamptFor(type: ResourceType) =
@@ -70,10 +70,10 @@ constructor(private val database: Database, private val context: Context) : Fhir
       )
 
     val timeStamps =
-      stuff.groupBy { it.resourceType }.entries.map {
-        SyncedResourceEntity(it.key, it.value.last().meta.lastUpdated.toTimeZoneString())
+      resources.groupBy { it.resourceType }.entries.map {
+        SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
       }
-    database.insertSyncedResources(timeStamps, stuff)
+    database.insertSyncedResources(timeStamps, resources)
   }
 
   override suspend fun syncUpload(
