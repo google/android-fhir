@@ -21,6 +21,7 @@ import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.Identifier
@@ -45,28 +46,33 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   fun filter(referenceParameter: ReferenceClientParam, init: ReferenceFilter.() -> Unit) {
     val filter = ReferenceFilter(referenceParameter)
     filter.init()
-    referenceFilter.add(filter)
+    referenceFilters.add(filter)
   }
 
   fun filter(filter: TokenClientParam, coding: Coding) =
-    tokenFilter.add(TokenFilter(parameter = filter, code = coding.code, system = coding.system))
+    tokenFilters.add(TokenFilter(parameter = filter, uri = coding.system, code = coding.code))
 
   fun filter(filter: TokenClientParam, identifier: Identifier) =
-    tokenFilter.add(
-      TokenFilter(parameter = filter, code = identifier.value, system = identifier.system)
+    tokenFilters.add(
+      TokenFilter(parameter = filter, uri = identifier.system, code = identifier.value)
     )
 
   fun filter(filter: TokenClientParam, contactPoint: ContactPoint) =
-    tokenFilter.add(TokenFilter(parameter = filter, code = contactPoint.value))
+    tokenFilters.add(
+      TokenFilter(parameter = filter, uri = contactPoint.use?.toCode(), code = contactPoint.value)
+    )
+
+  fun filter(filter: TokenClientParam, codeType: CodeType) =
+    tokenFilters.add(TokenFilter(parameter = filter, code = codeType.value))
 
   fun filter(filter: TokenClientParam, boolean: Boolean) =
-    tokenFilter.add(TokenFilter(parameter = filter, code = boolean.toString()))
+    tokenFilters.add(TokenFilter(parameter = filter, code = boolean.toString()))
 
   fun filter(filter: TokenClientParam, uriType: UriType) =
-    tokenFilter.add(TokenFilter(parameter = filter, code = uriType.value))
+    tokenFilters.add(TokenFilter(parameter = filter, code = uriType.value))
 
   fun filter(filter: TokenClientParam, string: String) =
-    tokenFilter.add(TokenFilter(parameter = filter, code = string))
+    tokenFilters.add(TokenFilter(parameter = filter, code = string))
 
   fun sort(parameter: StringClientParam, order: Order) {
     sort = parameter
@@ -90,11 +96,7 @@ data class StringFilter(
 data class ReferenceFilter(val parameter: ReferenceClientParam?, var value: String? = null)
 
 @SearchDslMarker
-data class TokenFilter(
-  val parameter: TokenClientParam?,
-  var system: String? = null,
-  var code: String
-)
+data class TokenFilter(val parameter: TokenClientParam?, var uri: String? = null, var code: String)
 
 enum class Order {
   ASCENDING,

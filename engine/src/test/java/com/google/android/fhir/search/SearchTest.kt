@@ -19,10 +19,14 @@ package com.google.android.fhir.search
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.CodeType
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
+import org.hl7.fhir.r4.model.UriType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -208,8 +212,16 @@ class SearchTest {
   }
 
   @Test
-  fun search_token_filter() {
-    val query = Search(ResourceType.Patient).apply { filter(Patient.ACTIVE, true) }.getQuery()
+  fun search_token_filter_by_coding_type() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.GENDER,
+            Coding("http://hl7.org/fhir/ValueSet/administrative-gender", "male", "Male")
+          )
+        }
+        .getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -220,7 +232,7 @@ class SearchTest {
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
-        AND index_system IS NULL
+        AND index_system = ?
         )
         """.trimIndent()
       )
@@ -229,14 +241,15 @@ class SearchTest {
         listOf(
           ResourceType.Patient.name,
           ResourceType.Patient.name,
-          Patient.ACTIVE.paramName,
-          "true"
+          Patient.GENDER.paramName,
+          "male",
+          "http://hl7.org/fhir/ValueSet/administrative-gender"
         )
       )
   }
 
   @Test
-  fun search_token_filter_with_system() {
+  fun search_token_filter_by_identifier() {
     val identifier = Identifier()
     identifier.value = "12345"
     identifier.system = "http://acme.org/patient"
@@ -264,6 +277,162 @@ class SearchTest {
           Patient.IDENTIFIER.paramName,
           "12345",
           "http://acme.org/patient"
+        )
+      )
+  }
+
+  @Test
+  fun search_token_filter_by_contact_point() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.TELECOM,
+            ContactPoint().apply {
+              system = ContactPoint.ContactPointSystem.EMAIL
+              use = ContactPoint.ContactPointUse.HOME
+              value = "test@gmail.com"
+            }
+          )
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND index_system = ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.TELECOM.paramName,
+          ContactPoint.ContactPointUse.HOME.toCode(),
+          "test@gmail.com"
+        )
+      )
+  }
+
+  @Test
+  fun search_token_filter_by_code() {
+    val query =
+      Search(ResourceType.Patient).apply { filter(Patient.GENDER, CodeType("male")) }.getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND index_system IS NULL
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.GENDER.paramName,
+          "male"
+        )
+      )
+  }
+
+  @Test
+  fun search_token_filter_by_boolean() {
+    val query = Search(ResourceType.Patient).apply { filter(Patient.ACTIVE, true) }.getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND index_system IS NULL
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.ACTIVE.paramName,
+          "true"
+        )
+      )
+  }
+
+  @Test
+  fun search_token_filter_by_uri_type() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply { filter(Patient.IDENTIFIER, UriType("16009886-bd57-11eb-8529-0242ac130003")) }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND index_system IS NULL
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.IDENTIFIER.paramName,
+          "16009886-bd57-11eb-8529-0242ac130003"
+        )
+      )
+  }
+
+  @Test
+  fun search_token_filter_by_string() {
+    val query =
+      Search(ResourceType.Patient).apply { filter(Patient.PHONE, "+14845219791") }.getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND index_system IS NULL
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.PHONE.paramName,
+          "+14845219791"
         )
       )
   }
