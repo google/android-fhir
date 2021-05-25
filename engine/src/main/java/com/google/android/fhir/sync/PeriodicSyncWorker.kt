@@ -32,7 +32,7 @@ abstract class PeriodicSyncWorker(appContext: Context, workerParams: WorkerParam
 
   override suspend fun doWork(): Result {
     // TODO handle retry
-    val result = FhirSynchronizer(getFhirEngine(), getDataSource(), getSyncData()).download()
+    val result = FhirSynchronizer(getFhirEngine(), getDataSource(), getSyncData()).synchronize()
     if (result is Success) {
       return Result.success()
     }

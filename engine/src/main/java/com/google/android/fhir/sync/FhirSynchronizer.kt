@@ -39,7 +39,7 @@ class FhirSynchronizer(
   private val dataSource: DataSource,
   private val resourceSyncParams: ResourceSyncParams
 ) {
-  suspend fun download(): Result {
+  suspend fun synchronize(): Result {
     val exceptions = mutableListOf<ResourceSyncException>()
 
     upload()

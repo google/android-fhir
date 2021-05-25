@@ -28,7 +28,7 @@ object Sync {
     dataSource: DataSource,
     resourceSyncParams: ResourceSyncParams
   ): Result {
-    return FhirSynchronizer(fhirEngine, dataSource, resourceSyncParams).download()
+    return FhirSynchronizer(fhirEngine, dataSource, resourceSyncParams).synchronize()
   }
 
   inline fun <reified W : PeriodicSyncWorker> periodicSync(

@@ -39,6 +39,7 @@ import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.RepeatInterval
 import com.google.android.fhir.sync.Sync
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -65,14 +66,6 @@ class PatientListActivity() : AppCompatActivity() {
     toolbar.title = title
 
     fhirEngine = fhirEngine(this)
-
-    lifecycleScope.launch {
-      Sync.oneTimeSync(
-        fhirEngine,
-        HapiFhirResourceDataSource(HapiFhirService.create(FhirContext.forR4().newJsonParser())),
-        mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
-      )
-    }
 
     patientListViewModel =
       ViewModelProvider(this, PatientListViewModelFactory(this.application, fhirEngine))

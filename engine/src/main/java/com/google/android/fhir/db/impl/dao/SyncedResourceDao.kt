@@ -20,7 +20,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import org.hl7.fhir.r4.model.ResourceType
 
