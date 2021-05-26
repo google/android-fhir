@@ -23,6 +23,7 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
@@ -49,36 +50,10 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           prefixTextView.visibility = View.GONE
         }
         val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
-        val answer = questionnaireResponseItem.answer
         checkboxGroupHeader.text = questionnaireItem.localizedText
         checkboxGroup.removeAllViews()
-        var index = 0
         questionnaireItem.answerOption.forEach { answerOption ->
-          val prefix = TextView(checkboxGroup.context)
-          val checkbox = CheckBox(checkboxGroup.context)
-          val linearLayout = LinearLayout(checkboxGroup.context)
-          if (questionnaireItemViewItem.hasAnswerOption(answerOption)) {
-            checkbox.isChecked = true
-          }
-          linearLayout.addView(checkbox)
-          linearLayout.addView(prefix)
-          prefix.text = answerOption.valueCoding.display
-          checkbox.setOnClickListener {
-            if (!(it as CheckBox).isChecked) {
-              removeAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = answerOption.value
-                }
-              )
-            } else {
-              addAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = answerOption.value
-                }
-              )
-            }
-          }
-          checkboxGroup.addView(linearLayout)
+          populateViewWithAnswerOption(answerOption)
         }
       }
 
@@ -94,6 +69,34 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
       ) {
         questionnaireItemViewItem.removeAnswer(questionnaireResponseItemAnswerComponent)
+      }
+
+      private fun populateViewWithAnswerOption(
+        answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent
+      ) {
+        val prefix = TextView(checkboxGroup.context)
+        val checkbox = CheckBox(checkboxGroup.context)
+        val linearLayout = LinearLayout(checkboxGroup.context)
+        checkbox.isChecked = questionnaireItemViewItem.hasAnswerOption(answerOption)
+        linearLayout.addView(checkbox)
+        linearLayout.addView(prefix)
+        prefix.text = answerOption.valueCoding.display
+        checkbox.setOnClickListener {
+          if (!(it as CheckBox).isChecked) {
+            removeAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = answerOption.value
+              }
+            )
+          } else {
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = answerOption.value
+              }
+            )
+          }
+        }
+        checkboxGroup.addView(linearLayout)
       }
     }
 }
