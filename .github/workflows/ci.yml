@@ -98,6 +98,8 @@ jobs:
         api-level: ${{ matrix.api-level }}
         arch: x86_64
         script: ./gradlew connectedCheck --stacktrace
+    - name: Code coverage (via codecov.io)
+      run: bash <(curl -s https://codecov.io/bash) -f engine/build/reports/coverage/debug/report.xml
     - name: Release artifacts to local repo
       run: ./gradlew publishReleasePublicationToCIRepository
     - name: Upload maven repo
