@@ -44,7 +44,7 @@ fun Search.getQuery(): SearchQuery {
       """.trimIndent()
     sortOrderStatement = """
       ORDER BY b.index_value ${order.sqlString}
-      """.trimIndent()
+    """.trimIndent()
     sortArgs += sort.paramName
   }
 

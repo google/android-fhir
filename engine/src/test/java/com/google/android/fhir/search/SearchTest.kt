@@ -491,7 +491,7 @@ class SearchTest {
       ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
       WHERE a.resourceType = ?
       ORDER BY b.index_value ASC
-      """.trimIndent()
+        """.trimIndent()
       )
   }
 
