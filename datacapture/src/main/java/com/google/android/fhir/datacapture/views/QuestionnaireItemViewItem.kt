@@ -54,6 +54,11 @@ internal data class QuestionnaireItemViewItem(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
   ) {
+    if (!questionnaireItem.repeats) {
+      throw IllegalArgumentException(
+        "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
+      )
+    }
     questionnaireResponseItem.answer.add(questionnaireResponseItemAnswerComponent)
   }
 
@@ -61,12 +66,20 @@ internal data class QuestionnaireItemViewItem(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
   ) {
+    if (!questionnaireItem.repeats) {
+      throw IllegalArgumentException(
+        "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
+      )
+    }
+
     questionnaireResponseItem.answer.removeIf {
-      it.value == questionnaireResponseItemAnswerComponent.value
+      it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value)
     }
   }
 
   fun hasAnswerOption(answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent): Boolean {
-    return questionnaireResponseItem.answer.find { it.value == answerOption.value } != null
+    return questionnaireResponseItem.answer.find {
+      it.value.equalsDeep(answerOption.value)
+    } != null
   }
 }
