@@ -19,46 +19,34 @@ This is the main library for building a mobile based clinical data repository us
 - SQLite database for FHIR resources
 - APIs for accessing (create, read, update, and delete) FHIR resources in the database
 - APIs for searching FHIR resources in the database
-- Sync API for sychnronisation of resources with a FHIR server
+- Sync API for synchronization of resources with a FHIR server
+
+To use this library in your Android application, see [FHIR Engine Library User's Guide](https://github.com/google/android-fhir/wiki/FHIR-Engine-Library-User's-Guide).
 
 ### Structured data capture (SDC) library  [![Google Maven](https://badgen.net/maven/v/metadata-url/dl.google.com/dl/android/maven2/com/google/android/fhir/data-capture/maven-metadata.xml)](https://maven.google.com/web/index.html?#com.google.android.fhir:data-capture)
 This library is a partial implementation of the [Structured Data Capture FHIR IG](http://build.fhir.org/ig/HL7/sdc/) on Android. It includes the UI components and APIs to capture healthcare data using FHIR questionnaires. 
 
-The following code snippet renders a questionnaire using a FHIR questionnaire resource and an optional questionnaire response resource.
-
-```
-if (savedInstanceState == null) {
-    val fragment = QuestionnaireFragment()
-    fragment.arguments = bundleOf(
-        QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to questionnaireJsonString
-        QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE_RESPONSE to
-            questionnaireResponseJsonString
-    )
-
-    supportFragmentManager.commit {
-        add(R.id.container, fragment, QUESTIONNAIRE_FRAGMENT_TAG)
-    }
-}
-```
+To use this library in your Android application, see [Structured Data Capture Library User's Guide](https://github.com/google/android-fhir/wiki/Structured-Data-Capture-Library-User's-Guide).
 
 ## Sample Applications
 Two sample applications are provided that demonstrate different features of the SDK. 
 
 **These applications are provided for demonstration purposes only and are not for use in production. Do NOT use in production.**
 
-### Clinical Data Repository (CDR) Application
+### Reference Application
 This is the initial demo application for showcasing core SDK features and CQL proof of concept. The demo uses synthea generated data that has been loaded into the HAPI FHIR server public demo site.
 
-#### CQL Proof of Concept
-Within the CDR demo is an example of evaluating CQL using the [CQL Engine](https://github.com/DBCG/cql_engine).
+To run this application, clone the codebase and run the `reference` module. 
 
 ### SDC Gallery App
 This app includes a number of pre-loaded sample FHIR Questionnaires. 
 
 It uses the SDC library to create data capture forms using FHIR questionnaires. For supported widgets, features and known bugs, see the latest release notes.
 
+To run this application, clone the codebase and run the `datacapturegallery` module. 
+
 ## Contributing
-The SDK is being developed by a consortium of application developers. We welcome contributions. Please see the [project boards](https://github.com/google/android-fhir/projects).
+The SDK is being developed by a consortium of application developers. We welcome contributions. Please see [How to Contribute](https://github.com/google/android-fhir/blob/master/docs/contributing.md) and [Developer's Guide](https://github.com/google/android-fhir/wiki/Developer's-Guide) for more information.
 
 ## Feedback
 If you want to provide any feedback, discuss use cases, raise feature requests, or simply want to get involved, please use the [Discussions](https://github.com/google/android-fhir/discussions) section, or email us at <android-fhir-sdk-feedback@google.com>.
