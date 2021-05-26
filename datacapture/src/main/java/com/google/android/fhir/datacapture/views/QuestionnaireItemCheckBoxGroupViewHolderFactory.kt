@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.views
 
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.CheckBox
 import android.widget.LinearLayout
@@ -57,46 +58,32 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         }
       }
 
-      fun addAnswer(
-        questionnaireResponseItemAnswerComponent:
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
-      ) {
-        questionnaireItemViewItem.addAnswer(questionnaireResponseItemAnswerComponent)
-      }
-
-      fun removeAnswer(
-        questionnaireResponseItemAnswerComponent:
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
-      ) {
-        questionnaireItemViewItem.removeAnswer(questionnaireResponseItemAnswerComponent)
-      }
-
       private fun populateViewWithAnswerOption(
         answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent
       ) {
-        val prefix = TextView(checkboxGroup.context)
-        val checkbox = CheckBox(checkboxGroup.context)
-        val linearLayout = LinearLayout(checkboxGroup.context)
+        val singleCheckBox =
+          LayoutInflater.from(checkboxGroup.context)
+            .inflate(R.layout.questionnaire_item_single_checkbox_view, null)
+        val displayText = singleCheckBox.findViewById<TextView>(R.id.single_check_box_text)
+        val checkbox = singleCheckBox.findViewById<CheckBox>(R.id.single_check_box)
         checkbox.isChecked = questionnaireItemViewItem.hasAnswerOption(answerOption)
-        linearLayout.addView(checkbox)
-        linearLayout.addView(prefix)
-        prefix.text = answerOption.valueCoding.display
+        displayText.text = answerOption.valueCoding.display
         checkbox.setOnClickListener {
           if (!(it as CheckBox).isChecked) {
-            removeAnswer(
+            questionnaireItemViewItem.removeAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = answerOption.value
               }
             )
           } else {
-            addAnswer(
+            questionnaireItemViewItem.addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = answerOption.value
               }
             )
           }
         }
-        checkboxGroup.addView(linearLayout)
+        checkboxGroup.addView(singleCheckBox)
       }
     }
 }
