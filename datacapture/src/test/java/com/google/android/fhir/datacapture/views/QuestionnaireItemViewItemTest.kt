@@ -192,10 +192,12 @@ class QuestionnaireItemViewItemTest {
           repeats = true
           linkId = "a-question"
           addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(Coding("sample-system", "sample-code1", "Sample Code1"))
+            Questionnaire.QuestionnaireItemAnswerOptionComponent()
+              .setValue(Coding("sample-system", "sample-code1", "Sample Code1"))
           )
           addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
+            Questionnaire.QuestionnaireItemAnswerOptionComponent()
+              .setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
@@ -207,10 +209,12 @@ class QuestionnaireItemViewItemTest {
       ) {}
 
     assertThat(
-      questionnaireItemViewItem.hasAnswerOption(
-        Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
+        questionnaireItemViewItem.hasAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent()
+            .setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
+        )
       )
-    ).isTrue()
+      .isTrue()
   }
 
   @Test
@@ -221,19 +225,23 @@ class QuestionnaireItemViewItemTest {
           repeats = true
           linkId = "a-question"
           addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(Coding("sample-system", "sample-code1", "Sample Code1"))
+            Questionnaire.QuestionnaireItemAnswerOptionComponent()
+              .setValue(Coding("sample-system", "sample-code1", "Sample Code1"))
           )
           addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
+            Questionnaire.QuestionnaireItemAnswerOptionComponent()
+              .setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
 
     assertThat(
-      questionnaireItemViewItem.hasAnswerOption(
-        Questionnaire.QuestionnaireItemAnswerOptionComponent().setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
+        questionnaireItemViewItem.hasAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent()
+            .setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
+        )
       )
-    ).isFalse()
+      .isFalse()
   }
 }
