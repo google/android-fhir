@@ -202,7 +202,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
     checkBox.performClick()
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
-    assertThat(answer.size).isEqualTo(1)
+    assertThat(answer).hasSize(1)
     assertThat(answer[0].valueCoding.display).isEqualTo("Coding 1")
   }
 
