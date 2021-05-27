@@ -61,7 +61,7 @@ class LocalChangeUtilsTest {
   val objectMapper = ObjectMapper()
   val payload_json_node: JsonNode = objectMapper.readTree(payload1)
 
-  val first =
+  val insert_payload1 =
     LocalChangeEntity(
       id = 1L,
       resourceType = "Test1",
@@ -70,7 +70,7 @@ class LocalChangeUtilsTest {
       payload = "payload1",
       type = LocalChangeEntity.Type.INSERT
     )
-  val second =
+  val insert_payload2 =
     LocalChangeEntity(
       id = 2L,
       resourceType = "Test2",
@@ -79,7 +79,7 @@ class LocalChangeUtilsTest {
       payload = "payload2",
       type = LocalChangeEntity.Type.INSERT
     )
-  val third =
+  val delete_payload =
     LocalChangeEntity(
       id = 3L,
       resourceType = "Test3",
@@ -88,7 +88,7 @@ class LocalChangeUtilsTest {
       payload = "payload3",
       type = LocalChangeEntity.Type.DELETE
     )
-  val fourth =
+  val update_json_patch =
     LocalChangeEntity(
       id = 4L,
       resourceType = "Test4",
@@ -97,7 +97,7 @@ class LocalChangeUtilsTest {
       payload = json_patch,
       type = LocalChangeEntity.Type.UPDATE
     )
-  val fifth =
+  val insert_payload_json_node =
     LocalChangeEntity(
       id = 5L,
       resourceType = "Test5",
@@ -108,9 +108,9 @@ class LocalChangeUtilsTest {
     )
 
   @Test
-  fun mergeInsertAndInsert() {
-    // Expected output when first and second mix,(INSERT AND INSERT)
-    val res12 =
+  fun response_test_insert_payload1_insert_payload2() {
+    // Expected output when (INSERT AND INSERT) mix
+    val insertPayload1_and_insertPayload2 =
       LocalChangeEntity(
         id = 0L,
         resourceType = "Test2",
@@ -119,13 +119,16 @@ class LocalChangeUtilsTest {
         type = LocalChangeEntity.Type.INSERT,
         payload = "payload2"
       )
-    assertEquals(mergeLocalChanges(first, second), res12)
+    assertEquals(
+      mergeLocalChanges(insert_payload1, insert_payload2),
+      insertPayload1_and_insertPayload2
+    )
   }
 
   @Test
-  fun mergeInsertAndDelete() {
-    // Expected output when first and second are mixed(INSERT AND DELETE)
-    val res13 =
+  fun response_test_insert_payload1_delete() {
+    // Expected output when (INSERT AND DELETE) are mixed
+    val insertPayload1_and_deletePayload =
       LocalChangeEntity(
         id = 0L,
         resourceType = "Test3",
@@ -134,13 +137,16 @@ class LocalChangeUtilsTest {
         type = LocalChangeEntity.Type.DELETE,
         payload = ""
       )
-    assertEquals(mergeLocalChanges(first, third), res13)
+    assertEquals(
+      mergeLocalChanges(insert_payload1, delete_payload),
+      insertPayload1_and_deletePayload
+    )
   }
 
   @Test
-  fun mergeDeleteAndInsert() {
-    // Expected output when third and first are mixed( DELETE AND INSERT)
-    val res31 =
+  fun response_test_delete_and_insert_payload1() {
+    // Expected output when delete_payload and first are mixed( DELETE AND INSERT)
+    val deletePayload_and_insertPayload1 =
       LocalChangeEntity(
         id = 0L,
         resourceType = "Test1",
@@ -149,13 +155,17 @@ class LocalChangeUtilsTest {
         type = LocalChangeEntity.Type.INSERT,
         payload = "payload1"
       )
-    assertEquals(mergeLocalChanges(third, first), res31)
+    assertEquals(
+      mergeLocalChanges(delete_payload, insert_payload1),
+      deletePayload_and_insertPayload1
+    )
   }
 
   @Test
-  fun mergeInsertAndUpdate() {
-    // Expected output when fifth and fourth are mixed(INSERT AND UPDATE)
-    val res54 =
+  fun response_test_insert_payload_JNode_Update_Jpatch() {
+    // Expected output when insert_payload_json_node and update_json_patch are mixed(INSERT AND
+    // UPDATE)
+    val insertPayloadJsonNode_and_UpdateJsonPatch =
       LocalChangeEntity(
         id = 0L,
         resourceType = "Test4",
@@ -165,6 +175,9 @@ class LocalChangeUtilsTest {
         payload =
           """{"resourceType":"Patient","id":"human","name":[{"use":"Ana2k","given":["Kenzi"]}]}"""
       )
-    assertEquals(mergeLocalChanges(fifth, fourth), res54)
+    assertEquals(
+      mergeLocalChanges(insert_payload_json_node, update_json_patch),
+      insertPayloadJsonNode_and_UpdateJsonPatch
+    )
   }
 }
