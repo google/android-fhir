@@ -20,14 +20,15 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.ResourceNotFoundException
 import com.google.android.fhir.db.ResourceNotFoundInDbException
+import com.google.android.fhir.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.resource.TestingUtils
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
+import java.util.Date
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Enumerations
-import org.hl7.fhir.r4.model.OperationOutcome
+import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Assert.assertThrows
 import org.junit.Before
@@ -38,34 +39,7 @@ import org.robolectric.RobolectricTestRunner
 /** Unit tests for [FhirEngineImpl]. */
 @RunWith(RobolectricTestRunner::class)
 class FhirEngineImplTest {
-  private val dataSource =
-    object : FhirDataSource {
-      override suspend fun loadData(path: String): Bundle {
-        return Bundle()
-      }
-
-      override suspend fun insert(
-        resourceType: String,
-        resourceId: String,
-        payload: String
-      ): Resource {
-        return Patient()
-      }
-
-      override suspend fun update(
-        resourceType: String,
-        resourceId: String,
-        payload: String
-      ): OperationOutcome {
-        return OperationOutcome()
-      }
-
-      override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
-        return OperationOutcome()
-      }
-    }
-  private val services =
-    builder(dataSource, ApplicationProvider.getApplicationContext()).inMemory().build()
+  private val services = builder(ApplicationProvider.getApplicationContext()).inMemory().build()
   private val fhirEngine = services.fhirEngine
   private val testingUtils = TestingUtils(services.parser)
 
@@ -99,7 +73,7 @@ class FhirEngineImplTest {
       assertThrows(ResourceNotFoundInDbException::class.java) {
         runBlocking { fhirEngine.update(TEST_PATIENT_2) }
       }
-    Truth.assertThat(exception.message)
+    assertThat(exception.message)
       .isEqualTo(
         "Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!"
       )
@@ -123,7 +97,7 @@ class FhirEngineImplTest {
       assertThrows(ResourceNotFoundException::class.java) {
         runBlocking { fhirEngine.load(Patient::class.java, "nonexistent_patient") }
       }
-    Truth.assertThat(resourceNotFoundException.message)
+    assertThat(resourceNotFoundException.message)
       .isEqualTo(
         "Resource not found with type ${ResourceType.Patient.name} and id nonexistent_patient!"
       )
@@ -137,19 +111,49 @@ class FhirEngineImplTest {
     )
   }
 
+  @Test
+  fun syncUpload_uploadLocalChange() = runBlocking {
+    var localChanges = mutableListOf<SquashedLocalChange>()
+    fhirEngine.syncUpload { it ->
+      localChanges.addAll(it)
+      return@syncUpload it.map { it.token }
+    }
+
+    assertThat(localChanges).hasSize(1)
+    val localChange = localChanges[0].localChange
+    assertThat(localChange.resourceType).isEqualTo(ResourceType.Patient.toString())
+    assertThat(localChange.resourceId).isEqualTo(TEST_PATIENT_1.id)
+    assertThat(localChange.type).isEqualTo(LocalChangeEntity.Type.INSERT)
+    assertThat(localChange.payload)
+      .isEqualTo(services.parser.encodeResourceToString(TEST_PATIENT_1))
+  }
+
+  @Test
+  fun syncDownload_downloadResources() = runBlocking {
+    fhirEngine.syncDownload {
+      return@syncDownload listOf(TEST_PATIENT_2)
+    }
+
+    testingUtils.assertResourceEquals(
+      TEST_PATIENT_2,
+      fhirEngine.load(Patient::class.java, TEST_PATIENT_2_ID)
+    )
+  }
+
   companion object {
     private const val TEST_PATIENT_1_ID = "test_patient_1"
-    private var TEST_PATIENT_1 = Patient()
-    init {
-      TEST_PATIENT_1.id = TEST_PATIENT_1_ID
-      TEST_PATIENT_1.gender = Enumerations.AdministrativeGender.MALE
+    private var TEST_PATIENT_1 = Patient().apply{
+      id = TEST_PATIENT_1_ID
+      gender = Enumerations.AdministrativeGender.MALE
     }
 
     private const val TEST_PATIENT_2_ID = "test_patient_2"
-    private var TEST_PATIENT_2 = Patient()
-    init {
-      TEST_PATIENT_2.id = TEST_PATIENT_2_ID
-      TEST_PATIENT_2.gender = Enumerations.AdministrativeGender.MALE
+    private var TEST_PATIENT_2 = Patient().apply {
+      id = TEST_PATIENT_2_ID
+      gender = Enumerations.AdministrativeGender.MALE
+      meta = Meta().apply {
+        lastUpdated = Date()
+      }
     }
   }
 }

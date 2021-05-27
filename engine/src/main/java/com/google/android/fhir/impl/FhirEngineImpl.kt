@@ -24,10 +24,13 @@ import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.execute
+import com.google.android.fhir.toTimeZoneString
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 
 /** Implementation of [FhirEngine]. */
 internal class FhirEngineImpl
@@ -58,12 +61,27 @@ constructor(private val database: Database, private val context: Context) : Fhir
   }
 
   override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {
-    database.syncDownload(download)
+    val resources =
+      download(
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
+        }
+      )
+
+    val timeStamps =
+      resources.groupBy { it.resourceType }.entries.map {
+        SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
+      }
+    database.insertSyncedResources(timeStamps, resources)
   }
 
   override suspend fun syncUpload(
     upload: (suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>)
   ) {
-    database.syncUpload(upload)
+    var localChanges = database.getAllLocalChanges()
+    while (localChanges.isNotEmpty()) {
+      upload(localChanges).forEach { database.deleteUpdates(it) }
+      localChanges = database.getAllLocalChanges()
+    }
   }
 }

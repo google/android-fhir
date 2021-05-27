@@ -95,8 +95,4 @@ internal interface Database {
 
   /** Remove the [LocalChangeEntity] s with given ids. Call this after a successful sync. */
   suspend fun deleteUpdates(token: LocalChangeToken)
-
-  suspend fun syncUpload(upload: (suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>))
-
-  suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>)
 }

@@ -130,34 +130,6 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
     localChangeDao.discardLocalChanges(token)
   }
 
-  override suspend fun syncUpload(
-    upload: suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>
-  ) {
-    db.withTransaction {
-      var localChanges = getAllLocalChanges()
-      while (localChanges.isNotEmpty()) {
-        upload(localChanges).forEach { deleteUpdates(it) }
-      }
-    }
-  }
-
-  override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {
-    db.withTransaction {
-      val resources =
-        download(
-          object : SyncDownloadContext {
-            override suspend fun getLatestTimestampFor(type: ResourceType) = lastUpdate(type)
-          }
-        )
-
-      val timeStamps =
-        resources.groupBy { it.resourceType }.entries.map {
-          SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
-        }
-      insertSyncedResources(timeStamps, resources)
-    }
-  }
-
   companion object {
     private const val DEFAULT_DATABASE_NAME = "ResourceDatabase"
   }

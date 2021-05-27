@@ -20,6 +20,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.FhirServices
 import com.google.android.fhir.db.ResourceNotFoundInDbException
+import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
@@ -27,6 +28,7 @@ import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
+import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
@@ -56,7 +58,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class DatabaseImplTest {
   private val dataSource =
-    object : FhirDataSource {
+    object : DataSource {
 
       override suspend fun loadData(path: String): Bundle {
         return Bundle()
@@ -83,7 +85,7 @@ class DatabaseImplTest {
       }
     }
   private val services =
-    FhirServices.builder(dataSource, ApplicationProvider.getApplicationContext()).inMemory().build()
+    FhirServices.builder(ApplicationProvider.getApplicationContext()).inMemory().build()
   private val testingUtils = TestingUtils(services.parser)
   private val database = services.database
 
