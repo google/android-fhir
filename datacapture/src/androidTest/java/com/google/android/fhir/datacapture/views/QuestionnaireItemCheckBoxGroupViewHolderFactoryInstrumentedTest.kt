@@ -170,10 +170,10 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
     val checkBoxGroup = viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group)
-    val linearLayoutGroup1 = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox1 = linearLayoutGroup1.getChildAt(1) as CheckBox
+    val linearLayoutGroup = checkBoxGroup.getChildAt(0) as LinearLayout
+    val checkBox = linearLayoutGroup.getChildAt(1) as CheckBox
 
-    assertThat(checkBox1.isChecked).isTrue()
+    assertThat(checkBox.isChecked).isTrue()
   }
 
   @Test
