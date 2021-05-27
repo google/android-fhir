@@ -135,7 +135,7 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
 
     val checkBoxGroup = viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group)
     val linearLayoutGroup = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox = linearLayoutGroup.getChildAt(0) as CheckBox
+    val checkBox = linearLayoutGroup.getChildAt(1) as CheckBox
     assertThat(checkBox.isChecked).isFalse()
   }
 
@@ -155,15 +155,6 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
                 }
             }
           )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-              value =
-                Coding().apply {
-                  code = "code 2"
-                  display = "Coding 2"
-                }
-            }
-          )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
@@ -180,19 +171,14 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
     )
     val checkBoxGroup = viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group)
     val linearLayoutGroup1 = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox1 = linearLayoutGroup1.getChildAt(0) as CheckBox
+    val checkBox1 = linearLayoutGroup1.getChildAt(1) as CheckBox
 
     assertThat(checkBox1.isChecked).isTrue()
-
-    val linearLayoutGroup2 = checkBoxGroup.getChildAt(1) as LinearLayout
-    val checkBox2 = linearLayoutGroup2.getChildAt(0) as CheckBox
-
-    assertThat(checkBox2.isChecked).isFalse()
   }
 
   @Test
   @UiThreadTest
-  fun click_singleAnswer_shouldSetQuestionnaireResponseItemAnswer() {
+  fun click_shouldAddQuestionnaireResponseItemAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -212,17 +198,17 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group)
     val linearLayoutGroup = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox = linearLayoutGroup.getChildAt(0) as CheckBox
+    val checkBox = linearLayoutGroup.getChildAt(1) as CheckBox
     checkBox.performClick()
-
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
+
     assertThat(answer.size).isEqualTo(1)
     assertThat(answer[0].valueCoding.display).isEqualTo("Coding 1")
   }
 
   @Test
   @UiThreadTest
-  fun click_moreAnswers_shouldSetQuestionnaireResponseItemAnswer() {
+  fun click_shouldRemoveQuestionnaireResponseItemAnswer() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -236,31 +222,26 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
                 }
             }
           )
-          addAnswerOption(
-            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
                 Coding().apply {
-                  code = "code 2"
-                  display = "Coding 2"
+                  code = "code 1"
+                  display = "Coding 1"
                 }
             }
           )
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent()
+        }
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group)
     val linearLayoutGroup1 = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox1 = linearLayoutGroup1.getChildAt(0) as CheckBox
-    val linearLayoutGroup2 = checkBoxGroup.getChildAt(1) as LinearLayout
-    val checkBox2 = linearLayoutGroup2.getChildAt(0) as CheckBox
-
+    val checkBox1 = linearLayoutGroup1.getChildAt(1) as CheckBox
     checkBox1.performClick()
-    checkBox2.performClick()
-
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
-    assertThat(answer.size).isEqualTo(2)
-    assertThat(answer[0].valueCoding.display).isEqualTo("Coding 1")
-    assertThat(answer[1].valueCoding.display).isEqualTo("Coding 2")
+
+    assertThat(answer.size).isEqualTo(0)
   }
 }
