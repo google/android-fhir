@@ -88,7 +88,7 @@ class QuestionnaireItemViewItemTest {
       ) {}
 
     val errorMessage =
-      assertFailsWith<IllegalArgumentException> {
+      assertFailsWith<IllegalStateException> {
           questionnaireItemViewItem.addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(BooleanType(true))
@@ -141,7 +141,7 @@ class QuestionnaireItemViewItemTest {
       ) {}
 
     val errorMessage =
-      assertFailsWith<IllegalArgumentException> {
+      assertFailsWith<IllegalStateException> {
           questionnaireItemViewItem.removeAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
               .setValue(BooleanType(true))
