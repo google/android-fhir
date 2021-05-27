@@ -142,18 +142,18 @@ class FhirEngineImplTest {
 
   companion object {
     private const val TEST_PATIENT_1_ID = "test_patient_1"
-    private var TEST_PATIENT_1 = Patient().apply{
-      id = TEST_PATIENT_1_ID
-      gender = Enumerations.AdministrativeGender.MALE
-    }
+    private var TEST_PATIENT_1 =
+      Patient().apply {
+        id = TEST_PATIENT_1_ID
+        gender = Enumerations.AdministrativeGender.MALE
+      }
 
     private const val TEST_PATIENT_2_ID = "test_patient_2"
-    private var TEST_PATIENT_2 = Patient().apply {
-      id = TEST_PATIENT_2_ID
-      gender = Enumerations.AdministrativeGender.MALE
-      meta = Meta().apply {
-        lastUpdated = Date()
+    private var TEST_PATIENT_2 =
+      Patient().apply {
+        id = TEST_PATIENT_2_ID
+        gender = Enumerations.AdministrativeGender.MALE
+        meta = Meta().apply { lastUpdated = Date() }
       }
-    }
   }
 }
