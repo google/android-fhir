@@ -242,6 +242,6 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
     checkBox1.performClick()
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
-    assertThat(answer.size).isEqualTo(0)
+    assertThat(answer).isEmpty()
   }
 }
