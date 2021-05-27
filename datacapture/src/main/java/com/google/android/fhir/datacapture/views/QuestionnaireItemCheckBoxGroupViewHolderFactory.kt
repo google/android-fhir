@@ -68,14 +68,14 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         checkbox.isChecked = questionnaireItemViewItem.hasAnswerOption(answerOption)
         checkbox.text = answerOption.valueCoding.display
         checkbox.setOnClickListener {
-          if (!(it as CheckBox).isChecked) {
-            questionnaireItemViewItem.removeAnswer(
+          if (checkbox.isChecked) {
+            questionnaireItemViewItem.addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = answerOption.value
               }
             )
           } else {
-            questionnaireItemViewItem.addAnswer(
+            questionnaireItemViewItem.removeAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = answerOption.value
               }
