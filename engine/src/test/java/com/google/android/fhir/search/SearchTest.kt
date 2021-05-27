@@ -642,7 +642,7 @@ class SearchTest {
         SELECT resourceId FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value < ?
         )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -678,7 +678,7 @@ class SearchTest {
         SELECT resourceId FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value < ? OR index_value >= ?
         )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -714,7 +714,7 @@ class SearchTest {
         SELECT resourceId FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value > ?
         )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -748,7 +748,7 @@ class SearchTest {
         SELECT resourceId FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value >= ?
         )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -782,7 +782,7 @@ class SearchTest {
         SELECT resourceId FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value < ?
         )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -816,7 +816,7 @@ class SearchTest {
         SELECT resourceId FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value <= ?
         )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -863,7 +863,7 @@ class SearchTest {
         SELECT resourceId FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value < ?
         )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -910,7 +910,7 @@ class SearchTest {
         SELECT resourceId FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value > ?
         )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -944,7 +944,7 @@ class SearchTest {
         SELECT resourceId FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value <= ?
         )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)

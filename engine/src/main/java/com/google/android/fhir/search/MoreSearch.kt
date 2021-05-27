@@ -58,7 +58,6 @@ fun Search.getQuery(): SearchQuery {
         referenceFilters.map { it.query(type) } +
         tokenFilters.map { it.query(type) } +
         numberFilter.map { it.query(type) })
-
       .intersect()
   if (filterQuery != null) {
     filterStatement =
