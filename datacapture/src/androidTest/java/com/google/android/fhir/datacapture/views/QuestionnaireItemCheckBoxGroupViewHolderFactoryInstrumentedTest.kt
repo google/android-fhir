@@ -237,9 +237,9 @@ class QuestionnaireItemCheckBoxGroupViewHolderFactoryInstrumentedTest {
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
     val checkBoxGroup = viewHolder.itemView.findViewById<LinearLayout>(R.id.checkbox_group)
-    val linearLayoutGroup1 = checkBoxGroup.getChildAt(0) as LinearLayout
-    val checkBox1 = linearLayoutGroup1.getChildAt(1) as CheckBox
-    checkBox1.performClick()
+    val linearLayoutGroup = checkBoxGroup.getChildAt(0) as LinearLayout
+    val checkBox = linearLayoutGroup.getChildAt(1) as CheckBox
+    checkBox.performClick()
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
 
     assertThat(answer).isEmpty()
