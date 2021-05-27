@@ -47,7 +47,7 @@ fun Search.getQuery(): SearchQuery {
       """.trimIndent()
     sortOrderStatement = """
       ORDER BY b.index_value ${order.sqlString}
-      """.trimIndent()
+    """.trimIndent()
     sortArgs += sort.paramName
   }
 
@@ -55,8 +55,10 @@ fun Search.getQuery(): SearchQuery {
   val filterArgs = mutableListOf<Any>()
   val filterQuery =
     (stringFilters.map { it.query(type) } +
-        referenceFilter.map { it.query(type) } +
+        referenceFilters.map { it.query(type) } +
+        tokenFilters.map { it.query(type) } +
         numberFilter.map { it.query(type) })
+
       .intersect()
   if (filterQuery != null) {
     filterStatement =
@@ -194,6 +196,17 @@ fun ReferenceFilter.query(type: ResourceType): SearchQuery {
     WHERE resourceType = ? AND index_name = ? AND index_value = ?
     """,
     listOf(type.name, parameter!!.paramName, value!!)
+  )
+}
+
+fun TokenFilter.query(type: ResourceType): SearchQuery {
+  return SearchQuery(
+    """
+    SELECT resourceId FROM TokenIndexEntity
+    WHERE resourceType = ? AND index_name = ? AND index_value = ?
+    AND IFNULL(index_system,'') = ? 
+    """,
+    listOfNotNull(type.name, parameter!!.paramName, code, uri ?: "")
   )
 }
 
