@@ -124,9 +124,9 @@ fun TokenFilter.query(type: ResourceType): SearchQuery {
     """
     SELECT resourceId FROM TokenIndexEntity
     WHERE resourceType = ? AND index_name = ? AND index_value = ?
-    AND index_system ${if (uri == null) "IS NULL" else "= ?"} 
+    AND IFNULL(index_system,'') = ? 
     """,
-    listOfNotNull(type.name, parameter!!.paramName, code!!, uri)
+    listOfNotNull(type.name, parameter!!.paramName, code, uri ?: "")
   )
 }
 

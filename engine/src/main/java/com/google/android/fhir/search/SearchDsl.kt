@@ -22,6 +22,7 @@ import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import org.hl7.fhir.r4.model.CodeType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.Identifier
@@ -32,7 +33,6 @@ import org.hl7.fhir.r4.model.UriType
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
   internal val stringFilters = mutableListOf<StringFilter>()
   internal val referenceFilters = mutableListOf<ReferenceFilter>()
-
   internal val tokenFilters = mutableListOf<TokenFilter>()
   internal var sort: IParam? = null
   internal var order: Order? = null
@@ -51,6 +51,11 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
 
   fun filter(filter: TokenClientParam, coding: Coding) =
     tokenFilters.add(TokenFilter(parameter = filter, uri = coding.system, code = coding.code))
+
+  fun filter(filter: TokenClientParam, codeableConcept: CodeableConcept) =
+    codeableConcept.coding.forEach {
+      tokenFilters.add(TokenFilter(parameter = filter, uri = it.system, code = it.code))
+    }
 
   fun filter(filter: TokenClientParam, identifier: Identifier) =
     tokenFilters.add(
