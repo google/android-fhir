@@ -120,7 +120,7 @@ class QuestionnaireItemViewItemTest {
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType(true))
     )
 
-    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer.size).isEqualTo(2)
+    assertThat(questionnaireItemViewItem.questionnaireResponseItem.answer).hasSize(2)
   }
 
   @Test
