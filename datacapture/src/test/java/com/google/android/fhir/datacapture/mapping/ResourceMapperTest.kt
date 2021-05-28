@@ -85,6 +85,12 @@ class ResourceMapperTest {
                   "text": "Date of Birth"
                 },
                 {
+                  "linkId": "PR-name-id",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Resource#Resource.id",
+                  "type": "string",
+                  "text": "Patient Id"
+                },
+                {
                   "linkId": "patient-0-gender",
                   "extension": [
                     {
@@ -332,6 +338,14 @@ class ResourceMapperTest {
                   "answer": [
                     {
                       "valueDate": "2021-01-01"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-name-id",
+                  "answer": [
+                    {
+                      "valueString": "98238-adsfsa-23rfdsf"
                     }
                   ]
                 },
