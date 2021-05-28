@@ -36,7 +36,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
-internal open class QuestionnaireItemAdapter(val mapper: ViewPicker?) :
+internal open class QuestionnaireItemAdapter(val questionnaireItemViewHolderMatchers: List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher>?) :
   ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
   /**
    * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
@@ -44,8 +44,9 @@ internal open class QuestionnaireItemAdapter(val mapper: ViewPicker?) :
    */
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
 
-    mapper?.getQuestionnaireItemViewHolderFactory(viewType)?.let {
-      return it.create(parent)
+    // map custom widget ints to their corresponding widget factories
+    if (questionnaireItemViewHolderMatchers != null && viewType >= questionnaireItemViewHolderMatchers.size) {
+      questionnaireItemViewHolderMatchers[viewType - questionnaireItemViewHolderMatchers.size].factory.create(parent)
     }
 
     val viewHolderFactory =
@@ -90,9 +91,17 @@ internal open class QuestionnaireItemAdapter(val mapper: ViewPicker?) :
   internal fun getItemViewTypeMapping(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
   ): Int {
-    mapper?.getQuestionnaireItemViewHolderType(questionnaireItem)?.let {
-      return it
+
+    // for custom widgets, generate an int that's > any int assigned to the
+    // canonical FHIR widgets
+    if (questionnaireItemViewHolderMatchers != null) {
+      for (i in 0..questionnaireItemViewHolderMatchers.size) {
+        if (questionnaireItemViewHolderMatchers[i].matches(questionnaireItem)) {
+            return i + QuestionnaireItemType.values().size + 1
+        }
+      }
     }
+
     return when (val type = questionnaireItem.type) {
       QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP
       QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX

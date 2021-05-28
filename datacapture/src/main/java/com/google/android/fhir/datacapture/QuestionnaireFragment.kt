@@ -31,7 +31,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFact
 import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Questionnaire
 
-open class QuestionnaireFragment : Fragment(), ViewPicker {
+open class QuestionnaireFragment : Fragment() {
   private val viewModel: QuestionnaireViewModel by viewModels()
 
   override fun onCreateView(
@@ -55,7 +55,7 @@ open class QuestionnaireFragment : Fragment(), ViewPicker {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-    val adapter = QuestionnaireItemAdapter(this)
+    val adapter = QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
     recyclerView.adapter = adapter
     recyclerView.layoutManager = LinearLayoutManager(view.context)
 
@@ -65,6 +65,10 @@ open class QuestionnaireFragment : Fragment(), ViewPicker {
     }
   }
 
+  open fun getQuestionnaireItemViewHolderFactoryMatchers(): List<QuestionnaireItemViewHolderFactoryMatcher>? {
+    return null
+  }
+  
   // Returns the current questionnaire response
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
@@ -73,15 +77,8 @@ open class QuestionnaireFragment : Fragment(), ViewPicker {
     const val BUNDLE_KEY_QUESTIONNAIRE_RESPONSE = "questionnaire-response"
   }
 
-  override fun getQuestionnaireItemViewHolderFactory(
-    questionnaireItemViewHolderType: Int
-  ): QuestionnaireItemViewHolderFactory? {
-    return null
-  }
-
-  override fun getQuestionnaireItemViewHolderType(
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent
-  ): Int? {
-    return null
-  }
+  data class QuestionnaireItemViewHolderFactoryMatcher(
+          val factory: QuestionnaireItemViewHolderFactory,
+          val matches: (Questionnaire.QuestionnaireItemComponent) -> Boolean
+  )
 }

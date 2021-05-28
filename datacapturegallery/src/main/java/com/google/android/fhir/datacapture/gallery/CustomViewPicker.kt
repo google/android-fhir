@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.gallery
 
 import android.view.View
 import android.widget.NumberPicker
-import com.google.android.fhir.datacapture.ViewPicker
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
