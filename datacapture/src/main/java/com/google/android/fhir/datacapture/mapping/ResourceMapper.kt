@@ -269,7 +269,7 @@ private val Questionnaire.QuestionnaireItemComponent.getDefinitionField: Field?
  * .
  */
 private const val ITEM_CONTEXT_EXTENSION_URL: String =
-  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext"
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
 
 private val Field.isList: Boolean
   get() = isParameterized && type == List::class.java
