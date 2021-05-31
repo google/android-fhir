@@ -44,8 +44,9 @@ internal open class QuestionnaireItemAdapter(val questionnaireItemViewHolderMatc
    */
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
 
-    // map custom widget ints to their corresponding widget factories
-    if (questionnaireItemViewHolderMatchers != null && viewType >= questionnaireItemViewHolderMatchers.size) questionnaireItemViewHolderMatchers[viewType - questionnaireItemViewHolderMatchers.size].factory.create(parent)
+    // map custom widget viewTypes to their corresponding widget factories
+    val numOfCanonicalWidgets = QuestionnaireItemViewHolderType.values().size
+    if (questionnaireItemViewHolderMatchers != null && viewType >= numOfCanonicalWidgets) return questionnaireItemViewHolderMatchers[viewType - numOfCanonicalWidgets].factory.create(parent)
 
     val viewHolderFactory =
       when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
@@ -90,12 +91,12 @@ internal open class QuestionnaireItemAdapter(val questionnaireItemViewHolderMatc
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
   ): Int {
 
-    // for custom widgets, generate an int that's > any int assigned to the
+    // for custom widgets, generate an int value that's > any int assigned to the
     // canonical FHIR widgets
     if (questionnaireItemViewHolderMatchers != null) {
-      for (i in 0..questionnaireItemViewHolderMatchers.size) {
+      for (i in questionnaireItemViewHolderMatchers.indices) {
         if (questionnaireItemViewHolderMatchers[i].matches(questionnaireItem)) {
-            return i + QuestionnaireItemType.values().size + 1
+            return i + QuestionnaireItemViewHolderType.values().size
         }
       }
     }
