@@ -37,8 +37,11 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
-internal open class QuestionnaireItemAdapter(private val questionnaireItemViewHolderMatchers: List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher>? = null) :
-  ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
+internal open class QuestionnaireItemAdapter(
+  private val questionnaireItemViewHolderMatchers:
+    List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher>? =
+    null
+) : ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
   /**
    * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
    * [QuestionnaireItemViewItem].
@@ -47,7 +50,10 @@ internal open class QuestionnaireItemAdapter(private val questionnaireItemViewHo
 
     // map custom widget viewTypes to their corresponding widget factories
     val numOfCanonicalWidgets = QuestionnaireItemViewHolderType.values().size
-    if (questionnaireItemViewHolderMatchers != null && viewType >= numOfCanonicalWidgets) return questionnaireItemViewHolderMatchers[viewType - numOfCanonicalWidgets].factory.create(parent)
+    if (questionnaireItemViewHolderMatchers != null && viewType >= numOfCanonicalWidgets)
+      return questionnaireItemViewHolderMatchers[viewType - numOfCanonicalWidgets].factory.create(
+        parent
+      )
 
     val viewHolderFactory =
       when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
@@ -99,7 +105,7 @@ internal open class QuestionnaireItemAdapter(private val questionnaireItemViewHo
     if (questionnaireItemViewHolderMatchers != null) {
       for (i in questionnaireItemViewHolderMatchers.indices) {
         if (questionnaireItemViewHolderMatchers[i].matches(questionnaireItem)) {
-            return i + QuestionnaireItemViewHolderType.values().size
+          return i + QuestionnaireItemViewHolderType.values().size
         }
       }
     }

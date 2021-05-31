@@ -94,7 +94,7 @@ object Dependencies {
 
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
   const val junit = "junit:junit:${Versions.junit}"
-  const val mockK = "org.mockito.kotlin:mockito-kotlin:${Versions.mockK}"
+  const val mockitoKotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mockitoKotlin}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
 
@@ -140,7 +140,7 @@ object Dependencies {
 
     const val espresso = "3.3.0"
     const val junit = "4.13"
-    const val mockK = "3.2.0"
+    const val mockitoKotlin = "3.2.0"
     const val robolectric = "4.3.1"
   }
 }

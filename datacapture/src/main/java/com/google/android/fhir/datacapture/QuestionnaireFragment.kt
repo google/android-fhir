@@ -65,10 +65,11 @@ open class QuestionnaireFragment : Fragment() {
     }
   }
 
-  open fun getQuestionnaireItemViewHolderFactoryMatchers(): List<QuestionnaireItemViewHolderFactoryMatcher>? {
+  open fun getQuestionnaireItemViewHolderFactoryMatchers():
+    List<QuestionnaireItemViewHolderFactoryMatcher>? {
     return null
   }
-  
+
   // Returns the current questionnaire response
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
@@ -78,7 +79,7 @@ open class QuestionnaireFragment : Fragment() {
   }
 
   data class QuestionnaireItemViewHolderFactoryMatcher(
-          val factory: QuestionnaireItemViewHolderFactory,
-          val matches: (Questionnaire.QuestionnaireItemComponent) -> Boolean
+    val factory: QuestionnaireItemViewHolderFactory,
+    val matches: (Questionnaire.QuestionnaireItemComponent) -> Boolean
   )
 }

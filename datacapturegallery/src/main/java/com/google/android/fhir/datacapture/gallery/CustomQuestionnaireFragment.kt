@@ -17,15 +17,15 @@
 package com.google.android.fhir.datacapture.gallery
 
 import com.google.android.fhir.datacapture.QuestionnaireFragment
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import org.hl7.fhir.r4.model.Questionnaire
 
 class CustomQuestionnaireFragment : QuestionnaireFragment() {
-  override fun getQuestionnaireItemViewHolderFactoryMatchers(): List<QuestionnaireItemViewHolderFactoryMatcher> {
+  override fun getQuestionnaireItemViewHolderFactoryMatchers():
+    List<QuestionnaireItemViewHolderFactoryMatcher> {
     return listOf(
-           QuestionnaireItemViewHolderFactoryMatcher (
-               CustomDatePickerFactory)
-  { questionnaireItem  -> questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATE }
+      QuestionnaireItemViewHolderFactoryMatcher(CustomDatePickerFactory) { questionnaireItem ->
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATE
+      }
     )
   }
 }
