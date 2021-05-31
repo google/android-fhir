@@ -25,6 +25,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.localizedPrefix
+import com.google.android.fhir.datacapture.localizedText
+import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
+import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.material.textfield.TextInputEditText
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -82,6 +86,12 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
                     value = date
                   }
                 questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
+                applyValidationResult(
+                  QuestionnaireResponseItemValidator.validate(
+                    questionnaireItemViewItem.questionnaireItem,
+                    questionnaireItemViewItem.questionnaireResponseItem
+                  )
+                )
               }
             }
           )
@@ -91,16 +101,24 @@ internal object QuestionnaireItemDatePickerViewHolderFactory :
         }
       }
 
+      private fun applyValidationResult(validationResult: ValidationResult) {
+        val validationMessage =
+          validationResult.validationMessages.joinToString {
+            it.plus(System.getProperty("line.separator"))
+          }
+        textInputEditText.error = if (validationMessage == "") null else validationMessage
+      }
+
       @SuppressLint("NewApi") // java.time APIs can be used due to desugaring
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
         this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
         } else {
           prefixTextView.visibility = View.GONE
         }
-        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.text
+        textDateQuestion.text = questionnaireItemViewItem.questionnaireItem.localizedText
         textInputEditText.setText(
           questionnaireItemViewItem
             .singleAnswerOrNull

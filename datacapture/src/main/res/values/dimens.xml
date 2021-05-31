@@ -17,5 +17,6 @@
 <resources>
     <dimen name="item_margin_horizontal">16dp</dimen>
     <dimen name="item_margin_vertical">8dp</dimen>
+    <dimen name="answer_option_checkbox_margin_vertical">2dp</dimen>
     <dimen name="padding_drop_down">16dp</dimen>
 </resources>

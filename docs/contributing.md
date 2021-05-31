@@ -22,6 +22,8 @@ use GitHub pull requests for this purpose. Consult
 [GitHub Help](https://help.github.com/articles/about-pull-requests/) for more
 information on using pull requests.
 
+See [Developer's Guide](https://github.com/google/android-fhir/wiki/Developer's-Guide) for more information.
+
 ## Community Guidelines
 
 This project follows [Google's Open Source Community

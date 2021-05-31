@@ -94,6 +94,13 @@ class QuestionnaireListFragment : Fragment() {
             "HL7 example \"bb\" with questionnaire response to pre-fill answers",
             "hl7-questionnaire-example-bluebook.json",
             "hl7-questionnaireresponse-example-bluebook.json"
+          ),
+          // Example taken from
+          // https://github.com/google/android-fhir/issues/161#issuecomment-842540918
+          QuestionnaireListItem(
+            "HIV Case Report With Vietnamese Translation",
+            "HIV Case Reporting and Monitoring IG with Vietnamese Translation",
+            "questionnaire-case-reporting-questionnaire-vn.json"
           )
         )
       )

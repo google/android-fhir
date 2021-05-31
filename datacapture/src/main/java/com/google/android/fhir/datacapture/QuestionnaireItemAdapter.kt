@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDateTimePickerViewHolderFactory
@@ -68,6 +69,8 @@ internal open class QuestionnaireItemAdapter(private val questionnaireItemViewHo
         QuestionnaireItemViewHolderType.DISPLAY -> QuestionnaireItemDisplayViewHolderFactory
         QuestionnaireItemViewHolderType.QUANTITY ->
           QuestionnaireItemEditTextQuantityViewHolderFactory
+        QuestionnaireItemViewHolderType.CHECK_BOX_GROUP ->
+          QuestionnaireItemCheckBoxGroupViewHolderFactory
       }
     return viewHolderFactory.create(parent)
   }
@@ -120,7 +123,9 @@ internal open class QuestionnaireItemAdapter(private val questionnaireItemViewHo
   private fun getChoiceViewHolderType(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
   ): QuestionnaireItemViewHolderType {
-    if (questionnaireItem.itemControl == ITEM_CONTROL_DROP_DOWN) {
+    if (questionnaireItem.itemControl == ITEM_CONTROL_CHECK_BOX || questionnaireItem.repeats) {
+      return QuestionnaireItemViewHolderType.CHECK_BOX_GROUP
+    } else if (questionnaireItem.itemControl == ITEM_CONTROL_DROP_DOWN) {
       return QuestionnaireItemViewHolderType.DROP_DOWN
     } else if (questionnaireItem.itemControl == ITEM_CONTROL_RADIO_BUTTON) {
       return QuestionnaireItemViewHolderType.RADIO_GROUP

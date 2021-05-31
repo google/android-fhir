@@ -93,7 +93,7 @@ dependencies {
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
-  testImplementation(Dependencies.roboelectric)
+  testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.mockK)
 }

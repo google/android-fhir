@@ -44,14 +44,17 @@ fun Search.getQuery(): SearchQuery {
       """.trimIndent()
     sortOrderStatement = """
       ORDER BY b.index_value ${order.sqlString}
-      """.trimIndent()
+    """.trimIndent()
     sortArgs += sort.paramName
   }
 
   var filterStatement = ""
   val filterArgs = mutableListOf<Any>()
   val filterQuery =
-    (stringFilters.map { it.query(type) } + referenceFilter.map { it.query(type) }).intersect()
+    (stringFilters.map { it.query(type) } +
+        referenceFilters.map { it.query(type) } +
+        tokenFilters.map { it.query(type) })
+      .intersect()
   if (filterQuery != null) {
     filterStatement =
       """
@@ -90,10 +93,17 @@ fun Search.getQuery(): SearchQuery {
 }
 
 fun StringFilter.query(type: ResourceType): SearchQuery {
+
+  val condition =
+    when (modifier) {
+      StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
+      StringFilterModifier.MATCHES_EXACTLY -> "= ?"
+      StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
+    }
   return SearchQuery(
     """
     SELECT resourceId FROM StringIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value = ? COLLATE NOCASE
+    WHERE resourceType = ? AND index_name = ? AND index_value $condition 
     """,
     listOf(type.name, parameter.paramName, value!!)
   )
@@ -106,6 +116,17 @@ fun ReferenceFilter.query(type: ResourceType): SearchQuery {
     WHERE resourceType = ? AND index_name = ? AND index_value = ?
     """,
     listOf(type.name, parameter!!.paramName, value!!)
+  )
+}
+
+fun TokenFilter.query(type: ResourceType): SearchQuery {
+  return SearchQuery(
+    """
+    SELECT resourceId FROM TokenIndexEntity
+    WHERE resourceType = ? AND index_name = ? AND index_value = ?
+    AND IFNULL(index_system,'') = ? 
+    """,
+    listOfNotNull(type.name, parameter!!.paramName, code, uri ?: "")
   )
 }
 
