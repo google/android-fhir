@@ -107,24 +107,92 @@
               "linkId": "arv_patient_nr",
               "prefix": "1",
               "text": "ARV Patient Number",
+              "_text": {
+                "extension": [
+                  {
+                    "extension": [
+                      {
+                        "url": "lang",
+                        "valueCode": "vi-VN"
+                      },
+                      {
+                        "url": "content",
+                        "valueString": "Số nhận dạng ARV của bệnh nhân"
+                      }
+                    ],
+                    "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                  }
+                ]
+              },
               "type": "string"
             },
             {
               "linkId": "personal_information",
               "prefix": "2",
               "text": "Personal Information",
+              "_text": {
+                "extension": [
+                  {
+                    "extension": [
+                      {
+                        "url": "lang",
+                        "valueCode": "vi-VN"
+                      },
+                      {
+                        "url": "content",
+                        "valueString": "Thông tin cá nhân của bệnh nhân"
+                      }
+                    ],
+                    "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                  }
+                ]
+              },
               "type": "group",
               "item": [
                 {
                   "linkId": "name",
                   "prefix": "3",
                   "text": "Full name",
+                  "_text": {
+                    "extension": [
+                      {
+                        "extension": [
+                          {
+                            "url": "lang",
+                            "valueCode": "vi-VN"
+                          },
+                          {
+                            "url": "content",
+                            "valueString": "Họ và tên"
+                          }
+                        ],
+                        "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                      }
+                    ]
+                  },
                   "type": "string"
                 },
                 {
                   "linkId": "ethnic",
                   "prefix": "4",
                   "text": "Ethnicity",
+                  "_text": {
+                    "extension": [
+                      {
+                        "extension": [
+                          {
+                            "url": "lang",
+                            "valueCode": "vi-VN"
+                          },
+                          {
+                            "url": "content",
+                            "valueString": "Dân tộc"
+                          }
+                        ],
+                        "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                      }
+                    ]
+                  },
                   "type": "choice",
                   "answerValueSet": "http://openhie.org/fhir/ValueSet/vs-ethnicity"
                 },
@@ -132,6 +200,23 @@
                   "linkId": "gender",
                   "prefix": "5",
                   "text": "Gender",
+                  "_text": {
+                    "extension": [
+                      {
+                        "extension": [
+                          {
+                            "url": "lang",
+                            "valueCode": "vi-VN"
+                          },
+                          {
+                            "url": "content",
+                            "valueString": "Giới tính"
+                          }
+                        ],
+                        "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                      }
+                    ]
+                  },
                   "type": "choice",
                   "answerValueSet": "http://openhie.org/fhir/ValueSet/vs-patient-gender"
                 },
@@ -139,24 +224,92 @@
                   "linkId": "birth_year",
                   "prefix": "6",
                   "text": "Year of Birth",
+                  "_text": {
+                    "extension": [
+                      {
+                        "extension": [
+                          {
+                            "url": "lang",
+                            "valueCode": "vi-VN"
+                          },
+                          {
+                            "url": "content",
+                            "valueString": "Năm sinh"
+                          }
+                        ],
+                        "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                      }
+                    ]
+                  },
                   "type": "integer"
                 },
                 {
                   "linkId": "id_cccd",
                   "prefix": "7",
                   "text": "Identification",
+                  "_text": {
+                    "extension": [
+                      {
+                        "extension": [
+                          {
+                            "url": "lang",
+                            "valueCode": "vi-VN"
+                          },
+                          {
+                            "url": "content",
+                            "valueString": "Nhận biết"
+                          }
+                        ],
+                        "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                      }
+                    ]
+                  },
                   "type": "group",
                   "item": [
                     {
                       "linkId": "health_insurance_code",
                       "prefix": "7.1",
                       "text": "Health insurance code",
+                      "_text": {
+                        "extension": [
+                          {
+                            "extension": [
+                              {
+                                "url": "lang",
+                                "valueCode": "vi-VN"
+                              },
+                              {
+                                "url": "content",
+                                "valueString": "Số bảo hiểm y tế"
+                              }
+                            ],
+                            "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                          }
+                        ]
+                      },
                       "type": "string"
                     },
                     {
                       "linkId": "passport_nr",
                       "prefix": "7.2",
                       "text": "Passport Number",
+                      "_text": {
+                        "extension": [
+                          {
+                            "extension": [
+                              {
+                                "url": "lang",
+                                "valueCode": "vi-VN"
+                              },
+                              {
+                                "url": "content",
+                                "valueString": "Số hộ chiếu"
+                              }
+                            ],
+                            "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                          }
+                        ]
+                      },
                       "type": "string"
                     }
                   ]
@@ -165,18 +318,69 @@
                   "linkId": "residence",
                   "prefix": "8",
                   "text": "Residence",
+                  "_text": {
+                    "extension": [
+                      {
+                        "extension": [
+                          {
+                            "url": "lang",
+                            "valueCode": "vi-VN"
+                          },
+                          {
+                            "url": "content",
+                            "valueString": "Nơi cư trú"
+                          }
+                        ],
+                        "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                      }
+                    ]
+                  },
                   "type": "group",
                   "item": [
                     {
                       "linkId": "current",
                       "prefix": "8.1",
                       "text": "Current residence",
+                      "_text": {
+                        "extension": [
+                          {
+                            "extension": [
+                              {
+                                "url": "lang",
+                                "valueCode": "vi-VN"
+                              },
+                              {
+                                "url": "content",
+                                "valueString": "Nơi ở hiện tại (nếu không giống với nơi ở thường trú)"
+                              }
+                            ],
+                            "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                          }
+                        ]
+                      },
                       "type": "string"
                     },
                     {
                       "linkId": "permanent",
                       "prefix": "8.2",
                       "text": "Permanent residence",
+                      "_text": {
+                        "extension": [
+                          {
+                            "extension": [
+                              {
+                                "url": "lang",
+                                "valueCode": "vi-VN"
+                              },
+                              {
+                                "url": "content",
+                                "valueString": "Hộ khẩu thường trú"
+                              }
+                            ],
+                            "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                          }
+                        ]
+                      },
                       "type": "string"
                     }
                   ]
@@ -185,6 +389,23 @@
                   "linkId": "occupation",
                   "prefix": "9",
                   "text": "Occupation",
+                  "_text": {
+                    "extension": [
+                      {
+                        "extension": [
+                          {
+                            "url": "lang",
+                            "valueCode": "vi-VN"
+                          },
+                          {
+                            "url": "content",
+                            "valueString": "Nghề nghiệp"
+                          }
+                        ],
+                        "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                      }
+                    ]
+                  },
                   "type": "choice",
                   "answerValueSet": "http://openhie.org/fhir/ValueSet/vs-occupation"
                 }
@@ -196,12 +417,46 @@
           "linkId": "risk_factors",
           "prefix": "10",
           "text": "Risk Factors",
+          "_text": {
+            "extension": [
+              {
+                "extension": [
+                  {
+                    "url": "lang",
+                    "valueCode": "vi-VN"
+                  },
+                  {
+                    "url": "content",
+                    "valueString": "Các yếu tố rủi ro"
+                  }
+                ],
+                "url": "http://hl7.org/fhir/StructureDefinition/translation"
+              }
+            ]
+          },
           "type": "group",
           "item": [
             {
               "linkId": "risk_population",
               "prefix": "10.1",
               "text": "Risk population",
+              "_text": {
+                "extension": [
+                  {
+                    "extension": [
+                      {
+                        "url": "lang",
+                        "valueCode": "vi-VN"
+                      },
+                      {
+                        "url": "content",
+                        "valueString": "Dân số Nguy cơ"
+                      }
+                    ],
+                    "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                  }
+                ]
+              },
               "type": "choice",
               "answerValueSet": "http://openhie.org/fhir/ValueSet/vs-hiv-risk-population"
             },
@@ -209,6 +464,23 @@
               "linkId": "risk_behavior",
               "prefix": "10.2",
               "text": "Risk Behavior",
+              "_text": {
+                "extension": [
+                  {
+                    "extension": [
+                      {
+                        "url": "lang",
+                        "valueCode": "vi-VN"
+                      },
+                      {
+                        "url": "content",
+                        "valueString": "Hành vi rủi ro"
+                      }
+                    ],
+                    "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                  }
+                ]
+              },
               "type": "choice",
               "answerValueSet": "http://openhie.org/fhir/ValueSet/vs-hiv-risk-behavior"
             },
@@ -216,6 +488,23 @@
               "linkId": "transmission_route",
               "prefix": "10.3",
               "text": "Transmission Route",
+              "_text": {
+                "extension": [
+                  {
+                    "extension": [
+                      {
+                        "url": "lang",
+                        "valueCode": "vi-VN"
+                      },
+                      {
+                        "url": "content",
+                        "valueString": "Đường truyền"
+                      }
+                    ],
+                    "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                  }
+                ]
+              },
               "type": "choice",
               "answerValueSet": "http://openhie.org/fhir/ValueSet/vs-hiv-transmission-route"
             }
@@ -225,30 +514,115 @@
           "linkId": "hiv-diagnosis",
           "prefix": "11",
           "text": "HIV Diagnosis",
+          "_text": {
+            "extension": [
+              {
+                "extension": [
+                  {
+                    "url": "lang",
+                    "valueCode": "vi-VN"
+                  },
+                  {
+                    "url": "content",
+                    "valueString": "Chẩn đoán HIV"
+                  }
+                ],
+                "url": "http://hl7.org/fhir/StructureDefinition/translation"
+              }
+            ]
+          },
           "type": "group",
           "item": [
             {
               "linkId": "hiv-diagnosis.dateOfConfirmation",
               "prefix": "11.1",
               "text": "Date of Confirmation",
+              "_text": {
+                "extension": [
+                  {
+                    "extension": [
+                      {
+                        "url": "lang",
+                        "valueCode": "vi-VN"
+                      },
+                      {
+                        "url": "content",
+                        "valueString": "Ngày xác nhận"
+                      }
+                    ],
+                    "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                  }
+                ]
+              },
               "type": "date"
             },
             {
               "linkId": "hiv-diagnosis.confirmingLab",
               "prefix": "11.1",
               "text": "Confirming Lab",
+              "_text": {
+                "extension": [
+                  {
+                    "extension": [
+                      {
+                        "url": "lang",
+                        "valueCode": "vi-VN"
+                      },
+                      {
+                        "url": "content",
+                        "valueString": "Phòng thí nghiệm xác nhận"
+                      }
+                    ],
+                    "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                  }
+                ]
+              },
               "type": "string"
             },
             {
               "linkId": "hiv-diagnosis.dateOfSpecimenCollection",
               "prefix": "11.2",
               "text": "Date of Specimen Collection",
+              "_text": {
+                "extension": [
+                  {
+                    "extension": [
+                      {
+                        "url": "lang",
+                        "valueCode": "vi-VN"
+                      },
+                      {
+                        "url": "content",
+                        "valueString": "Ngày lấy mẫu"
+                      }
+                    ],
+                    "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                  }
+                ]
+              },
               "type": "date"
             },
             {
               "linkId": "hiv-diagnosis.placeOfSpecimenCollection",
               "prefix": "11.3",
               "text": "Place of Specimen Collection",
+              "_text": {
+                "extension": [
+                  {
+                    "extension": [
+                      {
+                        "url": "lang",
+                        "valueCode": "vi-VN"
+                      },
+                      {
+                        "url": "content",
+                        "valueString": "Nơi lấy mẫu vật"
+                      }
+                    ],
+                    "url": "http://hl7.org/fhir/StructureDefinition/translation"
+                  }
+                ]
+              },
               "type": "string"
             }
           ]
@@ -257,6 +631,23 @@
           "linkId": "hiv-recency-test",
           "prefix": "12",
           "text": "HIV Recency Test",
+          "_text": {
+            "extension": [
+              {
+                "extension": [
+                  {
+                    "url": "lang",
+                    "valueCode": "vi-VN"
+                  },
+                  {
+                    "url": "content",
+                    "valueString": "Xét nghiệm nhanh lần truy cập HIV"
+                  }
+                ],
+                "url": "http://hl7.org/fhir/StructureDefinition/translation"
+              }
+            ]
+          },
           "type": "group",
           "item": [
             {

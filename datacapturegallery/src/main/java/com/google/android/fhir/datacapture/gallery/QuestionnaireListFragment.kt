@@ -97,10 +97,11 @@ class QuestionnaireListFragment : Fragment() {
           ),
           // Example taken from
           // https://github.com/google/android-fhir/issues/161#issuecomment-842540918
+          // and merged to openhie-hiv-case-report.json
           QuestionnaireListItem(
             "HIV Case Report With Vietnamese Translation",
             "HIV Case Reporting and Monitoring IG with Vietnamese Translation",
-            "questionnaire-case-reporting-questionnaire-vn.json"
+            "openhie-hiv-case-report.json"
           )
         )
       )
