@@ -21,15 +21,11 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFact
 import org.hl7.fhir.r4.model.Questionnaire
 
 class CustomQuestionnaireFragment : QuestionnaireFragment() {
-  override fun getQuestionnaireItemViewHolderFactory(
-    questionnaireItemViewHolderType: Int
-  ): QuestionnaireItemViewHolderFactory? {
-    return CustomViewPicker.getQuestionnaireItemViewHolderFactory(questionnaireItemViewHolderType)
-  }
-
-  override fun getQuestionnaireItemViewHolderType(
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent
-  ): Int? {
-    return CustomViewPicker.getQuestionnaireItemViewHolderType(questionnaireItem)
+  override fun getQuestionnaireItemViewHolderFactoryMatchers(): List<QuestionnaireItemViewHolderFactoryMatcher> {
+    return listOf(
+           QuestionnaireItemViewHolderFactoryMatcher (
+               CustomDatePickerFactory)
+  { questionnaireItem  -> questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATE }
+    )
   }
 }

@@ -21,27 +21,8 @@ import android.widget.NumberPicker
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
-import org.hl7.fhir.r4.model.Questionnaire
 
-object CustomViewPicker : ViewPicker {
-
-  override fun getQuestionnaireItemViewHolderFactory(
-    questionnaireItemViewHolderType: Int
-  ): QuestionnaireItemViewHolderFactory? {
-    return when (questionnaireItemViewHolderType) {
-      1000 -> CustomFactory
-      else -> null
-    }
-  }
-
-  override fun getQuestionnaireItemViewHolderType(
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent
-  ): Int? {
-    return if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATE) 1000 else null
-  }
-}
-
-object CustomFactory : QuestionnaireItemViewHolderFactory(R.layout.custom_layout) {
+object CustomDatePickerFactory : QuestionnaireItemViewHolderFactory(R.layout.custom_layout) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var numberPicker: NumberPicker

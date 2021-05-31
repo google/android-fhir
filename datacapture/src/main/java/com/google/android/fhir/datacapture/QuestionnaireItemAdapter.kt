@@ -45,9 +45,7 @@ internal open class QuestionnaireItemAdapter(val questionnaireItemViewHolderMatc
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
 
     // map custom widget ints to their corresponding widget factories
-    if (questionnaireItemViewHolderMatchers != null && viewType >= questionnaireItemViewHolderMatchers.size) {
-      questionnaireItemViewHolderMatchers[viewType - questionnaireItemViewHolderMatchers.size].factory.create(parent)
-    }
+    if (questionnaireItemViewHolderMatchers != null && viewType >= questionnaireItemViewHolderMatchers.size) questionnaireItemViewHolderMatchers[viewType - questionnaireItemViewHolderMatchers.size].factory.create(parent)
 
     val viewHolderFactory =
       when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
