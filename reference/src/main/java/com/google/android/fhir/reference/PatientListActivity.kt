@@ -24,6 +24,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
@@ -34,7 +35,7 @@ import com.google.android.fhir.reference.FhirApplication.Companion.fhirEngine
 class PatientListActivity() : AppCompatActivity() {
   private lateinit var fhirEngine: FhirEngine
   private lateinit var patientListViewModel: PatientListViewModel
-
+  private lateinit var searchView: SearchView
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     Log.d("PatientListActivity", "onCreate() called")
@@ -61,6 +62,21 @@ class PatientListActivity() : AppCompatActivity() {
         adapter.submitList(it)
       }
     )
+
+    searchView = findViewById(R.id.search)
+    searchView.setOnQueryTextListener(
+      object : SearchView.OnQueryTextListener {
+        override fun onQueryTextChange(newText: String?): Boolean {
+          patientListViewModel.searchPatientsByName(newText!!)
+          return true
+        }
+
+        override fun onQueryTextSubmit(query: String?): Boolean {
+          patientListViewModel.searchPatientsByName(query!!)
+          return true
+        }
+      }
+    )
   }
 
   // Click handler to help display the details about the patients from the list.
@@ -84,5 +100,9 @@ class PatientListActivity() : AppCompatActivity() {
       menu.setOptionalIconsVisible(true)
     }
     return true
+  }
+
+  override fun onBackPressed() {
+    if (searchView.query.isNotEmpty()) searchView.setQuery("", true) else super.onBackPressed()
   }
 }
