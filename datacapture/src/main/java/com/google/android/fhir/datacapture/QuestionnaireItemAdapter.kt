@@ -36,7 +36,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
-internal open class QuestionnaireItemAdapter(val questionnaireItemViewHolderMatchers: List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher>?) :
+internal open class QuestionnaireItemAdapter(private val questionnaireItemViewHolderMatchers: List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher>? = null) :
   ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
   /**
    * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
