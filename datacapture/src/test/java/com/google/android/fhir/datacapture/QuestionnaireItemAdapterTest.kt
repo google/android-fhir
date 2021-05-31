@@ -17,24 +17,19 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Build
-import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
-import kotlin.test.assertEquals
-import org.hl7.fhir.r4.model.CodeableConcept
-import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.Extension
-import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.*
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
@@ -357,22 +352,16 @@ class QuestionnaireItemAdapterTest {
   }
 
   @Test
-  fun onCreateViewHolder_customViewType_shouldReturnCustomViewHolder() {
-//    val viewPicker: ViewPicker = mock()
-//    val questionnaireItemViewHolderFactory: QuestionnaireItemViewHolderFactory = mock()
-//    val expectedQuestionnaireItemViewHolder: QuestionnaireItemViewHolder = mock()
-//    whenever(viewPicker.getQuestionnaireItemViewHolderFactory(anyInt()))
-//      .thenReturn(questionnaireItemViewHolderFactory)
-//    whenever(questionnaireItemViewHolderFactory.create(any()))
-//      .thenReturn(expectedQuestionnaireItemViewHolder)
-//
-//    val questionnaireItemAdapter = QuestionnaireItemAdapter(viewPicker)
-//    val actualQuestionnaireItemViewHolder = questionnaireItemAdapter.onCreateViewHolder(mock(), 40)
-//    assertEquals(expectedQuestionnaireItemViewHolder, actualQuestionnaireItemViewHolder)
+  fun onCreateViewHolder_customViewType_shouldReturnCorrectCustomViewHolder() {
+    val viewFactoryMatchers = getQuestionnaireItemViewHolderFactoryMatchers()
+    val questionnaireItemAdapter = QuestionnaireItemAdapter(viewFactoryMatchers)
+    val actualQuestionnaireItemViewHolder = questionnaireItemAdapter.onCreateViewHolder(mock(), QuestionnaireItemViewHolderType.values().size)
+    assertNotNull(actualQuestionnaireItemViewHolder)
+    assertEquals(viewFactoryMatchers[0].factory.create(mock()), actualQuestionnaireItemViewHolder)
   }
 
   @Test
-  fun getItemViewTypeMapping_customViewType_shouldReturnCustomType() {
+  fun getItemViewTypeMapping_customViewType_shouldReturnCustomTypeInt() {
     val expectedItemViewType = QuestionnaireItemViewHolderType.values().size
     val questionnaireItemViewItem : Questionnaire.QuestionnaireItemComponent = Questionnaire.QuestionnaireItemComponent()
     questionnaireItemViewItem.type = Questionnaire.QuestionnaireItemType.DATE
@@ -383,9 +372,11 @@ class QuestionnaireItemAdapterTest {
   }
 
   private fun getQuestionnaireItemViewHolderFactoryMatchers(): List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> {
+    val customQuestionnaireItemViewHolderFactory: QuestionnaireItemViewHolderFactory = mock()
+    whenever(customQuestionnaireItemViewHolderFactory.create(any())).thenReturn(mock())
     return listOf(
             QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher(
-                    mock())
+                    customQuestionnaireItemViewHolderFactory)
             { questionnaireItem -> questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATE }
     )
   }
