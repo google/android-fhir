@@ -37,7 +37,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
-internal open class QuestionnaireItemAdapter(
+internal class QuestionnaireItemAdapter(
   private val questionnaireItemViewHolderMatchers:
     List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher>? =
     null
@@ -100,7 +100,7 @@ internal open class QuestionnaireItemAdapter(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
   ): Int {
 
-    // for custom widgets, generate an int value that's > any int assigned to the
+    // for custom widgets, generate an int value that's greater than any int assigned to the
     // canonical FHIR widgets
     if (questionnaireItemViewHolderMatchers != null) {
       for (i in questionnaireItemViewHolderMatchers.indices) {

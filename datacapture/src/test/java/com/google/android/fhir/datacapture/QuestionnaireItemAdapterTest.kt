@@ -369,7 +369,7 @@ class QuestionnaireItemAdapterTest {
   }
 
   @Test
-  fun getItemViewTypeMapping_customViewType_shouldReturnCustomTypeInt() {
+  fun getItemViewTypeMapping_customViewType_shouldReturnCorrectIntValue() {
     val expectedItemViewType = QuestionnaireItemViewHolderType.values().size
     val questionnaireItemViewItem: Questionnaire.QuestionnaireItemComponent =
       Questionnaire.QuestionnaireItemComponent()

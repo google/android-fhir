@@ -65,6 +65,10 @@ open class QuestionnaireFragment : Fragment() {
     }
   }
 
+  /**
+   * Returns a list of {@link QuestionnaireItemViewHolderFactoryMatcher}s that provide custom views
+   * for both canonical and custom widgets
+   */
   open fun getQuestionnaireItemViewHolderFactoryMatchers():
     List<QuestionnaireItemViewHolderFactoryMatcher>? {
     return null
@@ -78,6 +82,11 @@ open class QuestionnaireFragment : Fragment() {
     const val BUNDLE_KEY_QUESTIONNAIRE_RESPONSE = "questionnaire-response"
   }
 
+  /**
+   * Data class that holds a matcher function which evaluates whether a given {@param factory}
+   * should be used in creating the {@link QuestionnaireItemViewHolder}
+   * that displays the given {@link Questionnaire.QuestionnaireItemComponent}
+   */
   data class QuestionnaireItemViewHolderFactoryMatcher(
     val factory: QuestionnaireItemViewHolderFactory,
     val matches: (Questionnaire.QuestionnaireItemComponent) -> Boolean
