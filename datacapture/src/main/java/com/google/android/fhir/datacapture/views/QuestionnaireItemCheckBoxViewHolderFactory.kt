@@ -20,6 +20,8 @@ import android.view.View
 import android.widget.CheckBox
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.localizedPrefix
+import com.google.android.fhir.datacapture.localizedText
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -53,11 +55,11 @@ internal object QuestionnaireItemCheckBoxViewHolderFactory :
         this.questionnaireItemViewItem = questionnaireItemViewItem
         if (!questionnaireItemViewItem.questionnaireItem.prefix.isNullOrEmpty()) {
           prefixTextView.visibility = View.VISIBLE
-          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.prefix
+          prefixTextView.text = questionnaireItemViewItem.questionnaireItem.localizedPrefix
         } else {
           prefixTextView.visibility = View.GONE
         }
-        checkBox.text = questionnaireItemViewItem.questionnaireItem.text
+        checkBox.text = questionnaireItemViewItem.questionnaireItem.localizedText
         checkBox.isChecked =
           questionnaireItemViewItem.singleAnswerOrNull?.valueBooleanType?.value ?: false
       }

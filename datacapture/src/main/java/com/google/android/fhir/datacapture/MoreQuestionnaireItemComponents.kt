@@ -16,9 +16,13 @@
 
 package com.google.android.fhir.datacapture
 
+import java.util.Locale
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 
+internal const val ITEM_CONTROL_CHECK_BOX = "check-box"
 internal const val ITEM_CONTROL_DROP_DOWN = "drop-down"
 internal const val ITEM_CONTROL_RADIO_BUTTON = "radio-button"
 
@@ -33,5 +37,33 @@ internal val Questionnaire.QuestionnaireItemComponent.itemControl: String?
       this.extension.firstOrNull { it.url == EXTENSION_ITEM_CONTROL_URL }?.value as CodeableConcept?
     val code =
       codeableConcept?.coding?.firstOrNull { it.system == EXTENSION_ITEM_CONTROL_SYSTEM }?.code
-    return listOf(ITEM_CONTROL_DROP_DOWN, ITEM_CONTROL_RADIO_BUTTON).firstOrNull { it == code }
+    return listOf(ITEM_CONTROL_DROP_DOWN, ITEM_CONTROL_RADIO_BUTTON, ITEM_CONTROL_CHECK_BOX)
+      .firstOrNull { it == code }
   }
+
+/**
+ * Whether the corresponding [QuestionnaireResponse.QuestionnaireResponseItemComponent] should have
+ * nested items within [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent](s).
+ */
+internal val Questionnaire.QuestionnaireItemComponent.hasNestedItemsWithinAnswers: Boolean
+  get() = item.isNotEmpty() && type != Questionnaire.QuestionnaireItemType.GROUP
+
+private fun StringType.getLocalizedText(
+  lang: String = Locale.getDefault().toLanguageTag()
+): String? {
+  return getTranslation(lang) ?: getTranslation(lang.split("-").first()) ?: value
+}
+
+/**
+ * Localized value of [Questionnaire.QuestionnaireItemComponent.text] if translation is present.
+ * Default value otherwise.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.localizedText: String?
+  get() = textElement?.getLocalizedText()
+
+/**
+ * Localized value of [Questionnaire.QuestionnaireItemComponent.prefix] if translation is present.
+ * Default value otherwise.
+ */
+internal val Questionnaire.QuestionnaireItemComponent.localizedPrefix: String?
+  get() = prefixElement?.getLocalizedText()
