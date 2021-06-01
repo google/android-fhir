@@ -66,13 +66,13 @@ class PatientListActivity() : AppCompatActivity() {
     searchView = findViewById(R.id.search)
     searchView.setOnQueryTextListener(
       object : SearchView.OnQueryTextListener {
-        override fun onQueryTextChange(newText: String?): Boolean {
-          patientListViewModel.searchPatientsByName(newText!!)
+        override fun onQueryTextChange(newText: String): Boolean {
+          patientListViewModel.searchPatientsByName(newText)
           return true
         }
 
-        override fun onQueryTextSubmit(query: String?): Boolean {
-          patientListViewModel.searchPatientsByName(query!!)
+        override fun onQueryTextSubmit(query: String): Boolean {
+          patientListViewModel.searchPatientsByName(query)
           return true
         }
       }
