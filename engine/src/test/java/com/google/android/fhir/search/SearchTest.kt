@@ -17,13 +17,14 @@
 package com.google.android.fhir.search
 
 import android.os.Build
+import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.Patient
@@ -543,7 +544,7 @@ class SearchTest {
     WHERE resourceType = ? AND index_name = ?
     AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?
     )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -583,7 +584,7 @@ class SearchTest {
     WHERE resourceType = ? AND index_name = ?
     AND ? <= index_from
     )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -620,7 +621,7 @@ class SearchTest {
     WHERE resourceType = ? AND index_name = ?
     AND ? >= index_to
     )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -657,7 +658,7 @@ class SearchTest {
     WHERE resourceType = ? AND index_name = ?
     AND index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?
     )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -697,7 +698,7 @@ class SearchTest {
     WHERE resourceType = ? AND index_name = ?
     AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?
     )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -737,7 +738,7 @@ class SearchTest {
     WHERE resourceType = ? AND index_name = ?
     AND ? <= index_from
     )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -774,7 +775,7 @@ class SearchTest {
     WHERE resourceType = ? AND index_name = ?
     AND ? <= index_from
     )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -811,7 +812,7 @@ class SearchTest {
     WHERE resourceType = ? AND index_name = ?
     AND ? >= index_to
     )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -848,7 +849,7 @@ class SearchTest {
     WHERE resourceType = ? AND index_name = ?
     AND ? >= index_to
     )
-    """.trimIndent()
+        """.trimIndent()
       )
 
     assertThat(query.args)

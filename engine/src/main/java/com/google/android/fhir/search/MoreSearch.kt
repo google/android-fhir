@@ -53,8 +53,8 @@ fun Search.getQuery(): SearchQuery {
   val filterArgs = mutableListOf<Any>()
   val filterQuery =
     (stringFilters.map { it.query(type) } +
-        referenceFilter.map { it.query(type) } +
-        dateFilter.map { it.query(type) })
+        referenceFilters.map { it.query(type) } +
+        dateFilter.map { it.query(type) } +
         tokenFilters.map { it.query(type) })
       .intersect()
   if (filterQuery != null) {
@@ -178,9 +178,9 @@ fun DateFilter.query(type: ResourceType): SearchQuery {
     AND ? $condition 
   """,
     listOf(type.name, parameter.paramName, if (!useHigh) value!!.value.time else tsHigh)
-    )
+  )
 }
-    
+
 fun TokenFilter.query(type: ResourceType): SearchQuery {
   return SearchQuery(
     """
