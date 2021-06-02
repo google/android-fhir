@@ -107,7 +107,7 @@ object Dependencies {
       const val lifecycle = "2.2.0"
       const val navigation = "2.3.4"
       const val recyclerView = "1.1.0"
-      const val room = "2.2.5"
+      const val room = "2.3.0"
       const val workRuntimeKtx = "2.3.4"
     }
 
