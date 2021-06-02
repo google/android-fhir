@@ -55,13 +55,9 @@ class QuestionnaireFragment : Fragment() {
     val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
 
     val paginationPreviousButton = view.findViewById<View>(R.id.pagination_previous_button)
-    paginationPreviousButton.setOnClickListener {
-      viewModel.goToPreviousPage()
-    }
+    paginationPreviousButton.setOnClickListener { viewModel.goToPreviousPage() }
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
-    paginationNextButton.setOnClickListener {
-      viewModel.goToNextPage()
-    }
+    paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
 
     val adapter = QuestionnaireItemAdapter()
     recyclerView.adapter = adapter
