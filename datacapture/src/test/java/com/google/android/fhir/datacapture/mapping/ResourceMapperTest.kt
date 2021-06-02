@@ -721,8 +721,4 @@ class ResourceMapperTest {
   private fun String.toDateFromFormatYyyyMmDd(): Date? {
     return SimpleDateFormat("yyyy-MM-dd").parse(this)
   }
-
-  companion object {
-    val parser: IParser = FhirContext.forR4().newJsonParser()
-  }
 }
