@@ -56,11 +56,11 @@ class QuestionnaireFragment : Fragment() {
 
     val paginationPreviousButton = view.findViewById<View>(R.id.pagination_previous_button)
     paginationPreviousButton.setOnClickListener {
-      viewModel.pageFlow.value = viewModel.pageFlow.value!!.previousPage()
+      viewModel.goToPage(viewModel.pageFlow.value!!.previousPage())
     }
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener {
-      viewModel.pageFlow.value = viewModel.pageFlow.value!!.nextPage()
+      viewModel.goToPage(viewModel.pageFlow.value!!.nextPage())
     }
 
     val adapter = QuestionnaireItemAdapter()
@@ -71,7 +71,6 @@ class QuestionnaireFragment : Fragment() {
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.questionnaireStateFlow.collect { state ->
         adapter.submitList(state.items)
-        println("kmost: state ${state.items.size} items. Pagination: ${state.pagination}")
 
         if (state.pagination != null) {
           paginationPreviousButton.visibility = View.VISIBLE

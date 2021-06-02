@@ -52,13 +52,7 @@ class QuestionnaireListFragment : Fragment() {
             "HL7 example \"bb\"",
             "hl7-questionnaire-example-bluebook.json"
           ),
-          // Example authored by fredhersch@google.com.
-          QuestionnaireListItem(
-            "Patient registration",
-            "Example authored by Fred Hersch",
-            "patient-registration.json"
-          ),
-          // Derived by kmost@google.com, from fredhersch@google.com's example.
+          // Example authored by fredhersch@google.com and kmost@google.com.
           QuestionnaireListItem(
             "Patient registration, paginated",
             "Example authored by Fred Hersch + Kevin Most",

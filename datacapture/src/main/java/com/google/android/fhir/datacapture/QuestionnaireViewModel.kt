@@ -18,13 +18,18 @@ package com.google.android.fhir.datacapture
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.enablement.QuestionnaireItemWithResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -83,20 +88,25 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     modificationCount.value += 1
   }
 
-  internal val pageFlow =
+  private val _pageFlow =
     MutableStateFlow<QuestionnairePagination?>(questionnaire.getInitialPagination())
 
-  internal val questionnaireState: QuestionnaireState
-    get() =
-      getQuestionnaireState(
-        questionnaireItemList = questionnaire.item,
-        questionnaireResponseItemList = questionnaireResponse.item,
-        pagination = pageFlow.value,
-      )
+  internal val pageFlow: StateFlow<QuestionnairePagination?>
+    get() = _pageFlow
+
+  internal fun goToPage(page: QuestionnairePagination) {
+    _pageFlow.value = page
+  }
 
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: Flow<QuestionnaireState> =
-    modificationCount.combine(pageFlow) { _, _ -> questionnaireState }
+    modificationCount.combine(_pageFlow) { _, _ ->
+      getQuestionnaireState(
+        questionnaireItemList = questionnaire.item,
+        questionnaireResponseItemList = questionnaireResponse.item,
+        pagination = _pageFlow.value,
+      )
+    }.shareIn(viewModelScope, started = SharingStarted.Lazily)
 
   /** The current [QuestionnaireResponse] captured by the UI. */
   fun getQuestionnaireResponse(): QuestionnaireResponse = questionnaireResponse
@@ -126,8 +136,8 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   }
 
   /**
-   * Traverse (DFS) through the list of questionnaire items , the list of questionnaire response
-   * items and the list of items in the questionnaire response answer list and populate
+   * Traverses through the list of questionnaire items, the list of questionnaire response
+   * items and the list of items in the questionnaire response answer list and populates
    * [questionnaireStateFlow] with matching pairs of questionnaire item and questionnaire response
    * item.
    *
