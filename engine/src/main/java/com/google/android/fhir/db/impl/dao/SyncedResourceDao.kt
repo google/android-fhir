@@ -28,6 +28,9 @@ interface SyncedResourceDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun insert(entity: SyncedResourceEntity)
 
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertAll(resources: List<SyncedResourceEntity>)
+
   /**
    * We will always have 1 entry for each [ResourceType] as it's the primary key, so we can limit
    * the result to 1. If there is no entry for that [ResourceType] then `null` will be returned.
