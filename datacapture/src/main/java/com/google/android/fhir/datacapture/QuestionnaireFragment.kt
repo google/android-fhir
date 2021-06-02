@@ -70,8 +70,8 @@ open class QuestionnaireFragment : Fragment() {
    * both canonical and custom widgets
    */
   open fun getQuestionnaireItemViewHolderFactoryMatchers():
-    List<QuestionnaireItemViewHolderFactoryMatcher>? {
-    return null
+    List<QuestionnaireItemViewHolderFactoryMatcher> {
+    return emptyList()
   }
 
   // Returns the current questionnaire response

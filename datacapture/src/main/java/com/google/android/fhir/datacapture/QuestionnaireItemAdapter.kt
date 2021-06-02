@@ -39,18 +39,17 @@ import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
 internal class QuestionnaireItemAdapter(
   private val questionnaireItemViewHolderMatchers:
-    List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher>? =
-    null
+    List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> =
+    emptyList()
 ) : ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
   /**
    * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
    * [QuestionnaireItemViewItem].
    */
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
-
     // map custom widget viewTypes to their corresponding widget factories
     val numOfCanonicalWidgets = QuestionnaireItemViewHolderType.values().size
-    if (questionnaireItemViewHolderMatchers != null && viewType >= numOfCanonicalWidgets)
+    if (viewType >= numOfCanonicalWidgets)
       return questionnaireItemViewHolderMatchers[viewType - numOfCanonicalWidgets].factory.create(
         parent
       )
@@ -99,16 +98,14 @@ internal class QuestionnaireItemAdapter(
   internal fun getItemViewTypeMapping(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
   ): Int {
-
     // for custom widgets, generate an int value that's greater than any int assigned to the
     // canonical FHIR widgets
-    if (questionnaireItemViewHolderMatchers != null) {
       for (i in questionnaireItemViewHolderMatchers.indices) {
         if (questionnaireItemViewHolderMatchers[i].matches(questionnaireItem)) {
           return i + QuestionnaireItemViewHolderType.values().size
         }
       }
-    }
+
 
     return when (val type = questionnaireItem.type) {
       QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP

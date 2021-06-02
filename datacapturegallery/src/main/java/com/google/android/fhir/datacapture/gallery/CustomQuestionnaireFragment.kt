@@ -23,7 +23,7 @@ class CustomQuestionnaireFragment : QuestionnaireFragment() {
   override fun getQuestionnaireItemViewHolderFactoryMatchers():
     List<QuestionnaireItemViewHolderFactoryMatcher> {
     return listOf(
-      QuestionnaireItemViewHolderFactoryMatcher(CustomDatePickerFactory) { questionnaireItem ->
+      QuestionnaireItemViewHolderFactoryMatcher(CustomNumberPickerFactory) { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATE
       }
     )

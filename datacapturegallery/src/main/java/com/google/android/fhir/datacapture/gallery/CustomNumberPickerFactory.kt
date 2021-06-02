@@ -22,7 +22,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderDele
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 
-object CustomDatePickerFactory : QuestionnaireItemViewHolderFactory(R.layout.custom_layout) {
+object CustomNumberPickerFactory : QuestionnaireItemViewHolderFactory(R.layout.custom_number_picker_layout) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var numberPicker: NumberPicker
