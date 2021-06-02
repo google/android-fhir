@@ -47,7 +47,7 @@ internal class QuestionnaireItemAdapter(
    * [QuestionnaireItemViewItem].
    */
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
-    // map custom widget viewTypes to their corresponding widget factories
+    // Map custom widget viewTypes to their corresponding widget factories
     val numOfCanonicalWidgets = QuestionnaireItemViewHolderType.values().size
     if (viewType >= numOfCanonicalWidgets)
       return questionnaireItemViewHolderMatchers[viewType - numOfCanonicalWidgets].factory.create(
@@ -98,7 +98,7 @@ internal class QuestionnaireItemAdapter(
   internal fun getItemViewTypeMapping(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
   ): Int {
-    // for custom widgets, generate an int value that's greater than any int assigned to the
+    // For custom widgets, generate an int value that's greater than any int assigned to the
     // canonical FHIR widgets
       for (i in questionnaireItemViewHolderMatchers.indices) {
         if (questionnaireItemViewHolderMatchers[i].matches(questionnaireItem)) {
