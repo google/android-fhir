@@ -83,7 +83,7 @@ open class QuestionnaireFragment : Fragment() {
   }
 
   /**
-   * Data class that holds a matcher function which evaluates whether a given [factory] should be
+   * Data class that holds a matcher function ([matches]) which evaluates whether a given [factory] should be
    * used in creating a [com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder] that
    * displays the given [Questionnaire.QuestionnaireItemComponent]
    */
