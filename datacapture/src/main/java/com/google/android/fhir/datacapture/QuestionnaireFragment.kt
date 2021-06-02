@@ -66,8 +66,7 @@ open class QuestionnaireFragment : Fragment() {
   }
 
   /**
-   * Returns a list of [QuestionnaireItemViewHolderFactoryMatcher]s that provide custom views for
-   * both canonical and custom widgets
+   * Returns a list of [QuestionnaireItemViewHolderFactoryMatcher]s that provide custom views for rendering items in the questionnaire. User-provided custom views will take precedence over canonical views provided by the library. If multiple [QuestionnaireItemViewHolderFactoryMatcher] are applicable for the same item, the behavior is undefined (any of them may be selected).
    */
   open fun getQuestionnaireItemViewHolderFactoryMatchers():
     List<QuestionnaireItemViewHolderFactoryMatcher>? {
