@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.mlkit.md.barcodedetection
+package com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import java.nio.ByteBuffer
 
-/** Information about a barcode field. */
-@Parcelize data class BarcodeField(val label: String, val value: String) : Parcelable
+/** An interface to process the input camera frame and perform detection on it. */
+interface FrameProcessor {
+
+  /** Processes the input frame with the underlying detector. */
+  fun process(data: ByteBuffer, frameMetadata: FrameMetadata, graphicOverlay: GraphicOverlay)
+
+  /** Stops the underlying detector and release resources. */
+  fun stop()
+}

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.mlkit.md.barcodedetection
+package com.google.android.fhir.datacapture.views.barcode.mlkit.md.barcodedetection
 
 import android.animation.ValueAnimator
 import android.graphics.Canvas
 import android.graphics.Path
 import android.graphics.Point
 import android.graphics.PointF
-import com.google.mlkit.md.camera.GraphicOverlay
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.GraphicOverlay
 
 /** Draws the graphic to indicate the barcode result is in loading. */
 internal class BarcodeLoadingGraphic(

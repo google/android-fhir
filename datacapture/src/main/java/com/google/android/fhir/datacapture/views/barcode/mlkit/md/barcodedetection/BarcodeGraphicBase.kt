@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.mlkit.md.barcodedetection
+package com.google.android.fhir.datacapture.views.barcode.mlkit.md.barcodedetection
 
 import android.graphics.Canvas
 import android.graphics.Color
@@ -26,9 +26,9 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
 import androidx.core.content.ContextCompat
 import com.google.android.fhir.datacapture.R
-import com.google.mlkit.md.camera.GraphicOverlay
-import com.google.mlkit.md.camera.GraphicOverlay.Graphic
-import com.google.mlkit.md.settings.PreferenceUtils
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.GraphicOverlay
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.GraphicOverlay.Graphic
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.settings.PreferenceUtils
 
 internal abstract class BarcodeGraphicBase(overlay: GraphicOverlay) : Graphic(overlay) {
 

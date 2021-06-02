@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.mlkit.md.barcodedetection
+package com.google.android.fhir.datacapture.views.barcode.mlkit.md.barcodedetection
 
 import android.animation.ValueAnimator
 import android.util.Log
 import androidx.annotation.MainThread
 import com.google.android.gms.tasks.Task
-import com.google.mlkit.md.InputInfo
-import com.google.mlkit.md.camera.CameraReticleAnimator
-import com.google.mlkit.md.camera.FrameProcessorBase
-import com.google.mlkit.md.camera.GraphicOverlay
-import com.google.mlkit.md.camera.WorkflowModel
-import com.google.mlkit.md.camera.WorkflowModel.WorkflowState
-import com.google.mlkit.md.settings.PreferenceUtils
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.InputInfo
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.CameraReticleAnimator
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.FrameProcessorBase
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.GraphicOverlay
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.WorkflowModel
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.WorkflowModel.WorkflowState
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.settings.PreferenceUtils
 import com.google.mlkit.vision.barcode.Barcode
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage

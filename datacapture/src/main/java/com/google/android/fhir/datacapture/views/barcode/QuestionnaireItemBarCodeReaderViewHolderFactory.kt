@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.R.color
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -29,7 +28,7 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
-import com.google.mlkit.md.LiveBarcodeScanningFragment
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.LiveBarcodeScanningFragment
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 

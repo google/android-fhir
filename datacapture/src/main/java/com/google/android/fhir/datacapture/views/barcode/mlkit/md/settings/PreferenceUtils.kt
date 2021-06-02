@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.mlkit.md.settings
+package com.google.android.fhir.datacapture.views.barcode.mlkit.md.settings
 
 import android.content.Context
 import android.graphics.RectF
@@ -22,8 +22,8 @@ import android.preference.PreferenceManager
 import androidx.annotation.StringRes
 import com.google.android.fhir.datacapture.R
 import com.google.android.gms.common.images.Size
-import com.google.mlkit.md.camera.CameraSizePair
-import com.google.mlkit.md.camera.GraphicOverlay
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.CameraSizePair
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.GraphicOverlay
 import com.google.mlkit.vision.barcode.Barcode
 
 /** Utility class to retrieve shared preferences. */

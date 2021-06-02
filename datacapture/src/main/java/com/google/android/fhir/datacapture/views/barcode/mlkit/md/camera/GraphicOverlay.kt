@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.mlkit.md.camera
+package com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera
 
 import android.content.Context
 import android.graphics.Canvas
@@ -22,7 +22,7 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
-import com.google.mlkit.md.Utils
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.Utils
 import java.util.ArrayList
 
 /**

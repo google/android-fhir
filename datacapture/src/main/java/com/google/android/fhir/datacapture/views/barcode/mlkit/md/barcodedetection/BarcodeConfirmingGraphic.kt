@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.mlkit.md.barcodedetection
+package com.google.android.fhir.datacapture.views.barcode.mlkit.md.barcodedetection
 
 import android.graphics.Canvas
 import android.graphics.Path
-import com.google.mlkit.md.camera.GraphicOverlay
-import com.google.mlkit.md.settings.PreferenceUtils
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.GraphicOverlay
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.settings.PreferenceUtils
 import com.google.mlkit.vision.barcode.Barcode
 
 /** Guides user to move camera closer to confirm the detected barcode. */

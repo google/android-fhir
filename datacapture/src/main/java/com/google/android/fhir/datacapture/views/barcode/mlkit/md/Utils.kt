@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.mlkit.md
+package com.google.android.fhir.datacapture.views.barcode.mlkit.md
 
 import android.app.Activity
 import android.content.ContentResolver
@@ -38,7 +38,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.exifinterface.media.ExifInterface
-import com.google.mlkit.md.camera.CameraSizePair
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.CameraSizePair
 import com.google.mlkit.vision.common.InputImage
 import java.io.ByteArrayOutputStream
 import java.io.IOException

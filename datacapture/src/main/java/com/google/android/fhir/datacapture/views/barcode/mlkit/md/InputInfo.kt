@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.mlkit.md
+package com.google.android.fhir.datacapture.views.barcode.mlkit.md
 
 import android.graphics.Bitmap
-import com.google.mlkit.md.camera.FrameMetadata
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.FrameMetadata
 import java.nio.ByteBuffer
 
 interface InputInfo {

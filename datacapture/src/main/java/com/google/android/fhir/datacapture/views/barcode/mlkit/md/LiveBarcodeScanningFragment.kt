@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.mlkit.md
+package com.google.android.fhir.datacapture.views.barcode.mlkit.md
 
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
@@ -33,12 +33,12 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.android.fhir.datacapture.R
 import com.google.android.material.chip.Chip
 import com.google.common.base.Objects
-import com.google.mlkit.md.barcodedetection.BarcodeProcessor
-import com.google.mlkit.md.camera.CameraSource
-import com.google.mlkit.md.camera.CameraSourcePreview
-import com.google.mlkit.md.camera.GraphicOverlay
-import com.google.mlkit.md.camera.WorkflowModel
-import com.google.mlkit.md.camera.WorkflowModel.WorkflowState
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.barcodedetection.BarcodeProcessor
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.CameraSource
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.CameraSourcePreview
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.GraphicOverlay
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.WorkflowModel
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.WorkflowModel.WorkflowState
 import java.io.IOException
 
 /** Demonstrates the barcode scanning workflow using camera preview. */

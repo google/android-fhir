@@ -37,7 +37,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.google.mlkit.md.LiveBarcodeScanningFragment"
+            android:name="com.google.android.fhir.datacapture.views.barcode.mlkit.md.LiveBarcodeScanningFragment"
             android:exported="false"
             android:screenOrientation="portrait"
         >

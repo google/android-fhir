@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.mlkit.md
+package com.google.android.fhir.datacapture.views.barcode.mlkit.md
 
 import com.google.android.gms.tasks.OnCanceledListener
 import com.google.android.gms.tasks.OnCompleteListener

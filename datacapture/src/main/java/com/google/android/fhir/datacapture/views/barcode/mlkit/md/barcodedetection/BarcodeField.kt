@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.mlkit.md.camera
+package com.google.android.fhir.datacapture.views.barcode.mlkit.md.barcodedetection
 
-/** Metadata info of a camera frame. */
-class FrameMetadata(val width: Int, val height: Int, val rotation: Int)
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+/** Information about a barcode field. */
+@Parcelize data class BarcodeField(val label: String, val value: String) : Parcelable

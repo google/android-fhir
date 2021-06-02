@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.mlkit.md.barcodedetection
+package com.google.android.fhir.datacapture.views.barcode.mlkit.md.barcodedetection
 
 import android.view.LayoutInflater
 import android.view.View
@@ -22,7 +22,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
-import com.google.mlkit.md.barcodedetection.BarcodeFieldAdapter.BarcodeFieldViewHolder
+import com.google.android.fhir.datacapture.views.barcode.mlkit.md.barcodedetection.BarcodeFieldAdapter.BarcodeFieldViewHolder
 
 /** Presents a list of field info in the detected barcode. */
 internal class BarcodeFieldAdapter(private val barcodeFieldList: List<BarcodeField>) :

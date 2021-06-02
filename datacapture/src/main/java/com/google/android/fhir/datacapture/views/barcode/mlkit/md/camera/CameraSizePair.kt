@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.mlkit.md.camera
+package com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera
 
 import android.hardware.Camera
 import com.google.android.gms.common.images.Size
