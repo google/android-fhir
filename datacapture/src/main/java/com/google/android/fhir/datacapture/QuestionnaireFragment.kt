@@ -56,11 +56,11 @@ class QuestionnaireFragment : Fragment() {
 
     val paginationPreviousButton = view.findViewById<View>(R.id.pagination_previous_button)
     paginationPreviousButton.setOnClickListener {
-      viewModel.goToPage(viewModel.pageFlow.value!!.previousPage())
+      viewModel.goToPreviousPage()
     }
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener {
-      viewModel.goToPage(viewModel.pageFlow.value!!.nextPage())
+      viewModel.goToNextPage()
     }
 
     val adapter = QuestionnaireItemAdapter()

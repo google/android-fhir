@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.stateIn
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -88,25 +87,28 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     modificationCount.value += 1
   }
 
-  private val _pageFlow =
+  private val pageFlow =
     MutableStateFlow<QuestionnairePagination?>(questionnaire.getInitialPagination())
 
-  internal val pageFlow: StateFlow<QuestionnairePagination?>
-    get() = _pageFlow
+  internal fun goToPreviousPage() {
+    pageFlow.value = pageFlow.value!!.previousPage()
+  }
 
-  internal fun goToPage(page: QuestionnairePagination) {
-    _pageFlow.value = page
+  internal fun goToNextPage() {
+    pageFlow.value = pageFlow.value!!.nextPage()
   }
 
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: Flow<QuestionnaireState> =
-    modificationCount.combine(_pageFlow) { _, _ ->
-      getQuestionnaireState(
-        questionnaireItemList = questionnaire.item,
-        questionnaireResponseItemList = questionnaireResponse.item,
-        pagination = _pageFlow.value,
-      )
-    }.shareIn(viewModelScope, started = SharingStarted.Lazily)
+    modificationCount
+      .combine(_pageFlow) { _, _ ->
+        getQuestionnaireState(
+          questionnaireItemList = questionnaire.item,
+          questionnaireResponseItemList = questionnaireResponse.item,
+          pagination = _pageFlow.value,
+        )
+      }
+      .shareIn(viewModelScope, started = SharingStarted.Lazily)
 
   /** The current [QuestionnaireResponse] captured by the UI. */
   fun getQuestionnaireResponse(): QuestionnaireResponse = questionnaireResponse
@@ -136,8 +138,8 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   }
 
   /**
-   * Traverses through the list of questionnaire items, the list of questionnaire response
-   * items and the list of items in the questionnaire response answer list and populates
+   * Traverses through the list of questionnaire items, the list of questionnaire response items and
+   * the list of items in the questionnaire response answer list and populates
    * [questionnaireStateFlow] with matching pairs of questionnaire item and questionnaire response
    * item.
    *

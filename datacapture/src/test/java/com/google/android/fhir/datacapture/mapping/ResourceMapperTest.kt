@@ -22,7 +22,6 @@ import ca.uhn.fhir.parser.IParser
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
 import java.util.Date
-import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.intellij.lang.annotations.Language
