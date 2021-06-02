@@ -100,11 +100,11 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: Flow<QuestionnaireState> =
     modificationCount
-      .combine(_pageFlow) { _, _ ->
+      .combine(pageFlow) { _, pagination ->
         getQuestionnaireState(
           questionnaireItemList = questionnaire.item,
           questionnaireResponseItemList = questionnaireResponse.item,
-          pagination = _pageFlow.value,
+          pagination = pagination,
         )
       }
       .shareIn(viewModelScope, started = SharingStarted.Lazily)
