@@ -62,7 +62,7 @@ class QuestionnaireListFragment : Fragment() {
           // https://openhie.github.io/hiv-ig/Questionnaire-hiv-case-report-questionnaire.json.html
           QuestionnaireListItem(
             "HIV Case Report",
-            "HIV Case Reporting and Monitoring IG along with Vietnamese translations.",
+            "HIV Case Reporting and Monitoring IG with Vietnamese translations",
             "openhie-hiv-case-report.json"
           ),
           // Example taken from
