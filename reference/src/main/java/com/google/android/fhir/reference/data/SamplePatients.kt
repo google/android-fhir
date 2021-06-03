@@ -79,7 +79,15 @@ class SamplePatients {
     val html: String = if (patient.hasText()) patient.text.div.valueAsString else ""
     val phone: String = if (patient.hasTelecom()) patient.telecom[0].value else ""
 
-    return PatientListViewModel.PatientItem(position.toString(), name, gender, dob, html, phone)
+    return PatientListViewModel.PatientItem(
+      position.toString(),
+      name,
+      gender,
+      dob,
+      html,
+      phone,
+      patient.idElement.idPart
+    )
   }
 
   /** Returns list of ObservationItem objects based on observations from the json string. */

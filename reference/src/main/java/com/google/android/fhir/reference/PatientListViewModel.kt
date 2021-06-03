@@ -18,14 +18,16 @@ package com.google.android.fhir.reference
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.data.SamplePatients
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.search
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
 
 /**
@@ -36,17 +38,28 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   AndroidViewModel(application) {
 
   private val samplePatients = SamplePatients()
+  val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
 
-  val liveSearchedPatients = liveData { emit(getSearchResults()) }
+  init {
+    fetchAndPost { getSearchResults() }
+  }
 
-  private suspend fun getSearchResults(): List<PatientItem> {
+  fun searchPatientsByName(nameQuery: String) {
+    fetchAndPost { getSearchResults(nameQuery) }
+  }
+
+  private fun fetchAndPost(search: suspend () -> List<PatientItem>) {
+    viewModelScope.launch { liveSearchedPatients.value = search() }
+  }
+
+  private suspend fun getSearchResults(nameQuery: String = ""): List<PatientItem> {
     val searchResults: List<Patient> =
       fhirEngine.search {
-        filter(Patient.ADDRESS_CITY) {
-          modifier = StringFilterModifier.MATCHES_EXACTLY
-          value = "NAIROBI"
-        }
-        filter(Patient.ACTIVE, true)
+        if (nameQuery.isNotEmpty())
+          filter(Patient.NAME) {
+            modifier = StringFilterModifier.CONTAINS
+            value = nameQuery
+          }
         sort(Patient.GIVEN, Order.ASCENDING)
         count = 100
         from = 0
@@ -61,7 +74,8 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val gender: String,
     val dob: String,
     val html: String,
-    val phone: String
+    val phone: String,
+    val resourceId: String
   ) {
     override fun toString(): String = name
   }

@@ -17,7 +17,7 @@
 package com.google.android.fhir.reference.data
 
 import com.google.android.fhir.reference.api.HapiFhirService
-import com.google.android.fhir.sync.FhirDataSource
+import com.google.android.fhir.sync.DataSource
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.hl7.fhir.r4.model.Bundle
@@ -25,7 +25,7 @@ import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 
 /** Implementation of the [FhirDataSource] that communicates with hapi fhir. */
-class HapiFhirResourceDataSource(private val service: HapiFhirService) : FhirDataSource {
+class HapiFhirResourceDataSource(private val service: HapiFhirService) : DataSource {
 
   override suspend fun loadData(path: String): Bundle {
     return service.getResource(path)
