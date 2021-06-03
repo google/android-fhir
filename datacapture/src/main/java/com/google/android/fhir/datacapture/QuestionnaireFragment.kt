@@ -66,7 +66,11 @@ open class QuestionnaireFragment : Fragment() {
   }
 
   /**
-   * Returns a list of [QuestionnaireItemViewHolderFactoryMatcher]s that provide custom views for rendering items in the questionnaire. User-provided custom views will take precedence over canonical views provided by the library. If multiple [QuestionnaireItemViewHolderFactoryMatcher] are applicable for the same item, the behavior is undefined (any of them may be selected).
+   * Returns a list of [QuestionnaireItemViewHolderFactoryMatcher]s that provide custom views for
+   * rendering items in the questionnaire. User-provided custom views will take precedence over
+   * canonical views provided by the library. If multiple
+   * [QuestionnaireItemViewHolderFactoryMatcher] are applicable for the same item, the behavior is
+   * undefined (any of them may be selected).
    */
   open fun getQuestionnaireItemViewHolderFactoryMatchers():
     List<QuestionnaireItemViewHolderFactoryMatcher> {
@@ -82,9 +86,10 @@ open class QuestionnaireFragment : Fragment() {
   }
 
   /**
-   * Data class that holds a matcher function ([matches]) which evaluates whether a given [factory] should be
-   * used in creating a [com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder] that
-   * displays the given [Questionnaire.QuestionnaireItemComponent]
+   * Data class that holds a matcher function ([matches]) which evaluates whether a given [factory]
+   * should be used in creating a
+   * [com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder] that displays the given
+   * [Questionnaire.QuestionnaireItemComponent]
    */
   data class QuestionnaireItemViewHolderFactoryMatcher(
     val factory: QuestionnaireItemViewHolderFactory,
