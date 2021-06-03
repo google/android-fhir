@@ -109,7 +109,7 @@ data class StringFilter(
 @SearchDslMarker
 data class DateFilter(
   val parameter: DateClientParam,
-  var prefix: ParamPrefixEnum? = null,
+  var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
   var value: DateTimeType? = null
 )
 

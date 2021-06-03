@@ -122,21 +122,12 @@ fun ReferenceFilter.query(type: ResourceType): SearchQuery {
 }
 
 fun DateFilter.query(type: ResourceType): SearchQuery {
-  val tsHigh = value!!.precision.add(value!!.value, 1).time
-  var useHigh = false
+  var tsHigh: Long? = null
   val condition =
     when (this.prefix) {
-      ParamPrefixEnum.APPROXIMATE -> {
-        val rangeHigh = value!!.precision.add(value!!.value, 10).time
-        val rangeLow = value!!.precision.add(value!!.value, -10).time
-        return SearchQuery(
-          """SELECT resourceId FROM DateIndexEntity
-              WHERE resourceType = ? AND index_name = ?
-              AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?""",
-          listOf(type.name, parameter.paramName, rangeLow, rangeHigh, rangeLow, rangeHigh)
-        )
-      }
-      ParamPrefixEnum.STARTS_AFTER -> "<= index_from".also { useHigh = true }
+      ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
+      ParamPrefixEnum.STARTS_AFTER ->
+        "<= index_from".also { tsHigh = value!!.precision.add(value!!.value, 1).time }
       ParamPrefixEnum.ENDS_BEFORE -> ">= index_to"
       ParamPrefixEnum.NOT_EQUAL ->
         return SearchQuery(
@@ -147,12 +138,12 @@ fun DateFilter.query(type: ResourceType): SearchQuery {
             type.name,
             parameter.paramName,
             value!!.value.time,
-            tsHigh - 1,
+            value!!.precision.add(value!!.value, 1).time - 1,
             value!!.value.time,
-            tsHigh - 1
+            value!!.precision.add(value!!.value, 1).time - 1
           )
         )
-      ParamPrefixEnum.EQUAL, null ->
+      ParamPrefixEnum.EQUAL ->
         return SearchQuery(
           """SELECT resourceId FROM DateIndexEntity
               WHERE resourceType = ? AND index_name = ?
@@ -161,23 +152,24 @@ fun DateFilter.query(type: ResourceType): SearchQuery {
             type.name,
             parameter.paramName,
             value!!.value.time,
-            tsHigh - 1,
+            value!!.precision.add(value!!.value, 1).time - 1,
             value!!.value.time,
-            tsHigh - 1
+            value!!.precision.add(value!!.value, 1).time - 1
           )
         )
-      ParamPrefixEnum.GREATERTHAN -> "<= index_from".also { useHigh = true }
+      ParamPrefixEnum.GREATERTHAN ->
+        "<= index_from".also { tsHigh = value!!.precision.add(value!!.value, 1).time }
       ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> "<= index_from"
       ParamPrefixEnum.LESSTHAN -> ">= index_to"
-      ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ">= index_to".also { useHigh = true }
+      ParamPrefixEnum.LESSTHAN_OR_EQUALS ->
+        ">= index_to".also { tsHigh = value!!.precision.add(value!!.value, 1).time }
     }
   return SearchQuery(
     """
     SELECT resourceId FROM DateIndexEntity 
-    WHERE resourceType = ? AND index_name = ? 
-    AND ? $condition 
-  """,
-    listOf(type.name, parameter.paramName, if (!useHigh) value!!.value.time else tsHigh)
+    WHERE resourceType = ? AND index_name = ? AND ? $condition 
+    """,
+    listOf(type.name, parameter.paramName, tsHigh ?: value!!.value.time)
   )
 }
 

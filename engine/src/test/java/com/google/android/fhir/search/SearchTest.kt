@@ -522,46 +522,6 @@ class SearchTest {
   }
 
   @Test
-  fun search_date_approximate() {
-    val query =
-      Search(ResourceType.Patient)
-        .apply {
-          filter(Patient.BIRTHDATE) {
-            prefix = ParamPrefixEnum.APPROXIMATE
-            value = DateTimeType("2013-03-14")
-          }
-        }
-        .getQuery()
-
-    assertThat(query.query)
-      .isEqualTo(
-        """
-    SELECT a.serializedResource
-    FROM ResourceEntity a
-    WHERE a.resourceType = ?
-    AND a.resourceId IN (
-    SELECT resourceId FROM DateIndexEntity
-    WHERE resourceType = ? AND index_name = ?
-    AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?
-    )
-        """.trimIndent()
-      )
-
-    assertThat(query.args)
-      .isEqualTo(
-        listOf(
-          ResourceType.Patient.name,
-          ResourceType.Patient.name,
-          Patient.BIRTHDATE.paramName,
-          DateTimeType("2013-03-04").value.time,
-          DateTimeType("2013-03-24").value.time,
-          DateTimeType("2013-03-04").value.time,
-          DateTimeType("2013-03-24").value.time
-        )
-      )
-  }
-
-  @Test
   fun search_date_starts_after() {
     val query =
       Search(ResourceType.Patient)
@@ -581,8 +541,7 @@ class SearchTest {
     WHERE a.resourceType = ?
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
-    WHERE resourceType = ? AND index_name = ?
-    AND ? <= index_from
+    WHERE resourceType = ? AND index_name = ? AND ? <= index_from
     )
         """.trimIndent()
       )
@@ -618,8 +577,7 @@ class SearchTest {
     WHERE a.resourceType = ?
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
-    WHERE resourceType = ? AND index_name = ?
-    AND ? >= index_to
+    WHERE resourceType = ? AND index_name = ? AND ? >= index_to
     )
         """.trimIndent()
       )
@@ -735,8 +693,7 @@ class SearchTest {
     WHERE a.resourceType = ?
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
-    WHERE resourceType = ? AND index_name = ?
-    AND ? <= index_from
+    WHERE resourceType = ? AND index_name = ? AND ? <= index_from
     )
         """.trimIndent()
       )
@@ -772,8 +729,7 @@ class SearchTest {
     WHERE a.resourceType = ?
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
-    WHERE resourceType = ? AND index_name = ?
-    AND ? <= index_from
+    WHERE resourceType = ? AND index_name = ? AND ? <= index_from
     )
         """.trimIndent()
       )
@@ -809,8 +765,7 @@ class SearchTest {
     WHERE a.resourceType = ?
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
-    WHERE resourceType = ? AND index_name = ?
-    AND ? >= index_to
+    WHERE resourceType = ? AND index_name = ? AND ? >= index_to
     )
         """.trimIndent()
       )
@@ -846,8 +801,7 @@ class SearchTest {
     WHERE a.resourceType = ?
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
-    WHERE resourceType = ? AND index_name = ?
-    AND ? >= index_to
+    WHERE resourceType = ? AND index_name = ? AND ? >= index_to
     )
         """.trimIndent()
       )
