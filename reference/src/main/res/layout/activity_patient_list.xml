@@ -40,15 +40,22 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:orientation="vertical"
     >
-
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search"
+            app:iconifiedByDefault="false"
+            app:queryHint="Find by Patient Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+        />
         <include layout="@layout/patient_list" />
-    </FrameLayout>
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
