@@ -28,9 +28,8 @@ import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
-import com.google.android.fhir.sync.FhirDataSource
-import com.google.common.truth.Truth
 import com.google.android.fhir.sync.DataSource
+import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
@@ -544,8 +543,8 @@ class DatabaseImplTest {
           .getQuery()
       )
     }
-    Truth.assertThat(res).hasSize(2)
-    Truth.assertThat(
+    assertThat(res).hasSize(2)
+    assertThat(
         res.all { it.deceasedDateTimeType.value.time >= DateTimeType("2013-03-14").value.time }
       )
       .isTrue()
@@ -585,8 +584,8 @@ class DatabaseImplTest {
           .getQuery()
       )
     }
-    Truth.assertThat(res).hasSize(2)
-    Truth.assertThat(
+    assertThat(res).hasSize(2)
+    assertThat(
         res.all { it.deceasedDateTimeType.value.time <= DateTimeType("2013-03-14").value.time }
       )
       .isTrue()
@@ -627,8 +626,8 @@ class DatabaseImplTest {
           .getQuery()
       )
     }
-    Truth.assertThat(res).hasSize(2)
-    Truth.assertThat(
+    assertThat(res).hasSize(2)
+    assertThat(
         res.all {
           it.deceasedDateTimeType.value.time >= DateTimeType("2013-03-15").value.time ||
             it.deceasedDateTimeType.value.time < DateTimeType("2013-03-14").value.time
@@ -672,8 +671,8 @@ class DatabaseImplTest {
           .getQuery()
       )
     }
-    Truth.assertThat(res).hasSize(2)
-    Truth.assertThat(
+    assertThat(res).hasSize(2)
+    assertThat(
         res.all {
           it.deceasedDateTimeType.value.time < DateTimeType("2013-03-15").value.time &&
             it.deceasedDateTimeType.value.time < DateTimeType("2013-03-15").value.time
@@ -716,8 +715,8 @@ class DatabaseImplTest {
           .getQuery()
       )
     }
-    Truth.assertThat(res).hasSize(1)
-    Truth.assertThat(
+    assertThat(res).hasSize(1)
+    assertThat(
         res.all { it.deceasedDateTimeType.value.time >= DateTimeType("2013-03-15").value.time }
       )
       .isTrue()
@@ -757,8 +756,8 @@ class DatabaseImplTest {
           .getQuery()
       )
     }
-    Truth.assertThat(res).hasSize(3)
-    Truth.assertThat(
+    assertThat(res).hasSize(3)
+    assertThat(
         res.all { it.deceasedDateTimeType.value.time >= DateTimeType("2013-03-14").value.time }
       )
       .isTrue()
@@ -798,8 +797,8 @@ class DatabaseImplTest {
           .getQuery()
       )
     }
-    Truth.assertThat(res).hasSize(1)
-    Truth.assertThat(
+    assertThat(res).hasSize(1)
+    assertThat(
         res.all { it.deceasedDateTimeType.value.time < DateTimeType("2013-03-14").value.time }
       )
       .isTrue()
@@ -840,8 +839,8 @@ class DatabaseImplTest {
           .getQuery()
       )
     }
-    Truth.assertThat(res).hasSize(3)
-    Truth.assertThat(
+    assertThat(res).hasSize(3)
+    assertThat(
         res.all { it.deceasedDateTimeType.value.time <= DateTimeType("2013-03-15").value.time }
       )
       .isTrue()
