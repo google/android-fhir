@@ -108,6 +108,21 @@ class SamplePatients {
     return observations
   }
 
+  fun getObservationItems(
+    fhirPatients: List<Observation>
+  ): List<PatientListViewModel.ObservationItem> {
+    val patients: MutableList<PatientListViewModel.ObservationItem> = mutableListOf()
+
+    // Create a list of ObservationItem from fhirObservation. The display index is 1 based.
+    fhirPatients
+      .take(MAX_RESOURCE_COUNT)
+      ?.mapIndexed { index, fhirPatient -> createObservationItem(index + 1, fhirPatient) }
+      ?.let { patients.addAll(it) }
+
+    // Return a cloned List
+    return patients
+  }
+
   /** Creates ObservationItem objects with displayable values from the Fhir Observation objects. */
   private fun createObservationItem(
     position: Int,
