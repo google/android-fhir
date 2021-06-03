@@ -25,7 +25,7 @@ import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
-suspend fun <R : Resource> Search.execute(database: Database): List<R> {
+internal suspend fun <R : Resource> Search.execute(database: Database): List<R> {
   return database.search(getQuery())
 }
 
