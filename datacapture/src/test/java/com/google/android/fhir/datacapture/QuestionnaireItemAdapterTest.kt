@@ -368,6 +368,16 @@ class QuestionnaireItemAdapterTest {
     assertEquals(viewFactoryMatchers[0].factory.create(mock()), actualQuestionnaireItemViewHolder)
   }
 
+
+  @Test(expected = QuestionnaireItemAdapter.InvalidQuestionnaireWidgetTypeException::class)
+  fun onCreateViewHolder_customViewType_shouldThrowExceptionForInvalidWidgetType() {
+    val questionnaireItemAdapter = QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
+    questionnaireItemAdapter.onCreateViewHolder(
+            mock(),
+            QuestionnaireItemViewHolderType.values().size + 1
+    )
+  }
+
   @Test
   fun getItemViewTypeMapping_customViewType_shouldReturnCorrectIntValue() {
     val expectedItemViewType = QuestionnaireItemViewHolderType.values().size
