@@ -27,7 +27,7 @@ import org.hl7.fhir.r4.model.Resource
 import org.json.JSONArray
 import org.json.JSONObject
 
-object LocalChangeUtils {
+internal object LocalChangeUtils {
 
   /** Squash the changes by merging them two at a time. */
   fun squash(localChangeEntities: List<LocalChangeEntity>): LocalChangeEntity =

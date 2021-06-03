@@ -28,8 +28,14 @@ import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.Constraints
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.FhirApplication.Companion.fhirEngine
+import com.google.android.fhir.reference.data.FhirPeriodicSyncWorker
+import com.google.android.fhir.sync.PeriodicSyncConfiguration
+import com.google.android.fhir.sync.RepeatInterval
+import com.google.android.fhir.sync.Sync
+import java.util.concurrent.TimeUnit
 
 /** An activity representing a list of Patients. */
 class PatientListActivity() : AppCompatActivity() {
@@ -40,6 +46,14 @@ class PatientListActivity() : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     Log.d("PatientListActivity", "onCreate() called")
     setContentView(R.layout.activity_patient_list)
+
+    Sync.periodicSync<FhirPeriodicSyncWorker>(
+      this,
+      PeriodicSyncConfiguration(
+        syncConstraints = Constraints.Builder().build(),
+        repeat = RepeatInterval(interval = 1, timeUnit = TimeUnit.MINUTES)
+      )
+    )
 
     val toolbar = findViewById<Toolbar>(R.id.toolbar)
     setSupportActionBar(toolbar)
