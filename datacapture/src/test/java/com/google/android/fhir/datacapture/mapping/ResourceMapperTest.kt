@@ -46,7 +46,7 @@ class ResourceMapperTest {
           ],
           "extension": [
             {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
               "valueExpression": {
                 "language": "application/x-fhir-query",
                 "expression": "Patient",
@@ -83,6 +83,12 @@ class ResourceMapperTest {
                   "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate",
                   "type": "date",
                   "text": "Date of Birth"
+                },
+                {
+                  "linkId": "PR-name-id",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Resource#Resource.id",
+                  "type": "string",
+                  "text": "Patient Id"
                 },
                 {
                   "linkId": "patient-0-gender",
@@ -295,7 +301,7 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+      """.trimIndent()
 
     val questionnaireResponseJson =
       """
@@ -332,6 +338,14 @@ class ResourceMapperTest {
                   "answer": [
                     {
                       "valueDate": "2021-01-01"
+                    }
+                  ]
+                },
+                {
+                  "linkId": "PR-name-id",
+                  "answer": [
+                    {
+                      "valueString": "98238-adsfsa-23rfdsf"
                     }
                   ]
                 },
@@ -419,7 +433,7 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+      """.trimIndent()
 
     val iParser: IParser = FhirContext.forR4().newJsonParser()
 
@@ -460,7 +474,7 @@ class ResourceMapperTest {
           ],
           "extension": [
             {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
               "valueExpression": {
                 "language": "application/x-fhir-query",
                 "expression": "Patient",
@@ -673,7 +687,7 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+      """.trimIndent()
 
     val iParser: IParser = FhirContext.forR4().newJsonParser()
 

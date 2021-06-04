@@ -22,7 +22,7 @@ import com.google.android.fhir.db.Database
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
-suspend fun <R : Resource> Search.execute(database: Database): List<R> {
+internal suspend fun <R : Resource> Search.execute(database: Database): List<R> {
   return database.search(getQuery())
 }
 
@@ -44,14 +44,17 @@ fun Search.getQuery(): SearchQuery {
       """.trimIndent()
     sortOrderStatement = """
       ORDER BY b.index_value ${order.sqlString}
-      """.trimIndent()
+    """.trimIndent()
     sortArgs += sort.paramName
   }
 
   var filterStatement = ""
   val filterArgs = mutableListOf<Any>()
   val filterQuery =
-    (stringFilters.map { it.query(type) } + referenceFilter.map { it.query(type) }).intersect()
+    (stringFilters.map { it.query(type) } +
+        referenceFilters.map { it.query(type) } +
+        tokenFilters.map { it.query(type) })
+      .intersect()
   if (filterQuery != null) {
     filterStatement =
       """
@@ -113,6 +116,17 @@ fun ReferenceFilter.query(type: ResourceType): SearchQuery {
     WHERE resourceType = ? AND index_name = ? AND index_value = ?
     """,
     listOf(type.name, parameter!!.paramName, value!!)
+  )
+}
+
+fun TokenFilter.query(type: ResourceType): SearchQuery {
+  return SearchQuery(
+    """
+    SELECT resourceId FROM TokenIndexEntity
+    WHERE resourceType = ? AND index_name = ? AND index_value = ?
+    AND IFNULL(index_system,'') = ? 
+    """,
+    listOfNotNull(type.name, parameter!!.paramName, code, uri ?: "")
   )
 }
 

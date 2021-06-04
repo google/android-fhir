@@ -18,14 +18,19 @@ package com.google.android.fhir.reference.data
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.google.android.fhir.FhirEngine
+import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.reference.FhirApplication
+import com.google.android.fhir.reference.api.HapiFhirService
 import com.google.android.fhir.sync.PeriodicSyncWorker
+import org.hl7.fhir.r4.model.ResourceType
 
 class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   PeriodicSyncWorker(appContext, workerParams) {
 
-  override fun getFhirEngine(): FhirEngine {
-    return FhirApplication.fhirEngine(applicationContext)
-  }
+  override fun getSyncData() = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
+
+  override fun getDataSource() =
+    HapiFhirResourceDataSource(HapiFhirService.create(FhirContext.forR4().newJsonParser()))
+
+  override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)
 }

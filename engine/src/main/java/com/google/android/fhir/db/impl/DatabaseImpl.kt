@@ -18,7 +18,7 @@ package com.google.android.fhir.db.impl
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.Transaction
+import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.ResourceNotFoundInDbException
@@ -61,21 +61,23 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
   private val syncedResourceDao = db.syncedResourceDao()
   private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 
-  @Transaction
   override suspend fun <R : Resource> insert(vararg resources: R) {
-    resourceDao.insertAll(resources.toList())
-    localChangeDao.addInsertAll(resources.toList())
+    db.withTransaction {
+      resourceDao.insertAll(resources.toList())
+      localChangeDao.addInsertAll(resources.toList())
+    }
   }
 
   override suspend fun <R : Resource> insertRemote(vararg resources: R) {
     resourceDao.insertAll(resources.toList())
   }
 
-  @Transaction
   override suspend fun <R : Resource> update(resource: R) {
-    val oldResource = select(resource.javaClass, resource.logicalId)
-    resourceDao.update(resource)
-    localChangeDao.addUpdate(oldResource, resource)
+    db.withTransaction {
+      val oldResource = select(resource.javaClass, resource.logicalId)
+      resourceDao.update(resource)
+      localChangeDao.addUpdate(oldResource, resource)
+    }
   }
 
   override suspend fun <R : Resource> select(clazz: Class<R>, id: String): R {
@@ -90,20 +92,22 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
     return syncedResourceDao.getLastUpdate(resourceType)
   }
 
-  @Transaction
   override suspend fun insertSyncedResources(
-    syncedResourceEntity: SyncedResourceEntity,
+    syncedResources: List<SyncedResourceEntity>,
     resources: List<Resource>
   ) {
-    syncedResourceDao.insert(syncedResourceEntity)
-    insertRemote(*resources.toTypedArray())
+    db.withTransaction {
+      syncedResourceDao.insertAll(syncedResources)
+      insertRemote(*resources.toTypedArray())
+    }
   }
 
-  @Transaction
   override suspend fun <R : Resource> delete(clazz: Class<R>, id: String) {
-    val type = getResourceType(clazz)
-    val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
-    if (rowsDeleted > 0) localChangeDao.addDelete(resourceId = id, resourceType = type)
+    db.withTransaction {
+      val type = getResourceType(clazz)
+      val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
+      if (rowsDeleted > 0) localChangeDao.addDelete(resourceId = id, resourceType = type)
+    }
   }
 
   override suspend fun <R : Resource> search(query: SearchQuery): List<R> =

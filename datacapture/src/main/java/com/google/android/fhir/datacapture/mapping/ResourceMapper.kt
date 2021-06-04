@@ -36,6 +36,7 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -326,6 +327,11 @@ private fun generateAnswerWithCorrectType(answer: Base, fieldType: Field): Base 
         return CodeableConcept(answer).apply { text = answer.display }
       }
     }
+    IdType::class.java -> {
+      if (answer is StringType) {
+        return IdType(answer.value)
+      }
+    }
   }
 
   return answer
@@ -426,7 +432,7 @@ private val Questionnaire.QuestionnaireItemComponent.getDefinitionField: Field?
  * .
  */
 private const val ITEM_CONTEXT_EXTENSION_URL: String =
-  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext"
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
 
 private const val ITEM_INITIAL_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
