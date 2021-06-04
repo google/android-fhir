@@ -73,10 +73,9 @@ interface FhirEngine {
   suspend fun <R : Resource> search(search: Search): List<R>
 
   /**
-   * One time download of resources.
+   * Total count of entities available for given search
    *
-   * @param syncConfiguration
-   * - configuration of data that needs to be synchronised
+   * @param search
    */
   suspend fun count(search: Search): Long
 }

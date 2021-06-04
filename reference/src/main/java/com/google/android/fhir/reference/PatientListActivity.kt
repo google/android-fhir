@@ -65,7 +65,7 @@ class PatientListActivity() : AppCompatActivity() {
 
     patientListViewModel.patientCount.observe(
       this,
-      { findViewById<TextView>(R.id.patient_count).text = it.toString() + " Patients" }
+      { findViewById<TextView>(R.id.patient_count).text = "$it Patient(s)" }
     )
   }
 

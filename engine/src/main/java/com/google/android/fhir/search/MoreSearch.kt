@@ -71,7 +71,7 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
 
   val query =
     """
-    SELECT ${ if (isCount) "count(*)" else "a.serializedResource" }
+    SELECT ${ if (isCount) "COUNT(*)" else "a.serializedResource" }
     FROM ResourceEntity a
     $sortJoinStatement
     WHERE a.resourceType = ?
