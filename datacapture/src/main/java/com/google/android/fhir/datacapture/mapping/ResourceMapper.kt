@@ -16,23 +16,34 @@
 
 package com.google.android.fhir.datacapture.mapping
 
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
+import java.util.*
+import kotlin.collections.HashMap
+import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
+import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.UrlType
+import org.hl7.fhir.r4.utils.FHIRPathEngine
 
 /**
  * Maps [QuestionnaireResponse] s to FHIR resources and vice versa.
@@ -52,6 +63,10 @@ import org.hl7.fhir.r4.model.UrlType
  */
 object ResourceMapper {
 
+  private val context = FhirContext.forR4()
+  private val fhirPathEngine =
+    FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
+
   /**
    * Extract a FHIR resource from the `questionnaire` and `questionnaireResponse`.
    *
@@ -62,6 +77,137 @@ object ResourceMapper {
     val className = questionnaire.itemContextNameToExpressionMap.values.first()
     return (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Base).apply {
       extractFields(questionnaire.item, questionnaireResponse.item)
+    }
+  }
+
+  fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
+    val expressionMap = HashMap<String, String>()
+    val questionnaireItemList = questionnaire.item[0].item
+    val questionnaireItemListIterator = questionnaireItemList.iterator()
+    while (questionnaireItemListIterator.hasNext()) {
+      val singleQuestion = questionnaireItemListIterator.next()
+      if (singleQuestion.type == Questionnaire.QuestionnaireItemType.GROUP) {
+        singleQuestion.item.forEach { question -> fetchExpression(question, expressionMap) }
+      } else {
+        fetchExpression(singleQuestion, expressionMap)
+      }
+    }
+
+    val answersHashMap = extractAnswersFromExpression(expressionMap, resource)
+    return createQuestionnaireResponse(questionnaireItemList, answersHashMap)
+  }
+
+  private fun fetchExpression(
+    question: Questionnaire.QuestionnaireItemComponent,
+    expressionMap: HashMap<String, String>
+  ) {
+    question.extension.filter { it.url == ITEM_INITIAL_EXPRESSION_URL }.map {
+      val expression = it.value as Expression
+      expressionMap[question.linkId] = expression.expression
+    }
+  }
+
+  private fun extractAnswersFromExpression(
+    expressionMap: HashMap<String, String>,
+    resource: Resource
+  ): HashMap<String, Any> {
+    val answersHashMap = HashMap<String, Any>()
+    val expressionMapIterator = expressionMap.keys.iterator()
+    while (expressionMapIterator.hasNext()) {
+      val key = expressionMapIterator.next()
+      val answerExtracted = fhirPathEngine.evaluate(resource, expressionMap[key])
+      val questionType = answerExtracted[0]
+      when {
+        questionType.isDateTime -> {
+          answersHashMap[key] = (questionType as DateType)
+        }
+        questionType.isBooleanPrimitive -> {
+          answersHashMap[key] = (questionType as BooleanType)
+        }
+        questionType.isPrimitive -> {
+          val gender = (questionType as Enumeration<*>).code
+          answersHashMap[key] = StringType(gender)
+        }
+        else -> {
+          when {
+            answerExtracted[0] is HumanName -> {
+              if (key.contains("family")) {
+                val family = (answerExtracted[0] as HumanName).family
+                answersHashMap[key] = StringType(family)
+              } else {
+                answersHashMap[key] = (answerExtracted[0] as HumanName).given[0]
+              }
+            }
+            answerExtracted[0] is Address -> {
+              val city = (answerExtracted[0] as Address).city
+              val country = (answerExtracted[0] as Address).country
+
+              if (key.contains("country")) {
+                answersHashMap[key] = StringType(country)
+              } else {
+                answersHashMap[key] = StringType(city)
+              }
+            }
+            answerExtracted[0] is ContactPoint -> {
+              val phoneNumber = (answerExtracted[0] as ContactPoint).value
+              answersHashMap[key] = StringType(phoneNumber)
+            }
+          }
+        }
+      }
+    }
+    return answersHashMap
+  }
+
+  private fun createQuestionnaireResponse(
+    questionnaireItemList: MutableList<Questionnaire.QuestionnaireItemComponent>,
+    answersHashMap: HashMap<String, Any>
+  ): QuestionnaireResponse {
+    val questionnaireResponse = QuestionnaireResponse()
+
+    questionnaireItemList.forEach {
+      if (it.type == Questionnaire.QuestionnaireItemType.GROUP) {
+        it.item.forEach { nestedQuestion ->
+          createResponseForSingleQuestion(answersHashMap, nestedQuestion, questionnaireResponse)
+        }
+      } else {
+        createResponseForSingleQuestion(answersHashMap, it, questionnaireResponse)
+      }
+    }
+    return questionnaireResponse
+  }
+
+  private fun createResponseForSingleQuestion(
+    answersHashMap: HashMap<String, Any>,
+    it: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponse: QuestionnaireResponse
+  ) {
+    if (answersHashMap.keys.contains(it.linkId)) {
+      questionnaireResponse.addItem(
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          val retrievedAnswer = answersHashMap[it.linkId]
+          linkId = it.linkId
+          answer =
+            mutableListOf(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                when (it.type) {
+                  Questionnaire.QuestionnaireItemType.DATE -> value = retrievedAnswer as DateType
+                  Questionnaire.QuestionnaireItemType.BOOLEAN ->
+                    value = retrievedAnswer as BooleanType
+                  Questionnaire.QuestionnaireItemType.DECIMAL ->
+                    value = retrievedAnswer as DecimalType
+                  Questionnaire.QuestionnaireItemType.INTEGER ->
+                    value = retrievedAnswer as IntegerType
+                  Questionnaire.QuestionnaireItemType.DATETIME ->
+                    value = retrievedAnswer as DateTimeType
+                  Questionnaire.QuestionnaireItemType.TIME -> value = retrievedAnswer as TimeType
+                  Questionnaire.QuestionnaireItemType.STRING,
+                  Questionnaire.QuestionnaireItemType.TEXT -> value = retrievedAnswer as StringType
+                }
+              }
+            )
+        }
+      )
     }
   }
 
@@ -230,6 +376,17 @@ private val Questionnaire.itemContextNameToExpressionMap: Map<String, String>
       .toMap()
   }
 
+private val Questionnaire.itemContextNameForInitialExpression: Map<String, String>
+  get() {
+    return this.extension
+      .filter { it.url == ITEM_INITIAL_EXPRESSION_URL }
+      .map {
+        val expression = it.value as Expression
+        expression.name to expression.expression
+      }
+      .toMap()
+  }
+
 /**
  * Extracts a list containing the resource name followed by field names leading to the destination
  * field defined in the [definition] field, or `null` if the [definition] field is empty or invalid.
@@ -270,6 +427,9 @@ private val Questionnaire.QuestionnaireItemComponent.getDefinitionField: Field?
  */
 private const val ITEM_CONTEXT_EXTENSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext"
+
+private const val ITEM_INITIAL_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
 
 private val Field.isList: Boolean
   get() = isParameterized && type == List::class.java
