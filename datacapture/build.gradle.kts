@@ -10,9 +10,9 @@ afterEvaluate {
     publications {
       register("release", MavenPublication::class) {
         from(components["release"])
-        artifactId = "datacapture"
+        artifactId = "data-capture"
         groupId = "com.google.android.fhir"
-        version = "0.0.7"
+        version = "0.1.0-alpha02"
         // Also publish source code for developers' convenience
         artifact(
           tasks.create<Jar>("androidSourcesJar") {
