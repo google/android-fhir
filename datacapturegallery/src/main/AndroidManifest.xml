@@ -36,12 +36,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.google.android.fhir.datacapture.views.barcode.mlkit.md.LiveBarcodeScanningFragment"
-            android:exported="false"
-            android:screenOrientation="portrait"
-        >
-        </activity>
+
     </application>
 
 </manifest>
