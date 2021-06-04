@@ -35,278 +35,271 @@ class ResourceMapperTest {
   fun extract() {
     // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
     val questionnaireJson =
-      """
+      """{
+  "resourceType": "Questionnaire",
+  "id": "client-registration-sample",
+  "status": "active",
+  "date": "2020-11-18T07:24:47.111Z",
+  "subjectType": [
+    "Patient"
+  ],
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+      "valueExpression": {
+        "language": "application/x-fhir-query",
+        "expression": "Patient",
+        "name": "patient"
+      }
+    }
+  ],
+  "item": [
+    {
+      "linkId": "PR",
+      "type": "group",
+      "item": [
         {
-          "resourceType": "Questionnaire",
-          "id": "client-registration-sample",
-          "status": "active",
-          "date": "2020-11-18T07:24:47.111Z",
-          "subjectType": [
-            "Patient"
-          ],
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-              "valueExpression": {
-                "language": "application/x-fhir-query",
-                "expression": "Patient",
-                "name": "patient"
-              }
-            }
-          ],
+          "linkId": "PR-name",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
           "item": [
             {
-              "linkId": "PR",
-              "type": "group",
-              "item": [
-                {
-                  "linkId": "PR-name",
-                  "type": "group",
-                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
-                  "item": [
-                    {
-                      "linkId": "PR-name-text",
-                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
-                      "type": "string",
-                      "text": "First Name"
-                    },
-                    {
-                      "linkId": "PR-name-family",
-                      "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#Patient.name.family",
-                      "type": "string",
-                      "text": "Family Name"
-                    }
-                  ]
-                },
-                {
-                  "linkId": "patient-0-birth-date",
-                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate",
-                  "type": "date",
-                  "text": "Date of Birth"
-                },
+              "linkId": "PR-name-text",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
+              "type": "string",
+              "text": "First Name"
+            },
+            {
+              "linkId": "PR-name-family",
+              "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#Patient.name.family",
+              "type": "string",
+              "text": "Family Name"
+            }
+          ]
+        },
+        {
+          "linkId": "patient-0-birth-date",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate",
+          "type": "date",
+          "text": "Date of Birth"
+        },
         {
           "linkId": "PR-name-id",
           "definition": "http://hl7.org/fhir/StructureDefinition/Resource#Resource.id",
           "type": "string",
           "text": "Patient Id"
         },
+        {
+          "linkId": "patient-0-gender",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "radio-button",
+                    "display": "Radio Button"
+                  }
+                ],
+                "text": "A control where choices are listed with a button beside them. The button can be toggled to select or de-select a given choice. Selecting one item deselects all others."
+              }
+            }
+          ],
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
+          "type": "choice",
+          "text": "Gender:",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "female",
+                "display": "Female"
+              },
+              "initialSelected": true
+            },
+            {
+              "valueCoding": {
+                "code": "male",
+                "display": "Male"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "other",
+                "display": "Other"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "unknown",
+                "display": "Unknown"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "patient-0-marital-status",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "check",
+                    "display": "Check-box"
+                  }
+                ],
+                "text": "A control where choices are listed with a button beside them. The button can be toggled to select or de-select a given choice. Selecting one item deselects all others."
+              }
+            }
+          ],
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.maritalStatus",
+          "type": "choice",
+          "text": "Marital Status:",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "A",
+                "display": "Annulled"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "D",
+                "display": "Divorced"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "I",
+                "display": "Interlocutory"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "L",
+                "display": "Legally Separated"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "M",
+                "display": "Married"
+              },
+              "initialSelected": true
+            },
+            {
+              "valueCoding": {
+                "code": "P",
+                "display": "Polygamous"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "S",
+                "display": "Never Married"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "T",
+                "display": "Domestic Partner"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "U",
+                "display": "Unmarried"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "W",
+                "display": "Widowed"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "UNK",
+                "display": "Unknown"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "PR-telecom",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom",
+          "item": [
+            {
+              "linkId": "PR-telecom-system",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
+              "type": "string",
+              "text": "system",
+              "initial": [
                 {
-                  "linkId": "PR-name-id",
-                  "definition": "http://hl7.org/fhir/StructureDefinition/Resource#Resource.id",
+                  "valueString": "phone"
+                }
+              ],
+              "enableWhen": [
+                {
+                  "question": "patient-0-gender",
+                  "operator": "=",
+                  "answerString": "ok"
+                }
+              ]
+            },
+            {
+              "linkId": "PR-telecom-value",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.value",
+              "type": "string",
+              "text": "Phone Number"
+            }
+          ]
+        },
+        {
+          "linkId": "PR-contact-party",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.contact",
+          "item": [
+            {
+              "linkId": "PR-contact-party-name",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.contact.name",
+              "type": "group",
+              "item": [
+                {
+                  "linkId": "PR-contact-party-name-given",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.contact.name.given",
                   "type": "string",
-                  "text": "Patient Id"
+                  "text": "First Name"
                 },
                 {
-                  "linkId": "patient-0-gender",
-                  "extension": [
-                    {
-                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-                      "valueCodeableConcept": {
-                        "coding": [
-                          {
-                            "system": "http://hl7.org/fhir/questionnaire-item-control",
-                            "code": "radio-button",
-                            "display": "Radio Button"
-                          }
-                        ],
-                        "text": "A control where choices are listed with a button beside them. The button can be toggled to select or de-select a given choice. Selecting one item deselects all others."
-                      }
-                    }
-                  ],
-                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
-                  "type": "choice",
-                  "text": "Gender:",
-                  "answerOption": [
-                    {
-                      "valueCoding": {
-                        "code": "female",
-                        "display": "Female"
-                      },
-                      "initialSelected": true
-                    },
-                    {
-                      "valueCoding": {
-                        "code": "male",
-                        "display": "Male"
-                      }
-                    },
-                    {
-                      "valueCoding": {
-                        "code": "other",
-                        "display": "Other"
-                      }
-                    },
-                    {
-                      "valueCoding": {
-                        "code": "unknown",
-                        "display": "Unknown"
-                      }
-                    }
-                  ]
-                },
-                {
-                  "linkId": "patient-0-marital-status",
-                  "extension": [
-                    {
-                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-                      "valueCodeableConcept": {
-                        "coding": [
-                          {
-                            "system": "http://hl7.org/fhir/questionnaire-item-control",
-                            "code": "check",
-                            "display": "Check-box"
-                          }
-                        ],
-                        "text": "A control where choices are listed with a button beside them. The button can be toggled to select or de-select a given choice. Selecting one item deselects all others."
-                      }
-                    }
-                  ],
-                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.maritalStatus",
-                  "type": "choice",
-                  "text": "Marital Status:",
-                  "answerOption": [
-                    {
-                      "valueCoding": {
-                        "code": "A",
-                        "display": "Annulled"
-                      }
-                    },
-                    {
-                      "valueCoding": {
-                        "code": "D",
-                        "display": "Divorced"
-                      }
-                    },
-                    {
-                      "valueCoding": {
-                        "code": "I",
-                        "display": "Interlocutory"
-                      }
-                    },
-                    {
-                      "valueCoding": {
-                        "code": "L",
-                        "display": "Legally Separated"
-                      }
-                    },
-                    {
-                      "valueCoding": {
-                        "code": "M",
-                        "display": "Married"
-                      },
-                      "initialSelected": true
-                    },
-                    {
-                      "valueCoding": {
-                        "code": "P",
-                        "display": "Polygamous"
-                      }
-                    },
-                    {
-                      "valueCoding": {
-                        "code": "S",
-                        "display": "Never Married"
-                      }
-                    },
-                    {
-                      "valueCoding": {
-                        "code": "T",
-                        "display": "Domestic Partner"
-                      }
-                    },
-                    {
-                      "valueCoding": {
-                        "code": "U",
-                        "display": "Unmarried"
-                      }
-                    },
-                    {
-                      "valueCoding": {
-                        "code": "W",
-                        "display": "Widowed"
-                      }
-                    },
-                    {
-                      "valueCoding": {
-                        "code": "UNK",
-                        "display": "Unknown"
-                      }
-                    }
-                  ]
-                },
-                {
-                  "linkId": "PR-telecom",
-                  "type": "group",
-                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom",
-                  "item": [
-                    {
-                      "linkId": "PR-telecom-system",
-                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
-                      "type": "string",
-                      "text": "system",
-                      "initial": [
-                        {
-                          "valueString": "phone"
-                        }
-                      ],
-                      "enableWhen": [
-                        {
-                          "question": "patient-0-gender",
-                          "operator": "=",
-                          "answerString": "ok"
-                        }
-                      ]
-                    },
-                    {
-                      "linkId": "PR-telecom-value",
-                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.value",
-                      "type": "string",
-                      "text": "Phone Number"
-                    }
-                  ]
-                },
-                {
-                  "linkId": "PR-contact-party",
-                  "type": "group",
-                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.contact",
-                  "item": [
-                    {
-                      "linkId": "PR-contact-party-name",
-                      "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.contact.name",
-                      "type": "group",
-                      "item": [
-                        {
-                          "linkId": "PR-contact-party-name-given",
-                          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.contact.name.given",
-                          "type": "string",
-                          "text": "First Name"
-                        },
-                        {
-                          "linkId": "PR-contact-party-name-family",
-                          "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#Patient.contact.name.family",
-                          "type": "string",
-                          "text": "Family Name"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "linkId": "PR-active",
-                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.active",
-                  "type": "boolean",
-                  "text": "Is Active?"
-                },
-                {
-                  "linkId": "PR-multiple-birth",
-                  "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.multipleBirth",
-                  "type": "integer",
-                  "text": "Multiple birth integer i.e. 1 is first-born, 2 is second-born"
+                  "linkId": "PR-contact-party-name-family",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#Patient.contact.name.family",
+                  "type": "string",
+                  "text": "Family Name"
                 }
               ]
             }
           ]
+        },
+        {
+          "linkId": "PR-active",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.active",
+          "type": "boolean",
+          "text": "Is Active?"
+        },
+        {
+          "linkId": "PR-multiple-birth",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.multipleBirth",
+          "type": "integer",
+          "text": "Multiple birth integer i.e. 1 is first-born, 2 is second-born"
         }
+      ]
+    }
+  ]
+}
       """.trimIndent()
 
     val questionnaireResponseJson =
