@@ -29,7 +29,6 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.sync.DataSource
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
