@@ -26,6 +26,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContract
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentResultListener
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.barcode.mlkit.md.LiveBarcodeScanningFragment
@@ -57,11 +58,12 @@ internal object QuestionnaireItemBarCodeReaderViewHolderFactory :
             "result",
             context,
             object : FragmentResultListener {
+
               override fun onFragmentResult(requestKey: String, result: Bundle) {
                 val barcode = result.getString("result")?.trim()
                 barcodeTextView.text = barcode
 
-                val black = context.getColor(R.color.black)
+                val black = ContextCompat.getColor(context, R.color.black)
                 barcodeTextView.setTextColor(black)
                 barcodeTextView.typeface =
                   Typeface.create(barcodeTextView.typeface, Typeface.NORMAL)
