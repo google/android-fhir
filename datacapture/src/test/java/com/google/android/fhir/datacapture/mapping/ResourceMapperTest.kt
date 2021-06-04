@@ -46,7 +46,7 @@ class ResourceMapperTest {
           ],
           "extension": [
             {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
               "valueExpression": {
                 "language": "application/x-fhir-query",
                 "expression": "Patient",
@@ -90,6 +90,12 @@ class ResourceMapperTest {
           "type": "string",
           "text": "Patient Id"
         },
+                {
+                  "linkId": "PR-name-id",
+                  "definition": "http://hl7.org/fhir/StructureDefinition/Resource#Resource.id",
+                  "type": "string",
+                  "text": "Patient Id"
+                },
                 {
                   "linkId": "patient-0-gender",
                   "extension": [
@@ -343,7 +349,11 @@ class ResourceMapperTest {
                 },
                 {
                   "linkId": "PR-name-id",
-                  "answer": [{ "valueString": "98238-adsfsa-23rfdsf" }]
+                  "answer": [
+                    {
+                      "valueString": "98238-adsfsa-23rfdsf"
+                    }
+                  ]
                 },
                 {
                   "linkId": "patient-0-gender",
@@ -470,7 +480,7 @@ class ResourceMapperTest {
           ],
           "extension": [
             {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
               "valueExpression": {
                 "language": "application/x-fhir-query",
                 "expression": "Patient",

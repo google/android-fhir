@@ -93,11 +93,11 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
   }
 
   override suspend fun insertSyncedResources(
-    syncedResourceEntity: SyncedResourceEntity,
+    syncedResources: List<SyncedResourceEntity>,
     resources: List<Resource>
   ) {
     db.withTransaction {
-      syncedResourceDao.insert(syncedResourceEntity)
+      syncedResourceDao.insertAll(syncedResources)
       insertRemote(*resources.toTypedArray())
     }
   }
