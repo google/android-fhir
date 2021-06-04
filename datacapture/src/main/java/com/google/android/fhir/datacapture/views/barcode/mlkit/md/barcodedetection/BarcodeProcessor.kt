@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.views.barcode.mlkit.md.barcodedetect
 import android.animation.ValueAnimator
 import android.util.Log
 import androidx.annotation.MainThread
-import com.google.android.gms.tasks.Task
 import com.google.android.fhir.datacapture.views.barcode.mlkit.md.InputInfo
 import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.CameraReticleAnimator
 import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.FrameProcessorBase
@@ -27,6 +26,7 @@ import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.Graphic
 import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.WorkflowModel
 import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.WorkflowModel.WorkflowState
 import com.google.android.fhir.datacapture.views.barcode.mlkit.md.settings.PreferenceUtils
+import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.barcode.Barcode
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage

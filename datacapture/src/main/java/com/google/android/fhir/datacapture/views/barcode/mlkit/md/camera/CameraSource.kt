@@ -26,9 +26,9 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.WindowManager
 import com.google.android.fhir.datacapture.R
-import com.google.android.gms.common.images.Size
 import com.google.android.fhir.datacapture.views.barcode.mlkit.md.Utils
 import com.google.android.fhir.datacapture.views.barcode.mlkit.md.settings.PreferenceUtils
+import com.google.android.gms.common.images.Size
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.util.IdentityHashMap

@@ -27,9 +27,9 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.WorkflowModel
 import com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera.WorkflowModel.WorkflowState
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 /** Displays the bottom sheet to present barcode fields contained in the detected barcode. */
 class BarcodeResultFragment : BottomSheetDialogFragment() {

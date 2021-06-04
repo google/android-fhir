@@ -19,12 +19,12 @@ package com.google.android.fhir.datacapture.views.barcode.mlkit.md.camera
 import android.os.SystemClock
 import android.util.Log
 import androidx.annotation.GuardedBy
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.TaskExecutors
 import com.google.android.fhir.datacapture.views.barcode.mlkit.md.CameraInputInfo
 import com.google.android.fhir.datacapture.views.barcode.mlkit.md.InputInfo
 import com.google.android.fhir.datacapture.views.barcode.mlkit.md.ScopedExecutor
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.TaskExecutors
 import com.google.mlkit.vision.common.InputImage
 import java.nio.ByteBuffer
 

@@ -23,8 +23,8 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.widget.FrameLayout
 import com.google.android.fhir.datacapture.R
-import com.google.android.gms.common.images.Size
 import com.google.android.fhir.datacapture.views.barcode.mlkit.md.Utils
+import com.google.android.gms.common.images.Size
 import java.io.IOException
 
 /** Preview the camera image in the screen. */
