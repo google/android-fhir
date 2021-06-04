@@ -381,17 +381,6 @@ private val Questionnaire.itemContextNameToExpressionMap: Map<String, String>
       .toMap()
   }
 
-private val Questionnaire.itemContextNameForInitialExpression: Map<String, String>
-  get() {
-    return this.extension
-      .filter { it.url == ITEM_INITIAL_EXPRESSION_URL }
-      .map {
-        val expression = it.value as Expression
-        expression.name to expression.expression
-      }
-      .toMap()
-  }
-
 /**
  * Extracts a list containing the resource name followed by field names leading to the destination
  * field defined in the [definition] field, or `null` if the [definition] field is empty or invalid.
