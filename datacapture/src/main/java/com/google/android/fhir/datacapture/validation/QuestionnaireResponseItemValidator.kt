@@ -23,6 +23,7 @@ internal object QuestionnaireResponseItemValidator {
 
   private val validators =
     mutableListOf(
+      RequiredConstraintValidator,
       MaxValueConstraintValidator,
       MinValueConstraintValidator,
       PrimitiveTypeAnswerMaxLengthValidator,
@@ -35,9 +36,6 @@ internal object QuestionnaireResponseItemValidator {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ): ValidationResult {
-    if (questionnaireResponseItem.answer.isEmpty()) {
-      return ValidationResult(true, listOf())
-    }
     val validationResults = mutableListOf<ConstraintValidator.ConstraintValidationResult>()
     validators.forEach {
       validationResults.add(it.validate(questionnaireItem, questionnaireResponseItem))
