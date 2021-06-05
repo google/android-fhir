@@ -20,7 +20,6 @@ import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.db.Database
-import java.lang.IllegalArgumentException
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -114,10 +113,11 @@ fun StringFilter.query(type: ResourceType): SearchQuery {
 }
 
 fun NumberFilter.query(type: ResourceType): SearchQuery {
+  val value = value!!
   val precision =
     when {
-      value!!.scale() >= 0 ->
-        BigDecimal(1).divide(BigDecimal(10).pow(value!!.scale())).divide(BigDecimal(2))
+      value.scale() >= 0 ->
+        BigDecimal(1).divide(BigDecimal(10).pow(value.scale())).divide(BigDecimal(2))
       else -> BigDecimal(5)
     }
 
@@ -132,8 +132,8 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
           listOf(
             type.name,
             parameter.paramName,
-            (value!! - precision).toDouble(),
-            (value!! + precision).toDouble()
+            (value - precision).toDouble(),
+            (value + precision).toDouble()
           )
         )
       ParamPrefixEnum.GREATERTHAN -> ">"
@@ -149,22 +149,22 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
           listOf(
             type.name,
             parameter.paramName,
-            (value!! - precision).toDouble(),
-            (value!! + precision).toDouble()
+            (value - precision).toDouble(),
+            (value + precision).toDouble()
           )
         )
       // Ends_Before and Starts_After are not used with integer values.
-      ParamPrefixEnum.ENDS_BEFORE ->
-        if (value!!.scale() <= 0)
-          throw IllegalArgumentException("Prefix not allowed for Integer type")
-        else "<"
-      ParamPrefixEnum.STARTS_AFTER ->
-        if (value!!.scale() <= 0)
-          throw IllegalArgumentException("Prefix not allowed for Integer type")
-        else ">"
+      ParamPrefixEnum.ENDS_BEFORE -> {
+        require(value.scale() > 0) { "Prefix $prefix not allowed for Integer type" }
+        "<"
+      }
+      ParamPrefixEnum.STARTS_AFTER -> {
+        require(value.scale() > 0) { "Prefix $prefix not allowed for Integer type" }
+        ">"
+      }
       // Approximate to a 10% range
       ParamPrefixEnum.APPROXIMATE -> {
-        val range = value!!.divide(BigDecimal(10))
+        val range = value.divide(BigDecimal(10))
         return SearchQuery(
           """
             SELECT resourceId FROM NumberIndexEntity
@@ -173,8 +173,8 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
           listOf(
             type.name,
             parameter.paramName,
-            (value!! - range).toDouble(),
-            (value!! + range).toDouble()
+            (value - range).toDouble(),
+            (value + range).toDouble()
           )
         )
       }
@@ -184,7 +184,7 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
      SELECT resourceId FROM NumberIndexEntity
      WHERE resourceType = ? AND index_name = ? AND index_value $condition ?
        """,
-    listOf(type.name, parameter.paramName, value!!.toDouble())
+    listOf(type.name, parameter.paramName, value.toDouble())
   )
 }
 
