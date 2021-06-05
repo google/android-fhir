@@ -25,7 +25,10 @@ internal object RequiredConstraintValidator : ConstraintValidator {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ): ConstraintValidator.ConstraintValidationResult {
     if (questionnaireItem.required && questionnaireResponseItem.answer.isEmpty()) {
-      return ConstraintValidator.ConstraintValidationResult(false, "Missing answer for required field.")
+      return ConstraintValidator.ConstraintValidationResult(
+        false,
+        "Missing answer for required field."
+      )
     }
     return ConstraintValidator.ConstraintValidationResult(true, null)
   }
