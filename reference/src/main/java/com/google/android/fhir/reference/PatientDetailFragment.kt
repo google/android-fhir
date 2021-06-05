@@ -30,6 +30,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.reference.databinding.PatientDetailBinding
 
 /**
  * A fragment representing a single Patient detail screen. This fragment is contained in a
@@ -39,6 +40,9 @@ class PatientDetailFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
   private lateinit var patientDetailsViewModel: PatientDetailsViewModel
   private val args: PatientDetailFragmentArgs by navArgs()
+  private var _binding: PatientDetailBinding? = null
+  private val binding
+    get() = _binding!!
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -48,7 +52,11 @@ class PatientDetailFragment : Fragment() {
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? = inflater.inflate(R.layout.patient_detail, container, false)
+  ): View? {
+    _binding = PatientDetailBinding.inflate(inflater, container, false)
+    val view = binding.root
+    return view
+  }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -98,5 +106,10 @@ class PatientDetailFragment : Fragment() {
   companion object {
     /** The fragment argument representing the patient item ID that this fragment represents. */
     const val ARG_ITEM_ID = "patient_item_id"
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    _binding = null
   }
 }

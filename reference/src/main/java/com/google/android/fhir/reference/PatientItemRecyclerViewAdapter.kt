@@ -20,6 +20,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import com.google.android.fhir.reference.databinding.PatientListItemBinding
 
 /** UI Controller helper class to monitor Patient viewmodel and display list of patients. */
 class PatientItemRecyclerViewAdapter(
@@ -40,9 +41,9 @@ class PatientItemRecyclerViewAdapter(
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientItemViewHolder {
-    val view =
-      LayoutInflater.from(parent.context).inflate(R.layout.patient_list_item, parent, false)
-    return PatientItemViewHolder(view)
+    return PatientItemViewHolder(
+      PatientListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    )
   }
 
   override fun onBindViewHolder(holder: PatientItemViewHolder, position: Int) {

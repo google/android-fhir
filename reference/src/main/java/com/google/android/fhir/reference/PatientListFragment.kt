@@ -29,18 +29,24 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.reference.databinding.FragmentPatientListBinding
 
 class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
   private lateinit var patientListViewModel: PatientListViewModel
   private lateinit var searchView: SearchView
+  private var _binding: FragmentPatientListBinding? = null
+  private val binding
+    get() = _binding!!
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? {
-    return inflater.inflate(R.layout.fragment_patient_list, container, false)
+  ): View {
+    _binding = FragmentPatientListBinding.inflate(inflater, container, false)
+    val view = binding.root
+    return view
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -100,5 +106,10 @@ class PatientListFragment : Fragment() {
   private fun onPatientItemClicked(patientItem: PatientListViewModel.PatientItem) {
     findNavController()
       .navigate(PatientListFragmentDirections.navigateToProductDetail(patientItem.resourceId))
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    _binding = null
   }
 }

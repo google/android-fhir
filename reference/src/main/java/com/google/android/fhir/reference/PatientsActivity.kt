@@ -21,16 +21,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.work.Constraints
 import com.google.android.fhir.reference.data.FhirPeriodicSyncWorker
+import com.google.android.fhir.reference.databinding.ActivityPatientsBinding
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.RepeatInterval
 import com.google.android.fhir.sync.Sync
 import java.util.concurrent.TimeUnit
 
 class PatientsActivity : AppCompatActivity() {
+  private lateinit var binding: ActivityPatientsBinding
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_patients)
+    binding = ActivityPatientsBinding.inflate(layoutInflater)
+    val view = binding.root
+    setContentView(view)
     val toolbar = findViewById<Toolbar>(R.id.toolbar)
     setSupportActionBar(toolbar)
     toolbar.title = title
