@@ -37,80 +37,80 @@ import org.hl7.fhir.r4.model.Patient
  * data for UI.
  */
 class PatientListViewModel(application: Application, private val fhirEngine: FhirEngine) :
-    AndroidViewModel(application) {
+  AndroidViewModel(application) {
 
-    private val samplePatients = SamplePatients()
-    val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
-    val patientCount = liveData { emit(count()) }
+  private val samplePatients = SamplePatients()
+  val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
+  val patientCount = liveData { emit(count()) }
 
-    init {
-        fetchAndPost { getSearchResults() }
+  init {
+    fetchAndPost { getSearchResults() }
+  }
+
+  fun searchPatientsByName(nameQuery: String) {
+    fetchAndPost { getSearchResults(nameQuery) }
+  }
+
+  private fun fetchAndPost(search: suspend () -> List<PatientItem>) {
+    viewModelScope.launch { liveSearchedPatients.value = search() }
+  }
+
+  private suspend fun count(): Long {
+    return fhirEngine.count<Patient> {
+      filter(Patient.ADDRESS_CITY) {
+        modifier = StringFilterModifier.MATCHES_EXACTLY
+        value = "NAIROBI"
+      }
     }
+  }
 
-    fun searchPatientsByName(nameQuery: String) {
-        fetchAndPost { getSearchResults(nameQuery) }
-    }
+  private suspend fun getSearchResults(nameQuery: String = ""): List<PatientItem> {
+    val searchResults: List<Patient> =
+      fhirEngine.search {
+        if (nameQuery.isNotEmpty())
+          filter(Patient.NAME) {
+            modifier = StringFilterModifier.CONTAINS
+            value = nameQuery
+          }
+        sort(Patient.GIVEN, Order.ASCENDING)
+        count = 100
+        from = 0
+      }
+    return samplePatients.getPatientItems(searchResults)
+  }
 
-    private fun fetchAndPost(search: suspend () -> List<PatientItem>) {
-        viewModelScope.launch { liveSearchedPatients.value = search() }
-    }
+  /** The Patient's details for display purposes. */
+  data class PatientItem(
+    val id: String,
+    val name: String,
+    val gender: String,
+    val dob: String,
+    val html: String,
+    val phone: String,
+    val resourceId: String
+  ) {
+    override fun toString(): String = name
+  }
 
-    private suspend fun count(): Long {
-        return fhirEngine.count<Patient> {
-            filter(Patient.ADDRESS_CITY) {
-                modifier = StringFilterModifier.MATCHES_EXACTLY
-                value = "NAIROBI"
-            }
-        }
-    }
+  /** The Observation's details for display purposes. */
+  data class ObservationItem(
+    val id: String,
+    val code: String,
+    val effective: String,
+    val value: String
+  ) {
+    override fun toString(): String = code
+  }
 
-    private suspend fun getSearchResults(nameQuery: String = ""): List<PatientItem> {
-        val searchResults: List<Patient> =
-            fhirEngine.search {
-                if (nameQuery.isNotEmpty())
-                    filter(Patient.NAME) {
-                        modifier = StringFilterModifier.CONTAINS
-                        value = nameQuery
-                    }
-                sort(Patient.GIVEN, Order.ASCENDING)
-                count = 100
-                from = 0
-            }
-        return samplePatients.getPatientItems(searchResults)
+  class PatientListViewModelFactory(
+    private val application: Application,
+    private val fhirEngine: FhirEngine
+  ) : ViewModelProvider.Factory {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+      if (modelClass.isAssignableFrom(PatientListViewModel::class.java)) {
+        return PatientListViewModel(application, fhirEngine) as T
+      }
+      throw IllegalArgumentException("Unknown ViewModel class")
     }
-
-    /** The Patient's details for display purposes. */
-    data class PatientItem(
-        val id: String,
-        val name: String,
-        val gender: String,
-        val dob: String,
-        val html: String,
-        val phone: String,
-        val resourceId: String
-    ) {
-        override fun toString(): String = name
-    }
-
-    /** The Observation's details for display purposes. */
-    data class ObservationItem(
-        val id: String,
-        val code: String,
-        val effective: String,
-        val value: String
-    ) {
-        override fun toString(): String = code
-    }
-
-    class PatientListViewModelFactory(
-        private val application: Application,
-        private val fhirEngine: FhirEngine
-    ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(PatientListViewModel::class.java)) {
-                return PatientListViewModel(application, fhirEngine) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
-    }
+  }
 }

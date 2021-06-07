@@ -63,9 +63,10 @@ class PatientListActivity() : AppCompatActivity() {
     fhirEngine = fhirEngine(this)
 
     patientListViewModel =
-      ViewModelProvider(this,
-        PatientListViewModel.PatientListViewModelFactory(this.application, fhirEngine)
-      )
+      ViewModelProvider(
+          this,
+          PatientListViewModel.PatientListViewModelFactory(this.application, fhirEngine)
+        )
         .get(PatientListViewModel::class.java)
     val recyclerView: RecyclerView = findViewById(R.id.patient_list)
 
@@ -80,9 +81,7 @@ class PatientListActivity() : AppCompatActivity() {
       }
     )
 
-    patientListViewModel.patientCount.observe(this, {
-      Log.d("PatientListActivity", "$it Patient")
-    })
+    patientListViewModel.patientCount.observe(this, { Log.d("PatientListActivity", "$it Patient") })
 
     patientListViewModel.patientCount.observe(
       this,
