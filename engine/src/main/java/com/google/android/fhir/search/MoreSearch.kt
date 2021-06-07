@@ -20,6 +20,7 @@ import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.db.Database
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -126,54 +127,14 @@ fun ReferenceFilter.query(type: ResourceType): SearchQuery {
 }
 
 fun DateFilter.query(type: ResourceType): SearchQuery {
-  var tsHigh: Long? = null
-  val condition =
-    when (this.prefix) {
-      ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
-      ParamPrefixEnum.STARTS_AFTER ->
-        "<= index_from".also { tsHigh = value!!.precision.add(value!!.value, 1).time }
-      ParamPrefixEnum.ENDS_BEFORE -> ">= index_to"
-      ParamPrefixEnum.NOT_EQUAL ->
-        return SearchQuery(
-          """SELECT resourceId FROM DateIndexEntity
-              WHERE resourceType = ? AND index_name = ?
-              AND index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?""",
-          listOf(
-            type.name,
-            parameter.paramName,
-            value!!.value.time,
-            value!!.precision.add(value!!.value, 1).time - 1,
-            value!!.value.time,
-            value!!.precision.add(value!!.value, 1).time - 1
-          )
-        )
-      ParamPrefixEnum.EQUAL ->
-        return SearchQuery(
-          """SELECT resourceId FROM DateIndexEntity
-              WHERE resourceType = ? AND index_name = ?
-              AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?""",
-          listOf(
-            type.name,
-            parameter.paramName,
-            value!!.value.time,
-            value!!.precision.add(value!!.value, 1).time - 1,
-            value!!.value.time,
-            value!!.precision.add(value!!.value, 1).time - 1
-          )
-        )
-      ParamPrefixEnum.GREATERTHAN ->
-        "<= index_from".also { tsHigh = value!!.precision.add(value!!.value, 1).time }
-      ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> "<= index_from"
-      ParamPrefixEnum.LESSTHAN -> ">= index_to"
-      ParamPrefixEnum.LESSTHAN_OR_EQUALS ->
-        ">= index_to".also { tsHigh = value!!.precision.add(value!!.value, 1).time }
-    }
+  val value = value!!
+  val conditionParamPair = getConditionParamPair(prefix, value)
   return SearchQuery(
     """
     SELECT resourceId FROM DateIndexEntity 
-    WHERE resourceType = ? AND index_name = ? AND ? $condition 
+    WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.first}
     """,
-    listOf(type.name, parameter.paramName, tsHigh ?: value!!.value.time)
+    listOf(type.name, parameter.paramName) + conditionParamPair.second
   )
 }
 
@@ -203,3 +164,34 @@ val Order?.sqlString: String
       Order.DESCENDING -> "DESC"
       null -> ""
     }
+
+private fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateTimeType): Pair<String, List<Any>> {
+  return when (prefix) {
+    ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
+    ParamPrefixEnum.STARTS_AFTER ->
+      "? <= index_from" to listOf(value.precision.add(value.value, 1).time)
+    ParamPrefixEnum.ENDS_BEFORE -> "? >= index_to" to listOf(value.value.time)
+    ParamPrefixEnum.NOT_EQUAL ->
+      "index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?" to
+        listOf(
+          value.value.time,
+          value.precision.add(value.value, 1).time - 1,
+          value.value.time,
+          value.precision.add(value.value, 1).time - 1
+        )
+    ParamPrefixEnum.EQUAL ->
+      "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?" to
+        listOf(
+          value.value.time,
+          value.precision.add(value.value, 1).time - 1,
+          value.value.time,
+          value.precision.add(value.value, 1).time - 1
+        )
+    ParamPrefixEnum.GREATERTHAN ->
+      "? <= index_from" to listOf(value.precision.add(value.value, 1).time)
+    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> "? <= index_from" to listOf(value.value.time)
+    ParamPrefixEnum.LESSTHAN -> "? >= index_to" to listOf(value.value.time)
+    ParamPrefixEnum.LESSTHAN_OR_EQUALS ->
+      "? >= index_to" to listOf(value.precision.add(value.value, 1).time)
+  }
+}

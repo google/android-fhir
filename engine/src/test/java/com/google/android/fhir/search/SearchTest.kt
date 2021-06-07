@@ -628,8 +628,7 @@ class SearchTest {
     WHERE a.resourceType = ?
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
-    WHERE resourceType = ? AND index_name = ?
-    AND index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?
+    WHERE resourceType = ? AND index_name = ? AND index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?
     )
         """.trimIndent()
       )
@@ -668,8 +667,7 @@ class SearchTest {
     WHERE a.resourceType = ?
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
-    WHERE resourceType = ? AND index_name = ?
-    AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?
+    WHERE resourceType = ? AND index_name = ? AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?
     )
         """.trimIndent()
       )
