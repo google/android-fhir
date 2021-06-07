@@ -121,70 +121,14 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
       else -> BigDecimal(5)
     }
 
-  val condition =
-    when (this.prefix) {
-      ParamPrefixEnum.EQUAL, null ->
-        return SearchQuery(
-          """
-            SELECT resourceId FROM NumberIndexEntity
-            WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value < ?
-            """,
-          listOf(
-            type.name,
-            parameter.paramName,
-            (value - precision).toDouble(),
-            (value + precision).toDouble()
-          )
-        )
-      ParamPrefixEnum.GREATERTHAN -> ">"
-      ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ">="
-      ParamPrefixEnum.LESSTHAN -> "<"
-      ParamPrefixEnum.LESSTHAN_OR_EQUALS -> "<="
-      ParamPrefixEnum.NOT_EQUAL ->
-        return SearchQuery(
-          """
-            SELECT resourceId FROM NumberIndexEntity
-            WHERE resourceType = ? AND index_name = ? AND index_value < ? OR index_value >= ?
-            """,
-          listOf(
-            type.name,
-            parameter.paramName,
-            (value - precision).toDouble(),
-            (value + precision).toDouble()
-          )
-        )
-      // Ends_Before and Starts_After are not used with integer values.
-      ParamPrefixEnum.ENDS_BEFORE -> {
-        require(value.scale() > 0) { "Prefix $prefix not allowed for Integer type" }
-        "<"
-      }
-      ParamPrefixEnum.STARTS_AFTER -> {
-        require(value.scale() > 0) { "Prefix $prefix not allowed for Integer type" }
-        ">"
-      }
-      // Approximate to a 10% range
-      ParamPrefixEnum.APPROXIMATE -> {
-        val range = value.divide(BigDecimal(10))
-        return SearchQuery(
-          """
-            SELECT resourceId FROM NumberIndexEntity
-            WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value <= ?
-            """,
-          listOf(
-            type.name,
-            parameter.paramName,
-            (value - range).toDouble(),
-            (value + range).toDouble()
-          )
-        )
-      }
-    }
+  val conditionParamPair = getConditionParamPair(prefix, value, precision)
+
   return SearchQuery(
     """
      SELECT resourceId FROM NumberIndexEntity
-     WHERE resourceType = ? AND index_name = ? AND index_value $condition ?
+     WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.first}
        """,
-    listOf(type.name, parameter.paramName, value.toDouble())
+    listOf(type.name, parameter.paramName) + conditionParamPair.second
   )
 }
 
@@ -224,3 +168,37 @@ val Order?.sqlString: String
       Order.DESCENDING -> "DESC"
       null -> ""
     }
+
+fun getConditionParamPair(
+  prefix: ParamPrefixEnum?,
+  value: BigDecimal,
+  precision: BigDecimal
+): Pair<String, List<Double>> {
+  return when (prefix) {
+    ParamPrefixEnum.EQUAL, null ->
+      "index_value >= ? AND index_value < ?" to
+        listOf((value - precision).toDouble(), (value + precision).toDouble())
+    ParamPrefixEnum.GREATERTHAN -> "index_value > ?" to listOf(value.toDouble())
+    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> "index_value >= ?" to listOf(value.toDouble())
+    ParamPrefixEnum.LESSTHAN -> "index_value < ?" to listOf(value.toDouble())
+    ParamPrefixEnum.LESSTHAN_OR_EQUALS -> "index_value <= ?" to listOf(value.toDouble())
+    ParamPrefixEnum.NOT_EQUAL ->
+      "index_value < ? OR index_value >= ?" to
+        listOf((value - precision).toDouble(), (value + precision).toDouble())
+    // Ends_Before and Starts_After are not used with integer values.
+    ParamPrefixEnum.ENDS_BEFORE -> {
+      require(value.scale() > 0) { "Prefix $prefix not allowed for Integer type" }
+      "index_value < ?" to listOf(value.toDouble())
+    }
+    ParamPrefixEnum.STARTS_AFTER -> {
+      require(value.scale() > 0) { "Prefix $prefix not allowed for Integer type" }
+      "index_value > ?" to listOf(value.toDouble())
+    }
+    // Approximate to a 10% range
+    ParamPrefixEnum.APPROXIMATE -> {
+      val range = value.divide(BigDecimal(10))
+      "index_value >= ? AND index_value <= ?" to
+        listOf((value - range).toDouble(), (value + range).toDouble())
+    }
+  }
+}
