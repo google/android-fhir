@@ -184,6 +184,8 @@ internal abstract class ResourceDao {
 
   @RawQuery abstract fun getResources(query: SupportSQLiteQuery): List<String>
 
+  @RawQuery abstract fun countResources(query: SupportSQLiteQuery): Long
+
   private fun insertResource(resource: Resource) {
     val entity =
       ResourceEntity(
