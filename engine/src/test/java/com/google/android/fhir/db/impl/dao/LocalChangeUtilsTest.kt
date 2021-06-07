@@ -125,7 +125,7 @@ class LocalChangeUtilsTest {
         timestamp = "",
         type = LocalChangeEntity.Type.INSERT,
         payload =
-          """{"resourceType":"Patient","id":"human","name":[{"use":"Ana2k","given":["Kenzi"]}]}"""
+        """{"resourceType":"Patient","id":"human","name":[{"use":"Ana2k","given":["Kenzi"]}]}"""
       )
     assertThat(mergeLocalChanges(insert_payload_json_node, update_json_patch))
       .isEqualTo(insertPayloadJsonNode_and_UpdateJsonPatch)
@@ -196,7 +196,7 @@ class LocalChangeUtilsTest {
         timestamp = "",
         type = LocalChangeEntity.Type.INSERT,
         payload =
-          """{"resourceType":"Patient","id":"human","name":[{"use":"usual","given":["Kenzi"]}]}"""
+        """{"resourceType":"Patient","id":"human","name":[{"use":"usual","given":["Kenzi"]}]}"""
       )
 
     assertThat(mergeLocalChanges(update_json_patch, insert_payload_json_node))
