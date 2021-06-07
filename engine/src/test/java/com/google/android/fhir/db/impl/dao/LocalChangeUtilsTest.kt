@@ -64,7 +64,7 @@ class LocalChangeUtilsTest {
 
   // INSERTS test cases
   @Test
-  fun mergeLocalChanges_insertTwice() { // insert insert
+  fun mergeLocalChanges_insert_insert() { // insert insert
     val insert_payload1 =
       LocalChangeEntity(
         id = 1L,
