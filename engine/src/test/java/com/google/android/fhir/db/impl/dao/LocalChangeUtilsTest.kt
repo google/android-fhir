@@ -30,41 +30,41 @@ import org.robolectric.RobolectricTestRunner
 /** Unit tests for [LocalChangeUtils]. */
 @RunWith(RobolectricTestRunner::class)
 class LocalChangeUtilsTest {
+
   val payload1 =
     """
-     {
-       "resourceType": "Patient",
-       "id": "human",
-       "name": [
-         {
-           "use": "usual",
-           "given": [
-             "Kenzi"
-           ]
-         }
-       ]
-     }
-     """
+    {
+      "resourceType": "Patient",
+      "id": "human",
+      "name": [
+        {
+          "use": "usual",
+          "given": [
+            "Kenzi"
+          ]
+        }
+      ]
+    }
+    """
 
   val json_patch =
     """
-       [
-         {
-          "op": "replace",
-          "path": "/name/0/use",
-          "value":"Ana2k"          
-          }
-       ]
-     """.trimMargin()
+      [
+        {
+         "op": "replace",
+         "path": "/name/0/use",
+         "value":"Ana2k"         
+         }
+      ]
+    """.trimMargin()
 
   // converting the json payload to json node type
   val objectMapper = ObjectMapper()
   val payload_json_node: JsonNode = objectMapper.readTree(payload1)
 
+  // INSERTS test cases
   @Test
-  fun mergeLocalChnages_insertTwice() {
-    // Expected output when insert_payload1 and insert_payload2 mix
-    // (INSERT AND INSERT)
+  fun mergeLocalChanges_insertTwice() { // insert insert
     val insert_payload1 =
       LocalChangeEntity(
         id = 1L,
@@ -83,7 +83,6 @@ class LocalChangeUtilsTest {
         payload = "payload2",
         type = LocalChangeEntity.Type.INSERT
       )
-
     val insertPayload1_and_insertPayload2 =
       LocalChangeEntity(
         id = 0L,
@@ -98,9 +97,43 @@ class LocalChangeUtilsTest {
   }
 
   @Test
-  fun mergeLocalChanges_insert_delete() {
-    // Expected output when insert_payload1 and delete_payload are mixed
-    // (INSERT AND DELETE)
+  fun mergeLocalChanges_insert_update() { // insert update
+
+    val update_json_patch =
+      LocalChangeEntity(
+        id = 4L,
+        resourceType = "Test4",
+        resourceId = "Anam4",
+        timestamp = Date().toTimeZoneString(),
+        payload = json_patch,
+        type = LocalChangeEntity.Type.UPDATE
+      )
+    val insert_payload_json_node =
+      LocalChangeEntity(
+        id = 5L,
+        resourceType = "Test5",
+        resourceId = "Anam5",
+        timestamp = Date().toTimeZoneString(),
+        payload = payload_json_node.toString(),
+        type = LocalChangeEntity.Type.INSERT
+      )
+    val insertPayloadJsonNode_and_UpdateJsonPatch =
+      LocalChangeEntity(
+        id = 0L,
+        resourceType = "Test4",
+        resourceId = "Anam4",
+        timestamp = "",
+        type = LocalChangeEntity.Type.INSERT,
+        payload =
+          """{"resourceType":"Patient","id":"human","name":[{"use":"Ana2k","given":["Kenzi"]}]}"""
+      )
+    assertThat(mergeLocalChanges(insert_payload_json_node, update_json_patch))
+      .isEqualTo(insertPayloadJsonNode_and_UpdateJsonPatch)
+  }
+
+  @Test
+  fun mergeLocalChanges_insert_delete() { // insert delete
+
     val insert_payload1 =
       LocalChangeEntity(
         id = 1L,
@@ -128,14 +161,122 @@ class LocalChangeUtilsTest {
         type = LocalChangeEntity.Type.DELETE,
         payload = ""
       )
+
     assertThat(mergeLocalChanges(insert_payload1, delete_payload))
       .isEqualTo(insertPayload1_and_deletePayload)
   }
 
+  // UPDATE test cases
   @Test
-  fun mergeLocalChanges_delete_and_insert() {
-    // Expected output when delete_payload and first insert are mixed
-    // ( DELETE AND INSERT1)
+  fun mergeLocalChanges_update_insert() { // update insert
+
+    val update_json_patch =
+      LocalChangeEntity(
+        id = 4L,
+        resourceType = "Test4",
+        resourceId = "Anam4",
+        timestamp = Date().toTimeZoneString(),
+        payload = json_patch,
+        type = LocalChangeEntity.Type.UPDATE
+      )
+    val insert_payload_json_node =
+      LocalChangeEntity(
+        id = 5L,
+        resourceType = "Test5",
+        resourceId = "Anam5",
+        timestamp = Date().toTimeZoneString(),
+        payload = payload_json_node.toString(),
+        type = LocalChangeEntity.Type.INSERT
+      )
+    val UpdateJsonPatch_and_insertPayloadJsonNode =
+      LocalChangeEntity(
+        id = 0L,
+        resourceType = "Test5",
+        resourceId = "Anam5",
+        timestamp = "",
+        type = LocalChangeEntity.Type.INSERT,
+        payload =
+          """{"resourceType":"Patient","id":"human","name":[{"use":"usual","given":["Kenzi"]}]}"""
+      )
+
+    assertThat(mergeLocalChanges(update_json_patch, insert_payload_json_node))
+      .isEqualTo(UpdateJsonPatch_and_insertPayloadJsonNode)
+  }
+
+  @Test
+  fun mergeLocalChanges_update_delete() { // update delete
+
+    val updateJsonPatch =
+      LocalChangeEntity(
+        id = 4L,
+        resourceType = "Test4",
+        resourceId = "Anam4",
+        timestamp = Date().toTimeZoneString(),
+        payload = json_patch,
+        type = LocalChangeEntity.Type.UPDATE
+      )
+    val deletePayload =
+      LocalChangeEntity(
+        id = 3L,
+        resourceType = "Test3",
+        resourceId = "Anam3",
+        timestamp = Date().toTimeZoneString(),
+        payload = "payload3",
+        type = LocalChangeEntity.Type.DELETE
+      )
+    val uploadJsonPatch_deletePayload =
+      LocalChangeEntity(
+        id = 0L,
+        resourceType = "Test3",
+        resourceId = "Anam3",
+        timestamp = "",
+        type = LocalChangeEntity.Type.DELETE,
+        payload = ""
+      )
+
+    assertThat(mergeLocalChanges(updateJsonPatch, deletePayload))
+      .isEqualTo(uploadJsonPatch_deletePayload)
+  }
+
+  @Test
+  fun mergeLocalChanges_update_update() { // update update
+
+    val updateJsonPatch =
+      LocalChangeEntity(
+        id = 4L,
+        resourceType = "Test4",
+        resourceId = "Anam4",
+        timestamp = Date().toTimeZoneString(),
+        payload = json_patch,
+        type = LocalChangeEntity.Type.UPDATE
+      )
+    val updateJsonPatch2 =
+      LocalChangeEntity(
+        id = 2L,
+        resourceType = "Test2",
+        resourceId = "Anam2",
+        timestamp = Date().toTimeZoneString(),
+        payload = json_patch,
+        type = LocalChangeEntity.Type.UPDATE
+      )
+    val updateJsonPatch_and_updateJsonPatch2 =
+      LocalChangeEntity(
+        id = 0L,
+        resourceType = "Test2",
+        resourceId = "Anam2",
+        timestamp = "",
+        type = LocalChangeEntity.Type.UPDATE,
+        payload = """[{"op":"replace","path":"\/name\/0\/use","value":"Ana2k"}]"""
+      )
+
+    assertThat(mergeLocalChanges(updateJsonPatch, updateJsonPatch2))
+      .isEqualTo(updateJsonPatch_and_updateJsonPatch2)
+  }
+
+  // DELETE test cases
+  @Test
+  fun mergeLocalChanges_delete_and_insert() { // delete insert
+
     val delete_payload =
       LocalChangeEntity(
         id = 3L,
@@ -169,9 +310,17 @@ class LocalChangeUtilsTest {
   }
 
   @Test
-  fun mergeLocalChanges_insertPayloadJNode_and_UpdateJpatch() {
-    // Expected output when insert_payload_json_node and update_json_patch are mixed
-    // (INSERT-PayloadJNODE AND UPDATE-JSON-PATCH)
+  fun mergeLocalChanges_delete_and_update() { // delete update
+
+    val delete_payload =
+      LocalChangeEntity(
+        id = 3L,
+        resourceType = "Test3",
+        resourceId = "Anam3",
+        timestamp = Date().toTimeZoneString(),
+        payload = "payload3",
+        type = LocalChangeEntity.Type.DELETE
+      )
     val update_json_patch =
       LocalChangeEntity(
         id = 4L,
@@ -181,26 +330,54 @@ class LocalChangeUtilsTest {
         payload = json_patch,
         type = LocalChangeEntity.Type.UPDATE
       )
-    val insert_payload_json_node =
-      LocalChangeEntity(
-        id = 5L,
-        resourceType = "Test5",
-        resourceId = "Anam5",
-        timestamp = Date().toTimeZoneString(),
-        payload = payload_json_node.toString(),
-        type = LocalChangeEntity.Type.INSERT
-      )
-    val insertPayloadJsonNode_and_UpdateJsonPatch =
+
+    val deletePayload_and_updateJsonPatch =
       LocalChangeEntity(
         id = 0L,
-        resourceType = "Test4",
-        resourceId = "Anam4",
+        resourceType = "Test3",
+        resourceId = "Anam3",
         timestamp = "",
-        type = LocalChangeEntity.Type.INSERT,
-        payload =
-          """{"resourceType":"Patient","id":"human","name":[{"use":"Ana2k","given":["Kenzi"]}]}"""
+        type = LocalChangeEntity.Type.DELETE,
+        payload = ""
       )
-    assertThat(mergeLocalChanges(insert_payload_json_node, update_json_patch))
-      .isEqualTo(insertPayloadJsonNode_and_UpdateJsonPatch)
+    assertThat(mergeLocalChanges(delete_payload, update_json_patch))
+      .isEqualTo(deletePayload_and_updateJsonPatch)
+  } // Illegal Exception required
+  // TEST INCOMPLTE TODO()
+  // giving assert realted exception
+
+  @Test
+  fun mergeLocalChanges_delete_delete() { // delete delete
+
+    val delete_payload =
+      LocalChangeEntity(
+        id = 3L,
+        resourceType = "Test3",
+        resourceId = "Anam3",
+        timestamp = Date().toTimeZoneString(),
+        payload = "payload3",
+        type = LocalChangeEntity.Type.DELETE
+      )
+    val delete_payload2 =
+      LocalChangeEntity(
+        id = 3L,
+        resourceType = "Test2",
+        resourceId = "Anam2",
+        timestamp = Date().toTimeZoneString(),
+        payload = "payload2",
+        type = LocalChangeEntity.Type.DELETE
+      )
+    val deletePayload_deletePayload2 =
+      LocalChangeEntity(
+        id = 0L,
+        resourceType = "Test2",
+        resourceId = "Anam2",
+        timestamp = "",
+        type = LocalChangeEntity.Type.DELETE,
+        payload = ""
+      )
+
+    assertThat(mergeLocalChanges(delete_payload, delete_payload2))
+      .isEqualTo(deletePayload_deletePayload2)
   }
 }
