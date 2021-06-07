@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.SearchView
@@ -62,7 +63,10 @@ class PatientListActivity() : AppCompatActivity() {
     fhirEngine = fhirEngine(this)
 
     patientListViewModel =
-      ViewModelProvider(this, PatientListViewModelFactory(this.application, fhirEngine))
+      ViewModelProvider(
+          this,
+          PatientListViewModel.PatientListViewModelFactory(this.application, fhirEngine)
+        )
         .get(PatientListViewModel::class.java)
     val recyclerView: RecyclerView = findViewById(R.id.patient_list)
 
@@ -75,6 +79,13 @@ class PatientListActivity() : AppCompatActivity() {
         Log.d("PatientListActivity", "Submitting ${it.count()} patient records")
         adapter.submitList(it)
       }
+    )
+
+    patientListViewModel.patientCount.observe(this, { Log.d("PatientListActivity", "$it Patient") })
+
+    patientListViewModel.patientCount.observe(
+      this,
+      { findViewById<TextView>(R.id.patient_count).text = " Patient(s)" }
     )
 
     searchView = findViewById(R.id.search)
