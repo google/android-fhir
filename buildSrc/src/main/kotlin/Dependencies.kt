@@ -26,6 +26,9 @@ object Dependencies {
     const val workRuntimeKtx = "androidx.work:work-runtime-ktx:${Versions.Androidx.workRuntimeKtx}"
   }
 
+  object Protobufs {
+    const val fhirProtobufs = "com.google.fhir:r4:${Versions.Protobufs.fhirprotobuf}"
+  }
   object Cql {
     const val cqlEngine = "org.opencds.cqf:cql-engine:${Versions.Cql.cqlEngine}"
     const val cqlEngineFhir = "org.opencds.cqf:cql-engine-fhir:${Versions.Cql.cqlEngine}"
@@ -106,7 +109,9 @@ object Dependencies {
       const val room = "2.3.0"
       const val workRuntimeKtx = "2.5.0"
     }
-
+    object Protobufs {
+      const val fhirprotobuf = "0.6.1"
+    }
     object Cql {
       const val cqlEngine = "1.3.14-SNAPSHOT"
     }
