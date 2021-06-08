@@ -63,10 +63,6 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
  */
 object ResourceMapper {
 
-  private val context = FhirContext.forR4()
-  private val fhirPathEngine =
-    FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
-
   /**
    * Extract a FHIR resource from the `questionnaire` and `questionnaireResponse`.
    *
@@ -111,6 +107,9 @@ object ResourceMapper {
     expressionMap: HashMap<String, String>,
     resource: Resource
   ): HashMap<String, Any> {
+    val context = FhirContext.forR4()
+    val fhirPathEngine =
+      FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
     val answersHashMap = HashMap<String, Any>()
     val expressionMapIterator = expressionMap.keys.iterator()
     while (expressionMapIterator.hasNext()) {

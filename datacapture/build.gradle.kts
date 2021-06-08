@@ -90,6 +90,7 @@ dependencies {
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
+  implementation(Dependencies.fhirEngine)
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
