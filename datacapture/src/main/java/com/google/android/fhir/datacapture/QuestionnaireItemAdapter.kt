@@ -48,7 +48,9 @@ internal class QuestionnaireItemAdapter(
    */
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
     val numOfCanonicalWidgets = QuestionnaireItemViewHolderType.values().size
-    check(viewType < numOfCanonicalWidgets + questionnaireItemViewHolderMatchers.size) {  "Invalid widget type specified. Widget Int type cannot exceed the total number of supported custom and canonical widgets" }
+    check(viewType < numOfCanonicalWidgets + questionnaireItemViewHolderMatchers.size) {
+      "Invalid widget type specified. Widget Int type cannot exceed the total number of supported custom and canonical widgets"
+    }
 
     // Map custom widget viewTypes to their corresponding widget factories
     if (viewType >= numOfCanonicalWidgets)

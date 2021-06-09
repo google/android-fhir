@@ -20,8 +20,6 @@ import android.os.Build
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import com.google.common.truth.Truth.assertThat
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
@@ -34,7 +32,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
@@ -367,21 +364,21 @@ class QuestionnaireItemAdapterTest {
         QuestionnaireItemViewHolderType.values().size
       )
     assertThat(actualQuestionnaireItemViewHolder).isNotNull()
-    assertThat(viewFactoryMatchers[0].factory.create(mock())).isEqualTo( actualQuestionnaireItemViewHolder)
+    assertThat(viewFactoryMatchers[0].factory.create(mock()))
+      .isEqualTo(actualQuestionnaireItemViewHolder)
   }
 
   @Test
   fun onCreateViewHolder_customViewType_shouldThrowExceptionForInvalidWidgetType() {
     val viewFactoryMatchers = getQuestionnaireItemViewHolderFactoryMatchers()
-    val questionnaireItemAdapter =
-            QuestionnaireItemAdapter(viewFactoryMatchers)
-          assertThrows(IllegalStateException::class.java) {
-            QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
-            questionnaireItemAdapter.onCreateViewHolder(
-                    mock(),
-                    QuestionnaireItemViewHolderType.values().size + viewFactoryMatchers.size
-            )
-          }
+    val questionnaireItemAdapter = QuestionnaireItemAdapter(viewFactoryMatchers)
+    assertThrows(IllegalStateException::class.java) {
+      QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
+      questionnaireItemAdapter.onCreateViewHolder(
+        mock(),
+        QuestionnaireItemViewHolderType.values().size + viewFactoryMatchers.size
+      )
+    }
   }
 
   @Test
@@ -402,9 +399,9 @@ class QuestionnaireItemAdapterTest {
     List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> {
     return listOf(
       QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher(
-              mock<QuestionnaireItemViewHolderFactory>().apply{
-                whenever(create(any())).thenReturn(mock())
-              }
+        mock<QuestionnaireItemViewHolderFactory>().apply {
+          whenever(create(any())).thenReturn(mock())
+        }
       ) { questionnaireItem -> questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATE }
     )
   }

@@ -17,15 +17,14 @@
 package com.google.android.fhir.datacapture.gallery
 
 import com.google.android.fhir.datacapture.QuestionnaireFragment
-import org.hl7.fhir.r4.model.Questionnaire
 
 class CustomQuestionnaireFragment : QuestionnaireFragment() {
   override fun getQuestionnaireItemViewHolderFactoryMatchers():
     List<QuestionnaireItemViewHolderFactoryMatcher> {
     return listOf(
       QuestionnaireItemViewHolderFactoryMatcher(CustomNumberPickerFactory) { questionnaireItem ->
-        questionnaireItem.getExtensionByUrl("http://dummy-widget-type-extension").run {
-           if (this == null) false else this.value.toString() == "number-picker"
+        questionnaireItem.getExtensionByUrl("http://dummy-widget-type-extension").let {
+          if (it == null) false else it.value.toString() == "number-picker"
         }
       }
     )
