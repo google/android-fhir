@@ -24,7 +24,9 @@ class CustomQuestionnaireFragment : QuestionnaireFragment() {
     List<QuestionnaireItemViewHolderFactoryMatcher> {
     return listOf(
       QuestionnaireItemViewHolderFactoryMatcher(CustomNumberPickerFactory) { questionnaireItem ->
-        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATE
+        questionnaireItem.getExtensionByUrl("http://dummy-widget-type-extension").run {
+           if (this == null) false else this.value.toString() == "number-picker"
+        }
       }
     )
   }
