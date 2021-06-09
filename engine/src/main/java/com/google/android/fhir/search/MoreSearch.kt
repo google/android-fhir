@@ -116,14 +116,13 @@ fun StringFilter.query(type: ResourceType): SearchQuery {
   )
 }
 
+/**
+ * Extension function that returns a SearchQuery based on the value and prefix of the NumberFilter
+ */
 fun NumberFilter.query(type: ResourceType): SearchQuery {
   val value = value!!
-  val precision =
-    when {
-      value.scale() >= 0 ->
-        BigDecimal(1).divide(BigDecimal(10).pow(value.scale())).divide(BigDecimal(2))
-      else -> BigDecimal(5)
-    }
+
+  val precision = value.getRange()
 
   val conditionParamPair = getConditionParamPair(prefix, value, precision)
 
@@ -173,7 +172,11 @@ val Order?.sqlString: String
       null -> ""
     }
 
-fun getConditionParamPair(
+/**
+ * returns the condition and list of params required in NumberFilter.query see
+ * https://www.hl7.org/fhir/search.html#number
+ */
+private fun getConditionParamPair(
   prefix: ParamPrefixEnum?,
   value: BigDecimal,
   precision: BigDecimal
@@ -204,5 +207,24 @@ fun getConditionParamPair(
       "index_value >= ? AND index_value <= ?" to
         listOf((value - range).toDouble(), (value + range).toDouble())
     }
+  }
+}
+
+/**
+ * Extension function that returns the range in which the value should lie for it to be considered a
+ * match (@see NumberFilter.query) . The value is directly related to the scale of the BigDecimal.
+ *
+ * For example A search for 100.00 (has a scale of 2) would match any value in [99.995, 100.005) and
+ * the function returns 0.005
+ *
+ * For Big integers which have a negative scale the function returns 5 For example A search for 1e3
+ * would match any value in [995, 1005) and the function returns 5
+ *
+ * Note 100 is considered to have 2 significant digits
+ */
+private fun BigDecimal.getRange(): BigDecimal {
+  return when {
+    scale() >= 0 -> BigDecimal(0.5).divide(BigDecimal(10).pow(scale()))
+    else -> BigDecimal(5)
   }
 }

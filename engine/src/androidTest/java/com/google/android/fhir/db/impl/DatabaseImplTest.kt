@@ -374,49 +374,46 @@ class DatabaseImplTest {
     }
 
   @Test
-  fun search_string_default() {
+  fun search_string_default() = runBlocking {
     val patient =
       Patient().apply {
         id = "test_1"
         addName(HumanName().addGiven("Evelyn"))
       }
-    val res = runBlocking {
-      database.insert(patient)
+    database.insert(patient)
+    val result =
       database.search<Patient>(
         Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { value = "eve" } }.getQuery()
       )
-    }
 
-    assertThat(res).hasSize(1)
-    assertThat(res[0].id).isEqualTo("Patient/${patient.id}")
+    assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
   }
 
   @Test
-  fun search_string_default_no_match() {
+  fun search_string_default_no_match() = runBlocking {
     val patient =
       Patient().apply {
         id = "test_1"
         addName(HumanName().addGiven("Severine"))
       }
-    val res = runBlocking {
-      database.insert(patient)
+    database.insert(patient)
+    val result =
       database.search<Patient>(
         Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { value = "eve" } }.getQuery()
       )
-    }
 
-    assertThat(res).hasSize(0)
+    assertThat(result).isEmpty()
   }
 
   @Test
-  fun search_string_exact() {
+  fun search_string_exact() = runBlocking {
     val patient =
       Patient().apply {
         id = "test_1"
         addName(HumanName().addGiven("Eve"))
       }
-    val res = runBlocking {
-      database.insert(patient)
+    database.insert(patient)
+    val result =
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
@@ -427,21 +424,19 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(1)
-    assertThat(res[0].id).isEqualTo("Patient/${patient.id}")
+    assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
   }
 
   @Test
-  fun search_string_exact_no_match() {
+  fun search_string_exact_no_match() = runBlocking {
     val patient =
       Patient().apply {
         id = "test_1"
         addName(HumanName().addGiven("EVE"))
       }
-    val res = runBlocking {
-      database.insert(patient)
+    database.insert(patient)
+    val result =
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
@@ -452,21 +447,20 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(0)
+    assertThat(result).isEmpty()
   }
 
   @Test
-  fun search_string_contains() {
+  fun search_string_contains() = runBlocking {
     val patient =
       Patient().apply {
         id = "test_1"
         addName(HumanName().addGiven("Severine"))
       }
 
-    val res = runBlocking {
-      database.insert(patient)
+    database.insert(patient)
+    val result =
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
@@ -477,21 +471,19 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(1)
-    assertThat(res[0].id).isEqualTo("Patient/${patient.id}")
+    assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
   }
 
   @Test
-  fun search_string_contains_no_match() {
+  fun search_string_contains_no_match() = runBlocking {
     val patient =
       Patient().apply {
         id = "test_1"
         addName(HumanName().addGiven("John"))
       }
-    val res = runBlocking {
-      database.insert(patient)
+    database.insert(patient)
+    val result =
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
@@ -502,13 +494,12 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(0)
+    assertThat(result).isEmpty()
   }
 
   @Test
-  fun search_number_equal() {
+  fun search_number_equal() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -517,8 +508,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -529,14 +520,12 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(1)
-    assertThat(res[0].id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
-  fun search_number_equal_no_match() {
+  fun search_number_equal_no_match() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -545,8 +534,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -557,13 +546,12 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(0)
+    assertThat(result).isEmpty()
   }
 
   @Test
-  fun search_number_notEqual() {
+  fun search_number_notEqual() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -572,8 +560,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -584,14 +572,11 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
-
-    assertThat(res).hasSize(1)
-    assertThat(res[0].id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
-  fun search_number_notEqual_no_match() {
+  fun search_number_notEqual_no_match() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -600,8 +585,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -612,13 +597,12 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(0)
+    assertThat(result).isEmpty()
   }
 
   @Test
-  fun search_number_greater() {
+  fun search_number_greater() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -627,8 +611,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -639,14 +623,12 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(1)
-    assertThat(res[0].id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
-  fun search_number_greater_no_match() {
+  fun search_number_greater_no_match() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -655,8 +637,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -667,13 +649,12 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(0)
+    assertThat(result).isEmpty()
   }
 
   @Test
-  fun search_number_greaterThanEqual() {
+  fun search_number_greaterThanEqual() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -682,8 +663,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -694,14 +675,12 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(1)
-    assertThat(res[0].id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
-  fun search_number_greaterThanEqual_no_match() {
+  fun search_number_greaterThanEqual_no_match() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -710,8 +689,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -722,13 +701,12 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(0)
+    assertThat(result).isEmpty()
   }
 
   @Test
-  fun search_number_less() {
+  fun search_number_less() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -737,8 +715,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -749,14 +727,12 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(1)
-    assertThat(res[0].id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
-  fun search_number_less_no_match() {
+  fun search_number_less_no_match() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -765,8 +741,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -777,13 +753,12 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(0)
+    assertThat(result).isEmpty()
   }
 
   @Test
-  fun search_number_lessThanEquals() {
+  fun search_number_lessThanEquals() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -792,8 +767,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -804,14 +779,11 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
-
-    assertThat(res).hasSize(1)
-    assertThat(res[0].id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
-  fun search_number_lessThanEquals_no_match() {
+  fun search_number_lessThanEquals_no_match() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -820,8 +792,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -832,13 +804,12 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(0)
+    assertThat(result).isEmpty()
   }
 
   @Test
-  fun search_decimal_endsBefore() {
+  fun search_decimal_endsBefore() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -847,8 +818,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -859,14 +830,12 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(1)
-    assertThat(res[0].id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
-  fun search_decimal_endsBefore_no_match() {
+  fun search_decimal_endsBefore_no_match() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -875,8 +844,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -887,13 +856,12 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(0)
+    assertThat(result).isEmpty()
   }
 
   @Test
-  fun search_decimal_startAfter() {
+  fun search_decimal_startAfter() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -902,8 +870,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -914,14 +882,12 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(1)
-    assertThat(res[0].id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
-  fun search_decimal_startAfter_no_match() {
+  fun search_decimal_startAfter_no_match() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -930,8 +896,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -942,13 +908,12 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(0)
+    assertThat(result).isEmpty()
   }
 
   @Test
-  fun search_number_Approximate() {
+  fun search_number_Approximate() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -957,8 +922,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -969,14 +934,12 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(1)
-    assertThat(res[0].id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
-  fun search_number_approximate_no_match() {
+  fun search_number_approximate_no_match() = runBlocking {
     val riskAssessment =
       RiskAssessment().apply {
         id = "1"
@@ -985,8 +948,8 @@ class DatabaseImplTest {
         )
       }
 
-    val res = runBlocking {
-      database.insert(riskAssessment)
+    database.insert(riskAssessment)
+    val result =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply {
@@ -997,9 +960,8 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(0)
+    assertThat(result).isEmpty()
   }
 
   private companion object {
