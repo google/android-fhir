@@ -372,13 +372,14 @@ class QuestionnaireItemAdapterTest {
 
   @Test
   fun onCreateViewHolder_customViewType_shouldThrowExceptionForInvalidWidgetType() {
+    val viewFactoryMatchers = getQuestionnaireItemViewHolderFactoryMatchers()
     val questionnaireItemAdapter =
-            QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
+            QuestionnaireItemAdapter(viewFactoryMatchers)
           assertThrows(IllegalStateException::class.java) {
             QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
             questionnaireItemAdapter.onCreateViewHolder(
                     mock(),
-                    QuestionnaireItemViewHolderType.values().size + 1
+                    QuestionnaireItemViewHolderType.values().size + viewFactoryMatchers.size
             )
           }
   }
@@ -399,11 +400,11 @@ class QuestionnaireItemAdapterTest {
 
   private fun getQuestionnaireItemViewHolderFactoryMatchers():
     List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> {
-    val customQuestionnaireItemViewHolderFactory: QuestionnaireItemViewHolderFactory = mock()
-    whenever(customQuestionnaireItemViewHolderFactory.create(any())).thenReturn(mock())
     return listOf(
       QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher(
-        customQuestionnaireItemViewHolderFactory
+              mock<QuestionnaireItemViewHolderFactory>().apply{
+                whenever(create(any())).thenReturn(mock())
+              }
       ) { questionnaireItem -> questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATE }
     )
   }
