@@ -27,12 +27,14 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
@@ -364,18 +366,21 @@ class QuestionnaireItemAdapterTest {
         mock(),
         QuestionnaireItemViewHolderType.values().size
       )
-    assertNotNull(actualQuestionnaireItemViewHolder)
-    assertEquals(viewFactoryMatchers[0].factory.create(mock()), actualQuestionnaireItemViewHolder)
+    assertThat(actualQuestionnaireItemViewHolder).isNotNull()
+    assertThat(viewFactoryMatchers[0].factory.create(mock())).isEqualTo( actualQuestionnaireItemViewHolder)
   }
 
-  @Test(expected = QuestionnaireItemAdapter.InvalidQuestionnaireWidgetTypeException::class)
+  @Test
   fun onCreateViewHolder_customViewType_shouldThrowExceptionForInvalidWidgetType() {
     val questionnaireItemAdapter =
-      QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
-    questionnaireItemAdapter.onCreateViewHolder(
-      mock(),
-      QuestionnaireItemViewHolderType.values().size + 1
-    )
+            QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
+          assertThrows(IllegalStateException::class.java) {
+            QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
+            questionnaireItemAdapter.onCreateViewHolder(
+                    mock(),
+                    QuestionnaireItemViewHolderType.values().size + 1
+            )
+          }
   }
 
   @Test
@@ -389,7 +394,7 @@ class QuestionnaireItemAdapterTest {
       QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
     val actualItemViewType =
       questionnaireItemAdapter.getItemViewTypeMapping(questionnaireItemViewItem)
-    assertEquals(expectedItemViewType, actualItemViewType)
+    assertThat(expectedItemViewType).isEqualTo(actualItemViewType)
   }
 
   private fun getQuestionnaireItemViewHolderFactoryMatchers():

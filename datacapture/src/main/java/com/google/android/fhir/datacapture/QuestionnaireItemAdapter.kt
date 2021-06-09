@@ -48,9 +48,7 @@ internal class QuestionnaireItemAdapter(
    */
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
     val numOfCanonicalWidgets = QuestionnaireItemViewHolderType.values().size
-    if (viewType >= numOfCanonicalWidgets + questionnaireItemViewHolderMatchers.size) {
-      throw InvalidQuestionnaireWidgetTypeException()
-    }
+    check(viewType < numOfCanonicalWidgets + questionnaireItemViewHolderMatchers.size) {  "Invalid widget type specified. Widget Int type cannot exceed the total number of supported custom and canonical widgets" }
 
     // Map custom widget viewTypes to their corresponding widget factories
     if (viewType >= numOfCanonicalWidgets)
@@ -104,9 +102,9 @@ internal class QuestionnaireItemAdapter(
   ): Int {
     // For custom widgets, generate an int value that's greater than any int assigned to the
     // canonical FHIR widgets
-    for (i in questionnaireItemViewHolderMatchers.indices) {
-      if (questionnaireItemViewHolderMatchers[i].matches(questionnaireItem)) {
-        return i + QuestionnaireItemViewHolderType.values().size
+    questionnaireItemViewHolderMatchers.forEachIndexed { index, matcher ->
+      if (matcher.matches(questionnaireItem)) {
+        return index + QuestionnaireItemViewHolderType.values().size
       }
     }
 
@@ -125,11 +123,6 @@ internal class QuestionnaireItemAdapter(
       else -> throw NotImplementedError("Question type $type not supported.")
     }.value
   }
-
-  internal class InvalidQuestionnaireWidgetTypeException(
-    override val message: String? =
-      "Invalid widget type specified. Widget Int type cannot exceed the total number of supported custom and canonical widgets"
-  ) : IllegalArgumentException(message)
 
   private fun getChoiceViewHolderType(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
