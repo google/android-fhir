@@ -211,16 +211,15 @@ private fun getConditionParamPair(
 }
 
 /**
- * Extension function that returns the range in which the value should lie for it to be considered a
- * match (@see NumberFilter.query) . The value is directly related to the scale of the BigDecimal.
+ * Returns the range in which the value should lie for it to be considered a match (@see NumberFilter.query). The value is directly related to the scale of the BigDecimal.
  *
- * For example A search for 100.00 (has a scale of 2) would match any value in [99.995, 100.005) and
- * the function returns 0.005
+ * For example, a search with a value 100.00 (has a scale of 2) would match any value in [99.995, 100.005) and
+ * the function returns 0.005.
  *
- * For Big integers which have a negative scale the function returns 5 For example A search for 1e3
- * would match any value in [995, 1005) and the function returns 5
+ * For Big integers which have a negative scale the function returns 5 For example A search with a value 1000
+ * would match any value in [995, 1005) and the function returns 5.
  *
- * Note 100 is considered to have 2 significant digits
+ * Note 100 is considered to have 2 significant digits.
  */
 private fun BigDecimal.getRange(): BigDecimal {
   return when {
