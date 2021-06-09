@@ -173,8 +173,8 @@ val Order?.sqlString: String
     }
 
 /**
- * returns the condition and list of params required in NumberFilter.query see
- * https://www.hl7.org/fhir/search.html#number
+ * Returns the condition and list of params required in NumberFilter.query see
+ * https://www.hl7.org/fhir/search.html#number.
  */
 private fun getConditionParamPair(
   prefix: ParamPrefixEnum?,
