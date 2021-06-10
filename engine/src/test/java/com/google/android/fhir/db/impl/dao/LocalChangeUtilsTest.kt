@@ -22,8 +22,8 @@ import com.google.android.fhir.db.impl.dao.LocalChangeUtils.mergeLocalChanges
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.toTimeZoneString
 import com.google.common.truth.Truth.assertThat
-import org.junit.Assert
 import java.util.Date
+import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -31,6 +31,34 @@ import org.robolectric.RobolectricTestRunner
 /** Unit tests for [LocalChangeUtils]. */
 @RunWith(RobolectricTestRunner::class)
 class LocalChangeUtilsTest {
+
+  @Test
+  fun mergeLocalChange_checkResourceID() {
+    val res1_typeDelete =
+      LocalChangeEntity(
+        id = 10L,
+        resourceType = "Test3",
+        resourceId = "Anam10",
+        timestamp = Date().toTimeZoneString(),
+        payload = "payload3",
+        type = LocalChangeEntity.Type.DELETE
+      )
+    val res2_typeInsert =
+      LocalChangeEntity(
+        id = 30L,
+        resourceType = "Test1",
+        resourceId = "Anam30",
+        timestamp = Date().toTimeZoneString(),
+        payload = "payload1",
+        type = LocalChangeEntity.Type.INSERT
+      )
+
+    val exception: Throwable =
+      Assert.assertThrows(IllegalStateException::class.java) {
+        mergeLocalChanges(res1_typeDelete, res2_typeInsert)
+      }
+    assertThat("Resource IDs Anam10 and Anam30 do not match").isEqualTo(exception.message)
+  }
 
   // INSERT-INSERT,UPDATE,DELETE test cases
   @Test
@@ -126,7 +154,7 @@ class LocalChangeUtilsTest {
         timestamp = "",
         type = LocalChangeEntity.Type.INSERT,
         payload =
-        """{"resourceType":"Patient","id":"human","name":[{"use":"Ana2k","given":["Kenzi"]}]}"""
+          """{"resourceType":"Patient","id":"human","name":[{"use":"Ana2k","given":["Kenzi"]}]}"""
       )
     assertThat(mergeLocalChanges(insert_payload_json_node, update_json_patch))
       .isEqualTo(insertPayloadJsonNode_and_UpdateJsonPatch)
@@ -227,7 +255,7 @@ class LocalChangeUtilsTest {
         timestamp = "",
         type = LocalChangeEntity.Type.INSERT,
         payload =
-        """{"resourceType":"Patient","id":"human","name":[{"use":"usual","given":["Kenzi"]}]}"""
+          """{"resourceType":"Patient","id":"human","name":[{"use":"usual","given":["Kenzi"]}]}"""
       )
 
     assertThat(mergeLocalChanges(update_json_patch, insert_payload_json_node))
@@ -395,9 +423,10 @@ class LocalChangeUtilsTest {
         type = LocalChangeEntity.Type.UPDATE
       )
 
-    val exception: Throwable = Assert.assertThrows(IllegalArgumentException::class.java) {
-      mergeLocalChanges(delete_payload, update_json_patch)
-    }
+    val exception: Throwable =
+      Assert.assertThrows(IllegalArgumentException::class.java) {
+        mergeLocalChanges(delete_payload, update_json_patch)
+      }
     assertThat("Cannot merge local changes with type DELETE and UPDATE.")
       .isEqualTo(exception.message)
   }
