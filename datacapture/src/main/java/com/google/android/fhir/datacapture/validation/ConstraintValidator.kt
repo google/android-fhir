@@ -19,9 +19,10 @@ package com.google.android.fhir.datacapture.validation
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
+/** A interface for validating FHIR native supported constraints on a questionnaire response. */
 internal interface ConstraintValidator {
   /**
-   * Validates the `answer`(s) in [questionnaireResponseItem] satify any constraints of the
+   * Validates the `answer`(s) in [questionnaireResponseItem] satisfy any constraints of the
    * [questionnaireItem] according to the [structured data capture implementation guide]
    * (http://build.fhir.org/ig/HL7/sdc/behavior.html). This does not validate the
    * [questionnaireResponseItem] and its child items are structurally consistent with the
