@@ -16,19 +16,11 @@
 
 package com.google.android.fhir.datacapture.validation
 
-import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-/** A validator to check if the value of an answer is at least the permitted value. */
-internal object MinValueConstraintValidator :
-  ValueConstraintExtensionValidator(
-    url = MIN_VALUE_EXTENSION_URL,
-    predicate = {
-      extension: Extension,
-      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
-      answer.value < extension.value
-    },
-    { extension: Extension -> "Minimum value allowed is:" + extension.value.primitiveValue() }
-  )
-
-internal const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"
+/** A data class which holds the questionnaire requirement and response. */
+data class QuestionnaireTestItem(
+  val requirement: Questionnaire.QuestionnaireItemComponent,
+  val response: QuestionnaireResponse.QuestionnaireResponseItemComponent
+)
