@@ -22,6 +22,7 @@ import com.google.android.fhir.db.impl.dao.LocalChangeUtils.mergeLocalChanges
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.toTimeZoneString
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assert
 import java.util.Date
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -331,20 +332,12 @@ class LocalChangeUtilsTest {
         type = LocalChangeEntity.Type.UPDATE
       )
 
-    val deletePayload_and_updateJsonPatch =
-      LocalChangeEntity(
-        id = 0L,
-        resourceType = "Test3",
-        resourceId = "Anam3",
-        timestamp = "",
-        type = LocalChangeEntity.Type.DELETE,
-        payload = ""
-      )
-    assertThat(mergeLocalChanges(delete_payload, update_json_patch))
-      .isEqualTo(deletePayload_and_updateJsonPatch)
-  } // Illegal Exception required
-  // TEST INCOMPLTE TODO()
-  // giving assert realted exception
+    val exception: Throwable = Assert.assertThrows(IllegalArgumentException::class.java) {
+      mergeLocalChanges(delete_payload, update_json_patch)
+    }
+    assertThat("Cannot merge local changes with type DELETE and UPDATE.")
+      .isEqualTo(exception.message)
+  }
 
   @Test
   fun mergeLocalChanges_delete_delete() { // delete delete
