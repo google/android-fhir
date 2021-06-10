@@ -42,9 +42,6 @@ object Dependencies {
   }
 
   object Lifecycle {
-    const val extensions = "androidx.lifecycle:lifecycle-extensions:${Versions.Androidx.lifecycle}"
-    const val liveDataCoreKtx =
-      "androidx.lifecycle:lifecycle-livedata-core-ktx:${Versions.Androidx.lifecycle}"
     const val liveDataKtx =
       "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.Androidx.lifecycle}"
     const val runtime = "androidx.lifecycle:lifecycle-runtime:${Versions.Androidx.lifecycle}"
@@ -107,7 +104,7 @@ object Dependencies {
       const val navigation = "2.3.4"
       const val recyclerView = "1.1.0"
       const val room = "2.3.0"
-      const val workRuntimeKtx = "2.3.4"
+      const val workRuntimeKtx = "2.5.0"
     }
 
     object Cql {
@@ -117,7 +114,7 @@ object Dependencies {
     object Kotlin {
       const val androidxCoreKtx = "1.2.0"
       const val kotlinCoroutinesCore = "1.4.2"
-      const val stdlib = "1.4.30"
+      const val stdlib = "1.4.31"
     }
 
     const val caffeine = "2.9.0"

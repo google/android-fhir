@@ -22,23 +22,39 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.Constraints
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.FhirApplication.Companion.fhirEngine
+import com.google.android.fhir.reference.data.FhirPeriodicSyncWorker
+import com.google.android.fhir.sync.PeriodicSyncConfiguration
+import com.google.android.fhir.sync.RepeatInterval
+import com.google.android.fhir.sync.Sync
+import java.util.concurrent.TimeUnit
 
 /** An activity representing a list of Patients. */
 class PatientListActivity() : AppCompatActivity() {
   private lateinit var fhirEngine: FhirEngine
   private lateinit var patientListViewModel: PatientListViewModel
-
+  private lateinit var searchView: SearchView
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     Log.d("PatientListActivity", "onCreate() called")
     setContentView(R.layout.activity_patient_list)
+
+    Sync.periodicSync<FhirPeriodicSyncWorker>(
+      this,
+      PeriodicSyncConfiguration(
+        syncConstraints = Constraints.Builder().build(),
+        repeat = RepeatInterval(interval = 1, timeUnit = TimeUnit.MINUTES)
+      )
+    )
 
     val toolbar = findViewById<Toolbar>(R.id.toolbar)
     setSupportActionBar(toolbar)
@@ -47,7 +63,10 @@ class PatientListActivity() : AppCompatActivity() {
     fhirEngine = fhirEngine(this)
 
     patientListViewModel =
-      ViewModelProvider(this, PatientListViewModelFactory(this.application, fhirEngine))
+      ViewModelProvider(
+          this,
+          PatientListViewModel.PatientListViewModelFactory(this.application, fhirEngine)
+        )
         .get(PatientListViewModel::class.java)
     val recyclerView: RecyclerView = findViewById(R.id.patient_list)
 
@@ -59,6 +78,28 @@ class PatientListActivity() : AppCompatActivity() {
       {
         Log.d("PatientListActivity", "Submitting ${it.count()} patient records")
         adapter.submitList(it)
+      }
+    )
+
+    patientListViewModel.patientCount.observe(this, { Log.d("PatientListActivity", "$it Patient") })
+
+    patientListViewModel.patientCount.observe(
+      this,
+      { findViewById<TextView>(R.id.patient_count).text = " Patient(s)" }
+    )
+
+    searchView = findViewById(R.id.search)
+    searchView.setOnQueryTextListener(
+      object : SearchView.OnQueryTextListener {
+        override fun onQueryTextChange(newText: String): Boolean {
+          patientListViewModel.searchPatientsByName(newText)
+          return true
+        }
+
+        override fun onQueryTextSubmit(query: String): Boolean {
+          patientListViewModel.searchPatientsByName(query)
+          return true
+        }
       }
     )
   }
@@ -84,5 +125,9 @@ class PatientListActivity() : AppCompatActivity() {
       menu.setOptionalIconsVisible(true)
     }
     return true
+  }
+
+  override fun onBackPressed() {
+    if (searchView.query.isNotEmpty()) searchView.setQuery("", true) else super.onBackPressed()
   }
 }
