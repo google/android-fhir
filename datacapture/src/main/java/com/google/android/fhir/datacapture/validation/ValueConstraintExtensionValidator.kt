@@ -20,7 +20,8 @@ import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal open class ValueConstraintValidator(
+/** A interface for validating constraints from FHIR extension on a questionnaire response. */
+internal open class ValueConstraintExtensionValidator(
   val url: String,
   val predicate:
     (Extension, QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> Boolean,
@@ -32,6 +33,7 @@ internal open class ValueConstraintValidator(
   ): ConstraintValidator.ConstraintValidationResult {
     if (questionnaireItem.hasExtension(url)) {
       val extension = questionnaireItem.getExtensionByUrl(url)
+      // TODO(https://github.com/google/android-fhir/issues/487): Validates all answers.
       val answer = questionnaireResponseItem.answer[0]
       if (predicate(extension, answer)) {
         return ConstraintValidator.ConstraintValidationResult(false, messageGenerator(extension))

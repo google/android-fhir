@@ -26,7 +26,11 @@ internal suspend fun <R : Resource> Search.execute(database: Database): List<R> 
   return database.search(getQuery())
 }
 
-fun Search.getQuery(): SearchQuery {
+internal suspend fun Search.count(database: Database): Long {
+  return database.count(getQuery(true))
+}
+
+fun Search.getQuery(isCount: Boolean = false): SearchQuery {
   var sortJoinStatement = ""
   var sortOrderStatement = ""
   val sortArgs = mutableListOf<Any>()
@@ -78,7 +82,7 @@ fun Search.getQuery(): SearchQuery {
 
   val query =
     """
-    SELECT a.serializedResource
+    SELECT ${ if (isCount) "COUNT(*)" else "a.serializedResource" }
     FROM ResourceEntity a
     $sortJoinStatement
     WHERE a.resourceType = ?

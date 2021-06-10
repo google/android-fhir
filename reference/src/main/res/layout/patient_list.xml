@@ -14,17 +14,32 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<androidx.recyclerview.widget.RecyclerView
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/patient_list"
-    android:name="com.google.fhirengine.example.PatientListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    app:layoutManager="LinearLayoutManager"
-    tools:context=".PatientListActivity"
-    tools:listitem="@layout/patient_list_item"
-/>
+>
+
+    <TextView
+        android:id="@+id/patient_count"
+        android:text="0 Patients"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+    />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/patient_list"
+        android:layout_below="@+id/patient_count"
+        android:name="com.google.fhirengine.example.PatientListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        app:layoutManager="LinearLayoutManager"
+        tools:context=".PatientListActivity"
+        tools:listitem="@layout/patient_list_item"
+    />
+</RelativeLayout>
