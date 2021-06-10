@@ -36,6 +36,11 @@ internal object LocalChangeUtils {
   fun mergeLocalChanges(first: LocalChangeEntity, second: LocalChangeEntity): LocalChangeEntity {
     val type: LocalChangeEntity.Type
     val payload: String
+
+    check(first.resourceId == second.resourceId) {
+      "Resource IDs ${first.resourceId} and ${second.resourceId} do not match"
+    } //check resource IDs-- throws illegal state exceptions
+
     when (second.type) {
       LocalChangeEntity.Type.UPDATE ->
         when {
