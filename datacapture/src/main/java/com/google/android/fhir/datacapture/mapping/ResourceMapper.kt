@@ -27,6 +27,7 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -180,6 +181,11 @@ private fun generateAnswerWithCorrectType(answer: Base, fieldType: Field): Base 
         return CodeableConcept(answer).apply { text = answer.display }
       }
     }
+    IdType::class.java -> {
+      if (answer is StringType) {
+        return IdType(answer.value)
+      }
+    }
   }
 
   return answer
@@ -269,7 +275,7 @@ private val Questionnaire.QuestionnaireItemComponent.getDefinitionField: Field?
  * .
  */
 private const val ITEM_CONTEXT_EXTENSION_URL: String =
-  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext"
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
 
 private val Field.isList: Boolean
   get() = isParameterized && type == List::class.java

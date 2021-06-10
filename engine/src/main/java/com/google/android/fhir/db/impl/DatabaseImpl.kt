@@ -93,11 +93,11 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
   }
 
   override suspend fun insertSyncedResources(
-    syncedResourceEntity: SyncedResourceEntity,
+    syncedResources: List<SyncedResourceEntity>,
     resources: List<Resource>
   ) {
     db.withTransaction {
-      syncedResourceDao.insert(syncedResourceEntity)
+      syncedResourceDao.insertAll(syncedResources)
       insertRemote(*resources.toTypedArray())
     }
   }
@@ -114,6 +114,9 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
     resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).map {
       iParser.parseResource(it) as R
     }
+
+  override suspend fun count(query: SearchQuery): Long =
+    resourceDao.countResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
 
   /**
    * @returns a list of pairs. Each pair is a token + squashed local change. Each token is a list of

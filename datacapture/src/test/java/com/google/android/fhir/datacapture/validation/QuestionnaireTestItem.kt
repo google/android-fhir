@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync
+package com.google.android.fhir.datacapture.validation
 
-/** Configuration for synchronization. */
-data class SyncConfiguration(
-  /** Data that needs to be synchronised */
-  val syncData: List<SyncData> = emptyList(),
-  /**
-   * true if the SDK needs to retry a failed sync attempt, false otherwise If this is set to true,
-   * then the result of the sync will be reported after the retry.
-   */
-  val retry: Boolean = false
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
+
+/** A data class which holds the questionnaire requirement and response. */
+data class QuestionnaireTestItem(
+  val requirement: Questionnaire.QuestionnaireItemComponent,
+  val response: QuestionnaireResponse.QuestionnaireResponseItemComponent
 )

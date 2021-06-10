@@ -19,8 +19,9 @@ package com.google.android.fhir.datacapture.validation
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
+/** A validator to check if the value of an answer is at least the permitted value. */
 internal object MinValueConstraintValidator :
-  ValueConstraintValidator(
+  ValueConstraintExtensionValidator(
     url = MIN_VALUE_EXTENSION_URL,
     predicate = {
       extension: Extension,
