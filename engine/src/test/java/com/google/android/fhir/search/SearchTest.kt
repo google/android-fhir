@@ -31,6 +31,7 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.UriType
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -638,18 +639,27 @@ class SearchTest {
 
   @Test
   fun search_number_equals() {
-    val query =
-      Search(ResourceType.RiskAssessment)
-        .apply {
-          filter(RiskAssessment.PROBABILITY) {
-            prefix = ParamPrefixEnum.EQUAL
-            value = BigDecimal("100.00")
+    // x contains pairs of values and their corresponding range (see BigDecimal.getRange() in
+    // MoreSearch.KT)
+    for (x in
+      listOf(
+        BigDecimal("100") to BigDecimal("0.5"),
+        BigDecimal("1e2") to BigDecimal("5"),
+        BigDecimal("100.00") to BigDecimal("0.005"),
+        BigDecimal("1e3") to BigDecimal("5")
+      )) {
+      val query =
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.EQUAL
+              value = x.first
+            }
           }
-        }
-        .getQuery()
-    assertThat(query.query)
-      .isEqualTo(
-        """ 
+          .getQuery()
+      assertThat(query.query)
+        .isEqualTo(
+          """ 
         SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
@@ -657,19 +667,20 @@ class SearchTest {
         SELECT resourceId FROM NumberIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value < ?
         )
-        """.trimIndent()
-      )
-
-    assertThat(query.args)
-      .isEqualTo(
-        listOf(
-          ResourceType.RiskAssessment.name,
-          ResourceType.RiskAssessment.name,
-          RiskAssessment.PROBABILITY.paramName,
-          BigDecimal.valueOf(99.995).toDouble(),
-          BigDecimal.valueOf(100.005).toDouble()
+          """.trimIndent()
         )
-      )
+
+      assertThat(query.args)
+        .isEqualTo(
+          listOf(
+            ResourceType.RiskAssessment.name,
+            ResourceType.RiskAssessment.name,
+            RiskAssessment.PROBABILITY.paramName,
+            (x.first - x.second).toDouble(),
+            (x.first + x.second).toDouble()
+          )
+        )
+    }
   }
 
   @Test
@@ -845,18 +856,22 @@ class SearchTest {
       )
   }
 
-  @Test(expected = java.lang.IllegalArgumentException::class)
+  @Test
   fun search_integer_endsBefore_error() {
-    Search(ResourceType.RiskAssessment)
-      .apply {
-        filter(RiskAssessment.PROBABILITY) {
-          prefix = ParamPrefixEnum.ENDS_BEFORE
-          value = BigDecimal("100")
-        }
+    val illegalArgumentException =
+      assertThrows(java.lang.IllegalArgumentException::class.java) {
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+              value = BigDecimal("100")
+            }
+          }
+          .getQuery()
       }
-      .getQuery()
+    assertThat(illegalArgumentException.message)
+      .isEqualTo("Prefix ENDS_BEFORE not allowed for Integer type")
   }
-
   @Test
   fun search_decimal_endsBefore() {
     val query =
@@ -892,16 +907,21 @@ class SearchTest {
       )
   }
 
-  @Test(expected = java.lang.IllegalArgumentException::class)
+  @Test
   fun search_integer_startsAfter_error() {
-    Search(ResourceType.RiskAssessment)
-      .apply {
-        filter(RiskAssessment.PROBABILITY) {
-          prefix = ParamPrefixEnum.STARTS_AFTER
-          value = BigDecimal("100")
-        }
+    val illegalArgumentException =
+      assertThrows(java.lang.IllegalArgumentException::class.java) {
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.STARTS_AFTER
+              value = BigDecimal("100")
+            }
+          }
+          .getQuery()
       }
-      .getQuery()
+    assertThat(illegalArgumentException.message)
+      .isEqualTo("Prefix STARTS_AFTER not allowed for Integer type")
   }
 
   @Test

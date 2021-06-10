@@ -120,11 +120,8 @@ fun StringFilter.query(type: ResourceType): SearchQuery {
  * Extension function that returns a SearchQuery based on the value and prefix of the NumberFilter
  */
 fun NumberFilter.query(type: ResourceType): SearchQuery {
-  val value = value!!
 
-  val precision = value.getRange()
-
-  val conditionParamPair = getConditionParamPair(prefix, value, precision)
+  val conditionParamPair = getConditionParamPair(prefix, value!!)
 
   return SearchQuery(
     """
@@ -178,20 +175,23 @@ val Order?.sqlString: String
  */
 private fun getConditionParamPair(
   prefix: ParamPrefixEnum?,
-  value: BigDecimal,
-  precision: BigDecimal
+  value: BigDecimal
 ): Pair<String, List<Double>> {
   return when (prefix) {
-    ParamPrefixEnum.EQUAL, null ->
+    ParamPrefixEnum.EQUAL, null -> {
+      val precision = value.getRange()
       "index_value >= ? AND index_value < ?" to
         listOf((value - precision).toDouble(), (value + precision).toDouble())
+    }
     ParamPrefixEnum.GREATERTHAN -> "index_value > ?" to listOf(value.toDouble())
     ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> "index_value >= ?" to listOf(value.toDouble())
     ParamPrefixEnum.LESSTHAN -> "index_value < ?" to listOf(value.toDouble())
     ParamPrefixEnum.LESSTHAN_OR_EQUALS -> "index_value <= ?" to listOf(value.toDouble())
-    ParamPrefixEnum.NOT_EQUAL ->
+    ParamPrefixEnum.NOT_EQUAL -> {
+      val precision = value.getRange()
       "index_value < ? OR index_value >= ?" to
         listOf((value - precision).toDouble(), (value + precision).toDouble())
+    }
     // Ends_Before and Starts_After are not used with integer values.
     ParamPrefixEnum.ENDS_BEFORE -> {
       require(value.scale() > 0) { "Prefix $prefix not allowed for Integer type" }
@@ -201,7 +201,7 @@ private fun getConditionParamPair(
       require(value.scale() > 0) { "Prefix $prefix not allowed for Integer type" }
       "index_value > ?" to listOf(value.toDouble())
     }
-    // Approximate to a 10% range
+    // Approximate to a 10% range see https://www.hl7.org/fhir/search.html#prefix
     ParamPrefixEnum.APPROXIMATE -> {
       val range = value.divide(BigDecimal(10))
       "index_value >= ? AND index_value <= ?" to
@@ -211,19 +211,19 @@ private fun getConditionParamPair(
 }
 
 /**
- * Returns the range in which the value should lie for it to be considered a match (@see NumberFilter.query). The value is directly related to the scale of the BigDecimal.
+ * Returns the range in which the value should lie for it to be considered a match (@see
+ * NumberFilter.query). The value is directly related to the scale of the BigDecimal.
  *
- * For example, a search with a value 100.00 (has a scale of 2) would match any value in [99.995, 100.005) and
- * the function returns 0.005.
+ * For example, a search with a value 100.00 (has a scale of 2) would match any value in [99.995,
+ * 100.005) and the function returns 0.005.
  *
- * For Big integers which have a negative scale the function returns 5 For example A search with a value 1000
- * would match any value in [995, 1005) and the function returns 5.
- *
- * Note 100 is considered to have 2 significant digits.
+ * For Big integers which have a negative scale the function returns 5 For example A search with a
+ * value 1000 would match any value in [995, 1005) and the function returns 5.
  */
 private fun BigDecimal.getRange(): BigDecimal {
-  return when {
-    scale() >= 0 -> BigDecimal(0.5).divide(BigDecimal(10).pow(scale()))
-    else -> BigDecimal(5)
+  return if (scale() >= 0) {
+    BigDecimal(0.5).divide(BigDecimal(10).pow(scale()))
+  } else {
+    BigDecimal(5)
   }
 }
