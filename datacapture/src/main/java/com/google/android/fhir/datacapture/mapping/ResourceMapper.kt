@@ -76,7 +76,7 @@ object ResourceMapper {
     }
   }
 
-  fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
+  fun populate(questionnaire: Questionnaire, resource: Resource): HashMap<String, Any> {
     val expressionMap = HashMap<String, String>()
     val questionnaireItemList = questionnaire.item[0].item
     val questionnaireItemListIterator = questionnaireItemList.iterator()
@@ -89,8 +89,7 @@ object ResourceMapper {
       }
     }
 
-    val answersHashMap = extractAnswersFromExpression(expressionMap, resource)
-    return createQuestionnaireResponse(questionnaireItemList, answersHashMap)
+    return extractAnswersFromExpression(expressionMap, resource)
   }
 
   private fun fetchExpression(
@@ -156,58 +155,6 @@ object ResourceMapper {
       }
     }
     return answersHashMap
-  }
-
-  private fun createQuestionnaireResponse(
-    questionnaireItemList: MutableList<Questionnaire.QuestionnaireItemComponent>,
-    answersHashMap: HashMap<String, Any>
-  ): QuestionnaireResponse {
-    val questionnaireResponse = QuestionnaireResponse()
-
-    questionnaireItemList.forEach {
-      if (it.type == Questionnaire.QuestionnaireItemType.GROUP) {
-        it.item.forEach { nestedQuestion ->
-          createResponseForSingleQuestion(answersHashMap, nestedQuestion, questionnaireResponse)
-        }
-      } else {
-        createResponseForSingleQuestion(answersHashMap, it, questionnaireResponse)
-      }
-    }
-    return questionnaireResponse
-  }
-
-  private fun createResponseForSingleQuestion(
-    answersHashMap: HashMap<String, Any>,
-    it: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponse: QuestionnaireResponse
-  ) {
-    if (answersHashMap.keys.contains(it.linkId)) {
-      questionnaireResponse.addItem(
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          val retrievedAnswer = answersHashMap[it.linkId]
-          linkId = it.linkId
-          answer =
-            mutableListOf(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                when (it.type) {
-                  Questionnaire.QuestionnaireItemType.DATE -> value = retrievedAnswer as DateType
-                  Questionnaire.QuestionnaireItemType.BOOLEAN ->
-                    value = retrievedAnswer as BooleanType
-                  Questionnaire.QuestionnaireItemType.DECIMAL ->
-                    value = retrievedAnswer as DecimalType
-                  Questionnaire.QuestionnaireItemType.INTEGER ->
-                    value = retrievedAnswer as IntegerType
-                  Questionnaire.QuestionnaireItemType.DATETIME ->
-                    value = retrievedAnswer as DateTimeType
-                  Questionnaire.QuestionnaireItemType.TIME -> value = retrievedAnswer as TimeType
-                  Questionnaire.QuestionnaireItemType.STRING,
-                  Questionnaire.QuestionnaireItemType.TEXT -> value = retrievedAnswer as StringType
-                }
-              }
-            )
-        }
-      )
-    }
   }
 
   /**

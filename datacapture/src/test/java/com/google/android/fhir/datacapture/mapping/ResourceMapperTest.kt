@@ -965,25 +965,22 @@ class ResourceMapperTest {
         org.hl7.fhir.r4.model.Questionnaire
 
     val patient = createPatientResource()
-    val patientResponse: QuestionnaireResponse =
+    val patientDataHashMap: HashMap<String, Any> =
       ResourceMapper.populate(uriTestQuestionnaire, patient)
 
-    assertThat((patientResponse.item[0].answer[0].value as StringType).valueAsString)
-      .isEqualTo("Salman")
-    assertThat((patientResponse.item[1].answer[0].value as StringType).valueAsString)
-      .isEqualTo("Ali")
-    assertThat((patientResponse.item[2].answer[0].value as DateType).valueAsString)
+    assertThat((patientDataHashMap["PR-name-text"] as StringType).valueAsString).isEqualTo("Salman")
+    assertThat((patientDataHashMap["PR-name-family"] as StringType).valueAsString).isEqualTo("Ali")
+    assertThat((patientDataHashMap["patient-0-birth-date"] as DateType).valueAsString)
       .isEqualTo("3896-09-17")
-    assertThat((patientResponse.item[3].answer[0].value as StringType).valueAsString)
+    assertThat((patientDataHashMap["patient-0-gender"] as StringType).valueAsString)
       .isEqualTo("male")
-    assertThat((patientResponse.item[4].answer[0].value as StringType).valueAsString)
+    assertThat((patientDataHashMap["PR-telecom-value"] as StringType).valueAsString)
       .isEqualTo("12345")
-    assertThat((patientResponse.item[5].answer[0].value as StringType).valueAsString)
+    assertThat((patientDataHashMap["PR-address-city"] as StringType).valueAsString)
       .isEqualTo("Lahore")
-    assertThat((patientResponse.item[6].answer[0].value as StringType).valueAsString)
+    assertThat((patientDataHashMap["PR-address-country"] as StringType).valueAsString)
       .isEqualTo("Pakistan")
-    assertThat((patientResponse.item[7].answer[0].value as BooleanType).booleanValue())
-      .isEqualTo(true)
+    assertThat((patientDataHashMap["PR-active"] as BooleanType).booleanValue()).isEqualTo(true)
   }
 
   private fun createPatientResource(): Patient {
