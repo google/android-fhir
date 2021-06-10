@@ -25,15 +25,13 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * A validator to check if the answer exceeds the maximum number of permitted characters.
  *
  * <p>Only the following primitive types are subjected to this validation:
- * <ol>
- *   <li>BooleanType</li>
- *   <li>DecimalType</li>
- *   <li>IntegerType</li>
- *   <li>DateType</li>
- *   <li>TimeType</li>
- *   <li>StringType</li>
- *   <li>UriType</li>
- * </ol>
+ * 1. BooleanType
+ * 2. DecimalType
+ * 3. IntegerType
+ * 4. DateType
+ * 5. TimeType
+ * 6. StringType
+ * 7. UriType
  */
 internal object PrimitiveTypeAnswerMaxLengthValidator : ConstraintValidator {
   override fun validate(

@@ -131,7 +131,8 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
   }
 
   private companion object {
-    @JvmStatic fun checkAnswerOverMaxLength(maxLength: Int, value: PrimitiveType<*>) {
+    @JvmStatic
+    fun checkAnswerOverMaxLength(maxLength: Int, value: PrimitiveType<*>) {
       val testComponent = createMaxLengthQuestionnaireTestItem(maxLength, value)
 
       val validationResult =
@@ -147,7 +148,8 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
         )
     }
 
-    @JvmStatic fun checkAnswerUnderMaxLength(maxLength: Int, value: PrimitiveType<*>) {
+    @JvmStatic
+    fun checkAnswerUnderMaxLength(maxLength: Int, value: PrimitiveType<*>) {
       val testComponent = createMaxLengthQuestionnaireTestItem(maxLength, value)
 
       val validationResult =
@@ -160,7 +162,8 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
       assertThat(validationResult.message.isNullOrBlank()).isTrue()
     }
 
-    @JvmStatic fun createMaxLengthQuestionnaireTestItem(
+    @JvmStatic
+    fun createMaxLengthQuestionnaireTestItem(
       maxLength: Int,
       value: PrimitiveType<*>
     ): QuestionnaireTestItem {

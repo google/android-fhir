@@ -139,7 +139,8 @@ class PrimitiveTypeAnswerMinLengthValidatorTest {
   }
 
   private companion object {
-    @JvmStatic fun checkAnswerOverMinLength(minLength: Int, value: PrimitiveType<*>) {
+    @JvmStatic
+    fun checkAnswerOverMinLength(minLength: Int, value: PrimitiveType<*>) {
       val testComponent = createMaxLengthQuestionnaireTestItem(minLength, value)
 
       val validationResult =
@@ -152,7 +153,8 @@ class PrimitiveTypeAnswerMinLengthValidatorTest {
       assertThat(validationResult.message.isNullOrBlank()).isTrue()
     }
 
-    @JvmStatic fun checkAnswerUnderMinLength(minLength: Int, value: PrimitiveType<*>) {
+    @JvmStatic
+    fun checkAnswerUnderMinLength(minLength: Int, value: PrimitiveType<*>) {
       val testComponent = createMaxLengthQuestionnaireTestItem(minLength, value)
 
       val validationResult =
@@ -168,7 +170,8 @@ class PrimitiveTypeAnswerMinLengthValidatorTest {
         )
     }
 
-    @JvmStatic fun createMaxLengthQuestionnaireTestItem(
+    @JvmStatic
+    fun createMaxLengthQuestionnaireTestItem(
       minLength: Int,
       value: PrimitiveType<*>
     ): QuestionnaireTestItem {
