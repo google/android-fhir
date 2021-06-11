@@ -29,7 +29,6 @@ import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,7 +42,7 @@ class ResourceMapperTest {
   fun extract() {
     // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
     val questionnaireJson =
-      """
+        """
         {
           "resourceType": "Questionnaire",
           "id": "client-registration-sample",
@@ -312,7 +311,7 @@ class ResourceMapperTest {
       """.trimIndent()
 
     val questionnaireResponseJson =
-      """
+        """
         {
           "resourceType": "QuestionnaireResponse",
           "questionnaire": "client-registration-sample",
@@ -446,18 +445,16 @@ class ResourceMapperTest {
     val iParser: IParser = FhirContext.forR4().newJsonParser()
 
     val uriTestQuestionnaire =
-      iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
-        org.hl7.fhir.r4.model.Questionnaire
+        iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
+            org.hl7.fhir.r4.model.Questionnaire
 
     val uriTestQuestionnaireResponse =
-      iParser.parseResource(
-        org.hl7.fhir.r4.model.QuestionnaireResponse::class.java,
-        questionnaireResponseJson
-      ) as
-        org.hl7.fhir.r4.model.QuestionnaireResponse
+        iParser.parseResource(
+            org.hl7.fhir.r4.model.QuestionnaireResponse::class.java, questionnaireResponseJson) as
+            org.hl7.fhir.r4.model.QuestionnaireResponse
 
     val patient =
-      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) as Patient
+        ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) as Patient
 
     assertThat(patient.birthDate).isEqualTo("2021-01-01".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isTrue()
@@ -471,7 +468,7 @@ class ResourceMapperTest {
   @Test
   fun `extract() should allow extracting with unanswered questions`() {
     val questionnaireJson =
-      """
+        """
         {
           "resourceType": "Questionnaire",
           "id": "client-registration-sample",
@@ -565,7 +562,7 @@ class ResourceMapperTest {
                           "valueExpression": {
                             "language": "application/x-fhir-query",
                             "expression": "ContactPoint$""" +
-        """ContactPointSystem",
+            """ContactPointSystem",
                             "name": "contactPointSystem"
                           }
                         }
@@ -606,7 +603,7 @@ class ResourceMapperTest {
         """.trimIndent()
 
     val questionnaireResponseJson =
-      """
+        """
         {
           "resourceType": "QuestionnaireResponse",
           "questionnaire": "Questionnaire/client-registration-sample",
@@ -700,18 +697,16 @@ class ResourceMapperTest {
     val iParser: IParser = FhirContext.forR4().newJsonParser()
 
     val uriTestQuestionnaire =
-      iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
-        org.hl7.fhir.r4.model.Questionnaire
+        iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
+            org.hl7.fhir.r4.model.Questionnaire
 
     val uriTestQuestionnaireResponse =
-      iParser.parseResource(
-        org.hl7.fhir.r4.model.QuestionnaireResponse::class.java,
-        questionnaireResponseJson
-      ) as
-        org.hl7.fhir.r4.model.QuestionnaireResponse
+        iParser.parseResource(
+            org.hl7.fhir.r4.model.QuestionnaireResponse::class.java, questionnaireResponseJson) as
+            org.hl7.fhir.r4.model.QuestionnaireResponse
 
     val patient =
-      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) as Patient
+        ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) as Patient
     assertThat(patient.birthDate).isEqualTo("2016-02-11".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isFalse()
     assertThat(patient.telecom.get(0).value).isNull()
@@ -726,7 +721,7 @@ class ResourceMapperTest {
   @Test
   fun populateResourceAnswers() {
     val questionnaireJson =
-      """
+        """
         {
   "resourceType": "Questionnaire",
   "id": "client-registration-sample",
@@ -961,47 +956,46 @@ class ResourceMapperTest {
     val iParser: IParser = FhirContext.forR4().newJsonParser()
 
     val uriTestQuestionnaire =
-      iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
-        org.hl7.fhir.r4.model.Questionnaire
+        iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
+            org.hl7.fhir.r4.model.Questionnaire
 
     val patient = createPatientResource()
     val patientDataHashMap: HashMap<String, Any> =
-      ResourceMapper.populate(uriTestQuestionnaire, patient)
+        ResourceMapper.populate(uriTestQuestionnaire, patient)
 
     assertThat((patientDataHashMap["PR-name-text"] as StringType).valueAsString).isEqualTo("Salman")
     assertThat((patientDataHashMap["PR-name-family"] as StringType).valueAsString).isEqualTo("Ali")
     assertThat((patientDataHashMap["patient-0-birth-date"] as DateType).valueAsString)
-      .isEqualTo("3896-09-17")
+        .isEqualTo("3896-09-17")
     assertThat((patientDataHashMap["patient-0-gender"] as StringType).valueAsString)
-      .isEqualTo("male")
+        .isEqualTo("male")
     assertThat((patientDataHashMap["PR-telecom-value"] as StringType).valueAsString)
-      .isEqualTo("12345")
+        .isEqualTo("12345")
     assertThat((patientDataHashMap["PR-address-city"] as StringType).valueAsString)
-      .isEqualTo("Lahore")
+        .isEqualTo("Lahore")
     assertThat((patientDataHashMap["PR-address-country"] as StringType).valueAsString)
-      .isEqualTo("Pakistan")
+        .isEqualTo("Pakistan")
     assertThat((patientDataHashMap["PR-active"] as BooleanType).booleanValue()).isEqualTo(true)
   }
 
   private fun createPatientResource(): Patient {
-    val patientResource = Patient()
-    patientResource.active = true
-    patientResource.birthDate = Date(1996, 8, 17)
-    patientResource.gender = Enumerations.AdministrativeGender.MALE
-    val address = Address()
-    address.city = "Lahore"
-    address.country = "Pakistan"
-    val addressList: List<Address> = listOf(address)
-    patientResource.address = addressList
-    val name = HumanName()
-    name.given = mutableListOf(StringType("Salman"))
-    name.family = "Ali"
-    val nameList: List<HumanName> = listOf(name)
-    patientResource.name = nameList
-    val contactPoint = ContactPoint()
-    contactPoint.value = "12345"
-    val contactList: List<ContactPoint> = listOf(contactPoint)
-    patientResource.telecom = contactList
-    return patientResource
+    return Patient().apply {
+      active = true
+      birthDate = Date(1996, 8, 17)
+      gender = Enumerations.AdministrativeGender.MALE
+      address =
+          listOf(
+              Address().apply {
+                city = "Lahore"
+                country = "Pakistan"
+              })
+      name =
+          listOf(
+              HumanName().apply {
+                given = mutableListOf(StringType("Salman"))
+                family = "Ali"
+              })
+      telecom = listOf(ContactPoint().apply { value = "12345" })
+    }
   }
 }
