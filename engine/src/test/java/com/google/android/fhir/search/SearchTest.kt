@@ -639,8 +639,8 @@ class SearchTest {
 
   @Test
   fun search_number_equals() {
-    // x contains pairs of values and their corresponding range (see BigDecimal.getRange() in
-    // MoreSearch.KT)
+    /* x contains pairs of values and their corresponding range (see BigDecimal.getRange() in
+    MoreSearch.KT) */
     for (x in
       listOf(
         BigDecimal("100") to BigDecimal("0.5"),
