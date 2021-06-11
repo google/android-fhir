@@ -644,7 +644,6 @@ class SearchTest {
     for (x in
       listOf(
         BigDecimal("100") to BigDecimal("0.5"),
-        BigDecimal("1e2") to BigDecimal("5"),
         BigDecimal("100.00") to BigDecimal("0.005"),
         BigDecimal("1e3") to BigDecimal("5")
       )) {

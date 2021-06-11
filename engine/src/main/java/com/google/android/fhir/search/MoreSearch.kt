@@ -177,6 +177,12 @@ private fun getConditionParamPair(
   prefix: ParamPrefixEnum?,
   value: BigDecimal
 ): Pair<String, List<Double>> {
+  // Ends_Before and Starts_After are not used with integer values. see
+  // https://www.hl7.org/fhir/search.html#prefix
+  require(
+    value.scale() > 0 ||
+      (prefix != ParamPrefixEnum.STARTS_AFTER && prefix != ParamPrefixEnum.ENDS_BEFORE)
+  ) { "Prefix $prefix not allowed for Integer type" }
   return when (prefix) {
     ParamPrefixEnum.EQUAL, null -> {
       val precision = value.getRange()
@@ -192,13 +198,10 @@ private fun getConditionParamPair(
       "index_value < ? OR index_value >= ?" to
         listOf((value - precision).toDouble(), (value + precision).toDouble())
     }
-    // Ends_Before and Starts_After are not used with integer values.
     ParamPrefixEnum.ENDS_BEFORE -> {
-      require(value.scale() > 0) { "Prefix $prefix not allowed for Integer type" }
       "index_value < ?" to listOf(value.toDouble())
     }
     ParamPrefixEnum.STARTS_AFTER -> {
-      require(value.scale() > 0) { "Prefix $prefix not allowed for Integer type" }
       "index_value > ?" to listOf(value.toDouble())
     }
     // Approximate to a 10% range see https://www.hl7.org/fhir/search.html#prefix
