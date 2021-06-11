@@ -42,7 +42,7 @@ class ResourceMapperTest {
   fun extract() {
     // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
     val questionnaireJson =
-        """
+      """
         {
           "resourceType": "Questionnaire",
           "id": "client-registration-sample",
@@ -311,7 +311,7 @@ class ResourceMapperTest {
       """.trimIndent()
 
     val questionnaireResponseJson =
-        """
+      """
         {
           "resourceType": "QuestionnaireResponse",
           "questionnaire": "client-registration-sample",
@@ -445,16 +445,18 @@ class ResourceMapperTest {
     val iParser: IParser = FhirContext.forR4().newJsonParser()
 
     val uriTestQuestionnaire =
-        iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
-            org.hl7.fhir.r4.model.Questionnaire
+      iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
+        org.hl7.fhir.r4.model.Questionnaire
 
     val uriTestQuestionnaireResponse =
-        iParser.parseResource(
-            org.hl7.fhir.r4.model.QuestionnaireResponse::class.java, questionnaireResponseJson) as
-            org.hl7.fhir.r4.model.QuestionnaireResponse
+      iParser.parseResource(
+        org.hl7.fhir.r4.model.QuestionnaireResponse::class.java,
+        questionnaireResponseJson
+      ) as
+        org.hl7.fhir.r4.model.QuestionnaireResponse
 
     val patient =
-        ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) as Patient
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) as Patient
 
     assertThat(patient.birthDate).isEqualTo("2021-01-01".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isTrue()
@@ -468,7 +470,7 @@ class ResourceMapperTest {
   @Test
   fun `extract() should allow extracting with unanswered questions`() {
     val questionnaireJson =
-        """
+      """
         {
           "resourceType": "Questionnaire",
           "id": "client-registration-sample",
@@ -562,7 +564,7 @@ class ResourceMapperTest {
                           "valueExpression": {
                             "language": "application/x-fhir-query",
                             "expression": "ContactPoint$""" +
-            """ContactPointSystem",
+        """ContactPointSystem",
                             "name": "contactPointSystem"
                           }
                         }
@@ -603,7 +605,7 @@ class ResourceMapperTest {
         """.trimIndent()
 
     val questionnaireResponseJson =
-        """
+      """
         {
           "resourceType": "QuestionnaireResponse",
           "questionnaire": "Questionnaire/client-registration-sample",
@@ -697,16 +699,18 @@ class ResourceMapperTest {
     val iParser: IParser = FhirContext.forR4().newJsonParser()
 
     val uriTestQuestionnaire =
-        iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
-            org.hl7.fhir.r4.model.Questionnaire
+      iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
+        org.hl7.fhir.r4.model.Questionnaire
 
     val uriTestQuestionnaireResponse =
-        iParser.parseResource(
-            org.hl7.fhir.r4.model.QuestionnaireResponse::class.java, questionnaireResponseJson) as
-            org.hl7.fhir.r4.model.QuestionnaireResponse
+      iParser.parseResource(
+        org.hl7.fhir.r4.model.QuestionnaireResponse::class.java,
+        questionnaireResponseJson
+      ) as
+        org.hl7.fhir.r4.model.QuestionnaireResponse
 
     val patient =
-        ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) as Patient
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) as Patient
     assertThat(patient.birthDate).isEqualTo("2016-02-11".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isFalse()
     assertThat(patient.telecom.get(0).value).isNull()
@@ -721,7 +725,7 @@ class ResourceMapperTest {
   @Test
   fun populateResourceAnswers() {
     val questionnaireJson =
-        """
+      """
         {
   "resourceType": "Questionnaire",
   "id": "client-registration-sample",
@@ -956,25 +960,25 @@ class ResourceMapperTest {
     val iParser: IParser = FhirContext.forR4().newJsonParser()
 
     val uriTestQuestionnaire =
-        iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
-            org.hl7.fhir.r4.model.Questionnaire
+      iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
+        org.hl7.fhir.r4.model.Questionnaire
 
     val patient = createPatientResource()
     val patientDataHashMap: HashMap<String, Any> =
-        ResourceMapper.populate(uriTestQuestionnaire, patient)
+      ResourceMapper.populate(uriTestQuestionnaire, patient)
 
     assertThat((patientDataHashMap["PR-name-text"] as StringType).valueAsString).isEqualTo("Salman")
     assertThat((patientDataHashMap["PR-name-family"] as StringType).valueAsString).isEqualTo("Ali")
     assertThat((patientDataHashMap["patient-0-birth-date"] as DateType).valueAsString)
-        .isEqualTo("3896-09-17")
+      .isEqualTo("3896-09-17")
     assertThat((patientDataHashMap["patient-0-gender"] as StringType).valueAsString)
-        .isEqualTo("male")
+      .isEqualTo("male")
     assertThat((patientDataHashMap["PR-telecom-value"] as StringType).valueAsString)
-        .isEqualTo("12345")
+      .isEqualTo("12345")
     assertThat((patientDataHashMap["PR-address-city"] as StringType).valueAsString)
-        .isEqualTo("Lahore")
+      .isEqualTo("Lahore")
     assertThat((patientDataHashMap["PR-address-country"] as StringType).valueAsString)
-        .isEqualTo("Pakistan")
+      .isEqualTo("Pakistan")
     assertThat((patientDataHashMap["PR-active"] as BooleanType).booleanValue()).isEqualTo(true)
   }
 
@@ -984,17 +988,19 @@ class ResourceMapperTest {
       birthDate = Date(1996, 8, 17)
       gender = Enumerations.AdministrativeGender.MALE
       address =
-          listOf(
-              Address().apply {
-                city = "Lahore"
-                country = "Pakistan"
-              })
+        listOf(
+          Address().apply {
+            city = "Lahore"
+            country = "Pakistan"
+          }
+        )
       name =
-          listOf(
-              HumanName().apply {
-                given = mutableListOf(StringType("Salman"))
-                family = "Ali"
-              })
+        listOf(
+          HumanName().apply {
+            given = mutableListOf(StringType("Salman"))
+            family = "Ali"
+          }
+        )
       telecom = listOf(ContactPoint().apply { value = "12345" })
     }
   }
