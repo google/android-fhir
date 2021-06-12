@@ -177,7 +177,11 @@ private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedIt
   questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
 ) {
   if (answer.isNotEmpty()) {
-    answer.first().item = questionnaireItemComponent.listOfItemInAnswer()
+    if (!answer.first().hasValueCoding() && !answer.first().valueBooleanType.booleanValue()) {
+      answer.removeFirstOrNull()
+    } else {
+      answer.first().item = questionnaireItemComponent.listOfItemInAnswer()
+    }
   }
 }
 
