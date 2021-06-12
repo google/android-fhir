@@ -23,6 +23,7 @@ import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import java.math.BigDecimal
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -36,6 +37,7 @@ import org.hl7.fhir.r4.model.UriType
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
   internal val stringFilters = mutableListOf<StringFilter>()
   internal val dateFilter = mutableListOf<DateFilter>()
+  internal val numberFilter = mutableListOf<NumberFilter>()
   internal val referenceFilters = mutableListOf<ReferenceFilter>()
   internal val tokenFilters = mutableListOf<TokenFilter>()
   internal var sort: IParam? = null
@@ -88,6 +90,12 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
   fun filter(filter: TokenClientParam, string: String) =
     tokenFilters.add(TokenFilter(parameter = filter, code = string))
 
+  fun filter(numberParameter: NumberClientParam, init: NumberFilter.() -> Unit) {
+    val filter = NumberFilter(numberParameter)
+    filter.init()
+    numberFilter.add(filter)
+  }
+
   fun sort(parameter: StringClientParam, order: Order) {
     sort = parameter
     this.order = order
@@ -115,6 +123,13 @@ data class DateFilter(
 
 @SearchDslMarker
 data class ReferenceFilter(val parameter: ReferenceClientParam?, var value: String? = null)
+
+@SearchDslMarker
+data class NumberFilter(
+  val parameter: NumberClientParam,
+  var prefix: ParamPrefixEnum? = null,
+  var value: BigDecimal? = null
+)
 
 @SearchDslMarker
 data class TokenFilter(val parameter: TokenClientParam?, var uri: String? = null, var code: String)
