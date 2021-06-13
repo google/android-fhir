@@ -744,12 +744,7 @@ class QuestionnaireViewModelTest {
       }
     )
     viewModel.questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
-    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItem.answer[0].item[0]
-      .addAnswer(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          this.value = valueBooleanType.setValue(false)
-        }
-      )
+
 
     assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
   }
