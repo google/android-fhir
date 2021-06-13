@@ -745,6 +745,7 @@ class QuestionnaireViewModelTest {
     )
     viewModel.questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
 
+
     assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
   }
 
