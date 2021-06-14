@@ -85,7 +85,9 @@ class QuestionnaireContainerFragment : Fragment() {
         val questionnaireFragment =
           childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as
             QuestionnaireFragment
-        displayQuestionnaireResponse(questionnaireFragment.getQuestionnaireResponse())
+        if (questionnaireFragment.validateQuestionnaireResponse().isEmpty()) {
+          displayQuestionnaireResponse(questionnaireFragment.getQuestionnaireResponse())
+        }
         true
       }
       android.R.id.home -> {
