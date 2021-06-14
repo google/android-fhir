@@ -26,11 +26,14 @@ import com.google.android.fhir.sync.RepeatInterval
 import com.google.android.fhir.sync.Sync
 import java.util.concurrent.TimeUnit
 
-class PatientsActivity : AppCompatActivity() {
+const val MAX_RESOURCE_COUNT = 20
+
+class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_patients)
+    setContentView(R.layout.activity_main)
+
     val toolbar = findViewById<Toolbar>(R.id.toolbar)
     setSupportActionBar(toolbar)
     toolbar.title = title

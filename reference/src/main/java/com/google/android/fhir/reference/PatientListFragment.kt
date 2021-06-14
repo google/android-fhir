@@ -47,6 +47,7 @@ class PatientListFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     (requireActivity() as AppCompatActivity).supportActionBar?.apply {
       title = requireActivity().title
+      setDisplayHomeAsUpEnabled(false)
     }
     fhirEngine = FhirApplication.fhirEngine(requireContext())
     patientListViewModel =

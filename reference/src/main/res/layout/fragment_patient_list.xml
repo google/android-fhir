@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:iconifiedByDefault="false"
-        app:queryHint="Find by Patient Name"
+        app:queryHint="@string/query_hint_patient_search"
     />
 
     <include layout="@layout/patient_list" />

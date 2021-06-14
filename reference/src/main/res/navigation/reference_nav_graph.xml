@@ -21,7 +21,7 @@
 
     <fragment
         android:id="@+id/patient_details"
-        android:name="com.google.android.fhir.reference.PatientDetailFragment"
+        android:name="com.google.android.fhir.reference.PatientDetailsFragment"
         android:label="Patient Details"
         tools:layout="@layout/patient_detail"
     >

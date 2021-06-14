@@ -23,7 +23,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.reference.data.SamplePatients
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.search
@@ -37,7 +36,6 @@ import org.hl7.fhir.r4.model.Patient
 class PatientListViewModel(application: Application, private val fhirEngine: FhirEngine) :
   AndroidViewModel(application) {
 
-  private val samplePatients = SamplePatients()
   val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
 
   init {
@@ -53,8 +51,9 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   }
 
   private suspend fun getSearchResults(nameQuery: String = ""): List<PatientItem> {
-    val searchResults: List<Patient> =
-      fhirEngine.search {
+    val patients: MutableList<PatientItem> = mutableListOf()
+    fhirEngine
+      .search<Patient> {
         if (nameQuery.isNotEmpty())
           filter(Patient.NAME) {
             modifier = StringFilterModifier.CONTAINS
@@ -64,7 +63,10 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
         count = 100
         from = 0
       }
-    return samplePatients.getPatientItems(searchResults)
+      .take(MAX_RESOURCE_COUNT)
+      .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
+      .let { patients.addAll(it) }
+    return patients
   }
 
   /** The Patient's details for display purposes. */
@@ -101,4 +103,24 @@ class PatientListViewModelFactory(
     }
     throw IllegalArgumentException("Unknown ViewModel class")
   }
+}
+
+internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientItem {
+  val name = name[0].nameAsSingleString
+
+  // Show nothing if no values available for gender and date of birth.
+  val gender = if (hasGenderElement()) genderElement.valueAsString else ""
+  val dob = if (hasBirthDateElement()) birthDateElement.valueAsString else ""
+  val html: String = if (hasText()) text.div.valueAsString else ""
+  val phone: String = if (hasTelecom()) telecom[0].value else ""
+
+  return PatientListViewModel.PatientItem(
+    position.toString(),
+    name,
+    gender,
+    dob,
+    html,
+    phone,
+    idElement.idPart
+  )
 }

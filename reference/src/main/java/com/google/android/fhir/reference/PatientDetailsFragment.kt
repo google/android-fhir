@@ -33,17 +33,18 @@ import com.google.android.fhir.FhirEngine
 
 /**
  * A fragment representing a single Patient detail screen. This fragment is contained in a
- * [PatientsActivity].
+ * [MainActivity].
  */
-class PatientDetailFragment : Fragment() {
+class PatientDetailsFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
   private lateinit var patientDetailsViewModel: PatientDetailsViewModel
-  private val args: PatientDetailFragmentArgs by navArgs()
+  private val args: PatientDetailsFragmentArgs by navArgs()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setHasOptionsMenu(true)
   }
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -73,13 +74,13 @@ class PatientDetailFragment : Fragment() {
   private fun setupPatientData(view: View, patient: PatientListViewModel.PatientItem?) {
     patient?.let {
       view.findViewById<TextView>(R.id.patient_detail).text =
-        HtmlCompat.fromHtml(patient.html, HtmlCompat.FROM_HTML_MODE_LEGACY)
-      view.findViewById<TextView>(R.id.name).text = patient.name
-      view.findViewById<TextView>(R.id.dob).text = patient.dob
-      view.findViewById<TextView>(R.id.gender).text = patient.phone
+        HtmlCompat.fromHtml(it.html, HtmlCompat.FROM_HTML_MODE_LEGACY)
+      view.findViewById<TextView>(R.id.name).text = it.name
+      view.findViewById<TextView>(R.id.dob).text = it.dob
+      view.findViewById<TextView>(R.id.gender).text = it.phone
 
       (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-        title = patient.name
+        title = it.name
         setDisplayHomeAsUpEnabled(true)
       }
     }

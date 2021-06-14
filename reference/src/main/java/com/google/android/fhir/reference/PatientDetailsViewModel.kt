@@ -22,7 +22,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.liveData
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.reference.data.SamplePatients
 import com.google.android.fhir.search.search
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
@@ -37,22 +36,48 @@ class PatientDetailsViewModel(
   private val patientId: String
 ) : AndroidViewModel(application) {
 
-  private val samplePatients = SamplePatients()
-
   val livePatientData = liveData { emit(getPatient()) }
   val livePatientObservation = liveData { emit(getPatientObservations()) }
 
-  private suspend fun getPatient(): PatientListViewModel.PatientItem? {
+  private suspend fun getPatient(): PatientListViewModel.PatientItem {
     val patient = fhirEngine.load(Patient::class.java, patientId)
-    return samplePatients.getPatientItems(listOf(patient))?.first()
+    return patient.toPatientItem(0)
   }
 
   private suspend fun getPatientObservations(): List<PatientListViewModel.ObservationItem> {
-    val observations =
-      fhirEngine.search<Observation> {
-        filter(Observation.SUBJECT) { value = "Patient/$patientId" }
-      }
-    return samplePatients.getObservationItems(observations)
+    val observations: MutableList<PatientListViewModel.ObservationItem> = mutableListOf()
+    fhirEngine
+      .search<Observation> { filter(Observation.SUBJECT) { value = "Patient/$patientId" } }
+      .take(MAX_RESOURCE_COUNT)
+      .mapIndexed { index, fhirPatient -> createObservationItem(index + 1, fhirPatient) }
+      .let { observations.addAll(it) }
+    return observations
+  }
+
+  /** Creates ObservationItem objects with displayable values from the Fhir Observation objects. */
+  private fun createObservationItem(
+    position: Int,
+    observation: Observation
+  ): PatientListViewModel.ObservationItem {
+    // val observation: Observation = getObservationDetails(position)
+    val observationCode = observation.code.text
+
+    // Show nothing if no values available for datetime and value quantity.
+    val dateTimeStr =
+      if (observation.hasEffectiveDateTimeType()) observation.effectiveDateTimeType.asStringValue()
+      else "No effective DateTime"
+    val value =
+      if (observation.hasValueQuantity()) observation.valueQuantity.value.toString()
+      else "No ValueQuantity"
+    val valueUnit = if (observation.hasValueQuantity()) observation.valueQuantity.unit else ""
+    val valueStr = "$value $valueUnit"
+
+    return PatientListViewModel.ObservationItem(
+      position.toString(),
+      observationCode,
+      dateTimeStr,
+      valueStr
+    )
   }
 }
 
@@ -62,9 +87,9 @@ class PatientDetailsViewModelFactory(
   private val patientId: String
 ) : ViewModelProvider.Factory {
   override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-    if (modelClass.isAssignableFrom(PatientDetailsViewModel::class.java)) {
-      return PatientDetailsViewModel(application, fhirEngine, patientId) as T
+    require(modelClass.isAssignableFrom(PatientDetailsViewModel::class.java)) {
+      "Unknown ViewModel class"
     }
-    throw IllegalArgumentException("Unknown ViewModel class")
+    return PatientDetailsViewModel(application, fhirEngine, patientId) as T
   }
 }
