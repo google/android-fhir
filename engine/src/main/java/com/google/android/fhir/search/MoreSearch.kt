@@ -20,8 +20,8 @@ import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.db.Database
-import org.hl7.fhir.r4.model.DateTimeType
 import java.math.BigDecimal
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -183,7 +183,10 @@ val Order?.sqlString: String
       null -> ""
     }
 
-private fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateTimeType): Pair<String, List<Any>> {
+private fun getConditionParamPair(
+  prefix: ParamPrefixEnum,
+  value: DateTimeType
+): Pair<String, List<Any>> {
   return when (prefix) {
     ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
     ParamPrefixEnum.STARTS_AFTER ->
@@ -212,7 +215,7 @@ private fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateTimeType):
     ParamPrefixEnum.LESSTHAN_OR_EQUALS ->
       "? >= index_to" to listOf(value.precision.add(value.value, 1).time)
   }
-}  
+}
 /**
  * Returns the condition and list of params required in NumberFilter.query see
  * https://www.hl7.org/fhir/search.html#number.
