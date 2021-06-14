@@ -30,7 +30,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
-import  com.google.android.fhir.reference.PatientListViewModel.PatientListViewModelFactory
+import com.google.android.fhir.reference.PatientListViewModel.PatientListViewModelFactory
 
 class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
@@ -69,7 +69,10 @@ class PatientListFragment : Fragment() {
         adapter.submitList(it)
       }
     )
-    patientListViewModel.patientCount.observe(viewLifecycleOwner, { Log.d("PatientListActivity", "$it Patient") })
+    patientListViewModel.patientCount.observe(
+      viewLifecycleOwner,
+      { Log.d("PatientListActivity", "$it Patient") }
+    )
 
     patientListViewModel.patientCount.observe(
       viewLifecycleOwner,
