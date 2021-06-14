@@ -21,7 +21,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal interface ConstraintValidator {
   /**
-   * Validates the `answer`(s) in [questionnaireResponseItem] satify any constraints of the
+   * Validates the `answer`(s) in [questionnaireResponseItem] satisfy any constraints of the
    * [questionnaireItem] according to the [structured data capture implementation guide]
    * (http://build.fhir.org/ig/HL7/sdc/behavior.html). This does not validate the
    * [questionnaireResponseItem] and its child items are structurally consistent with the
@@ -33,5 +33,9 @@ internal interface ConstraintValidator {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ): ConstraintValidationResult
 
-  data class ConstraintValidationResult(val isValid: Boolean, val message: String?)
+  data class ConstraintValidationResult(
+    val isValid: Boolean,
+    val linkId: String?,
+    val message: String?
+  )
 }

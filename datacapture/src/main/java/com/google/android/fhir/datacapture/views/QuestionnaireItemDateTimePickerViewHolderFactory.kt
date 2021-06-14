@@ -167,8 +167,8 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
 
       private fun applyValidationResult(validationResult: ValidationResult) {
         val validationMessage =
-          validationResult.validationMessages.joinToString {
-            it.plus(System.getProperty("line.separator"))
+          validationResult.validationLinkIdAndMessages.joinToString {
+            it.second.plus(System.getProperty("line.separator"))
           }
         dateInputEditText.error = if (validationMessage == "") null else validationMessage
         timeInputEditText.error = if (validationMessage == "") null else validationMessage

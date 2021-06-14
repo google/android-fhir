@@ -34,9 +34,13 @@ internal open class ValueConstraintValidator(
       val extension = questionnaireItem.getExtensionByUrl(url)
       val answer = questionnaireResponseItem.answer[0]
       if (predicate(extension, answer)) {
-        return ConstraintValidator.ConstraintValidationResult(false, messageGenerator(extension))
+        return ConstraintValidator.ConstraintValidationResult(
+          false,
+          questionnaireItem.linkId,
+          messageGenerator(extension)
+        )
       }
     }
-    return ConstraintValidator.ConstraintValidationResult(true, null)
+    return ConstraintValidator.ConstraintValidationResult(true, null, null)
   }
 }
