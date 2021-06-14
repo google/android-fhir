@@ -21,6 +21,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -29,6 +30,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
+import  com.google.android.fhir.reference.PatientListViewModel.PatientListViewModelFactory
 
 class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
@@ -66,6 +68,12 @@ class PatientListFragment : Fragment() {
         Log.d("PatientListActivity", "Submitting ${it.count()} patient records")
         adapter.submitList(it)
       }
+    )
+    patientListViewModel.patientCount.observe(viewLifecycleOwner, { Log.d("PatientListActivity", "$it Patient") })
+
+    patientListViewModel.patientCount.observe(
+      viewLifecycleOwner,
+      { view.findViewById<TextView>(R.id.patient_count).text = "$it Patient(s)" }
     )
     searchView = view.findViewById(R.id.search)
     searchView.setOnQueryTextListener(

@@ -71,6 +71,13 @@ interface FhirEngine {
    * result of the [download] operation.
    */
   suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>)
+
+  /**
+   * Total count of entities available for given search
+   *
+   * @param search
+   */
+  suspend fun count(search: Search): Long
 }
 
 interface SyncDownloadContext {

@@ -115,6 +115,9 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
       iParser.parseResource(it) as R
     }
 
+  override suspend fun count(query: SearchQuery): Long =
+    resourceDao.countResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+
   /**
    * @returns a list of pairs. Each pair is a token + squashed local change. Each token is a list of
    * [LocalChangeEntity.id] s of rows of the [LocalChangeEntity].

@@ -17,7 +17,9 @@
 package com.google.android.fhir.search
 
 import android.os.Build
+import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.common.truth.Truth.assertThat
+import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -29,6 +31,7 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.UriType
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -46,6 +49,21 @@ class SearchTest {
       .isEqualTo(
         """
         SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        """.trimIndent()
+      )
+    assertThat(query.args).isEqualTo(listOf(ResourceType.Patient.name))
+  }
+
+  @Test
+  fun count_search() = runBlocking {
+    val query = Search(ResourceType.Patient).getQuery(true)
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT COUNT(*)
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         """.trimIndent()
@@ -615,6 +633,362 @@ class SearchTest {
           "Jones",
           10,
           20
+        )
+      )
+  }
+
+  @Test
+  fun search_number_equals() {
+    /* x contains pairs of values and their corresponding range (see BigDecimal.getRange() in
+    MoreSearch.KT) */
+    for (x in
+      listOf(
+        BigDecimal("100") to BigDecimal("0.5"),
+        BigDecimal("100.00") to BigDecimal("0.005"),
+        BigDecimal("1e3") to BigDecimal("5")
+      )) {
+      val query =
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.EQUAL
+              value = x.first
+            }
+          }
+          .getQuery()
+      assertThat(query.query)
+        .isEqualTo(
+          """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value < ?
+        )
+          """.trimIndent()
+        )
+
+      assertThat(query.args)
+        .isEqualTo(
+          listOf(
+            ResourceType.RiskAssessment.name,
+            ResourceType.RiskAssessment.name,
+            RiskAssessment.PROBABILITY.paramName,
+            (x.first - x.second).toDouble(),
+            (x.first + x.second).toDouble()
+          )
+        )
+    }
+  }
+
+  @Test
+  fun search_number_notEquals() {
+    val query =
+      Search(ResourceType.RiskAssessment)
+        .apply {
+          filter(RiskAssessment.PROBABILITY) {
+            prefix = ParamPrefixEnum.NOT_EQUAL
+            value = BigDecimal("100.00")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value < ? OR index_value >= ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.RiskAssessment.name,
+          ResourceType.RiskAssessment.name,
+          RiskAssessment.PROBABILITY.paramName,
+          BigDecimal.valueOf(99.995).toDouble(),
+          BigDecimal.valueOf(100.005).toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_number_greater() {
+    val query =
+      Search(ResourceType.RiskAssessment)
+        .apply {
+          filter(RiskAssessment.PROBABILITY) {
+            prefix = ParamPrefixEnum.GREATERTHAN
+            value = BigDecimal("100.00")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value > ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.RiskAssessment.name,
+          ResourceType.RiskAssessment.name,
+          RiskAssessment.PROBABILITY.paramName,
+          BigDecimal("100.00").toDouble()
+        )
+      )
+  }
+  @Test
+  fun search_number_greaterThanEqual() {
+    val query =
+      Search(ResourceType.RiskAssessment)
+        .apply {
+          filter(RiskAssessment.PROBABILITY) {
+            prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+            value = BigDecimal("100.00")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value >= ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.RiskAssessment.name,
+          ResourceType.RiskAssessment.name,
+          RiskAssessment.PROBABILITY.paramName,
+          BigDecimal("100.00").toDouble()
+        )
+      )
+  }
+  @Test
+  fun search_number_less() {
+    val query =
+      Search(ResourceType.RiskAssessment)
+        .apply {
+          filter(RiskAssessment.PROBABILITY) {
+            prefix = ParamPrefixEnum.LESSTHAN
+            value = BigDecimal("100.00")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value < ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.RiskAssessment.name,
+          ResourceType.RiskAssessment.name,
+          RiskAssessment.PROBABILITY.paramName,
+          BigDecimal("100.00").toDouble()
+        )
+      )
+  }
+  @Test
+  fun search_number_lessThanEquals() {
+    val query =
+      Search(ResourceType.RiskAssessment)
+        .apply {
+          filter(RiskAssessment.PROBABILITY) {
+            prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+            value = BigDecimal("100.00")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value <= ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.RiskAssessment.name,
+          ResourceType.RiskAssessment.name,
+          RiskAssessment.PROBABILITY.paramName,
+          BigDecimal("100.00").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_integer_endsBefore_error() {
+    val illegalArgumentException =
+      assertThrows(java.lang.IllegalArgumentException::class.java) {
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+              value = BigDecimal("100")
+            }
+          }
+          .getQuery()
+      }
+    assertThat(illegalArgumentException.message)
+      .isEqualTo("Prefix ENDS_BEFORE not allowed for Integer type")
+  }
+  @Test
+  fun search_decimal_endsBefore() {
+    val query =
+      Search(ResourceType.RiskAssessment)
+        .apply {
+          filter(RiskAssessment.PROBABILITY) {
+            prefix = ParamPrefixEnum.ENDS_BEFORE
+            value = BigDecimal("100.00")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value < ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.RiskAssessment.name,
+          ResourceType.RiskAssessment.name,
+          RiskAssessment.PROBABILITY.paramName,
+          BigDecimal("100.00").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_integer_startsAfter_error() {
+    val illegalArgumentException =
+      assertThrows(java.lang.IllegalArgumentException::class.java) {
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.STARTS_AFTER
+              value = BigDecimal("100")
+            }
+          }
+          .getQuery()
+      }
+    assertThat(illegalArgumentException.message)
+      .isEqualTo("Prefix STARTS_AFTER not allowed for Integer type")
+  }
+
+  @Test
+  fun search_decimal_startsAfter() {
+    val query =
+      Search(ResourceType.RiskAssessment)
+        .apply {
+          filter(RiskAssessment.PROBABILITY) {
+            prefix = ParamPrefixEnum.STARTS_AFTER
+            value = BigDecimal("100.00")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value > ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.RiskAssessment.name,
+          ResourceType.RiskAssessment.name,
+          RiskAssessment.PROBABILITY.paramName,
+          BigDecimal("100.00").toDouble()
+        )
+      )
+  }
+  @Test
+  fun search_number_approximate() {
+    val query =
+      Search(ResourceType.RiskAssessment)
+        .apply {
+          filter(RiskAssessment.PROBABILITY) {
+            prefix = ParamPrefixEnum.APPROXIMATE
+            value = BigDecimal("100.00")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM NumberIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value <= ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.RiskAssessment.name,
+          ResourceType.RiskAssessment.name,
+          RiskAssessment.PROBABILITY.paramName,
+          BigDecimal("90.00").toDouble(),
+          BigDecimal("110.00").toDouble()
         )
       )
   }
