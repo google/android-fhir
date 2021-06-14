@@ -62,13 +62,14 @@ class QuestionnaireResponseItemValidatorTest {
       QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
 
     assertThat(validateAggregationFromChildValidators.isValid).isTrue()
-    assertThat(validateAggregationFromChildValidators.validationMessages).isEmpty()
+    assertThat(validateAggregationFromChildValidators.validationLinkIdAndMessages).isEmpty()
   }
 
   @Test
   fun exceededMaxMinValue_shouldReturnInvalidResultWithMessages() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "a-question"
         addExtension(
           Extension().apply {
             url = MIN_VALUE_EXTENSION_URL
@@ -84,6 +85,7 @@ class QuestionnaireResponseItemValidatorTest {
       }
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "a-question"
         addAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
             value = IntegerType(550)
@@ -95,7 +97,7 @@ class QuestionnaireResponseItemValidatorTest {
       QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
 
     assertThat(validateAggregationFromChildValidators.isValid).isFalse()
-    assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(2)
+    assertThat(validateAggregationFromChildValidators.validationLinkIdAndMessages.size).isEqualTo(2)
   }
 
   @Test
