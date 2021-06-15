@@ -109,8 +109,8 @@ object Dependencies {
       const val room = "2.3.0"
       const val workRuntimeKtx = "2.5.0"
     }
-    object Protobufs {
-      const val fhirprotobuf = "0.6.1"
+    object FhirProto {
+      const val fhirProto = "0.6.1"
     }
     object Cql {
       const val cqlEngine = "1.3.14-SNAPSHOT"
