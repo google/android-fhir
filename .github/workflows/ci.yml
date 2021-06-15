@@ -18,7 +18,7 @@ name: CI
 # events for the `master` branch
 on:
   push:
-    branches: [ master ]
+    branches: [ master, gsoc/hapi-proto-converter ]
     paths-ignore: 
       - '**.md'
       - 'CODEOWNERS'
@@ -26,7 +26,7 @@ on:
     tags:
       run_ci*
   pull_request:
-    branches: [ master ]
+    branches: [ master, gsoc/hapi-proto-converter ]
     paths-ignore: 
       - '**.md'
       - 'CODEOWNERS'
