@@ -23,4 +23,5 @@
 
     <!-- For display observations in brief, for a patient -->
     <string name="observation_brief_text">%1$s: %2$s\nEffective: %3$s</string>
+    <string name="query_hint_patient_search">Find by Patient Name</string>
 </resources>
