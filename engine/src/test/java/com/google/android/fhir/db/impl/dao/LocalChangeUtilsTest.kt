@@ -60,9 +60,8 @@ class LocalChangeUtilsTest {
     assertThat("Resource IDs Anam10 and Anam30 do not match").isEqualTo(exception.message)
   }
 
-  // INSERT-INSERT,UPDATE,DELETE test cases
   @Test
-  fun mergeLocalChanges_insert_insert() { // insert insert
+  fun mergeLocalChanges_insertion_shouldMergeInsertPayloads() {
     val insert_payload1 =
       LocalChangeEntity(
         id = 1L,
@@ -95,7 +94,7 @@ class LocalChangeUtilsTest {
   }
 
   @Test
-  fun mergeLocalChanges_insert_update() { // insert update
+  fun mergeLocalChanges_insertion_shouldMergeInsertPayloadUpdatePatch() {
 
     val payload1 =
       """
@@ -161,7 +160,7 @@ class LocalChangeUtilsTest {
   }
 
   @Test
-  fun mergeLocalChanges_insert_delete() { // insert delete
+  fun mergeLocalChanges_insertion_shouldMergeInsertPayloadDeletePayload() {
 
     val insert_payload1 =
       LocalChangeEntity(
@@ -195,9 +194,8 @@ class LocalChangeUtilsTest {
       .isEqualTo(insertPayload1_and_deletePayload)
   }
 
-  // UPDATE-INSERT,UPDATE,DELETE test cases
   @Test
-  fun mergeLocalChanges_update_insert() { // update insert
+  fun mergeLocalChanges_updation_shouldMergeUpdatePatchInsertPayload() {
     val payload1 =
       """
     {
@@ -225,7 +223,6 @@ class LocalChangeUtilsTest {
       ]
     """.trimMargin()
 
-    // converting the json payload to json node type
     val objectMapper = ObjectMapper()
     val payload_json_node: JsonNode = objectMapper.readTree(payload1)
 
@@ -263,7 +260,7 @@ class LocalChangeUtilsTest {
   }
 
   @Test
-  fun mergeLocalChanges_update_update() { // update update
+  fun mergeLocalChanges_updation_shouldMergeUpdatePatches() {
 
     val json_patch =
       """
@@ -309,7 +306,7 @@ class LocalChangeUtilsTest {
   }
 
   @Test
-  fun mergeLocalChanges_update_delete() { // update delete
+  fun mergeLocalChanges_updation_shouldMergeUpdatePatchDeletePayload() {
 
     val json_patch =
       """
@@ -354,9 +351,8 @@ class LocalChangeUtilsTest {
       .isEqualTo(uploadJsonPatch_deletePayload)
   }
 
-  // DELETE-INSERT,UPDATE,DELETE test cases
   @Test
-  fun mergeLocalChanges_delete_and_insert() { // delete insert
+  fun mergeLocalChanges_deletion_shouldMergeDeleteAndInsertPayload() {
 
     val delete_payload =
       LocalChangeEntity(
@@ -391,7 +387,7 @@ class LocalChangeUtilsTest {
   }
 
   @Test
-  fun mergeLocalChanges_delete_and_update() { // delete update
+  fun mergeLocalChanges_deletion_shouldMergeDeletePayloadUpdatePatch() {
 
     val json_patch =
       """
@@ -432,8 +428,7 @@ class LocalChangeUtilsTest {
   }
 
   @Test
-  fun mergeLocalChanges_delete_delete() { // delete delete
-
+  fun mergeLocalChanges_deletion_shouldMergeDeletePayloads() {
     val delete_payload =
       LocalChangeEntity(
         id = 9L,
