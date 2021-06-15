@@ -48,6 +48,12 @@ class QuestionnaireResponseItemValidatorTest {
             this.setValue(IntegerType(300))
           }
         )
+        addExtension(
+          Extension().apply {
+            url = REGEX_EXTENSION_URL
+            this.setValue(StringType("[0-9]+"))
+          }
+        )
       }
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
@@ -124,5 +130,32 @@ class QuestionnaireResponseItemValidatorTest {
 
     assertThat(validateAggregationFromChildValidators.isValid).isFalse()
     assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(2)
+  }
+
+  @Test
+  fun notMatchRegex_shouldReturnInvalidResultWithMessages() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            url = REGEX_EXTENSION_URL
+            this.setValue(StringType("[0-9]+\\.[0-9]+"))
+          }
+        )
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = IntegerType("3141516")
+          }
+        )
+      }
+
+    val validateAggregationFromChildValidators =
+      QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
+
+    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
+    assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(1)
   }
 }
