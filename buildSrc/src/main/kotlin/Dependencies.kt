@@ -26,7 +26,7 @@ object Dependencies {
     const val workRuntimeKtx = "androidx.work:work-runtime-ktx:${Versions.Androidx.workRuntimeKtx}"
   }
 
-  object Protobufs {
+  object FhirProto {
     const val fhirProtobufs = "com.google.fhir:r4:${Versions.Protobufs.fhirprotobuf}"
   }
   object Cql {
