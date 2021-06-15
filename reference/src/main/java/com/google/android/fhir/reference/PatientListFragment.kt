@@ -36,6 +36,7 @@ class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
   private lateinit var patientListViewModel: PatientListViewModel
   private lateinit var searchView: SearchView
+  private val TAG = this.javaClass.name
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -65,13 +66,13 @@ class PatientListFragment : Fragment() {
     patientListViewModel.liveSearchedPatients.observe(
       viewLifecycleOwner,
       {
-        Log.d("PatientListActivity", "Submitting ${it.count()} patient records")
+        Log.d(TAG, "Submitting ${it.count()} patient records")
         adapter.submitList(it)
       }
     )
     patientListViewModel.patientCount.observe(
       viewLifecycleOwner,
-      { Log.d("PatientListActivity", "$it Patient") }
+      { Log.d(TAG, "$it Patient") }
     )
 
     patientListViewModel.patientCount.observe(

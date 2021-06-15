@@ -40,7 +40,7 @@ import org.hl7.fhir.r4.model.ResourceType
 internal abstract class LocalChangeDao {
 
   lateinit var iParser: IParser
-
+  private val TAG = this.javaClass.name
   @Insert abstract fun addLocalChange(localChangeEntity: LocalChangeEntity)
 
   @Transaction
@@ -81,7 +81,7 @@ internal abstract class LocalChangeDao {
     val jsonDiff = LocalChangeUtils.diff(iParser, oldResource, resource)
     if (jsonDiff.length() == 0) {
       Log.i(
-        "LocalChangeDao",
+        TAG,
         "New resource ${resource.resourceType}/${resource.id} is same as old resource. " +
           "Not inserting UPDATE LocalChange."
       )
