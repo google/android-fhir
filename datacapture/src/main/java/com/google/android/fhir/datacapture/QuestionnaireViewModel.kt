@@ -37,7 +37,6 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     questionnaire =
       FhirContext.forR4().newJsonParser().parseResource(questionnaireJson) as Questionnaire
   }
-
   /** The current questionnaire response as questions are being answered. */
   private var questionnaireResponse: QuestionnaireResponse
 
@@ -73,9 +72,16 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   private val modificationCount = MutableStateFlow(0)
 
   /** Callback function to update the UI. */
-  private val questionnaireResponseItemChangedCallback: (String) -> Unit = { linkId ->
+  private val questionnaireResponseItemChangedCallback:
+    (String, QuestionnaireResponse.QuestionnaireResponseItemComponent) -> Unit =
+      { linkId, questionnaireResponseItem ->
     linkIdToQuestionnaireItemMap[linkId]?.let {
       if (it.hasNestedItemsWithinAnswers) {
+        if (questionnaireResponseItem.answer.first().hasValueBooleanType() &&
+            !questionnaireResponseItem.answer.first().valueBooleanType.booleanValue()
+        ) {
+          questionnaireResponseItem.answer.removeFirstOrNull()
+        }
         linkIdToQuestionnaireResponseItemMap[linkId]!!.addNestedItemsToAnswer(it)
       }
     }
@@ -148,7 +154,10 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       if (enabled) {
         questionnaireItemViewItemList.add(
           QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
-            questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
+            questionnaireResponseItemChangedCallback(
+              questionnaireItem.linkId,
+              questionnaireResponseItem
+            )
           }
         )
         questionnaireItemViewItemList.addAll(
@@ -177,11 +186,7 @@ private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedIt
   questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
 ) {
   if (answer.isNotEmpty()) {
-    if (!answer.first().hasValueCoding() && !answer.first().valueBooleanType.booleanValue()) {
-      answer.removeFirstOrNull()
-    } else {
-      answer.first().item = questionnaireItemComponent.listOfItemInAnswer()
-    }
+    answer.first().item = questionnaireItemComponent.listOfItemInAnswer()
   }
 }
 
