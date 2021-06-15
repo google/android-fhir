@@ -24,3 +24,9 @@ suspend inline fun <reified R : Resource> FhirEngine.search(init: Search.() -> U
   search.init()
   return this.search(search)
 }
+
+suspend inline fun <reified R : Resource> FhirEngine.count(init: Search.() -> Unit): Long {
+  val search = Search(type = R::class.java.newInstance().resourceType)
+  search.init()
+  return this.count(search)
+}

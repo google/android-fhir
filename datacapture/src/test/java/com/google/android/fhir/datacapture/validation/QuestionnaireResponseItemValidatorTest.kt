@@ -22,6 +22,7 @@ import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -65,7 +66,7 @@ class QuestionnaireResponseItemValidatorTest {
   }
 
   @Test
-  fun shouldReturnInvalidResultWithMessages() {
+  fun exceededMaxMinValue_shouldReturnInvalidResultWithMessages() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -86,6 +87,34 @@ class QuestionnaireResponseItemValidatorTest {
         addAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
             value = IntegerType(550)
+          }
+        )
+      }
+
+    val validateAggregationFromChildValidators =
+      QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
+
+    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
+    assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(2)
+  }
+
+  @Test
+  fun exceededMaxMinLength_shouldReturnInvalidResultWithMessages() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        maxLength = 10
+        addExtension(
+          Extension().apply {
+            url = MIN_LENGTH_EXTENSION_URL
+            this.setValue(IntegerType(20))
+          }
+        )
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = StringType("Length: 15chars")
           }
         )
       }
