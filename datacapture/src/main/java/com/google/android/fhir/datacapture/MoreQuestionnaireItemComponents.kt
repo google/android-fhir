@@ -46,7 +46,7 @@ internal val Questionnaire.QuestionnaireItemComponent.itemControl: String?
  * nested items within [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent](s).
  */
 internal val Questionnaire.QuestionnaireItemComponent.hasNestedItemsWithinAnswers: Boolean
-  get() = item.isNotEmpty() && type != Questionnaire.QuestionnaireItemType.GROUP
+  get() = !item.isNullOrEmpty() && type != Questionnaire.QuestionnaireItemType.GROUP
 
 private fun StringType.getLocalizedText(
   lang: String = Locale.getDefault().toLanguageTag()
