@@ -44,7 +44,7 @@ dependencies {
   androidTestImplementation(Dependencies.truth)
 
   api(Dependencies.hapiFhirStructuresR4) { exclude(module = "junit") }
-  implementation(Dependencies.Protobufs.fhirProtobufs)
+  implementation(Dependencies.FhirProto.fhirProtobufs)
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
   implementation(Dependencies.Kotlin.stdlib)
 

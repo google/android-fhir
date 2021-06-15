@@ -27,7 +27,7 @@ object Dependencies {
   }
 
   object FhirProto {
-    const val fhirProtobufs = "com.google.fhir:r4:${Versions.Protobufs.fhirprotobuf}"
+    const val fhirProtobufs = "com.google.fhir:r4:${Versions.FhirProto.fhirProto}"
   }
   object Cql {
     const val cqlEngine = "org.opencds.cqf:cql-engine:${Versions.Cql.cqlEngine}"
