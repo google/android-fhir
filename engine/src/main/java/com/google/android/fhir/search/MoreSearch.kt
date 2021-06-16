@@ -128,9 +128,9 @@ fun NumberFilter.query(type: ResourceType): SearchQuery {
   return SearchQuery(
     """
      SELECT resourceId FROM NumberIndexEntity
-     WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.first}
+     WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
        """,
-    listOf(type.name, parameter.paramName) + conditionParamPair.second
+    listOf(type.name, parameter.paramName) + conditionParamPair.params
   )
 }
 
@@ -149,9 +149,9 @@ fun DateFilter.query(type: ResourceType): SearchQuery {
   return SearchQuery(
     """
     SELECT resourceId FROM DateIndexEntity 
-    WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.first}
+    WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
     """,
-    listOf(type.name, parameter.paramName) + conditionParamPair.second
+    listOf(type.name, parameter.paramName) + conditionParamPair.params
   )
 }
 
@@ -185,34 +185,27 @@ val Order?.sqlString: String
 private fun getConditionParamPair(
   prefix: ParamPrefixEnum,
   value: DateTimeType
-): Pair<String, List<Any>> {
+): ConditionParam<Long> {
   return when (prefix) {
     ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
-    ParamPrefixEnum.STARTS_AFTER ->
-      "? <= index_from" to listOf(value.precision.add(value.value, 1).time)
-    ParamPrefixEnum.ENDS_BEFORE -> "? >= index_to" to listOf(value.value.time)
+    ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from >= ?", listOf(value.getTsHigh() + 1))
+    ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("? >= index_to", listOf(value.value.time))
     ParamPrefixEnum.NOT_EQUAL ->
-      "index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?" to
-        listOf(
-          value.value.time,
-          value.precision.add(value.value, 1).time - 1,
-          value.value.time,
-          value.precision.add(value.value, 1).time - 1
-        )
+      ConditionParam(
+        "index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?",
+        listOf(value.value.time, value.getTsHigh(), value.value.time, value.getTsHigh())
+      )
     ParamPrefixEnum.EQUAL ->
-      "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?" to
-        listOf(
-          value.value.time,
-          value.precision.add(value.value, 1).time - 1,
-          value.value.time,
-          value.precision.add(value.value, 1).time - 1
-        )
-    ParamPrefixEnum.GREATERTHAN ->
-      "? <= index_to" to listOf(value.precision.add(value.value, 1).time)
-    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> "? <= index_from" to listOf(value.value.time)
-    ParamPrefixEnum.LESSTHAN -> "? >= index_from" to listOf(value.value.time)
+      ConditionParam(
+        "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
+        listOf(value.value.time, value.getTsHigh(), value.value.time, value.getTsHigh())
+      )
+    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to >= ?", listOf(value.getTsHigh() + 1))
+    ParamPrefixEnum.GREATERTHAN_OR_EQUALS ->
+      ConditionParam("index_from >= ?", listOf(value.value.time))
+    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_from <= ?", listOf(value.value.time))
     ParamPrefixEnum.LESSTHAN_OR_EQUALS ->
-      "? >= index_to" to listOf(value.precision.add(value.value, 1).time)
+      ConditionParam("index_to <= ?", listOf(value.precision.add(value.value, 1).time))
   }
 }
 /**
@@ -222,7 +215,7 @@ private fun getConditionParamPair(
 private fun getConditionParamPair(
   prefix: ParamPrefixEnum?,
   value: BigDecimal
-): Pair<String, List<Double>> {
+): ConditionParam<Double> {
   // Ends_Before and Starts_After are not used with integer values. see
   // https://www.hl7.org/fhir/search.html#prefix
   require(
@@ -232,29 +225,37 @@ private fun getConditionParamPair(
   return when (prefix) {
     ParamPrefixEnum.EQUAL, null -> {
       val precision = value.getRange()
-      "index_value >= ? AND index_value < ?" to
+      ConditionParam(
+        "index_value >= ? AND index_value < ?",
         listOf((value - precision).toDouble(), (value + precision).toDouble())
+      )
     }
-    ParamPrefixEnum.GREATERTHAN -> "index_value > ?" to listOf(value.toDouble())
-    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> "index_value >= ?" to listOf(value.toDouble())
-    ParamPrefixEnum.LESSTHAN -> "index_value < ?" to listOf(value.toDouble())
-    ParamPrefixEnum.LESSTHAN_OR_EQUALS -> "index_value <= ?" to listOf(value.toDouble())
+    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_value > ?", listOf(value.toDouble()))
+    ParamPrefixEnum.GREATERTHAN_OR_EQUALS ->
+      ConditionParam("index_value >= ?", listOf(value.toDouble()))
+    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_value < ?", listOf(value.toDouble()))
+    ParamPrefixEnum.LESSTHAN_OR_EQUALS ->
+      ConditionParam("index_value <= ?", listOf(value.toDouble()))
     ParamPrefixEnum.NOT_EQUAL -> {
       val precision = value.getRange()
-      "index_value < ? OR index_value >= ?" to
+      ConditionParam(
+        "index_value < ? OR index_value >= ?",
         listOf((value - precision).toDouble(), (value + precision).toDouble())
+      )
     }
     ParamPrefixEnum.ENDS_BEFORE -> {
-      "index_value < ?" to listOf(value.toDouble())
+      ConditionParam("index_value < ?", listOf(value.toDouble()))
     }
     ParamPrefixEnum.STARTS_AFTER -> {
-      "index_value > ?" to listOf(value.toDouble())
+      ConditionParam("index_value > ?", listOf(value.toDouble()))
     }
     // Approximate to a 10% range see https://www.hl7.org/fhir/search.html#prefix
     ParamPrefixEnum.APPROXIMATE -> {
       val range = value.divide(BigDecimal(10))
-      "index_value >= ? AND index_value <= ?" to
+      ConditionParam(
+        "index_value >= ? AND index_value <= ?",
         listOf((value - range).toDouble(), (value + range).toDouble())
+      )
     }
   }
 }
@@ -276,3 +277,14 @@ private fun BigDecimal.getRange(): BigDecimal {
     BigDecimal(5)
   }
 }
+
+/**
+ * Returns the upper bound of the range of the Date's epoch Timestamp. The value is related to the
+ * precision of the DateTimeType
+ *
+ * For example 2001-01-01 includes all values on the given day and thus this functions will return
+ * 978373799 ( which is one second less than the epoch of 2001-01-02)
+ */
+private fun DateTimeType.getTsHigh(): Long = precision.add(value, 1).time - 1
+
+private data class ConditionParam<T>(val condition: String, val params: List<T>)

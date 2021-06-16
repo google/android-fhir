@@ -60,6 +60,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     filter.init()
     dateFilter.add(filter)
   }
+
   fun filter(filter: TokenClientParam, coding: Coding) =
     tokenFilters.add(TokenFilter(parameter = filter, uri = coding.system, code = coding.code))
 

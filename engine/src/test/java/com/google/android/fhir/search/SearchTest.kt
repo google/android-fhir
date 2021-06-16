@@ -558,7 +558,7 @@ class SearchTest {
     WHERE a.resourceType = ?
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND ? <= index_from
+    WHERE resourceType = ? AND index_name = ? AND index_from >= ?
     )
         """.trimIndent()
       )
@@ -708,7 +708,7 @@ class SearchTest {
     WHERE a.resourceType = ?
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND ? <= index_from
+    WHERE resourceType = ? AND index_name = ? AND index_to >= ?
     )
         """.trimIndent()
       )
@@ -744,7 +744,7 @@ class SearchTest {
     WHERE a.resourceType = ?
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND ? <= index_from
+    WHERE resourceType = ? AND index_name = ? AND index_from >= ?
     )
         """.trimIndent()
       )
@@ -780,7 +780,7 @@ class SearchTest {
     WHERE a.resourceType = ?
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND ? >= index_to
+    WHERE resourceType = ? AND index_name = ? AND index_from <= ?
     )
         """.trimIndent()
       )
@@ -816,7 +816,7 @@ class SearchTest {
     WHERE a.resourceType = ?
     AND a.resourceId IN (
     SELECT resourceId FROM DateIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND ? >= index_to
+    WHERE resourceType = ? AND index_name = ? AND index_to <= ?
     )
         """.trimIndent()
       )
