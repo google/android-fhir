@@ -59,7 +59,7 @@ class PatientDetailsFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    val recyclerView: RecyclerView = binding.observationListInclude.observationList
+    val recyclerView: RecyclerView = binding.observationList.observationList
     val adapter = ObservationItemRecyclerViewAdapter()
     recyclerView.adapter = adapter
     fhirEngine = FhirApplication.fhirEngine(requireContext())
@@ -80,9 +80,9 @@ class PatientDetailsFragment : Fragment() {
   private fun setupPatientData(view: View, patient: PatientListViewModel.PatientItem?) {
     patient?.let {
       binding.patientDetail.text = HtmlCompat.fromHtml(it.html, HtmlCompat.FROM_HTML_MODE_LEGACY)
-      binding.patientListItemInclude.name.text = it.name
-      binding.patientListItemInclude.dob.text = it.dob
-      binding.patientListItemInclude.gender.text = it.phone
+      binding.patientListItem.name.text = it.name
+      binding.patientListItem.dob.text = it.dob
+      binding.patientListItem.gender.text = it.phone
 
       (requireActivity() as AppCompatActivity).supportActionBar?.apply {
         title = it.name

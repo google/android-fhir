@@ -18,9 +18,9 @@ package com.google.android.fhir.reference
 
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.reference.databinding.PatientListItemBinding
+import com.google.android.fhir.reference.databinding.PatientListItemViewBinding
 
-class PatientItemViewHolder(private val binding: PatientListItemBinding) :
+class PatientItemViewHolder(private val binding: PatientListItemViewBinding) :
   RecyclerView.ViewHolder(binding.root) {
   private val idView: TextView = binding.idPatientNumber
   private val nameView: TextView = binding.name

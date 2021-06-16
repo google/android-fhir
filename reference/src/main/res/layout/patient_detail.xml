@@ -40,8 +40,8 @@
         >
 
             <include
-                android:id="@+id/patient_list_item_include"
-                layout="@layout/patient_list_item"
+                android:id="@+id/patient_list_item"
+                layout="@layout/patient_list_item_view"
             />
 
             <TextView
@@ -62,8 +62,8 @@
     >
 
         <include
-            android:id="@+id/observation_list_include"
-            layout="@layout/observation_list"
+            android:id="@+id/observation_list"
+            layout="@layout/observation_list_view"
         />
 
     </androidx.core.widget.NestedScrollView>

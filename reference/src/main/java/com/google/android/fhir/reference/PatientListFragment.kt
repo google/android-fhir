@@ -63,7 +63,7 @@ class PatientListFragment : Fragment() {
           PatientListViewModelFactory(requireActivity().application, fhirEngine)
         )
         .get(PatientListViewModel::class.java)
-    val recyclerView: RecyclerView = binding.patientListInclude.patientList
+    val recyclerView: RecyclerView = binding.patientList.patientListRecyclerView
     val adapter = PatientItemRecyclerViewAdapter(this::onPatientItemClicked)
     recyclerView.adapter = adapter
 
@@ -81,7 +81,7 @@ class PatientListFragment : Fragment() {
 
     patientListViewModel.patientCount.observe(
       viewLifecycleOwner,
-      { binding.patientListInclude.patientCount.text = "$it Patient(s)" }
+      { binding.patientList.patientCount.text = "$it Patient(s)" }
     )
     searchView = binding.search
     searchView.setOnQueryTextListener(
