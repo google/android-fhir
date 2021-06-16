@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import com.google.android.fhir.datacapture.hasNestedItemsWithinAnswers
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -42,6 +43,10 @@ object QuestionnaireValidator {
       linkIdToValidationResultMap[questionnaireItem.linkId]?.add(
         QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
       )
+      if (questionnaireItem.hasNestedItemsWithinAnswers) {
+        // TODO(https://github.com/google/android-fhir/issues/487): Validates all answers.
+        validate(questionnaireItem.item, questionnaireResponseItem.answer[0].item)
+      }
       validate(questionnaireItem.item, questionnaireResponseItem.item)
     }
     return linkIdToValidationResultMap
