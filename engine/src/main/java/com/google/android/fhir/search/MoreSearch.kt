@@ -145,8 +145,7 @@ fun ReferenceFilter.query(type: ResourceType): SearchQuery {
 }
 
 fun DateFilter.query(type: ResourceType): SearchQuery {
-  val value = value!!
-  val conditionParamPair = getConditionParamPair(prefix, value)
+  val conditionParamPair = getConditionParamPair(prefix, value!!)
   return SearchQuery(
     """
     SELECT resourceId FROM DateIndexEntity 
