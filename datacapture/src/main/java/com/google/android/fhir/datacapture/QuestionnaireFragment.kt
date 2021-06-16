@@ -27,8 +27,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
-import com.google.android.fhir.datacapture.validation.ValidationResult
 import kotlinx.coroutines.flow.collect
 
 class QuestionnaireFragment : Fragment() {
@@ -68,20 +66,8 @@ class QuestionnaireFragment : Fragment() {
   // Returns the current questionnaire response
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
-  fun validateQuestionnaireResponse(): MutableList<ValidationResult> {
-    var results = mutableListOf<ValidationResult>()
-    viewModel.questionnaireItemViewItemList.forEach {
-      val result =
-        QuestionnaireResponseItemValidator.validate(
-          it.questionnaireItem,
-          it.questionnaireResponseItem
-        )
-      if (!result.isValid) {
-        results.add(result)
-      }
-    }
-    return results
-  }
+  // Returns the current questionnaire
+  fun getQuestionnaire() = viewModel.getQuestionnaire()
 
   companion object {
     const val BUNDLE_KEY_QUESTIONNAIRE = "questionnaire"
