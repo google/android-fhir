@@ -30,7 +30,7 @@
         android:theme="@style/AppTheme"
     >
         <activity
-            android:name="com.google.android.fhir.reference.PatientListActivity"
+            android:name="com.google.android.fhir.reference.MainActivity"
             android:label="@string/title_patient_list"
             android:theme="@style/AppTheme.NoActionBar"
         >
@@ -39,17 +39,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name="com.google.android.fhir.reference.PatientDetailActivity"
-            android:label="@string/title_patient_detail"
-            android:parentActivityName="com.google.android.fhir.reference.PatientListActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-        >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.google.android.fhir.reference.PatientListActivity"
-            />
         </activity>
     </application>
     <uses-permission android:name="android.permission.INTERNET" />

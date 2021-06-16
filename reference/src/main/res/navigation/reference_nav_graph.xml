@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/reference_nav_graph"
+    app:startDestination="@id/patient_list"
+>
+
+    <fragment
+        android:id="@+id/patient_list"
+        android:name="com.google.android.fhir.reference.PatientListFragment"
+        android:label="Patient List"
+        tools:layout="@layout/patient_list"
+    >
+        <action
+            android:id="@+id/navigate_to_product_detail"
+            app:destination="@id/patient_details"
+        />
+    </fragment>
+
+    <fragment
+        android:id="@+id/patient_details"
+        android:name="com.google.android.fhir.reference.PatientDetailsFragment"
+        android:label="Patient Details"
+        tools:layout="@layout/patient_detail"
+    >
+        <argument android:name="patient_id" app:argType="string" />
+    </fragment>
+
+</navigation>
