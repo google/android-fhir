@@ -62,7 +62,7 @@ class QuestionnaireResponseItemValidatorTest {
       QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
 
     assertThat(validateAggregationFromChildValidators.isValid).isTrue()
-    assertThat(validateAggregationFromChildValidators.validationLinkIdAndMessages).isEmpty()
+    assertThat(validateAggregationFromChildValidators.validationMessages).isEmpty()
   }
 
   @Test
@@ -97,7 +97,7 @@ class QuestionnaireResponseItemValidatorTest {
       QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
 
     assertThat(validateAggregationFromChildValidators.isValid).isFalse()
-    assertThat(validateAggregationFromChildValidators.validationLinkIdAndMessages.size).isEqualTo(2)
+    assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(2)
   }
 
   @Test
