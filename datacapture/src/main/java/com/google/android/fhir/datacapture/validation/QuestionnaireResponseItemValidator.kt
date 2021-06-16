@@ -41,20 +41,11 @@ internal object QuestionnaireResponseItemValidator {
     validators.forEach {
       validationResults.add(it.validate(questionnaireItem, questionnaireResponseItem))
     }
-    val allValidationResults =
-      ValidationResult(
-        validationResults.all { it.isValid },
-        validationResults
-          .map { Pair(it.linkId, it.message) }
-          .filter { it.first != null }
-          .toList() as
-          List<Pair<String, String>>
-      )
-    return allValidationResults
+    return ValidationResult(
+      validationResults.all { it.isValid },
+      validationResults.mapNotNull { it.message }.toList()
+    )
   }
 }
 
-data class ValidationResult(
-  var isValid: Boolean,
-  val validationLinkIdAndMessages: List<Pair<String, String>>
-)
+internal data class ValidationResult(var isValid: Boolean, val validationMessages: List<String>)

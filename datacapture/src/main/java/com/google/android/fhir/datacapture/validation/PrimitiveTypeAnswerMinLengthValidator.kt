@@ -38,7 +38,7 @@ internal object PrimitiveTypeAnswerMinLengthValidator :
     predicate = { extension, answer ->
       answer.value.isPrimitive &&
         (answer.value as PrimitiveType<*>).asStringValue().length <
-          (extension.value as IntegerType).value
+        (extension.value as IntegerType).value
     },
     messageGenerator = { extension: Extension ->
       ("The minimum number of characters that are permitted in the answer is: " +

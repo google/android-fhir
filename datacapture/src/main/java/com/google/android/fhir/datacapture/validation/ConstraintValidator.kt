@@ -34,9 +34,5 @@ internal interface ConstraintValidator {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ): ConstraintValidationResult
 
-  data class ConstraintValidationResult(
-    val isValid: Boolean,
-    val linkId: String,
-    val message: String?
-  )
+  data class ConstraintValidationResult(val isValid: Boolean, val message: String?)
 }

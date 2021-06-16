@@ -63,8 +63,8 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
 
   private fun applyValidationResult(validationResult: ValidationResult) {
     val validationMessage =
-      validationResult.validationLinkIdAndMessages.joinToString {
-        it.second.plus(System.getProperty("line.separator"))
+      validationResult.validationMessages.joinToString {
+        it.plus(System.getProperty("line.separator"))
       }
     textInputEditText.error = if (validationMessage == "") null else validationMessage
   }

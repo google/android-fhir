@@ -24,7 +24,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal open class ValueConstraintExtensionValidator(
   val url: String,
   val predicate:
-    (Extension, QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> Boolean,
+  (Extension, QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> Boolean,
   val messageGenerator: (Extension) -> String
 ) : ConstraintValidator {
   override fun validate(
@@ -36,13 +36,9 @@ internal open class ValueConstraintExtensionValidator(
       // TODO(https://github.com/google/android-fhir/issues/487): Validates all answers.
       val answer = questionnaireResponseItem.answer[0]
       if (predicate(extension, answer)) {
-        return ConstraintValidator.ConstraintValidationResult(
-          false,
-          questionnaireItem.linkId,
-          messageGenerator(extension)
-        )
+        return ConstraintValidator.ConstraintValidationResult(false, messageGenerator(extension))
       }
     }
-    return ConstraintValidator.ConstraintValidationResult(true, null, null)
+    return ConstraintValidator.ConstraintValidationResult(true, null)
   }
 }
