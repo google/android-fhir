@@ -16,5 +16,8 @@
         app:queryHint="@string/query_hint_patient_search"
     />
 
-    <include layout="@layout/patient_list" />
+    <include
+        android:id="@+id/patient_list_include"
+        layout="@layout/patient_list"
+    />
 </LinearLayout>
