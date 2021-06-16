@@ -21,7 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".PatientListActivity"
+    tools:context=".MainActivity"
 >
 
     <com.google.android.material.appbar.AppBarLayout
@@ -40,31 +40,14 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <LinearLayout
-        android:id="@+id/frameLayout"
+    <androidx.fragment.app.FragmentContainerView
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:orientation="vertical"
-    >
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/search"
-            app:iconifiedByDefault="false"
-            app:queryHint="Find by Patient Name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-        />
-        <include layout="@layout/patient_list" />
-    </LinearLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:visibility="gone"
-        app:srcCompat="@android:drawable/ic_menu_add"
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        app:navGraph="@navigation/reference_nav_graph"
+        app:defaultNavHost="true"
     />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
