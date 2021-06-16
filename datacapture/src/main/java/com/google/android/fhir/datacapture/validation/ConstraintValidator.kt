@@ -36,7 +36,7 @@ internal interface ConstraintValidator {
 
   data class ConstraintValidationResult(
     val isValid: Boolean,
-    val linkId: String?,
+    val linkId: String,
     val message: String?
   )
 }
