@@ -26,6 +26,7 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.PrimitiveType
+import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
@@ -133,31 +134,29 @@ class RegexValidatorTest {
     checkAnswerMatchRegex("[.*", StringType("http://www.google.com"))
   }
 
-  //  @Test
-  //  fun nonPrimitiveUnderMinLength_shouldReturnValidResult() {
-  //    val requirement =
-  //      Questionnaire.QuestionnaireItemComponent().apply {
-  //        addExtension(
-  //          Extension().apply {
-  //            url = MIN_LENGTH_EXTENSION_URL
-  //            this.setValue(IntegerType(100))
-  //          }
-  //        )
-  //      }
-  //    val response =
-  //      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-  //        addAnswer(
-  //          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-  //            this.value = Quantity(1234567.89)
-  //          }
-  //        )
-  //      }
-  //
-  //    val validationResult = PrimitiveTypeAnswerMaxLengthValidator.validate(requirement, response)
-  //
-  //    assertThat(validationResult.isValid).isTrue()
-  //    assertThat(validationResult.message.isNullOrBlank()).isTrue()
-  //  }
+  @Test
+  fun nonPrimitive_notMatch_shouldReturnValidResult() {
+    val requirement =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            url = REGEX_EXTENSION_URL
+            this.setValue(StringType("[0-9]+"))
+          }
+        )
+      }
+    val response =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        addAnswer(
+          QuestionnaireResponseItemAnswerComponent().apply { this.value = Quantity(1234567.89) }
+        )
+      }
+
+    val validationResult = RegexValidator.validate(requirement, response)
+
+    assertThat(validationResult.isValid).isTrue()
+    assertThat(validationResult.message.isNullOrBlank()).isTrue()
+  }
 
   private companion object {
 
