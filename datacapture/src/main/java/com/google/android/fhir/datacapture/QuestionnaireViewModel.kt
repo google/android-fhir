@@ -72,17 +72,21 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   private val modificationCount = MutableStateFlow(0)
 
   /** Callback function to update the UI. */
-  private val questionnaireResponseItemChangedCallback:
-    (String, QuestionnaireResponse.QuestionnaireResponseItemComponent) -> Unit =
-      { linkId, questionnaireResponseItem ->
+  private val questionnaireResponseItemChangedCallback: (String) -> Unit = { linkId ->
     linkIdToQuestionnaireItemMap[linkId]?.let {
       if (it.hasNestedItemsWithinAnswers) {
-        if (questionnaireResponseItem.answer.first().hasValueBooleanType() &&
-            !questionnaireResponseItem.answer.first().valueBooleanType.booleanValue()
+        if (linkIdToQuestionnaireResponseItemMap[linkId]!!.answer.first().value.isEmpty ||
+            ((linkIdToQuestionnaireResponseItemMap[linkId]!!.answer.first().hasValueBooleanType() &&
+              !linkIdToQuestionnaireResponseItemMap[linkId]!!
+                .answer
+                .first()
+                .valueBooleanType
+                .booleanValue()))
         ) {
-          questionnaireResponseItem.answer.removeFirstOrNull()
+          linkIdToQuestionnaireResponseItemMap[linkId]!!.answer?.removeFirstOrNull()
+        } else {
+          linkIdToQuestionnaireResponseItemMap[linkId]!!.addNestedItemsToAnswer(it)
         }
-        linkIdToQuestionnaireResponseItemMap[linkId]!!.addNestedItemsToAnswer(it)
       }
     }
     modificationCount.value += 1
@@ -154,10 +158,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       if (enabled) {
         questionnaireItemViewItemList.add(
           QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
-            questionnaireResponseItemChangedCallback(
-              questionnaireItem.linkId,
-              questionnaireResponseItem
-            )
+            questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
           }
         )
         questionnaireItemViewItemList.addAll(

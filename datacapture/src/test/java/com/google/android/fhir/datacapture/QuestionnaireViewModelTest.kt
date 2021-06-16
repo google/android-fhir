@@ -719,13 +719,13 @@ class QuestionnaireViewModelTest {
             linkId = "a-boolean-item"
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                this.value = valueBooleanType.setValue(false)
+                this.value = valueBooleanType.setValue(true)
                 addItem(
                   QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
                     linkId = "a-nested-boolean-item"
                     addAnswer(
                       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                        this.value = valueBooleanType.setValue(false)
+                        this.value = valueBooleanType.setValue(true)
                       }
                     )
                   }
@@ -740,16 +740,72 @@ class QuestionnaireViewModelTest {
 
     viewModel.questionnaireItemViewItemList[0].questionnaireResponseItem.addAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-        this.value = valueBooleanType.setValue(false)
+        this.value = valueBooleanType.setValue(true)
       }
     )
     viewModel.questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
     viewModel.questionnaireItemViewItemList[0].questionnaireResponseItem.answer[0].item[0]
       .addAnswer(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          this.value = valueBooleanType.setValue(false)
+          this.value = valueBooleanType.setValue(true)
         }
       )
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+  }
+
+  @Test
+  fun questionnaireHasNestedItem_notOfTypeGroup_shouldRemoveNestedItemsWhenParentItemValueFalse() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-boolean-item"
+            text = "Parent question"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "a-nested-boolean-item"
+                text = "Nested question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+      }
+
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        this.questionnaire = "Questionnaire/a-questionnaire"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-boolean-item"
+          }
+        )
+      }
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+    val viewModel = QuestionnaireViewModel(state)
+
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItem.addAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        this.value = valueBooleanType.setValue(true)
+      }
+    )
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItem.answer[0].item[0]
+      .addAnswer(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          this.value = valueBooleanType.setValue(true)
+        }
+      )
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItem.answer.clear()
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItem.addAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        this.value = valueBooleanType.setValue(false)
+      }
+    )
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
     assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
   }
 
