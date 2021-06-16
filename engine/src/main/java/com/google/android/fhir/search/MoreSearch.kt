@@ -210,7 +210,7 @@ private fun getConditionParamPair(
     ParamPrefixEnum.GREATERTHAN ->
       "? <= index_from" to listOf(value.precision.add(value.value, 1).time)
     ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> "? <= index_from" to listOf(value.value.time)
-    ParamPrefixEnum.LESSTHAN -> "? >= index_to" to listOf(value.value.time)
+    ParamPrefixEnum.LESSTHAN -> "? >= index_from" to listOf(value.value.time)
     ParamPrefixEnum.LESSTHAN_OR_EQUALS ->
       "? >= index_to" to listOf(value.precision.add(value.value, 1).time)
   }
