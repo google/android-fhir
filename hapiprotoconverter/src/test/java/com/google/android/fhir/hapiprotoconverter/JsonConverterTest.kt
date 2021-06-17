@@ -27,9 +27,9 @@ import org.junit.Test
 
 /** Contains tests for JsonConverter.kt */
 class JsonConverterTest {
-  lateinit var hapiParser: IParser
-  lateinit var protoParser: JsonFormat.Parser
-  lateinit var protoPrinter: JsonFormat.Printer
+  private lateinit var hapiParser: IParser
+  private lateinit var protoParser: JsonFormat.Parser
+  private lateinit var protoPrinter: JsonFormat.Printer
 
   @Before
   fun before_test() {
@@ -47,7 +47,23 @@ class JsonConverterTest {
         addName(org.hl7.fhir.r4.model.HumanName().setFamily("Doe").addGiven("John"))
       }
 
-    val output =
+    val expectedOutput =
+      Patient.newBuilder()
+        .setId(com.google.fhir.r4.core.Id.newBuilder().setValue("Patient/1"))
+        .addName(
+          HumanName.newBuilder()
+            .addGiven(com.google.fhir.r4.core.String.newBuilder().setValue("John"))
+            .setFamily(com.google.fhir.r4.core.String.newBuilder().setValue("Doe"))
+        )
+        .build()
+
+    Truth.assertThat(convert<Patient>(input, hapiParser, protoParser)).isEqualTo(expectedOutput)
+  }
+
+  @Test
+  fun convert_patient_proto_to_hapi() {
+
+    val input =
       Patient.newBuilder()
         .setId(com.google.fhir.r4.core.Id.newBuilder().setValue("1"))
         .addName(
@@ -57,6 +73,18 @@ class JsonConverterTest {
         )
         .build()
 
-    Truth.assertThat(convert<Patient>(input, hapiParser, protoParser)).isEqualTo(output)
+    val expectedOutput =
+      org.hl7.fhir.r4.model.Patient().apply {
+        id = "1"
+        addName(org.hl7.fhir.r4.model.HumanName().setFamily("Doe").addGiven("John"))
+      }
+
+    val actualOutput = convert<org.hl7.fhir.r4.model.Patient>(input, hapiParser, protoPrinter)
+
+    Truth.assertThat(actualOutput.id.toString()).isEqualTo("Patient/${expectedOutput.id}")
+    Truth.assertThat(actualOutput.nameFirstRep.given.toString())
+      .isEqualTo(expectedOutput.nameFirstRep.given.toString())
+    Truth.assertThat(actualOutput.nameFirstRep.family.toString())
+      .isEqualTo(expectedOutput.nameFirstRep.family.toString())
   }
 }
