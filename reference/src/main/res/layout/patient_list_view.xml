@@ -31,7 +31,7 @@
     />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/patient_list_recyclerView"
+        android:id="@+id/patient_list"
         android:layout_below="@+id/patient_count"
         android:name="com.google.fhirengine.example.PatientListFragment"
         android:layout_width="match_parent"

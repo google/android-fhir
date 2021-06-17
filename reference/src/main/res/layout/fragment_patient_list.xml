@@ -17,7 +17,7 @@
     />
 
     <include
-        android:id="@+id/patient_list"
+        android:id="@+id/patient_list_container"
         layout="@layout/patient_list_view"
     />
 </LinearLayout>
