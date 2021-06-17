@@ -186,28 +186,34 @@ private fun getConditionParamPair(
   prefix: ParamPrefixEnum,
   value: DateTimeType
 ): ConditionParam<Long> {
+  val (start, end) = value.rangeEpochMillis
   return when (prefix) {
     ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
-    ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from >= ?", listOf(value.getTsHigh() + 1))
-    ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("? >= index_to", listOf(value.value.time))
+    ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from >= ?", end + 1)
+    ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("? >= index_to", start)
     ParamPrefixEnum.NOT_EQUAL ->
       ConditionParam(
         "index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?",
-        listOf(value.value.time, value.getTsHigh(), value.value.time, value.getTsHigh())
+        start,
+        end,
+        start,
+        end
       )
     ParamPrefixEnum.EQUAL ->
       ConditionParam(
         "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
-        listOf(value.value.time, value.getTsHigh(), value.value.time, value.getTsHigh())
+        start,
+        end,
+        start,
+        end
       )
-    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to >= ?", listOf(value.getTsHigh() + 1))
-    ParamPrefixEnum.GREATERTHAN_OR_EQUALS ->
-      ConditionParam("index_from >= ?", listOf(value.value.time))
-    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_from <= ?", listOf(value.value.time))
-    ParamPrefixEnum.LESSTHAN_OR_EQUALS ->
-      ConditionParam("index_to <= ?", listOf(value.precision.add(value.value, 1).time))
+    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to >= ?", end + 1)
+    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_from >= ?", start)
+    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_from <= ?", start)
+    ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ConditionParam("index_to <= ?", end + 1)
   }
 }
+
 /**
  * Returns the condition and list of params required in NumberFilter.query see
  * https://www.hl7.org/fhir/search.html#number.
@@ -279,12 +285,16 @@ private fun BigDecimal.getRange(): BigDecimal {
 }
 
 /**
- * Returns the upper bound of the range of the Date's epoch Timestamp. The value is related to the
- * precision of the DateTimeType
+ * The range of the range of the Date's epoch Timestamp. The value is related to the precision of
+ * the DateTimeType
  *
  * For example 2001-01-01 includes all values on the given day and thus this functions will return
- * 978373799 ( which is one second less than the epoch of 2001-01-02)
+ * 978307200 (epoch timestamp of 2001-01-01) and 978393599 ( which is one second less than the epoch
+ * of 2001-01-02)
  */
-private fun DateTimeType.getTsHigh(): Long = precision.add(value, 1).time - 1
+private val DateTimeType.rangeEpochMillis
+  get() = value.time to precision.add(value, 1).time - 1
 
-private data class ConditionParam<T>(val condition: String, val params: List<T>)
+private data class ConditionParam<T>(val condition: String, val params: List<T>) {
+  constructor(condition: String, vararg params: T) : this(condition, params.asList())
+}
