@@ -99,8 +99,8 @@ object ResourceMapper {
   }
 
   private fun createQuestionnaireResponse(
-      questions: Questionnaire,
-      answersHashMap: HashMap<String, Any>
+    questions: Questionnaire,
+    answersHashMap: HashMap<String, Any>
   ): QuestionnaireResponse {
 
     questions.item[0].item.forEach {
@@ -112,22 +112,23 @@ object ResourceMapper {
     }
 
     val questionnaireResponse: QuestionnaireResponse =
-        QuestionnaireResponse().apply { questionnaire = questions.id }
+      QuestionnaireResponse().apply { questionnaire = questions.id }
 
     questions.item.forEach { questionnaireResponse.addItem(it.createQuestionnaireResponseItem()) }
     return questionnaireResponse
   }
 
   private fun setInitialValueToQuestionnaire(
-      answersHashMap: HashMap<String, Any>,
-      it: Questionnaire.QuestionnaireItemComponent
+    answersHashMap: HashMap<String, Any>,
+    it: Questionnaire.QuestionnaireItemComponent
   ) {
     if (answersHashMap.keys.contains(it.linkId)) {
       it.apply {
         initial =
-            mutableListOf(
-                Questionnaire.QuestionnaireItemInitialComponent()
-                    .setValue(answersHashMap[it.linkId] as Type?))
+          mutableListOf(
+            Questionnaire.QuestionnaireItemInitialComponent()
+              .setValue(answersHashMap[it.linkId] as Type?)
+          )
       }
     }
   }
@@ -140,12 +141,12 @@ object ResourceMapper {
   }
 
   private fun extractAnswersFromExpression(
-      expressionMap: HashMap<String, String>,
-      resource: Resource
+    expressionMap: HashMap<String, String>,
+    resource: Resource
   ): HashMap<String, Any> {
     val context = FhirContext.forR4()
     val fhirPathEngine =
-        FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
+      FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
     val answersHashMap = HashMap<String, Any>()
     val expressionMapIterator = expressionMap.keys.iterator()
     while (expressionMapIterator.hasNext()) {

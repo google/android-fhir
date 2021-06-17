@@ -188,7 +188,7 @@ private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedIt
  * The hierarchy and order of child items will be retained as specified in the standard. See
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
- fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
+fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
   QuestionnaireResponse.QuestionnaireResponseItemComponent {
   return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
