@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <string-array name="languages">
+        <item>en</item>
+        <item>vi-VN</item>
+    </string-array>
+</resources>
