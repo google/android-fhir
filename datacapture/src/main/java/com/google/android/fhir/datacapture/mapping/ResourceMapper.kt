@@ -18,10 +18,10 @@ package com.google.android.fhir.datacapture.mapping
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
+import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
-import kotlin.collections.HashMap
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Base
@@ -42,6 +42,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
+import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 
@@ -76,85 +77,116 @@ object ResourceMapper {
     }
   }
 
-  fun populate(questionnaire: Questionnaire, resource: Resource): HashMap<String, Any> {
+  fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
     val expressionMap = HashMap<String, String>()
     val questionnaireItemList = questionnaire.item[0].item
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     while (questionnaireItemListIterator.hasNext()) {
       val singleQuestion = questionnaireItemListIterator.next()
       if (singleQuestion.type == Questionnaire.QuestionnaireItemType.GROUP) {
-        singleQuestion.item.forEach { question -> fetchExpression(question, expressionMap) }
+        singleQuestion.item.forEach { question ->
+          question.fetchExpression()?.let { expressionMap[question.linkId] = it.expression }
+        }
       } else {
-        fetchExpression(singleQuestion, expressionMap)
+        singleQuestion.fetchExpression()?.let {
+          expressionMap[singleQuestion.linkId] = it.expression
+        }
       }
     }
 
-    return extractAnswersFromExpression(expressionMap, resource)
+    val answersHashMap = extractAnswersFromExpression(expressionMap, resource)
+    return createQuestionnaireResponse(questionnaire, answersHashMap)
   }
 
-  private fun fetchExpression(
-    question: Questionnaire.QuestionnaireItemComponent,
-    expressionMap: HashMap<String, String>
+  private fun createQuestionnaireResponse(
+      questions: Questionnaire,
+      answersHashMap: HashMap<String, Any>
+  ): QuestionnaireResponse {
+
+    questions.item[0].item.forEach {
+      if (it.type == Questionnaire.QuestionnaireItemType.GROUP) {
+        it.item.forEach { question -> setInitialValueToQuestionnaire(answersHashMap, question) }
+      } else {
+        setInitialValueToQuestionnaire(answersHashMap, it)
+      }
+    }
+
+    val questionnaireResponse: QuestionnaireResponse =
+        QuestionnaireResponse().apply { questionnaire = questions.id }
+
+    questions.item.forEach { questionnaireResponse.addItem(it.createQuestionnaireResponseItem()) }
+    return questionnaireResponse
+  }
+
+  private fun setInitialValueToQuestionnaire(
+      answersHashMap: HashMap<String, Any>,
+      it: Questionnaire.QuestionnaireItemComponent
   ) {
-    question.extension.filter { it.url == ITEM_INITIAL_EXPRESSION_URL }.map {
-      val expression = it.value as Expression
-      expressionMap[question.linkId] = expression.expression
+    if (answersHashMap.keys.contains(it.linkId)) {
+      it.apply {
+        initial =
+            mutableListOf(
+                Questionnaire.QuestionnaireItemInitialComponent()
+                    .setValue(answersHashMap[it.linkId] as Type?))
+      }
     }
   }
 
+  private fun Questionnaire.QuestionnaireItemComponent.fetchExpression(): Expression? {
+    this.extension.filter { it.url == ITEM_INITIAL_EXPRESSION_URL }.map {
+      return it.value as Expression
+    }
+    return null
+  }
+
   private fun extractAnswersFromExpression(
-    expressionMap: HashMap<String, String>,
-    resource: Resource
+      expressionMap: HashMap<String, String>,
+      resource: Resource
   ): HashMap<String, Any> {
     val context = FhirContext.forR4()
     val fhirPathEngine =
-      FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
+        FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
     val answersHashMap = HashMap<String, Any>()
     val expressionMapIterator = expressionMap.keys.iterator()
     while (expressionMapIterator.hasNext()) {
       val key = expressionMapIterator.next()
       val answerExtracted = fhirPathEngine.evaluate(resource, expressionMap[key])
-      val questionType = answerExtracted[0]
-      when {
-        questionType.isDateTime -> {
-          answersHashMap[key] = (questionType as DateType)
-        }
-        questionType.isBooleanPrimitive -> {
-          answersHashMap[key] = (questionType as BooleanType)
-        }
-        questionType.isPrimitive -> {
-          val gender = (questionType as Enumeration<*>).code
-          answersHashMap[key] = StringType(gender)
-        }
-        else -> {
-          when {
-            answerExtracted[0] is HumanName -> {
-              if (key.contains("family")) {
-                val family = (answerExtracted[0] as HumanName).family
-                answersHashMap[key] = StringType(family)
-              } else {
-                answersHashMap[key] = (answerExtracted[0] as HumanName).given[0]
-              }
-            }
-            answerExtracted[0] is Address -> {
-              val city = (answerExtracted[0] as Address).city
-              val country = (answerExtracted[0] as Address).country
-
-              if (key.contains("country")) {
-                answersHashMap[key] = StringType(country)
-              } else {
-                answersHashMap[key] = StringType(city)
-              }
-            }
-            answerExtracted[0] is ContactPoint -> {
-              val phoneNumber = (answerExtracted[0] as ContactPoint).value
-              answersHashMap[key] = StringType(phoneNumber)
-            }
-          }
-        }
-      }
+      val questionType: Base = answerExtracted[0]
+      questionType.getType(key)?.let { answersHashMap[key] = it }
     }
     return answersHashMap
+  }
+
+  private fun Base.getType(questionLinkId: String): Type? {
+    when {
+      this.isDateTime -> {
+        return (this as DateType)
+      }
+      this.isBooleanPrimitive -> {
+        return (this as BooleanType)
+      }
+      this.isPrimitive -> {
+        return StringType((this as Enumeration<*>).code)
+      }
+      this is HumanName -> {
+        return if (questionLinkId.contains("family")) {
+          StringType(this.family)
+        } else {
+          this.given[0]
+        }
+      }
+      this is Address -> {
+        return if (questionLinkId.contains("country")) {
+          StringType(this.country)
+        } else {
+          StringType(this.city)
+        }
+      }
+      this is ContactPoint -> {
+        return StringType(this.value)
+      }
+    }
+    return null
   }
 
   /**

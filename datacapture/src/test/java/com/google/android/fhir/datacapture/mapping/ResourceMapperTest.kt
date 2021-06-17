@@ -29,6 +29,7 @@ import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -964,22 +965,17 @@ class ResourceMapperTest {
         org.hl7.fhir.r4.model.Questionnaire
 
     val patient = createPatientResource()
-    val patientDataHashMap: HashMap<String, Any> =
+    val response: QuestionnaireResponse =
       ResourceMapper.populate(uriTestQuestionnaire, patient)
 
-    assertThat((patientDataHashMap["PR-name-text"] as StringType).valueAsString).isEqualTo("Salman")
-    assertThat((patientDataHashMap["PR-name-family"] as StringType).valueAsString).isEqualTo("Ali")
-    assertThat((patientDataHashMap["patient-0-birth-date"] as DateType).valueAsString)
-      .isEqualTo("3896-09-17")
-    assertThat((patientDataHashMap["patient-0-gender"] as StringType).valueAsString)
-      .isEqualTo("male")
-    assertThat((patientDataHashMap["PR-telecom-value"] as StringType).valueAsString)
-      .isEqualTo("12345")
-    assertThat((patientDataHashMap["PR-address-city"] as StringType).valueAsString)
-      .isEqualTo("Lahore")
-    assertThat((patientDataHashMap["PR-address-country"] as StringType).valueAsString)
-      .isEqualTo("Pakistan")
-    assertThat((patientDataHashMap["PR-active"] as BooleanType).booleanValue()).isEqualTo(true)
+    assertThat(((response.item[0].item[0].item[0].answer[0]).value as StringType).valueAsString).isEqualTo("Salman")
+    assertThat(((response.item[0].item[0].item[1].answer[0]).value as StringType).valueAsString).isEqualTo("Ali")
+    assertThat(((response.item[0].item[1].answer[0]).value as DateType).valueAsString).isEqualTo("3896-09-17")
+    assertThat(((response.item[0].item[2].answer[0]).value as StringType).valueAsString).isEqualTo("male")
+    assertThat(((response.item[0].item[3].item[1].answer[0]).value as StringType).valueAsString).isEqualTo("12345")
+    assertThat(((response.item[0].item[4].item[0].answer[0]).value as StringType).valueAsString).isEqualTo("Lahore")
+    assertThat(((response.item[0].item[4].item[1].answer[0]).value as StringType).valueAsString).isEqualTo("Pakistan")
+    assertThat(((response.item[0].item[5].answer[0]).value as BooleanType).booleanValue()).isEqualTo(true)
   }
 
   private fun createPatientResource(): Patient {
