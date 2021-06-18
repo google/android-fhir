@@ -49,7 +49,7 @@ class JsonConverterTest {
 
     val expectedOutput =
       Patient.newBuilder()
-        .setId(com.google.fhir.r4.core.Id.newBuilder().setValue("Patient/1"))
+        .setId(com.google.fhir.r4.core.Id.newBuilder().setValue("1"))
         .addName(
           HumanName.newBuilder()
             .addGiven(com.google.fhir.r4.core.String.newBuilder().setValue("John"))
