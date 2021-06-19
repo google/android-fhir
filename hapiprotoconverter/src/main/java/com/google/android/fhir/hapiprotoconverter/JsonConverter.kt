@@ -23,7 +23,7 @@ import org.hl7.fhir.r4.model.Resource
 
 @Suppress("UNCHECKED_CAST")
 /**
- * @param resource resource that will be converter to FhirProto representation
+ * @param resource resource that will be converted to FhirProto representation
  * @param hapiParser the parser that will encode the resource to Json see
  * https://hapifhir.io/hapi-fhir/docs/model/parsers.html
  * @param protoParser the parser that will serialize Json to the fhir proto
@@ -41,7 +41,7 @@ inline fun <reified T : GeneratedMessageV3> convert(
 }
 
 /**
- * @param resource resource that will be converter to Hapi resource representation
+ * @param resource resource that will be converted to Hapi resource representation
  * @param hapiParser the parser that will decode the resource from Json see
  * https://hapifhir.io/hapi-fhir/docs/model/parsers.html
  * @param protoPrinter the parser that will encode Json to the fhir proto
