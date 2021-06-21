@@ -18,9 +18,9 @@ package com.google.android.fhir.reference
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.work.Constraints
 import com.google.android.fhir.reference.data.FhirPeriodicSyncWorker
+import com.google.android.fhir.reference.databinding.ActivityMainBinding
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.RepeatInterval
 import com.google.android.fhir.sync.Sync
@@ -29,12 +29,15 @@ import java.util.concurrent.TimeUnit
 const val MAX_RESOURCE_COUNT = 20
 
 class MainActivity : AppCompatActivity() {
+  private lateinit var binding: ActivityMainBinding
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
+    binding = ActivityMainBinding.inflate(layoutInflater)
+    val view = binding.root
+    setContentView(view)
 
-    val toolbar = findViewById<Toolbar>(R.id.toolbar)
+    val toolbar = binding.toolbar
     setSupportActionBar(toolbar)
     toolbar.title = title
 
