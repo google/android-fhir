@@ -29,7 +29,15 @@ import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.ResourceType
 
 class FhirApplication : Application() {
-  init {
+  //     only initiate the FhirEngine when used for the first time, not when the app is created
+  private val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
+
+  companion object {
+    fun fhirEngine(context: Context) = (context.applicationContext as FhirApplication).fhirEngine
+  }
+
+  override fun onCreate() {
+    super.onCreate()
     GlobalScope.launch {
       Sync.oneTimeSync(
         fhirEngine,
@@ -39,14 +47,7 @@ class FhirApplication : Application() {
     }
   }
 
-  // only initiate the FhirEngine when used for the first time, not when the app is created
-  private val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
-
   private fun constructFhirEngine(): FhirEngine {
     return FhirEngineBuilder(this).build()
-  }
-
-  companion object {
-    fun fhirEngine(context: Context) = (context.applicationContext as FhirApplication).fhirEngine
   }
 }
