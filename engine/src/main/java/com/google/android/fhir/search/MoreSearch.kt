@@ -189,6 +189,8 @@ private fun getConditionParamPair(
   val (start, end) = value.rangeEpochMillis
   return when (prefix) {
     ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
+    // see https://github.com/google/android-fhir/issues/568
+    // https://www.hl7.org/fhir/search.html#prefix
     ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from >= ?", end + 1)
     ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("? >= index_to", start)
     ParamPrefixEnum.NOT_EQUAL ->
