@@ -11,7 +11,7 @@
         android:id="@+id/patient_list"
         android:name="com.google.android.fhir.reference.PatientListFragment"
         android:label="Patient List"
-        tools:layout="@layout/patient_list"
+        tools:layout="@layout/patient_list_view"
     >
         <action
             android:id="@+id/navigate_to_product_detail"
