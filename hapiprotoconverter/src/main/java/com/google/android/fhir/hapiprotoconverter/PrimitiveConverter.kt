@@ -39,65 +39,62 @@ fun <T : GeneratedMessageV3> convert(hapiPrimitive: IPrimitiveType<*>, protoClas
     "Cannot convert ${hapiPrimitive::class.java.name} to ${protoClass.name}"
   }
 
-  // Creating builder for corresponding protoclass
+  // Creating builder for corresponding proto class
   val newBuilder =
     protoClass.getDeclaredMethod("newBuilder").invoke(null) as GeneratedMessageV3.Builder<*>
 
-  if (hapiPrimitive.fhirType() == "date" ||
-      hapiPrimitive.fhirType() == "dateTime" ||
-      hapiPrimitive.fhirType() == "instant"
-  ) {
+  val builderClass = newBuilder::class.java
 
-    // To set value
-    newBuilder::class
-      .java
-      .getDeclaredMethod("setValueUs", java.lang.Long.TYPE)
-      .invoke(newBuilder, (hapiPrimitive.value as Date).time)
-    // To set TimeZone
-    val temp = hapiPrimitive::class.java.getMethod("getTimeZone").invoke(hapiPrimitive)
-    if (temp != null) {
-      newBuilder::class
-        .java
-        .getDeclaredMethod("setTimezone", java.lang.String::class.java)
-        .invoke(newBuilder, temp::class.java.getMethod("getID").invoke(temp))
-    }
+  when (hapiPrimitive.fhirType()) {
+    "date", "dateTime", "instant" -> {
+      // To set value
+      builderClass
+        .getDeclaredMethod("setValueUs", java.lang.Long.TYPE)
+        .invoke(newBuilder, (hapiPrimitive.value as Date).time)
 
-    // To Set Precision
-    newBuilder::class
-      .java
-      .getDeclaredMethod("setPrecisionValue", Integer.TYPE)
-      .invoke(
-        newBuilder,
-        getValueForDateTimeEnum(
-          hapiPrimitive::class.java.getMethod("getPrecision").invoke(hapiPrimitive) as
-            TemporalPrecisionEnum,
-          hapiPrimitive.fhirType()
+      // To set TimeZone
+      hapiPrimitive::class.java.getMethod("getTimeZone").invoke(hapiPrimitive)?.let {
+        builderClass
+          .getDeclaredMethod("setTimezone", java.lang.String::class.java)
+          .invoke(newBuilder, it::class.java.getMethod("getID").invoke(it))
+      }
+
+      // To Set Precision
+      builderClass
+        .getDeclaredMethod("setPrecisionValue", Integer.TYPE)
+        .invoke(
+          newBuilder,
+          getValueForDateTimeEnum(
+            hapiPrimitive::class.java.getMethod("getPrecision").invoke(hapiPrimitive) as
+              TemporalPrecisionEnum,
+            hapiPrimitive.fhirType()
+          )
         )
-      )
-  } else if (hapiPrimitive.fhirType() == "time") {
-    val (duration, precision) = getDurationPrecisionPairFromTimeString(hapiPrimitive.valueAsString)
-    newBuilder::class
-      .java
-      .getDeclaredMethod("setValueUs", java.lang.Long.TYPE)
-      .invoke(newBuilder, duration)
-    newBuilder::class
-      .java
-      .getDeclaredMethod("setPrecisionValue", Integer.TYPE)
-      .invoke(newBuilder, precision)
-  } else if (hapiPrimitive.fhirType() == "base64Binary") {
-    newBuilder
-      .javaClass
-      .getDeclaredMethod("setValue", getProtoDataTypeFromHapi(hapiPrimitive))
-      .invoke(newBuilder, ByteString.copyFrom((hapiPrimitive.valueAsString).toByteArray()))
-  } else {
-    val type = getProtoDataTypeFromHapi(hapiPrimitive)
-    newBuilder
-      .javaClass
-      .getDeclaredMethod("setValue", getProtoDataTypeFromHapi(hapiPrimitive))
-      .invoke(
-        newBuilder,
-        if (type == String::class.java) hapiPrimitive.valueAsString else hapiPrimitive.value
-      )
+    }
+    "time" -> {
+      val (duration, precision) =
+        getDurationPrecisionPairFromTimeString(hapiPrimitive.valueAsString)
+      builderClass.getDeclaredMethod("setValueUs", java.lang.Long.TYPE).invoke(newBuilder, duration)
+
+      builderClass
+        .getDeclaredMethod("setPrecisionValue", Integer.TYPE)
+        .invoke(newBuilder, precision)
+    }
+    "base64Binary" -> {
+      builderClass
+        .getDeclaredMethod("setValue", getProtoDataTypeFromHapi(hapiPrimitive))
+        .invoke(newBuilder, ByteString.copyFrom((hapiPrimitive.valueAsString).toByteArray()))
+    }
+    "decimal" -> {
+      builderClass
+        .getDeclaredMethod("setValue", getProtoDataTypeFromHapi(hapiPrimitive))
+        .invoke(newBuilder, hapiPrimitive.valueAsString)
+    }
+    else -> {
+      builderClass
+        .getDeclaredMethod("setValue", getProtoDataTypeFromHapi(hapiPrimitive))
+        .invoke(newBuilder, hapiPrimitive.value)
+    }
   }
   @Suppress("UNCHECKED_CAST") return newBuilder.build() as T
 }
@@ -114,52 +111,50 @@ fun <T : IPrimitiveType<*>> convert(primitiveProto: GeneratedMessageV3, hapiClas
   }
 
   val primitive = hapiClass.newInstance()
+  val protoClass = primitiveProto::class.java
 
-  if (primitive.fhirType() == "date" ||
-      primitive.fhirType() == "dateTime" ||
-      primitive.fhirType() == "instant"
-  ) {
-    // To set value
-    primitive.value =
-      Date(
-        primitiveProto::class.java.getDeclaredMethod("getValueUs").invoke(primitiveProto) as Long
-      )
+  when (primitive.fhirType()) {
+    "date", "dateTime", "instant" -> {
+      // To set value
+      primitive.value =
+        Date(protoClass.getDeclaredMethod("getValueUs").invoke(primitiveProto) as Long)
 
-    // Probably not the best thing to do?
-    val temp = primitiveProto::class.java.getMethod("getTimezone").invoke(primitiveProto) as String?
-    if (temp != null) {
+      // Probably not the best thing to do?
+      protoClass.getMethod("getTimezone").invoke(primitiveProto)?.let {
+        primitive::class
+          .java
+          .getMethod("setTimeZone", TimeZone::class.java)
+          .invoke(primitive, TimeZone.getTimeZone(it as String))
+      }
+
+      // To Set Precision
       primitive::class
         .java
-        .getMethod("setTimeZone", TimeZone::class.java)
-        .invoke(primitive, TimeZone.getTimeZone(temp))
-    }
-    // To Set Precision
-    primitive::class
-      .java
-      .getMethod("setPrecision", TemporalPrecisionEnum::class.java)
-      .invoke(
-        primitive,
-        getValueForDateTimeEnum(
-          primitiveProto::class.java.getMethod("getPrecisionValue").invoke(primitiveProto) as Int,
-          primitive.fhirType()
+        .getMethod("setPrecision", TemporalPrecisionEnum::class.java)
+        .invoke(
+          primitive,
+          getValueForDateTimeEnum(
+            protoClass.getMethod("getPrecisionValue").invoke(primitiveProto) as Int,
+            primitive.fhirType()
+          )
         )
-      )
-  } else if (primitive.fhirType() == "time") {
-
-    primitive.valueAsString =
-      getTimeStringFromDuration(
-        primitiveProto::class.java.getDeclaredMethod("getValueUs").invoke(primitiveProto) as Long
-      )
-  } else if (primitive.fhirType() == "base64Binary") {
-    primitive.valueAsString =
-      (primitiveProto::class.java.getMethod("getValue").invoke(primitiveProto) as ByteString)
-        .toStringUtf8()
-  } else {
-    val type = getProtoDataTypeFromHapi(primitive)
-    if (type == String::class.java)
+    }
+    "time" -> {
       primitive.valueAsString =
-        primitiveProto::class.java.getMethod("getValue").invoke(primitiveProto) as String
-    else primitive.value = primitiveProto::class.java.getMethod("getValue").invoke(primitiveProto)
+        getTimeStringFromDuration(
+          protoClass.getDeclaredMethod("getValueUs").invoke(primitiveProto) as Long
+        )
+    }
+    "base64Binary" -> {
+      primitive.valueAsString =
+        (protoClass.getMethod("getValue").invoke(primitiveProto) as ByteString).toStringUtf8()
+    }
+    "decimal" -> {
+      primitive.valueAsString = protoClass.getMethod("getValue").invoke(primitiveProto) as String
+    }
+    else -> {
+      primitive.value = protoClass.getMethod("getValue").invoke(primitiveProto)
+    }
   }
 
   return primitive

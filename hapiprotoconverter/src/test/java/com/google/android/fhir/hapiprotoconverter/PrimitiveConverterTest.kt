@@ -162,7 +162,7 @@ class PrimitiveConverterTest {
     val proto =
       DateTime.newBuilder()
         .setValueUs(hapi.value.time)
-        .setPrecisionValue(4)
+        .setPrecision(DateTime.Precision.SECOND)
         .setTimezone(hapi.timeZone.id)
         .build()
 
