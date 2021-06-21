@@ -21,7 +21,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.StructureMap
@@ -831,7 +831,7 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+      """.trimIndent()
 
     val questionnaireResponseJson =
       """
