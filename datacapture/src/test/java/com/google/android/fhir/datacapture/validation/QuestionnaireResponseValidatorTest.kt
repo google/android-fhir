@@ -29,7 +29,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class QuestionnaireValidatorTest {
+class QuestionnaireResponseValidatorTest {
 
   @Test
   fun shouldReturnValidResult() {
@@ -54,7 +54,7 @@ class QuestionnaireValidatorTest {
               )
             )
         )
-    val result = QuestionnaireValidator.validate(questionnaire.item, questionnaireResponse.item)
+    val result = QuestionnaireResponseValidator.validate(questionnaire.item, questionnaireResponse.item)
     assertEquals(result.get("a-question"), listOf(ValidationResult(true, listOf())))
   }
 
@@ -81,7 +81,7 @@ class QuestionnaireValidatorTest {
               )
             )
         )
-    val result = QuestionnaireValidator.validate(questionnaire.item, questionnaireResponse.item)
+    val result = QuestionnaireResponseValidator.validate(questionnaire.item, questionnaireResponse.item)
     assertEquals(
       result.get("a-question"),
       listOf(
@@ -133,7 +133,7 @@ class QuestionnaireValidatorTest {
               )
             )
         )
-    val result = QuestionnaireValidator.validate(questionnaire.item, questionnaireResponse.item)
+    val result = QuestionnaireResponseValidator.validate(questionnaire.item, questionnaireResponse.item)
     assertEquals(
       result.get("a-question"),
       listOf(

@@ -20,7 +20,7 @@ import com.google.android.fhir.datacapture.hasNestedItemsWithinAnswers
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-object QuestionnaireValidator {
+object QuestionnaireResponseValidator {
 
   /** Maps linkId to [ValidationResult]. */
   private val linkIdToValidationResultMap = mutableMapOf<String, MutableList<ValidationResult>>()
