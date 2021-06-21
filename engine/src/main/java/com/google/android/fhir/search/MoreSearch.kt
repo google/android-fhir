@@ -233,34 +233,35 @@ private fun getConditionParamPair(
       val precision = value.getRange()
       ConditionParam(
         "index_value >= ? AND index_value < ?",
-        listOf((value - precision).toDouble(), (value + precision).toDouble())
+        (value - precision).toDouble(),
+        (value + precision).toDouble()
       )
     }
-    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_value > ?", listOf(value.toDouble()))
-    ParamPrefixEnum.GREATERTHAN_OR_EQUALS ->
-      ConditionParam("index_value >= ?", listOf(value.toDouble()))
-    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_value < ?", listOf(value.toDouble()))
-    ParamPrefixEnum.LESSTHAN_OR_EQUALS ->
-      ConditionParam("index_value <= ?", listOf(value.toDouble()))
+    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_value > ?", value.toDouble())
+    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_value >= ?", value.toDouble())
+    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_value < ?", value.toDouble())
+    ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ConditionParam("index_value <= ?", value.toDouble())
     ParamPrefixEnum.NOT_EQUAL -> {
       val precision = value.getRange()
       ConditionParam(
         "index_value < ? OR index_value >= ?",
-        listOf((value - precision).toDouble(), (value + precision).toDouble())
+        (value - precision).toDouble(),
+        (value + precision).toDouble()
       )
     }
     ParamPrefixEnum.ENDS_BEFORE -> {
-      ConditionParam("index_value < ?", listOf(value.toDouble()))
+      ConditionParam("index_value < ?", value.toDouble())
     }
     ParamPrefixEnum.STARTS_AFTER -> {
-      ConditionParam("index_value > ?", listOf(value.toDouble()))
+      ConditionParam("index_value > ?", value.toDouble())
     }
     // Approximate to a 10% range see https://www.hl7.org/fhir/search.html#prefix
     ParamPrefixEnum.APPROXIMATE -> {
       val range = value.divide(BigDecimal(10))
       ConditionParam(
         "index_value >= ? AND index_value <= ?",
-        listOf((value - range).toDouble(), (value + range).toDouble())
+        (value - range).toDouble(),
+        (value + range).toDouble()
       )
     }
   }
