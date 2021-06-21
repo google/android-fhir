@@ -102,6 +102,10 @@ class QuestionnaireResponseItemValidatorTest {
 
     assertThat(validateAggregationFromChildValidators.isValid).isFalse()
     assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(2)
+    assertThat(validateAggregationFromChildValidators.validationMessages[0])
+      .isEqualTo("Maximum value allowed is:500")
+    assertThat(validateAggregationFromChildValidators.validationMessages[1])
+      .isEqualTo("Minimum value allowed is:600")
   }
 
   @Test
@@ -130,16 +134,21 @@ class QuestionnaireResponseItemValidatorTest {
 
     assertThat(validateAggregationFromChildValidators.isValid).isFalse()
     assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(2)
+    assertThat(validateAggregationFromChildValidators.validationMessages[0])
+      .isEqualTo("The maximum number of characters that are permitted in the answer is: 10")
+    assertThat(validateAggregationFromChildValidators.validationMessages[1])
+      .isEqualTo("The minimum number of characters that are permitted in the answer is: 20")
   }
 
   @Test
-  fun notMatchRegex_shouldReturnInvalidResultWithMessages() {
+  fun notMatchingRegex_shouldReturnInvalidResultWithMessages() {
+    val regex = "[0-9]+\\.[0-9]+"
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
           Extension().apply {
             url = REGEX_EXTENSION_URL
-            this.setValue(StringType("[0-9]+\\.[0-9]+"))
+            this.setValue(StringType(regex))
           }
         )
       }
@@ -157,5 +166,7 @@ class QuestionnaireResponseItemValidatorTest {
 
     assertThat(validateAggregationFromChildValidators.isValid).isFalse()
     assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(1)
+    assertThat(validateAggregationFromChildValidators.validationMessages[0])
+      .isEqualTo("The answer doesn't match regular expression: $regex")
   }
 }

@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.util.Log
+import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
 import org.hl7.fhir.r4.model.Extension
@@ -26,33 +27,27 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 /**
  * A validator to check if the answer matches a given regular expression.
  *
- * <p>Only the following primitive types are subjected to this validation:
- * 1. BooleanType
- * 2. DecimalType
- * 3. IntegerType
- * 4. DateType
- * 5. TimeType
- * 6. StringType
- * 7. UriType
+ * <p>Only primitive types permitted in questionnaires response are subjected to this validation.
+ * See https://www.hl7.org/fhir/valueset-item-type.html#expansion
  */
 internal object RegexValidator :
   ValueConstraintExtensionValidator(
     url = REGEX_EXTENSION_URL,
-    predicate = {
-      extension: Extension,
-      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
-      if (extension.value.isPrimitive && answer.value.isPrimitive) {
+    predicate =
+      predicate@{
+        extension: Extension,
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
+        if (!extension.value.isPrimitive || !answer.value.isPrimitive) {
+          return@predicate false
+        }
         try {
           val pattern = Pattern.compile((extension.value as PrimitiveType<*>).asStringValue())
-          !pattern.matcher((answer.value as PrimitiveType<*>).asStringValue()).matches()
+          !pattern.matcher(answer.value.asStringValue()).matches()
         } catch (e: PatternSyntaxException) {
           Log.w(TAG, "Can't parse regex: " + extension.value, e)
           false
         }
-      } else {
-        false
-      }
-    },
+      },
     { extension: Extension ->
       "The answer doesn't match regular expression: " + extension.value.primitiveValue()
     }
