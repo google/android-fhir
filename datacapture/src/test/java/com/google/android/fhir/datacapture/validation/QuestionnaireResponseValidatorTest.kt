@@ -17,7 +17,7 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.os.Build
-import kotlin.test.assertEquals
+import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -54,8 +54,9 @@ class QuestionnaireResponseValidatorTest {
               )
             )
         )
-    val result = QuestionnaireResponseValidator.validate(questionnaire.item, questionnaireResponse.item)
-    assertEquals(result.get("a-question"), listOf(ValidationResult(true, listOf())))
+    val result =
+      QuestionnaireResponseValidator.validate(questionnaire.item, questionnaireResponse.item)
+    assertThat(result.get("a-question")).isEqualTo(listOf(ValidationResult(true, listOf())))
   }
 
   @Test
@@ -81,16 +82,17 @@ class QuestionnaireResponseValidatorTest {
               )
             )
         )
-    val result = QuestionnaireResponseValidator.validate(questionnaire.item, questionnaireResponse.item)
-    assertEquals(
-      result.get("a-question"),
-      listOf(
-        ValidationResult(
-          false,
-          listOf("The maximum number of characters that are permitted in the answer is: 3")
+    val result =
+      QuestionnaireResponseValidator.validate(questionnaire.item, questionnaireResponse.item)
+    assertThat(result.get("a-question"))
+      .isEqualTo(
+        listOf(
+          ValidationResult(
+            false,
+            listOf("The maximum number of characters that are permitted in the answer is: 3")
+          )
         )
       )
-    )
   }
 
   @Test
@@ -133,24 +135,25 @@ class QuestionnaireResponseValidatorTest {
               )
             )
         )
-    val result = QuestionnaireResponseValidator.validate(questionnaire.item, questionnaireResponse.item)
-    assertEquals(
-      result.get("a-question"),
-      listOf(
-        ValidationResult(
-          false,
-          listOf("The maximum number of characters that are permitted in the answer is: 3")
+    val result =
+      QuestionnaireResponseValidator.validate(questionnaire.item, questionnaireResponse.item)
+    assertThat(result.get("a-question"))
+      .isEqualTo(
+        listOf(
+          ValidationResult(
+            false,
+            listOf("The maximum number of characters that are permitted in the answer is: 3")
+          )
         )
       )
-    )
-    assertEquals(
-      result.get("a-nested-question"),
-      listOf(
-        ValidationResult(
-          false,
-          listOf("The maximum number of characters that are permitted in the answer is: 3")
+    assertThat(result.get("a-nested-question"))
+      .isEqualTo(
+        listOf(
+          ValidationResult(
+            false,
+            listOf("The maximum number of characters that are permitted in the answer is: 3")
+          )
         )
       )
-    )
   }
 }
