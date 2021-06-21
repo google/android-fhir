@@ -16,11 +16,14 @@
 
 package com.google.android.fhir.datacapture.mapping
 
+import ca.uhn.fhir.context.FhirContext
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
+import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
@@ -31,9 +34,15 @@ import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceFactory
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.UrlType
+import org.hl7.fhir.r4.utils.StructureMapUtilities
+import org.hl7.fhir.utilities.npm.FilesystemPackageCacheManager
+import org.hl7.fhir.utilities.npm.ToolsVersion
 
 /**
  * Maps [QuestionnaireResponse] s to FHIR resources and vice versa.
@@ -54,16 +63,92 @@ import org.hl7.fhir.r4.model.UrlType
 object ResourceMapper {
 
   /**
-   * Extract a FHIR resource from the `questionnaire` and `questionnaireResponse`.
+   * Extract a FHIR resource from the [questionnaire] and [questionnaireResponse].
    *
-   * This method assumes there is only one FHIR resource to be extracted from the given
-   * `questionnaire` and `questionnaireResponse`.
+   * This method only supports definition-based extraction. StructureMap-based extraction will be
+   * invoked if the [Questionnaire] declares a targetStructureMap extension. However, the returned
+   * [Bundle] will be empty since the [StructureMapProvider] is not provided
+   *
+   * @return [Bundle] containing the extracted [Resource]s or empty Bundle if the extraction fails.
+   * An exception might also be thrown in a few cases
    */
-  fun extract(questionnaire: Questionnaire, questionnaireResponse: QuestionnaireResponse): Base {
+  fun extract(questionnaire: Questionnaire, questionnaireResponse: QuestionnaireResponse): Bundle {
+    return extract(questionnaire, questionnaireResponse, null)
+  }
+
+  /**
+   * Extract a FHIR resource from the [questionnaire] and [questionnaireResponse].
+   *
+   * This method supports both Definition-based and StructureMap-based extraction.
+   * StructureMap-based extraction will fail and an empty [Bundle] will be returned if the
+   * [structureMapProvider] is not passed.
+   */
+  fun extract(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse,
+    structureMapProvider: StructureMapProvider?
+  ): Bundle {
+    return if (questionnaire.targetStructureMap == null)
+      extractByDefinitionBased(questionnaire, questionnaireResponse)
+    else extractByStructureMapBased(questionnaire, questionnaireResponse, structureMapProvider)
+  }
+
+  /**
+   * Extracts a FHIR resource from the [questionnaire] and [questionnaireResponse] using the
+   * definition-based extraction methodology.
+   *
+   * It currently only supports extracting a single resource. It returns a [Bundle] with the
+   * extracted resource. If the process completely fails, an error is thrown or a [Bundle]
+   * containing empty [Resource] is returned
+   */
+  private fun extractByDefinitionBased(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse
+  ): Bundle {
     val className = questionnaire.itemContextNameToExpressionMap.values.first()
-    return (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Base).apply {
-      extractFields(questionnaire.item, questionnaireResponse.item)
+    val extractedResource =
+      (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Resource).apply {
+        extractFields(questionnaire.item, questionnaireResponse.item)
+      }
+
+    return Bundle().apply {
+      type = Bundle.BundleType.TRANSACTION
+      addEntry(Bundle.BundleEntryComponent().apply { resource = extractedResource })
     }
+  }
+
+  /**
+   * Extracts a FHIR resource from the [questionnaire], [questionnaireResponse] and
+   * [structureMapProvider] using the StructureMap-based extraction methodology.
+   *
+   * The [StructureMapProvider] implementation passed should fetch the referenced [StructureMap]
+   * either from persistence or a remote service. The [StructureMap] should strictly return a
+   * [Bundle], failure to this an exception will be thrown. If a [StructureMapProvider] is not
+   * passed, an empty [Bundle] object is returned
+   *
+   * @return [Bundle] containing the extracted [Resource]s
+   */
+  private fun extractByStructureMapBased(
+    questionnaire: Questionnaire,
+    questionnaireResponse: QuestionnaireResponse,
+    structureMapProvider: StructureMapProvider?
+  ): Bundle {
+    if (structureMapProvider == null) return Bundle()
+    FhirContext.forR4()
+    val pcm = FilesystemPackageCacheManager(true, ToolsVersion.TOOLS_VERSION)
+    val contextR4 =
+      SimpleWorkerContext.fromPackage(pcm.loadPackage("hl7.fhir.r4.core", "4.0.1")).apply {
+        isCanRunWithoutTerminology = true
+      }
+
+    val structureMapUrl = questionnaire.targetStructureMap ?: return Bundle()
+    val structureMap = structureMapProvider.getStructureMap(structureMapUrl)
+
+    val scu = StructureMapUtilities(contextR4)
+    val targetResource: Resource =
+      ResourceFactory.createResource(scu.getTargetType(structureMap).name)
+    scu.transform(contextR4, questionnaireResponse, structureMap, targetResource)
+    return targetResource as Bundle
   }
 
   /**
@@ -237,6 +322,16 @@ private val Questionnaire.itemContextNameToExpressionMap: Map<String, String>
   }
 
 /**
+ * The map from the `name`s to `expression`s in the
+ * [item extraction context extension](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemExtractionContext.html)
+ * s.
+ */
+private val Questionnaire.targetStructureMap: String?
+  get() {
+    return this.extension.singleOrNull { it.url == TARGET_STRUCTURE_MAP }?.value?.toString()
+  }
+
+/**
  * Extracts a list containing the resource name followed by field names leading to the destination
  * field defined in the [definition] field, or `null` if the [definition] field is empty or invalid.
  *
@@ -276,6 +371,13 @@ private val Questionnaire.QuestionnaireItemComponent.getDefinitionField: Field?
  */
 private const val ITEM_CONTEXT_EXTENSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
+/**
+ * See
+ * [Extension: target structure map](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-targetStructureMap.html)
+ * .
+ */
+private const val TARGET_STRUCTURE_MAP: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap"
 
 private val Field.isList: Boolean
   get() = isParameterized && type == List::class.java
@@ -295,4 +397,9 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
   } catch (ex: NoSuchFieldException) {
     return null
   }
+}
+
+interface StructureMapProvider {
+
+  fun getStructureMap(fullUrl: String): StructureMap?
 }

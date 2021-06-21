@@ -72,6 +72,8 @@ object Dependencies {
   const val guava = "com.google.guava:guava:${Versions.guava}"
   const val hapiFhirStructuresR4 =
     "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhirStructuresR4}"
+  const val hapiFhirValidation =
+    "ca.uhn.hapi.fhir:org.hl7.fhir.validation:${Versions.hapiFhirValidations}"
   const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.httpInterceptor}"
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
   const val material = "com.google.android.material:material:${Versions.material}"
@@ -128,6 +130,7 @@ object Dependencies {
     const val retrofit = "2.7.2"
     const val truth = "1.0.1"
     const val flexBox = "3.0.0"
+    const val hapiFhirValidations = "5.3.0"
 
     object AndroidxTest {
       const val core = "1.2.0"
