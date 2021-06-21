@@ -30,7 +30,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   /** The current questionnaire as questions are being answered. */
-  private val questionnaire: Questionnaire
+  internal val questionnaire: Questionnaire
 
   init {
     val questionnaireJson: String = state[QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE]!!
