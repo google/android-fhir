@@ -87,8 +87,8 @@ class PrimitiveConverterTest {
 
   @Test
   fun test_primitive_converter_decimal() {
-    val hapi = DecimalType(100.1)
-    val proto = Decimal.newBuilder().setValue("100.1").build()
+    val hapi = DecimalType("100.10")
+    val proto = Decimal.newBuilder().setValue("100.10").build()
     Truth.assertThat(convert(hapi, Decimal::class.java)).isEqualTo(proto)
     Truth.assertThat(convert(proto, DecimalType::class.java).valueAsString).isEqualTo(proto.value)
   }
@@ -137,9 +137,11 @@ class PrimitiveConverterTest {
         .setTimezone(hapi.timeZone.id)
         .build()
     Truth.assertThat(convert(hapi, Instant::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, InstantType::class.java).value.time).isEqualTo(hapi.value.time)
-    Truth.assertThat(convert(proto, InstantType::class.java).timeZone).isEqualTo(hapi.timeZone)
-    Truth.assertThat(convert(proto, InstantType::class.java).precision).isEqualTo(hapi.precision)
+
+    val converted = convert(proto, InstantType::class.java)
+    Truth.assertThat(converted.value.time).isEqualTo(hapi.value.time)
+    Truth.assertThat(converted.timeZone).isEqualTo(hapi.timeZone)
+    Truth.assertThat(converted.precision).isEqualTo(hapi.precision)
   }
 
   @Test
@@ -148,8 +150,10 @@ class PrimitiveConverterTest {
     val proto =
       Date.newBuilder().setValueUs(hapi.value.time).setPrecision(Date.Precision.DAY).build()
     Truth.assertThat(convert(hapi, Date::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, DateType::class.java).value.time).isEqualTo(hapi.value.time)
-    Truth.assertThat(convert(proto, DateType::class.java).precision).isEqualTo(hapi.precision)
+
+    val converted = convert(proto, DateType::class.java)
+    Truth.assertThat(converted.value.time).isEqualTo(hapi.value.time)
+    Truth.assertThat(converted.precision).isEqualTo(hapi.precision)
   }
 
   @Test
@@ -161,10 +165,12 @@ class PrimitiveConverterTest {
         .setPrecisionValue(4)
         .setTimezone(hapi.timeZone.id)
         .build()
+
+    val converted = convert(proto, DateTimeType::class.java)
     Truth.assertThat(convert(hapi, DateTime::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, DateTimeType::class.java).value.time).isEqualTo(hapi.value.time)
-    Truth.assertThat(convert(proto, DateTimeType::class.java).timeZone).isEqualTo(hapi.timeZone)
-    Truth.assertThat(convert(proto, DateTimeType::class.java).precision).isEqualTo(hapi.precision)
+    Truth.assertThat(converted.value.time).isEqualTo(hapi.value.time)
+    Truth.assertThat(converted.timeZone).isEqualTo(hapi.timeZone)
+    Truth.assertThat(converted.precision).isEqualTo(hapi.precision)
   }
 
   @Test
