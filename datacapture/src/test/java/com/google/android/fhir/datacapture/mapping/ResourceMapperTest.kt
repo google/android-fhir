@@ -735,16 +735,6 @@ class ResourceMapperTest {
   "subjectType": [
     "Patient"
   ],
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
-      "valueExpression": {
-        "language": "application/x-fhir-query",
-        "expression": "Patient",
-        "name": "patient"
-      }
-    }
-  ],
   "item": [
     {
       "linkId": "PR",
@@ -754,16 +744,6 @@ class ResourceMapperTest {
           "linkId": "PR-name",
           "type": "group",
           "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
-              "valueExpression": {
-                "language": "application/x-fhir-query",
-                "expression": "HumanName",
-                "name": "humanName"
-              }
-            }
-          ],
           "item": [
             {
               "extension": [
@@ -771,7 +751,7 @@ class ResourceMapperTest {
                   "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                   "valueExpression": {
                     "language": "text/fhirpath",
-                    "expression": "Patient.name",
+                    "expression": "Patient.name.given",
                     "name": "patientName"
                   }
                 }
@@ -787,7 +767,7 @@ class ResourceMapperTest {
                   "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                   "valueExpression": {
                     "language": "text/fhirpath",
-                    "expression": "Patient.name",
+                    "expression": "Patient.name.family",
                     "name": "patientFamily"
                   }
                 }
@@ -822,7 +802,7 @@ class ResourceMapperTest {
               "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
               "valueExpression": {
                 "language": "text/fhirpath",
-                "expression": "Patient.gender",
+                "expression": "Patient.gender.value",
                 "name": "patientGender"
               }
             }
@@ -840,16 +820,6 @@ class ResourceMapperTest {
           "linkId": "PR-telecom",
           "type": "group",
           "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
-              "valueExpression": {
-                "language": "application/x-fhir-query",
-                "expression": "ContactPoint",
-                "name": "contactPoint"
-              }
-            }
-          ],
           "item": [
             {
               "linkId": "PR-telecom-system",
@@ -875,7 +845,7 @@ class ResourceMapperTest {
                   "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                   "valueExpression": {
                     "language": "text/fhirpath",
-                    "expression": "Patient.telecom",
+                    "expression": "Patient.telecom.value",
                     "name": "patientTelecom"
                   }
                 }
@@ -891,16 +861,6 @@ class ResourceMapperTest {
           "linkId": "PR-address",
           "type": "group",
           "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
-              "valueExpression": {
-                "language": "application/x-fhir-query",
-                "expression": "Address",
-                "name": "address"
-              }
-            }
-          ],
           "item": [
             {
               "extension": [
@@ -908,7 +868,7 @@ class ResourceMapperTest {
                   "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                   "valueExpression": {
                     "language": "text/fhirpath",
-                    "expression": "Patient.address",
+                    "expression": "Patient.address.city",
                     "name": "patientCity"
                   }
                 }
@@ -924,7 +884,7 @@ class ResourceMapperTest {
                   "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                   "valueExpression": {
                     "language": "text/fhirpath",
-                    "expression": "Patient.address",
+                    "expression": "Patient.address.country",
                     "name": "patientCity"
                   }
                 }

@@ -67,11 +67,6 @@ android {
     // See https://developer.android.com/studio/write/java8-support
     jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
-
-  packagingOptions {
-    exclude("META-INF/ASL-2.0.txt")
-    exclude("META-INF/LGPL-3.0.txt")
-  }
 }
 
 configurations { all { exclude(module = "xpp3") } }
