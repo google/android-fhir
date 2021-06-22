@@ -88,9 +88,6 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   internal val questionnaireItemViewItemListFlow: Flow<List<QuestionnaireItemViewItem>> =
     modificationCount.map { questionnaireItemViewItemList }
 
-  /** The current [Questionnaire] . */
-  fun getQuestionnaire(): Questionnaire = questionnaire
-
   /** The current [QuestionnaireResponse] captured by the UI. */
   fun getQuestionnaireResponse(): QuestionnaireResponse = questionnaireResponse
 
