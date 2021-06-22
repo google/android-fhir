@@ -18,13 +18,17 @@ package com.google.android.fhir.datacapture
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.enablement.QuestionnaireItemWithResponse
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -39,7 +43,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   }
 
   /** The current questionnaire response as questions are being answered. */
-  private var questionnaireResponse: QuestionnaireResponse
+  private val questionnaireResponse: QuestionnaireResponse
 
   init {
     val questionnaireJsonResponseString: String? =
@@ -81,12 +85,38 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     }
     modificationCount.value += 1
   }
-  internal val questionnaireItemViewItemList
-    get() = getQuestionnaireItemViewItemList(questionnaire.item, questionnaireResponse.item)
 
-  /** [QuestionnaireItemViewItem] s to be displayed in the UI. */
-  internal val questionnaireItemViewItemListFlow: Flow<List<QuestionnaireItemViewItem>> =
-    modificationCount.map { questionnaireItemViewItemList }
+  private val pageFlow =
+    MutableStateFlow<QuestionnairePagination?>(questionnaire.getInitialPagination())
+
+  internal fun goToPreviousPage() {
+    pageFlow.value = pageFlow.value!!.previousPage()
+  }
+
+  internal fun goToNextPage() {
+    pageFlow.value = pageFlow.value!!.nextPage()
+  }
+
+  /** [QuestionnaireState] to be displayed in the UI. */
+  internal val questionnaireStateFlow: Flow<QuestionnaireState> =
+    modificationCount
+      .combine(pageFlow) { _, pagination ->
+        getQuestionnaireState(
+          questionnaireItemList = questionnaire.item,
+          questionnaireResponseItemList = questionnaireResponse.item,
+          pagination = pagination,
+        )
+      }
+      .stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        initialValue =
+          getQuestionnaireState(
+            questionnaireItemList = questionnaire.item,
+            questionnaireResponseItemList = questionnaireResponse.item,
+            pagination = questionnaire.getInitialPagination(),
+          )
+      )
 
   /** The current [QuestionnaireResponse] captured by the UI. */
   fun getQuestionnaireResponse(): QuestionnaireResponse = questionnaireResponse
@@ -116,54 +146,67 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   }
 
   /**
-   * Traverse (DFS) through the list of questionnaire items , the list of questionnaire response
-   * items and the list of items in the questionnaire response answer list and populate
-   * [questionnaireItemViewItemList] with matching pairs of questionnaire item and questionnaire
-   * response item.
+   * Traverses through the list of questionnaire items, the list of questionnaire response items and
+   * the list of items in the questionnaire response answer list and populates
+   * [questionnaireStateFlow] with matching pairs of questionnaire item and questionnaire response
+   * item.
    *
    * The traverse is carried out in the two lists in tandem. The two lists should be structurally
    * identical.
    */
-  private fun getQuestionnaireItemViewItemList(
+  private fun getQuestionnaireState(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
-    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-  ): List<QuestionnaireItemViewItem> {
-    val questionnaireItemViewItemList = mutableListOf<QuestionnaireItemViewItem>()
-    val questionnaireItemListIterator = questionnaireItemList.iterator()
-    val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-    while (questionnaireItemListIterator.hasNext() &&
-      questionnaireResponseItemListIterator.hasNext()) {
-      val questionnaireItem = questionnaireItemListIterator.next()
-      val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+    pagination: QuestionnairePagination?,
+  ): QuestionnaireState {
+    // TODO(kmost): validate pages before switching between next/prev pages
+    val items: List<QuestionnaireItemViewItem> =
+      questionnaireItemList
+        .asSequence()
+        .withIndex()
+        .zip(questionnaireResponseItemList.asSequence())
+        .flatMap { (questionnaireItemAndIndex, questionnaireResponseItem) ->
+          val (index, questionnaireItem) = questionnaireItemAndIndex
 
-      val enabled =
-        EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
-          QuestionnaireItemWithResponse(
-            (linkIdToQuestionnaireItemMap[linkId]
-              ?: return@evaluate QuestionnaireItemWithResponse(null, null)),
-            (linkIdToQuestionnaireResponseItemMap[linkId]
-              ?: return@evaluate QuestionnaireItemWithResponse(null, null))
-          )
-        }
-      if (enabled) {
-        questionnaireItemViewItemList.add(
-          QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
-            questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
+          // if the questionnaire is paginated and we're currently working through the paginated
+          // groups, make sure that only the current page gets set
+          if (pagination != null && pagination.currentPageIndex != index) {
+            return@flatMap emptyList()
           }
-        )
-        questionnaireItemViewItemList.addAll(
-          getQuestionnaireItemViewItemList(
-            questionnaireItem.item,
-            if (questionnaireResponseItem.answer.isEmpty()) {
-              questionnaireResponseItem.item
-            } else {
-              questionnaireResponseItem.answer.first().item
+
+          val enabled =
+            EnablementEvaluator.evaluate(questionnaireItem) { linkId ->
+              QuestionnaireItemWithResponse(
+                questionnaireItem = (linkIdToQuestionnaireItemMap[linkId]
+                    ?: return@evaluate QuestionnaireItemWithResponse(null, null)),
+                questionnaireResponseItem = (linkIdToQuestionnaireResponseItemMap[linkId]
+                    ?: return@evaluate QuestionnaireItemWithResponse(null, null))
+              )
             }
-          )
-        )
-      }
-    }
-    return questionnaireItemViewItemList
+          if (enabled) {
+            listOf(
+              QuestionnaireItemViewItem(questionnaireItem, questionnaireResponseItem) {
+                questionnaireResponseItemChangedCallback(questionnaireItem.linkId)
+              }
+            ) +
+              getQuestionnaireState(
+                  questionnaireItemList = questionnaireItem.item,
+                  questionnaireResponseItemList =
+                    if (questionnaireResponseItem.answer.isEmpty()) {
+                      questionnaireResponseItem.item
+                    } else {
+                      questionnaireResponseItem.answer.first().item
+                    },
+                  // we're now dealing with nested items, so pagination is no longer a concern
+                  pagination = null,
+                )
+                .items
+          } else {
+            emptyList()
+          }
+        }
+        .toList()
+    return QuestionnaireState(items = items, pagination = pagination)
   }
 }
 
@@ -289,4 +332,59 @@ private fun validateQuestionnaireResponseItems(
       )
     }
   }
+}
+
+/**
+ * Checks if this questionnaire uses pagination via the "page" extension.
+ *
+ * If any one group has a "page" extension, it is assumed that the whole questionnaire is a
+ * well-formed, paginated questionnaire (eg, each top-level group should be its own page).
+ *
+ * If this questionnaire uses pagination, returns the [QuestionnairePagination] that you would see
+ * when first opening this questionnaire. Otherwise, returns `null`.
+ */
+private fun Questionnaire.getInitialPagination(): QuestionnairePagination? {
+  val usesPagination =
+    item.any { item ->
+      item.extension.any { extension ->
+        (extension.value as? CodeableConcept)?.coding?.any { coding -> coding.code == "page" }
+          ?: false
+      }
+    }
+  return if (usesPagination) {
+    QuestionnairePagination(
+      currentPageIndex = 0,
+      lastPageIndex = item.size - 1,
+    )
+  } else {
+    null
+  }
+}
+
+/** Questionnaire state for the Fragment to consume. */
+internal data class QuestionnaireState(
+  /** The items that should be currently-rendered into the Fragment. */
+  val items: List<QuestionnaireItemViewItem>,
+  /** The pagination state of the questionnaire. If `null`, the questionnaire is not paginated. */
+  val pagination: QuestionnairePagination?,
+)
+
+internal data class QuestionnairePagination(
+  val currentPageIndex: Int,
+  val lastPageIndex: Int,
+)
+
+internal val QuestionnairePagination.hasPreviousPage: Boolean
+  get() = currentPageIndex > 0
+internal val QuestionnairePagination.hasNextPage: Boolean
+  get() = currentPageIndex < lastPageIndex
+
+internal fun QuestionnairePagination.previousPage(): QuestionnairePagination {
+  check(hasPreviousPage) { "Can't call previousPage() if hasPreviousPage is false ($this)" }
+  return copy(currentPageIndex = currentPageIndex - 1)
+}
+
+internal fun QuestionnairePagination.nextPage(): QuestionnairePagination {
+  check(hasNextPage) { "Can't call nextPage() if hasNextPage is false ($this)" }
+  return copy(currentPageIndex = currentPageIndex + 1)
 }
