@@ -799,12 +799,62 @@ class QuestionnaireViewModelTest {
           this.value = valueBooleanType.setValue(true)
         }
       )
-    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItem.answer.clear()
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItem.answer[0]
+      .valueBooleanType
+      .value = false
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
+    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+  }
+
+  @Test
+  fun questionnaireHasNestedItem_notOfTypeGroup_shouldRemoveNestedItemsWhenParentItemEmpty() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-boolean-item"
+            text = "Parent question"
+            type = Questionnaire.QuestionnaireItemType.STRING
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "a-nested-boolean-item"
+                text = "Nested question"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              }
+            )
+          }
+        )
+      }
+
+    val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        this.questionnaire = "Questionnaire/a-questionnaire"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            linkId = "a-boolean-item"
+          }
+        )
+      }
+    state.set(QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE, serializedQuestionnaire)
+    val viewModel = QuestionnaireViewModel(state)
+
     viewModel.questionnaireItemViewItemList[0].questionnaireResponseItem.addAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-        this.value = valueBooleanType.setValue(false)
+        this.value = valueStringType.setValue("hello")
       }
     )
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItem.answer[0].item[0]
+      .addAnswer(
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          this.value = valueBooleanType.setValue(true)
+        }
+      )
+    viewModel.questionnaireItemViewItemList[0].questionnaireResponseItem.answer[0]
+      .valueStringType
+      .value = ""
     viewModel.questionnaireItemViewItemList[0].questionnaireResponseItemChangedCallback()
     assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
   }
