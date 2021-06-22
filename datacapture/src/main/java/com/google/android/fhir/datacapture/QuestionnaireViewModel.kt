@@ -110,11 +110,12 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       .stateIn(
         viewModelScope,
         SharingStarted.Lazily,
-        initialValue = getQuestionnaireState(
-          questionnaireItemList = questionnaire.item,
-          questionnaireResponseItemList = questionnaireResponse.item,
-          pagination = questionnaire.getInitialPagination(),
-        )
+        initialValue =
+          getQuestionnaireState(
+            questionnaireItemList = questionnaire.item,
+            questionnaireResponseItemList = questionnaireResponse.item,
+            pagination = questionnaire.getInitialPagination(),
+          )
       )
 
   /** The current [QuestionnaireResponse] captured by the UI. */
