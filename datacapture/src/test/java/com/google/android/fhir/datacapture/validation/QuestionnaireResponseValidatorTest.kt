@@ -138,21 +138,17 @@ class QuestionnaireResponseValidatorTest {
     val result =
       QuestionnaireResponseValidator.validate(questionnaire.item, questionnaireResponse.item)
     assertThat(result.get("a-question"))
-      .isEqualTo(
-        listOf(
-          ValidationResult(
-            false,
-            listOf("The maximum number of characters that are permitted in the answer is: 3")
-          )
+      .containsExactly(
+        ValidationResult(
+          false,
+          listOf("The maximum number of characters that are permitted in the answer is: 3")
         )
       )
     assertThat(result.get("a-nested-question"))
-      .isEqualTo(
-        listOf(
-          ValidationResult(
-            false,
-            listOf("The maximum number of characters that are permitted in the answer is: 3")
-          )
+      .containsExactly(
+        ValidationResult(
+          false,
+          listOf("The maximum number of characters that are permitted in the answer is: 3")
         )
       )
   }
