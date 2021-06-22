@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import ca.uhn.fhir.context.FhirContext
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -134,7 +133,6 @@ object ResourceMapper {
     structureMapProvider: StructureMapProvider?
   ): Bundle {
     if (structureMapProvider == null) return Bundle()
-    FhirContext.forR4()
     val pcm = FilesystemPackageCacheManager(true, ToolsVersion.TOOLS_VERSION)
     val contextR4 =
       SimpleWorkerContext.fromPackage(pcm.loadPackage("hl7.fhir.r4.core", "4.0.1")).apply {
