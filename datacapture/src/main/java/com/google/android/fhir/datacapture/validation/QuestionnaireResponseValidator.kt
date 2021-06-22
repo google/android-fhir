@@ -33,6 +33,8 @@ object QuestionnaireResponseValidator {
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
   ): Map<String, List<ValidationResult>> {
+    /* TODO create an iterator for questionnaire item + questionnaire response item refer to the
+    questionnaire view model */
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
     while (questionnaireItemListIterator.hasNext() &&
