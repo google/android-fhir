@@ -26,7 +26,8 @@ internal object QuestionnaireResponseItemValidator {
       MaxValueConstraintValidator,
       MinValueConstraintValidator,
       PrimitiveTypeAnswerMaxLengthValidator,
-      PrimitiveTypeAnswerMinLengthValidator
+      PrimitiveTypeAnswerMinLengthValidator,
+      RegexValidator
     )
 
   /** Validates [questionnaireResponseItem] contains valid answer(s) to [questionnaireItem]. */
