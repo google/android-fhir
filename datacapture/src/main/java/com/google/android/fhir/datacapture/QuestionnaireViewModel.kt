@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -107,7 +107,15 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
           pagination = pagination,
         )
       }
-      .shareIn(viewModelScope, started = SharingStarted.Lazily)
+      .stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        initialValue = getQuestionnaireState(
+          questionnaireItemList = questionnaire.item,
+          questionnaireResponseItemList = questionnaireResponse.item,
+          pagination = questionnaire.getInitialPagination(),
+        )
+      )
 
   /** The current [QuestionnaireResponse] captured by the UI. */
   fun getQuestionnaireResponse(): QuestionnaireResponse = questionnaireResponse
