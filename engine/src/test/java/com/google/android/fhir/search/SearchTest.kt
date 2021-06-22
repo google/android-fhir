@@ -25,6 +25,7 @@ import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.Patient
@@ -538,6 +539,300 @@ class SearchTest {
   }
 
   @Test
+  fun search_date_starts_after() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.BIRTHDATE) {
+            prefix = ParamPrefixEnum.STARTS_AFTER
+            value = DateTimeType("2013-03-14")
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM DateIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_from >= ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.BIRTHDATE.paramName,
+          DateTimeType("2013-03-15").value.time
+        )
+      )
+  }
+
+  @Test
+  fun search_date_ends_before() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.BIRTHDATE) {
+            prefix = ParamPrefixEnum.ENDS_BEFORE
+            value = DateTimeType("2013-03-14")
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM DateIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND ? >= index_to
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.BIRTHDATE.paramName,
+          DateTimeType("2013-03-14").value.time
+        )
+      )
+  }
+
+  @Test
+  fun search_date_not_equal() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.BIRTHDATE) {
+            prefix = ParamPrefixEnum.NOT_EQUAL
+            value = DateTimeType("2013-03-14")
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM DateIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.BIRTHDATE.paramName,
+          DateTimeType("2013-03-14").value.time,
+          DateTimeType("2013-03-15").value.time - 1,
+          DateTimeType("2013-03-14").value.time,
+          DateTimeType("2013-03-15").value.time - 1
+        )
+      )
+  }
+
+  @Test
+  fun search_date_equal() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.BIRTHDATE) {
+            prefix = ParamPrefixEnum.EQUAL
+            value = DateTimeType("2013-03-14")
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM DateIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.BIRTHDATE.paramName,
+          DateTimeType("2013-03-14").value.time,
+          DateTimeType("2013-03-15").value.time - 1,
+          DateTimeType("2013-03-14").value.time,
+          DateTimeType("2013-03-15").value.time - 1
+        )
+      )
+  }
+
+  @Test
+  fun search_date_greater() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.BIRTHDATE) {
+            prefix = ParamPrefixEnum.GREATERTHAN
+            value = DateTimeType("2013-03-14")
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM DateIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_to >= ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.BIRTHDATE.paramName,
+          DateTimeType("2013-03-15").value.time
+        )
+      )
+  }
+
+  @Test
+  fun search_date_greaterOrEqual() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.BIRTHDATE) {
+            prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+            value = DateTimeType("2013-03-14")
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM DateIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_from >= ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.BIRTHDATE.paramName,
+          DateTimeType("2013-03-14").value.time
+        )
+      )
+  }
+
+  @Test
+  fun search_date_less() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.BIRTHDATE) {
+            prefix = ParamPrefixEnum.LESSTHAN
+            value = DateTimeType("2013-03-14")
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM DateIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_from <= ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.BIRTHDATE.paramName,
+          DateTimeType("2013-03-14").value.time
+        )
+      )
+  }
+
+  @Test
+  fun search_date_lessOrEqual() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.BIRTHDATE) {
+            prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+            value = DateTimeType("2013-03-14")
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM DateIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_to <= ?
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.BIRTHDATE.paramName,
+          DateTimeType("2013-03-15").value.time
+        )
+      )
+  }
+
+  @Test
   fun search_sort_string_ascending() {
     val query =
       Search(ResourceType.Patient).apply { sort(Patient.GIVEN, Order.ASCENDING) }.getQuery()
@@ -585,12 +880,12 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-      SELECT a.serializedResource
-      FROM ResourceEntity a
-      LEFT JOIN NumberIndexEntity b
-      ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
-      WHERE a.resourceType = ?
-      ORDER BY b.index_value ASC
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        LEFT JOIN NumberIndexEntity b
+        ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
+        WHERE a.resourceType = ?
+        ORDER BY b.index_value ASC
         """.trimIndent()
       )
   }
@@ -659,13 +954,13 @@ class SearchTest {
       assertThat(query.query)
         .isEqualTo(
           """ 
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceId IN (
-        SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value < ?
-        )
+          SELECT a.serializedResource
+          FROM ResourceEntity a
+          WHERE a.resourceType = ?
+          AND a.resourceId IN (
+          SELECT resourceId FROM NumberIndexEntity
+          WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value < ?
+          )
           """.trimIndent()
         )
 

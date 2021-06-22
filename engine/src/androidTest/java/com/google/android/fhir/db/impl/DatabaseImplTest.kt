@@ -33,6 +33,7 @@ import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
@@ -961,6 +962,357 @@ class DatabaseImplTest {
           .getQuery()
       )
 
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_starts_after() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-23T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.STARTS_AFTER
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_date_starts_after_noMatch() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-13T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.STARTS_AFTER
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_ends_before() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-13T01:00:00")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_date_ends_before_noMatch() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2014-03-13T01:00:00")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_not_equals() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-13T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.NOT_EQUAL
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_date_not_equals_noMatch() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-14T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.NOT_EQUAL
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_equals() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-14T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.EQUAL
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_date_equals_noMatch() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-13T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.EQUAL
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_greater() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-15")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.GREATERTHAN
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_date_greater_noMatch() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-14T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.GREATERTHAN
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_greater_or_equal() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-14T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+  @Test
+  fun search_date_greater_or_equal_noMatch() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-13T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_less() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-13")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.LESSTHAN
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_date_less_noMatch() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-14T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.LESSTHAN
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_less_or_equal() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-14T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_date_less_or_equal_noMatch() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-14T23:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
     assertThat(result).isEmpty()
   }
 
