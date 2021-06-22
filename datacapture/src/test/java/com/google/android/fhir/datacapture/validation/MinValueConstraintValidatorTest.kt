@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.os.Build
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
@@ -49,7 +50,11 @@ class MinValueConstraintValidatorTest {
       }
 
     val validationResult =
-      MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
+      MinValueConstraintValidator.validate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        InstrumentationRegistry.getInstrumentation().context
+      )
 
     assertThat(validationResult.isValid).isFalse()
     assertThat(validationResult.message).isEqualTo("Minimum value allowed is:10")
@@ -72,7 +77,11 @@ class MinValueConstraintValidatorTest {
       }
 
     val validationResult =
-      MinValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
+      MinValueConstraintValidator.validate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        InstrumentationRegistry.getInstrumentation().context
+      )
 
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.message.isNullOrBlank()).isTrue()

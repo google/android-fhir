@@ -25,6 +25,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
@@ -52,7 +53,11 @@ class MaxValueConstraintValidatorTest {
       }
 
     val validationResult =
-      MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
+      MaxValueConstraintValidator.validate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        RuntimeEnvironment.application.applicationContext
+      )
 
     assertThat(validationResult.isValid).isFalse()
     assertThat(validationResult.message).isEqualTo("Maximum value allowed is:200000")
@@ -79,7 +84,11 @@ class MaxValueConstraintValidatorTest {
       }
 
     val validationResult =
-      MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
+      MaxValueConstraintValidator.validate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        RuntimeEnvironment.application.applicationContext
+      )
 
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.message.isNullOrBlank()).isTrue()

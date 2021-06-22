@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.os.Build
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
@@ -65,7 +66,11 @@ class QuestionnaireResponseItemValidatorTest {
       }
 
     val validateAggregationFromChildValidators =
-      QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
+      QuestionnaireResponseItemValidator.validate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        InstrumentationRegistry.getInstrumentation().context
+      )
 
     assertThat(validateAggregationFromChildValidators.isValid).isTrue()
     assertThat(validateAggregationFromChildValidators.validationMessages).isEmpty()
@@ -100,7 +105,11 @@ class QuestionnaireResponseItemValidatorTest {
       }
 
     val validateAggregationFromChildValidators =
-      QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
+      QuestionnaireResponseItemValidator.validate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        InstrumentationRegistry.getInstrumentation().context
+      )
 
     assertThat(validateAggregationFromChildValidators.isValid).isFalse()
     assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(2)

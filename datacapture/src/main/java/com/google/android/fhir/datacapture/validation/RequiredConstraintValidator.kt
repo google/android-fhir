@@ -16,18 +16,21 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android.content.Context
+import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object RequiredConstraintValidator : ConstraintValidator {
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    context: Context
   ): ConstraintValidator.ConstraintValidationResult {
     if (questionnaireItem.required && questionnaireResponseItem.answer.isEmpty()) {
       return ConstraintValidator.ConstraintValidationResult(
         false,
-        "Missing answer for required field."
+        context.getString(R.string.required_constraint_validation_message)
       )
     }
     return ConstraintValidator.ConstraintValidationResult(true, null)

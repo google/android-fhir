@@ -48,13 +48,14 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         dateInputEditText = itemView.findViewById(R.id.dateInputEditText)
         // Disable direct text input to only allow input from the date picker dialog
         dateInputEditText.keyListener = null
-        dateInputEditText.setOnFocusChangeListener { _: View, hasFocus: Boolean ->
+        dateInputEditText.setOnFocusChangeListener { view: View, hasFocus: Boolean ->
           // Do not show the date picker dialog when losing focus.
           if (!hasFocus) {
             applyValidationResult(
               QuestionnaireResponseItemValidator.validate(
                 questionnaireItemViewItem.questionnaireItem,
-                questionnaireItemViewItem.questionnaireResponseItem
+                questionnaireItemViewItem.questionnaireResponseItem,
+                view.context
               )
             )
             return@setOnFocusChangeListener

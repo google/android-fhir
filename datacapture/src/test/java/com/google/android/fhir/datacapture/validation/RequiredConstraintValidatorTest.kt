@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.os.Build
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -43,7 +44,11 @@ class RequiredConstraintValidatorTest {
       }
 
     val validationResult =
-      RequiredConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
+      RequiredConstraintValidator.validate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        InstrumentationRegistry.getInstrumentation().context
+      )
     assertThat(validationResult.isValid).isTrue()
   }
 
@@ -53,8 +58,12 @@ class RequiredConstraintValidatorTest {
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
 
     val validationResult =
-      RequiredConstraintValidator.validate(questionnaireItem, questionnaireResponseItem)
+      RequiredConstraintValidator.validate(
+        questionnaireItem,
+        questionnaireResponseItem,
+        InstrumentationRegistry.getInstrumentation().context
+      )
     assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.message).isEqualTo("This field is required!")
+    assertThat(validationResult.message).isEqualTo("Missing answer for required field.")
   }
 }
