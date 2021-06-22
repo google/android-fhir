@@ -69,6 +69,7 @@ class QuestionnaireResponseItemValidatorTest {
   fun exceededMaxMinValue_shouldReturnInvalidResultWithMessages() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "a-question"
         addExtension(
           Extension().apply {
             url = MIN_VALUE_EXTENSION_URL
@@ -84,6 +85,7 @@ class QuestionnaireResponseItemValidatorTest {
       }
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "a-question"
         addAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
             value = IntegerType(550)

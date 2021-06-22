@@ -48,4 +48,4 @@ internal object QuestionnaireResponseItemValidator {
   }
 }
 
-internal data class ValidationResult(var isValid: Boolean, val validationMessages: List<String>)
+data class ValidationResult(var isValid: Boolean, val validationMessages: List<String>)
