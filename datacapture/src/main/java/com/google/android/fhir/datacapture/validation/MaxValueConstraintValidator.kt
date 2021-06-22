@@ -30,7 +30,9 @@ internal object MaxValueConstraintValidator :
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
       answer.value > extension.value
     },
-    { extension: Extension, context: Context -> context.getString(R.string.max_value_validation_prefix) + extension.value.primitiveValue() }
+    { extension: Extension, context: Context ->
+      context.getString(R.string.max_value_validation_prefix) + extension.value.primitiveValue()
+    }
   )
 
 internal const val MAX_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/maxValue"

@@ -38,7 +38,10 @@ internal open class ValueConstraintExtensionValidator(
       // TODO(https://github.com/google/android-fhir/issues/487): Validates all answers.
       val answer = questionnaireResponseItem.answer[0]
       if (predicate(extension, answer)) {
-        return ConstraintValidator.ConstraintValidationResult(false, messageGenerator(extension, context))
+        return ConstraintValidator.ConstraintValidationResult(
+          false,
+          messageGenerator(extension, context)
+        )
       }
     }
     return ConstraintValidator.ConstraintValidationResult(true, null)
