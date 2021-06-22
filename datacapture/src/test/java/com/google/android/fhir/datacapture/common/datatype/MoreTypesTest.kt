@@ -49,7 +49,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
-class TypesTest {
+class MoreTypesTest {
 
   @Test
   fun instant_shouldReturnExpectedStringValue() {
