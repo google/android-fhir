@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.search
 
+import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.gclient.IParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam
@@ -27,6 +28,7 @@ import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.UriType
@@ -34,7 +36,7 @@ import org.hl7.fhir.r4.model.UriType
 @SearchDslMarker
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
   internal val stringFilters = mutableListOf<StringFilter>()
-  internal val referenceFilter = mutableListOf<ReferenceFilter>()
+  internal val dateFilter = mutableListOf<DateFilter>()
   internal val numberFilter = mutableListOf<NumberFilter>()
   internal val referenceFilters = mutableListOf<ReferenceFilter>()
   internal val tokenFilters = mutableListOf<TokenFilter>()
@@ -51,6 +53,12 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     val filter = ReferenceFilter(referenceParameter)
     filter.init()
     referenceFilters.add(filter)
+  }
+
+  fun filter(dateParameter: DateClientParam, init: DateFilter.() -> Unit) {
+    val filter = DateFilter(dateParameter)
+    filter.init()
+    dateFilter.add(filter)
   }
 
   fun filter(filter: TokenClientParam, coding: Coding) =
@@ -105,6 +113,13 @@ data class StringFilter(
   val parameter: StringClientParam,
   var modifier: StringFilterModifier = StringFilterModifier.STARTS_WITH,
   var value: String? = null
+)
+
+@SearchDslMarker
+data class DateFilter(
+  val parameter: DateClientParam,
+  var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
+  var value: DateTimeType? = null
 )
 
 @SearchDslMarker

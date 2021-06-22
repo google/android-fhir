@@ -136,6 +136,6 @@ object Dependencies {
 
     const val espresso = "3.3.0"
     const val junit = "4.13"
-    const val robolectric = "4.3.1"
+    const val robolectric = "4.5.1"
   }
 }
