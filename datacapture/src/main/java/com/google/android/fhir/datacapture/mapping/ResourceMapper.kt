@@ -66,7 +66,6 @@ object ResourceMapper {
    * This method assumes there is only one FHIR resource to be extracted from the given
    * `questionnaire` and `questionnaireResponse`.
    */
-
   private val expressionMap: HashMap<String, String> = hashMapOf()
 
   fun extract(questionnaire: Questionnaire, questionnaireResponse: QuestionnaireResponse): Base {
