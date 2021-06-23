@@ -23,6 +23,8 @@ import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
 import java.util.Date
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Questionnaire
+import org.intellij.lang.annotations.Language
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -34,6 +36,7 @@ class ResourceMapperTest {
   @Test
   fun extract() {
     // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
+    @Language("JSON")
     val questionnaireJson =
       """
         {
@@ -303,6 +306,7 @@ class ResourceMapperTest {
         }
       """.trimIndent()
 
+    @Language("JSON")
     val questionnaireResponseJson =
       """
         {
@@ -462,6 +466,7 @@ class ResourceMapperTest {
 
   @Test
   fun `extract() should allow extracting with unanswered questions`() {
+    @Language("JSON")
     val questionnaireJson =
       """
         {
@@ -597,6 +602,7 @@ class ResourceMapperTest {
         }
         """.trimIndent()
 
+    @Language("JSON")
     val questionnaireResponseJson =
       """
         {

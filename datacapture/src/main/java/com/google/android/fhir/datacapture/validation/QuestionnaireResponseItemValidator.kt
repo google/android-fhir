@@ -26,7 +26,8 @@ internal object QuestionnaireResponseItemValidator {
       MaxValueConstraintValidator,
       MinValueConstraintValidator,
       PrimitiveTypeAnswerMaxLengthValidator,
-      PrimitiveTypeAnswerMinLengthValidator
+      PrimitiveTypeAnswerMinLengthValidator,
+      RegexValidator
     )
 
   /** Validates [questionnaireResponseItem] contains valid answer(s) to [questionnaireItem]. */
@@ -48,4 +49,4 @@ internal object QuestionnaireResponseItemValidator {
   }
 }
 
-internal data class ValidationResult(var isValid: Boolean, val validationMessages: List<String>)
+data class ValidationResult(var isValid: Boolean, val validationMessages: List<String>)

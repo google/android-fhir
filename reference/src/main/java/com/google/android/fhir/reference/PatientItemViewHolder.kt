@@ -16,15 +16,16 @@
 
 package com.google.android.fhir.reference
 
-import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.reference.databinding.PatientListItemViewBinding
 
-class PatientItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-  private val idView: TextView = itemView.findViewById(R.id.id_patient_number)
-  private val nameView: TextView = itemView.findViewById(R.id.name)
-  private val genderView: TextView = itemView.findViewById(R.id.gender)
-  private val dobView: TextView = itemView.findViewById(R.id.dob)
+class PatientItemViewHolder(private val binding: PatientListItemViewBinding) :
+  RecyclerView.ViewHolder(binding.root) {
+  private val idView: TextView = binding.idPatientNumber
+  private val nameView: TextView = binding.name
+  private val genderView: TextView = binding.gender
+  private val dobView: TextView = binding.dob
 
   fun bindTo(
     patientItem: PatientListViewModel.PatientItem,
