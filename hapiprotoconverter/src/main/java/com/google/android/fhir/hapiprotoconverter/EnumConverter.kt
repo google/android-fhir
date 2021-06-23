@@ -16,8 +16,10 @@
 
 package com.google.android.fhir.hapiprotoconverter
 
+import android.annotation.SuppressLint
 import com.google.fhir.shaded.protobuf.ProtocolMessageEnum
 
+@SuppressLint("DefaultLocale")
 fun <T : ProtocolMessageEnum> convert(hapiEnum: Enum<*>, protoEnumClass: Class<T>): T {
   // Ensures that protoClass and hapiClass represent the same datatype
   /* In proto the actual enum is in the class AdministrativeGenderCode.Value so if we want to check
@@ -29,7 +31,15 @@ fun <T : ProtocolMessageEnum> convert(hapiEnum: Enum<*>, protoEnumClass: Class<T
     ) == hapiEnum::class.java.simpleName
   ) { "Cannot convert ${hapiEnum::class.java.name} to ${protoEnumClass.enclosingClass?.name}" }
 
-  @Suppress("UNCHECKED_CAST") return protoEnumClass.getDeclaredField(hapiEnum.name).get(null) as T
+  @Suppress("UNCHECKED_CAST")
+  return protoEnumClass
+    .getDeclaredField(
+      (hapiEnum::class.java.getMethod("toCode").invoke(hapiEnum) as String)
+        .toUpperCase()
+        .replace('-', '_')
+    )
+    .get(null) as
+    T
 }
 
 fun <T : Enum<*>> convert(protoEnum: ProtocolMessageEnum, hapiEnumClass: Class<T>): T {
@@ -47,7 +57,7 @@ fun <T : Enum<*>> convert(protoEnum: ProtocolMessageEnum, hapiEnumClass: Class<T
   @Suppress("UNCHECKED_CAST")
   return hapiEnumClass
     .getMethod("valueOf", String::class.java)
-    .invoke(null, protoEnum.valueDescriptor.name) as
+    .invoke(null, protoEnum.valueDescriptor.name.replace("_", "")) as
     T
 }
 
