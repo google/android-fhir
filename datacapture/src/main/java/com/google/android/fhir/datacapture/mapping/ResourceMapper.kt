@@ -66,8 +66,6 @@ object ResourceMapper {
    * This method assumes there is only one FHIR resource to be extracted from the given
    * `questionnaire` and `questionnaireResponse`.
    */
-  private val expressionMap: HashMap<String, String> = hashMapOf()
-
   fun extract(questionnaire: Questionnaire, questionnaireResponse: QuestionnaireResponse): Base {
     val className = questionnaire.itemContextNameToExpressionMap.values.first()
     return (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Base).apply {
@@ -76,7 +74,7 @@ object ResourceMapper {
   }
 
   fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
-    val expressionMap = fetchExpressions(questionnaire.item)
+    val expressionMap = fetchExpressionsFromItemsList(questionnaire.item, hashMapOf())
     val answersHashMap = extractAnswersFromExpression(expressionMap, resource)
     return createQuestionnaireResponse(questionnaire, answersHashMap)
   }
@@ -85,40 +83,42 @@ object ResourceMapper {
     questions: Questionnaire,
     answersHashMap: HashMap<String, Type>
   ): QuestionnaireResponse {
-    setInitialValue(questions.item, answersHashMap)
+    setInitialValueForItemList(questions.item, answersHashMap)
     val questionnaireResponse: QuestionnaireResponse =
       QuestionnaireResponse().apply { questionnaire = questions.id }
     questions.item.forEach { questionnaireResponse.addItem(it.createQuestionnaireResponseItem()) }
     return questionnaireResponse
   }
 
-  private fun setInitialValue(
+  private fun setInitialValueForItemList(
     questions: List<Questionnaire.QuestionnaireItemComponent>,
     answersHashMap: HashMap<String, Type>
   ) {
     val itemsIterator = questions.iterator()
     while (itemsIterator.hasNext()) {
-      setInitialValueToAllItems(itemsIterator.next(), answersHashMap)
+      setInitialValueForItem(itemsIterator.next(), answersHashMap)
     }
   }
 
-  private fun fetchExpressions(
-    questionnaire: List<Questionnaire.QuestionnaireItemComponent>
+  private fun fetchExpressionsFromItemsList(
+    questionnaire: List<Questionnaire.QuestionnaireItemComponent>,
+    expressionMap: HashMap<String, String>
   ): HashMap<String, String> {
     val itemsIterator = questionnaire.iterator()
     while (itemsIterator.hasNext()) {
-      val pair = fetchExpressionsFromQuestionnaire(itemsIterator.next())
+      val pair = fetchExpressionsFromQuestionnaireItem(itemsIterator.next(), expressionMap)
       pair?.let { expressionMap[it.first] = it.second }
     }
     return expressionMap
   }
 
-  private fun fetchExpressionsFromQuestionnaire(
-    question: Questionnaire.QuestionnaireItemComponent
+  private fun fetchExpressionsFromQuestionnaireItem(
+    question: Questionnaire.QuestionnaireItemComponent,
+    expressionMap: HashMap<String, String>
   ): Pair<String, String>? {
     var expressionPair: Pair<String, String>? = null
     if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      fetchExpressions(question.item)
+      fetchExpressionsFromItemsList(question.item, expressionMap)
     } else {
       question.fetchExpression()?.let { exp ->
         expressionPair = Pair(question.linkId, exp.expression)
@@ -127,12 +127,12 @@ object ResourceMapper {
     return expressionPair
   }
 
-  private fun setInitialValueToAllItems(
+  private fun setInitialValueForItem(
     question: Questionnaire.QuestionnaireItemComponent,
     answersHashMap: HashMap<String, Type>
   ) {
     if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      setInitialValue(question.item, answersHashMap)
+      setInitialValueForItemList(question.item, answersHashMap)
     } else {
       setInitialValueToQuestion(answersHashMap, question)
     }
