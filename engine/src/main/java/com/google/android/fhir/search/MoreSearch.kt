@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.search
 
+import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
@@ -42,6 +43,7 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
       when (sort) {
         is StringClientParam -> "StringIndexEntity"
         is NumberClientParam -> "NumberIndexEntity"
+        is DateClientParam -> "DateIndexEntity"
         else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
       }
     sortJoinStatement =

@@ -21,6 +21,7 @@ import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.Appointment
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -1285,6 +1286,60 @@ class SearchTest {
           BigDecimal("90.00").toDouble(),
           BigDecimal("110.00").toDouble()
         )
+      )
+  }
+
+  @Test
+  fun search_date_sort() {
+    val query =
+      Search(ResourceType.Patient).apply { sort(Patient.BIRTHDATE, Order.ASCENDING) }.getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        LEFT JOIN DateIndexEntity b
+        ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
+        WHERE a.resourceType = ?
+        ORDER BY b.index_value ASC
+        """.trimIndent()
+      )
+  }
+
+  @Test
+  fun search_date_sort_descending() {
+    val query =
+      Search(ResourceType.Patient).apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }.getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        LEFT JOIN DateIndexEntity b
+        ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
+        WHERE a.resourceType = ?
+        ORDER BY b.index_value DESC
+        """.trimIndent()
+      )
+  }
+
+  @Test
+  fun search_date_sort_appointmentDate() {
+    val query =
+      Search(ResourceType.Appointment).apply { sort(Appointment.DATE, Order.ASCENDING) }.getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        LEFT JOIN DateIndexEntity b
+        ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
+        WHERE a.resourceType = ?
+        ORDER BY b.index_value ASC
+        """.trimIndent()
       )
   }
 }
