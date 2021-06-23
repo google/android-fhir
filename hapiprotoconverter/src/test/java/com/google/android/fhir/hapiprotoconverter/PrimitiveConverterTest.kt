@@ -119,15 +119,6 @@ class PrimitiveConverterTest {
         Truth.assertThat(converted::class.java.getMethod("getPrecision").invoke(converted))
           .isEqualTo(hapi::class.java.getMethod("getPrecision").invoke(hapi))
       }
-      //       -> {
-      //        // Compare time
-      //
-      // Truth.assertThat(converted.value::class.java.getMethod("getTime").invoke(converted.value))
-      //          .isEqualTo(hapi.value::class.java.getMethod("getTime").invoke(hapi.value))
-      //        // Compare precision
-      //        Truth.assertThat(converted::class.java.getMethod("getPrecision").invoke(converted))
-      //          .isEqualTo(hapi::class.java.getMethod("getPrecision").invoke(hapi))
-      //      }
       "base64Binary" -> {
         // compare ValueAsString because value is a byteArray
         Truth.assertThat(converted.valueAsString).isEqualTo(hapi.valueAsString)
