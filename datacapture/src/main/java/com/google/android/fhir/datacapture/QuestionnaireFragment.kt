@@ -53,18 +53,39 @@ class QuestionnaireFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
+
+    val paginationPreviousButton = view.findViewById<View>(R.id.pagination_previous_button)
+    paginationPreviousButton.setOnClickListener { viewModel.goToPreviousPage() }
+    val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
+    paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
+
     val adapter = QuestionnaireItemAdapter()
     recyclerView.adapter = adapter
     recyclerView.layoutManager = LinearLayoutManager(view.context)
 
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-      viewModel.questionnaireItemViewItemListFlow.collect { adapter.submitList(it) }
+      viewModel.questionnaireStateFlow.collect { state ->
+        adapter.submitList(state.items)
+
+        if (state.pagination != null) {
+          paginationPreviousButton.visibility = View.VISIBLE
+          paginationPreviousButton.isEnabled = state.pagination.hasPreviousPage
+          paginationNextButton.visibility = View.VISIBLE
+          paginationNextButton.isEnabled = state.pagination.hasNextPage
+        } else {
+          paginationPreviousButton.visibility = View.GONE
+          paginationNextButton.visibility = View.GONE
+        }
+      }
     }
   }
 
   // Returns the current questionnaire response
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
+
+  // The current questionnaire
+  internal val questionnaire = viewModel.questionnaire
 
   companion object {
     const val BUNDLE_KEY_QUESTIONNAIRE = "questionnaire"

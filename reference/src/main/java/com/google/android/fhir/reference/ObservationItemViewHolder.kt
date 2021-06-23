@@ -16,12 +16,13 @@
 
 package com.google.android.fhir.reference
 
-import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.reference.databinding.ObservationListItemBinding
 
-class ObservationItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-  private val observationTextView: TextView = itemView.findViewById(R.id.observation_detail)
+class ObservationItemViewHolder(private val binding: ObservationListItemBinding) :
+  RecyclerView.ViewHolder(binding.root) {
+  private val observationTextView: TextView = binding.observationDetail
 
   fun bindTo(observationItem: PatientListViewModel.ObservationItem) {
     this.observationTextView.text =
