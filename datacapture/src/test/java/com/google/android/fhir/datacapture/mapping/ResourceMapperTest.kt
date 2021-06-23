@@ -29,6 +29,8 @@ import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Questionnaire
+import org.intellij.lang.annotations.Language
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.junit.Test
@@ -42,6 +44,7 @@ class ResourceMapperTest {
   @Test
   fun extract() {
     // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
+    @Language("JSON")
     val questionnaireJson =
       """
         {
@@ -311,6 +314,7 @@ class ResourceMapperTest {
         }
       """.trimIndent()
 
+    @Language("JSON")
     val questionnaireResponseJson =
       """
         {
@@ -470,6 +474,7 @@ class ResourceMapperTest {
 
   @Test
   fun `extract() should allow extracting with unanswered questions`() {
+    @Language("JSON")
     val questionnaireJson =
       """
         {
@@ -605,6 +610,7 @@ class ResourceMapperTest {
         }
         """.trimIndent()
 
+    @Language("JSON")
     val questionnaireResponseJson =
       """
         {
