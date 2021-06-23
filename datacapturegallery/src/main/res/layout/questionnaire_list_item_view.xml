@@ -31,6 +31,7 @@
         android:maxLines="1"
         android:textAppearance="?attr/textAppearanceSubtitle1"
         android:textColor="?colorOnSurface"
+        android:ellipsize="end"
     />
 
     <TextView
