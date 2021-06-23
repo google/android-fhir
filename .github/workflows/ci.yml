@@ -37,7 +37,7 @@ jobs:
    # Build will compile APK, test APK and run tests, lint, etc.
    build:
 
-    runs-on: macos-11.3 # use mac build for emulator hardware accelerator
+    runs-on: macos-11.0 # use mac build for emulator hardware accelerator
     
     strategy:
       matrix:
