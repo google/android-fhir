@@ -35,9 +35,45 @@ import com.google.fhir.r4.core.Time
 import com.google.fhir.r4.core.UnsignedInt
 import com.google.fhir.r4.core.Uri
 import com.google.fhir.r4.core.Url
-import com.google.fhir.r4.core.Uuid
 import com.google.fhir.shaded.protobuf.ByteString
+import com.google.fhir.shaded.protobuf.GeneratedMessageV3
+import com.google.fhir.stu3.proto.Base64Binary as Base64BinaryStu3
+import com.google.fhir.stu3.proto.Boolean as BooleanStu3
+import com.google.fhir.stu3.proto.Code as CodeStu3
+import com.google.fhir.stu3.proto.Date as DateStu3
+import com.google.fhir.stu3.proto.DateTime as DateTimeStu3
+import com.google.fhir.stu3.proto.Decimal as DecimalStu3
+import com.google.fhir.stu3.proto.Id as IdStu3
+import com.google.fhir.stu3.proto.Instant as InstantStu3
+import com.google.fhir.stu3.proto.Integer as IntegerStu3
+import com.google.fhir.stu3.proto.Markdown as MarkdownStu3
+import com.google.fhir.stu3.proto.Oid as OidStu3
+import com.google.fhir.stu3.proto.PositiveInt as PositiveIntStu3
+import com.google.fhir.stu3.proto.String as StringStu3
+import com.google.fhir.stu3.proto.Time as TimeStu3
+import com.google.fhir.stu3.proto.UnsignedInt as UnsignedIntStu3
+import com.google.fhir.stu3.proto.Uri as UriStu3
+import com.google.fhir.stu3.proto.Uuid as UuidStu3
+import com.google.fhir.stu3.proto.Uuid
 import java.time.LocalTime
+import org.hl7.fhir.dstu3.model.Base64BinaryType as Base64BinaryTypeStu3
+import org.hl7.fhir.dstu3.model.BooleanType as BooleanTypeStu3
+import org.hl7.fhir.dstu3.model.CodeType as CodeTypeStu3
+import org.hl7.fhir.dstu3.model.DateTimeType as DateTimeTypeStu3
+import org.hl7.fhir.dstu3.model.DateType as DateTypeStu3
+import org.hl7.fhir.dstu3.model.DecimalType as DecimalTypeStu3
+import org.hl7.fhir.dstu3.model.IdType as IdTypeStu3
+import org.hl7.fhir.dstu3.model.InstantType as InstantTypeStu3
+import org.hl7.fhir.dstu3.model.IntegerType as IntegerTypeStu3
+import org.hl7.fhir.dstu3.model.MarkdownType as MarkdownTypeStu3
+import org.hl7.fhir.dstu3.model.OidType as OidTypeStu3
+import org.hl7.fhir.dstu3.model.PositiveIntType as PositiveIntTypeStu3
+import org.hl7.fhir.dstu3.model.StringType as StringTypeStu3
+import org.hl7.fhir.dstu3.model.TimeType as TimeTypeStu3
+import org.hl7.fhir.dstu3.model.UnsignedIntType as UnsignedIntTypeStu3
+import org.hl7.fhir.dstu3.model.UriType as UriTypeStu3
+import org.hl7.fhir.dstu3.model.UuidType as UuidTypeStu3
+import org.hl7.fhir.instance.model.api.IPrimitiveType
 import org.hl7.fhir.r4.model.Base64BinaryType
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CanonicalType
@@ -58,186 +94,183 @@ import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.model.UuidType
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 /** Contains tests for PrimitiveConverter.kt */
+@RunWith(Parameterized::class)
 class PrimitiveConverterTest {
-
+  @Parameterized.Parameter(0) lateinit var hapi: IPrimitiveType<*>
+  @Parameterized.Parameter(1) lateinit var proto: GeneratedMessageV3
   @Test
-  fun test_primitive_converter_boolean() {
-    val hapi = BooleanType(false)
-    val proto = Boolean.newBuilder().setValue(false).build()
-    Truth.assertThat(convert(hapi, Boolean::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, BooleanType::class.java).value).isEqualTo(hapi.value)
+  fun test_primitive_converter() {
+    Truth.assertThat(convert(hapi, proto::class.java)).isEqualTo(proto)
+    val converted = convert(proto, hapi::class.java)
+
+    when (hapi.fhirType()) {
+      "instant", "dateTime", "date" -> {
+        // Compare time
+        Truth.assertThat(converted.value::class.java.getMethod("getTime").invoke(converted.value))
+          .isEqualTo(hapi.value::class.java.getMethod("getTime").invoke(hapi.value))
+        // Compare time zone
+        Truth.assertThat(converted::class.java.getMethod("getTimeZone").invoke(converted))
+          .isEqualTo(hapi::class.java.getMethod("getTimeZone").invoke(hapi))
+        // compare precision
+        Truth.assertThat(converted::class.java.getMethod("getPrecision").invoke(converted))
+          .isEqualTo(hapi::class.java.getMethod("getPrecision").invoke(hapi))
+      }
+      //       -> {
+      //        // Compare time
+      //
+      // Truth.assertThat(converted.value::class.java.getMethod("getTime").invoke(converted.value))
+      //          .isEqualTo(hapi.value::class.java.getMethod("getTime").invoke(hapi.value))
+      //        // Compare precision
+      //        Truth.assertThat(converted::class.java.getMethod("getPrecision").invoke(converted))
+      //          .isEqualTo(hapi::class.java.getMethod("getPrecision").invoke(hapi))
+      //      }
+      "base64Binary" -> {
+        // compare ValueAsString because value is a byteArray
+        Truth.assertThat(converted.valueAsString).isEqualTo(hapi.valueAsString)
+      }
+      else -> {
+        Truth.assertThat(converted.value).isEqualTo(hapi.value)
+      }
+    }
   }
 
-  @Test
-  fun test_primitive_converter_integer() {
-    val hapi = IntegerType(9)
-    val proto = Integer.newBuilder().setValue(9).build()
-    Truth.assertThat(convert(hapi, Integer::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, IntegerType::class.java).value).isEqualTo(hapi.value)
-  }
-  @Test
-  fun test_primitive_converter_string() {
-    val hapi = StringType("String")
-    val proto = String.newBuilder().setValue("String").build()
-    Truth.assertThat(convert(hapi, String::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, StringType::class.java).value).isEqualTo(hapi.value)
-  }
-
-  @Test
-  fun test_primitive_converter_decimal() {
-    val hapi = DecimalType("100.10")
-    val proto = Decimal.newBuilder().setValue("100.10").build()
-    Truth.assertThat(convert(hapi, Decimal::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, DecimalType::class.java).valueAsString).isEqualTo(proto.value)
-  }
-
-  @Test
-  fun test_primitive_converter_uri() {
-    val hapi = UriType("urn:uuid:53fefa32-fcbb-4ff8-8a92-55ee120877b7")
-    val proto = Uri.newBuilder().setValue("urn:uuid:53fefa32-fcbb-4ff8-8a92-55ee120877b7").build()
-    Truth.assertThat(convert(hapi, Uri::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, UriType::class.java).value).isEqualTo(hapi.value)
-  }
-
-  @Test
-  fun test_primitive_converter_url() {
-    val hapi = UrlType("https://example.com")
-    val proto = Url.newBuilder().setValue("https://example.com").build()
-    Truth.assertThat(convert(hapi, Url::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, UrlType::class.java).value).isEqualTo(hapi.value)
-  }
-
-  @Test
-  fun test_primitive_converter_canonical() {
-    val hapi = CanonicalType("Library/3")
-    val proto = Canonical.newBuilder().setValue("Library/3").build()
-    Truth.assertThat(convert(hapi, Canonical::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, CanonicalType::class.java).value).isEqualTo(hapi.value)
-  }
-
-  @Test
-  fun test_primitive_converter_base64Binary() {
-    val hapi = Base64BinaryType("QmFzZTY0Cg==")
-    val proto =
-      Base64Binary.newBuilder().setValue(ByteString.copyFrom("QmFzZTY0Cg==".toByteArray())).build()
-    Truth.assertThat(convert(hapi, Base64Binary::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, Base64BinaryType::class.java).valueAsString)
-      .isEqualTo(hapi.valueAsString)
-  }
-
-  @Test
-  fun test_primitive_converter_Instant() {
-    val hapi = InstantType("2001-01-01T10:00:00.000+05:30")
-    val proto =
-      Instant.newBuilder()
-        .setValueUs(hapi.value.time)
-        .setPrecision(Instant.Precision.MILLISECOND)
-        .setTimezone(hapi.timeZone.id)
-        .build()
-    Truth.assertThat(convert(hapi, Instant::class.java)).isEqualTo(proto)
-
-    val converted = convert(proto, InstantType::class.java)
-    Truth.assertThat(converted.value.time).isEqualTo(hapi.value.time)
-    Truth.assertThat(converted.timeZone).isEqualTo(hapi.timeZone)
-    Truth.assertThat(converted.precision).isEqualTo(hapi.precision)
-  }
-
-  @Test
-  fun test_primitive_converter_date() {
-    val hapi = DateType("2001-01-01")
-    val proto =
-      Date.newBuilder().setValueUs(hapi.value.time).setPrecision(Date.Precision.DAY).build()
-    Truth.assertThat(convert(hapi, Date::class.java)).isEqualTo(proto)
-
-    val converted = convert(proto, DateType::class.java)
-    Truth.assertThat(converted.value.time).isEqualTo(hapi.value.time)
-    Truth.assertThat(converted.precision).isEqualTo(hapi.precision)
-  }
-
-  @Test
-  fun test_primitive_converter_dateTime() {
-    val hapi = DateTimeType("2001-01-01T10:00:00+05:30")
-    val proto =
-      DateTime.newBuilder()
-        .setValueUs(hapi.value.time)
-        .setPrecision(DateTime.Precision.SECOND)
-        .setTimezone(hapi.timeZone.id)
-        .build()
-
-    val converted = convert(proto, DateTimeType::class.java)
-    Truth.assertThat(convert(hapi, DateTime::class.java)).isEqualTo(proto)
-    Truth.assertThat(converted.value.time).isEqualTo(hapi.value.time)
-    Truth.assertThat(converted.timeZone).isEqualTo(hapi.timeZone)
-    Truth.assertThat(converted.precision).isEqualTo(hapi.precision)
-  }
-
-  @Test
-  fun test_primitive_converter_time() {
-    val hapi = TimeType("10:00:00")
-    val proto =
-      Time.newBuilder()
-        .setValueUs(LocalTime.parse("10:00:00").toNanoOfDay() / 1000)
-        .setPrecision(Time.Precision.SECOND)
-        .build()
-    Truth.assertThat(convert(hapi, Time::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, TimeType::class.java).value).isEqualTo(hapi.value)
-  }
-
-  @Test
-  fun test_primitive_converter_code() {
-    val hapi = CodeType().apply { value = "something" }
-    val proto = Code.newBuilder().setValue("something").build()
-    Truth.assertThat(convert(hapi, Code::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, CodeType::class.java).value).isEqualTo(hapi.value)
-  }
-
-  @Test
-  fun test_primitive_converter_oid() {
-    val hapi = OidType("urn:oid:1.2.3.4.5")
-    val proto = Oid.newBuilder().setValue("urn:oid:1.2.3.4.5").build()
-    Truth.assertThat(convert(hapi, Oid::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, OidType::class.java).value).isEqualTo(hapi.value)
-  }
-
-  @Test
-  fun test_primitive_converter_Id() {
-    val hapi = IdType("ID")
-    val proto = Id.newBuilder().setValue("ID").build()
-    Truth.assertThat(convert(hapi, Id::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, IdType::class.java).value).isEqualTo(hapi.value)
-  }
-
-  @Test
-  fun test_primitive_converter_markdown() {
-    val hapi = MarkdownType("**bold**")
-    val proto = Markdown.newBuilder().setValue("**bold**").build()
-    Truth.assertThat(convert(hapi, Markdown::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, MarkdownType::class.java).value).isEqualTo(hapi.value)
-  }
-
-  @Test
-  fun test_primitive_converter_unsignedInt() {
-    val hapi = UnsignedIntType(200)
-    val proto = UnsignedInt.newBuilder().setValue(200).build()
-    Truth.assertThat(convert(hapi, UnsignedInt::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, UnsignedIntType::class.java).value).isEqualTo(hapi.value)
-  }
-
-  @Test
-  fun test_primitive_converter_positiveInt() {
-    val hapi = PositiveIntType(200)
-    val proto = PositiveInt.newBuilder().setValue(200).build()
-    Truth.assertThat(convert(hapi, PositiveInt::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, PositiveIntType::class.java).value).isEqualTo(hapi.value)
-  }
-
-  @Test
-  fun test_primitive_converter_UUID() {
-    val hapi = UuidType("urn:uuid:c757873d-ec9a-4326-a141-556f43239520")
-    val proto = Uuid.newBuilder().setValue("urn:uuid:c757873d-ec9a-4326-a141-556f43239520").build()
-    Truth.assertThat(convert(hapi, Uuid::class.java)).isEqualTo(proto)
-    Truth.assertThat(convert(proto, UuidType::class.java).value).isEqualTo(hapi.value)
+  private companion object {
+    @Parameterized.Parameters
+    @JvmStatic
+    fun data() =
+      listOf(
+        arrayOf(BooleanType(false), Boolean.newBuilder().setValue(false).build()),
+        arrayOf(BooleanTypeStu3(false), BooleanStu3.newBuilder().setValue(false).build()),
+        arrayOf(IntegerType(9), Integer.newBuilder().setValue(9).build()),
+        arrayOf(IntegerTypeStu3(9), IntegerStu3.newBuilder().setValue(9).build()),
+        arrayOf(StringType("String"), String.newBuilder().setValue("String").build()),
+        arrayOf(StringTypeStu3("String"), StringStu3.newBuilder().setValue("String").build()),
+        arrayOf(DecimalType("100.10"), Decimal.newBuilder().setValue("100.10").build()),
+        arrayOf(DecimalTypeStu3("100.10"), DecimalStu3.newBuilder().setValue("100.10").build()),
+        arrayOf(
+          UriType("urn:uuid:53fefa32-fcbb-4ff8-8a92-55ee120877b7"),
+          Uri.newBuilder().setValue("urn:uuid:53fefa32-fcbb-4ff8-8a92-55ee120877b7").build()
+        ),
+        arrayOf(
+          UriTypeStu3("urn:uuid:53fefa32-fcbb-4ff8-8a92-55ee120877b7"),
+          UriStu3.newBuilder().setValue("urn:uuid:53fefa32-fcbb-4ff8-8a92-55ee120877b7").build()
+        ),
+        arrayOf(
+          UrlType("https://example.com"),
+          Url.newBuilder().setValue("https://example.com").build()
+        ),
+        arrayOf(CanonicalType("Library/3"), Canonical.newBuilder().setValue("Library/3").build()),
+        arrayOf(
+          Base64BinaryType("QmFzZTY0Cg=="),
+          Base64Binary.newBuilder()
+            .setValue(ByteString.copyFrom("QmFzZTY0Cg==".toByteArray()))
+            .build()
+        ),
+        arrayOf(
+          Base64BinaryTypeStu3("QmFzZTY0Cg=="),
+          Base64BinaryStu3.newBuilder()
+            .setValue(ByteString.copyFrom("QmFzZTY0Cg==".toByteArray()))
+            .build()
+        ),
+        arrayOf(
+          InstantType("2001-01-01T10:00:00.000+05:30"),
+          Instant.newBuilder()
+            .setValueUs(InstantType("2001-01-01T10:00:00.000+05:30").value.time)
+            .setPrecision(Instant.Precision.MILLISECOND)
+            .setTimezone(InstantType("2001-01-01T10:00:00.000+05:30").timeZone.id)
+            .build()
+        ),
+        arrayOf(
+          InstantTypeStu3("2001-01-01T10:00:00.000+05:30"),
+          InstantStu3.newBuilder()
+            .setValueUs(InstantType("2001-01-01T10:00:00.000+05:30").value.time)
+            .setPrecision(InstantStu3.Precision.MILLISECOND)
+            .setTimezone(InstantType("2001-01-01T10:00:00.000+05:30").timeZone.id)
+            .build()
+        ),
+        arrayOf(
+          DateType("2001-01-01"),
+          Date.newBuilder()
+            .setValueUs(DateType("2001-01-01").value.time)
+            .setPrecision(Date.Precision.DAY)
+            .build()
+        ),
+        arrayOf(
+          DateTypeStu3("2001-01-01"),
+          DateStu3.newBuilder()
+            .setValueUs(DateTypeStu3("2001-01-01").value.time)
+            .setPrecision(DateStu3.Precision.DAY)
+            .build()
+        ),
+        arrayOf(
+          DateTimeType("2001-01-01T10:00:00+05:30"),
+          DateTime.newBuilder()
+            .setValueUs(DateTimeType("2001-01-01T10:00:00+05:30").value.time)
+            .setPrecision(DateTime.Precision.SECOND)
+            .setTimezone(DateTimeType("2001-01-01T10:00:00+05:30").timeZone.id)
+            .build()
+        ),
+        arrayOf(
+          DateTimeTypeStu3("2001-01-01T10:00:00+05:30"),
+          DateTimeStu3.newBuilder()
+            .setValueUs(DateTimeTypeStu3("2001-01-01T10:00:00+05:30").value.time)
+            .setPrecision(DateTimeStu3.Precision.SECOND)
+            .setTimezone(DateTimeType("2001-01-01T10:00:00+05:30").timeZone.id)
+            .build()
+        ),
+        arrayOf(
+          TimeType("10:00:00"),
+          Time.newBuilder()
+            .setValueUs(LocalTime.parse("10:00:00").toNanoOfDay() / 1000)
+            .setPrecision(Time.Precision.SECOND)
+            .build()
+        ),
+        arrayOf(
+          TimeTypeStu3("10:00:00"),
+          TimeStu3.newBuilder()
+            .setValueUs(LocalTime.parse("10:00:00").toNanoOfDay() / 1000)
+            .setPrecision(TimeStu3.Precision.SECOND)
+            .build()
+        ),
+        arrayOf(
+          CodeType().apply { value = "something" },
+          Code.newBuilder().setValue("something").build()
+        ),
+        arrayOf(
+          CodeTypeStu3().apply { value = "something" },
+          CodeStu3.newBuilder().setValue("something").build()
+        ),
+        arrayOf(
+          OidType("urn:oid:1.2.3.4.5"),
+          Oid.newBuilder().setValue("urn:oid:1.2.3.4.5").build()
+        ),
+        arrayOf(
+          OidTypeStu3("urn:oid:1.2.3.4.5"),
+          OidStu3.newBuilder().setValue("urn:oid:1.2.3.4.5").build()
+        ),
+        arrayOf(IdType("ID"), Id.newBuilder().setValue("ID").build()),
+        arrayOf(IdTypeStu3("ID"), IdStu3.newBuilder().setValue("ID").build()),
+        arrayOf(MarkdownType("**bold**"), Markdown.newBuilder().setValue("**bold**").build()),
+        arrayOf(
+          MarkdownTypeStu3("**bold**"),
+          MarkdownStu3.newBuilder().setValue("**bold**").build()
+        ),
+        arrayOf(UnsignedIntType(0), UnsignedInt.newBuilder().setValue(0).build()),
+        arrayOf(UnsignedIntTypeStu3(0), UnsignedIntStu3.newBuilder().setValue(0).build()),
+        arrayOf(PositiveIntType(200), PositiveInt.newBuilder().setValue(200).build()),
+        arrayOf(PositiveIntTypeStu3(200), PositiveIntStu3.newBuilder().setValue(200).build()),
+        arrayOf(
+          UuidType("urn:uuid:c757873d-ec9a-4326-a141-556f43239520"),
+          Uuid.newBuilder().setValue("urn:uuid:c757873d-ec9a-4326-a141-556f43239520").build()
+        ),
+        arrayOf(
+          UuidTypeStu3("urn:uuid:c757873d-ec9a-4326-a141-556f43239520"),
+          UuidStu3.newBuilder().setValue("urn:uuid:c757873d-ec9a-4326-a141-556f43239520").build()
+        )
+      )
   }
 }

@@ -74,7 +74,9 @@ object Dependencies {
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val guava = "com.google.guava:guava:${Versions.guava}"
   const val hapiFhirStructuresR4 =
-    "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhirStructuresR4}"
+    "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhirStructures}"
+  const val hapiFhirStructuresStu3 =
+    "ca.uhn.hapi.fhir:hapi-fhir-structures-dstu3:${Versions.hapiFhirStructures}"
   const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.httpInterceptor}"
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
   const val material = "com.google.android.material:material:${Versions.material}"
@@ -125,7 +127,7 @@ object Dependencies {
     const val caffeine = "2.9.0"
     const val desugarJdkLibs = "1.0.9"
     const val guava = "28.2-android"
-    const val hapiFhirStructuresR4 = "5.3.0"
+    const val hapiFhirStructures = "5.4.1"
     const val httpInterceptor = "4.0.0"
     const val jsonToolsPatch = "1.13"
     const val material = "1.3.0"

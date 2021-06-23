@@ -135,13 +135,16 @@ fun <T : IPrimitiveType<*>> convert(primitiveProto: GeneratedMessageV3, hapiClas
       primitive.value =
         Date(protoClass.getDeclaredMethod("getValueUs").invoke(primitiveProto) as Long)
 
-      // Probably not the best thing to do?
-      protoClass.getMethod("getTimezone").invoke(primitiveProto)?.let {
-        primitive::class
-          .java
-          .getMethod("setTimeZone", TimeZone::class.java)
-          .invoke(primitive, TimeZone.getTimeZone(it as String))
-      }
+      (protoClass.getMethod("getTimezone").invoke(primitiveProto) as String?)
+        .takeUnless { it.isNullOrEmpty() }
+        .let {
+          primitive::class
+            .java
+            .getMethod("setTimeZone", TimeZone::class.java)
+            // if timeZone is not set on proto then it should be null in the corresponding hapi
+            // struct as well
+            .invoke(primitive, if (it == null) null else TimeZone.getTimeZone(it))
+        }
 
       // To Set Precision
       primitive::class
@@ -191,7 +194,22 @@ fun <T : IPrimitiveType<*>> convert(primitiveProto: GeneratedMessageV3, hapiClas
  */
 private const val hapiPrimitiveSuffix = "Type"
 
-/** returns proto value for precision of @param [precision] */
+/**
+ * returns proto value for precision of @param [precision] In protos the precision Enums are
+ * different for different date types (Instant.Precision is not the same as Date.Precision) However
+ * the values (integer corresponding to the Enum) are the same.
+ *
+ * For example Date.Precision.Year and DateTime.Precision.Year are the same.
+ *
+ * Note
+ *
+ * - value 0 maps to Precision.PRECISION_UNSPECIFIED
+ *
+ * - Precision.Minute is not present in fhir protos is mapped to Precision.UNRECOGNIZED
+ *
+ * - For instant proto only Second and Milli are valid precisions ( it also supports Micro , however
+ * micro isn't supported by hapi)
+ */
 private fun getValueForDateTimeEnum(precision: TemporalPrecisionEnum, fhirType: String): Int {
   val value =
     when (precision) {
@@ -200,19 +218,20 @@ private fun getValueForDateTimeEnum(precision: TemporalPrecisionEnum, fhirType: 
       TemporalPrecisionEnum.DAY -> 3
       TemporalPrecisionEnum.SECOND -> 4
       TemporalPrecisionEnum.MILLI -> 5
-      // 0 maps to Precision.Unspecified
+      TemporalPrecisionEnum.MINUTE -> -1
       else -> 0
     }
-
-  // For instant proto only Second and Milli are valid precisions ( it also supports Micro , however
-  // micro isn't supported by hapi)
   return if (fhirType == "instant") value - 3 else value
 }
 
-/** returns temporalPrecisionEnum representation of @param [precision] */
+/**
+ * returns temporalPrecisionEnum representation of @param [precision]
+ *
+ * @see getValueForDateTimeEnum
+ *
+ * Note when precision is unspecified it will be mapped to TemporalPrecisionEnum.Milli
+ */
 private fun getValueForDateTimeEnum(precision: Int, fhirType: String): TemporalPrecisionEnum {
-  // For instant proto only Second and Milli are valid precisions ( it also supports Micro , however
-  // micro isn't supported by hapi)
   return when (if (fhirType == "instant") precision + 3 else precision) {
     1 -> TemporalPrecisionEnum.YEAR
     2 -> TemporalPrecisionEnum.MONTH
