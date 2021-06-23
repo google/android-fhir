@@ -29,10 +29,9 @@ import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.Questionnaire
-import org.intellij.lang.annotations.Language
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
+import org.intellij.lang.annotations.Language
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
