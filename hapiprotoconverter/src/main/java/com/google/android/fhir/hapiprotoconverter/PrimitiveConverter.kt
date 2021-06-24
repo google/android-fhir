@@ -266,13 +266,15 @@ private fun getProtoDataTypeFromHapi(hapiPrimitive: IPrimitiveType<*>): Class<*>
  * returns duration (microseconds of the day) and precision from string representation of [time]
  *
  * For example when the time string is 10:00:00 the precision will be seconds and when the time
- * string is 10:00:00.000 the precision will be milliseconds
+ * string is 10:00:00.000 the precision will be milliseconds.
+ *
+ * The precision and value are used to set corresponding Time fhir proto.
  */
 private fun getDurationPrecisionPairFromTimeString(time: String): Pair<Long, Int> {
   return (LocalTime.parse(time).toNanoOfDay() / 1000 to
     when (time.length) {
-      8 -> 1
-      11 -> 2
+      8 -> 1 // 1 represents precision of seconds
+      11 -> 2 // 2 represents precision of microseconds
       else -> 0
     })
 }

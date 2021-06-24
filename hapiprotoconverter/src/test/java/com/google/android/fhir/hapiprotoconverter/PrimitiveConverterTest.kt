@@ -35,6 +35,7 @@ import com.google.fhir.r4.core.Time
 import com.google.fhir.r4.core.UnsignedInt
 import com.google.fhir.r4.core.Uri
 import com.google.fhir.r4.core.Url
+import com.google.fhir.r4.core.Uuid
 import com.google.fhir.shaded.protobuf.ByteString
 import com.google.fhir.shaded.protobuf.GeneratedMessageV3
 import com.google.fhir.stu3.proto.Base64Binary as Base64BinaryStu3
@@ -54,7 +55,6 @@ import com.google.fhir.stu3.proto.Time as TimeStu3
 import com.google.fhir.stu3.proto.UnsignedInt as UnsignedIntStu3
 import com.google.fhir.stu3.proto.Uri as UriStu3
 import com.google.fhir.stu3.proto.Uuid as UuidStu3
-import com.google.fhir.stu3.proto.Uuid
 import java.time.LocalTime
 import org.hl7.fhir.dstu3.model.Base64BinaryType as Base64BinaryTypeStu3
 import org.hl7.fhir.dstu3.model.BooleanType as BooleanTypeStu3
