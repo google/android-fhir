@@ -563,17 +563,6 @@ class ResourceMapperTest {
                     {
                       "linkId": "PR-telecom-system",
                       "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
-                      "extension": [
-                        {
-                          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
-                          "valueExpression": {
-                            "language": "application/x-fhir-query",
-                            "expression": "ContactPoint$""" +
-        """ContactPointSystem",
-                            "name": "contactPointSystem"
-                          }
-                        }
-                      ],
                       "type": "string",
                       "text": "system",
                       "initial": [

@@ -73,8 +73,12 @@ object ResourceMapper {
     }
   }
 
+  /**
+   * This function takes Questionnaire and Resource and returns Questionnaire Response
+   * that we can populate to Questionnaire
+   */
   fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
-    val expressionMap = fetchExpressionsFromItemsList(questionnaire.item, hashMapOf())
+    val expressionMap = fetchExpressionsFromItemsList(questionnaire.item)
     val answersHashMap = extractAnswersFromExpression(expressionMap, resource)
     return createQuestionnaireResponse(questionnaire, answersHashMap)
   }
@@ -94,37 +98,34 @@ object ResourceMapper {
     questions: List<Questionnaire.QuestionnaireItemComponent>,
     answersHashMap: HashMap<String, Type>
   ) {
-    val itemsIterator = questions.iterator()
-    while (itemsIterator.hasNext()) {
-      setInitialValueForItem(itemsIterator.next(), answersHashMap)
+    questions.forEach {
+      setInitialValueForItem(it, answersHashMap)
     }
   }
 
   private fun fetchExpressionsFromItemsList(
-    questionnaire: List<Questionnaire.QuestionnaireItemComponent>,
-    expressionMap: HashMap<String, String>
+    questionnaire: List<Questionnaire.QuestionnaireItemComponent>
   ): HashMap<String, String> {
+    val expressionMap:HashMap<String , String> = hashMapOf()
     val itemsIterator = questionnaire.iterator()
     while (itemsIterator.hasNext()) {
-      val pair = fetchExpressionsFromQuestionnaireItem(itemsIterator.next(), expressionMap)
-      pair?.let { expressionMap[it.first] = it.second }
+      expressionMap.putAll(fetchExpressionsFromQuestionnaireItem(itemsIterator.next()))
     }
     return expressionMap
   }
 
   private fun fetchExpressionsFromQuestionnaireItem(
-    question: Questionnaire.QuestionnaireItemComponent,
-    expressionMap: HashMap<String, String>
-  ): Pair<String, String>? {
-    var expressionPair: Pair<String, String>? = null
+    question: Questionnaire.QuestionnaireItemComponent
+  ): HashMap<String, String> {
+    val expressionMap: HashMap<String, String> = hashMapOf()
     if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      fetchExpressionsFromItemsList(question.item, expressionMap)
+     return fetchExpressionsFromItemsList(question.item)
     } else {
       question.fetchExpression()?.let { exp ->
-        expressionPair = Pair(question.linkId, exp.expression)
+        expressionMap[question.linkId] = exp.expression
       }
     }
-    return expressionPair
+    return expressionMap
   }
 
   private fun setInitialValueForItem(
