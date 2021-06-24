@@ -58,6 +58,12 @@ class QuestionnaireListFragment : Fragment() {
             "Example authored by Fred Hersch + Kevin Most",
             "patient-registration-paginated.json"
           ),
+          // Example authored by fredhersch@google.com for showcasing autoCOmplete item
+          QuestionnaireListItem(
+            "General Health Assessment Questionnaire",
+            "Example authored by Fred Hersch ",
+            "generic-health-assessment-exmaple.json"
+          ),
           // Example taken from
           // https://openhie.github.io/hiv-ig/Questionnaire-hiv-case-report-questionnaire.json.html
           QuestionnaireListItem(
