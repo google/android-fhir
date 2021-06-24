@@ -207,7 +207,7 @@ private const val hapiPrimitiveSuffix = "Type"
  *
  * - Precision.Minute is not present in fhir protos is mapped to Precision.UNRECOGNIZED
  *
- * - For instant proto only Second and Milli are valid precisions ( it also supports Micro , however
+ * - For instant proto only Second and Milli are valid precisions ( it also supports micro , however
  * micro isn't supported by hapi)
  */
 private fun getValueForDateTimeEnum(precision: TemporalPrecisionEnum, fhirType: String): Int {
@@ -265,19 +265,39 @@ private fun getProtoDataTypeFromHapi(hapiPrimitive: IPrimitiveType<*>): Class<*>
 /**
  * returns duration (microseconds of the day) and precision from string representation of [time]
  *
- * For example when the time string is 10:00:00 the precision will be seconds and when the time
- * string is 10:00:00.000 the precision will be milliseconds.
+ * and
  *
  * The precision and value are used to set corresponding Time fhir proto.
  */
 private fun getDurationPrecisionPairFromTimeString(time: String): Pair<Long, Int> {
   return (LocalTime.parse(time).toNanoOfDay() / 1000 to
     when (time.length) {
-      8 -> 1 // 1 represents precision of seconds
-      11 -> 2 // 2 represents precision of microseconds
-      else -> 0
+      SECONDS_PRECISION_STRING_LENGTH -> SECONDS_PRECISION_TIME
+      MILLISECONDS_PRECISION_STRING_LENGTH -> MILLISECONDS_PRECISION_TIME
+      else -> UNKNOWN_PRECISION_TIME
     })
 }
+
+/**
+ * The length of the time string with precision as seconds
+ *
+ * For example when the time string is 10:00:00 the precision will be seconds
+ */
+private const val SECONDS_PRECISION_STRING_LENGTH = 8
+/** The integer value that represent a Milliseconds precision in the Time.Precision Enum */
+private const val SECONDS_PRECISION_TIME = 1
+
+/**
+ * The length of the time string with precision as milliseconds
+ *
+ * For example when the time string is 10:00:00.000 the precision will be milliseconds
+ */
+private const val MILLISECONDS_PRECISION_STRING_LENGTH = 11
+
+/** The integer value that represent a Milliseconds precision in the Time.Precision Enum */
+private const val MILLISECONDS_PRECISION_TIME = 2
+
+private const val UNKNOWN_PRECISION_TIME = 0
 
 /** returns string representation of [microOfDay] */
 private fun getTimeStringFromDuration(microOfDay: Long): String {
