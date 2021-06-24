@@ -84,9 +84,6 @@ class QuestionnaireFragment : Fragment() {
   // Returns the current questionnaire response
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
-  // The current questionnaire
-  internal val questionnaire = viewModel.questionnaire
-
   companion object {
     const val BUNDLE_KEY_QUESTIONNAIRE = "questionnaire"
     const val BUNDLE_KEY_QUESTIONNAIRE_RESPONSE = "questionnaire-response"
