@@ -2,7 +2,7 @@
   "meta": {
     "profile": [
       "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire|2.7"
-    ],
+    ]
   },
   "status": "draft",
   "resourceType": "Questionnaire",
@@ -156,6 +156,24 @@
       "answerOption": [
         {
           "valueCoding": {
+            "code": "asthma",
+            "display": "Asthma"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "copd",
+            "display": "Chronic Lung Disease"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "depression",
+            "display": "Depression"
+          }
+        },
+        {
+          "valueCoding": {
             "code": "t2dm",
             "display": "Diabetes"
           }
@@ -176,24 +194,6 @@
           "valueCoding": {
             "code": "hypercholesterolaemia",
             "display": "High Cholesterol"
-          }
-        },
-        {
-          "valueCoding": {
-            "code": "asthma",
-            "display": "Asthma"
-          }
-        },
-        {
-          "valueCoding": {
-            "code": "copd",
-            "display": "Chronic Lung Disease"
-          }
-        },
-        {
-          "valueCoding": {
-            "code": "depression",
-            "display": "Depression"
           }
         }
       ]
