@@ -74,8 +74,8 @@ object ResourceMapper {
   }
 
   /**
-   * This function takes Questionnaire and Resource and returns Questionnaire Response
-   * that we can populate to Questionnaire
+   * This function takes Questionnaire and Resource and returns Questionnaire Response that we can
+   * populate to Questionnaire
    */
   fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
     val expressionMap = fetchExpressionsFromItemsList(questionnaire.item)
@@ -98,15 +98,13 @@ object ResourceMapper {
     questions: List<Questionnaire.QuestionnaireItemComponent>,
     answersHashMap: HashMap<String, Type>
   ) {
-    questions.forEach {
-      setInitialValueForItem(it, answersHashMap)
-    }
+    questions.forEach { setInitialValueForItem(it, answersHashMap) }
   }
 
   private fun fetchExpressionsFromItemsList(
     questionnaire: List<Questionnaire.QuestionnaireItemComponent>
   ): HashMap<String, String> {
-    val expressionMap:HashMap<String , String> = hashMapOf()
+    val expressionMap: HashMap<String, String> = hashMapOf()
     val itemsIterator = questionnaire.iterator()
     while (itemsIterator.hasNext()) {
       expressionMap.putAll(fetchExpressionsFromQuestionnaireItem(itemsIterator.next()))
@@ -119,11 +117,9 @@ object ResourceMapper {
   ): HashMap<String, String> {
     val expressionMap: HashMap<String, String> = hashMapOf()
     if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
-     return fetchExpressionsFromItemsList(question.item)
+      return fetchExpressionsFromItemsList(question.item)
     } else {
-      question.fetchExpression()?.let { exp ->
-        expressionMap[question.linkId] = exp.expression
-      }
+      question.fetchExpression()?.let { exp -> expressionMap[question.linkId] = exp.expression }
     }
     return expressionMap
   }

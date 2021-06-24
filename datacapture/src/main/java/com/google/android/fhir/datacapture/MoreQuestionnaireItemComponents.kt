@@ -83,7 +83,7 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
     if (hasNestedItemsWithinAnswers && answer.isNotEmpty()) {
       this.addNestedItemsToAnswer(this@createQuestionnaireResponseItem)
     } else if (this@createQuestionnaireResponseItem.type ==
-      Questionnaire.QuestionnaireItemType.GROUP
+        Questionnaire.QuestionnaireItemType.GROUP
     ) {
       this@createQuestionnaireResponseItem.item.forEach {
         this.addItem(it.createQuestionnaireResponseItem())
@@ -103,7 +103,7 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   }
 
   if (type == Questionnaire.QuestionnaireItemType.GROUP ||
-    type == Questionnaire.QuestionnaireItemType.DISPLAY
+      type == Questionnaire.QuestionnaireItemType.DISPLAY
   ) {
     throw IllegalArgumentException(
       "Questionnaire item $linkId has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
@@ -129,7 +129,7 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
  * order of child items will be retained as specified in the standard. See
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
- fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAnswer(
+fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAnswer(
   questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
 ) {
   if (answer.isNotEmpty()) {

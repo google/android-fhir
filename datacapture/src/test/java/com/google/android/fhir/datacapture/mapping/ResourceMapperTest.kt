@@ -596,7 +596,7 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+      """.trimIndent()
 
     @Language("JSON")
     val questionnaireResponseJson =
