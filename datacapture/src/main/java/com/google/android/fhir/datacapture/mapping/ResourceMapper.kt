@@ -79,7 +79,7 @@ object ResourceMapper {
    */
   fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
     val questionnaireResponse = QuestionnaireResponse()
-    evaluatePopulateExpressionsInItemList(questionnaire.item, resource, questionnaire)
+    evaluatePopulateExpressionsInItemList(questionnaire.item, resource)
     questionnaire.item.forEach {
       questionnaireResponse.addItem(it.createQuestionnaireResponseItem())
     }
@@ -88,26 +88,24 @@ object ResourceMapper {
 
   private fun evaluatePopulateExpressionsInItemList(
     questionsList: List<Questionnaire.QuestionnaireItemComponent>,
-    resource: Resource,
-    questionnaire: Questionnaire
+    resource: Resource
   ) {
     val itemsIterator = questionsList.iterator()
     while (itemsIterator.hasNext()) {
-      evaluatePopulateExpressionOnQuestionnaireItem(itemsIterator.next(), resource, questionnaire)
+      evaluatePopulateExpressionOnQuestionnaireItem(itemsIterator.next(), resource)
     }
   }
 
   private fun evaluatePopulateExpressionOnQuestionnaireItem(
     question: Questionnaire.QuestionnaireItemComponent,
-    resource: Resource,
-    questionnaire: Questionnaire
+    resource: Resource
   ) {
     val expressionMap: HashMap<String, String> = hashMapOf()
     val context = FhirContext.forR4()
     val fhirPathEngine =
       FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
     if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      evaluatePopulateExpressionsInItemList(question.item, resource, questionnaire)
+      evaluatePopulateExpressionsInItemList(question.item, resource)
     } else {
       question.fetchExpression()?.let { exp ->
         expressionMap[question.linkId] = exp.expression
