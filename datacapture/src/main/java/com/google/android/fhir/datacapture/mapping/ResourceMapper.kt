@@ -127,23 +127,6 @@ object ResourceMapper {
     return null
   }
 
-  private fun extractAnswersFromExpression(
-    expressionMap: HashMap<String, String>,
-    resource: Resource
-  ): HashMap<String, Type> {
-    val context = FhirContext.forR4()
-    val fhirPathEngine =
-      FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
-    val answersHashMap = HashMap<String, Type>()
-    val expressionMapIterator = expressionMap.keys.iterator()
-    while (expressionMapIterator.hasNext()) {
-      val key = expressionMapIterator.next()
-      val answerExtracted = fhirPathEngine.evaluate(resource, expressionMap[key])
-      answersHashMap[key] = answerExtracted[0] as Type
-    }
-    return answersHashMap
-  }
-
   /**
    * Extracts answer values from [questionnaireResponseItemList] and updates the fields defined in
    * the corresponding questions in [questionnaireItemList]. This method handles nested fields.
