@@ -22,10 +22,10 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
+internal const val ITEM_CONTROL_AUTO_COMPLETE = "autocomplete"
 internal const val ITEM_CONTROL_CHECK_BOX = "check-box"
 internal const val ITEM_CONTROL_DROP_DOWN = "drop-down"
 internal const val ITEM_CONTROL_RADIO_BUTTON = "radio-button"
-internal const val ITEM_CONTROL_AUTO_COMPLETE = "autocomplete"
 
 internal const val EXTENSION_ITEM_CONTROL_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
@@ -39,10 +39,10 @@ internal val Questionnaire.QuestionnaireItemComponent.itemControl: String?
     val code =
       codeableConcept?.coding?.firstOrNull { it.system == EXTENSION_ITEM_CONTROL_SYSTEM }?.code
     return listOf(
+      ITEM_CONTROL_AUTO_COMPLETE,
+      ITEM_CONTROL_CHECK_BOX,
       ITEM_CONTROL_DROP_DOWN,
       ITEM_CONTROL_RADIO_BUTTON,
-      ITEM_CONTROL_CHECK_BOX,
-      ITEM_CONTROL_AUTO_COMPLETE
     )
       .firstOrNull { it == code }
   }
