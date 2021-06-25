@@ -18,6 +18,7 @@ package com.google.android.fhir.db.impl
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirServices
 import com.google.android.fhir.db.ResourceNotFoundInDbException
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -32,6 +33,7 @@ import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
@@ -373,49 +375,46 @@ class DatabaseImplTest {
     }
 
   @Test
-  fun search_string_default() {
+  fun search_string_default() = runBlocking {
     val patient =
       Patient().apply {
         id = "test_1"
         addName(HumanName().addGiven("Evelyn"))
       }
-    val res = runBlocking {
-      database.insert(patient)
+    database.insert(patient)
+    val result =
       database.search<Patient>(
         Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { value = "eve" } }.getQuery()
       )
-    }
 
-    assertThat(res).hasSize(1)
-    assertThat(res[0].id).isEqualTo("Patient/${patient.id}")
+    assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
   }
 
   @Test
-  fun search_string_default_no_match() {
+  fun search_string_default_no_match() = runBlocking {
     val patient =
       Patient().apply {
         id = "test_1"
         addName(HumanName().addGiven("Severine"))
       }
-    val res = runBlocking {
-      database.insert(patient)
+    database.insert(patient)
+    val result =
       database.search<Patient>(
         Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { value = "eve" } }.getQuery()
       )
-    }
 
-    assertThat(res).hasSize(0)
+    assertThat(result).isEmpty()
   }
 
   @Test
-  fun search_string_exact() {
+  fun search_string_exact() = runBlocking {
     val patient =
       Patient().apply {
         id = "test_1"
         addName(HumanName().addGiven("Eve"))
       }
-    val res = runBlocking {
-      database.insert(patient)
+    database.insert(patient)
+    val result =
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
@@ -426,20 +425,19 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(1)
-    assertThat(res[0].id).isEqualTo("Patient/${patient.id}")
+    assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
   }
+
   @Test
-  fun search_string_exact_no_match() {
+  fun search_string_exact_no_match() = runBlocking {
     val patient =
       Patient().apply {
         id = "test_1"
         addName(HumanName().addGiven("EVE"))
       }
-    val res = runBlocking {
-      database.insert(patient)
+    database.insert(patient)
+    val result =
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
@@ -450,21 +448,20 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(0)
+    assertThat(result).isEmpty()
   }
 
   @Test
-  fun search_string_contains() {
+  fun search_string_contains() = runBlocking {
     val patient =
       Patient().apply {
         id = "test_1"
         addName(HumanName().addGiven("Severine"))
       }
 
-    val res = runBlocking {
-      database.insert(patient)
+    database.insert(patient)
+    val result =
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
@@ -475,21 +472,19 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(1)
-    assertThat(res[0].id).isEqualTo("Patient/${patient.id}")
+    assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
   }
 
   @Test
-  fun search_string_contains_no_match() {
+  fun search_string_contains_no_match() = runBlocking {
     val patient =
       Patient().apply {
         id = "test_1"
         addName(HumanName().addGiven("John"))
       }
-    val res = runBlocking {
-      database.insert(patient)
+    database.insert(patient)
+    val result =
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
@@ -500,9 +495,825 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    }
 
-    assertThat(res).hasSize(0)
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_number_equal() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.EQUAL
+              value = BigDecimal("100")
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+  }
+
+  @Test
+  fun search_number_equal_no_match() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100.5))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.EQUAL
+              value = BigDecimal("100")
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_number_notEqual() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.NOT_EQUAL
+              value = BigDecimal("100")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+  }
+
+  @Test
+  fun search_number_notEqual_no_match() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.NOT_EQUAL
+              value = BigDecimal("100")
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_number_greater() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.GREATERTHAN
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+  }
+
+  @Test
+  fun search_number_greater_no_match() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.GREATERTHAN
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_number_greaterThanEqual() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+  }
+
+  @Test
+  fun search_number_greaterThanEqual_no_match() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_number_less() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.LESSTHAN
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+  }
+
+  @Test
+  fun search_number_less_no_match() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.LESSTHAN
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_number_lessThanEquals() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+  }
+
+  @Test
+  fun search_number_lessThanEquals_no_match() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_decimal_endsBefore() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+  }
+
+  @Test
+  fun search_decimal_endsBefore_no_match() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_decimal_startAfter() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.STARTS_AFTER
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+  }
+
+  @Test
+  fun search_decimal_startAfter_no_match() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.STARTS_AFTER
+              value = BigDecimal("99.5")
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_number_Approximate() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(93))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.APPROXIMATE
+              value = BigDecimal("100")
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+  }
+
+  @Test
+  fun search_number_approximate_no_match() = runBlocking {
+    val riskAssessment =
+      RiskAssessment().apply {
+        id = "1"
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(120))
+        )
+      }
+
+    database.insert(riskAssessment)
+    val result =
+      database.search<RiskAssessment>(
+        Search(ResourceType.RiskAssessment)
+          .apply {
+            filter(RiskAssessment.PROBABILITY) {
+              prefix = ParamPrefixEnum.APPROXIMATE
+              value = BigDecimal("100")
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_starts_after() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-23T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.STARTS_AFTER
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_date_starts_after_noMatch() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-13T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.STARTS_AFTER
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_ends_before() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-13T01:00:00")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_date_ends_before_noMatch() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2014-03-13T01:00:00")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_not_equals() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-13T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.NOT_EQUAL
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_date_not_equals_noMatch() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-14T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.NOT_EQUAL
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_equals() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-14T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.EQUAL
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_date_equals_noMatch() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-13T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.EQUAL
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_greater() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-15")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.GREATERTHAN
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_date_greater_noMatch() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-14T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.GREATERTHAN
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_greater_or_equal() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-14T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+  @Test
+  fun search_date_greater_or_equal_noMatch() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-13T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_less() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-13")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.LESSTHAN
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_date_less_noMatch() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-14T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.LESSTHAN
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_date_less_or_equal() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-14T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_date_less_or_equal_noMatch() = runBlocking {
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-14T23:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE) {
+              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              value = DateTimeType("2013-03-14")
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
   }
 
   private companion object {

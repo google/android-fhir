@@ -27,6 +27,7 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.Search
+import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.toTimeZoneString
 import org.hl7.fhir.r4.model.Resource
@@ -58,6 +59,10 @@ constructor(private val database: Database, private val context: Context) : Fhir
 
   override suspend fun <R : Resource> search(search: Search): List<R> {
     return search.execute(database)
+  }
+
+  override suspend fun count(search: Search): Long {
+    return search.count(database)
   }
 
   override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {

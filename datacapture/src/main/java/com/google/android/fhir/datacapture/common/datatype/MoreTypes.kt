@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.search
+package com.google.android.fhir.datacapture.common.datatype
 
-import com.google.android.fhir.FhirEngine
-import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.PrimitiveType
+import org.hl7.fhir.r4.model.Type
 
-suspend inline fun <reified R : Resource> FhirEngine.search(init: Search.() -> Unit): List<R> {
-  val search = Search(type = R::class.java.newInstance().resourceType)
-  search.init()
-  return this.search(search)
-}
-
-suspend inline fun <reified R : Resource> FhirEngine.count(init: Search.() -> Unit): Long {
-  val search = Search(type = R::class.java.newInstance().resourceType)
-  search.init()
-  return this.count(search)
+/**
+ * Returns the string representation of a [PrimitiveType].
+ *
+ * <p>If the type isn't a [PrimitiveType], an empty string is returned.
+ */
+fun Type.asStringValue(): String {
+  if (!isPrimitive) return ""
+  return (this as PrimitiveType<*>).asStringValue()
 }

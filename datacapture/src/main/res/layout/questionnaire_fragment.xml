@@ -14,9 +14,39 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<androidx.recyclerview.widget.RecyclerView
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/recycler_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-/>
+    android:orientation="vertical"
+>
+
+  <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    />
+
+  <Button
+        android:id="@+id/pagination_previous_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+        android:layout_marginVertical="@dimen/item_margin_vertical"
+        android:text="@string/button_pagination_previous"
+    />
+
+  <Button
+        android:id="@+id/pagination_next_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+        android:layout_marginVertical="@dimen/item_margin_vertical"
+        android:text="@string/button_pagination_next"
+    />
+
+</RelativeLayout>
