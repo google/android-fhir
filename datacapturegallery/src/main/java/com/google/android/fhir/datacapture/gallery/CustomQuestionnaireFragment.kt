@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture.gallery
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 
 class CustomQuestionnaireFragment : QuestionnaireFragment() {
-  override fun getQuestionnaireItemViewHolderFactoryMatchers():
+  override fun getCustomQuestionnaireItemViewHolderFactoryMatchers():
     List<QuestionnaireItemViewHolderFactoryMatcher> {
     return listOf(
       QuestionnaireItemViewHolderFactoryMatcher(CustomNumberPickerFactory) { questionnaireItem ->

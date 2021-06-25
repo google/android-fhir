@@ -61,7 +61,7 @@ open class QuestionnaireFragment : Fragment() {
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
 
-    val adapter = QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
+    val adapter = QuestionnaireItemAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
 
     recyclerView.adapter = adapter
     recyclerView.layoutManager = LinearLayoutManager(view.context)

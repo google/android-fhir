@@ -359,11 +359,12 @@ class QuestionnaireItemAdapterTest {
     val viewFactoryMatchers = getQuestionnaireItemViewHolderFactoryMatchers()
     val questionnaireItemAdapter = QuestionnaireItemAdapter(viewFactoryMatchers)
     assertThat(
-      questionnaireItemAdapter.onCreateViewHolder(
-        mock(),
-        QuestionnaireItemViewHolderType.values().size
+        questionnaireItemAdapter.onCreateViewHolder(
+          mock(),
+          QuestionnaireItemViewHolderType.values().size
+        )
       )
-    ).isEqualTo(viewFactoryMatchers[0].factory.create(mock()))
+      .isEqualTo(viewFactoryMatchers[0].factory.create(mock()))
   }
 
   @Test
