@@ -91,7 +91,7 @@ open class QuestionnaireFragment : Fragment() {
    * [QuestionnaireItemViewHolderFactoryMatcher] are applicable for the same item, the behavior is
    * undefined (any of them may be selected).
    */
-  open fun getQuestionnaireItemViewHolderFactoryMatchers() =
+  open fun getCustomQuestionnaireItemViewHolderFactoryMatchers() =
     emptyList<QuestionnaireItemViewHolderFactoryMatcher>()
 
   // Returns the current questionnaire response
