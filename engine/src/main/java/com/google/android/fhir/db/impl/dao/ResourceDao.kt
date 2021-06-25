@@ -205,7 +205,7 @@ internal abstract class ResourceDao {
     //  we can either use room-autovalue integration or go w/ embedded data classes.
     //  we may also want to merge them:
     //  https://github.com/jingtang10/fhir-engine/issues/33
-    index.stringIndices.distinctBy { listOf(it.name, it.path, it.value) }.forEach {
+    index.stringIndices.forEach {
       insertStringIndex(
         StringIndexEntity(
           id = 0,

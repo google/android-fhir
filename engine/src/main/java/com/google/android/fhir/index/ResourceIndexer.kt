@@ -28,6 +28,7 @@ import com.google.android.fhir.index.entities.StringIndex
 import com.google.android.fhir.index.entities.TokenIndex
 import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.logicalId
+import java.io.Serializable
 import java.math.BigDecimal
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Address
@@ -72,6 +73,7 @@ internal object ResourceIndexer {
       .filter { it.path.isNotEmpty() }
       .map { it to fhirPathEngine.evaluate(resource, it.path) }
       .flatMap { pair -> pair.second.map { pair.first to it } }
+      .distinctBy { pair -> indexValues(pair) }
       .forEach { pair ->
         val (searchParam, value) = pair
         when (SearchParamType.fromCode(pair.first.type)) {
@@ -284,6 +286,61 @@ internal object ResourceIndexer {
       }
       else -> null
     }
+  }
+
+  private fun indexValues(pair: Pair<SearchParamDefinition, Base>): Serializable? {
+    val (searchParam, value) = pair
+    return when (SearchParamType.fromCode(pair.first.type)) {
+      SearchParamType.NUMBER -> numberIndexValues(searchParam, value)
+      SearchParamType.DATE -> dateIndexValues(searchParam, value)
+      SearchParamType.STRING -> stringIndexValues(searchParam, value)
+      SearchParamType.TOKEN -> tokenIndexValues(searchParam, value)
+      SearchParamType.REFERENCE -> referenceIndexValues(searchParam, value)
+      SearchParamType.QUANTITY -> quantityIndexValues(searchParam, value)
+      SearchParamType.URI -> uriIndexValues(searchParam, value)
+      SearchParamType.SPECIAL -> specialIndexValues(searchParam, value)
+      else -> null
+    }
+  }
+
+  private fun numberIndexValues(searchParam: SearchParamDefinition, value: Base): Serializable? {
+    var n: NumberIndex? = numberIndex(searchParam, value)
+    return n?.let { Triple(n.name, n.path, n.value) }
+  }
+
+  private fun dateIndexValues(searchParam: SearchParamDefinition, value: Base): Serializable? {
+    var d: DateIndex? = dateIndex(searchParam, value)
+    return d?.let { Pair(Triple(d.name, d.path, d.from), d.to) }
+  }
+
+  private fun stringIndexValues(searchParam: SearchParamDefinition, value: Base): Serializable? {
+    var s: StringIndex? = stringIndex(searchParam, value)
+    return s?.let { Triple(s.name, s.path, s.value) }
+  }
+
+  private fun tokenIndexValues(searchParam: SearchParamDefinition, value: Base): Serializable? {
+    var t: TokenIndex? = tokenIndex(searchParam, value).firstOrNull()
+    return t?.let { Pair(Triple(t.name, t.path, t.system), t.value) }
+  }
+
+  private fun referenceIndexValues(searchParam: SearchParamDefinition, value: Base): Serializable? {
+    var r: ReferenceIndex? = referenceIndex(searchParam, value)
+    return r?.let { Triple(r.name, r.path, r.value) }
+  }
+
+  private fun quantityIndexValues(searchParam: SearchParamDefinition, value: Base): Serializable? {
+    var q: QuantityIndex? = quantityIndex(searchParam, value)
+    return q?.let { Triple(Triple(q.name, q.path, q.system), q.unit, q.value) }
+  }
+
+  private fun uriIndexValues(searchParam: SearchParamDefinition, value: Base): Serializable? {
+    var u: UriIndex? = uriIndex(searchParam, value)
+    return u?.let { Triple(u.name, u.path, u.uri) }
+  }
+
+  private fun specialIndexValues(searchParam: SearchParamDefinition, value: Base): Serializable? {
+    var p: PositionIndex? = specialIndex(value)
+    return p?.let { Pair(p.latitude, p.latitude) }
   }
 
   /**

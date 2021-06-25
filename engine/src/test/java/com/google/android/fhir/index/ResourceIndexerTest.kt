@@ -1063,6 +1063,155 @@ class ResourceIndexerTest {
     assertThat(resourceIndices.stringIndices.any { it.name == "address" }).isFalse()
   }
 
+  @Test
+  fun index_duplicateString_deDuplicatesStringIndices() {
+    val givenValue = "Nickole"
+    val patient =
+      Patient().apply {
+        id = "2126234"
+        addName(HumanName().addGiven(givenValue))
+        addName(HumanName().addGiven(givenValue))
+      }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(
+        resourceIndices.stringIndices.filter {
+          it.name == "given" && it.path == "Patient.name.given" && it.value == givenValue
+        }
+      )
+      .hasSize(1)
+  }
+
+  @Test
+  fun index_duplicateNumber_deDuplicatesNumberIndices() {
+    val windowValue = 22125510
+    val startValue = 100
+    val molecularSequence =
+      MolecularSequence().apply {
+        id = "2126234"
+        referenceSeq.windowStart = windowValue
+        addVariant(
+          MolecularSequence.MolecularSequenceVariantComponent().apply { start = startValue }
+        )
+        addVariant(
+          MolecularSequence.MolecularSequenceVariantComponent().apply { start = startValue }
+        )
+      }
+
+    val resourceIndices = ResourceIndexer.index(molecularSequence)
+
+    assertThat(
+        resourceIndices.numberIndices.filter {
+          it.name == "variant-start" &&
+            it.path == "MolecularSequence.variant.start" &&
+            it.value == BigDecimal.valueOf(startValue.toLong())
+        }
+      )
+      .hasSize(1)
+  }
+
+  @Test
+  fun index_duplicateToken_deDuplicatesTokenIndices() {
+    val systemIdentity = "https://github.com/synthetichealth/synthea"
+    val indexValue = "000000039481"
+    val patient =
+      Patient().apply {
+        id = "2126234"
+        addIdentifier(
+          Identifier().apply {
+            system = systemIdentity
+            value = indexValue
+          }
+        )
+        addIdentifier(
+          Identifier().apply {
+            system = systemIdentity
+            value = indexValue
+          }
+        )
+      }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(
+        resourceIndices.tokenIndices.filter {
+          it.name == "identifier" &&
+            it.path == "Patient.identifier" &&
+            it.system == systemIdentity &&
+            it.value == indexValue
+        }
+      )
+      .hasSize(1)
+  }
+
+  @Test
+  fun index_duplicateQuantity_deduplicateQuantityIndices() {
+    val systemValue = "system"
+    val unitValue = "unit"
+    val values = listOf<Long>(100, 200, 300)
+    val substance =
+      Substance().apply {
+        id = "2126234"
+        instance.add(
+          Substance.SubstanceInstanceComponent()
+            .setQuantity(
+              Quantity(values[0]).apply {
+                system = systemValue
+                unit = unitValue
+              }
+            )
+        )
+        instance.add(
+          Substance.SubstanceInstanceComponent()
+            .setQuantity(
+              Quantity(values[0]).apply {
+                system = systemValue
+                unit = unitValue
+              }
+            )
+        )
+        instance.add(Substance.SubstanceInstanceComponent().setQuantity(Quantity(values[1])))
+        instance.add(Substance.SubstanceInstanceComponent().setQuantity(Quantity(values[2])))
+      }
+
+    val resourceIndices = ResourceIndexer.index(substance)
+
+    assertThat(
+        resourceIndices.quantityIndices.filter {
+          it.name == "quantity" &&
+            it.path == "Substance.instance.quantity" &&
+            it.system == systemValue &&
+            it.unit == unitValue &&
+            it.value == BigDecimal.valueOf(values[0])
+        }
+      )
+      .hasSize(1)
+  }
+
+  @Test
+  fun index_duplicateReferences_deDuplicatesReferenceIndices() {
+    val values = listOf("reference_1", "reference_2")
+    val patient =
+      Patient().apply {
+        id = "2126234"
+        addGeneralPractitioner(Reference().apply { reference = values[0] })
+        addGeneralPractitioner(Reference().apply { reference = values[0] })
+        addGeneralPractitioner(Reference().apply { reference = values[1] })
+      }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(
+        resourceIndices.referenceIndices.filter {
+          it.name == "general-practitioner" &&
+            it.path == "Patient.generalPractitioner" &&
+            it.value == values[0]
+        }
+      )
+      .hasSize(1)
+  }
+
   private companion object {
     // See: https://www.hl7.org/fhir/valueset-currencies.html
     const val FHIR_CURRENCY_SYSTEM = "urn:iso:std:iso:4217"
