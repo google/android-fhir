@@ -87,9 +87,9 @@ object ResourceMapper {
   }
 
   private fun evaluatePopulateExpressionsInItemList(
-      questionsList: List<Questionnaire.QuestionnaireItemComponent>,
-      resource: Resource,
-      questionnaire: Questionnaire
+    questionsList: List<Questionnaire.QuestionnaireItemComponent>,
+    resource: Resource,
+    questionnaire: Questionnaire
   ) {
     val itemsIterator = questionsList.iterator()
     while (itemsIterator.hasNext()) {
@@ -98,14 +98,14 @@ object ResourceMapper {
   }
 
   private fun evaluatePopulateExpressionOnQuestionnaireItem(
-      question: Questionnaire.QuestionnaireItemComponent,
-      resource: Resource,
-      questionnaire: Questionnaire
+    question: Questionnaire.QuestionnaireItemComponent,
+    resource: Resource,
+    questionnaire: Questionnaire
   ) {
     val expressionMap: HashMap<String, String> = hashMapOf()
     val context = FhirContext.forR4()
     val fhirPathEngine =
-        FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
+      FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
     if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
       evaluatePopulateExpressionsInItemList(question.item, resource, questionnaire)
     } else {
@@ -114,8 +114,9 @@ object ResourceMapper {
         val answerExtracted = fhirPathEngine.evaluate(resource, exp.expression)[0] as Type
         question.apply {
           initial =
-              mutableListOf(
-                  Questionnaire.QuestionnaireItemInitialComponent().setValue(answerExtracted))
+            mutableListOf(
+              Questionnaire.QuestionnaireItemInitialComponent().setValue(answerExtracted)
+            )
         }
       }
     }
@@ -129,12 +130,12 @@ object ResourceMapper {
   }
 
   private fun extractAnswersFromExpression(
-      expressionMap: HashMap<String, String>,
-      resource: Resource
+    expressionMap: HashMap<String, String>,
+    resource: Resource
   ): HashMap<String, Type> {
     val context = FhirContext.forR4()
     val fhirPathEngine =
-        FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
+      FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
     val answersHashMap = HashMap<String, Type>()
     val expressionMapIterator = expressionMap.keys.iterator()
     while (expressionMapIterator.hasNext()) {
@@ -150,15 +151,17 @@ object ResourceMapper {
    * the corresponding questions in [questionnaireItemList]. This method handles nested fields.
    */
   private fun Base.extractFields(
-      questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
-      questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+    questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
   ) {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
     while (questionnaireItemListIterator.hasNext() &&
-        questionnaireResponseItemListIterator.hasNext()) {
+      questionnaireResponseItemListIterator.hasNext()) {
       extractField(
-          questionnaireItemListIterator.next(), questionnaireResponseItemListIterator.next())
+        questionnaireItemListIterator.next(),
+        questionnaireResponseItemListIterator.next()
+      )
     }
   }
 
@@ -167,8 +170,8 @@ object ResourceMapper {
    * [questionnaireItem]. This method handles nested fields.
    */
   private fun Base.extractField(
-      questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-      questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ) {
     if (questionnaireItem.definition == null) {
       extractFields(questionnaireItem.item, questionnaireResponseItem.item)
@@ -183,9 +186,9 @@ object ResourceMapper {
     val definitionField = questionnaireItem.getDefinitionField ?: return
     if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
       val value: Base =
-          (definitionField.nonParameterizedType.newInstance() as Base).apply {
-            extractFields(questionnaireItem.item, questionnaireResponseItem.item)
-          }
+        (definitionField.nonParameterizedType.newInstance() as Base).apply {
+          extractFields(questionnaireItem.item, questionnaireResponseItem.item)
+        }
 
       updateField(definitionField, value)
     } else {
@@ -222,8 +225,8 @@ private fun Base.updateFieldWithEnum(field: Field, value: Base) {
   val stringValue = if (value is Coding) value.code else value.toString()
 
   javaClass
-      .getMethod("set${field.name.capitalize()}", field.nonParameterizedType)
-      .invoke(this, fromCodeMethod.invoke(dataTypeClass, stringValue))
+    .getMethod("set${field.name.capitalize()}", field.nonParameterizedType)
+    .invoke(this, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
 
 /**
@@ -235,14 +238,13 @@ private fun Base.updateField(field: Field, value: Base) {
 
   try {
     javaClass
-        .getMethod("set${field.name.capitalize()}Element", field.type)
-        .invoke(this, answerValue)
+      .getMethod("set${field.name.capitalize()}Element", field.type)
+      .invoke(this, answerValue)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
     javaClass
-        .getMethod("set${field.name.capitalize()}", field.type)
-        .invoke(
-            this, if (field.isParameterized && field.isList) listOf(answerValue) else answerValue)
+      .getMethod("set${field.name.capitalize()}", field.type)
+      .invoke(this, if (field.isParameterized && field.isList) listOf(answerValue) else answerValue)
   }
 }
 
@@ -285,18 +287,18 @@ private val Questionnaire.QuestionnaireItemComponent.definitionFieldName
  * Used to retrieve the method to invoke to set the field in the extracted FHIR resource.
  */
 private fun Questionnaire.QuestionnaireItemType.getClass(): Class<out Base>? =
-    when (this) {
-      Questionnaire.QuestionnaireItemType.DATE -> DateType::class.java
-      Questionnaire.QuestionnaireItemType.BOOLEAN -> BooleanType::class.java
-      Questionnaire.QuestionnaireItemType.DECIMAL -> DecimalType::class.java
-      Questionnaire.QuestionnaireItemType.INTEGER -> IntegerType::class.java
-      Questionnaire.QuestionnaireItemType.DATETIME -> DateTimeType::class.java
-      Questionnaire.QuestionnaireItemType.TIME -> TimeType::class.java
-      Questionnaire.QuestionnaireItemType.STRING, Questionnaire.QuestionnaireItemType.TEXT ->
-          StringType::class.java
-      Questionnaire.QuestionnaireItemType.URL -> UrlType::class.java
-      else -> null
-    }
+  when (this) {
+    Questionnaire.QuestionnaireItemType.DATE -> DateType::class.java
+    Questionnaire.QuestionnaireItemType.BOOLEAN -> BooleanType::class.java
+    Questionnaire.QuestionnaireItemType.DECIMAL -> DecimalType::class.java
+    Questionnaire.QuestionnaireItemType.INTEGER -> IntegerType::class.java
+    Questionnaire.QuestionnaireItemType.DATETIME -> DateTimeType::class.java
+    Questionnaire.QuestionnaireItemType.TIME -> TimeType::class.java
+    Questionnaire.QuestionnaireItemType.STRING, Questionnaire.QuestionnaireItemType.TEXT ->
+      StringType::class.java
+    Questionnaire.QuestionnaireItemType.URL -> UrlType::class.java
+    else -> null
+  }
 
 /**
  * The map from the `name`s to `expression`s in the
@@ -306,12 +308,12 @@ private fun Questionnaire.QuestionnaireItemType.getClass(): Class<out Base>? =
 private val Questionnaire.itemContextNameToExpressionMap: Map<String, String>
   get() {
     return this.extension
-        .filter { it.url == ITEM_CONTEXT_EXTENSION_URL }
-        .map {
-          val expression = it.value as Expression
-          expression.name to expression.expression
-        }
-        .toMap()
+      .filter { it.url == ITEM_CONTEXT_EXTENSION_URL }
+      .map {
+        val expression = it.value as Expression
+        expression.name to expression.expression
+      }
+      .toMap()
   }
 
 /**
@@ -353,10 +355,10 @@ private val Questionnaire.QuestionnaireItemComponent.getDefinitionField: Field?
  * .
  */
 private const val ITEM_CONTEXT_EXTENSION_URL: String =
-    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
 
 private const val ITEM_INITIAL_EXPRESSION_URL: String =
-    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
 
 private val Field.isList: Boolean
   get() = isParameterized && type == List::class.java
@@ -367,8 +369,8 @@ private val Field.isParameterized: Boolean
 /** The non-parameterized type of this field (e.g. `String` for a field of type `List<String>`). */
 private val Field.nonParameterizedType: Class<*>
   get() =
-      if (isParameterized) (genericType as ParameterizedType).actualTypeArguments[0] as Class<*>
-      else type
+    if (isParameterized) (genericType as ParameterizedType).actualTypeArguments[0] as Class<*>
+    else type
 
 private fun Class<*>.getFieldOrNull(name: String): Field? {
   return try {
