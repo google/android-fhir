@@ -62,7 +62,7 @@ class QuestionnaireListFragment : Fragment() {
           QuestionnaireListItem(
             "General Health Assessment Questionnaire",
             "Example authored by Fred Hersch ",
-            "generic-health-assessment-exmaple.json"
+            "generic-health-assessment-example.json"
           ),
           // Example taken from
           // https://openhie.github.io/hiv-ig/Questionnaire-hiv-case-report-questionnaire.json.html

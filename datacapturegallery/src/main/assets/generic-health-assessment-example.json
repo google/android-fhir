@@ -46,15 +46,8 @@
         },
         {
           "valueCoding": {
-            "code": "transgender-female",
-            "display": "Transgender Female",
-            "system": "http://hl7.org/fhir/gender-identity"
-          }
-        },
-        {
-          "valueCoding": {
-            "code": "transgender-male",
-            "display": "Transgender Male",
+            "code": "other",
+            "display": "Other",
             "system": "http://hl7.org/fhir/gender-identity"
           }
         }
@@ -132,8 +125,6 @@
       ]
     },
     {
-      "type": "choice",
-      "code": [],
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
