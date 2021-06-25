@@ -358,14 +358,12 @@ class QuestionnaireItemAdapterTest {
   fun onCreateViewHolder_customViewType_shouldReturnCorrectCustomViewHolder() {
     val viewFactoryMatchers = getQuestionnaireItemViewHolderFactoryMatchers()
     val questionnaireItemAdapter = QuestionnaireItemAdapter(viewFactoryMatchers)
-    val actualQuestionnaireItemViewHolder =
+    assertThat(
       questionnaireItemAdapter.onCreateViewHolder(
         mock(),
         QuestionnaireItemViewHolderType.values().size
       )
-    assertThat(actualQuestionnaireItemViewHolder).isNotNull()
-    assertThat(viewFactoryMatchers[0].factory.create(mock()))
-      .isEqualTo(actualQuestionnaireItemViewHolder)
+    ).isEqualTo(viewFactoryMatchers[0].factory.create(mock()))
   }
 
   @Test
