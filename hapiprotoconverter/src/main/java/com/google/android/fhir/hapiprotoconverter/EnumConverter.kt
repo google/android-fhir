@@ -22,6 +22,11 @@ import com.google.fhir.shaded.protobuf.ProtocolMessageEnum
 import org.hl7.fhir.instance.model.api.IBaseEnumeration
 
 @SuppressLint("DefaultLocale")
+/**
+ * returns the hapi enum representation of @param hapiEnum
+ * @param hapiEnum enum that needs to be converted to proto
+ * @param protoEnumClass corresponding proto class that the hapi Enum will be converted to
+ */
 fun <T : ProtocolMessageEnum> convert(hapiEnum: Enum<*>, protoEnumClass: Class<T>): T {
   // Ensures that protoClass and hapiClass represent the same datatype
   /* In proto the actual enum is in the class AdministrativeGenderCode.Value so if we want to check
@@ -44,6 +49,11 @@ fun <T : ProtocolMessageEnum> convert(hapiEnum: Enum<*>, protoEnumClass: Class<T
     T
 }
 
+/**
+ * returns the hapi enum representation of @param hapiEnum
+ * @param protoEnum enum that needs to be converted to hapi
+ * @param hapiEnumClass corresponding hapi class that the proto Enum will be converted to
+ */
 fun <T : Enum<*>> convert(protoEnum: ProtocolMessageEnum, hapiEnumClass: Class<T>): T {
   // Ensures that protoClass and hapiClass represent the same datatype
   /* In proto the actual enum is in the class AdministrativeGenderCode.Value so if we want to check
