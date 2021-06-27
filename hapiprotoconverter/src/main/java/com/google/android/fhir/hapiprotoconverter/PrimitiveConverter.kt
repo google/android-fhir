@@ -39,7 +39,7 @@ fun <T : GeneratedMessageV3> convert(hapiPrimitive: IPrimitiveType<*>, protoClas
 
   // Creating builder for corresponding proto class
   val newBuilder =
-    protoClass.getDeclaredMethod("newBuilder").invoke(null) as GeneratedMessageV3.Builder<*>
+    protoClass.getDeclaredMethod(newBuilderMethodName).invoke(null) as GeneratedMessageV3.Builder<*>
 
   val builderClass = newBuilder::class.java
 
@@ -92,20 +92,20 @@ fun <T : GeneratedMessageV3> convert(hapiPrimitive: IPrimitiveType<*>, protoClas
     "base64Binary" -> {
       // base64Binary in fhir expects a byte array and in fhir protos it expects a byteString
       builderClass
-        .getDeclaredMethod("setValue", getProtoDataTypeFromHapi(hapiPrimitive))
+        .getDeclaredMethod(setValueMethodName, getProtoDataTypeFromHapi(hapiPrimitive))
         .invoke(newBuilder, ByteString.copyFrom((hapiPrimitive.valueAsString).toByteArray()))
     }
     "decimal" -> {
       // decimal value in fhir expects a long (however it can be set using a string by the
       // setValueAsString() method) and in fhir protos it expects a string
       builderClass
-        .getDeclaredMethod("setValue", getProtoDataTypeFromHapi(hapiPrimitive))
+        .getDeclaredMethod(setValueMethodName, getProtoDataTypeFromHapi(hapiPrimitive))
         .invoke(newBuilder, hapiPrimitive.valueAsString)
     }
     else -> {
       // the remaining class have the same type for value in both hapi and fhir protos.
       builderClass
-        .getDeclaredMethod("setValue", getProtoDataTypeFromHapi(hapiPrimitive))
+        .getDeclaredMethod(setValueMethodName, getProtoDataTypeFromHapi(hapiPrimitive))
         .invoke(newBuilder, hapiPrimitive.value)
     }
   }
@@ -195,6 +195,19 @@ fun <T : IPrimitiveType<*>> convert(primitiveProto: GeneratedMessageV3, hapiClas
 private const val hapiPrimitiveSuffix = "Type"
 
 /**
+ * Name of the method that is used to create a new builder of the proto class
+ *
+ * For example Patient.newBuilder() will return a new builder for a patient proto
+ */
+private const val newBuilderMethodName = "newBuilder"
+
+/**
+ * Name of the method of a primitive builder that is used to set value for a primitive proto
+ *
+ * For example String.newBuilder.setValue("") will set the value of the string
+ */
+private const val setValueMethodName = "setValue"
+/**
  * returns proto value for precision of @param [precision] In protos the precision Enums are
  * different for different date types (Instant.Precision is not the same as Date.Precision) However
  * the values (integer corresponding to the Enum) are the same.
@@ -264,10 +277,7 @@ private fun getProtoDataTypeFromHapi(hapiPrimitive: IPrimitiveType<*>): Class<*>
 }
 /**
  * returns duration (microseconds of the day) and precision from string representation of [time]
- *
- * and
- *
- * The precision and value are used to set corresponding Time fhir proto.
+ * and the precision and value are used to set corresponding Time fhir proto.
  */
 private fun getDurationPrecisionPairFromTimeString(time: String): Pair<Long, Int> {
   return (LocalTime.parse(time).toNanoOfDay() / 1000 to
