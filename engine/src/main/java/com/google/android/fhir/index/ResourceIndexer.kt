@@ -28,7 +28,6 @@ import com.google.android.fhir.index.entities.StringIndex
 import com.google.android.fhir.index.entities.TokenIndex
 import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.logicalId
-import java.io.Serializable
 import java.math.BigDecimal
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Address
@@ -286,6 +285,7 @@ internal object ResourceIndexer {
       else -> null
     }
   }
+
   /**
    * The FHIR currency code system. See: https://bit.ly/30YB3ML. See:
    * https://www.hl7.org/fhir/valueset-currencies.html.
