@@ -26,6 +26,11 @@ import org.hl7.fhir.instance.model.api.IBaseEnumeration
  * returns the hapi enum representation of @param hapiEnum
  * @param hapiEnum enum that needs to be converted to proto
  * @param protoEnumClass corresponding proto class that the hapi Enum will be converted to
+ *
+ * Note The value of the enum i.e. is represented differently in hapi and fhir protos for example
+ * CodeSystemContentMode.NOTPRESENT in Hapi is equivalent to
+ * CodeSystemContentModeCode.Value.NOT_PRESENT. However we can use the toCode method of the hapi
+ * Enum returns `not-present` which we can convert to the proto value
  */
 fun <T : ProtocolMessageEnum> convert(hapiEnum: Enum<*>, protoEnumClass: Class<T>): T {
   // Ensures that protoClass and hapiClass represent the same datatype
@@ -82,19 +87,33 @@ fun <T : Enum<*>> convert(protoEnum: ProtocolMessageEnum, hapiEnumClass: Class<T
 const val protoEnumSuffix = "Code"
 
 /**
+ * The name of the proto class that contains the actual enum values
+ *
+ * For example NameUse.NickName is equivalent to NameUseCode$Value.NickName
+ */
+private const val protoEnumValueClass = "Value"
+
+/**
  * Converts the outer class of the HapiEnum to a ProtoEnumOuterClass Just converting Enum values
  * will not be sufficient to achieve complete conversion form hapi to proto (and vice versa) Fields
  * that accept an enumeratedValue have the type Enumeration<*> in hapi and have a corresponding
  * protoMessage in protos
  *
+ * @param hapiOuterEnum the outer hapi enum that needs to be converted to proto
+ * @param protoOuterEnumClass the outer proto class to which hapiEnum will be converted to
+ *
  * For example the field use in HumanName has the Type Enumeration<HumanName.NameUse> and it's
- * corresponding fhir proto would be HumanName.UseCode.
+ * corresponding fhir proto would be HumanName.UseCode
  */
 @Suppress("UNCHECKED_CAST")
-fun <T : GeneratedMessageV3> convert(hapiEnum: IBaseEnumeration<*>, protoEnumClass: Class<T>): T {
+fun <T : GeneratedMessageV3> convert(
+  hapiOuterEnum: IBaseEnumeration<*>,
+  protoOuterEnumClass: Class<T>
+): T {
   // create new builder
   val newBuilder =
-    protoEnumClass.getDeclaredMethod("newBuilder").invoke(null) as GeneratedMessageV3.Builder<*>
+    protoOuterEnumClass.getDeclaredMethod("newBuilder").invoke(null) as
+      GeneratedMessageV3.Builder<*>
 
   /* Inner class of the protoEnum. For example Inner class for UseCode is NameUseCode which is
   located in the same package as the proto Enum outer class we can get the class name
@@ -102,7 +121,9 @@ fun <T : GeneratedMessageV3> convert(hapiEnum: IBaseEnumeration<*>, protoEnumCla
   static subclass Value */
   val protoEnumInnerClass =
     Class.forName(
-      "${protoEnumClass.`package`!!.name}.${hapiEnum.enumFactory::class.java.simpleName.removeSuffix("EnumFactory")}Code\$Value"
+      "${protoOuterEnumClass.`package`!!.name}.${hapiOuterEnum.enumFactory::class.java.simpleName.removeSuffix(
+        enumFactorySuffix
+      )}${protoEnumSuffix}\$$protoEnumValueClass"
     )
 
   // set Value to the new Builder
@@ -111,30 +132,53 @@ fun <T : GeneratedMessageV3> convert(hapiEnum: IBaseEnumeration<*>, protoEnumCla
     .getDeclaredMethod("setValue", protoEnumInnerClass)
     .invoke(
       newBuilder,
-      convert(hapiEnum.value, protoEnumInnerClass as Class<out ProtocolMessageEnum>)
+      convert(hapiOuterEnum.value, protoEnumInnerClass as Class<out ProtocolMessageEnum>)
     )
 
   return newBuilder.build() as T
 }
 
-/** Converts outer class of protoEnum to outer class of a hapi enum */
+/**
+ * Converts outer class of protoEnum to outer class of a hapi enum
+ *
+ * @param protoOuterEnum the outer proto enum that needs to be converted to hapi
+ *
+ * @param hapiOuterEnumClass the outer hapi class that the protoEnum will be converted to
+ *
+ * @param hapiEnumClass the inner hapi class
+ *
+ * For example the field use in HumanName has the Type Enumeration<HumanName.NameUse> and it's
+ * corresponding fhir proto would be HumanName.UseCode. HumanName.Name use will be the inner class
+ */
 // TODO check if it is possible to infer param enumClass just from hapiEnumClass
 fun <T : IBaseEnumeration<*>> convert(
-  protoEnum: GeneratedMessageV3,
-  hapiEnumClass: Class<T>,
-  enumClass: Class<out Enum<*>>
+  protoOuterEnum: GeneratedMessageV3,
+  hapiOuterEnumClass: Class<T>,
+  hapiEnumClass: Class<out Enum<*>>
 ): T {
 
-  /*Inner Class or (enum factory) of the hapi enum*/
-  val enumFactory = Class.forName(enumClass.name + "EnumFactory") // NameUseEnumFactory
+  // enum factory of the hapi enum
+  val enumFactory =
+    Class.forName("${hapiEnumClass.name}$enumFactorySuffix") // example NameUseEnumFactory
   // create a new instance of the hapi enum
   val hapiEnum =
-    hapiEnumClass.getConstructor(enumFactory.interfaces[0]).newInstance(enumFactory.newInstance())
+    hapiOuterEnumClass
+      .getConstructor(enumFactory.interfaces[0])
+      .newInstance(enumFactory.newInstance())
   // set value to the hapi enum
   hapiEnum.value =
     convert(
-      protoEnum::class.java.getDeclaredMethod("getValue").invoke(protoEnum) as ProtocolMessageEnum,
-      enumClass
+      protoOuterEnum::class.java.getDeclaredMethod("getValue").invoke(protoOuterEnum) as
+        ProtocolMessageEnum,
+      hapiEnumClass
     )
   return hapiEnum
 }
+
+/**
+ * The suffix that the needs to be added to the enum class to get the corresponding enum factory
+ * class
+ *
+ * For example HumanName.NameUse and its corresponding enum factory HumanName.NameUseEnumFactory
+ */
+private const val enumFactorySuffix = "EnumFactory"

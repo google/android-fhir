@@ -23,6 +23,7 @@ import com.google.fhir.r4.core.AdministrativeGenderCode
 import com.google.fhir.r4.core.BindingStrengthCode
 import com.google.fhir.r4.core.CapabilityStatement
 import com.google.fhir.r4.core.CapabilityStatementKindCode
+import com.google.fhir.r4.core.CodeSystemContentModeCode
 import com.google.fhir.r4.core.ContactPoint
 import com.google.fhir.r4.core.ContactPointSystemCode
 import com.google.fhir.r4.core.ContactPointUseCode
@@ -33,6 +34,7 @@ import com.google.fhir.shaded.protobuf.ProtocolMessageEnum
 import java.io.Serializable
 import org.hl7.fhir.instance.model.api.IBaseEnumeration
 import org.hl7.fhir.r4.model.Address
+import org.hl7.fhir.r4.model.CodeSystem
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.codesystems.AddressType
 import org.hl7.fhir.r4.model.codesystems.AddressTypeEnumFactory
@@ -57,7 +59,7 @@ class EnumConverterTest {
   @Parameterized.Parameter(1) lateinit var proto: GeneratedMessageV3
 
   @Test
-  fun test_enum_converter_test_outter() {
+  fun test_enum_converter_test_outer() {
     Truth.assertThat(convert(hapi, proto::class.java)).isEqualTo(proto)
     Truth.assertThat(convert(proto, hapi::class.java, hapi.value::class.java).value)
       .isEquivalentAccordingToCompareTo(hapi.value)
@@ -124,6 +126,16 @@ class EnumConverterTest {
                 CapabilityStatementKindCode.Value.valueOf(
                   it.toCode().replace('-', '_').toUpperCase()
                 )
+              )
+              .build()
+          )
+        } +
+        CodeSystem.CodeSystemContentMode.values().filter { it.name != "NULL" }.map {
+          arrayOf(
+            Enumeration(CodeSystem.CodeSystemContentModeEnumFactory(), it),
+            com.google.fhir.r4.core.CodeSystem.ContentCode.newBuilder()
+              .setValue(
+                CodeSystemContentModeCode.Value.valueOf(it.toCode().replace('-', '_').toUpperCase())
               )
               .build()
           )
