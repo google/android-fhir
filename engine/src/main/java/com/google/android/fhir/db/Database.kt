@@ -67,7 +67,7 @@ internal interface Database {
   suspend fun lastUpdate(resourceType: ResourceType): String?
 
   /**
-   * Insert a resource that was syncronised.
+   * Insert resources that were synchronised.
    *
    * @param syncedResources The synced resource
    */

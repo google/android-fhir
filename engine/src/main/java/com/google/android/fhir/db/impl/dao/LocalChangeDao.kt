@@ -41,14 +41,14 @@ internal abstract class LocalChangeDao {
 
   lateinit var iParser: IParser
 
-  @Insert abstract fun addLocalChange(localChangeEntity: LocalChangeEntity)
+  @Insert abstract suspend fun addLocalChange(localChangeEntity: LocalChangeEntity)
 
   @Transaction
-  open fun addInsertAll(resources: List<Resource>) {
+  open suspend fun addInsertAll(resources: List<Resource>) {
     resources.forEach { resource -> addInsert(resource) }
   }
 
-  fun addInsert(resource: Resource) {
+  suspend fun addInsert(resource: Resource) {
     val resourceId = resource.logicalId
     val resourceType = resource.resourceType
     val timestamp = Date().toTimeZoneString()
@@ -66,7 +66,7 @@ internal abstract class LocalChangeDao {
     )
   }
 
-  fun addUpdate(oldResource: Resource, resource: Resource) {
+  suspend fun addUpdate(oldResource: Resource, resource: Resource) {
     val resourceId = resource.logicalId
     val resourceType = resource.resourceType
     val timestamp = Date().toTimeZoneString()
@@ -99,7 +99,7 @@ internal abstract class LocalChangeDao {
     )
   }
 
-  fun addDelete(resourceId: String, resourceType: ResourceType) {
+  suspend fun addDelete(resourceId: String, resourceType: ResourceType) {
     val timestamp = Date().toTimeZoneString()
     addLocalChange(
       LocalChangeEntity(
@@ -123,7 +123,7 @@ internal abstract class LocalChangeDao {
         LIMIT 1
     """
   )
-  abstract fun lastChangeType(resourceId: String, resourceType: ResourceType): Type?
+  abstract suspend fun lastChangeType(resourceId: String, resourceType: ResourceType): Type?
 
   @Query(
     """
@@ -134,9 +134,9 @@ internal abstract class LocalChangeDao {
         LIMIT 1
     """
   )
-  abstract fun countLastChange(resourceId: String, resourceType: ResourceType): Int
+  abstract suspend fun countLastChange(resourceId: String, resourceType: ResourceType): Int
 
-  private fun localChangeIsEmpty(resourceId: String, resourceType: ResourceType): Boolean =
+  private suspend fun localChangeIsEmpty(resourceId: String, resourceType: ResourceType): Boolean =
     countLastChange(resourceId, resourceType) == 0
 
   @Query(
@@ -145,7 +145,7 @@ internal abstract class LocalChangeDao {
         FROM LocalChangeEntity
         ORDER BY LocalChangeEntity.id ASC"""
   )
-  abstract fun getAllLocalChanges(): List<LocalChangeEntity>
+  abstract suspend fun getAllLocalChanges(): List<LocalChangeEntity>
 
   @Query(
     """
@@ -153,9 +153,9 @@ internal abstract class LocalChangeDao {
         WHERE LocalChangeEntity.id = (:id)
     """
   )
-  abstract fun discardLocalChanges(id: Long)
+  abstract suspend fun discardLocalChanges(id: Long)
 
-  fun discardLocalChanges(token: LocalChangeToken) {
+  suspend fun discardLocalChanges(token: LocalChangeToken) {
     token.ids.forEach { discardLocalChanges(it) }
   }
 
