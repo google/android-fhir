@@ -48,6 +48,12 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       private lateinit var prefixTextView: TextView
       private lateinit var groupHeader: TextView
       private lateinit var autoCompleteTextView: AppCompatAutoCompleteTextView
+      /**
+       * This view is a container that contains the selected answers as Chip(View) and the EditText
+       * that is used to enter the answer query. Current logic in this class expects the EditText to
+       * be always there in the FlexboxLayout as its last child. Any new answer Chip is added as a
+       * Child before the EditText
+       */
       private lateinit var chipContainer: FlexboxLayout
       private lateinit var editText: TextInputEditText
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
@@ -86,6 +92,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
               event.action == KeyEvent.ACTION_DOWN &&
               event.keyCode == KeyEvent.KEYCODE_DEL
           ) {
+            /** Check [chipContainer] on how children are laid out. */
             if (editText.length() == 0 && chipContainer.childCount > 1) {
               val chip = chipContainer.getChildAt(chipContainer.childCount - 2) as Chip
               chipContainer.removeView(chip)
@@ -146,9 +153,10 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
             answerOptionString
           )
         autoCompleteTextView.setAdapter(adapter)
-        // Remove chips as this FlexBox might contain chips from some previous item where it was
-        // used
-        // in the recyclerview
+        /**
+         * Remove chips as this FlexBox might contain chips from the last time bindView was called
+         * for this VH. Check [chipContainer] on how children are laid out.
+         */
         val textBox = chipContainer.getChildAt(chipContainer.childCount - 1)
         chipContainer.removeAllViews()
         chipContainer.addView(textBox)
@@ -156,12 +164,8 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
       }
 
       private fun presetValuesIfAny() {
-        questionnaireItemViewItem.questionnaireResponseItem.answer?.forEach {
-          if (canHaveMultipleAnswers) {
-            addNewChipIfNotPresent(it)
-          } else {
-            replaceChip(it)
-          }
+        questionnaireItemViewItem.questionnaireResponseItem.answer?.let {
+          it.map { answer -> addNewChipIfNotPresent(answer) }
         }
       }
 
@@ -176,11 +180,15 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         }
       }
 
+      /**
+       * Adds a new chip if it not already present in [chipContainer].It returns [true] if a new
+       * Chip is added and [false] if the Chip is already present for the selected answer. The later
+       * will happen if the user selects an already selected answer.
+       */
       private fun addNewChipIfNotPresent(
         answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
       ): Boolean {
-
-        if (chipIsAlreadyPresent(answer.valueCoding.display)) return false
+        if (chipIsAlreadyPresent(answer)) return false
 
         val chip = Chip(chipContainer.context)
         chip.text = answer.valueCoding.display
@@ -199,10 +207,12 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         return true
       }
 
-      private fun chipIsAlreadyPresent(selection: String): Boolean {
-        return chipContainer.children.filter { view -> view is Chip }.find { chip ->
-          (chip as Chip).text == selection
-        } != null
+      private fun chipIsAlreadyPresent(
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+      ): Boolean {
+        return chipContainer.children.any { view ->
+          (view is Chip) && view.getTag(R.id.flexboxLayout) == answer
+        }
       }
 
       private fun replaceChip(

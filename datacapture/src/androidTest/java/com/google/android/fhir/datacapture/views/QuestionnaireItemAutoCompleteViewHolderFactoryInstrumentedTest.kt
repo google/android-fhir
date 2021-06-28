@@ -28,7 +28,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.displayString
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -63,9 +63,8 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text)
-      .isEqualTo("Prefix?")
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).text).isEqualTo("Prefix?")
   }
 
   @Test
@@ -78,7 +77,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
   }
 
   @Test
@@ -91,7 +90,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).text)
       .isEqualTo("Display")
   }
 
@@ -105,7 +104,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).visibility)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).visibility)
       .isEqualTo(View.VISIBLE)
   }
 
@@ -119,7 +118,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    Truth.assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).visibility)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.group_header).visibility)
       .isEqualTo(View.GONE)
   }
 
@@ -152,7 +151,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
         }
     )
 
-    Truth.assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
+    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
       .isEqualTo(2)
   }
 
@@ -195,7 +194,7 @@ class QuestionnaireItemAutoCompleteViewHolderFactoryInstrumentedTest {
         }
     )
 
-    Truth.assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
+    assertThat(viewHolder.itemView.findViewById<ViewGroup>(R.id.flexboxLayout).childCount)
       .isEqualTo(3)
   }
 }
