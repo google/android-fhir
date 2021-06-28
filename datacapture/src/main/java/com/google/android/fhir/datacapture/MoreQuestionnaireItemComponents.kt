@@ -133,16 +133,16 @@ fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAns
   questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
 ) {
   if (answer.isNotEmpty()) {
-    answer.first().item = questionnaireItemComponent.listOfItemInAnswer()
+    answer.first().item = questionnaireItemComponent.getNestedQuestionnaireResponseItems()
   }
 }
 
 /**
- * Creates a List of [QuestionnaireResponse.QuestionnaireResponseItemComponent] from the provided
- * [Questionnaire.QuestionnaireItemComponent].
+ * Creates a list of [QuestionnaireResponse.QuestionnaireResponseItemComponent]s from the nested
+ * items in the [Questionnaire.QuestionnaireItemComponent].
  *
  * The hierarchy and order of child items will be retained as specified in the standard. See
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
-private inline fun Questionnaire.QuestionnaireItemComponent.listOfItemInAnswer() =
-  item.map { it.createQuestionnaireResponseItem() }.toList()
+private inline fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
+  item.map { it.createQuestionnaireResponseItem() }

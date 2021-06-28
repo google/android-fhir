@@ -78,25 +78,22 @@ object ResourceMapper {
    * populate to Questionnaire
    */
   fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
-    val questionnaireResponse = QuestionnaireResponse()
-    evaluatePopulateExpressionsInItemList(questionnaire.item, resource)
-    questionnaire.item.forEach {
-      questionnaireResponse.addItem(it.createQuestionnaireResponseItem())
+    populateInitialValues(questionnaire.item, resource)
+    return QuestionnaireResponse().apply {
+      item = questionnaire.item.map { it.createQuestionnaireResponseItem() }
     }
-    return questionnaireResponse
   }
 
-  private fun evaluatePopulateExpressionsInItemList(
-    questionsList: List<Questionnaire.QuestionnaireItemComponent>,
+  private fun populateInitialValues(
+    questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
     resource: Resource
   ) {
-    val itemsIterator = questionsList.iterator()
-    while (itemsIterator.hasNext()) {
-      evaluatePopulateExpressionOnQuestionnaireItem(itemsIterator.next(), resource)
+    questionnaireItems.forEach {
+      populateInitialValue(it, resource)
     }
   }
 
-  private fun evaluatePopulateExpressionOnQuestionnaireItem(
+  private fun populateInitialValue(
     question: Questionnaire.QuestionnaireItemComponent,
     resource: Resource
   ) {
@@ -105,9 +102,9 @@ object ResourceMapper {
     val fhirPathEngine =
       FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
     if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      evaluatePopulateExpressionsInItemList(question.item, resource)
+      populateInitialValues(question.item, resource)
     } else {
-      question.fetchExpression()?.let { exp ->
+      question.fetchExpression?.let { exp ->
         expressionMap[question.linkId] = exp.expression
         val answerExtracted = fhirPathEngine.evaluate(resource, exp.expression)[0] as Type
         question.apply {
@@ -120,12 +117,12 @@ object ResourceMapper {
     }
   }
 
-  private fun Questionnaire.QuestionnaireItemComponent.fetchExpression(): Expression? {
-    this.extension.filter { it.url == ITEM_INITIAL_EXPRESSION_URL }.map {
-      return it.value as Expression
+  private val Questionnaire.QuestionnaireItemComponent.fetchExpression: Expression?
+    get() {
+      return this.extension.firstOrNull { it.url == ITEM_INITIAL_EXPRESSION_URL }?.let {
+        it.value as Expression
+      }
     }
-    return null
-  }
 
   /**
    * Extracts answer values from [questionnaireResponseItemList] and updates the fields defined in
