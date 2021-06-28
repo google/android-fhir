@@ -16,7 +16,9 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android.content.Context
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Extension
@@ -24,6 +26,7 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -32,6 +35,13 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class MinValueConstraintValidatorTest {
+
+  lateinit var context: Context
+
+  @Before
+  fun initContext() {
+    context = ApplicationProvider.getApplicationContext()
+  }
 
   @Test
   fun shouldReturnInvalidResult() {

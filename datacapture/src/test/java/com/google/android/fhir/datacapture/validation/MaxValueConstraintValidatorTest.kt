@@ -16,21 +16,30 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android.content.Context
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class MaxValueConstraintValidatorTest {
+
+  lateinit var context: Context
+
+  @Before
+  fun initContext() {
+    context = ApplicationProvider.getApplicationContext()
+  }
 
   @Test
   fun shouldReturnInvalidResult() {
@@ -53,11 +62,7 @@ class MaxValueConstraintValidatorTest {
       }
 
     val validationResult =
-      MaxValueConstraintValidator.validate(
-        questionnaireItem,
-        questionnaireResponseItem,
-        RuntimeEnvironment.application.applicationContext
-      )
+      MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem, context)
 
     assertThat(validationResult.isValid).isFalse()
     assertThat(validationResult.message).isEqualTo("Maximum value allowed is:200000")
@@ -84,11 +89,7 @@ class MaxValueConstraintValidatorTest {
       }
 
     val validationResult =
-      MaxValueConstraintValidator.validate(
-        questionnaireItem,
-        questionnaireResponseItem,
-        RuntimeEnvironment.application.applicationContext
-      )
+      MaxValueConstraintValidator.validate(questionnaireItem, questionnaireResponseItem, context)
 
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.message.isNullOrBlank()).isTrue()

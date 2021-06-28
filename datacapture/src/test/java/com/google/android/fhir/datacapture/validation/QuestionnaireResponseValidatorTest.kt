@@ -16,12 +16,15 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android.content.Context
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -30,6 +33,13 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class QuestionnaireResponseValidatorTest {
+
+  lateinit var context: Context
+
+  @Before
+  fun initContext() {
+    context = ApplicationProvider.getApplicationContext()
+  }
 
   @Test
   fun shouldReturnValidResult() {
@@ -55,7 +65,11 @@ class QuestionnaireResponseValidatorTest {
             )
         )
     val result =
-      QuestionnaireResponseValidator.validate(questionnaire.item, questionnaireResponse.item)
+      QuestionnaireResponseValidator.validate(
+        questionnaire.item,
+        questionnaireResponse.item,
+        context
+      )
     assertThat(result.get("a-question")).isEqualTo(listOf(ValidationResult(true, listOf())))
   }
 
@@ -83,7 +97,11 @@ class QuestionnaireResponseValidatorTest {
             )
         )
     val result =
-      QuestionnaireResponseValidator.validate(questionnaire.item, questionnaireResponse.item)
+      QuestionnaireResponseValidator.validate(
+        questionnaire.item,
+        questionnaireResponse.item,
+        context
+      )
     assertThat(result.get("a-question"))
       .isEqualTo(
         listOf(
@@ -136,7 +154,11 @@ class QuestionnaireResponseValidatorTest {
             )
         )
     val result =
-      QuestionnaireResponseValidator.validate(questionnaire.item, questionnaireResponse.item)
+      QuestionnaireResponseValidator.validate(
+        questionnaire.item,
+        questionnaireResponse.item,
+        context
+      )
     assertThat(result.get("a-question"))
       .containsExactly(
         ValidationResult(
