@@ -88,9 +88,7 @@ object ResourceMapper {
     questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
     resource: Resource
   ) {
-    questionnaireItems.forEach {
-      populateInitialValue(it, resource)
-    }
+    questionnaireItems.forEach { populateInitialValue(it, resource) }
   }
 
   private fun populateInitialValue(
