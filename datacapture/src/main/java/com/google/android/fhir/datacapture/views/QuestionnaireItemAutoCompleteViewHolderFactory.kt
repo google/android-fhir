@@ -173,7 +173,15 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
       ) {
         if (canHaveMultipleAnswers) {
-          questionnaireItemViewItem.takeIf { addNewChipIfNotPresent(answer) }?.addAnswer(answer)
+          val answerNotPresent =
+            questionnaireItemViewItem.questionnaireResponseItem.answer?.none {
+              it.value.equalsDeep(answer.value)
+            }
+              ?: false
+          if (answerNotPresent) {
+            addNewChipIfNotPresent(answer)
+            questionnaireItemViewItem.addAnswer(answer)
+          }
         } else {
           replaceChip(answer)
           questionnaireItemViewItem.singleAnswerOrNull = answer
@@ -211,7 +219,10 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
       ): Boolean {
         return chipContainer.children.any { view ->
-          (view is Chip) && view.getTag(R.id.flexboxLayout) == answer
+          (view is Chip) &&
+            (view.getTag(R.id.flexboxLayout) as
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent)
+              .value.equalsDeep(answer.value)
         }
       }
 
