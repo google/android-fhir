@@ -154,7 +154,7 @@ class QuestionnaireItemViewItemTest {
   }
 
   @Test
-  fun asdasaasddddas() {
+  fun removeAnswer_questionnaireItemRepeats_shouldRemoveQuestionnaireResponseItemAnswerComponent() {
     val questionnaireItemViewItem =
       QuestionnaireItemViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
