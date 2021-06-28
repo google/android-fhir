@@ -30,7 +30,7 @@ internal object RequiredConstraintValidator : ConstraintValidator {
     if (questionnaireItem.required && questionnaireResponseItem.answer.isEmpty()) {
       return ConstraintValidator.ConstraintValidationResult(
         false,
-        context.getString(R.string.required_constraint_validation_message)
+        context.getString(R.string.required_constraint_validation_error_msg)
       )
     }
     return ConstraintValidator.ConstraintValidationResult(true, null)

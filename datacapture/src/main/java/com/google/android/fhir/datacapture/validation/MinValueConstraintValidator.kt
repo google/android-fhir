@@ -31,7 +31,7 @@ internal object MinValueConstraintValidator :
       answer.value < extension.value
     },
     { extension: Extension, context: Context ->
-      context.getString(R.string.min_value_validation_prefix) + extension.value.primitiveValue()
+      context.getString(R.string.min_value_validation_error_msg, extension.value.primitiveValue())
     }
   )
 

@@ -31,7 +31,7 @@ internal object MaxValueConstraintValidator :
       answer.value > extension.value
     },
     { extension: Extension, context: Context ->
-      context.getString(R.string.max_value_validation_prefix) + extension.value.primitiveValue()
+      context.getString(R.string.max_value_validation_error_msg, extension.value.primitiveValue())
     }
   )
 
