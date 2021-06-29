@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android.content.Context
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -31,7 +32,8 @@ internal interface ConstraintValidator {
    */
   fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    context: Context
   ): ConstraintValidationResult
 
   data class ConstraintValidationResult(val isValid: Boolean, val message: String?)
