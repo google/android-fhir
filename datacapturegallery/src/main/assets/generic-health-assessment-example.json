@@ -125,6 +125,8 @@
       ]
     },
     {
+      "type": "choice",
+      "code": [],
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
