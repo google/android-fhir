@@ -34,6 +34,7 @@ import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
@@ -47,6 +48,10 @@ import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.text.DateFormat
+import java.time.Instant
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Integration tests for [DatabaseImpl]. There are written as integration tests as officially
@@ -1314,6 +1319,42 @@ class DatabaseImplTest {
           .getQuery()
       )
     assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_sortDescending_Date() = runBlocking {
+    //add 2 patients with two different date and then check for their order
+    val earlyDateId= "1"
+    val laterDateId = "2"
+
+    val earlyDate: Date = Date(20130314)
+    val laterDate = Date(20140314)
+
+    val patient1 =
+      Patient().apply {
+        id = earlyDateId
+        setBirthDate(earlyDate)
+      }
+    database.insert(patient1)
+
+    val patient2 = Patient().apply {
+      id = laterDateId
+      setBirthDate(laterDate)
+    }
+    database.insert(patient2)
+
+    val results =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }
+          .getQuery()
+      )
+
+
+    val ids = results.map { it.id }
+    assertThat(ids)
+      .containsExactly("Patient/$laterDateId", "Patient/$earlyDateId")
+      .inOrder()
   }
 
   private companion object {

@@ -1302,7 +1302,7 @@ class SearchTest {
         LEFT JOIN DateIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
         WHERE a.resourceType = ?
-        ORDER BY b.index_value ASC
+        ORDER BY b.index_from ASC
         """.trimIndent()
       )
   }
@@ -1320,7 +1320,7 @@ class SearchTest {
         LEFT JOIN DateIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
         WHERE a.resourceType = ?
-        ORDER BY b.index_value DESC
+        ORDER BY b.index_from DESC
         """.trimIndent()
       )
   }
@@ -1338,7 +1338,7 @@ class SearchTest {
         LEFT JOIN DateIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
         WHERE a.resourceType = ?
-        ORDER BY b.index_value ASC
+        ORDER BY b.index_from ASC
         """.trimIndent()
       )
   }

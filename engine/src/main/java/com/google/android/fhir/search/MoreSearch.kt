@@ -51,9 +51,14 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
       LEFT JOIN $sortTableName b
       ON a.resourceType = b.resourceType AND a.resourceId = b.resourceId AND b.index_name = ?
       """.trimIndent()
-    sortOrderStatement = """
+    sortOrderStatement =
+      if (sortTableName == "DateIndexEntity")
+        """
+      ORDER BY b.index_from ${order.sqlString}
+        """.trimIndent()
+      else """
       ORDER BY b.index_value ${order.sqlString}
-    """.trimIndent()
+      """.trimIndent()
     sortArgs += sort.paramName
   }
 
