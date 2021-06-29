@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.mapping
 
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import com.google.common.truth.Truth.assertThat
@@ -24,11 +25,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.r4.utils.StructureMapUtilities
-import org.hl7.fhir.utilities.npm.FilesystemPackageCacheManager
-import org.hl7.fhir.utilities.npm.ToolsVersion
-import org.hl7.fhir.r4.model.Questionnaire
 import org.intellij.lang.annotations.Language
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -36,10 +36,10 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.P])
+@Config(sdk = [Build.VERSION_CODES.P], shadows = [ResourceMapperTestVersion::class])
 class ResourceMapperTest {
   @Test
-  fun `extract() should allow extract correct Patient resource using definition-based extraction`() {
+  fun `extract() should allow perform definition-based extraction`() {
     // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
     @Language("JSON")
     val questionnaireJson =
@@ -447,15 +447,11 @@ class ResourceMapperTest {
     val iParser: IParser = FhirContext.forR4().newJsonParser()
 
     val uriTestQuestionnaire =
-      iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
-        org.hl7.fhir.r4.model.Questionnaire
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
     val uriTestQuestionnaireResponse =
-      iParser.parseResource(
-        org.hl7.fhir.r4.model.QuestionnaireResponse::class.java,
-        questionnaireResponseJson
-      ) as
-        org.hl7.fhir.r4.model.QuestionnaireResponse
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
+        QuestionnaireResponse
 
     val patient =
       ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse)
@@ -474,7 +470,7 @@ class ResourceMapperTest {
   }
 
   @Test
-  fun `extract() should allow extracting correct Patient resource with unanswered questions using definition-based extraction`() {
+  fun `extract() should perform definition-based extraction with unanswered questions`() {
     @Language("JSON")
     val questionnaireJson =
       """
@@ -569,7 +565,6 @@ class ResourceMapperTest {
                         {
                           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
                           "valueExpression": {
-                            "language": "application/x-fhir-query",
                             "expression": "ContactPoint$""" +
         """ContactPointSystem",
                             "name": "contactPointSystem"
@@ -707,15 +702,11 @@ class ResourceMapperTest {
     val iParser: IParser = FhirContext.forR4().newJsonParser()
 
     val uriTestQuestionnaire =
-      iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
-        org.hl7.fhir.r4.model.Questionnaire
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
     val uriTestQuestionnaireResponse =
-      iParser.parseResource(
-        org.hl7.fhir.r4.model.QuestionnaireResponse::class.java,
-        questionnaireResponseJson
-      ) as
-        org.hl7.fhir.r4.model.QuestionnaireResponse
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
+        QuestionnaireResponse
 
     val patient =
       ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse)
@@ -731,7 +722,8 @@ class ResourceMapperTest {
   }
 
   @Test
-  fun `extract() should allow StructureMap-based extraction and return correct Patient resource`() {
+  fun `extract() should perform StructureMap-based extraction`() {
+    @Language("JSON")
     val questionnaireJson =
       """
         {
@@ -833,6 +825,7 @@ class ResourceMapperTest {
         }
       """.trimIndent()
 
+    @Language("JSON")
     val questionnaireResponseJson =
       """
         {
@@ -957,16 +950,14 @@ class ResourceMapperTest {
         }
       """.trimIndent()
 
-    val pcm = FilesystemPackageCacheManager(true, ToolsVersion.TOOLS_VERSION)
-    // Package name manually checked from
-    // https://simplifier.net/packages?Text=hl7.fhir.core&fhirVersion=All+FHIR+Versions
-    // Package name manually checked from
-    // https://simplifier.net/packages?Text=hl7.fhir.core&fhirVersion=All+FHIR+Versions
-    val contextR4 = SimpleWorkerContext.fromPackage(pcm.loadPackage("hl7.fhir.r4.core", "4.0.1"))
+    val contextR4 =
+      SimpleWorkerContext.fromPackage(
+        ResourceMapper.loadNpmPackage(ApplicationProvider.getApplicationContext())
+      )
     contextR4.isCanRunWithoutTerminology = true
-    val scu = StructureMapUtilities(contextR4)
+    val structureMapUtilities = StructureMapUtilities(contextR4)
     val map: StructureMap =
-      scu.parse(
+      structureMapUtilities.parse(
         """map "http://hl7.org/fhir/StructureMap/PatientRegistration" = 'PatientRegistration'
 
         uses "http://hl7.org/fhir/StructureDefinition/QuestionnaireReponse" as source
@@ -999,15 +990,11 @@ class ResourceMapperTest {
     val iParser: IParser = FhirContext.forR4().newJsonParser()
 
     val uriTestQuestionnaire =
-      iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
-        org.hl7.fhir.r4.model.Questionnaire
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
 
     val uriTestQuestionnaireResponse =
-      iParser.parseResource(
-        org.hl7.fhir.r4.model.QuestionnaireResponse::class.java,
-        questionnaireResponseJson
-      ) as
-        org.hl7.fhir.r4.model.QuestionnaireResponse
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
+        QuestionnaireResponse
 
     val bundle =
       ResourceMapper.extract(
@@ -1017,7 +1004,8 @@ class ResourceMapperTest {
           override fun getStructureMap(fullUrl: String): StructureMap? {
             return map
           }
-        }
+        },
+        ApplicationProvider.getApplicationContext()
       )
 
     val patient = bundle.entry.get(0).resource as Patient

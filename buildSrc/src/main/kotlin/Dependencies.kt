@@ -73,7 +73,7 @@ object Dependencies {
   const val hapiFhirStructuresR4 =
     "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhirStructuresR4}"
   const val hapiFhirValidation =
-    "ca.uhn.hapi.fhir:org.hl7.fhir.validation:${Versions.hapiFhirValidations}"
+    "ca.uhn.hapi.fhir:org.hl7.fhir.validation:${Versions.hapiFhirStructuresR4}"
   const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.httpInterceptor}"
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
   const val material = "com.google.android.material:material:${Versions.material}"
@@ -92,6 +92,8 @@ object Dependencies {
   }
 
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
+  const val commonsCompress = "org.apache.commons:commons-compress:${Versions.commonsCompress}"
+  const val commonsIo = "commons-io:commons-io:${Versions.commonsIo}"
   const val junit = "junit:junit:${Versions.junit}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
@@ -121,6 +123,8 @@ object Dependencies {
     }
 
     const val caffeine = "2.9.0"
+    const val commonsCompress = "1.20"
+    const val commonsIo = "2.10.0"
     const val desugarJdkLibs = "1.0.9"
     const val guava = "28.2-android"
     const val hapiFhirStructuresR4 = "5.3.0"
@@ -130,7 +134,6 @@ object Dependencies {
     const val retrofit = "2.7.2"
     const val truth = "1.0.1"
     const val flexBox = "3.0.0"
-    const val hapiFhirValidations = "5.3.0"
 
     object AndroidxTest {
       const val core = "1.2.0"

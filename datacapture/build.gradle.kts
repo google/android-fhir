@@ -86,6 +86,8 @@ dependencies {
 
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.fragmentKtx)
+  implementation(Dependencies.commonsCompress)
+  implementation(Dependencies.commonsIo)
   implementation(Dependencies.Kotlin.androidxCoreKtx)
   implementation(Dependencies.Kotlin.kotlinTestJunit)
   implementation(Dependencies.Kotlin.stdlib)
@@ -94,8 +96,8 @@ dependencies {
   implementation(Dependencies.flexBox)
 
   testImplementation(Dependencies.AndroidxTest.core)
+  testImplementation(Dependencies.hapiFhirValidation)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
-  testImplementation(Dependencies.hapiFhirValidation)
 }
