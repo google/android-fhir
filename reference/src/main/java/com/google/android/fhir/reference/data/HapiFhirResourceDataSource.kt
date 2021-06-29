@@ -18,7 +18,6 @@ package com.google.android.fhir.reference.data
 
 import com.google.android.fhir.reference.api.HapiFhirService
 import com.google.android.fhir.sync.DataSource
-import java.net.SocketTimeoutException
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.hl7.fhir.r4.model.Bundle
@@ -29,12 +28,10 @@ import org.hl7.fhir.r4.model.Resource
 class HapiFhirResourceDataSource(private val service: HapiFhirService) : DataSource {
 
   override suspend fun loadData(path: String): Bundle {
-    if (1 != 0) throw SocketTimeoutException("Failed to connect to the server for data loading")
     return service.getResource(path)
   }
 
   override suspend fun insert(resourceType: String, resourceId: String, payload: String): Resource {
-    if (1 != 0) throw SocketTimeoutException("Failed to connect to the server for data insertion")
     return service.insertResource(
       resourceType,
       resourceId,
