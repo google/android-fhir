@@ -111,9 +111,10 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
   }
 
   override suspend fun <R : Resource> search(query: SearchQuery): List<R> =
-    resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).map {
-      iParser.parseResource(it) as R
-    }
+    resourceDao
+      .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+      .map { iParser.parseResource(it) as R }
+      .distinctBy { it.id }
 
   override suspend fun count(query: SearchQuery): Long =
     resourceDao.countResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))

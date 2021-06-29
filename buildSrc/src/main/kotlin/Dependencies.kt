@@ -93,6 +93,7 @@ object Dependencies {
   const val junit = "junit:junit:${Versions.junit}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
+  const val flexBox = "com.google.android.flexbox:flexbox:${Versions.flexBox}"
 
   object Versions {
     object Androidx {
@@ -126,6 +127,7 @@ object Dependencies {
     const val material = "1.3.0"
     const val retrofit = "2.7.2"
     const val truth = "1.0.1"
+    const val flexBox = "3.0.0"
 
     object AndroidxTest {
       const val core = "1.2.0"
