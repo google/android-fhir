@@ -1331,7 +1331,7 @@ class DatabaseImplTest {
           }
           .getQuery()
       )
-    assertThat(result.filter { it.id.contains("1401518") }).hasSize(1)
+    assertThat(result.filter { it.id == patient.id }).hasSize(1)
   }
 
   private companion object {

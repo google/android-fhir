@@ -1064,7 +1064,7 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_duplicateString_deDuplicatesStringIndices() {
+  fun index_duplicateString_deduplicateStringIndices() {
     val givenValue = "Nickole"
     val patient =
       Patient().apply {
@@ -1084,7 +1084,7 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_duplicateNumber_deDuplicatesNumberIndices() {
+  fun index_duplicateNumber_deduplicateNumberIndices() {
     val windowValue = 22125510
     val startValue = 100
     val molecularSequence =
@@ -1112,7 +1112,7 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_duplicateToken_deDuplicatesTokenIndices() {
+  fun index_duplicateToken_deduplicateTokenIndices() {
     val systemIdentity = "https://github.com/synthetichealth/synthea"
     val indexValue = "000000039481"
     val patient =
@@ -1190,7 +1190,7 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_duplicateReferences_deDuplicatesReferenceIndices() {
+  fun index_duplicateReferences_deduplicateReferenceIndices() {
     val values = listOf("reference_1", "reference_2")
     val patient =
       Patient().apply {
