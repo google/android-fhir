@@ -67,6 +67,7 @@ android {
     // See https://developer.android.com/studio/write/java8-support
     jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
+  testOptions { unitTests.isIncludeAndroidResources = true }
 }
 
 configurations { all { exclude(module = "xpp3") } }
