@@ -1316,6 +1316,24 @@ class DatabaseImplTest {
     assertThat(result).isEmpty()
   }
 
+  @Test
+  fun search_nameGivenDuplicate_deduplicatePatient() = runBlocking {
+    var patient: Patient =
+      testingUtils.readFromFile(Patient::class.java, "/patient_name_given_duplicate.json")
+    database.insertRemote(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            sort(Patient.GIVEN, Order.ASCENDING)
+            count = 100
+            from = 0
+          }
+          .getQuery()
+      )
+    assertThat(result.filter { it.id == patient.id }).hasSize(1)
+  }
+
   private companion object {
     const val TEST_PATIENT_1_ID = "test_patient_1"
     val TEST_PATIENT_1 = Patient()
