@@ -464,7 +464,7 @@ private fun setupNpmPackage(context: Context) {
 
     Log.e(ResourceMapper::class.java.name, e.stackTraceToString())
     throw NpmPackageInitializationError(
-      "Could not copy archived package [${filename}] to app private storage",
+      "Could not copy archived package [$filename] to app private storage",
       e
     )
   }

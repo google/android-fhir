@@ -36,7 +36,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.P], shadows = [ResourceMapperTestVersion::class])
+@Config(sdk = [Build.VERSION_CODES.P], shadows = [ShadowResourceMapper::class])
 class ResourceMapperTest {
   @Test
   fun `extract() should allow perform definition-based extraction`() {
