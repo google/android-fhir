@@ -18,15 +18,10 @@ package com.google.android.fhir.reference
 
 import android.app.Application
 import android.content.Context
-import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineBuilder
-import com.google.android.fhir.reference.api.HapiFhirService
-import com.google.android.fhir.reference.data.HapiFhirResourceDataSource
+import com.google.android.fhir.reference.data.FhirPeriodicSyncWorker
 import com.google.android.fhir.sync.Sync
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import org.hl7.fhir.r4.model.ResourceType
 
 class FhirApplication : Application() {
   // Only initiate the FhirEngine when used for the first time, not when the app is created.
@@ -34,13 +29,16 @@ class FhirApplication : Application() {
 
   override fun onCreate() {
     super.onCreate()
-    GlobalScope.launch {
-      Sync.oneTimeSync(
-        fhirEngine,
-        HapiFhirResourceDataSource(HapiFhirService.create(FhirContext.forR4().newJsonParser())),
-        mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
-      )
-    }
+    //    GlobalScope.launch {
+    //      Sync.oneTimeSync(
+    //        fhirEngine,
+    //
+    // HapiFhirResourceDataSource(HapiFhirService.create(FhirContext.forR4().newJsonParser())),
+    //        mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
+    //      )
+    //    }
+
+    Sync.oneTimeSync<FhirPeriodicSyncWorker>(this)
   }
 
   private fun constructFhirEngine(): FhirEngine {

@@ -23,7 +23,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.sync.Result.Success
 
 /** A WorkManager Worker that handles periodic sync. */
-abstract class PeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
+abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
 
   abstract fun getFhirEngine(): FhirEngine
@@ -31,11 +31,18 @@ abstract class PeriodicSyncWorker(appContext: Context, workerParams: WorkerParam
   abstract fun getSyncData(): ResourceSyncParams
 
   override suspend fun doWork(): Result {
-    // TODO handle retry
     val result = FhirSynchronizer(getFhirEngine(), getDataSource(), getSyncData()).synchronize()
-    if (result is Success) {
-      return Result.success()
+    /**
+     * In case of failure, we can check if its worth retrying and do retry based on
+     * [RetryConfiguration.maxRetries] set by user.
+     */
+    val retries = inputData.getInt(MAX_RETRIES_ALLOWED, 0)
+    return if (result is Success) {
+      Result.success()
+    } else if (retries > runAttemptCount) {
+      Result.retry()
+    } else {
+      Result.failure()
     }
-    return Result.failure()
   }
 }

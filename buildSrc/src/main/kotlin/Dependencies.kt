@@ -83,6 +83,8 @@ object Dependencies {
     const val extJunitKtx = "androidx.test.ext:junit-ktx:${Versions.AndroidxTest.extJunit}"
     const val rules = "androidx.test:rules:${Versions.AndroidxTest.rules}"
     const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
+    const val workTestingRuntimeKtx =
+      "androidx.work:work-testing:${Versions.Androidx.workRuntimeKtx}"
   }
 
   object Espresso {
@@ -93,6 +95,7 @@ object Dependencies {
   const val junit = "junit:junit:${Versions.junit}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
+  const val mockk = "io.mockk:mockk-android:${Versions.mockk}"
 
   object Versions {
     object Androidx {
@@ -126,6 +129,7 @@ object Dependencies {
     const val material = "1.3.0"
     const val retrofit = "2.7.2"
     const val truth = "1.0.1"
+    const val mockk = "1.11.0"
 
     object AndroidxTest {
       const val core = "1.2.0"

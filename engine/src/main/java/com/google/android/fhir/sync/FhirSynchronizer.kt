@@ -34,16 +34,25 @@ sealed class Result {
 data class ResourceSyncException(val resourceType: ResourceType, val exception: Exception)
 
 /** Class that helps synchronize the data source and save it in the local database */
-class FhirSynchronizer(
+internal class FhirSynchronizer(
   private val fhirEngine: FhirEngine,
   private val dataSource: DataSource,
   private val resourceSyncParams: ResourceSyncParams
 ) {
   suspend fun synchronize(): Result {
+    val uploadResult = upload()
+    val downloadResult = download()
+    return if (uploadResult is Result.Success && downloadResult is Result.Success) Result.Success
+    else if (uploadResult is Result.Success) downloadResult
+    else if (downloadResult is Result.Success) uploadResult
+    else
+      Result.Error(
+        (downloadResult as Result.Error).exceptions + (uploadResult as Result.Error).exceptions
+      )
+  }
+
+  private suspend fun download(): Result {
     val exceptions = mutableListOf<ResourceSyncException>()
-
-    upload()
-
     resourceSyncParams.forEach {
       try {
         downloadResourceType(it.key, it.value)
