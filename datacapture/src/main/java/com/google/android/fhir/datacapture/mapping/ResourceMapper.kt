@@ -74,8 +74,8 @@ object ResourceMapper {
   }
 
   /**
-   * This function takes Questionnaire and Resource and returns Questionnaire Response that we can
-   * populate to Questionnaire
+   * Returns a `QuestionnaireResponse` to the [questionnaire] that is pre-filled from the [resource]
+   * . See http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population.
    */
   fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
     populateInitialValues(questionnaire.item, resource)
@@ -95,7 +95,6 @@ object ResourceMapper {
     question: Questionnaire.QuestionnaireItemComponent,
     resource: Resource
   ) {
-    val expressionMap: HashMap<String, String> = hashMapOf()
     val context = FhirContext.forR4()
     val fhirPathEngine =
       FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
@@ -103,7 +102,6 @@ object ResourceMapper {
       populateInitialValues(question.item, resource)
     } else {
       question.fetchExpression?.let { exp ->
-        expressionMap[question.linkId] = exp.expression
         val answerExtracted = fhirPathEngine.evaluate(resource, exp.expression)[0] as Type
         question.apply {
           initial =
