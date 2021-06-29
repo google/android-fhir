@@ -75,7 +75,7 @@ object ResourceMapper {
 
   /**
    * Returns a `QuestionnaireResponse` to the [questionnaire] that is pre-filled from the [resource]
-   * . See http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population.
+   * See http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population.
    */
   fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
     populateInitialValues(questionnaire.item, resource)
@@ -103,12 +103,8 @@ object ResourceMapper {
     } else {
       question.fetchExpression?.let { exp ->
         val answerExtracted = fhirPathEngine.evaluate(resource, exp.expression)[0] as Type
-        question.apply {
-          initial =
-            mutableListOf(
-              Questionnaire.QuestionnaireItemInitialComponent().setValue(answerExtracted)
-            )
-        }
+        question.initial =
+          mutableListOf(Questionnaire.QuestionnaireItemInitialComponent().setValue(answerExtracted))
       }
     }
   }
