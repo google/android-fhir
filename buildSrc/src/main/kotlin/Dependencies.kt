@@ -95,7 +95,7 @@ object Dependencies {
   const val junit = "junit:junit:${Versions.junit}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
-  const val mockk = "io.mockk:mockk-android:${Versions.mockk}"
+  const val mockk = "io.mockk:mockk:${Versions.mockk}"
   const val flexBox = "com.google.android.flexbox:flexbox:${Versions.flexBox}"
 
   object Versions {

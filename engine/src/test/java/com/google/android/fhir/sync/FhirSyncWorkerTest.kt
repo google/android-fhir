@@ -17,10 +17,7 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
-import android.os.Build
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SdkSuppress
 import androidx.work.Data
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
@@ -37,9 +34,11 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
-@RunWith(AndroidJUnit4::class)
-@SdkSuppress(minSdkVersion = Build.VERSION_CODES.P)
+@RunWith(RobolectricTestRunner::class)
+@Config(manifest = Config.NONE)
 class FhirSyncWorkerTest {
   private lateinit var context: Context
   class MockedPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :

@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.BackoffPolicy
 import androidx.work.WorkerParameters
 import com.google.android.fhir.FhirEngine
@@ -27,8 +26,11 @@ import io.mockk.impl.annotations.MockK
 import java.util.concurrent.TimeUnit
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
-@RunWith(AndroidJUnit4::class)
+@RunWith(RobolectricTestRunner::class)
+@Config(manifest = Config.NONE)
 class SyncTest {
   class MockedPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
     FhirSyncWorker(appContext, workerParams) {

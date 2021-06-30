@@ -107,8 +107,6 @@ dependencies {
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
-  androidTestImplementation(Dependencies.mockk)
   androidTestImplementation(Dependencies.truth)
 
   api(Dependencies.hapiFhirStructuresR4) { exclude(module = "junit") }
@@ -129,4 +127,6 @@ dependencies {
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  testImplementation(Dependencies.mockk)
 }
