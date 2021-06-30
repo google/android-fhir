@@ -19,8 +19,10 @@ package com.google.android.fhir.datacapture
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
 import java.util.Locale
+import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.StringType
@@ -247,5 +249,59 @@ class MoreQuestionnaireItemComponentsTest {
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
     assertThat(questionnaireItem.localizedPrefix).isEqualTo("Một")
+  }
+
+  @Test
+  fun createQuestionnaireResponse() {
+    val questionnaire =
+      Questionnaire().apply {
+        this.addItem(
+          Questionnaire.QuestionnaireItemComponent(
+              StringType("gender"),
+              Enumeration(
+                Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                Questionnaire.QuestionnaireItemType.STRING
+              )
+            )
+            .apply {
+              initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
+            }
+        )
+
+        this.addItem(
+          Questionnaire.QuestionnaireItemComponent(
+              StringType("country"),
+              Enumeration(
+                Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                Questionnaire.QuestionnaireItemType.STRING
+              )
+            )
+            .apply {
+              initial =
+                listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("south-africa")))
+            }
+        )
+
+        this.addItem(
+          Questionnaire.QuestionnaireItemComponent(
+              StringType("isActive"),
+              Enumeration(
+                Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                Questionnaire.QuestionnaireItemType.BOOLEAN
+              )
+            )
+            .apply {
+              initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true)))
+            }
+        )
+      }
+
+    val questionnaireResponse = questionnaire.item.map { it.createQuestionnaireResponseItem() }
+
+    assertThat((questionnaireResponse[0].answer[0].value as StringType).value).isEqualTo("male")
+    assertThat((questionnaireResponse[1].answer[0].value as StringType).value)
+      .isEqualTo("south-africa")
+    assertThat((questionnaireResponse[2].answer[0].value as BooleanType).booleanValue())
+      .isEqualTo(true)
   }
 }
