@@ -79,6 +79,7 @@ object ResourceMapper {
    * loaded.
    */
   lateinit var npmPackage: NpmPackage
+  lateinit var contextR4: SimpleWorkerContext
 
   /**
    * Extract a FHIR resource from the [questionnaire] and [questionnaireResponse].
@@ -156,8 +157,9 @@ object ResourceMapper {
     // Load the npm package
     loadNpmPackage(context)
 
-    val contextR4 =
-      SimpleWorkerContext.fromPackage(npmPackage).apply { isCanRunWithoutTerminology = true }
+    if (!this::contextR4.isInitialized) {
+      contextR4 = SimpleWorkerContext.fromPackage(npmPackage).apply { isCanRunWithoutTerminology = true }
+    }
 
     val structureMapUrl = questionnaire.targetStructureMap!!
     val structureMap = structureMapProvider.getStructureMap(structureMapUrl)
