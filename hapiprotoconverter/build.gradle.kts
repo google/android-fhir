@@ -47,7 +47,7 @@ dependencies {
   implementation(Dependencies.FhirProto.fhirProtobufs)
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
   implementation(Dependencies.Kotlin.stdlib)
-
+  implementation(Dependencies.kotlinPoet)
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.truth)

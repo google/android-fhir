@@ -77,6 +77,7 @@ object Dependencies {
     "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhirStructuresR4}"
   const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.httpInterceptor}"
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
+  const val kotlinPoet = "com.squareup:kotlinpoet:${Versions.kotlinPoet}"
   const val material = "com.google.android.material:material:${Versions.material}"
 
   // Dependencies for testing go here
@@ -128,6 +129,7 @@ object Dependencies {
     const val hapiFhirStructuresR4 = "5.3.0"
     const val httpInterceptor = "4.0.0"
     const val jsonToolsPatch = "1.13"
+    const val kotlinPoet = "1.9.0"
     const val material = "1.3.0"
     const val retrofit = "2.7.2"
     const val truth = "1.0.1"
