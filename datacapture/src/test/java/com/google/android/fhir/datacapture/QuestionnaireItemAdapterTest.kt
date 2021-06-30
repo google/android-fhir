@@ -387,11 +387,11 @@ class QuestionnaireItemAdapterTest {
       Questionnaire.QuestionnaireItemComponent()
     questionnaireItemViewItem.type = Questionnaire.QuestionnaireItemType.DATE
 
-    val questionnaireItemAdapter =
-      QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
-    val actualItemViewType =
-      questionnaireItemAdapter.getItemViewTypeMapping(questionnaireItemViewItem)
-    assertThat(expectedItemViewType).isEqualTo(actualItemViewType)
+    assertThat(expectedItemViewType)
+      .isEqualTo(
+        QuestionnaireItemAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
+          .getItemViewTypeMapping(questionnaireItemViewItem)
+      )
   }
 
   private fun getQuestionnaireItemViewHolderFactoryMatchers():
