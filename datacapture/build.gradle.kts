@@ -64,6 +64,7 @@ android {
     // See https://developer.android.com/studio/write/java8-support
     jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
+  testOptions { unitTests.isIncludeAndroidResources = true }
 }
 
 configurations { all { exclude(module = "xpp3") } }
@@ -87,9 +88,11 @@ dependencies {
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
+  implementation(Dependencies.flexBox)
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(Dependencies.mockitoKotlin)
 }

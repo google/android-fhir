@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android.content.Context
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.validation.ConstraintValidator.ConstraintValidationResult
 import org.hl7.fhir.r4.model.Questionnaire
@@ -30,7 +31,8 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal object PrimitiveTypeAnswerMaxLengthValidator : ConstraintValidator {
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    context: Context
   ): ConstraintValidationResult {
     // TODO(https://github.com/google/android-fhir/issues/487): Validate all answers.
     val answer = questionnaireResponseItem.answer[0].value
