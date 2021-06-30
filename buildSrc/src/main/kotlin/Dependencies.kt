@@ -122,7 +122,7 @@ object Dependencies {
     const val caffeine = "2.9.0"
     const val desugarJdkLibs = "1.0.9"
     const val guava = "28.2-android"
-    const val hapiFhirStructuresR4 = "5.3.0"
+    const val hapiFhirStructuresR4 = "5.4.0"
     const val httpInterceptor = "4.0.0"
     const val jsonToolsPatch = "1.13"
     const val material = "1.3.0"
