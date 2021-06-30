@@ -252,56 +252,116 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun createQuestionnaireResponse() {
-    val questionnaire =
-      Questionnaire().apply {
-        this.addItem(
-          Questionnaire.QuestionnaireItemComponent(
-              StringType("gender"),
-              Enumeration(
-                Questionnaire.QuestionnaireItemTypeEnumFactory(),
-                Questionnaire.QuestionnaireItemType.STRING
-              )
-            )
-            .apply {
-              initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
-            }
+  fun createQuestionResponseWithoutGroupAndNestedQuestions() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent(
+          StringType("gender"),
+          Enumeration(
+            Questionnaire.QuestionnaireItemTypeEnumFactory(),
+            Questionnaire.QuestionnaireItemType.STRING
+          )
         )
+        .apply {
+          initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
+        }
 
-        this.addItem(
-          Questionnaire.QuestionnaireItemComponent(
-              StringType("country"),
-              Enumeration(
-                Questionnaire.QuestionnaireItemTypeEnumFactory(),
-                Questionnaire.QuestionnaireItemType.STRING
-              )
-            )
-            .apply {
-              initial =
-                listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("south-africa")))
-            }
+    val questionResponse = question.createQuestionnaireResponseItem()
+
+    assertThat((questionResponse.answer[0].value as StringType).value).isEqualTo("male")
+  }
+
+  @Test
+  fun createQuestionResponseWithGroupQuestions() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent(
+          StringType("group-test"),
+          Enumeration(
+            Questionnaire.QuestionnaireItemTypeEnumFactory(),
+            Questionnaire.QuestionnaireItemType.GROUP
+          )
         )
-
-        this.addItem(
-          Questionnaire.QuestionnaireItemComponent(
-              StringType("isActive"),
-              Enumeration(
-                Questionnaire.QuestionnaireItemTypeEnumFactory(),
-                Questionnaire.QuestionnaireItemType.BOOLEAN
+        .apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent(
+                StringType("gender"),
+                Enumeration(
+                  Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                  Questionnaire.QuestionnaireItemType.STRING
+                )
               )
-            )
-            .apply {
-              initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true)))
-            }
+              .apply {
+                initial =
+                  listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
+              }
+          )
+
+          addItem(
+            Questionnaire.QuestionnaireItemComponent(
+                StringType("isActive"),
+                Enumeration(
+                  Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                  Questionnaire.QuestionnaireItemType.BOOLEAN
+                )
+              )
+              .apply {
+                initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true)))
+              }
+          )
+        }
+
+    val questionResponse = question.createQuestionnaireResponseItem()
+
+    assertThat((questionResponse.item[0].answer[0].value as StringType).value).isEqualTo("male")
+    assertThat((questionResponse.item[1].answer[0].value as BooleanType).booleanValue())
+      .isEqualTo(true)
+  }
+
+  @Test
+  fun createQuestionResponseWithNestedQuestions() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent(
+          StringType("group-test"),
+          Enumeration(
+            Questionnaire.QuestionnaireItemTypeEnumFactory(),
+            Questionnaire.QuestionnaireItemType.GROUP
+          )
         )
-      }
+        .apply {
+          addItem(
+            Questionnaire.QuestionnaireItemComponent(
+                StringType("gender"),
+                Enumeration(
+                  Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                  Questionnaire.QuestionnaireItemType.STRING
+                )
+              )
+              .apply {
+                initial =
+                  listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
 
-    val questionnaireResponse = questionnaire.item.map { it.createQuestionnaireResponseItem() }
+                addItem(
+                  Questionnaire.QuestionnaireItemComponent(
+                      StringType("isActive"),
+                      Enumeration(
+                        Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                        Questionnaire.QuestionnaireItemType.BOOLEAN
+                      )
+                    )
+                    .apply {
+                      initial =
+                        listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true)))
+                    }
+                )
+              }
+          )
+        }
 
-    assertThat((questionnaireResponse[0].answer[0].value as StringType).value).isEqualTo("male")
-    assertThat((questionnaireResponse[1].answer[0].value as StringType).value)
-      .isEqualTo("south-africa")
-    assertThat((questionnaireResponse[2].answer[0].value as BooleanType).booleanValue())
+    val questionResponse = question.createQuestionnaireResponseItem()
+
+    assertThat((questionResponse.item[0].answer[0].value as StringType).value).isEqualTo("male")
+    assertThat(
+        (questionResponse.item[0].answer[0].item[0].answer[0].value as BooleanType).booleanValue()
+      )
       .isEqualTo(true)
   }
 }
