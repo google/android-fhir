@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android.content.Context
 import android.util.Log
 import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import java.util.regex.Pattern
@@ -48,7 +49,7 @@ internal object RegexValidator :
           false
         }
       },
-    { extension: Extension ->
+    { extension: Extension, context: Context ->
       "The answer doesn't match regular expression: " + extension.value.primitiveValue()
     }
   )
