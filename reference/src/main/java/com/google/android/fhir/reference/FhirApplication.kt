@@ -29,15 +29,6 @@ class FhirApplication : Application() {
 
   override fun onCreate() {
     super.onCreate()
-    //    GlobalScope.launch {
-    //      Sync.oneTimeSync(
-    //        fhirEngine,
-    //
-    // HapiFhirResourceDataSource(HapiFhirService.create(FhirContext.forR4().newJsonParser())),
-    //        mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
-    //      )
-    //    }
-
     Sync.oneTimeSync<FhirPeriodicSyncWorker>(this)
   }
 
