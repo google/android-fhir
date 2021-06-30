@@ -17,21 +17,14 @@
 package com.google.android.fhir.datacapture.mapping
 
 import android.content.Context
-import android.os.Environment
-import android.util.Log
-import com.google.android.fhir.datacapture.utilities.TarGzipUtility
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
+import com.google.android.fhir.datacapture.targetStructureMap
+import com.google.android.fhir.datacapture.utilities.NpmPackageProvider
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
-import org.apache.commons.compress.utils.IOUtils
-import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
@@ -49,7 +42,6 @@ import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.utils.StructureMapUtilities
-import org.hl7.fhir.utilities.npm.NpmPackage
 
 /**
  * Maps [QuestionnaireResponse] s to FHIR resources and vice versa.
@@ -70,18 +62,6 @@ import org.hl7.fhir.utilities.npm.NpmPackage
 object ResourceMapper {
 
   /**
-   *
-   * NpmPackage containing all the [org.hl7.fhir.r4.model.StructureDefinition]s takes around 20
-   * seconds to load. Therefore, reloading for each extraction is not desirable. This should happen
-   * once and cache the variable throughout the app's lifecycle.
-   *
-   * Call [loadNpmPackage] to load it. The method handles skips the operation if it's already
-   * loaded.
-   */
-  lateinit var npmPackage: NpmPackage
-  lateinit var contextR4: SimpleWorkerContext
-
-  /**
    * Extract a FHIR resource from the [questionnaire] and [questionnaireResponse].
    *
    * This method supports both Definition-based and StructureMap-based extraction.
@@ -97,7 +77,7 @@ object ResourceMapper {
   fun extract(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    structureMapProvider: StructureMapProvider? = null,
+    structureMapProvider: ((String) -> StructureMap?)? = null,
     context: Context? = null
   ): Bundle {
     return if (questionnaire.targetStructureMap == null)
@@ -149,44 +129,20 @@ object ResourceMapper {
   private fun extractByStructureMapBased(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    structureMapProvider: StructureMapProvider?,
+    structureMapProvider: ((String) -> StructureMap?)?,
     context: Context?
   ): Bundle {
     if (structureMapProvider == null || context == null) return Bundle()
-
-    // Load the npm package
-    loadNpmPackage(context)
-
-    if (!this::contextR4.isInitialized) {
-      contextR4 = SimpleWorkerContext.fromPackage(npmPackage).apply { isCanRunWithoutTerminology = true }
-    }
+    val contextR4 = NpmPackageProvider.loadSimpleWorkerContextWithPackage(context)
 
     val structureMapUrl = questionnaire.targetStructureMap!!
-    val structureMap = structureMapProvider.getStructureMap(structureMapUrl)
+    val structureMap = structureMapProvider(structureMapUrl)
 
     val structureMapUtilities = StructureMapUtilities(contextR4)
     val targetResource: Resource =
       ResourceFactory.createResource(structureMapUtilities.getTargetType(structureMap).name)
     structureMapUtilities.transform(contextR4, questionnaireResponse, structureMap, targetResource)
     return targetResource as Bundle
-  }
-
-  /**
-   * Decompresses the hl7.fhir.r4.core archived package into app storage and loads it into memory.
-   * It loads the package into [npmPackage]. The method skips any unnecessary operations. This
-   * method can be called during initial app installation and run in the background so as to reduce
-   * the time it takes for the whole process.
-   *
-   * The whole process can take 1-3 minutes on a clean installation.
-   */
-  fun loadNpmPackage(context: Context): NpmPackage {
-    setupNpmPackage(context)
-
-    if (!this::npmPackage.isInitialized) {
-      npmPackage = NpmPackage.fromFolder(getLocalFhirCorePackageDirectory(context))
-    }
-
-    return npmPackage
   }
 
   /**
@@ -360,18 +316,6 @@ private val Questionnaire.itemContextNameToExpressionMap: Map<String, String>
   }
 
 /**
- * The map from the `name`s to `expression`s in the
- * [item extraction context extension](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-itemExtractionContext.html)
- * s.
- */
-val Questionnaire.targetStructureMap: String?
-  get() {
-    val extensionValue =
-      this.extension.singleOrNull { it.url == TARGET_STRUCTURE_MAP }?.value ?: return null
-    return if (extensionValue is CanonicalType) extensionValue.valueAsString else null
-  }
-
-/**
  * Extracts a list containing the resource name followed by field names leading to the destination
  * field defined in the [definition] field, or `null` if the [definition] field is empty or invalid.
  *
@@ -411,13 +355,6 @@ private val Questionnaire.QuestionnaireItemComponent.getDefinitionField: Field?
  */
 private const val ITEM_CONTEXT_EXTENSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
-/**
- * See
- * [Extension: target structure map](http://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-targetStructureMap.html)
- * .
- */
-private const val TARGET_STRUCTURE_MAP: String =
-  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap"
 
 private val Field.isList: Boolean
   get() = isParameterized && type == List::class.java
@@ -437,58 +374,4 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
   } catch (ex: NoSuchFieldException) {
     return null
   }
-}
-
-private fun setupNpmPackage(context: Context) {
-  val filename = "packages.fhir.org-hl7.fhir.r4.core-4.0.1.tgz"
-  val outDir = getLocalFhirCorePackageDirectory(context)
-
-  if (File(outDir + "/package/package.json").exists()) {
-    return
-  }
-  // Create any missing folders
-  File(outDir).mkdirs()
-
-  // Copy the tgz package to private app storage
-  try {
-    val inputStream = context.assets.open(filename)
-    val outputStream = FileOutputStream(File(getLocalNpmPackagesDirectory(context) + filename))
-
-    IOUtils.copy(inputStream, outputStream)
-    IOUtils.closeQuietly(inputStream)
-    IOUtils.closeQuietly(outputStream)
-  } catch (e: IOException) {
-    // Delete the folders
-    val packageDirectory = File(outDir)
-    if (packageDirectory.exists()) {
-      packageDirectory.delete()
-    }
-
-    Log.e(ResourceMapper::class.java.name, e.stackTraceToString())
-    throw NpmPackageInitializationError(
-      "Could not copy archived package [$filename] to app private storage",
-      e
-    )
-  }
-
-  // decompress the .tgz package
-  TarGzipUtility.decompress(getLocalNpmPackagesDirectory(context) + filename, File(outDir))
-}
-
-/** Generate the path to the local npm packages directory */
-private fun getLocalNpmPackagesDirectory(context: Context): String {
-  val outDir =
-    Environment.getDataDirectory().getAbsolutePath() +
-      "/data/${context.applicationContext.packageName}/npm_packages/"
-  return outDir
-}
-
-/** Generate the path to the local hl7.fhir.r4.core package */
-private fun getLocalFhirCorePackageDirectory(context: Context): String {
-  return getLocalNpmPackagesDirectory(context) + "hl7.fhir.r4.core#4.0.1"
-}
-
-interface StructureMapProvider {
-
-  fun getStructureMap(fullUrl: String): StructureMap?
 }

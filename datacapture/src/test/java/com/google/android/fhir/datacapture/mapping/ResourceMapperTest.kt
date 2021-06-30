@@ -20,6 +20,7 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.datacapture.utilities.NpmPackageProvider
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -36,10 +37,10 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.P], shadows = [ShadowResourceMapper::class])
+@Config(sdk = [Build.VERSION_CODES.P], shadows = [ShadowNpmPackageProvider::class])
 class ResourceMapperTest {
   @Test
-  fun `extract() should allow perform definition-based extraction`() {
+  fun `extract() should perform definition-based extraction`() {
     // https://developer.commure.com/docs/apis/sdc/examples#definition-based-extraction
     @Language("JSON")
     val questionnaireJson =
@@ -952,7 +953,7 @@ class ResourceMapperTest {
 
     val contextR4 =
       SimpleWorkerContext.fromPackage(
-        ResourceMapper.loadNpmPackage(ApplicationProvider.getApplicationContext())
+        NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
       )
     contextR4.isCanRunWithoutTerminology = true
     val structureMapUtilities = StructureMapUtilities(contextR4)
@@ -1000,10 +1001,8 @@ class ResourceMapperTest {
       ResourceMapper.extract(
         uriTestQuestionnaire,
         uriTestQuestionnaireResponse,
-        object : StructureMapProvider {
-          override fun getStructureMap(fullUrl: String): StructureMap? {
-            return map
-          }
+        fun(fullUrl: String): StructureMap? {
+          return map
         },
         ApplicationProvider.getApplicationContext()
       )
