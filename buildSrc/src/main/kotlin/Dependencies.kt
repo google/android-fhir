@@ -95,6 +95,7 @@ object Dependencies {
   const val commonsCompress = "org.apache.commons:commons-compress:${Versions.commonsCompress}"
   const val commonsIo = "commons-io:commons-io:${Versions.commonsIo}"
   const val junit = "junit:junit:${Versions.junit}"
+  const val mockitoKotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mockitoKotlin}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
   const val flexBox = "com.google.android.flexbox:flexbox:${Versions.flexBox}"
@@ -127,7 +128,7 @@ object Dependencies {
     const val commonsIo = "2.10.0"
     const val desugarJdkLibs = "1.0.9"
     const val guava = "28.2-android"
-    const val hapiFhirStructuresR4 = "5.3.0"
+    const val hapiFhirStructuresR4 = "5.4.0"
     const val httpInterceptor = "4.0.0"
     const val jsonToolsPatch = "1.13"
     const val material = "1.3.0"
@@ -144,6 +145,7 @@ object Dependencies {
 
     const val espresso = "3.3.0"
     const val junit = "4.13"
+    const val mockitoKotlin = "3.2.0"
     const val robolectric = "4.5.1"
   }
 }

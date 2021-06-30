@@ -40,9 +40,6 @@ android {
   defaultConfig {
     minSdkVersion(Sdk.minSdk)
     targetSdkVersion(Sdk.targetSdk)
-    versionCode = 1
-    versionName = "1.0"
-
     testInstrumentationRunner(Dependencies.androidJunitRunner)
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments(mapOf("package" to "com.google.android.fhir.datacapture"))
@@ -94,10 +91,12 @@ dependencies {
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
   implementation(Dependencies.flexBox)
+  implementation(Dependencies.caffeine)
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.hapiFhirValidation)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(Dependencies.mockitoKotlin)
 }

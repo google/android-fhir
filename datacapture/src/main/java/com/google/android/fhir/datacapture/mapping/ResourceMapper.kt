@@ -17,11 +17,15 @@
 package com.google.android.fhir.datacapture.mapping
 
 import android.content.Context
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
+import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
 import com.google.android.fhir.datacapture.utilities.NpmPackageProvider
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
+import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Bundle
@@ -40,7 +44,9 @@ import org.hl7.fhir.r4.model.ResourceFactory
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.r4.model.TimeType
+import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UrlType
+import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 
 /**
@@ -144,6 +150,49 @@ object ResourceMapper {
     structureMapUtilities.transform(contextR4, questionnaireResponse, structureMap, targetResource)
     return targetResource as Bundle
   }
+
+  /**
+   * Returns a `QuestionnaireResponse` to the [questionnaire] that is pre-filled from the [resource]
+   * See http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population.
+   */
+  fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
+    populateInitialValues(questionnaire.item, resource)
+    return QuestionnaireResponse().apply {
+      item = questionnaire.item.map { it.createQuestionnaireResponseItem() }
+    }
+  }
+
+  private fun populateInitialValues(
+    questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
+    resource: Resource
+  ) {
+    questionnaireItems.forEach { populateInitialValue(it, resource) }
+  }
+
+  private fun populateInitialValue(
+    question: Questionnaire.QuestionnaireItemComponent,
+    resource: Resource
+  ) {
+    val context = FhirContext.forR4()
+    val fhirPathEngine =
+      FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
+    if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
+      populateInitialValues(question.item, resource)
+    } else {
+      question.fetchExpression?.let { exp ->
+        val answerExtracted = fhirPathEngine.evaluate(resource, exp.expression)[0] as Type
+        question.initial =
+          mutableListOf(Questionnaire.QuestionnaireItemInitialComponent().setValue(answerExtracted))
+      }
+    }
+  }
+
+  private val Questionnaire.QuestionnaireItemComponent.fetchExpression: Expression?
+    get() {
+      return this.extension.firstOrNull { it.url == ITEM_INITIAL_EXPRESSION_URL }?.let {
+        it.value as Expression
+      }
+    }
 
   /**
    * Extracts answer values from [questionnaireResponseItemList] and updates the fields defined in
@@ -355,6 +404,9 @@ private val Questionnaire.QuestionnaireItemComponent.getDefinitionField: Field?
  */
 private const val ITEM_CONTEXT_EXTENSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext"
+
+private const val ITEM_INITIAL_EXPRESSION_URL: String =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
 
 private val Field.isList: Boolean
   get() = isParameterized && type == List::class.java

@@ -25,9 +25,16 @@ import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
 import java.util.Date
 import org.hl7.fhir.r4.context.SimpleWorkerContext
+import org.hl7.fhir.r4.model.Address
+import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.ContactPoint
+import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 import org.intellij.lang.annotations.Language
@@ -562,16 +569,6 @@ class ResourceMapperTest {
                     {
                       "linkId": "PR-telecom-system",
                       "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
-                      "extension": [
-                        {
-                          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemContext",
-                          "valueExpression": {
-                            "expression": "ContactPoint$""" +
-        """ContactPointSystem",
-                            "name": "contactPointSystem"
-                          }
-                        }
-                      ],
                       "type": "string",
                       "text": "system",
                       "initial": [
@@ -605,7 +602,7 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+      """.trimIndent()
 
     @Language("JSON")
     val questionnaireResponseJson =
@@ -720,6 +717,251 @@ class ResourceMapperTest {
     assertThat(patient.telecom.get(0).value).isNull()
     assertThat(patient.name.first().given.first().toString()).isEqualTo("Simon")
     assertThat(patient.name.first().family).isEqualTo("Crawford")
+  }
+
+  @Test
+  fun populateResourceAnswers() {
+    val questionnaireJson =
+      """
+        {
+  "resourceType": "Questionnaire",
+  "id": "client-registration-sample",
+  "status": "active",
+  "date": "2020-11-18T07:24:47.111Z",
+  "subjectType": [
+    "Patient"
+  ],
+  "item": [
+    {
+      "linkId": "PR",
+      "type": "group",
+      "item": [
+        {
+          "linkId": "PR-name",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                  "valueExpression": {
+                    "language": "text/fhirpath",
+                    "expression": "Patient.name.given",
+                    "name": "patientName"
+                  }
+                }
+              ],
+              "linkId": "PR-name-text",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
+              "type": "string",
+              "text": "First Name"
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                  "valueExpression": {
+                    "language": "text/fhirpath",
+                    "expression": "Patient.name.family",
+                    "name": "patientFamily"
+                  }
+                }
+              ],
+              "linkId": "PR-name-family",
+              "definition": "http://hl7.org/fhir/StructureDefinition/datatypes#HumanName.family",
+              "type": "string",
+              "text": "Family Name"
+            }
+          ]
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": {
+                "language": "text/fhirpath",
+                "expression": "Patient.birthDate",
+                "name": "patientBirthDate"
+              }
+            }
+          ],
+          "linkId": "patient-0-birth-date",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate",
+          "type": "date",
+          "text": "Date of Birth"
+        },
+        {
+          "linkId": "patient-0-gender",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": {
+                "language": "text/fhirpath",
+                "expression": "Patient.gender.value",
+                "name": "patientGender"
+              }
+            }
+          ],
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
+          "initial": [
+            {
+              "valueString": "female"
+            }
+          ],
+          "type": "string",
+          "text": "Gender"
+        },
+        {
+          "linkId": "PR-telecom",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom",
+          "item": [
+            {
+              "linkId": "PR-telecom-system",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.system",
+              "type": "string",
+              "text": "system",
+              "initial": [
+                {
+                  "valueString": "phone"
+                }
+              ],
+              "enableWhen": [
+                {
+                  "question": "patient-0-gender",
+                  "operator": "=",
+                  "answerString": "ok"
+                }
+              ]
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                  "valueExpression": {
+                    "language": "text/fhirpath",
+                    "expression": "Patient.telecom.value",
+                    "name": "patientTelecom"
+                  }
+                }
+              ],
+              "linkId": "PR-telecom-value",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.telecom.value",
+              "type": "string",
+              "text": "Phone Number"
+            }
+          ]
+        },
+        {
+          "linkId": "PR-address",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                  "valueExpression": {
+                    "language": "text/fhirpath",
+                    "expression": "Patient.address.city",
+                    "name": "patientCity"
+                  }
+                }
+              ],
+              "linkId": "PR-address-city",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address.city",
+              "type": "string",
+              "text": "City"
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+                  "valueExpression": {
+                    "language": "text/fhirpath",
+                    "expression": "Patient.address.country",
+                    "name": "patientCity"
+                  }
+                }
+              ],
+              "linkId": "PR-address-country",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.address.country",
+              "type": "string",
+              "text": "Country"
+            }
+          ]
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": {
+                "language": "text/fhirpath",
+                "expression": "Patient.active",
+                "name": "patientActive"
+              }
+            }
+          ],
+          "linkId": "PR-active",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.active",
+          "type": "boolean",
+          "text": "Is Active?"
+        }
+      ]
+    }
+  ]
+}
+      """.trimIndent()
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+
+    val uriTestQuestionnaire =
+      iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
+        org.hl7.fhir.r4.model.Questionnaire
+
+    val patient = createPatientResource()
+    val response: QuestionnaireResponse = ResourceMapper.populate(uriTestQuestionnaire, patient)
+    val responseItem = response.item[0]
+    assertThat(((responseItem.item[0].item[0].answer[0]).value as StringType).valueAsString)
+      .isEqualTo("Salman")
+    assertThat(((responseItem.item[0].item[1].answer[0]).value as StringType).valueAsString)
+      .isEqualTo("Ali")
+    assertThat(((responseItem.item[1].answer[0]).value as DateType).valueAsString)
+      .isEqualTo("3896-09-17")
+    assertThat(((responseItem.item[2].answer[0]).value as StringType).valueAsString)
+      .isEqualTo("male")
+    assertThat(((responseItem.item[3].item[1].answer[0]).value as StringType).valueAsString)
+      .isEqualTo("12345")
+    assertThat(((responseItem.item[4].item[0].answer[0]).value as StringType).valueAsString)
+      .isEqualTo("Lahore")
+    assertThat(((responseItem.item[4].item[1].answer[0]).value as StringType).valueAsString)
+      .isEqualTo("Pakistan")
+    assertThat(((responseItem.item[5].answer[0]).value as BooleanType).booleanValue())
+      .isEqualTo(true)
+  }
+
+  private fun createPatientResource(): Patient {
+    return Patient().apply {
+      active = true
+      birthDate = Date(1996, 8, 17)
+      gender = Enumerations.AdministrativeGender.MALE
+      address =
+        listOf(
+          Address().apply {
+            city = "Lahore"
+            country = "Pakistan"
+          }
+        )
+      name =
+        listOf(
+          HumanName().apply {
+            given = mutableListOf(StringType("Salman"))
+            family = "Ali"
+          }
+        )
+      telecom = listOf(ContactPoint().apply { value = "12345" })
+    }
   }
 
   @Test
