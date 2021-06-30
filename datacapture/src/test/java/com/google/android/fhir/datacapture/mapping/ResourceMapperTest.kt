@@ -920,22 +920,22 @@ class ResourceMapperTest {
 
     val patient = createPatientResource()
     val response: QuestionnaireResponse = ResourceMapper.populate(uriTestQuestionnaire, patient)
-
-    assertThat(((response.item[0].item[0].item[0].answer[0]).value as StringType).valueAsString)
+    val responseItem = response.item[0]
+    assertThat(((responseItem.item[0].item[0].answer[0]).value as StringType).valueAsString)
       .isEqualTo("Salman")
-    assertThat(((response.item[0].item[0].item[1].answer[0]).value as StringType).valueAsString)
+    assertThat(((responseItem.item[0].item[1].answer[0]).value as StringType).valueAsString)
       .isEqualTo("Ali")
-    assertThat(((response.item[0].item[1].answer[0]).value as DateType).valueAsString)
+    assertThat(((responseItem.item[1].answer[0]).value as DateType).valueAsString)
       .isEqualTo("3896-09-17")
-    assertThat(((response.item[0].item[2].answer[0]).value as StringType).valueAsString)
+    assertThat(((responseItem.item[2].answer[0]).value as StringType).valueAsString)
       .isEqualTo("male")
-    assertThat(((response.item[0].item[3].item[1].answer[0]).value as StringType).valueAsString)
+    assertThat(((responseItem.item[3].item[1].answer[0]).value as StringType).valueAsString)
       .isEqualTo("12345")
-    assertThat(((response.item[0].item[4].item[0].answer[0]).value as StringType).valueAsString)
+    assertThat(((responseItem.item[4].item[0].answer[0]).value as StringType).valueAsString)
       .isEqualTo("Lahore")
-    assertThat(((response.item[0].item[4].item[1].answer[0]).value as StringType).valueAsString)
+    assertThat(((responseItem.item[4].item[1].answer[0]).value as StringType).valueAsString)
       .isEqualTo("Pakistan")
-    assertThat(((response.item[0].item[5].answer[0]).value as BooleanType).booleanValue())
+    assertThat(((responseItem.item[5].answer[0]).value as BooleanType).booleanValue())
       .isEqualTo(true)
   }
 
