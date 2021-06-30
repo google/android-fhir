@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import com.google.android.fhir.datacapture.views.QuestionnaireItemAutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
@@ -80,6 +81,8 @@ internal class QuestionnaireItemAdapter(
           QuestionnaireItemEditTextQuantityViewHolderFactory
         QuestionnaireItemViewHolderType.CHECK_BOX_GROUP ->
           QuestionnaireItemCheckBoxGroupViewHolderFactory
+        QuestionnaireItemViewHolderType.AUTO_COMPLETE ->
+          QuestionnaireItemAutoCompleteViewHolderFactory
       }
     return viewHolderFactory.create(parent)
   }
@@ -129,7 +132,10 @@ internal class QuestionnaireItemAdapter(
   private fun getChoiceViewHolderType(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
   ): QuestionnaireItemViewHolderType {
-    if (questionnaireItem.itemControl == ITEM_CONTROL_CHECK_BOX || questionnaireItem.repeats) {
+    if (questionnaireItem.itemControl == ITEM_CONTROL_AUTO_COMPLETE) {
+      return QuestionnaireItemViewHolderType.AUTO_COMPLETE
+    } else if (questionnaireItem.itemControl == ITEM_CONTROL_CHECK_BOX || questionnaireItem.repeats
+    ) {
       return QuestionnaireItemViewHolderType.CHECK_BOX_GROUP
     } else if (questionnaireItem.itemControl == ITEM_CONTROL_DROP_DOWN) {
       return QuestionnaireItemViewHolderType.DROP_DOWN

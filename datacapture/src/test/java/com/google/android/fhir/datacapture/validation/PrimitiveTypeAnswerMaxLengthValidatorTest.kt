@@ -16,7 +16,9 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android.content.Context
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import java.net.URI
 import java.text.SimpleDateFormat
@@ -32,6 +34,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComp
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.UriType
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -40,6 +43,14 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class PrimitiveTypeAnswerMaxLengthValidatorTest {
+
+  lateinit var context: Context
+
+  @Before
+  fun initContext() {
+    context = ApplicationProvider.getApplicationContext()
+  }
+
   @Test
   fun boolean_answerOverMaxLength_shouldReturnInvalidResult() {
     checkAnswerOverMaxLength(maxLength = 4, value = BooleanType(false))
@@ -124,13 +135,17 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
         )
       }
 
-    val validationResult = PrimitiveTypeAnswerMaxLengthValidator.validate(requirement, response)
+    val validationResult =
+      PrimitiveTypeAnswerMaxLengthValidator.validate(requirement, response, context)
 
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.message.isNullOrBlank()).isTrue()
   }
 
   private companion object {
+
+    var context: Context = ApplicationProvider.getApplicationContext()
+
     @JvmStatic
     fun checkAnswerOverMaxLength(maxLength: Int, value: PrimitiveType<*>) {
       val testComponent = createMaxLengthQuestionnaireTestItem(maxLength, value)
@@ -138,7 +153,8 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
       val validationResult =
         PrimitiveTypeAnswerMaxLengthValidator.validate(
           testComponent.requirement,
-          testComponent.response
+          testComponent.response,
+          context
         )
 
       assertThat(validationResult.isValid).isFalse()
@@ -155,7 +171,8 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
       val validationResult =
         PrimitiveTypeAnswerMaxLengthValidator.validate(
           testComponent.requirement,
-          testComponent.response
+          testComponent.response,
+          context
         )
 
       assertThat(validationResult.isValid).isTrue()

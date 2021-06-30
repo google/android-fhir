@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android.content.Context
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.PrimitiveType
@@ -40,7 +41,7 @@ internal object PrimitiveTypeAnswerMinLengthValidator :
         (answer.value as PrimitiveType<*>).asStringValue().length <
           (extension.value as IntegerType).value
     },
-    messageGenerator = { extension: Extension ->
+    messageGenerator = { extension: Extension, context: Context ->
       ("The minimum number of characters that are permitted in the answer is: " +
         extension.value.primitiveValue())
     }

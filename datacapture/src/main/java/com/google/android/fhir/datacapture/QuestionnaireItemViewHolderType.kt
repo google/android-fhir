@@ -39,7 +39,8 @@ internal enum class QuestionnaireItemViewHolderType(val value: Int) {
   DROP_DOWN(9),
   DISPLAY(10),
   QUANTITY(11),
-  CHECK_BOX_GROUP(12);
+  CHECK_BOX_GROUP(12),
+  AUTO_COMPLETE(13);
 
   companion object {
     private val VALUES = values()
