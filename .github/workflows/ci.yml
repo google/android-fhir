@@ -89,11 +89,11 @@ jobs:
           ${{ runner.os }}-gradlebuildcache-
 
     - name: Spotless check
-      if: matrix.full-build == true
+      if: ${{ matrix.full-build == true }}
       run: ./gradlew spotlessCheck
 
     - name: Build with Gradle
-      if: matrix.full-build == true
+      if: ${{ matrix.full-build == true }}
       run: ./gradlew build
 
     - name: AVD cache
