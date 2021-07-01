@@ -18,6 +18,7 @@ package com.google.android.fhir.hapiprotoconverter
 
 import android.annotation.SuppressLint
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
+import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.StructureDefinition
 import com.google.fhir.r4.core.StructureDefinitionKindCode
 import com.google.fhir.shaded.common.collect.ImmutableList
@@ -52,20 +53,20 @@ object PrimitiveCodegen {
 
   @SuppressLint("DefaultLocale")
   fun generate(def: StructureDefinition, outLocation: File? = null) {
-    require(def.kind.value == StructureDefinitionKindCode.Value.PRIMITIVE_TYPE) {
-      "structure definition needs to be of type primitive"
-    }
+//    require(def.kind.value == StructureDefinitionKindCode.Value.PRIMITIVE_TYPE) {
+//      "structure definition needs to be of type primitive"
+//    }
     val hapiName = "${def.id.value.capitalize()}Type"
     val protoName = def.id.value.capitalize()
 
     val fileBuilder =
       FileSpec.builder(
-        "com.google.android.fhir.hapiprotoconverter.primitive",
+        "com.google.android.fhir.hapiprotoconverter.generated",
         "${hapiName}Converter"
       )
     val primitiveConverterClass =
       ClassName(
-        "com.google.android.fhir.hapiprotoconverter.primitive",
+        "com.google.android.fhir.hapiprotoconverter.generated",
         def.id.value.capitalize() + "Converter"
       )
 
@@ -99,7 +100,7 @@ object PrimitiveCodegen {
 
     when (def.id.value) {
       in TIME_LIKE_PRECISION_MAP.keys -> {
-        toProtoBuilder.addStatement(".setPrecision(precision.ToProtoPrecision())")
+        toProtoBuilder.addStatement(".setPrecision(precision.toProtoPrecision())")
         val precisionToProtoFunc =
           FunSpec.builder("toProtoPrecision")
             .addModifiers(KModifier.PRIVATE)
@@ -169,6 +170,10 @@ object PrimitiveCodegen {
         )
         toHapiBuilder.addStatement("hapiValue.value = value.toStringUtf8().toByteArray()")
       }
+      "decimal"-> {
+        toProtoBuilder.addStatement(".setValue(valueAsString)")
+        toHapiBuilder.addStatement("hapiValue.valueAsString = value")
+      }
       else -> {
         toProtoBuilder.addStatement(".setValue(value)")
         toHapiBuilder.addStatement("hapiValue.value = value")
@@ -188,7 +193,7 @@ object PrimitiveCodegen {
       )
       .build()
       // Write to System.out for now
-      // .writeTo(outLocation)
+       //.writeTo(outLocation!!)
       .writeTo(System.out)
   }
 }
