@@ -60,7 +60,7 @@ object PrimitiveCodegen {
     val fileBuilder =
       FileSpec.builder(
         "com.google.android.fhir.hapiprotoconverter.generated",
-        "${hapiName}Converter"
+        "${protoName}Converter"
       )
     val primitiveConverterClass =
       ClassName(
@@ -191,7 +191,8 @@ object PrimitiveCodegen {
       )
       .build()
       // Write to System.out for now
-      // .writeTo(outLocation!!)
-      .writeTo(System.out)
+       .writeTo(outLocation!!)
+      //.writeTo(System.out)
   }
 }
+
