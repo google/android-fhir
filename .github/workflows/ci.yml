@@ -41,7 +41,10 @@ jobs:
     
     strategy:
       matrix:
-        api-level: [24, 27, 29]
+        api-level: [24, 27, 29, 30]
+        include:
+          - api-level: 30
+          - full-build: true
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - name: Cancel previous
@@ -86,18 +89,42 @@ jobs:
           ${{ runner.os }}-gradlebuildcache-
 
     - name: Spotless check
-      if: matrix.api-level == 29  # don't spotless on older APIs
+      if: matrix.full-build == true
       run: ./gradlew spotlessCheck
 
     - name: Build with Gradle
-      if: matrix.api-level == 29 # don't run full build on older APIs
+      if: matrix.full-build == true
       run: ./gradlew build
+
+    - name: AVD cache
+      uses: actions/cache@v2
+      id: avd-cache
+      with:
+        path: |
+          ~/.android/avd/*
+          ~/.android/adb*
+        key: avd-${{ matrix.api-level }}
+
+    - name: create AVD and generate snapshot for caching
+      if: steps.avd-cache.outputs.cache-hit != 'true'
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: ${{ matrix.api-level }}
+        force-avd-creation: false
+        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: false
+        script: echo "Generated AVD snapshot for caching."
+
     - name: Run Integration Tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: ${{ matrix.api-level }}
         arch: x86_64
+        force-avd-creation: false
+        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: true
         script: ./gradlew connectedCheck --stacktrace
+
     - name: Release artifacts to local repo
       run: ./gradlew publishReleasePublicationToCIRepository
     - name: Upload maven repo
