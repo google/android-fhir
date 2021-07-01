@@ -18,9 +18,7 @@ package com.google.android.fhir.hapiprotoconverter
 
 import android.annotation.SuppressLint
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
-import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.StructureDefinition
-import com.google.fhir.r4.core.StructureDefinitionKindCode
 import com.google.fhir.shaded.common.collect.ImmutableList
 import com.google.fhir.shaded.common.collect.ImmutableMap
 import com.google.fhir.shaded.protobuf.ByteString
@@ -53,9 +51,9 @@ object PrimitiveCodegen {
 
   @SuppressLint("DefaultLocale")
   fun generate(def: StructureDefinition, outLocation: File? = null) {
-//    require(def.kind.value == StructureDefinitionKindCode.Value.PRIMITIVE_TYPE) {
-//      "structure definition needs to be of type primitive"
-//    }
+    //    require(def.kind.value == StructureDefinitionKindCode.Value.PRIMITIVE_TYPE) {
+    //      "structure definition needs to be of type primitive"
+    //    }
     val hapiName = "${def.id.value.capitalize()}Type"
     val protoName = def.id.value.capitalize()
 
@@ -170,7 +168,7 @@ object PrimitiveCodegen {
         )
         toHapiBuilder.addStatement("hapiValue.value = value.toStringUtf8().toByteArray()")
       }
-      "decimal"-> {
+      "decimal" -> {
         toProtoBuilder.addStatement(".setValue(valueAsString)")
         toHapiBuilder.addStatement("hapiValue.valueAsString = value")
       }
@@ -193,7 +191,7 @@ object PrimitiveCodegen {
       )
       .build()
       // Write to System.out for now
-       //.writeTo(outLocation!!)
+      // .writeTo(outLocation!!)
       .writeTo(System.out)
   }
 }

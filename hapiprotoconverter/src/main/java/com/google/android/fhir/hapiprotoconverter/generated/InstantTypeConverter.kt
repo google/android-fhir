@@ -1,19 +1,36 @@
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import com.google.fhir.r4.core.Instant
+import java.time.Instant as InstantUtil
 import java.util.Date
 import java.util.TimeZone
 import org.hl7.fhir.r4.model.InstantType
-import java.time.Instant as InstantUtil
 
 public object InstantConverter {
   public fun InstantType.toProto(): Instant {
-    val protoValue = Instant.newBuilder()
-    .setTimezone(timeZone.id)
-    .setValueUs(value.time)
-    .setPrecision(precision.toProtoPrecision())
-    .build()
+    val protoValue =
+      Instant.newBuilder()
+        .setTimezone(timeZone.id)
+        .setValueUs(value.time)
+        .setPrecision(precision.toProtoPrecision())
+        .build()
     return protoValue
   }
 
@@ -24,15 +41,17 @@ public object InstantConverter {
     return hapiValue
   }
 
-  private fun TemporalPrecisionEnum.toProtoPrecision(): Instant.Precision = when(this) {
-    TemporalPrecisionEnum.SECOND -> Instant.Precision.SECOND
-    TemporalPrecisionEnum.MILLI -> Instant.Precision.MILLISECOND
-    else ->Instant.Precision.PRECISION_UNSPECIFIED
-  }
+  private fun TemporalPrecisionEnum.toProtoPrecision(): Instant.Precision =
+    when (this) {
+      TemporalPrecisionEnum.SECOND -> Instant.Precision.SECOND
+      TemporalPrecisionEnum.MILLI -> Instant.Precision.MILLISECOND
+      else -> Instant.Precision.PRECISION_UNSPECIFIED
+    }
 
-  private fun Instant.Precision.toHapiPrecision(): TemporalPrecisionEnum = when(this) {
-    Instant.Precision.SECOND -> TemporalPrecisionEnum.SECOND
-    Instant.Precision.MILLISECOND-> TemporalPrecisionEnum.MILLI
-    else ->TemporalPrecisionEnum.MILLI
-  }
+  private fun Instant.Precision.toHapiPrecision(): TemporalPrecisionEnum =
+    when (this) {
+      Instant.Precision.SECOND -> TemporalPrecisionEnum.SECOND
+      Instant.Precision.MILLISECOND -> TemporalPrecisionEnum.MILLI
+      else -> TemporalPrecisionEnum.MILLI
+    }
 }
