@@ -53,22 +53,10 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
 
   @Test
   fun noAnswer_shouldReturnValidResult() {
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply { this.maxLength = maxLength }
-    val questionnaireResponseItem =
-      QuestionnaireResponseItemComponent().apply {
-        addAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            this.value = value
-          }
-        )
-      }
-    QuestionnaireTestItem(questionnaireItem, questionnaireResponseItem)
-
     val validationResult =
       PrimitiveTypeAnswerMaxLengthValidator.validate(
-        questionnaireItem,
-        questionnaireResponseItem,
+        Questionnaire.QuestionnaireItemComponent().apply { this.maxLength = maxLength },
+        QuestionnaireResponseItemComponent(),
         Companion.context
       )
 
