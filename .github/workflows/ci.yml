@@ -87,7 +87,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradlejars-
     - name: Gradle build cache
-    - uses: actions/cache@v1
+      uses: actions/cache@v1
       with:
         path: ~/.gradle/caches/build-cache-1
         key: ${{ runner.os }}-gradlebuildcache-${{ hashFiles('checksum.txt') }}
