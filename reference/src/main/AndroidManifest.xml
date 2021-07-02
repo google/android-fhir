@@ -16,6 +16,7 @@
 -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.google.android.fhir.reference"
 >
 
@@ -29,6 +30,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
     >
+        <activity
+            android:name="com.google.android.fhir.reference.ips.IPSActivity"
+            android:label="FHIR Patients implementation"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="Instantiatable"
+            android:parentActivityName=".MainActivity"/>
         <activity
             android:name="com.google.android.fhir.reference.MainActivity"
             android:label="@string/title_patient_list"

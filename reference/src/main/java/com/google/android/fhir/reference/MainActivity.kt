@@ -41,6 +41,8 @@ class MainActivity : AppCompatActivity() {
     setSupportActionBar(toolbar)
     toolbar.title = title
 
+    binding.button.setOnClickListener {  }
+
     Sync.periodicSync<FhirPeriodicSyncWorker>(
       this,
       PeriodicSyncConfiguration(
