@@ -107,6 +107,7 @@ jobs:
       with:
         api-level: ${{ matrix.api-level }}
         arch: x86_64
+        emulator-build: 7425822 # https://github.com/ReactiveCircus/android-emulator-runner/issues/160
         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         disable-animations: true
         script: ./gradlew connectedCheck --stacktrace
