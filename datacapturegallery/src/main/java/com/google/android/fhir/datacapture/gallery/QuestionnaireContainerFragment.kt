@@ -51,7 +51,7 @@ class QuestionnaireContainerFragment : Fragment() {
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? {
+  ): View {
     super.onCreate(savedInstanceState)
     _binding = FragmentQuestionnaireContainerBinding.inflate(inflater, container, false)
     requireArguments().putString(QUESTIONNAIRE_FILE_PATH_KEY, args.questionnaireFilePathKey)
@@ -64,7 +64,9 @@ class QuestionnaireContainerFragment : Fragment() {
     }
     // Only add the fragment once, when this fragment is first created.
     if (savedInstanceState == null) {
-      val fragment = QuestionnaireFragment()
+
+      val fragment = CustomQuestionnaireFragment()
+
       fragment.arguments =
         bundleOf(
           QuestionnaireFragment.BUNDLE_KEY_QUESTIONNAIRE to viewModel.questionnaire,

@@ -48,9 +48,18 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
         dateInputEditText = itemView.findViewById(R.id.dateInputEditText)
         // Disable direct text input to only allow input from the date picker dialog
         dateInputEditText.keyListener = null
-        dateInputEditText.setOnFocusChangeListener { _: View, hasFocus: Boolean ->
+        dateInputEditText.setOnFocusChangeListener { view: View, hasFocus: Boolean ->
           // Do not show the date picker dialog when losing focus.
-          if (!hasFocus) return@setOnFocusChangeListener
+          if (!hasFocus) {
+            applyValidationResult(
+              QuestionnaireResponseItemValidator.validate(
+                questionnaireItemViewItem.questionnaireItem,
+                questionnaireItemViewItem.questionnaireResponseItem,
+                view.context
+              )
+            )
+            return@setOnFocusChangeListener
+          }
 
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
@@ -157,12 +166,6 @@ internal object QuestionnaireItemDateTimePickerViewHolderFactory :
               )
             )
         questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-        applyValidationResult(
-          QuestionnaireResponseItemValidator.validate(
-            questionnaireItemViewItem.questionnaireItem,
-            questionnaireItemViewItem.questionnaireResponseItem
-          )
-        )
       }
 
       private fun applyValidationResult(validationResult: ValidationResult) {

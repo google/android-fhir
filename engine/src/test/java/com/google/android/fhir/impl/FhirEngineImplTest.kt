@@ -18,8 +18,7 @@ package com.google.android.fhir.impl
 
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirServices.Companion.builder
-import com.google.android.fhir.ResourceNotFoundException
-import com.google.android.fhir.db.ResourceNotFoundInDbException
+import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.resource.TestingUtils
@@ -70,7 +69,7 @@ class FhirEngineImplTest {
   @Test
   fun update_nonexistentResource_shouldNotInsertResource() {
     val exception =
-      assertThrows(ResourceNotFoundInDbException::class.java) {
+      assertThrows(ResourceNotFoundException::class.java) {
         runBlocking { fhirEngine.update(TEST_PATIENT_2) }
       }
     assertThat(exception.message)

@@ -16,7 +16,9 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android.content.Context
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import java.net.URI
 import java.text.SimpleDateFormat
@@ -33,6 +35,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnsw
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.UriType
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -41,6 +44,13 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class RegexValidatorTest {
+
+  lateinit var context: Context
+
+  @Before
+  fun initContext() {
+    context = ApplicationProvider.getApplicationContext()
+  }
 
   @Test
   fun boolean_notMatchingRegex_shouldReturnInvalidResult() {
@@ -155,7 +165,7 @@ class RegexValidatorTest {
         )
       }
 
-    val validationResult = RegexValidator.validate(requirement, response)
+    val validationResult = RegexValidator.validate(requirement, response, context)
 
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.message.isNullOrBlank()).isTrue()
@@ -163,12 +173,14 @@ class RegexValidatorTest {
 
   private companion object {
 
+    var context: Context = ApplicationProvider.getApplicationContext()
+
     @JvmStatic
     fun checkAnswerMatchingRegex(regex: String, value: PrimitiveType<*>) {
       val testComponent = createRegexQuestionnaireTestItem(regex, value)
 
       val validationResult =
-        RegexValidator.validate(testComponent.requirement, testComponent.response)
+        RegexValidator.validate(testComponent.requirement, testComponent.response, context)
 
       assertThat(validationResult.isValid).isTrue()
       assertThat(validationResult.message.isNullOrBlank()).isTrue()
@@ -179,7 +191,7 @@ class RegexValidatorTest {
       val testComponent = createRegexQuestionnaireTestItem(regex, value)
 
       val validationResult =
-        RegexValidator.validate(testComponent.requirement, testComponent.response)
+        RegexValidator.validate(testComponent.requirement, testComponent.response, context)
 
       assertThat(validationResult.isValid).isFalse()
       assertThat(validationResult.message)

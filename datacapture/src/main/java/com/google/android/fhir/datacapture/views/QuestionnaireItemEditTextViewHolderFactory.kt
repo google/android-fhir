@@ -52,12 +52,17 @@ internal abstract class QuestionnaireItemEditTextViewHolderDelegate(
     textInputEditText.doAfterTextChanged { editable: Editable? ->
       questionnaireItemViewItem.singleAnswerOrNull = getValue(editable.toString())
       questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
-      applyValidationResult(
-        QuestionnaireResponseItemValidator.validate(
-          questionnaireItemViewItem.questionnaireItem,
-          questionnaireItemViewItem.questionnaireResponseItem
+    }
+    textInputEditText.setOnFocusChangeListener { view, hasFocus ->
+      if (!hasFocus) {
+        applyValidationResult(
+          QuestionnaireResponseItemValidator.validate(
+            questionnaireItemViewItem.questionnaireItem,
+            questionnaireItemViewItem.questionnaireResponseItem,
+            view.context
+          )
         )
-      )
+      }
     }
   }
 

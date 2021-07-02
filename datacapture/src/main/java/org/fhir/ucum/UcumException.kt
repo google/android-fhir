@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir
+package org.fhir.ucum
 
-/** Thrown to indicate that the requested resource is not found. */
-class ResourceNotFoundException(val type: String, val id: String, cause: Throwable) :
-  Exception("Resource not found with type $type and id $id!", cause)
+import org.hl7.fhir.exceptions.FHIRException
+
+/** Needed for HAPI's FHIRPathEngine. See https://github.com/hapifhir/hapi-fhir/issues/2443. */
+class UcumException : FHIRException {
+  constructor() {}
+  constructor(message: String?, cause: Throwable?) : super(message, cause) {}
+  constructor(message: String?) : super(message) {}
+  constructor(cause: Throwable?) : super(cause) {}
+}

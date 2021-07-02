@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import com.google.android.fhir.datacapture.views.QuestionnaireItemAutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemCheckBoxViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemDatePickerViewHolderFactory
@@ -37,13 +38,27 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
-internal class QuestionnaireItemAdapter :
-  ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
+internal class QuestionnaireItemAdapter(
+  private val questionnaireItemViewHolderMatchers:
+    List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> =
+    emptyList()
+) : ListAdapter<QuestionnaireItemViewItem, QuestionnaireItemViewHolder>(DiffCallback) {
   /**
    * @param viewType the integer value of the [QuestionnaireItemViewHolderType] used to render the
    * [QuestionnaireItemViewItem].
    */
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
+    val numOfCanonicalWidgets = QuestionnaireItemViewHolderType.values().size
+    check(viewType < numOfCanonicalWidgets + questionnaireItemViewHolderMatchers.size) {
+      "Invalid widget type specified. Widget Int type cannot exceed the total number of supported custom and canonical widgets"
+    }
+
+    // Map custom widget viewTypes to their corresponding widget factories
+    if (viewType >= numOfCanonicalWidgets)
+      return questionnaireItemViewHolderMatchers[viewType - numOfCanonicalWidgets].factory.create(
+        parent
+      )
+
     val viewHolderFactory =
       when (QuestionnaireItemViewHolderType.fromInt(viewType)) {
         QuestionnaireItemViewHolderType.GROUP -> QuestionnaireItemGroupViewHolderFactory
@@ -66,6 +81,8 @@ internal class QuestionnaireItemAdapter :
           QuestionnaireItemEditTextQuantityViewHolderFactory
         QuestionnaireItemViewHolderType.CHECK_BOX_GROUP ->
           QuestionnaireItemCheckBoxGroupViewHolderFactory
+        QuestionnaireItemViewHolderType.AUTO_COMPLETE ->
+          QuestionnaireItemAutoCompleteViewHolderFactory
       }
     return viewHolderFactory.create(parent)
   }
@@ -82,7 +99,20 @@ internal class QuestionnaireItemAdapter :
    * extension (http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html).
    */
   override fun getItemViewType(position: Int): Int {
-    val questionnaireItem = getItem(position).questionnaireItem
+    return getItemViewTypeMapping(getItem(position).questionnaireItem)
+  }
+
+  internal fun getItemViewTypeMapping(
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent
+  ): Int {
+    // For custom widgets, generate an int value that's greater than any int assigned to the
+    // canonical FHIR widgets
+    questionnaireItemViewHolderMatchers.forEachIndexed { index, matcher ->
+      if (matcher.matches(questionnaireItem)) {
+        return index + QuestionnaireItemViewHolderType.values().size
+      }
+    }
+
     return when (val type = questionnaireItem.type) {
       QuestionnaireItemType.GROUP -> QuestionnaireItemViewHolderType.GROUP
       QuestionnaireItemType.BOOLEAN -> QuestionnaireItemViewHolderType.CHECK_BOX
@@ -102,7 +132,10 @@ internal class QuestionnaireItemAdapter :
   private fun getChoiceViewHolderType(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
   ): QuestionnaireItemViewHolderType {
-    if (questionnaireItem.itemControl == ITEM_CONTROL_CHECK_BOX || questionnaireItem.repeats) {
+    if (questionnaireItem.itemControl == ITEM_CONTROL_AUTO_COMPLETE) {
+      return QuestionnaireItemViewHolderType.AUTO_COMPLETE
+    } else if (questionnaireItem.itemControl == ITEM_CONTROL_CHECK_BOX || questionnaireItem.repeats
+    ) {
       return QuestionnaireItemViewHolderType.CHECK_BOX_GROUP
     } else if (questionnaireItem.itemControl == ITEM_CONTROL_DROP_DOWN) {
       return QuestionnaireItemViewHolderType.DROP_DOWN

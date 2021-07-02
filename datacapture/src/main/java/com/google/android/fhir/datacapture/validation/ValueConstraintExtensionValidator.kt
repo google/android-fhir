@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android.content.Context
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -25,18 +26,22 @@ internal open class ValueConstraintExtensionValidator(
   val url: String,
   val predicate:
     (Extension, QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> Boolean,
-  val messageGenerator: (Extension) -> String
+  val messageGenerator: (Extension, Context) -> String
 ) : ConstraintValidator {
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    context: Context
   ): ConstraintValidator.ConstraintValidationResult {
-    if (questionnaireItem.hasExtension(url)) {
+    if (questionnaireItem.hasExtension(url) && !questionnaireResponseItem.answer.isEmpty()) {
       val extension = questionnaireItem.getExtensionByUrl(url)
       // TODO(https://github.com/google/android-fhir/issues/487): Validates all answers.
       val answer = questionnaireResponseItem.answer[0]
       if (predicate(extension, answer)) {
-        return ConstraintValidator.ConstraintValidationResult(false, messageGenerator(extension))
+        return ConstraintValidator.ConstraintValidationResult(
+          false,
+          messageGenerator(extension, context)
+        )
       }
     }
     return ConstraintValidator.ConstraintValidationResult(true, null)

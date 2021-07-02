@@ -20,7 +20,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirServices
-import com.google.android.fhir.db.ResourceNotFoundInDbException
+import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
@@ -131,12 +131,12 @@ class DatabaseImplTest {
 
   @Test
   fun update_nonExistingResource_shouldNotInsertResource() {
-    val resourceNotFoundInDbException =
-      assertThrows(ResourceNotFoundInDbException::class.java) {
+    val resourceNotFoundException =
+      assertThrows(ResourceNotFoundException::class.java) {
         runBlocking { database.update(TEST_PATIENT_2) }
       }
     /* ktlint-disable max-line-length */
-    assertThat(resourceNotFoundInDbException.message)
+    assertThat(resourceNotFoundException.message)
       .isEqualTo(
         "Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!"
         /* ktlint-enable max-line-length */
@@ -156,7 +156,7 @@ class DatabaseImplTest {
   @Test
   fun select_nonexistentResource_shouldThrowResourceNotFoundException() {
     val resourceNotFoundException =
-      assertThrows(ResourceNotFoundInDbException::class.java) {
+      assertThrows(ResourceNotFoundException::class.java) {
         runBlocking { database.select(Patient::class.java, "nonexistent_patient") }
       }
     assertThat(resourceNotFoundException.message)
@@ -1314,6 +1314,24 @@ class DatabaseImplTest {
           .getQuery()
       )
     assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_nameGivenDuplicate_deduplicatePatient() = runBlocking {
+    var patient: Patient =
+      testingUtils.readFromFile(Patient::class.java, "/patient_name_given_duplicate.json")
+    database.insertRemote(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            sort(Patient.GIVEN, Order.ASCENDING)
+            count = 100
+            from = 0
+          }
+          .getQuery()
+      )
+    assertThat(result.filter { it.id == patient.id }).hasSize(1)
   }
 
   private companion object {

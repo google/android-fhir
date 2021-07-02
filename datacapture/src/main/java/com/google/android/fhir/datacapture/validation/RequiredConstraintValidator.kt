@@ -17,36 +17,22 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
+import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-internal object QuestionnaireResponseItemValidator {
-
-  private val validators =
-    mutableListOf(
-      RequiredConstraintValidator,
-      MaxValueConstraintValidator,
-      MinValueConstraintValidator,
-      PrimitiveTypeAnswerMaxLengthValidator,
-      PrimitiveTypeAnswerMinLengthValidator,
-      RegexValidator
-    )
-
-  /** Validates [questionnaireResponseItem] contains valid answer(s) to [questionnaireItem]. */
-  fun validate(
+internal object RequiredConstraintValidator : ConstraintValidator {
+  override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     context: Context
-  ): ValidationResult {
-    val validationResults = mutableListOf<ConstraintValidator.ConstraintValidationResult>()
-    validators.forEach {
-      validationResults.add(it.validate(questionnaireItem, questionnaireResponseItem, context))
+  ): ConstraintValidator.ConstraintValidationResult {
+    if (questionnaireItem.required && questionnaireResponseItem.answer.isEmpty()) {
+      return ConstraintValidator.ConstraintValidationResult(
+        false,
+        context.getString(R.string.required_constraint_validation_error_msg)
+      )
     }
-    return ValidationResult(
-      validationResults.all { it.isValid },
-      validationResults.mapNotNull { it.message }.toList()
-    )
+    return ConstraintValidator.ConstraintValidationResult(true, null)
   }
 }
-
-data class ValidationResult(var isValid: Boolean, val validationMessages: List<String>)

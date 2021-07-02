@@ -46,7 +46,7 @@ internal abstract class ResourceDao {
   lateinit var iParser: IParser
 
   @Transaction
-  open fun update(resource: Resource) {
+  open suspend fun update(resource: Resource) {
     updateResource(
       resource.logicalId,
       resource.resourceType,
@@ -64,41 +64,41 @@ internal abstract class ResourceDao {
   }
 
   @Transaction
-  open fun insert(resource: Resource) {
+  open suspend fun insert(resource: Resource) {
     insertResource(resource)
   }
 
   @Transaction
-  open fun insertAll(resources: List<Resource>) {
+  open suspend fun insertAll(resources: List<Resource>) {
     resources.forEach { resource -> insertResource(resource) }
   }
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract fun insertResource(resource: ResourceEntity)
+  abstract suspend fun insertResource(resource: ResourceEntity)
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract fun insertStringIndex(stringIndexEntity: StringIndexEntity)
+  abstract suspend fun insertStringIndex(stringIndexEntity: StringIndexEntity)
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract fun insertReferenceIndex(referenceIndexEntity: ReferenceIndexEntity)
+  abstract suspend fun insertReferenceIndex(referenceIndexEntity: ReferenceIndexEntity)
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract fun insertCodeIndex(tokenIndexEntity: TokenIndexEntity)
+  abstract suspend fun insertCodeIndex(tokenIndexEntity: TokenIndexEntity)
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract fun insertQuantityIndex(quantityIndexEntity: QuantityIndexEntity)
+  abstract suspend fun insertQuantityIndex(quantityIndexEntity: QuantityIndexEntity)
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract fun insertUriIndex(uriIndexEntity: UriIndexEntity)
+  abstract suspend fun insertUriIndex(uriIndexEntity: UriIndexEntity)
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract fun insertDateIndex(dateIndexEntity: DateIndexEntity)
+  abstract suspend fun insertDateIndex(dateIndexEntity: DateIndexEntity)
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract fun insertNumberIndex(numberIndexEntity: NumberIndexEntity)
+  abstract suspend fun insertNumberIndex(numberIndexEntity: NumberIndexEntity)
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract fun insertPositionIndex(positionIndexEntity: PositionIndexEntity)
+  abstract suspend fun insertPositionIndex(positionIndexEntity: PositionIndexEntity)
 
   @Query(
     """
@@ -108,7 +108,7 @@ internal abstract class ResourceDao {
         AND resourceType = :resourceType
         """
   )
-  abstract fun updateResource(
+  abstract suspend fun updateResource(
     resourceId: String,
     resourceType: ResourceType,
     serializedResource: String
@@ -119,7 +119,7 @@ internal abstract class ResourceDao {
         DELETE FROM ResourceEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType"""
   )
-  abstract fun deleteResource(resourceId: String, resourceType: ResourceType): Int
+  abstract suspend fun deleteResource(resourceId: String, resourceType: ResourceType): Int
 
   @Query(
     """
@@ -127,7 +127,7 @@ internal abstract class ResourceDao {
         FROM ResourceEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType"""
   )
-  abstract fun getResource(resourceId: String, resourceType: ResourceType): String?
+  abstract suspend fun getResource(resourceId: String, resourceType: ResourceType): String?
 
   @Query(
     """
@@ -140,7 +140,7 @@ internal abstract class ResourceDao {
             AND ReferenceIndexEntity.index_path = :indexPath
             AND ReferenceIndexEntity.index_value = :indexValue"""
   )
-  abstract fun getResourceByReferenceIndex(
+  abstract suspend fun getResourceByReferenceIndex(
     resourceType: String,
     indexPath: String,
     indexValue: String
@@ -157,7 +157,7 @@ internal abstract class ResourceDao {
             AND StringIndexEntity.index_path = :indexPath
             AND StringIndexEntity.index_value = :indexValue"""
   )
-  abstract fun getResourceByStringIndex(
+  abstract suspend fun getResourceByStringIndex(
     resourceType: String,
     indexPath: String,
     indexValue: String
@@ -175,18 +175,18 @@ internal abstract class ResourceDao {
             AND TokenIndexEntity.index_system = :indexSystem
             AND TokenIndexEntity.index_value = :indexValue"""
   )
-  abstract fun getResourceByCodeIndex(
+  abstract suspend fun getResourceByCodeIndex(
     resourceType: String,
     indexPath: String,
     indexSystem: String,
     indexValue: String
   ): List<String>
 
-  @RawQuery abstract fun getResources(query: SupportSQLiteQuery): List<String>
+  @RawQuery abstract suspend fun getResources(query: SupportSQLiteQuery): List<String>
 
-  @RawQuery abstract fun countResources(query: SupportSQLiteQuery): Long
+  @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
-  private fun insertResource(resource: Resource) {
+  private suspend fun insertResource(resource: Resource) {
     val entity =
       ResourceEntity(
         id = 0,
@@ -199,7 +199,7 @@ internal abstract class ResourceDao {
     updateIndicesForResource(index, entity)
   }
 
-  private fun updateIndicesForResource(index: ResourceIndices, resource: ResourceEntity) {
+  private suspend fun updateIndicesForResource(index: ResourceIndices, resource: ResourceEntity) {
     // TODO Move StringIndices to persistable types
     //  https://github.com/jingtang10/fhir-engine/issues/31
     //  we can either use room-autovalue integration or go w/ embedded data classes.

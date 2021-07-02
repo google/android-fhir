@@ -54,14 +54,61 @@ internal data class ResourceIndices(
     private val numberIndices = mutableListOf<NumberIndex>()
     private val positionIndices = mutableListOf<PositionIndex>()
 
-    fun addNumberIndex(numberIndex: NumberIndex) = numberIndices.add(numberIndex)
-    fun addDateIndex(dateIndex: DateIndex) = dateIndices.add(dateIndex)
-    fun addStringIndex(stringIndex: StringIndex) = stringIndices.add(stringIndex)
-    fun addUriIndex(uriIndex: UriIndex) = uriIndices.add(uriIndex)
-    fun addTokenIndex(tokenIndex: TokenIndex) = tokenIndices.add(tokenIndex)
-    fun addQuantityIndex(quantityIndex: QuantityIndex) = quantityIndices.add(quantityIndex)
-    fun addReferenceIndex(referenceIndex: ReferenceIndex) = referenceIndices.add(referenceIndex)
-    fun addPositionIndex(positionIndex: PositionIndex) = positionIndices.add(positionIndex)
+    fun addNumberIndex(numberIndex: NumberIndex) {
+      if (numberIndices.contains(numberIndex)) {
+        return
+      }
+      numberIndices.add(numberIndex)
+    }
+
+    fun addDateIndex(dateIndex: DateIndex) {
+      if (dateIndices.contains(dateIndex)) {
+        return
+      }
+      dateIndices.add(dateIndex)
+    }
+
+    fun addStringIndex(stringIndex: StringIndex) {
+      if (stringIndices.contains(stringIndex)) {
+        return
+      }
+      stringIndices.add(stringIndex)
+    }
+
+    fun addUriIndex(uriIndex: UriIndex) {
+      if (uriIndices.contains(uriIndex)) {
+        return
+      }
+      uriIndices.add(uriIndex)
+    }
+
+    fun addTokenIndex(tokenIndex: TokenIndex) {
+      if (tokenIndices.contains(tokenIndex)) {
+        return
+      }
+      tokenIndices.add(tokenIndex)
+    }
+
+    fun addQuantityIndex(quantityIndex: QuantityIndex) {
+      if (quantityIndices.contains(quantityIndex)) {
+        return
+      }
+      quantityIndices.add(quantityIndex)
+    }
+
+    fun addReferenceIndex(referenceIndex: ReferenceIndex) {
+      if (referenceIndices.contains(referenceIndex)) {
+        return
+      }
+      referenceIndices.add(referenceIndex)
+    }
+
+    fun addPositionIndex(positionIndex: PositionIndex) {
+      if (positionIndices.contains(positionIndex)) {
+        return
+      }
+      positionIndices.add(positionIndex)
+    }
 
     fun build() =
       ResourceIndices(
