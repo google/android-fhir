@@ -31,8 +31,6 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import java.io.File
-import java.util.Date as DateUtil
-import kotlin.reflect.KClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -42,13 +40,16 @@ object PrimitiveTestCodegen {
 
   private const val protoPackage = "com.google.fhir.r4.core"
   private const val hapiPackage = "org.hl7.fhir.r4.model"
-  val TIME_LIKE_TEST = listOf("date", "dateTime", "instant")
+  private val TIME_LIKE_TEST = listOf("date", "dateTime", "instant")
+  private const val TIME_LIKE_TEST_TEMPLATE =
+    "%1T.assertThat(proto.%2M().precision).isEquivalentAccordingToCompareTo(hapi.precision)\n%1T.assertThat(proto.%2M().timeZone.id).isEqualTo(hapi.timeZone.id)\n"
 
   @SuppressLint("DefaultLocale")
   fun generate(def: StructureDefinition, outLocation: File? = null) {
     require(def.kind.value == StructureDefinitionKindCode.Value.PRIMITIVE_TYPE) {
       "structure definition needs to be of type primitive"
     }
+
     val hapiName = "${def.id.value.capitalize()}Type"
     val protoName = def.id.value.capitalize()
 
@@ -57,6 +58,7 @@ object PrimitiveTestCodegen {
         "com.google.android.fhir.hapiprotoconverter.generated",
         "${protoName}ConverterTest"
       )
+
     val primitiveConverterClass =
       ClassName(
         "com.google.android.fhir.hapiprotoconverter.generated",
@@ -71,8 +73,6 @@ object PrimitiveTestCodegen {
             .build()
         )
 
-    mutableListOf<FunSpec>()
-
     val parameterFunction =
       FunSpec.builder("data")
         .addAnnotation(Parameterized.Parameters::class)
@@ -83,28 +83,6 @@ object PrimitiveTestCodegen {
 
     val toHapiBuilder = FunSpec.builder("hapi").addAnnotation(Test::class)
 
-    when (def.id.value) {
-      in TIME_LIKE_TEST -> {
-        if (def.id.value == "date") fileBuilder.addAliasedImport(DateUtil::class, "DateUtil")
-        toHapiBuilder.addStatement(
-          "%T.assertThat(proto.%M().precision).isEquivalentAccordingToCompareTo(hapi.precision)",
-          Truth::class,
-          MemberName(
-            "com.google.android.fhir.hapiprotoconverter.generated.${def.id.value.capitalize()}Converter",
-            "toHapi"
-          )
-        )
-        toHapiBuilder.addStatement(
-          "%T.assertThat(proto.%M().timeZone.id).isEqualTo(hapi.timeZone.id)",
-          Truth::class,
-          MemberName(
-            "com.google.android.fhir.hapiprotoconverter.generated.${def.id.value.capitalize()}Converter",
-            "toHapi"
-          )
-        )
-      }
-      else -> {}
-    }
     parameterFunction.addStatement(
       "return %T.%L_DATA",
       PrimitiveTestData::class,
@@ -121,7 +99,7 @@ object PrimitiveTestCodegen {
     )
 
     toHapiBuilder.addStatement(
-      "%T.assertThat(proto.%M().value).isEqualTo(hapi.value)",
+      "${if (def.id.value in TIME_LIKE_TEST) TIME_LIKE_TEST_TEMPLATE else "" }%1T.assertThat(proto.%2M().value).isEqualTo(hapi.value)",
       Truth::class,
       MemberName(
         "com.google.android.fhir.hapiprotoconverter.generated.${def.id.value.capitalize()}Converter",
@@ -135,6 +113,7 @@ object PrimitiveTestCodegen {
       Class.forName("$hapiPackage.$hapiName"),
       testClass
     )
+
     testClassConstructor.addConstructorParameter(
       "proto",
       Class.forName("$protoPackage.$protoName"),
@@ -155,15 +134,6 @@ object PrimitiveTestCodegen {
   }
 }
 
-private fun FunSpec.Builder.addConstructorParameter(
-  s: String,
-  kClass: KClass<*>,
-  testClass: TypeSpec.Builder
-) {
-  addParameter(s, kClass)
-  testClass.addProperty(PropertySpec.builder(s, kClass, KModifier.PRIVATE).initializer(s).build())
-}
-
 // because temporal precision enum is a java class
 private fun FunSpec.Builder.addConstructorParameter(
   s: String,
@@ -175,28 +145,7 @@ private fun FunSpec.Builder.addConstructorParameter(
 }
 
 fun main() {
-  for (x in
-    listOf(
-      "base64Binary",
-      "boolean",
-      "canonical",
-      "code",
-      "date",
-      "dateTime",
-      "decimal",
-      "id",
-      "instant",
-      "integer",
-      "markdown",
-      "oid",
-      "positiveInt",
-      "string",
-      "time",
-      "unsignedInt",
-      "uri",
-      "url",
-      "uuid"
-    )) {
+  for (x in GeneratorUtils.primitiveTypeList) {
     val file = File("hapiprotoconverter\\src\\test\\java")
     // This is temp will parse files
     PrimitiveTestCodegen.generate(

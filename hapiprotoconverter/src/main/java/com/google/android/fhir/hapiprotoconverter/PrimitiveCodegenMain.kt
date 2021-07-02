@@ -22,28 +22,7 @@ import com.google.fhir.r4.core.StructureDefinitionKindCode
 import java.io.File
 
 fun main() {
-  for (x in
-    listOf(
-      "base64Binary",
-      "boolean",
-      "canonical",
-      "code",
-      "date",
-      "dateTime",
-      "decimal",
-      "id",
-      "instant",
-      "integer",
-      "markdown",
-      "oid",
-      "positiveInt",
-      "string",
-      "time",
-      "unsignedInt",
-      "uri",
-      "url",
-      "uuid"
-    )) {
+  for (x in GeneratorUtils.primitiveTypeList) {
     val file = File("hapiprotoconverter\\src\\main\\java")
     // This is temp will parse files
     PrimitiveCodegen.generate(

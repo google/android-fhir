@@ -50,7 +50,7 @@ object PrimitiveCodegen {
     )
 
   @SuppressLint("DefaultLocale")
-  fun generate(def: StructureDefinition, outLocation: File? = null) {
+  fun generate(def: StructureDefinition, outLocation: File) {
     // ensure that the definition is of PRIMITIVE_TYPE
     require(def.kind.value == StructureDefinitionKindCode.Value.PRIMITIVE_TYPE) {
       "structure definition needs to be of type primitive"
@@ -175,7 +175,7 @@ object PrimitiveCodegen {
         functionsList.add(precisionToProtoFunc.build())
       }
       "base64Binary" -> {
-        // set Value needs to be handled differently
+        // set value needs to be handled differently
         toProtoBuilder.addStatement(".setValue( %T.copyFromUtf8(valueAsString))", ByteString::class)
         toHapiBuilder.addStatement("hapiValue.valueAsString = value.toStringUtf8()")
       }
@@ -203,7 +203,6 @@ object PrimitiveCodegen {
           .build()
       )
       .build()
-      .writeTo(outLocation!!)
-    // .writeTo(System.out)
+      .writeTo(outLocation)
   }
 }
