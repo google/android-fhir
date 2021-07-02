@@ -36,8 +36,9 @@ public object InstantConverter {
 
   public fun Instant.toHapi(): InstantType {
     val hapiValue = InstantType()
-    hapiValue.value = Date.from(InstantUtil.ofEpochMilli(valueUs))
     hapiValue.timeZone = TimeZone.getTimeZone(timezone)
+    hapiValue.value = Date.from(InstantUtil.ofEpochMilli(valueUs))
+    hapiValue.precision = precision.toHapiPrecision()
     return hapiValue
   }
 

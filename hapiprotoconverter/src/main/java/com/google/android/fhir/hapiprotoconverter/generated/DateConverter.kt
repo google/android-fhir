@@ -35,8 +35,9 @@ public object DateConverter {
 
   public fun Date.toHapi(): DateType {
     val hapiValue = DateType()
-    hapiValue.value = java.util.Date.from(Instant.ofEpochMilli(valueUs))
     hapiValue.timeZone = TimeZone.getTimeZone(timezone)
+    hapiValue.value = java.util.Date.from(Instant.ofEpochMilli(valueUs))
+    hapiValue.precision = precision.toHapiPrecision()
     return hapiValue
   }
 

@@ -23,7 +23,6 @@ import com.google.fhir.r4.core.StructureDefinitionKindCode
 import com.google.fhir.shaded.common.collect.ImmutableList
 import com.google.fhir.shaded.common.collect.ImmutableMap
 import com.google.fhir.shaded.protobuf.ByteString
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -52,54 +51,62 @@ object PrimitiveCodegen {
 
   @SuppressLint("DefaultLocale")
   fun generate(def: StructureDefinition, outLocation: File? = null) {
+    // ensure that the definition is of PRIMITIVE_TYPE
     require(def.kind.value == StructureDefinitionKindCode.Value.PRIMITIVE_TYPE) {
       "structure definition needs to be of type primitive"
     }
+    // Name of the hapi Primitive
     val hapiName = "${def.id.value.capitalize()}Type"
+    // Name of the proto Primitive
     val protoName = def.id.value.capitalize()
 
+    // builder for the file that will contain the converter object
     val fileBuilder =
       FileSpec.builder(
         "com.google.android.fhir.hapiprotoconverter.generated",
         "${protoName}Converter"
       )
-    val primitiveConverterClass =
-      ClassName(
-        "com.google.android.fhir.hapiprotoconverter.generated",
-        def.id.value.capitalize() + "Converter"
-      )
 
+    // List of functions to be added to the file
     val functionsList = mutableListOf<FunSpec>()
 
+    // Function that will convert Hapi to proto
     val toProtoBuilder =
       FunSpec.builder("toProto")
         .receiver(Class.forName("$hapiPackage.$hapiName"))
         .returns(Class.forName("$protoPackage.$protoName"))
         .addStatement("val protoValue = %T.newBuilder()", Class.forName("$protoPackage.$protoName"))
 
+    // Function that will convert proto to hapi
     val toHapiBuilder =
       FunSpec.builder("toHapi")
         .receiver(Class.forName("$protoPackage.$protoName"))
         .returns(Class.forName("$hapiPackage.$hapiName"))
         .addStatement("val hapiValue = %T()", Class.forName("$hapiPackage.$hapiName"))
 
-    if (def.id.value in TIME_LIKE_PRECISION_MAP.keys) {
-      toProtoBuilder.addStatement(".setTimezone(timeZone.id)")
-      toProtoBuilder.addStatement(".setValueUs(value.time)")
-      toHapiBuilder.addStatement(
-        "hapiValue.value = %T.from(%T.ofEpochMilli(valueUs))",
-        Date::class,
-        Instant::class
-      )
-      if (def.id.value == "instant") {
-        fileBuilder.addAliasedImport(Instant::class, "InstantUtil")
-      }
-      toHapiBuilder.addStatement("hapiValue.timeZone = %T.getTimeZone(timezone)", TimeZone::class)
-    }
-
     when (def.id.value) {
       in TIME_LIKE_PRECISION_MAP.keys -> {
+        // to set timezone
+        toProtoBuilder.addStatement(".setTimezone(timeZone.id)")
+        toHapiBuilder.addStatement("hapiValue.timeZone = %T.getTimeZone(timezone)", TimeZone::class)
+
+        // to set value
+        toProtoBuilder.addStatement(".setValueUs(value.time)")
+        toHapiBuilder.addStatement(
+          "hapiValue.value = %T.from(%T.ofEpochMilli(valueUs))",
+          Date::class,
+          Instant::class
+        )
+        // use import alias
+        if (def.id.value == "instant") {
+          fileBuilder.addAliasedImport(Instant::class, "InstantUtil")
+        }
+
+        // To set Precision
         toProtoBuilder.addStatement(".setPrecision(precision.toProtoPrecision())")
+        toHapiBuilder.addStatement("hapiValue.precision = precision.toHapiPrecision()")
+
+        // private func to convert hapi precision to proto precision
         val precisionToProtoFunc =
           FunSpec.builder("toProtoPrecision")
             .addModifiers(KModifier.PRIVATE)
@@ -107,6 +114,7 @@ object PrimitiveCodegen {
             .returns(Class.forName("$protoPackage.$protoName\$Precision"))
             .beginControlFlow("return when(this)")
 
+        // private func to convert proto precision to hapi precision
         val precisionToHapiFunc =
           FunSpec.builder("toHapiPrecision")
             .addModifiers(KModifier.PRIVATE)
@@ -114,6 +122,7 @@ object PrimitiveCodegen {
             .returns(TemporalPrecisionEnum::class)
             .beginControlFlow("return when(this)")
 
+        // populating the functions
         for (value in TIME_LIKE_PRECISION_MAP[def.id.value]!!) {
           if (value == "MILLISECOND") {
             precisionToProtoFunc.addStatement(
@@ -140,16 +149,19 @@ object PrimitiveCodegen {
         functionsList.add(precisionToHapiFunc.build())
       }
       "time" -> {
+        // setValue
         toProtoBuilder.addStatement(
           ".setValueUs(%T.parse(value).toNanoOfDay()/1000)",
           LocalTime::class
         )
         toHapiBuilder.addStatement(
-          "hapiValue.value = %T.ofNanoOfDay(valueUs).format(%T.ISO_LOCAL_TIME)",
+          "hapiValue.value = %T.ofNanoOfDay(valueUs*1000).format(%T.ISO_LOCAL_TIME)",
           LocalTime::class,
           DateTimeFormatter::class
         )
+        // setPrecision
         toProtoBuilder.addStatement(".setPrecisionValue(getTimePrecision(value))")
+        // private func to get precision
         val precisionToProtoFunc =
           FunSpec.builder("getTimePrecision")
             .addModifiers(KModifier.PRIVATE)
@@ -157,23 +169,23 @@ object PrimitiveCodegen {
             .returns(Integer.TYPE)
             .beginControlFlow("return when(timeString.length)")
             .addStatement("8 -> Time.Precision.SECOND_VALUE")
-            .addStatement("11-> Time.Precision.MILLISECOND_VALUE")
+            .addStatement("12 -> Time.Precision.MILLISECOND_VALUE")
             .addStatement("else -> -1")
             .endControlFlow()
         functionsList.add(precisionToProtoFunc.build())
       }
       "base64Binary" -> {
-        toProtoBuilder.addStatement(
-          ".setValue( %T.copyFrom((valueAsString).toByteArray()))",
-          ByteString::class
-        )
-        toHapiBuilder.addStatement("hapiValue.value = value.toStringUtf8().toByteArray()")
+        // set Value needs to be handled differently
+        toProtoBuilder.addStatement(".setValue( %T.copyFromUtf8(valueAsString))", ByteString::class)
+        toHapiBuilder.addStatement("hapiValue.valueAsString = value.toStringUtf8()")
       }
       "decimal" -> {
+        // set value needs to be handled differently
         toProtoBuilder.addStatement(".setValue(valueAsString)")
         toHapiBuilder.addStatement("hapiValue.valueAsString = value")
       }
       else -> {
+        // set value
         toProtoBuilder.addStatement(".setValue(value)")
         toHapiBuilder.addStatement("hapiValue.value = value")
       }
@@ -186,13 +198,12 @@ object PrimitiveCodegen {
 
     fileBuilder
       .addType(
-        TypeSpec.objectBuilder(primitiveConverterClass.simpleName)
+        TypeSpec.objectBuilder(def.id.value.capitalize() + "Converter")
           .addFunctions(functionsList)
           .build()
       )
       .build()
-      // Write to System.out for now
-      // .writeTo(outLocation!!)
-      .writeTo(System.out)
+      .writeTo(outLocation!!)
+    // .writeTo(System.out)
   }
 }

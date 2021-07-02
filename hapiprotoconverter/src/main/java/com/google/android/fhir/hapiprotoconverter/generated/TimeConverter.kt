@@ -35,14 +35,14 @@ public object TimeConverter {
 
   public fun Time.toHapi(): TimeType {
     val hapiValue = TimeType()
-    hapiValue.value = LocalTime.ofNanoOfDay(valueUs).format(DateTimeFormatter.ISO_LOCAL_TIME)
+    hapiValue.value = LocalTime.ofNanoOfDay(valueUs * 1000).format(DateTimeFormatter.ISO_LOCAL_TIME)
     return hapiValue
   }
 
   private fun getTimePrecision(timeString: String): Int =
     when (timeString.length) {
       8 -> Time.Precision.SECOND_VALUE
-      11 -> Time.Precision.MILLISECOND_VALUE
+      12 -> Time.Precision.MILLISECOND_VALUE
       else -> -1
     }
 }
