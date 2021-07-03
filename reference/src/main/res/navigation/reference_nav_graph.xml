@@ -27,5 +27,10 @@
     >
         <argument android:name="patient_id" app:argType="string" />
     </fragment>
+    <activity
+        android:id="@+id/IPSActivity"
+        android:name="com.google.android.fhir.reference.ips.IPSActivity"
+        android:label="activity_ips"
+        tools:layout="@layout/activity_ips" />
 
 </navigation>

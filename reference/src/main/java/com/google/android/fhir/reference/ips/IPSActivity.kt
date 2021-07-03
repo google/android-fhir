@@ -10,7 +10,5 @@ class IPSActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ips)
 
-
-        //val binding = Data
     }
 }

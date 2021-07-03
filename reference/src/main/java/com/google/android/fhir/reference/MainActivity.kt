@@ -17,6 +17,8 @@
 package com.google.android.fhir.reference
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.work.Constraints
 import com.google.android.fhir.reference.data.FhirPeriodicSyncWorker
@@ -41,7 +43,6 @@ class MainActivity : AppCompatActivity() {
     setSupportActionBar(toolbar)
     toolbar.title = title
 
-    binding.button.setOnClickListener {  }
 
     Sync.periodicSync<FhirPeriodicSyncWorker>(
       this,
@@ -50,5 +51,7 @@ class MainActivity : AppCompatActivity() {
         repeat = RepeatInterval(interval = 1, timeUnit = TimeUnit.MINUTES)
       )
     )
+
   }
+
 }
