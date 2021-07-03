@@ -54,9 +54,9 @@ internal interface Database {
    * Selects the FHIR resource of type `clazz` with `id`.
    *
    * @param <R> The resource type
-   * @throws ResourceNotFoundInDbException if the resource is not found in the database
+   * @throws ResourceNotFoundException if the resource is not found in the database
    */
-  @Throws(ResourceNotFoundInDbException::class)
+  @Throws(ResourceNotFoundException::class)
   suspend fun <R : Resource> select(clazz: Class<R>, id: String): R
 
   /**
@@ -67,7 +67,7 @@ internal interface Database {
   suspend fun lastUpdate(resourceType: ResourceType): String?
 
   /**
-   * Insert a resource that was syncronised.
+   * Insert resources that were synchronised.
    *
    * @param syncedResources The synced resource
    */

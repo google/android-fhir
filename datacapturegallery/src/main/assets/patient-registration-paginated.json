@@ -1,0 +1,118 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "client-registration-sample-paginated",
+  "status": "active",
+  "date": "2021-05-18T07:24:47.111Z",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "Page 1",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "1.1",
+          "text": "ANC ID",
+          "type": "string",
+          "required": true,
+          "maxLength": 8,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction",
+              "valueString": "Unique ANC ID"
+            }
+          ]
+        },
+        {
+          "linkId": "1.2",
+          "text": "First name",
+          "type": "string",
+          "required": true,
+          "maxLength": 30,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction",
+              "valueString": "Given name"
+            }
+          ]
+        },
+        {
+          "linkId": "1.3",
+          "text": "Last name",
+          "type": "string",
+          "required": true,
+          "maxLength": 50,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction",
+              "valueString": "Family name"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "2",
+      "text": "Page 2",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "2.1",
+          "text": "Mobile number",
+          "type": "integer",
+          "maxLength": 8,
+          "required": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-instruction",
+              "valueString": "Mobile phone number"
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+              "valueInteger": 200000
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+              "valueInteger": 10
+            }
+          ]
+        },
+        {
+          "linkId": "2.2",
+          "text": "Receive SMS Notifications?",
+          "type": "boolean",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

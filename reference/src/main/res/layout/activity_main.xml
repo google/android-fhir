@@ -14,32 +14,40 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<RelativeLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".MainActivity"
 >
 
-    <TextView
-        android:id="@+id/patient_count"
-        android:text="0 Patients"
-        android:layout_centerHorizontal="true"
-        android:layout_width="wrap_content"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-    />
+        android:theme="@style/AppTheme.AppBarOverlay"
+    >
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/patient_list"
-        android:layout_below="@+id/patient_count"
-        android:name="com.google.fhirengine.example.PatientListFragment"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+        />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.fragment.app.FragmentContainerView
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        app:layoutManager="LinearLayoutManager"
-        tools:context=".PatientListActivity"
-        tools:listitem="@layout/patient_list_item"
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        app:navGraph="@navigation/reference_nav_graph"
+        app:defaultNavHost="true"
     />
-</RelativeLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

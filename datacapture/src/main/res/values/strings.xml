@@ -1,0 +1,14 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string
+        name="required_constraint_validation_error_msg"
+    >Missing answer for required field.</string>
+    <string
+        name="min_value_validation_error_msg"
+    >Minimum value allowed is:<xliff:g id="min_value">%1$s</xliff:g> </string>
+    <string
+        name="max_value_validation_error_msg"
+    >Maximum value allowed is:<xliff:g id="max_value">%1$s</xliff:g> </string>
+    <string name="submit_button_text">Submit</string>
+    <string name="button_pagination_next">Next</string>
+    <string name="button_pagination_previous">Previous</string>
+</resources>
