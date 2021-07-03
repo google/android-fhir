@@ -11,7 +11,7 @@ afterEvaluate {
         from(components["release"])
         artifactId = "data-capture"
         groupId = "com.google.android.fhir"
-        version = "0.1.0-alpha02"
+        version = "0.1.0-alpha03"
         // Also publish source code for developers' convenience
         artifact(
           tasks.create<Jar>("androidSourcesJar") {
@@ -40,9 +40,6 @@ android {
   defaultConfig {
     minSdkVersion(Sdk.minSdk)
     targetSdkVersion(Sdk.targetSdk)
-    versionCode = 1
-    versionName = "1.0"
-
     testInstrumentationRunner(Dependencies.androidJunitRunner)
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments(mapOf("package" to "com.google.android.fhir.datacapture"))
@@ -67,6 +64,7 @@ android {
     // See https://developer.android.com/studio/write/java8-support
     jvmTarget = JavaVersion.VERSION_1_8.toString()
   }
+  testOptions { unitTests.isIncludeAndroidResources = true }
 }
 
 configurations { all { exclude(module = "xpp3") } }
@@ -90,9 +88,12 @@ dependencies {
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
+  implementation(Dependencies.flexBox)
+  implementation(Dependencies.caffeine)
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(Dependencies.mockitoKotlin)
 }

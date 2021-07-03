@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir
+package com.google.android.fhir.datacapture.common.datatype
 
-/** Thrown to indicate that the resource already exists. */
-class ResourceAlreadyExistsException(val type: String, val id: String, cause: Throwable) :
-  Exception("Resource with type $type and id $id already exists!", cause)
+import org.hl7.fhir.r4.model.PrimitiveType
+import org.hl7.fhir.r4.model.Type
+
+/**
+ * Returns the string representation of a [PrimitiveType].
+ *
+ * <p>If the type isn't a [PrimitiveType], an empty string is returned.
+ */
+fun Type.asStringValue(): String {
+  if (!isPrimitive) return ""
+  return (this as PrimitiveType<*>).asStringValue()
+}

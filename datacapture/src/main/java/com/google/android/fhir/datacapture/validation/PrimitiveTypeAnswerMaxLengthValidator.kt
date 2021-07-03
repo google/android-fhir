@@ -16,33 +16,32 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android.content.Context
+import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import com.google.android.fhir.datacapture.validation.ConstraintValidator.ConstraintValidationResult
-import org.hl7.fhir.r4.model.PrimitiveType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /**
  * A validator to check if the answer exceeds the maximum number of permitted characters.
  *
- * <p>Only the following primitive types are subjected to this validation:
- * 1. BooleanType
- * 2. DecimalType
- * 3. IntegerType
- * 4. DateType
- * 5. TimeType
- * 6. StringType
- * 7. UriType
+ * <p>Only primitive types permitted in questionnaires response are subjected to this validation.
+ * See https://www.hl7.org/fhir/valueset-item-type.html#expansion
  */
 internal object PrimitiveTypeAnswerMaxLengthValidator : ConstraintValidator {
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    context: Context
   ): ConstraintValidationResult {
     // TODO(https://github.com/google/android-fhir/issues/487): Validate all answers.
-    val answer = questionnaireResponseItem.answer[0].value
+    val answer =
+      questionnaireResponseItem.answer.singleOrNull()
+        ?: return ConstraintValidationResult(true, null)
+
     if (questionnaireItem.hasMaxLength() &&
-        answer.isPrimitive &&
-        (answer as PrimitiveType<*>).asStringValue().length > questionnaireItem.maxLength
+        answer.value.isPrimitive &&
+        answer.value.asStringValue().length > questionnaireItem.maxLength
     ) {
       return ConstraintValidationResult(
         false,

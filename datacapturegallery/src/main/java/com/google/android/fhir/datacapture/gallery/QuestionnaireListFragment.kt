@@ -52,11 +52,17 @@ class QuestionnaireListFragment : Fragment() {
             "HL7 example \"bb\"",
             "hl7-questionnaire-example-bluebook.json"
           ),
-          // Example authored by fredhersch@google.com.
+          // Example authored by fredhersch@google.com and kmost@google.com.
           QuestionnaireListItem(
-            "Patient registration",
-            "Example authored by Fred Hersch",
-            "patient-registration.json"
+            "Patient registration, paginated",
+            "Example authored by Fred Hersch + Kevin Most",
+            "patient-registration-paginated.json"
+          ),
+          // Example authored by fredhersch@google.com for showcasing autoCOmplete item
+          QuestionnaireListItem(
+            "General Health Assessment Questionnaire",
+            "Example authored by Fred Hersch ",
+            "generic-health-assessment-example.json"
           ),
           // Example taken from
           // https://openhie.github.io/hiv-ig/Questionnaire-hiv-case-report-questionnaire.json.html
