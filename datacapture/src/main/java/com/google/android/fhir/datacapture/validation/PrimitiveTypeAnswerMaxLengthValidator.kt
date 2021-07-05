@@ -35,10 +35,13 @@ internal object PrimitiveTypeAnswerMaxLengthValidator : ConstraintValidator {
     context: Context
   ): ConstraintValidationResult {
     // TODO(https://github.com/google/android-fhir/issues/487): Validate all answers.
-    val answer = questionnaireResponseItem.answer[0].value
+    val answer =
+      questionnaireResponseItem.answer.singleOrNull()
+        ?: return ConstraintValidationResult(true, null)
+
     if (questionnaireItem.hasMaxLength() &&
-        answer.isPrimitive &&
-        answer.asStringValue().length > questionnaireItem.maxLength
+        answer.value.isPrimitive &&
+        answer.value.asStringValue().length > questionnaireItem.maxLength
     ) {
       return ConstraintValidationResult(
         false,

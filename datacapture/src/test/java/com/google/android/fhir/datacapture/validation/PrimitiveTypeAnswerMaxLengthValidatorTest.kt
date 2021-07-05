@@ -52,6 +52,19 @@ class PrimitiveTypeAnswerMaxLengthValidatorTest {
   }
 
   @Test
+  fun noAnswer_shouldReturnValidResult() {
+    val validationResult =
+      PrimitiveTypeAnswerMaxLengthValidator.validate(
+        Questionnaire.QuestionnaireItemComponent().apply { this.maxLength = maxLength },
+        QuestionnaireResponseItemComponent(),
+        Companion.context
+      )
+
+    assertThat(validationResult.isValid).isTrue()
+    assertThat(validationResult.message.isNullOrBlank()).isTrue()
+  }
+
+  @Test
   fun boolean_answerOverMaxLength_shouldReturnInvalidResult() {
     checkAnswerOverMaxLength(maxLength = 4, value = BooleanType(false))
   }
