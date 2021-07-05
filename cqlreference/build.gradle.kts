@@ -57,7 +57,7 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.Espresso.espressoCore)
 
-  api(Dependencies.hapiFhirStructuresR4) { exclude(module = "junit") }
+  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
