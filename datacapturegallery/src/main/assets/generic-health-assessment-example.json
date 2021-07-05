@@ -126,6 +126,10 @@
     },
     {
       "type": "choice",
+      "required": true,
+      "linkId": "4",
+      "text": "Do you have any existing conditions",
+      "prefix": "Q4:",
       "code": [],
       "extension": [
         {
@@ -142,10 +146,6 @@
           }
         }
       ],
-      "required": true,
-      "linkId": "4",
-      "text": "Do you have any existing conditions",
-      "prefix": "Q4:",
       "answerOption": [
         {
           "valueCoding": {

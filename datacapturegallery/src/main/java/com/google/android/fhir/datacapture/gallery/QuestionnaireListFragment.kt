@@ -38,6 +38,12 @@ class QuestionnaireListFragment : Fragment() {
     binding.recyclerView.adapter =
       QuestionnaireListAdapter(
         listOf(
+          // Sample screener Questionnaire
+          QuestionnaireListItem(
+            "Samepl screener questionnaire",
+            "Sample of a multi-step screener questionnaire",
+            "sample-screener-questionnaire.json"
+          ),
           // Example taken from
           // https://www.hl7.org/fhir/questionnaire-example-f201-lifelines.json.html
           QuestionnaireListItem(
