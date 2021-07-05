@@ -77,12 +77,23 @@ class PatientDetailsFragment : Fragment() {
     }
   }
 
-  private fun setupPatientData(view: View, patient: PatientListViewModel.PatientItem?) {
-    patient?.let {
-      binding.patientDetail.text = HtmlCompat.fromHtml(it.html, HtmlCompat.FROM_HTML_MODE_LEGACY)
-      binding.patientListItem.name.text = it.name
-      binding.patientListItem.dob.text = it.dob
-      binding.patientListItem.gender.text = it.phone
+  private fun setupPatientData(view: View, patientItem: PatientListViewModel.PatientItem?) {
+    patientItem?.let {
+      binding.apply {
+        patientDetail.apply {
+          text = HtmlCompat.fromHtml(it.html, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        }
+        patientListItem.apply {
+          title.text = it.name
+          idPatientNumber.text = it.resourceId
+          gender.text = it.gender
+          dob.text = it.dob
+          phoneNumber.text = it.phone
+          city.text = it.city
+          country.text = it.country
+          isActive.text = it.isActive.toString()
+        }
+      }
 
       (requireActivity() as AppCompatActivity).supportActionBar?.apply {
         title = it.name

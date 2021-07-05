@@ -24,7 +24,7 @@
     android:orientation="vertical"
 >
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/patient_info_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
 
             <include
                 android:id="@+id/patient_list_item"
-                layout="@layout/patient_list_item_view"
+                layout="@layout/patient_details_layout"
             />
 
             <TextView
@@ -54,7 +54,7 @@
                 tools:context=".PatientDetailsFragment"
             />
         </androidx.appcompat.widget.LinearLayoutCompat>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
