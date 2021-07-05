@@ -20,7 +20,16 @@
     <style name="Theme.MyQuestionnaire" parent="Theme.Questionnaire">
         <item
             name="groupHeaderTextAppearance"
-        >@style/TextAppearance.MaterialComponents.Subtitle2
+        >@style/Theme.MyQuestionnaire.groupHeaderTextAppearance
+        </item>
+    </style>
+
+    <style
+        name="Theme.MyQuestionnaire.groupHeaderTextAppearance"
+        parent="@style/TextAppearance.MaterialComponents.Headline6"
+    >
+        <item name="android:textColor">
+            @color/purple_700
         </item>
     </style>
 </resources>
