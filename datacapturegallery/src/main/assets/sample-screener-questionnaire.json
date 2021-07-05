@@ -1,10 +1,6 @@
 {
   "id": "5270e23a-17fc-46e1-9e4c-5dc8e4c98a17",
   "url": "urn:uuid:30aa988e-7a63-43a3-9948-5d376bdaf57d",
-  "meta": {
-    "versionId": "5c2d222d-b934-4ab8-b209-1c752f025602",
-    "lastUpdated": "2021-07-05T07:04:24.051267Z"
-  },
   "title": "Sample screener",
   "status": "active",
   "version": "0.0.1",
@@ -33,21 +29,126 @@
       "item": [
         {
           "text": "Do you have a history of fever?",
-          "type": "boolean",
+          "type": "choice",
           "linkId": "linkId-16617",
-          "required": true
+          "required": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "Y",
+                "display": "Yes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "N",
+                "display": "No"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "DN",
+                "display": "Don't Know"
+              }
+            }
+          ]
         },
         {
           "text": "Have you developed a cough recently?",
-          "type": "boolean",
+          "type": "choice",
           "linkId": "linkId-34503",
-          "required": true
+          "required": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "Y",
+                "display": "Yes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "N",
+                "display": "No"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "DN",
+                "display": "Don't Know"
+              }
+            }
+          ]
         },
         {
           "text": "Are you experiencing any shortness of breath?",
-          "type": "boolean",
+          "type": "choice",
           "linkId": "linkId-963404",
-          "required": true
+          "required": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "Y",
+                "display": "Yes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "N",
+                "display": "No"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "DN",
+                "display": "Don't Know"
+              }
+            }
+          ]
         }
       ]
     },
@@ -73,21 +174,114 @@
       "item": [
         {
           "text": "Do you smoke cigarettes?",
-          "type": "boolean",
+          "type": "choice",
           "linkId": "linkId-142748",
-          "required": true
+          "required": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "Y",
+                "display": "Yes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "N",
+                "display": "No"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "Ex",
+                "display": "Ex-smoker"
+              }
+            }
+          ]
         },
         {
           "text": "Have you traveled in the last 2 weeks?",
-          "type": "boolean",
+          "type": "choice",
           "linkId": "linkId-705141",
-          "required": true
+          "required": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "Y",
+                "display": "Yes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "N",
+                "display": "No"
+              }
+            }
+          ]
         },
         {
           "text": "Has anyone at home recently become unwell?",
-          "type": "boolean",
+          "type": "choice",
           "linkId": "linkId-840491",
-          "required": true
+          "required": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "Y",
+                "display": "Yes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "N",
+                "display": "No"
+              }
+            }
+          ]
         }
       ]
     },
@@ -113,10 +307,6 @@
       "item": [
         {
           "type": "choice",
-          "required": true,
-          "linkId": "LinkId-324879",
-          "text": "Do you have any existing conditions",
-          "code": [],
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -124,14 +314,19 @@
                 "coding": [
                   {
                     "system": "http://hl7.org/fhir/questionnaire-item-control",
-                    "code": "autocomplete",
-                    "display": "Auto-complete"
+                    "code": "drop-down",
+                    "display": "Drop down"
                   }
                 ],
-                "text": "Auto-complete"
+                "text": "Drop down"
               }
             }
           ],
+          "required": true,
+          "repeats": true,
+          "linkId": "LinkId-324879",
+          "text": "Do you have any existing conditions",
+          "code": [],
           "answerOption": [
             {
               "valueCoding": {
@@ -289,7 +484,17 @@
         {
           "text": "Record temperature",
           "type": "decimal",
-          "linkId": "linkId-704342"
+          "linkId": "linkId-704342",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+              "valueDecimal": 35.0
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+              "valueDecimal": 45.0
+            }
+          ]
         }
       ]
     },
@@ -321,7 +526,17 @@
         {
           "text": "Pulse oximetry reading",
           "type": "integer",
-          "linkId": "linkId-351969"
+          "linkId": "linkId-351969",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+              "valueInteger": 60
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+              "valueInteger": 100
+            }
+          ]
         },
         {
           "text": "Pulse (heart rate)",

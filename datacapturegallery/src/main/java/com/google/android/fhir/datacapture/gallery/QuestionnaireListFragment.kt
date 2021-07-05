@@ -40,7 +40,7 @@ class QuestionnaireListFragment : Fragment() {
         listOf(
           // Sample screener Questionnaire
           QuestionnaireListItem(
-            "Samepl screener questionnaire",
+            "Sample screener questionnaire",
             "Sample of a multi-step screener questionnaire",
             "sample-screener-questionnaire.json"
           ),
