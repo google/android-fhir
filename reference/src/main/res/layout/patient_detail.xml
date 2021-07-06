@@ -46,10 +46,10 @@
 
             <TextView
                 android:id="@+id/patient_detail"
-                style="?android:attr/textAppearanceSmall"
+                style="@style/AppTheme.PatientDetails.body2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
+                android:layout_marginTop="16dp"
                 android:textIsSelectable="true"
                 tools:context=".PatientDetailsFragment"
             />
