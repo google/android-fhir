@@ -23,6 +23,7 @@ import com.google.fhir.r4.core.StructureDefinitionKindCode
 import com.google.fhir.shaded.common.collect.ImmutableList
 import com.google.fhir.shaded.common.collect.ImmutableMap
 import com.google.fhir.shaded.protobuf.ByteString
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -60,6 +61,9 @@ object PrimitiveCodegen {
     // Name of the proto Primitive
     val protoName = def.id.value.capitalize()
 
+    val hapiClass = ClassName(hapiPackage, hapiName)
+
+    val protoClass = ClassName(protoPackage, protoName)
     // builder for the file that will contain the converter object
     val fileBuilder =
       FileSpec.builder(
@@ -73,16 +77,16 @@ object PrimitiveCodegen {
     // Function that will convert Hapi to proto
     val toProtoBuilder =
       FunSpec.builder("toProto")
-        .receiver(Class.forName("$hapiPackage.$hapiName"))
-        .returns(Class.forName("$protoPackage.$protoName"))
-        .addStatement("val protoValue = %T.newBuilder()", Class.forName("$protoPackage.$protoName"))
+        .receiver(hapiClass)
+        .returns(protoClass)
+        .addStatement("val protoValue = %T.newBuilder()", protoClass)
 
     // Function that will convert proto to hapi
     val toHapiBuilder =
       FunSpec.builder("toHapi")
-        .receiver(Class.forName("$protoPackage.$protoName"))
-        .returns(Class.forName("$hapiPackage.$hapiName"))
-        .addStatement("val hapiValue = %T()", Class.forName("$hapiPackage.$hapiName"))
+        .receiver(protoClass)
+        .returns(hapiClass)
+        .addStatement("val hapiValue = %T()", hapiClass)
 
     when (def.id.value) {
       in TIME_LIKE_PRECISION_MAP.keys -> {
@@ -111,14 +115,14 @@ object PrimitiveCodegen {
           FunSpec.builder("toProtoPrecision")
             .addModifiers(KModifier.PRIVATE)
             .receiver(TemporalPrecisionEnum::class)
-            .returns(Class.forName("$protoPackage.$protoName\$Precision"))
+            .returns(ClassName(protoPackage, protoName, "Precision"))
             .beginControlFlow("return when(this)")
 
         // private func to convert proto precision to hapi precision
         val precisionToHapiFunc =
           FunSpec.builder("toHapiPrecision")
             .addModifiers(KModifier.PRIVATE)
-            .receiver(Class.forName("$protoPackage.$protoName\$Precision"))
+            .receiver(ClassName(protoPackage, protoName, "Precision"))
             .returns(TemporalPrecisionEnum::class)
             .beginControlFlow("return when(this)")
 
