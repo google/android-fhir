@@ -80,6 +80,7 @@ object PrimitiveCodegen {
         .receiver(hapiClass)
         .returns(protoClass)
         .addStatement("val protoValue = %T.newBuilder()", protoClass)
+        .addKdoc("returns the proto $protoName equivalent of the hapi $hapiName")
 
     // Function that will convert proto to hapi
     val toHapiBuilder =
@@ -87,6 +88,7 @@ object PrimitiveCodegen {
         .receiver(protoClass)
         .returns(hapiClass)
         .addStatement("val hapiValue = %T()", hapiClass)
+        .addKdoc("returns the hapi $hapiName equivalent of the proto $protoName")
 
     when (def.id.value) {
       in TIME_LIKE_PRECISION_MAP.keys -> {
@@ -117,6 +119,7 @@ object PrimitiveCodegen {
             .receiver(TemporalPrecisionEnum::class)
             .returns(ClassName(protoPackage, protoName, "Precision"))
             .beginControlFlow("return when(this)")
+            .addKdoc("converts the hapi temporal precision to $protoName.Precision")
 
         // private func to convert proto precision to hapi precision
         val precisionToHapiFunc =
@@ -125,6 +128,7 @@ object PrimitiveCodegen {
             .receiver(ClassName(protoPackage, protoName, "Precision"))
             .returns(TemporalPrecisionEnum::class)
             .beginControlFlow("return when(this)")
+            .addKdoc("converts the $protoName.Precision to hapi Temporal Precision")
 
         // populating the functions
         for (value in TIME_LIKE_PRECISION_MAP[def.id.value]!!) {
@@ -176,6 +180,7 @@ object PrimitiveCodegen {
             .addStatement("12 -> Time.Precision.MILLISECOND_VALUE")
             .addStatement("else -> -1")
             .endControlFlow()
+            .addKdoc("generates $protoName.Precision for the hapi $hapiName")
         functionsList.add(precisionToProtoFunc.build())
       }
       "base64Binary" -> {
@@ -204,6 +209,9 @@ object PrimitiveCodegen {
       .addType(
         TypeSpec.objectBuilder(def.id.value.capitalize() + "Converter")
           .addFunctions(functionsList)
+          .addKdoc(
+            "contains functions that convert between the hapi and proto representations of ${def.id.value}"
+          )
           .build()
       )
       .build()

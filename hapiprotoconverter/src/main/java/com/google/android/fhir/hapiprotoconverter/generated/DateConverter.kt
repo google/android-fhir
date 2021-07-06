@@ -22,7 +22,9 @@ import java.time.Instant
 import java.util.TimeZone
 import org.hl7.fhir.r4.model.DateType
 
+/** contains functions that convert between the hapi and proto representations of date */
 public object DateConverter {
+  /** returns the proto Date equivalent of the hapi DateType */
   public fun DateType.toProto(): Date {
     val protoValue =
       Date.newBuilder()
@@ -33,6 +35,7 @@ public object DateConverter {
     return protoValue
   }
 
+  /** returns the hapi DateType equivalent of the proto Date */
   public fun Date.toHapi(): DateType {
     val hapiValue = DateType()
     hapiValue.timeZone = TimeZone.getTimeZone(timezone)
@@ -41,6 +44,7 @@ public object DateConverter {
     return hapiValue
   }
 
+  /** converts the hapi temporal precision to Date.Precision */
   private fun TemporalPrecisionEnum.toProtoPrecision(): Date.Precision =
     when (this) {
       TemporalPrecisionEnum.YEAR -> Date.Precision.YEAR
@@ -49,6 +53,7 @@ public object DateConverter {
       else -> Date.Precision.PRECISION_UNSPECIFIED
     }
 
+  /** converts the Date.Precision to hapi Temporal Precision */
   private fun Date.Precision.toHapiPrecision(): TemporalPrecisionEnum =
     when (this) {
       Date.Precision.YEAR -> TemporalPrecisionEnum.YEAR

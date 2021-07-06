@@ -23,7 +23,9 @@ import java.util.Date
 import java.util.TimeZone
 import org.hl7.fhir.r4.model.InstantType
 
+/** contains functions that convert between the hapi and proto representations of instant */
 public object InstantConverter {
+  /** returns the proto Instant equivalent of the hapi InstantType */
   public fun InstantType.toProto(): Instant {
     val protoValue =
       Instant.newBuilder()
@@ -34,6 +36,7 @@ public object InstantConverter {
     return protoValue
   }
 
+  /** returns the hapi InstantType equivalent of the proto Instant */
   public fun Instant.toHapi(): InstantType {
     val hapiValue = InstantType()
     hapiValue.timeZone = TimeZone.getTimeZone(timezone)
@@ -42,6 +45,7 @@ public object InstantConverter {
     return hapiValue
   }
 
+  /** converts the hapi temporal precision to Instant.Precision */
   private fun TemporalPrecisionEnum.toProtoPrecision(): Instant.Precision =
     when (this) {
       TemporalPrecisionEnum.SECOND -> Instant.Precision.SECOND
@@ -49,6 +53,7 @@ public object InstantConverter {
       else -> Instant.Precision.PRECISION_UNSPECIFIED
     }
 
+  /** converts the Instant.Precision to hapi Temporal Precision */
   private fun Instant.Precision.toHapiPrecision(): TemporalPrecisionEnum =
     when (this) {
       Instant.Precision.SECOND -> TemporalPrecisionEnum.SECOND
