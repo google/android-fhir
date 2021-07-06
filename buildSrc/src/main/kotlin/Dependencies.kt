@@ -31,6 +31,11 @@ object Dependencies {
     const val cqlEngineFhir = "org.opencds.cqf:cql-engine-fhir:${Versions.Cql.cqlEngine}"
   }
 
+  object HapiFhir {
+    const val structuresR4 = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhir}"
+    const val validation = "ca.uhn.hapi.fhir:hapi-fhir-validation:${Versions.hapiFhir}"
+  }
+
   object Kotlin {
     const val androidxCoreKtx = "androidx.core:core-ktx:${Versions.Kotlin.androidxCoreKtx}"
     const val kotlinCoroutinesAndroid =
@@ -67,13 +72,8 @@ object Dependencies {
     const val runtime = "androidx.room:room-runtime:${Versions.Androidx.room}"
   }
 
-  const val caffeine = "com.github.ben-manes.caffeine:caffeine:${Versions.caffeine}"
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val guava = "com.google.guava:guava:${Versions.guava}"
-  const val hapiFhirStructuresR4 =
-    "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhirStructuresR4}"
-  const val hapiFhirValidation =
-    "ca.uhn.hapi.fhir:org.hl7.fhir.validation:${Versions.hapiFhirStructuresR4}"
   const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.httpInterceptor}"
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
   const val material = "com.google.android.material:material:${Versions.material}"
@@ -123,12 +123,11 @@ object Dependencies {
       const val stdlib = "1.4.31"
     }
 
-    const val caffeine = "2.9.0"
     const val commonsCompress = "1.20"
     const val commonsIo = "2.10.0"
     const val desugarJdkLibs = "1.0.9"
     const val guava = "28.2-android"
-    const val hapiFhirStructuresR4 = "5.4.0"
+    const val hapiFhir = "5.4.0"
     const val httpInterceptor = "4.0.0"
     const val jsonToolsPatch = "1.13"
     const val material = "1.3.0"
