@@ -41,13 +41,6 @@
       },
       "item": [
         {
-          "linkId": "PR-name-id",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Resource#Resource.id",
-          "type": "string",
-          "text": "Patient Id"
-        },
-
-        {
           "linkId": "PR-name",
           "type": "group",
           "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name",

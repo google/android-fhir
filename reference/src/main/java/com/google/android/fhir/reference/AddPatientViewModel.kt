@@ -51,8 +51,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
     viewModelScope.launch {
       val patient = ResourceMapper.extract(questionnaireResource, questionnaireResponse) as Patient
 
-      if (patient.id != null &&
-          patient.hasName() &&
+      if (patient.hasName() &&
           patient.name[0].hasGiven() &&
           patient.name[0].hasFamily() &&
           patient.hasBirthDate() &&

@@ -121,6 +121,7 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
   val name = name[0].nameAsSingleString
 
   // Show nothing if no values available for gender and date of birth.
+  val id = if (hasIdElement()) idElement.idPart else ""
   val gender = if (hasGenderElement()) genderElement.valueAsString else ""
   val dob = if (hasBirthDateElement()) birthDateElement.valueAsString else ""
   val html: String = if (hasText()) text.div.valueAsString else ""
@@ -133,6 +134,6 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
     dob,
     html,
     phone,
-    idElement.idPart
+    id,
   )
 }
