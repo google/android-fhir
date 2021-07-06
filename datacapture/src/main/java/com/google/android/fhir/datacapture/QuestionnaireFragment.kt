@@ -27,9 +27,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolderFactory
 import kotlinx.coroutines.flow.collect
+import org.hl7.fhir.r4.model.Questionnaire
 
-class QuestionnaireFragment : Fragment() {
+open class QuestionnaireFragment : Fragment() {
   private val viewModel: QuestionnaireViewModel by viewModels()
 
   override fun onCreateView(
@@ -59,7 +61,8 @@ class QuestionnaireFragment : Fragment() {
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
 
-    val adapter = QuestionnaireItemAdapter()
+    val adapter = QuestionnaireItemAdapter(getCustomQuestionnaireItemViewHolderFactoryMatchers())
+
     recyclerView.adapter = adapter
     recyclerView.layoutManager = LinearLayoutManager(view.context)
 
@@ -81,14 +84,32 @@ class QuestionnaireFragment : Fragment() {
     }
   }
 
+  /**
+   * Returns a list of [QuestionnaireItemViewHolderFactoryMatcher]s that provide custom views for
+   * rendering items in the questionnaire. User-provided custom views will take precedence over
+   * canonical views provided by the library. If multiple
+   * [QuestionnaireItemViewHolderFactoryMatcher] are applicable for the same item, the behavior is
+   * undefined (any of them may be selected).
+   */
+  open fun getCustomQuestionnaireItemViewHolderFactoryMatchers() =
+    emptyList<QuestionnaireItemViewHolderFactoryMatcher>()
+
   // Returns the current questionnaire response
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
-
-  // The current questionnaire
-  internal val questionnaire = viewModel.questionnaire
 
   companion object {
     const val BUNDLE_KEY_QUESTIONNAIRE = "questionnaire"
     const val BUNDLE_KEY_QUESTIONNAIRE_RESPONSE = "questionnaire-response"
   }
+
+  /**
+   * Data class that holds a matcher function ([matches]) which evaluates whether a given [factory]
+   * should be used in creating a
+   * [com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder] that displays the given
+   * [Questionnaire.QuestionnaireItemComponent]
+   */
+  data class QuestionnaireItemViewHolderFactoryMatcher(
+    val factory: QuestionnaireItemViewHolderFactory,
+    val matches: (Questionnaire.QuestionnaireItemComponent) -> Boolean
+  )
 }

@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android.content.Context
 import com.google.android.fhir.datacapture.hasNestedItemsWithinAnswers
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -31,7 +32,8 @@ object QuestionnaireResponseValidator {
    */
   fun validate(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
-    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+    questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+    context: Context
   ): Map<String, List<ValidationResult>> {
     /* TODO create an iterator for questionnaire item + questionnaire response item refer to the
     questionnaire view model */
@@ -43,13 +45,17 @@ object QuestionnaireResponseValidator {
       val questionnaireResponseItem = questionnaireResponseItemListIterator.next()
       linkIdToValidationResultMap[questionnaireItem.linkId] = mutableListOf()
       linkIdToValidationResultMap[questionnaireItem.linkId]?.add(
-        QuestionnaireResponseItemValidator.validate(questionnaireItem, questionnaireResponseItem)
+        QuestionnaireResponseItemValidator.validate(
+          questionnaireItem,
+          questionnaireResponseItem,
+          context
+        )
       )
       if (questionnaireItem.hasNestedItemsWithinAnswers) {
         // TODO(https://github.com/google/android-fhir/issues/487): Validates all answers.
-        validate(questionnaireItem.item, questionnaireResponseItem.answer[0].item)
+        validate(questionnaireItem.item, questionnaireResponseItem.answer[0].item, context)
       }
-      validate(questionnaireItem.item, questionnaireResponseItem.item)
+      validate(questionnaireItem.item, questionnaireResponseItem.item, context)
     }
     return linkIdToValidationResultMap
   }

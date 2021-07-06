@@ -91,8 +91,10 @@ object Dependencies {
 
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
   const val junit = "junit:junit:${Versions.junit}"
+  const val mockitoKotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mockitoKotlin}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
   const val truth = "com.google.truth:truth:${Versions.truth}"
+  const val flexBox = "com.google.android.flexbox:flexbox:${Versions.flexBox}"
 
   object Versions {
     object Androidx {
@@ -120,12 +122,13 @@ object Dependencies {
     const val caffeine = "2.9.0"
     const val desugarJdkLibs = "1.0.9"
     const val guava = "28.2-android"
-    const val hapiFhirStructuresR4 = "5.3.0"
+    const val hapiFhirStructuresR4 = "5.4.0"
     const val httpInterceptor = "4.0.0"
     const val jsonToolsPatch = "1.13"
     const val material = "1.3.0"
     const val retrofit = "2.7.2"
     const val truth = "1.0.1"
+    const val flexBox = "3.0.0"
 
     object AndroidxTest {
       const val core = "1.2.0"
@@ -136,6 +139,7 @@ object Dependencies {
 
     const val espresso = "3.3.0"
     const val junit = "4.13"
+    const val mockitoKotlin = "3.2.0"
     const val robolectric = "4.5.1"
   }
 }
