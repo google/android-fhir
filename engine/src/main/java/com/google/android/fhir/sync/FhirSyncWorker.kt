@@ -37,12 +37,16 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
      * [RetryConfiguration.maxRetries] set by user.
      */
     val retries = inputData.getInt(MAX_RETRIES_ALLOWED, 0)
-    return if (result is Success) {
-      Result.success()
-    } else if (retries > runAttemptCount) {
-      Result.retry()
-    } else {
-      Result.failure()
+    return when {
+      result is Success -> {
+        Result.success()
+      }
+      retries > runAttemptCount -> {
+        Result.retry()
+      }
+      else -> {
+        Result.failure()
+      }
     }
   }
 }

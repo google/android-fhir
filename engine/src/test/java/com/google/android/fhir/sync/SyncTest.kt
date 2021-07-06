@@ -48,7 +48,7 @@ class SyncTest {
   fun createOneTimeWorkRequestWithRetryConfiguration_shouldHave3MaxTries() {
     val workRequest =
       Sync.createOneTimeWorkRequest<MockedPeriodicSyncWorker>(
-        RetryConfiguration(BackOffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3)
+        RetryConfiguration(BackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3)
       )
     assertThat(workRequest.workSpec.backoffPolicy).isEqualTo(BackoffPolicy.LINEAR)
     assertThat(workRequest.workSpec.backoffDelayDuration).isEqualTo(TimeUnit.SECONDS.toMillis(30))
@@ -67,8 +67,11 @@ class SyncTest {
   fun createPeriodicWorkRequest_withRetryConfiguration_shouldHave3MaxTries() {
     val workRequest =
       Sync.createPeriodicWorkRequest<MockedPeriodicSyncWorker>(
-        PeriodicSyncConfiguration(repeat = RepeatInterval(20, TimeUnit.MINUTES)),
-        RetryConfiguration(BackOffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3)
+        PeriodicSyncConfiguration(
+          repeat = RepeatInterval(20, TimeUnit.MINUTES),
+          retryConfiguration =
+            RetryConfiguration(BackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3)
+        ),
       )
     assertThat(workRequest.workSpec.intervalDuration).isEqualTo(TimeUnit.MINUTES.toMillis(20))
     assertThat(workRequest.workSpec.backoffPolicy).isEqualTo(BackoffPolicy.LINEAR)
@@ -80,8 +83,10 @@ class SyncTest {
   fun createPeriodicWorkRequest_withoutRetryConfiguration_shouldHaveZeroMaxRetries() {
     val workRequest =
       Sync.createPeriodicWorkRequest<MockedPeriodicSyncWorker>(
-        PeriodicSyncConfiguration(repeat = RepeatInterval(20, TimeUnit.MINUTES)),
-        null
+        PeriodicSyncConfiguration(
+          repeat = RepeatInterval(20, TimeUnit.MINUTES),
+          retryConfiguration = null
+        )
       )
     assertThat(workRequest.workSpec.intervalDuration).isEqualTo(TimeUnit.MINUTES.toMillis(20))
     assertThat(workRequest.workSpec.input.getInt(MAX_RETRIES_ALLOWED, 0)).isEqualTo(0)

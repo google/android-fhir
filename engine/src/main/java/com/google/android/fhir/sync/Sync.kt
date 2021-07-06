@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
-import androidx.work.BackoffPolicy
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
@@ -27,11 +26,8 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.android.fhir.FhirEngine
-import java.util.concurrent.TimeUnit
 
 object Sync {
-  val DefaultRetryConfiguration =
-    RetryConfiguration(BackOffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3)
   /**
    * Does a one time sync based on [ResourceSyncParams]. Returns a [Result] that tells caller
    * whether process was Success or Failure. In case of failure, caller needs to take care of the
@@ -51,7 +47,7 @@ object Sync {
    */
   inline fun <reified W : FhirSyncWorker> oneTimeSync(
     context: Context,
-    retryConfiguration: RetryConfiguration? = DefaultRetryConfiguration
+    retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
   ) {
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
@@ -68,14 +64,13 @@ object Sync {
   inline fun <reified W : FhirSyncWorker> periodicSync(
     context: Context,
     periodicSyncConfiguration: PeriodicSyncConfiguration,
-    retryConfiguration: RetryConfiguration? = DefaultRetryConfiguration
   ) {
 
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
         SyncWorkType.DOWNLOAD.workerName,
         ExistingPeriodicWorkPolicy.KEEP,
-        createPeriodicWorkRequest<W>(periodicSyncConfiguration, retryConfiguration)
+        createPeriodicWorkRequest<W>(periodicSyncConfiguration)
       )
   }
 
@@ -86,9 +81,9 @@ object Sync {
     val oneTimeWorkRequest = OneTimeWorkRequestBuilder<W>()
     retryConfiguration?.let {
       oneTimeWorkRequest.setBackoffCriteria(
-        it.backOffCriteria.backoffPolicy,
-        it.backOffCriteria.backoffDelay,
-        it.backOffCriteria.timeUnit
+        it.backoffCriteria.backoffPolicy,
+        it.backoffCriteria.backoffDelay,
+        it.backoffCriteria.timeUnit
       )
       oneTimeWorkRequest.setInputData(
         Data.Builder().putInt(MAX_RETRIES_ALLOWED, it.maxRetries).build()
@@ -99,8 +94,7 @@ object Sync {
 
   @PublishedApi
   internal inline fun <reified W : FhirSyncWorker> createPeriodicWorkRequest(
-    periodicSyncConfiguration: PeriodicSyncConfiguration,
-    retryConfiguration: RetryConfiguration?
+    periodicSyncConfiguration: PeriodicSyncConfiguration
   ): PeriodicWorkRequest {
     val periodicWorkRequestBuilder =
       PeriodicWorkRequestBuilder<W>(
@@ -109,11 +103,11 @@ object Sync {
         )
         .setConstraints(periodicSyncConfiguration.syncConstraints)
 
-    retryConfiguration?.let {
+    periodicSyncConfiguration.retryConfiguration?.let {
       periodicWorkRequestBuilder.setBackoffCriteria(
-        it.backOffCriteria.backoffPolicy,
-        it.backOffCriteria.backoffDelay,
-        it.backOffCriteria.timeUnit
+        it.backoffCriteria.backoffPolicy,
+        it.backoffCriteria.backoffDelay,
+        it.backoffCriteria.timeUnit
       )
       periodicWorkRequestBuilder.setInputData(
         Data.Builder().putInt(MAX_RETRIES_ALLOWED, it.maxRetries).build()

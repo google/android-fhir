@@ -40,15 +40,16 @@ internal class FhirSynchronizer(
   private val resourceSyncParams: ResourceSyncParams
 ) {
   suspend fun synchronize(): Result {
-    val uploadResult = upload()
-    val downloadResult = download()
-    return if (uploadResult is Result.Success && downloadResult is Result.Success) Result.Success
-    else if (uploadResult is Result.Success) downloadResult
-    else if (downloadResult is Result.Success) uploadResult
-    else
-      Result.Error(
-        (downloadResult as Result.Error).exceptions + (uploadResult as Result.Error).exceptions
-      )
+    return listOf(upload(), download())
+      .filterIsInstance<Result.Error>()
+      .flatMap { it.exceptions }
+      .let {
+        if (it.isEmpty()) {
+          Result.Success
+        } else {
+          Result.Error(it)
+        }
+      }
   }
 
   private suspend fun download(): Result {
