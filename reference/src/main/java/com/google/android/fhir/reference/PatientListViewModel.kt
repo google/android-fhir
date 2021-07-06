@@ -111,6 +111,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     private val application: Application,
     private val fhirEngine: FhirEngine
   ) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
       if (modelClass.isAssignableFrom(PatientListViewModel::class.java)) {
         return PatientListViewModel(application, fhirEngine) as T
