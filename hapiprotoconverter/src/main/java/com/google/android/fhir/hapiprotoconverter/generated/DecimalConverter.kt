@@ -23,8 +23,9 @@ import org.hl7.fhir.r4.model.DecimalType
 public object DecimalConverter {
   /** returns the proto Decimal equivalent of the hapi DecimalType */
   public fun DecimalType.toProto(): Decimal {
-    val protoValue = Decimal.newBuilder().setValue(valueAsString).build()
-    return protoValue
+    val protoValue = Decimal.newBuilder()
+    if (valueAsString != null) protoValue.setValue(valueAsString)
+    return protoValue.build()
   }
 
   /** returns the hapi DecimalType equivalent of the proto Decimal */

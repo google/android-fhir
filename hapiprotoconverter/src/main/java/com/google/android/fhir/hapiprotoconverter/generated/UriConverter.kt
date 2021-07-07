@@ -23,8 +23,9 @@ import org.hl7.fhir.r4.model.UriType
 public object UriConverter {
   /** returns the proto Uri equivalent of the hapi UriType */
   public fun UriType.toProto(): Uri {
-    val protoValue = Uri.newBuilder().setValue(value).build()
-    return protoValue
+    val protoValue = Uri.newBuilder()
+    if (value != null) protoValue.setValue(value)
+    return protoValue.build()
   }
 
   /** returns the hapi UriType equivalent of the proto Uri */

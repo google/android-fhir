@@ -23,8 +23,9 @@ import org.hl7.fhir.r4.model.StringType
 public object StringConverter {
   /** returns the proto String equivalent of the hapi StringType */
   public fun StringType.toProto(): String {
-    val protoValue = String.newBuilder().setValue(value).build()
-    return protoValue
+    val protoValue = String.newBuilder()
+    if (value != null) protoValue.setValue(value)
+    return protoValue.build()
   }
 
   /** returns the hapi StringType equivalent of the proto String */

@@ -23,8 +23,9 @@ import org.hl7.fhir.r4.model.IdType
 public object IdConverter {
   /** returns the proto Id equivalent of the hapi IdType */
   public fun IdType.toProto(): Id {
-    val protoValue = Id.newBuilder().setValue(value).build()
-    return protoValue
+    val protoValue = Id.newBuilder()
+    if (value != null) protoValue.setValue(value)
+    return protoValue.build()
   }
 
   /** returns the hapi IdType equivalent of the proto Id */

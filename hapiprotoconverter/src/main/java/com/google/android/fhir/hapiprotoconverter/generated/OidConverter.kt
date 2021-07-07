@@ -23,8 +23,9 @@ import org.hl7.fhir.r4.model.OidType
 public object OidConverter {
   /** returns the proto Oid equivalent of the hapi OidType */
   public fun OidType.toProto(): Oid {
-    val protoValue = Oid.newBuilder().setValue(value).build()
-    return protoValue
+    val protoValue = Oid.newBuilder()
+    if (value != null) protoValue.setValue(value)
+    return protoValue.build()
   }
 
   /** returns the hapi OidType equivalent of the proto Oid */

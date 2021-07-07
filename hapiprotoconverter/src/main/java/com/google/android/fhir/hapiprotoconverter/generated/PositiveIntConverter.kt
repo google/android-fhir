@@ -23,8 +23,9 @@ import org.hl7.fhir.r4.model.PositiveIntType
 public object PositiveIntConverter {
   /** returns the proto PositiveInt equivalent of the hapi PositiveIntType */
   public fun PositiveIntType.toProto(): PositiveInt {
-    val protoValue = PositiveInt.newBuilder().setValue(value).build()
-    return protoValue
+    val protoValue = PositiveInt.newBuilder()
+    if (value != null) protoValue.setValue(value)
+    return protoValue.build()
   }
 
   /** returns the hapi PositiveIntType equivalent of the proto PositiveInt */

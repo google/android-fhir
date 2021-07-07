@@ -23,8 +23,9 @@ import org.hl7.fhir.r4.model.CodeType
 public object CodeConverter {
   /** returns the proto Code equivalent of the hapi CodeType */
   public fun CodeType.toProto(): Code {
-    val protoValue = Code.newBuilder().setValue(value).build()
-    return protoValue
+    val protoValue = Code.newBuilder()
+    if (value != null) protoValue.setValue(value)
+    return protoValue.build()
   }
 
   /** returns the hapi CodeType equivalent of the proto Code */

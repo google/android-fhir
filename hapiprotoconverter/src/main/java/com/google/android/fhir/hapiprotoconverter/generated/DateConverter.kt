@@ -26,13 +26,11 @@ import org.hl7.fhir.r4.model.DateType
 public object DateConverter {
   /** returns the proto Date equivalent of the hapi DateType */
   public fun DateType.toProto(): Date {
-    val protoValue =
-      Date.newBuilder()
-        .setTimezone(timeZone.id)
-        .setValueUs(value.time)
-        .setPrecision(precision.toProtoPrecision())
-        .build()
-    return protoValue
+    val protoValue = Date.newBuilder()
+    if (timeZone.id != null) protoValue.setTimezone(timeZone.id)
+    if (value.time != null) protoValue.setValueUs(value.time)
+    if (precision.toProtoPrecision() != null) protoValue.setPrecision(precision.toProtoPrecision())
+    return protoValue.build()
   }
 
   /** returns the hapi DateType equivalent of the proto Date */

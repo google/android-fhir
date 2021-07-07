@@ -23,8 +23,9 @@ import org.hl7.fhir.r4.model.UuidType
 public object UuidConverter {
   /** returns the proto Uuid equivalent of the hapi UuidType */
   public fun UuidType.toProto(): Uuid {
-    val protoValue = Uuid.newBuilder().setValue(value).build()
-    return protoValue
+    val protoValue = Uuid.newBuilder()
+    if (value != null) protoValue.setValue(value)
+    return protoValue.build()
   }
 
   /** returns the hapi UuidType equivalent of the proto Uuid */

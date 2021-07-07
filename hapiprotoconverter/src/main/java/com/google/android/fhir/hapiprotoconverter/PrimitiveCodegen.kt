@@ -93,11 +93,11 @@ object PrimitiveCodegen {
     when (def.id.value) {
       in TIME_LIKE_PRECISION_MAP.keys -> {
         // to set timezone
-        toProtoBuilder.addStatement(".setTimezone(timeZone.id)")
+        toProtoBuilder.addProtoStatement("timeZone.id", "setTimezone(%L)")
         toHapiBuilder.addStatement("hapiValue.timeZone = %T.getTimeZone(timezone)", TimeZone::class)
 
         // to set value
-        toProtoBuilder.addStatement(".setValueUs(value.time)")
+        toProtoBuilder.addProtoStatement("value.time", "setValueUs(%L)")
         toHapiBuilder.addStatement(
           "hapiValue.value = %T.from(%T.ofEpochMilli(valueUs))",
           Date::class,
@@ -109,7 +109,7 @@ object PrimitiveCodegen {
         }
 
         // To set Precision
-        toProtoBuilder.addStatement(".setPrecision(precision.toProtoPrecision())")
+        toProtoBuilder.addProtoStatement("precision.toProtoPrecision()", "setPrecision(%L)")
         toHapiBuilder.addStatement("hapiValue.precision = precision.toHapiPrecision()")
 
         // private func to convert hapi precision to proto precision
@@ -158,8 +158,9 @@ object PrimitiveCodegen {
       }
       "time" -> {
         // setValue
-        toProtoBuilder.addStatement(
-          ".setValueUs(%T.parse(value).toNanoOfDay()/1000)",
+        toProtoBuilder.addProtoStatement(
+          "value",
+          "setValueUs(%T.parse(%L).toNanoOfDay()/1000)",
           LocalTime::class
         )
         toHapiBuilder.addStatement(
@@ -168,7 +169,7 @@ object PrimitiveCodegen {
           DateTimeFormatter::class
         )
         // setPrecision
-        toProtoBuilder.addStatement(".setPrecisionValue(getTimePrecision(value))")
+        toProtoBuilder.addProtoStatement("value", "setPrecisionValue(getTimePrecision(%L))")
         // private func to get precision
         val precisionToProtoFunc =
           FunSpec.builder("getTimePrecision")
@@ -185,22 +186,25 @@ object PrimitiveCodegen {
       }
       "base64Binary" -> {
         // set value needs to be handled differently
-        toProtoBuilder.addStatement(".setValue( %T.copyFromUtf8(valueAsString))", ByteString::class)
+        toProtoBuilder.addProtoStatement(
+          " valueAsString",
+          "setValue(%T.copyFromUtf8(%L))",
+          ByteString::class
+        )
         toHapiBuilder.addStatement("hapiValue.valueAsString = value.toStringUtf8()")
       }
       "decimal" -> {
         // set value needs to be handled differently
-        toProtoBuilder.addStatement(".setValue(valueAsString)")
+        toProtoBuilder.addProtoStatement("valueAsString", "setValue(%L)")
         toHapiBuilder.addStatement("hapiValue.valueAsString = value")
       }
       else -> {
         // set value
-        toProtoBuilder.addStatement(".setValue(value)")
+        toProtoBuilder.addProtoStatement("value", "setValue(%L)")
         toHapiBuilder.addStatement("hapiValue.value = value")
       }
     }
-    toProtoBuilder.addStatement(".build()")
-    toProtoBuilder.addStatement("return protoValue")
+    toProtoBuilder.addStatement("return protoValue.build()")
     toHapiBuilder.addStatement("return hapiValue")
     functionsList.add(0, toProtoBuilder.build())
     functionsList.add(1, toHapiBuilder.build())
@@ -216,5 +220,9 @@ object PrimitiveCodegen {
       )
       .build()
       .writeTo(outLocation)
+  }
+
+  fun FunSpec.Builder.addProtoStatement(param: String, method: String, vararg args: Any) {
+    this.addStatement("if ($param!=null) protoValue.$method", *args, param)
   }
 }

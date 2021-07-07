@@ -59,6 +59,7 @@ import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.model.UuidType
 
 object PrimitiveTestData {
+
   val BASE64BINARY_DATA =
     listOf(
       arrayOf(

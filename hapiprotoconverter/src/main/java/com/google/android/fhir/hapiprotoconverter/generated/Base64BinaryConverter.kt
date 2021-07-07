@@ -24,9 +24,9 @@ import org.hl7.fhir.r4.model.Base64BinaryType
 public object Base64BinaryConverter {
   /** returns the proto Base64Binary equivalent of the hapi Base64BinaryType */
   public fun Base64BinaryType.toProto(): Base64Binary {
-    val protoValue =
-      Base64Binary.newBuilder().setValue(ByteString.copyFromUtf8(valueAsString)).build()
-    return protoValue
+    val protoValue = Base64Binary.newBuilder()
+    if (valueAsString != null) protoValue.setValue(ByteString.copyFromUtf8(valueAsString))
+    return protoValue.build()
   }
 
   /** returns the hapi Base64BinaryType equivalent of the proto Base64Binary */

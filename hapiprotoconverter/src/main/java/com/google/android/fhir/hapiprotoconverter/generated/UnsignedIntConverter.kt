@@ -23,8 +23,9 @@ import org.hl7.fhir.r4.model.UnsignedIntType
 public object UnsignedIntConverter {
   /** returns the proto UnsignedInt equivalent of the hapi UnsignedIntType */
   public fun UnsignedIntType.toProto(): UnsignedInt {
-    val protoValue = UnsignedInt.newBuilder().setValue(value).build()
-    return protoValue
+    val protoValue = UnsignedInt.newBuilder()
+    if (value != null) protoValue.setValue(value)
+    return protoValue.build()
   }
 
   /** returns the hapi UnsignedIntType equivalent of the proto UnsignedInt */

@@ -27,13 +27,11 @@ import org.hl7.fhir.r4.model.InstantType
 public object InstantConverter {
   /** returns the proto Instant equivalent of the hapi InstantType */
   public fun InstantType.toProto(): Instant {
-    val protoValue =
-      Instant.newBuilder()
-        .setTimezone(timeZone.id)
-        .setValueUs(value.time)
-        .setPrecision(precision.toProtoPrecision())
-        .build()
-    return protoValue
+    val protoValue = Instant.newBuilder()
+    if (timeZone.id != null) protoValue.setTimezone(timeZone.id)
+    if (value.time != null) protoValue.setValueUs(value.time)
+    if (precision.toProtoPrecision() != null) protoValue.setPrecision(precision.toProtoPrecision())
+    return protoValue.build()
   }
 
   /** returns the hapi InstantType equivalent of the proto Instant */

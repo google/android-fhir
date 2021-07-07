@@ -23,8 +23,9 @@ import org.hl7.fhir.r4.model.MarkdownType
 public object MarkdownConverter {
   /** returns the proto Markdown equivalent of the hapi MarkdownType */
   public fun MarkdownType.toProto(): Markdown {
-    val protoValue = Markdown.newBuilder().setValue(value).build()
-    return protoValue
+    val protoValue = Markdown.newBuilder()
+    if (value != null) protoValue.setValue(value)
+    return protoValue.build()
   }
 
   /** returns the hapi MarkdownType equivalent of the proto Markdown */

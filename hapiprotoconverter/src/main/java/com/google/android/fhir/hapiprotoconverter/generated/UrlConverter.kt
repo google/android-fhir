@@ -23,8 +23,9 @@ import org.hl7.fhir.r4.model.UrlType
 public object UrlConverter {
   /** returns the proto Url equivalent of the hapi UrlType */
   public fun UrlType.toProto(): Url {
-    val protoValue = Url.newBuilder().setValue(value).build()
-    return protoValue
+    val protoValue = Url.newBuilder()
+    if (value != null) protoValue.setValue(value)
+    return protoValue.build()
   }
 
   /** returns the hapi UrlType equivalent of the proto Url */

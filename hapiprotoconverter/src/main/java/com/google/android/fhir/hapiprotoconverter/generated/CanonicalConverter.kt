@@ -23,8 +23,9 @@ import org.hl7.fhir.r4.model.CanonicalType
 public object CanonicalConverter {
   /** returns the proto Canonical equivalent of the hapi CanonicalType */
   public fun CanonicalType.toProto(): Canonical {
-    val protoValue = Canonical.newBuilder().setValue(value).build()
-    return protoValue
+    val protoValue = Canonical.newBuilder()
+    if (value != null) protoValue.setValue(value)
+    return protoValue.build()
   }
 
   /** returns the hapi CanonicalType equivalent of the proto Canonical */

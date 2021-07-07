@@ -23,8 +23,9 @@ import org.hl7.fhir.r4.model.BooleanType
 public object BooleanConverter {
   /** returns the proto Boolean equivalent of the hapi BooleanType */
   public fun BooleanType.toProto(): Boolean {
-    val protoValue = Boolean.newBuilder().setValue(value).build()
-    return protoValue
+    val protoValue = Boolean.newBuilder()
+    if (value != null) protoValue.setValue(value)
+    return protoValue.build()
   }
 
   /** returns the hapi BooleanType equivalent of the proto Boolean */
