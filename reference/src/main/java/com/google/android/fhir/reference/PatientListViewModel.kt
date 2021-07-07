@@ -122,7 +122,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
 
 internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientItem {
   // Show nothing if no values available for gender and date of birth.
-  val html: String = text.div.valueAsString ?: ""
   val patientId = if (hasIdElement()) idElement.idPart else ""
   val name = if (hasName()) name[0].nameAsSingleString else ""
   val gender = if (hasGenderElement()) genderElement.valueAsString else ""
@@ -131,6 +130,7 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
   val city = if (hasAddress()) address[0].city else ""
   val country = if (hasAddress()) address[0].country else ""
   val isActive = active
+  val html: String = if (hasText()) text.div.valueAsString else ""
 
   return PatientListViewModel.PatientItem(
     id = position.toString(),
