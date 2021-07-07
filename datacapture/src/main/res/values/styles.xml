@@ -41,5 +41,9 @@
             name="groupHeaderTextAppearance"
         >@style/TextAppearance.MaterialComponents.Headline6
         </item>
+        <item
+            name="checkBoxStyle"
+        >@style/Widget.AppCompat.CompoundButton.CheckBox
+        </item>
     </style>
 </resources>

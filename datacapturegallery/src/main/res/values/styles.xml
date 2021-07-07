@@ -22,6 +22,7 @@
             name="groupHeaderTextAppearance"
         >@style/Theme.MyQuestionnaire.groupHeaderTextAppearance
         </item>
+        <item name="checkBoxStyle">@style/Widget.MyQuestionnaire.CheckBox</item>
     </style>
 
     <style
@@ -31,5 +32,16 @@
         <item name="android:textColor">
             @color/purple_700
         </item>
+    </style>
+
+    <style
+        name="Widget.MyQuestionnaire.CheckBox"
+        parent="Widget.AppCompat.CompoundButton.CheckBox"
+    >
+        <item name="android:buttonTint">@color/check_box_tint</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item
+            name="android:textAppearance"
+        >@style/TextAppearance.AppCompat</item>
     </style>
 </resources>
