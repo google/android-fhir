@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
+import java.util.UUID
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
@@ -50,7 +51,6 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
   fun savePatient(questionnaireResponse: QuestionnaireResponse) {
     viewModelScope.launch {
       val patient = ResourceMapper.extract(questionnaireResource, questionnaireResponse) as Patient
-
       if (patient.hasName() &&
           patient.name[0].hasGiven() &&
           patient.name[0].hasFamily() &&
@@ -58,6 +58,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
           patient.hasTelecom() &&
           patient.telecom[0].value != null
       ) {
+        patient.id = generateUuid()
         fhirEngine.save(patient)
         isPatientSaved.value = true
         return@launch
@@ -79,5 +80,9 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
     return getApplication<Application>().assets.open(filename).bufferedReader().use {
       it.readText()
     }
+  }
+
+  private fun generateUuid(): String {
+    return UUID.randomUUID().toString()
   }
 }
