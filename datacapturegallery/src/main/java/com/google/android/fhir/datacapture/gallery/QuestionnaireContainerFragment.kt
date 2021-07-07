@@ -78,7 +78,8 @@ class QuestionnaireContainerFragment : Fragment() {
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    inflater.inflate(R.menu.top_bar_menu, menu)
+    menu.findItem(R.id.action_submit).isVisible = true
+    menu.findItem(R.id.action_language).isVisible = false
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -20,18 +20,15 @@ import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.fhir.datacapture.gallery.databinding.ActivityMainBinding
 import com.google.android.fhir.datacapture.gallery.utils.LanguageSwitcherUtils
-import com.google.android.material.navigation.NavigationView
 import java.util.Locale
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
-  private lateinit var drawerToggle: ActionBarDrawerToggle
   private lateinit var languageList: List<LanguageSwitcherUtils.Language>
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,16 +37,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     setContentView(binding.root)
 
     languageList = LanguageSwitcherUtils.getLanguageList(this)
+  }
 
-    setUpNavigationView()
+  override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    menuInflater.inflate(R.menu.top_bar_menu, menu)
+
+    menu.findItem(R.id.action_submit).isVisible = false
+    menu.findItem(R.id.action_language).isVisible = true
+    return true
   }
 
   private fun refreshToSelectedLanguage(
     language: LanguageSwitcherUtils.Language,
     context: Activity
   ) {
-
-    getNavigationView().menu.findItem(R.id.switch_language).title = language.displayName
 
     val sharedPref =
       context?.getSharedPreferences(
@@ -82,45 +83,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     applyOverrideConfiguration(newConfiguration)
   }
 
-  override fun onNavigationItemSelected(item: MenuItem): Boolean {
-    when (item.itemId) {
-      R.id.switch_language ->
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    return when (item.itemId) {
+      R.id.action_language -> {
         LanguageSwitcherUtils.renderSelectLanguageDialog(this, languageList) { _, i ->
           refreshToSelectedLanguage(languageList[i], this)
         }
-      else -> false
+        true
+      }
+      else -> super.onOptionsItemSelected(item)
     }
-
-    return true
   }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-    if (drawerToggle.onOptionsItemSelected(item)) {
-      return true
-    }
-    return super.onOptionsItemSelected(item)
-  }
-
-  private fun setUpNavigationView() {
-
-    drawerToggle =
-      ActionBarDrawerToggle(
-        this,
-        binding.drawerLayout,
-        R.string.nav_app_bar_open_drawer_description,
-        R.string.nav_app_bar_navigate_up_description
-      )
-    binding.drawerLayout.addDrawerListener(drawerToggle)
-    drawerToggle.syncState()
-
-    supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-    val navigationView = getNavigationView()
-    navigationView.setNavigationItemSelectedListener(this)
-
-    navigationView.menu.findItem(R.id.switch_language).title = Locale.getDefault().displayName
-  }
-
-  private fun getNavigationView() = findViewById<View>(R.id.nav_view) as NavigationView
 }
