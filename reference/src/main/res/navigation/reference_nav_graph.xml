@@ -26,6 +26,16 @@
         tools:layout="@layout/patient_detail"
     >
         <argument android:name="patient_id" app:argType="string" />
+        <action
+            android:id="@+id/action_patient_details_to_screenEncounterFragment"
+            app:destination="@id/screenerEncounterFragment"
+        />
     </fragment>
+    <fragment
+        android:id="@+id/screenerEncounterFragment"
+        android:label="Screen Encounter"
+        android:name="com.google.android.fhir.reference.ScreenerEncounterFragment"
+        tools:layout="@layout/screener_encounter_fragment"
+    />
 
 </navigation>

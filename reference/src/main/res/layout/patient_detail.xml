@@ -14,57 +14,77 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<androidx.appcompat.widget.LinearLayoutCompat
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:orientation="vertical"
 >
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:orientation="vertical"
+    >
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/patient_info_card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="16dp"
-    >
-        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/patient_info_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:orientation="vertical"
+            android:layout_marginTop="10dp"
+            android:padding="16dp"
         >
-
-            <include
-                android:id="@+id/patient_list_item"
-                layout="@layout/patient_list_item_view"
-            />
-
-            <TextView
-                android:id="@+id/patient_detail"
-                style="?android:attr/textAppearanceSmall"
+        <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:textIsSelectable="true"
-                tools:context=".PatientDetailsFragment"
-            />
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:orientation="vertical"
+            >
+
+            <include
+                    android:id="@+id/patient_list_item"
+                    layout="@layout/patient_list_item_view"
+                />
+
+            <TextView
+                    android:id="@+id/patient_detail"
+                    style="?android:attr/textAppearanceSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:textIsSelectable="true"
+                    tools:context=".PatientDetailsFragment"
+                />
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.cardview.widget.CardView>
     <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="10dp"
-    >
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="10dp"
+        >
 
         <include
-            android:id="@+id/observation_list"
-            layout="@layout/observation_list_view"
-        />
+                android:id="@+id/observation_list"
+                layout="@layout/observation_list_view"
+            />
 
     </androidx.core.widget.NestedScrollView>
 </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_screener"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_gravity="bottom|end"
+        android:clickable="true"
+        app:srcCompat="@drawable/ic_baseline_add_24"
+    />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
