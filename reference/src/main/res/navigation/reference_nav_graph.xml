@@ -7,35 +7,46 @@
     app:startDestination="@id/patient_list"
 >
 
-    <fragment
+  <fragment
         android:id="@+id/patient_list"
-        android:name="com.google.android.fhir.reference.PatientListFragment"
         android:label="Patient List"
+        android:name="com.google.android.fhir.reference.PatientListFragment"
         tools:layout="@layout/patient_list_view"
     >
-        <action
+    <action
             android:id="@+id/navigate_to_product_detail"
             app:destination="@id/patient_details"
         />
-    </fragment>
+    <action
+            android:id="@+id/action_patient_list_to_addPatientFragment"
+            app:destination="@id/addPatientFragment"
+        />
+  </fragment>
 
-    <fragment
+  <fragment
         android:id="@+id/patient_details"
-        android:name="com.google.android.fhir.reference.PatientDetailsFragment"
         android:label="Patient Details"
+        android:name="com.google.android.fhir.reference.PatientDetailsFragment"
         tools:layout="@layout/patient_detail"
     >
-        <argument android:name="patient_id" app:argType="string" />
-        <action
+    <action
             android:id="@+id/action_patient_details_to_screenEncounterFragment"
             app:destination="@id/screenerEncounterFragment"
         />
-    </fragment>
-    <fragment
+    <argument android:name="patient_id" app:argType="string" />
+  </fragment>
+
+  <fragment
         android:id="@+id/screenerEncounterFragment"
         android:label="Screen Encounter"
         android:name="com.google.android.fhir.reference.ScreenerEncounterFragment"
         tools:layout="@layout/screener_encounter_fragment"
+    />
+  <fragment
+        android:id="@+id/addPatientFragment"
+        android:label="@string/add_patient"
+        android:name="com.google.android.fhir.reference.AddPatientFragment"
+        tools:layout="@layout/add_patient_fragment"
     />
 
 </navigation>
