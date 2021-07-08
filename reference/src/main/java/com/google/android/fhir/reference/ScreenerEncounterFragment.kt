@@ -17,7 +17,6 @@
 package com.google.android.fhir.reference
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -30,7 +29,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
-import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 
 /** A fragment class to show screener questionnaire screen. */
@@ -60,7 +58,7 @@ class ScreenerEncounterFragment : Fragment(R.layout.screener_encounter_fragment)
         true
       }
       android.R.id.home -> {
-        showCancelDialog()
+        showCancelScreenerQuestionnaireAlertDialog()
         true
       }
       else -> super.onOptionsItemSelected(item)
@@ -89,16 +87,11 @@ class ScreenerEncounterFragment : Fragment(R.layout.screener_encounter_fragment)
   private fun onSubmitAction() {
     val questionnaireFragment =
       childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
-    val response =
-      FhirContext.forR4()
-        .newJsonParser()
-        .encodeResourceToString(questionnaireFragment.getQuestionnaireResponse())
-    //ToDO Post submit questionnaire response extraction.
+    viewModel.saveScreenerEncounter(questionnaireFragment.getQuestionnaireResponse())
     Toast.makeText(context, "questionnaire response is received.", Toast.LENGTH_SHORT).show()
-    Log.d("ScreenerEncounter", "onSubmitAction: $response")
   }
 
-  private fun showCancelDialog() {
+  private fun showCancelScreenerQuestionnaireAlertDialog() {
     val alertDialog: AlertDialog? =
       activity?.let {
         val builder = AlertDialog.Builder(it)

@@ -17,10 +17,12 @@
 package com.google.android.fhir.reference
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import ca.uhn.fhir.context.FhirContext
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /** ViewModel for screener questionnaire screen {@link ScreenerEncounterFragment}. */
 class ScreenerEncounterViewModel(application: Application, private val state: SavedStateHandle) :
@@ -31,6 +33,15 @@ class ScreenerEncounterViewModel(application: Application, private val state: Sa
   private val questionnaireResource: Questionnaire
     get() = FhirContext.forR4().newJsonParser().parseResource(questionnaire) as Questionnaire
   private var questionnaireJson: String? = null
+
+  fun saveScreenerEncounter(questionnaireResponse: QuestionnaireResponse) {
+    // TODO Extract the screener encounter resource and save into the database.
+    // Extraction of screener questionnaire response is pending for some clarifications on data
+    // modelling.
+    // https://github.com/google/android-fhir/issues/625#issuecomment-875276231
+    val response = FhirContext.forR4().newJsonParser().encodeResourceToString(questionnaireResponse)
+    Log.d("ScreenerEncounter", "saveScreenerEncounter: $response")
+  }
 
   private fun getQuestionnaireJson(): String {
     questionnaireJson?.let {
