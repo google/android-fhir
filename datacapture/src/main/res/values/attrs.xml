@@ -16,6 +16,7 @@
 -->
 <resources>
     <attr name="groupHeaderTextAppearance" format="reference" />
+    <attr name="checkBoxGroupHeaderTextAppearance" format="reference" />
     <attr name="checkBoxStyle" format="reference" />
 
     <declare-styleable name="QuestionnaireTheme">

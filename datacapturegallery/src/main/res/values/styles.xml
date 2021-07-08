@@ -22,6 +22,7 @@
             name="groupHeaderTextAppearance"
         >@style/TextAppearance.MyQuestionnaire.GroupHeader
         </item>
+        <item name="checkBoxGroupHeaderTextAppearance">@style/TextAppearance.MyQuestionnaire.CheckBoxGroupHeader</item>
         <item name="checkBoxStyle">@style/Widget.MyQuestionnaire.CheckBox</item>
     </style>
 
@@ -30,6 +31,10 @@
         parent="TextAppearance.MaterialComponents.Headline6"
     >
         <item name="android:textColor">@color/purple_700</item>
+    </style>
+
+    <style name="TextAppearance.MyQuestionnaire.CheckBoxGroupHeader" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
     <style
