@@ -36,6 +36,7 @@ object GeneratorUtils {
       "unsignedInt",
       "uri",
       "url",
-      "uuid"
+      "uuid",
+//      "xhtml"
     )
 }
