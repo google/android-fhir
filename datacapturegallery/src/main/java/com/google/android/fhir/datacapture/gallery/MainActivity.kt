@@ -18,25 +18,27 @@ package com.google.android.fhir.datacapture.gallery
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.fhir.datacapture.gallery.databinding.ActivityMainBinding
-import com.google.android.fhir.datacapture.gallery.utils.LanguageSwitcherUtils
-import java.util.Locale
+import com.google.android.fhir.datacapture.gallery.utils.LocaleUtils
 
 class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
-  private lateinit var languageList: List<LanguageSwitcherUtils.Language>
+  private lateinit var languageList: List<LocaleUtils.Language>
+  private lateinit var sharedPreferences: SharedPreferences
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
 
-    languageList = LanguageSwitcherUtils.getLanguageList(this)
+    languageList = LocaleUtils.getLanguageList(this)
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -47,51 +49,45 @@ class MainActivity : AppCompatActivity() {
     return true
   }
 
-  private fun refreshToSelectedLanguage(
-    language: LanguageSwitcherUtils.Language,
-    context: Activity
-  ) {
+  private fun refreshToSelectedLanguage(language: LocaleUtils.Language, context: Activity) {
 
-    val sharedPref =
-      context?.getSharedPreferences(
-        BuildConfig.APPLICATION_ID.plus(this.javaClass.canonicalName),
-        Context.MODE_PRIVATE
-      )
-        ?: return
-    with(sharedPref.edit()) {
-      putString(LanguageSwitcherUtils.SHARED_PREF_KEY_LANG, language.tag)
-      commit()
-    }
+    LocaleUtils.saveSelectedLanguage(language, sharedPreferences)
 
-    LanguageSwitcherUtils.refreshActivity(context)
+    this reload context
   }
 
-  override fun attachBaseContext(base: Context) {
-    val sharedPref =
-      base?.getSharedPreferences(
+  override fun attachBaseContext(baseContext: Context) {
+    sharedPreferences =
+      baseContext.getSharedPreferences(
         BuildConfig.APPLICATION_ID.plus(this.javaClass.canonicalName),
         Context.MODE_PRIVATE
       )
-        ?: return
-    val languageTag =
-      sharedPref.getString(
-        LanguageSwitcherUtils.SHARED_PREF_KEY_LANG,
-        Locale.getDefault().toLanguageTag()
-      )
-    val newConfiguration: Configuration? = LanguageSwitcherUtils.setAppLocale(base, languageTag)
-    super.attachBaseContext(base)
-    applyOverrideConfiguration(newConfiguration)
+
+    var newContextResourceConfiguration: Configuration?
+
+    LocaleUtils.getSelectedLanguage(sharedPreferences).also {
+      newContextResourceConfiguration =
+        LocaleUtils.updateContextResourceConfiguration(baseContext, it)
+    }
+
+    super.attachBaseContext(baseContext)
+    applyOverrideConfiguration(newContextResourceConfiguration)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       R.id.action_language -> {
-        LanguageSwitcherUtils.renderSelectLanguageDialog(this, languageList) { _, i ->
+        LocaleUtils.renderSelectLanguageDialog(this, languageList) { _, i ->
           refreshToSelectedLanguage(languageList[i], this)
         }
         true
       }
       else -> super.onOptionsItemSelected(item)
     }
+  }
+
+  private infix fun Activity.reload(activity: Activity) {
+    val intent = Intent(activity, activity.javaClass)
+    activity.startActivity(intent)
   }
 }

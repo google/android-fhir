@@ -19,39 +19,56 @@ package com.google.android.fhir.datacapture.gallery.utils
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
-import android.content.Intent
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Build
 import android.os.LocaleList
 import android.widget.ArrayAdapter
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import com.google.android.fhir.datacapture.gallery.R
 import java.util.Locale
 
-object LanguageSwitcherUtils {
+object LocaleUtils {
 
-  const val SHARED_PREF_KEY_LANG = "shared_pref_key_lang"
+  private const val SHARED_PREF_KEY_LANG = "shared_pref_key_lang"
 
-  fun setAppLocale(context: Context, language: String?): Configuration? {
-    val res: Resources = context.resources
-    val configuration: Configuration = res.configuration
+  fun updateContextResourceConfiguration(context: Context, language: String?): Configuration? {
+    val resources: Resources = context.resources
+    val configuration: Configuration = resources.configuration
     try {
       val locale = Locale.forLanguageTag(language)
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        configuration.setLocale(locale)
-        val localeList = LocaleList(locale)
-        LocaleList.setDefault(localeList)
-        configuration.setLocales(localeList)
-        context.createConfigurationContext(configuration)
+        updateResourcesLocaleConfiguration(context, locale)
       } else {
-        configuration.locale = locale
-        res.updateConfiguration(configuration, res.displayMetrics)
+        updateResourcesLocaleConfigurationLegacy(context, locale)
       }
     } catch (e: Exception) {
       e.printStackTrace()
     }
     return configuration
+  }
+
+  @RequiresApi(Build.VERSION_CODES.N)
+  private fun updateResourcesLocaleConfiguration(context: Context, locale: Locale) {
+    context.resources.configuration.also {
+      it.setLocale(locale)
+
+      val localeList = LocaleList(locale)
+      LocaleList.setDefault(localeList)
+      it.setLocales(localeList)
+
+      context.createConfigurationContext(it)
+    }
+  }
+
+  @Suppress("DEPRECATION")
+  private fun updateResourcesLocaleConfigurationLegacy(context: Context, locale: Locale) {
+    context.resources.configuration.also {
+      it.locale = locale
+      context.resources.updateConfiguration(it, context.resources.displayMetrics)
+    }
   }
 
   fun getLanguageList(activity: Activity): List<Language> {
@@ -60,25 +77,35 @@ object LanguageSwitcherUtils {
     }
   }
 
-  fun refreshActivity(activity: Activity) {
-    val intent = Intent(activity, activity.javaClass)
-    activity.startActivity(intent)
-  }
-
   fun renderSelectLanguageDialog(
     context: Activity,
     languageList: List<Language>,
     listener: DialogInterface.OnClickListener
   ) {
-
     val adapter: ArrayAdapter<Language> =
       ArrayAdapter(context, android.R.layout.simple_list_item_1, languageList)
 
-    val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-    builder.setTitle(context.getString(R.string.select_language))
-    builder.setIcon(R.drawable.outline_language_24)
-    builder.setAdapter(adapter, listener).create().show()
+    AlertDialog.Builder(context)
+      .apply {
+        setTitle(context.getString(R.string.select_language))
+        setIcon(R.drawable.outline_language_24)
+        setAdapter(adapter, listener)
+      }
+      .create()
+      .show()
   }
+
+  fun saveSelectedLanguage(language: Language, sharedPreferences: SharedPreferences) {
+
+    with(sharedPreferences.edit()) {
+      putString(SHARED_PREF_KEY_LANG, language.tag)
+      commit()
+    }
+  }
+
+  fun getSelectedLanguage(sharedPreferences: SharedPreferences): String? =
+    sharedPreferences.getString(SHARED_PREF_KEY_LANG, null)
+
   data class Language(val tag: String, val displayName: String) {
     override fun toString() = displayName
   }
