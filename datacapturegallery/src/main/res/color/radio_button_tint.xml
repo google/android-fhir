@@ -14,15 +14,12 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<resources>
-    <attr name="groupHeaderTextAppearance" format="reference" />
-    <attr name="checkBoxGroupHeaderTextAppearance" format="reference" />
-    <attr name="checkBoxStyle" format="reference" />
-    <attr name="radioButtonStyle" format="reference" />
-
-    <declare-styleable name="QuestionnaireTheme">
-        <!-- The ID of the theme to be applied to the questionnaire. The referenced theme must
-             extend Theme.Questionnaire. If unspecified, Theme.Questionnaire will be used. -->
-        <attr name="questionnaire_theme" format="reference" />
-    </declare-styleable>
-</resources>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/colorSecondary" android:state_checked="true" />
+    <item
+        android:alpha="0.38"
+        android:color="?attr/colorOnSurface"
+        android:state_checked="false"
+    />
+    <item android:color="?attr/colorOnSurface" />
+</selector>

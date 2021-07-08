@@ -24,6 +24,9 @@
         </item>
         <item name="checkBoxGroupHeaderTextAppearance">@style/TextAppearance.MyQuestionnaire.CheckBoxGroupHeader</item>
         <item name="checkBoxStyle">@style/Widget.MyQuestionnaire.CheckBox</item>
+        <item
+            name="radioButtonStyle"
+        >@style/Widget.MyQuestionnaire.RadioButton</item>
     </style>
 
     <style
@@ -42,6 +45,17 @@
         parent="Widget.AppCompat.CompoundButton.CheckBox"
     >
         <item name="android:buttonTint">@color/check_box_tint</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item
+            name="android:textAppearance"
+        >@style/TextAppearance.AppCompat</item>
+    </style>
+
+    <style
+        name="Widget.MyQuestionnaire.RadioButton"
+        parent="Widget.AppCompat.CompoundButton.RadioButton"
+    >
+        <item name="android:buttonTint">@color/radio_button_tint</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
         <item
             name="android:textAppearance"

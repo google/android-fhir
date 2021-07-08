@@ -46,5 +46,8 @@
             name="checkBoxStyle"
         >@style/Widget.AppCompat.CompoundButton.CheckBox
         </item>
+        <item
+            name="radioButtonStyle"
+        >@style/Widget.AppCompat.CompoundButton.RadioButton</item>
     </style>
 </resources>
