@@ -128,5 +128,4 @@ dependencies {
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
-  testImplementation(Dependencies.mockk)
 }
