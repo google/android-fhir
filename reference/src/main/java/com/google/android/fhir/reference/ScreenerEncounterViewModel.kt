@@ -36,8 +36,8 @@ class ScreenerEncounterViewModel(application: Application, private val state: Sa
 
   fun saveScreenerEncounter(questionnaireResponse: QuestionnaireResponse) {
     // TODO Extract the screener encounter resource and save into the database.
-    // Extraction of screener questionnaire response is pending for some clarifications on data
-    // modelling.
+    // Extraction of screener questionnaire response approach is under review, and not confirmed
+    // yet.
     // https://github.com/google/android-fhir/issues/625#issuecomment-875276231
     val response = FhirContext.forR4().newJsonParser().encodeResourceToString(questionnaireResponse)
     Log.d("ScreenerEncounter", "saveScreenerEncounter: $response")
