@@ -117,8 +117,7 @@ private fun evaluateEnableWhen(
   if (questionnaireItem == null || questionnaireResponseItem == null) return true
   return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
     (questionnaireResponseItem.answer.size > 0) == enableWhen.answerBooleanType.booleanValue()
-  }
-  else {
+  } else {
     questionnaireResponseItem.answer.any {
       enableWhenTypeToPredicate(enableWhen, questionnaireItem.type)(it)
     }
@@ -147,11 +146,11 @@ private fun enableWhenTypeToPredicate(
 ): (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> Boolean {
   when (val operator = enableWhen.operator) {
     Questionnaire.QuestionnaireItemOperator.EQUAL -> return {
-      if(it.hasValueCoding()){
-        it.valueCoding.code == enableWhen.answerCoding.code
-      }else {
-        it.value.toString() == enableWhen.answer.toString()
-      }
+        if (it.hasValueCoding()) {
+          it.valueCoding.code == enableWhen.answerCoding.code
+        } else {
+          it.value.toString() == enableWhen.answer.toString()
+        }
       }
     Questionnaire.QuestionnaireItemOperator.NOT_EQUAL -> return {
         it.value.toString() != enableWhen.answer.toString()
