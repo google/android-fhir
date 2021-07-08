@@ -49,6 +49,9 @@
         >@style/Widget.AppCompat.CompoundButton.CheckBox
         </item>
         <item
+            name="radioGroupHeaderTextAppearance"
+        >@style/TextAppearance.MaterialComponents.Subtitle2</item>
+        <item
             name="radioButtonStyle"
         >@style/Widget.AppCompat.CompoundButton.RadioButton</item>
     </style>

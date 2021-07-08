@@ -18,6 +18,7 @@
     <attr name="groupHeaderTextAppearance" format="reference" />
     <attr name="checkBoxGroupHeaderTextAppearance" format="reference" />
     <attr name="checkBoxStyle" format="reference" />
+    <attr name="radioGroupHeaderTextAppearance" format="reference" />
     <attr name="radioButtonStyle" format="reference" />
 
     <declare-styleable name="QuestionnaireTheme">
