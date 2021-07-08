@@ -11,7 +11,7 @@ afterEvaluate {
         from(components["release"])
         artifactId = "data-capture"
         groupId = "com.google.android.fhir"
-        version = "0.1.0-alpha02"
+        version = "0.1.0-alpha03"
         // Also publish source code for developers' convenience
         artifact(
           tasks.create<Jar>("androidSourcesJar") {
@@ -40,9 +40,6 @@ android {
   defaultConfig {
     minSdkVersion(Sdk.minSdk)
     targetSdkVersion(Sdk.targetSdk)
-    versionCode = 1
-    versionName = "1.0"
-
     testInstrumentationRunner(Dependencies.androidJunitRunner)
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments(mapOf("package" to "com.google.android.fhir.datacapture"))
@@ -80,12 +77,16 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.truth)
 
-  api(Dependencies.hapiFhirStructuresR4)
+  api(Dependencies.HapiFhir.structuresR4)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.fragmentKtx)
+  implementation(Dependencies.HapiFhir.validation) {
+    exclude(module = "commons-logging")
+    exclude(module = "httpclient")
+  }
   implementation(Dependencies.Kotlin.androidxCoreKtx)
   implementation(Dependencies.Kotlin.kotlinTestJunit)
   implementation(Dependencies.Kotlin.stdlib)
@@ -95,6 +96,7 @@ dependencies {
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
 }

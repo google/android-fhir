@@ -20,11 +20,9 @@ import android.content.Context
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
-import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
-import com.google.android.fhir.resource.getResourceType
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
@@ -43,13 +41,8 @@ constructor(private val database: Database, private val context: Context) : Fhir
     database.update(resource)
   }
 
-  @Throws(ResourceNotFoundException::class)
   override suspend fun <R : Resource> load(clazz: Class<R>, id: String): R {
-    return try {
-      database.select(clazz, id)
-    } catch (e: ResourceNotFoundException) {
-      throw ResourceNotFoundException(getResourceType(clazz).name, id, e)
-    }
+    return database.select(clazz, id)
   }
 
   override suspend fun <R : Resource> remove(clazz: Class<R>, id: String) {
