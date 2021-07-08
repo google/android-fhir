@@ -1,8 +1,8 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
 >
 
   <TextView
@@ -15,30 +15,11 @@
     />
 
   <TextView
-        android:id="@+id/patient_id"
-        style="@style/AppTheme.PatientDetails.Subtitle2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/title"
-        android:text="@string/patient_id"
-    />
-
-  <TextView
-        android:id="@+id/id_patient_number"
-        style="@style/AppTheme.PatientDetails.body2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/title"
-        android:layout_toEndOf="@id/patient_id"
-        tools:text="Patient1234"
-    />
-
-  <TextView
         android:id="@+id/patient_gender"
         style="@style/AppTheme.PatientDetails.Subtitle2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/patient_id"
+        android:layout_below="@+id/title"
         android:text="@string/patient_gender"
     />
 
@@ -47,7 +28,7 @@
         style="@style/AppTheme.PatientDetails.body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/id_patient_number"
+        android:layout_below="@+id/title"
         android:layout_toEndOf="@id/patient_gender"
         tools:text="Female"
     />

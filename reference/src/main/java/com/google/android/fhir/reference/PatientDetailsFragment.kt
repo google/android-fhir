@@ -84,7 +84,6 @@ class PatientDetailsFragment : Fragment() {
       }
       binding.patientListItem.apply {
         title.text = it.name
-        idPatientNumber.text = it.resourceId
         gender.text = it.gender
         dob.text = it.dob
         phoneNumber.text = it.phone
