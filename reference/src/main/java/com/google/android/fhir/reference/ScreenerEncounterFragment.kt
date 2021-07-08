@@ -22,6 +22,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
@@ -41,6 +42,7 @@ class ScreenerEncounterFragment : Fragment(R.layout.screener_encounter_fragment)
     setUpActionBar()
     setHasOptionsMenu(true)
     updateArguments()
+    onBackPressed()
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
     }
@@ -105,6 +107,12 @@ class ScreenerEncounterFragment : Fragment(R.layout.screener_encounter_fragment)
         builder.create()
       }
     alertDialog?.show()
+  }
+
+  private fun onBackPressed() {
+    activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner) {
+      showCancelScreenerQuestionnaireAlertDialog()
+    }
   }
 
   companion object {
