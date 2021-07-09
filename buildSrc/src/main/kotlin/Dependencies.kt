@@ -85,6 +85,8 @@ object Dependencies {
     const val extJunitKtx = "androidx.test.ext:junit-ktx:${Versions.AndroidxTest.extJunit}"
     const val rules = "androidx.test:rules:${Versions.AndroidxTest.rules}"
     const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
+    const val workTestingRuntimeKtx =
+      "androidx.work:work-testing:${Versions.Androidx.workRuntimeKtx}"
   }
 
   object Espresso {

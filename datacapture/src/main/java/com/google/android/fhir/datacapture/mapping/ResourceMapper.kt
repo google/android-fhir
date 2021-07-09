@@ -25,6 +25,7 @@ import com.google.android.fhir.datacapture.utilities.NpmPackageProvider
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
+import java.util.Locale
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
@@ -264,7 +265,7 @@ private fun Base.updateFieldWithEnum(field: Field, value: Base) {
   val stringValue = if (value is Coding) value.code else value.toString()
 
   javaClass
-    .getMethod("set${field.name.capitalize()}", field.nonParameterizedType)
+    .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.nonParameterizedType)
     .invoke(this, fromCodeMethod.invoke(dataTypeClass, stringValue))
 }
 
@@ -277,12 +278,12 @@ private fun Base.updateField(field: Field, value: Base) {
 
   try {
     javaClass
-      .getMethod("set${field.name.capitalize()}Element", field.type)
+      .getMethod("set${field.name.capitalize(Locale.ROOT)}Element", field.type)
       .invoke(this, answerValue)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
     javaClass
-      .getMethod("set${field.name.capitalize()}", field.type)
+      .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.type)
       .invoke(this, if (field.isParameterized && field.isList) listOf(answerValue) else answerValue)
   }
 }
@@ -381,9 +382,9 @@ private val Questionnaire.QuestionnaireItemComponent.getDefinitionField: Field?
     val path = definitionPath ?: return null
     if (path.size < 2) return null
     val resourceClass: Class<*> = Class.forName("org.hl7.fhir.r4.model.${path[0]}")
-    val field: Field = resourceClass.getFieldOrNull(path[1]) ?: return null
+    val definitionField: Field = resourceClass.getFieldOrNull(path[1]) ?: return null
 
-    return path.drop(2).fold(field) { field: Field?, nestedFieldName: String ->
+    return path.drop(2).fold(definitionField) { field: Field?, nestedFieldName: String ->
       field?.nonParameterizedType?.getFieldOrNull(nestedFieldName)
     }
   }
