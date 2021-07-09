@@ -78,22 +78,21 @@ class PatientDetailsFragment : Fragment() {
   }
 
   private fun setupPatientData(view: View, patientItem: PatientListViewModel.PatientItem?) {
-    patientItem?.let {
+    patientItem?.let { patient ->
       binding.patientDetail.apply {
-        text = HtmlCompat.fromHtml(it.html, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        text = HtmlCompat.fromHtml(patient.html, HtmlCompat.FROM_HTML_MODE_LEGACY)
       }
       binding.patientListItem.apply {
-        title.text = it.name
-        gender.text = it.gender
-        dob.text = it.dob
-        phoneNumber.text = it.phone
-        city.text = it.city
-        country.text = it.country
-        isActive.text = it.isActive.toString()
+        title.text = patient.name
+        gender.text = patient.gender
+        dob.text = patient.dob
+        phoneNumber.text = patient.phone
+        city.text = patient.city
+        country.text = patient.country
+        isActive.text = patient.isActive.toString()
       }
-
       (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-        title = it.name
+        title = patient.name
         setDisplayHomeAsUpEnabled(true)
       }
     }
