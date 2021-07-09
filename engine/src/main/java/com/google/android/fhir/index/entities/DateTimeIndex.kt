@@ -21,12 +21,19 @@ package com.google.android.fhir.index.entities
  *
  * See https://hl7.org/FHIR/search.html#date.
  */
-internal data class DateIndex(
+internal data class DateTimeIndex(
   /** The name of the date index, e.g. "birthdate". */
   val name: String,
   /** The path of the date index, e.g. "Patient.birthdate". */
   val path: String,
-  /** The epoch day. */
+  /**
+   * The lower bound or start time of the date value. This is a closed interval and the value is
+   * included
+   */
   val from: Long,
+  /**
+   * The upper bound or end time of the date value. This is a closed interval and the value is
+   * included
+   */
   val to: Long
 )

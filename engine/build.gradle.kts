@@ -101,6 +101,7 @@ configurations {
 }
 
 dependencies {
+  implementation("androidx.sqlite:sqlite-ktx:2.1.0")
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)

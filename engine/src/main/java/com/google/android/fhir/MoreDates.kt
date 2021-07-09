@@ -14,19 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.index.entities
+package com.google.android.fhir
 
-/**
- * An index record for a date value in a resource.
- *
- * See https://hl7.org/FHIR/search.html#date.
- */
-internal data class DateIndex(
-  /** The name of the date index, e.g. "birthdate". */
-  val name: String,
-  /** The path of the date index, e.g. "Patient.birthdate". */
-  val path: String,
-  /** The epoch day. */
-  val from: Long,
-  val to: Long
-)
+import java.time.LocalDate
+import java.util.Date
+
+internal val Date.epochDay
+  get() = LocalDate.of(year + 1900, month + 1, date).toEpochDay()
