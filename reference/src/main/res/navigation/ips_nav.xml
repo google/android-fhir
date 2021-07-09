@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ips_nav">
+
+    <fragment
+        android:id="@+id/IPSListFragment"
+        android:name="com.google.android.fhir.reference.ips.IPSListFragment"
+        android:label="fragment_ips_list"
+        tools:layout="@layout/fragment_ips_list" />
+</navigation>
