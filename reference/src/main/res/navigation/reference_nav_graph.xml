@@ -17,6 +17,10 @@
             android:id="@+id/navigate_to_product_detail"
             app:destination="@id/patient_details"
         />
+        <action
+            android:id="@+id/action_patient_list_to_addPatientFragment"
+            app:destination="@id/addPatientFragment"
+        />
     </fragment>
 
     <fragment
@@ -27,5 +31,11 @@
     >
         <argument android:name="patient_id" app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/addPatientFragment"
+        android:label="@string/add_patient"
+        android:name="com.google.android.fhir.reference.AddPatientFragment"
+        tools:layout="@layout/add_patient_fragment"
+    />
 
 </navigation>
