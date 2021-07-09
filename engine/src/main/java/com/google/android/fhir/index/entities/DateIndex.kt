@@ -17,7 +17,10 @@
 package com.google.android.fhir.index.entities
 
 /**
- * An index record for a date value in a resource.
+ * An index record for a `Date` value in a FHIR resource.
+ *
+ * Note one fundamental difference between `Date` and `DateTime` data types in FHIR in that `Date`
+ * does not contain timezone info where `DateTime` does.
  *
  * See https://hl7.org/FHIR/search.html#date.
  */
@@ -26,7 +29,8 @@ internal data class DateIndex(
   val name: String,
   /** The path of the date index, e.g. "Patient.birthdate". */
   val path: String,
-  /** The epoch day. */
+  /** The epoch day of the first date. */
   val from: Long,
+  /** The epoch day of the last date. */
   val to: Long
 )
