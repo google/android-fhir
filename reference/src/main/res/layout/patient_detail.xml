@@ -29,7 +29,7 @@
         android:orientation="vertical"
     >
 
-    <androidx.cardview.widget.CardView
+  <com.google.android.material.card.MaterialCardView
             android:id="@+id/patient_info_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -46,20 +46,20 @@
 
             <include
                     android:id="@+id/patient_list_item"
-                    layout="@layout/patient_list_item_view"
+                    layout="@layout/patient_details_layout"
                 />
 
             <TextView
                     android:id="@+id/patient_detail"
-                    style="?android:attr/textAppearanceSmall"
+                    style="@style/AppTheme.PatientDetails.body2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
+                    android:layout_marginTop="16dp"
                     android:textIsSelectable="true"
                     tools:context=".PatientDetailsFragment"
                 />
         </androidx.appcompat.widget.LinearLayoutCompat>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
     <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

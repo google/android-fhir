@@ -29,6 +29,14 @@
     >Do you want to cancel current questionnaire?</string>
   <string name="yes">Yes</string>
   <string name="no">No</string>
+  <string name="patient_id">Id</string>
+  <string name="patient_name">Name</string>
+  <string name="patient_gender">Gender</string>
+  <string name="patient_dob">DOB</string>
+  <string name="patient_phone_number">Phone Number</string>
+  <string name="patient_city">City</string>
+  <string name="patient_country">Country</string>
+  <string name="patient_is_active">Is Active</string>
   <string name="add_patient">Add Patient</string>
   <string name="submit">Submit</string>
 </resources>

@@ -24,6 +24,7 @@ import ca.uhn.fhir.context.FhirContext
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
+const val TAG = "ScreenerEncounterModel"
 /** ViewModel for screener questionnaire screen {@link ScreenerEncounterFragment}. */
 class ScreenerEncounterViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
@@ -34,13 +35,16 @@ class ScreenerEncounterViewModel(application: Application, private val state: Sa
     get() = FhirContext.forR4().newJsonParser().parseResource(questionnaire) as Questionnaire
   private var questionnaireJson: String? = null
 
+  /**
+   * Saves screener encounter questionnaire response into the application database.
+   *
+   * @param questionnaireResponse screener encounter questionnaire response
+   */
   fun saveScreenerEncounter(questionnaireResponse: QuestionnaireResponse) {
     // TODO Extract the screener encounter resource and save into the database.
-    // Extraction of screener questionnaire response approach is under review, and not confirmed
-    // yet.
-    // https://github.com/google/android-fhir/issues/625#issuecomment-875276231
+    // Extraction of screener questionnaire response approach is under review.
     val response = FhirContext.forR4().newJsonParser().encodeResourceToString(questionnaireResponse)
-    Log.d("ScreenerEncounter", "saveScreenerEncounter: $response")
+    Log.d(TAG, "saveScreenerEncounter: $response")
   }
 
   private fun getQuestionnaireJson(): String {
