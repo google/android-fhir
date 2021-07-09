@@ -1,0 +1,130 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+>
+
+  <TextView
+        android:id="@+id/title"
+        style="@style/AppTheme.PatientDetails.headline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:text="Mary Odhiambo"
+    />
+
+  <TextView
+        android:id="@+id/patient_gender"
+        style="@style/AppTheme.PatientDetails.Subtitle2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        android:text="@string/patient_gender"
+    />
+
+  <TextView
+        android:id="@+id/gender"
+        style="@style/AppTheme.PatientDetails.body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        android:layout_toEndOf="@id/patient_gender"
+        tools:text="Female"
+    />
+
+  <TextView
+        android:id="@+id/patient_dob"
+        style="@style/AppTheme.PatientDetails.Subtitle2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/patient_gender"
+        android:text="@string/patient_dob"
+    />
+
+  <TextView
+        android:id="@+id/dob"
+        style="@style/AppTheme.PatientDetails.body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/gender"
+        android:layout_toEndOf="@id/patient_dob"
+        tools:text="2020-07-04"
+    />
+
+  <TextView
+        android:id="@+id/patient_phone_number"
+        style="@style/AppTheme.PatientDetails.Subtitle2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/patient_dob"
+        android:text="@string/patient_phone_number"
+    />
+
+  <TextView
+        android:id="@+id/phone_number"
+        style="@style/AppTheme.PatientDetails.body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dob"
+        android:layout_toEndOf="@id/patient_phone_number"
+        tools:text="2020070400"
+    />
+
+  <TextView
+        android:id="@+id/patient_city"
+        style="@style/AppTheme.PatientDetails.Subtitle2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/patient_phone_number"
+        android:text="@string/patient_city"
+    />
+
+  <TextView
+        android:id="@+id/city"
+        style="@style/AppTheme.PatientDetails.body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/phone_number"
+        android:layout_toEndOf="@id/patient_city"
+        tools:text="Nairobi"
+    />
+
+  <TextView
+        android:id="@+id/patient_country"
+        style="@style/AppTheme.PatientDetails.Subtitle2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/patient_city"
+        android:text="@string/patient_country"
+    />
+
+  <TextView
+        android:id="@+id/country"
+        style="@style/AppTheme.PatientDetails.body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/city"
+        android:layout_toEndOf="@id/patient_country"
+        tools:text="Nairobi"
+    />
+
+  <TextView
+        android:id="@+id/patient_is_active"
+        style="@style/AppTheme.PatientDetails.Subtitle2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/patient_country"
+        android:text="@string/patient_is_active"
+    />
+
+  <TextView
+        android:id="@+id/is_active"
+        style="@style/AppTheme.PatientDetails.body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/country"
+        android:layout_toEndOf="@id/patient_is_active"
+        tools:text="True"
+    />
+</RelativeLayout>
