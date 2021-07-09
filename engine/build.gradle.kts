@@ -102,20 +102,23 @@ configurations {
 
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.core)
-  androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
+  androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
 
-  api(Dependencies.hapiFhirStructuresR4) { exclude(module = "junit") }
+  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
+  implementation(Dependencies.Androidx.workRuntimeKtx)
+  implementation(Dependencies.HapiFhir.validation) {
+    exclude(module = "commons-logging")
+    exclude(module = "httpclient")
+  }
+  implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.Room.ktx)
-  implementation(Dependencies.Androidx.workRuntimeKtx)
-  implementation(Dependencies.Kotlin.stdlib)
-  implementation(Dependencies.caffeine)
   implementation(Dependencies.guava)
   implementation(Dependencies.jsonToolsPatch)
 

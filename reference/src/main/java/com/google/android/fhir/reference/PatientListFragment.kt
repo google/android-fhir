@@ -113,6 +113,13 @@ class PatientListFragment : Fragment() {
           }
         }
       )
+
+    binding.apply { addPatient.setOnClickListener { onAddPatientClick() } }
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   private fun onPatientItemClicked(patientItem: PatientListViewModel.PatientItem) {
@@ -120,9 +127,9 @@ class PatientListFragment : Fragment() {
       .navigate(PatientListFragmentDirections.navigateToProductDetail(patientItem.resourceId))
   }
 
-  override fun onDestroyView() {
-    super.onDestroyView()
-    _binding = null
+  private fun onAddPatientClick() {
+    findNavController()
+      .navigate(PatientListFragmentDirections.actionPatientListToAddPatientFragment())
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
