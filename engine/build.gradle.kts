@@ -128,4 +128,5 @@ dependencies {
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
 }
