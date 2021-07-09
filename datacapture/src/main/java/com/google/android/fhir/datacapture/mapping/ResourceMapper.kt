@@ -40,7 +40,6 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceFactory
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.r4.model.TimeType
@@ -138,10 +137,9 @@ object ResourceMapper {
     val structureMap = structureMapProvider(questionnaire.targetStructureMap!!)
 
     val structureMapUtilities = StructureMapUtilities(contextR4)
-    val targetResource: Resource =
-      ResourceFactory.createResource(structureMapUtilities.getTargetType(structureMap).name)
+    val targetResource = Bundle()
     structureMapUtilities.transform(contextR4, questionnaireResponse, structureMap, targetResource)
-    return targetResource as Bundle
+    return targetResource
   }
 
   /**
