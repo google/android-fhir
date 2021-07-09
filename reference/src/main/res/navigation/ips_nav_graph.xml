@@ -2,10 +2,11 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/ips_nav">
+    android:id="@+id/ips_nav_graph"
+    app:startDestination="@id/ips_list_fragment">
 
     <fragment
-        android:id="@+id/IPSListFragment"
+        android:id="@+id/ips_list_fragment"
         android:name="com.google.android.fhir.reference.ips.IPSListFragment"
         android:label="fragment_ips_list"
         tools:layout="@layout/fragment_ips_list" />

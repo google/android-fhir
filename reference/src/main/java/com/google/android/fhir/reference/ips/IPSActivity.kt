@@ -1,13 +1,14 @@
 package com.google.android.fhir.reference.ips
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.fhir.reference.R
+import com.google.android.fhir.reference.databinding.ActivityIpsBinding
 
 class IPSActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_ips)
+        val binding = ActivityIpsBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
     }
 }

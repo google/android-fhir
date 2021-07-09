@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ips.IPSActivity"
-    android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ips.IPSActivity">
     <fragment
+        android:id="@+id/ips_activity_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:navGraph = "@navigation/ips_nav"
-        app:defaultNavHost = "true"
-        android:id="@+id/ips_activity_frag"/>
+        app:navGraph = "@navigation/ips_nav_graph"
+        app:defaultNavHost = "true" />
     <TextView
         android:id="@+id/ipsAct_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="INSIDE IPS ACITIVITY"
+        android:text="INSIDE IPS ACTIVITY FRAGMENT"
         tools:ignore="MissingConstraints" />
 
 </LinearLayout>
