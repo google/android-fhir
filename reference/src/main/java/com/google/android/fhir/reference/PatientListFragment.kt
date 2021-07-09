@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.reference
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -31,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.reference.databinding.FragmentPatientListBinding
+import com.google.android.fhir.reference.ips.IPSActivity
 
 class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
@@ -137,7 +139,14 @@ class PatientListFragment : Fragment() {
     inflater.inflate(R.menu.overflow_menu,menu)
   }
 
-//  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//    return
-//  }
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    when (item.itemId) {
+        R.id.ips_activity_menu-> {
+      val intent = Intent(requireContext(), IPSActivity::class.java)
+      requireContext().startActivity(intent)
+          return true
+    }
+    }
+    return super.onOptionsItemSelected(item)
+  }
 }

@@ -4,6 +4,6 @@
     xmlns:app ="http://schemas.android.com/apk/res-auto"
     tools:ignore="NamespaceTypo">
     <item
-        android:id="@+id/ips_fragment_menu"
-        android:title="IPS"/>
+        android:id="@+id/ips_activity_menu"
+        android:title="IPS Screen open"/>
 </menu>
