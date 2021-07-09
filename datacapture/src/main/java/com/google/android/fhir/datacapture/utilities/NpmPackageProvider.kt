@@ -42,7 +42,7 @@ object NpmPackageProvider {
   lateinit var npmPackage: NpmPackage
   lateinit var contextR4: SimpleWorkerContext
 
-  fun loadSimpleWorkerContextWithPackage(context: Context): SimpleWorkerContext {
+  fun loadSimpleWorkerContext(context: Context): SimpleWorkerContext {
     return loadSimpleWorkerContext(loadNpmPackage(context))
   }
 

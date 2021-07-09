@@ -22,7 +22,7 @@ import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.junit.Test
 
-class MoreQuestionnairesKtTest {
+class MoreQuestionnairesTest {
 
   @Test
   fun `targetStructureMap() should return null when Questionnaire lacks extension`() {

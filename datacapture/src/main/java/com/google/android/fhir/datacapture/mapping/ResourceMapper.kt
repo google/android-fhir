@@ -87,14 +87,8 @@ object ResourceMapper {
     context: Context? = null
   ): Bundle {
     return if (questionnaire.targetStructureMap == null)
-      extractByDefinitionBased(questionnaire, questionnaireResponse)
-    else
-      extractByStructureMapBased(
-        questionnaire,
-        questionnaireResponse,
-        structureMapProvider,
-        context
-      )
+      extractByDefinitions(questionnaire, questionnaireResponse)
+    else extractByStructureMap(questionnaire, questionnaireResponse, structureMapProvider, context)
   }
 
   /**
@@ -105,7 +99,7 @@ object ResourceMapper {
    * extracted resource. If the process completely fails, an error is thrown or a [Bundle]
    * containing empty [Resource] is returned
    */
-  private fun extractByDefinitionBased(
+  private fun extractByDefinitions(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse
   ): Bundle {
@@ -132,17 +126,16 @@ object ResourceMapper {
    *
    * @return [Bundle] containing the extracted [Resource]s
    */
-  private fun extractByStructureMapBased(
+  private fun extractByStructureMap(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     structureMapProvider: ((String) -> StructureMap?)?,
     context: Context?
   ): Bundle {
     if (structureMapProvider == null || context == null) return Bundle()
-    val contextR4 = NpmPackageProvider.loadSimpleWorkerContextWithPackage(context)
+    val contextR4 = NpmPackageProvider.loadSimpleWorkerContext(context)
 
-    val structureMapUrl = questionnaire.targetStructureMap!!
-    val structureMap = structureMapProvider(structureMapUrl)
+    val structureMap = structureMapProvider(questionnaire.targetStructureMap!!)
 
     val structureMapUtilities = StructureMapUtilities(contextR4)
     val targetResource: Resource =

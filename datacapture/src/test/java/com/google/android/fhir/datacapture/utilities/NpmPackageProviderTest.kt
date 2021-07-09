@@ -38,8 +38,6 @@ class NpmPackageProviderTest {
     ReflectionHelpers.setField(NpmPackageProvider, "contextR4", null)
   }
 
-  @Test fun testGetNpmPackage() {}
-
   @Test
   fun `loadSimpleWorkerContext() should initialize contextR4`() {
     Assert.assertThrows(UninitializedPropertyAccessException::class.java) {
