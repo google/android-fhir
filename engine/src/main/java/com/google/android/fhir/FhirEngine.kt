@@ -22,6 +22,7 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import java.time.LocalDateTime
 
 /** The FHIR Engine interface that handles the local storage of FHIR resources. */
 interface FhirEngine {
@@ -79,6 +80,16 @@ interface FhirEngine {
    * @param search
    */
   suspend fun count(search: Search): Long
+
+  /**
+   * Returns the timestamp when data was last synchronized
+   */
+  suspend fun getLastSyncTimeStamp(): LocalDateTime
+
+  /**
+   * Saves the timestamp when data was last synchronized
+   */
+  suspend fun saveLastSyncTimeStamp(lastSyncTimestamp: LocalDateTime)
 }
 
 interface SyncDownloadContext {

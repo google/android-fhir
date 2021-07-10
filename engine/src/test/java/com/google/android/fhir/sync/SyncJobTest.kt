@@ -27,6 +27,8 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Assert
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,6 +36,9 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalUnit
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
@@ -45,7 +50,6 @@ class SyncJobTest {
   private lateinit var dataSource: DataSource
 
   private lateinit var syncJob: SyncJobImpl
-
 
   private val testDispatcher = TestCoroutineDispatcher()
 
@@ -59,22 +63,29 @@ class SyncJobTest {
   }
 
   @Test
-  fun test() = runBlockingTest {
-    val res = mutableListOf<Result>()
+  fun `should run synchronizer and emit states accurately in sequence`() = runBlockingTest {
+    val res = mutableListOf<State>()
 
-    syncJob.subscribe().collect {
-      res.add(it)
-    }
-    
-    launch {
-      syncJob.run()
-
-      assertEquals(Result.Started, res[0])
-      assertEquals(5, res.size)
+    val job = launch {
+      syncJob.subscribe().collect {
+        res.add(it)
+      }
     }
 
-    testDispatcher.advanceTimeBy(30000)
-    syncJob.close()
+    syncJob.run()
+
+    // State transition for successful job as below
+    // Nothing, Started, InProgress, Success
+    assertTrue(res[0] is State.Nothing)
+    assertTrue(res[1] is State.Started)
+    assertTrue(res[2] is State.InProgress)
+    assertTrue(res[3] is State.Success)
+    assertEquals(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+      (res[3] as State.Success).lastSyncTimestamp.truncatedTo(ChronoUnit.SECONDS))
+
+    assertEquals(4, res.size)
+
+    job.cancel()
   }
 
   @Test

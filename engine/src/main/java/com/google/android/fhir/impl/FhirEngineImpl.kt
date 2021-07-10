@@ -29,10 +29,14 @@ import com.google.android.fhir.search.execute
 import com.google.android.fhir.toTimeZoneString
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import com.google.android.fhir.SharedPreferencesUtil
+import java.time.LocalDateTime
 
 /** Implementation of [FhirEngine]. */
 internal class FhirEngineImpl
-constructor(private val database: Database, private val context: Context) : FhirEngine {
+constructor(private val database: Database, context: Context) : FhirEngine {
+  val preferences = SharedPreferencesUtil.init(context)
+
   override suspend fun <R : Resource> save(vararg resource: R) {
     database.insert(*resource)
   }
@@ -55,6 +59,14 @@ constructor(private val database: Database, private val context: Context) : Fhir
 
   override suspend fun count(search: Search): Long {
     return search.count(database)
+  }
+
+  override suspend fun getLastSyncTimeStamp(): LocalDateTime {
+    return preferences.readTimestamp(LAST_SYNC_TIMESTAMP)
+  }
+
+  override suspend fun saveLastSyncTimeStamp(lastSyncTimestamp: LocalDateTime) {
+    preferences.write(LAST_SYNC_TIMESTAMP, lastSyncTimestamp)
   }
 
   override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {
@@ -80,5 +92,9 @@ constructor(private val database: Database, private val context: Context) : Fhir
       upload(localChanges).forEach { database.deleteUpdates(it) }
       localChanges = database.getAllLocalChanges()
     }
+  }
+
+  companion object {
+    private const val LAST_SYNC_TIMESTAMP = "LAST_SYNC_TIMESTAMP"
   }
 }

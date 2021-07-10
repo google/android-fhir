@@ -81,7 +81,7 @@ class SyncJobImpl(
   /**
    * Subscribe to updates on fhir synchronizer sync progress
    */
-  override fun subscribe(): StateFlow<Result> {
+  override fun subscribe(): StateFlow<State> {
     return fhirSynchronizer.state
   }
 

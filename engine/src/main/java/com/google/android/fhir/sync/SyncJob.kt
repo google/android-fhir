@@ -25,5 +25,5 @@ interface SyncJob {
   fun poll(delay: Long): Flow<Result>
   suspend fun run(): Result
   suspend fun run(resourceSyncParams: ResourceSyncParams): Result
-  fun subscribe(): StateFlow<Result>
+  fun subscribe(): StateFlow<State>
 }

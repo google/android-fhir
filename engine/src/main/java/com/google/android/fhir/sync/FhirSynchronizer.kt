@@ -23,20 +23,27 @@ import com.google.android.fhir.isUploadSuccess
 import com.google.android.fhir.logicalId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import java.time.LocalDateTime
 
 sealed class Result {
-  object Nothing : Result()
-  object Started: Result()
-
-  data class InProgress(val resourceType: ResourceType): Result()
-  data class Glitch(val exceptions: List<ResourceSyncException>): Result()
-
   object Success : Result()
-  data class Error(val exceptions: List<ResourceSyncException>) : Result()
+  data class Error (val exceptions: List<ResourceSyncException>): Result()
+}
+
+sealed class State {
+  data class Nothing (val lastSyncTimestamp: LocalDateTime?): State()
+  object Started: State()
+
+  data class InProgress (val resourceType: ResourceType?): State()
+  data class Glitch (val exceptions: List<ResourceSyncException>): State()
+
+  data class Success (val lastSyncTimestamp: LocalDateTime): State()
+  data class Error (val lastSyncTimestamp: LocalDateTime, val exceptions: List<ResourceSyncException>): State()
 }
 
 data class ResourceSyncException(val resourceType: ResourceType, val exception: Exception)
@@ -47,11 +54,26 @@ class FhirSynchronizer(
   private val dataSource: DataSource,
   private val resourceSyncParams: ResourceSyncParams
 ) {
-  private val _state = MutableStateFlow<Result>(Result.Nothing)
-  val state: StateFlow<Result> get() = _state
+  private val _state: MutableStateFlow<State> = MutableStateFlow(State.Nothing(null))
+  val state: StateFlow<State> get() = _state
 
-  private fun emit(result: Result){
-    _state.value = result
+  init {
+      var lastSyncDatetime: LocalDateTime
+      runBlocking {
+        lastSyncDatetime = fhirEngine.getLastSyncTimeStamp()
+      }
+
+    emit(State.Nothing(lastSyncDatetime))
+  }
+
+  private fun emit(state: State){
+    _state.value = state
+  }
+
+  private suspend fun emitAndWrite(state: State){
+    fhirEngine.saveLastSyncTimeStamp(LocalDateTime.now())
+
+    _state.value = state
   }
 
   suspend fun synchronize(): Result {
@@ -59,7 +81,7 @@ class FhirSynchronizer(
   }
 
   suspend fun synchronize(resourceSyncParams: ResourceSyncParams): Result {
-    emit(Result.Started)
+    emit(State.Started)
 
     val exceptions = mutableListOf<ResourceSyncException>()
 
@@ -68,11 +90,11 @@ class FhirSynchronizer(
     if (result is Result.Error) {
       exceptions.addAll(result.exceptions)
 
-      emit(Result.Glitch(exceptions))
+      emit(State.Glitch(exceptions))
     }
 
     resourceSyncParams.forEach {
-      emit(Result.InProgress(it.key))
+      emit(State.InProgress(it.key))
 
       try {
         downloadResourceType(it.key, it.value)
@@ -82,11 +104,11 @@ class FhirSynchronizer(
     }
 
     return if (exceptions.isEmpty()) {
-      emit(Result.Success)
+      emitAndWrite(State.Success(LocalDateTime.now()))
 
       Result.Success
     } else {
-      emit(Result.Error(exceptions))
+      emitAndWrite(State.Error(LocalDateTime.now(), exceptions))
 
       Result.Error(exceptions)
     }
