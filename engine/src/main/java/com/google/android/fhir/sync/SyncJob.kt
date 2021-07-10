@@ -17,8 +17,13 @@
 package com.google.android.fhir.sync
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface SyncJob {
   fun close()
   fun poll(delay: Long, initialDelay: Long?): Flow<Result>
+  fun poll(delay: Long): Flow<Result>
+  suspend fun run(): Result
+  suspend fun run(resourceSyncParams: ResourceSyncParams): Result
+  fun subscribe(): StateFlow<Result>
 }

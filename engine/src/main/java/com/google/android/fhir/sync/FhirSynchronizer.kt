@@ -21,12 +21,20 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.isUploadSuccess
 import com.google.android.fhir.logicalId
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
+  object Nothing : Result()
+  object Started: Result()
+
+  data class InProgress(val resourceType: ResourceType): Result()
+  data class Glitch(val exceptions: List<ResourceSyncException>): Result()
+
   object Success : Result()
   data class Error(val exceptions: List<ResourceSyncException>) : Result()
 }
@@ -39,21 +47,47 @@ class FhirSynchronizer(
   private val dataSource: DataSource,
   private val resourceSyncParams: ResourceSyncParams
 ) {
+  private val _state = MutableStateFlow<Result>(Result.Nothing)
+  val state: StateFlow<Result> get() = _state
+
+  private fun emit(result: Result){
+    _state.value = result
+  }
+
   suspend fun synchronize(): Result {
+    return synchronize(resourceSyncParams)
+  }
+
+  suspend fun synchronize(resourceSyncParams: ResourceSyncParams): Result {
+    emit(Result.Started)
+
     val exceptions = mutableListOf<ResourceSyncException>()
 
-    upload()
+    val result = upload()
+
+    if (result is Result.Error) {
+      exceptions.addAll(result.exceptions)
+
+      emit(Result.Glitch(exceptions))
+    }
 
     resourceSyncParams.forEach {
+      emit(Result.InProgress(it.key))
+
       try {
         downloadResourceType(it.key, it.value)
       } catch (exception: Exception) {
         exceptions.add(ResourceSyncException(it.key, exception))
       }
     }
+
     return if (exceptions.isEmpty()) {
+      emit(Result.Success)
+
       Result.Success
     } else {
+      emit(Result.Error(exceptions))
+
       Result.Error(exceptions)
     }
   }

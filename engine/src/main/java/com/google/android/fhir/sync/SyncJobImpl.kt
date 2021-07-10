@@ -17,34 +17,41 @@
 package com.google.android.fhir.sync
 
 import android.util.Log
+import com.google.android.fhir.FhirEngine
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 
-class SyncJobImpl(val dispatcher: CoroutineDispatcher) : SyncJob {
+class SyncJobImpl(
+  private val dispatcher: CoroutineDispatcher,
+  fhirEngine: FhirEngine,
+  dataSource: DataSource,
+  resourceSyncParams: ResourceSyncParams) : SyncJob {
+  private val TAG = javaClass.name
 
-  private fun getTag(): String {
-    return javaClass.name
-  }
+  private var fhirSynchronizer: FhirSynchronizer =
+    FhirSynchronizer(fhirEngine, dataSource, resourceSyncParams)
 
   @ExperimentalCoroutinesApi
   override fun poll(delay: Long, initialDelay: Long?): Flow<Result> {
-    Log.i(getTag(), "Initiating polling")
+    Log.i(TAG, "Initiating polling")
 
     return channelFlow {
-        Log.i(getTag(), "Initiating channel flow")
         if (initialDelay != null && initialDelay > 0) {
+          Log.i(TAG, "Injecting a delay of $initialDelay millis")
+
           delay(initialDelay)
         }
 
         while (!isClosedForSend) {
-          Log.i(getTag(), "Running channel flow")
+          Log.i(TAG, "Running channel flow")
 
-          val result = Result.Success; // todo//repository.getData()
+          val result = Result.Success // todo//repository.getData()
           send(result)
           delay(delay)
         }
@@ -52,7 +59,33 @@ class SyncJobImpl(val dispatcher: CoroutineDispatcher) : SyncJob {
       .flowOn(dispatcher)
   }
 
-  override fun close() {
+  @ExperimentalCoroutinesApi
+  override fun poll(delay: Long): Flow<Result> {
+    return poll(delay, null)
+  }
+
+  /**
+   * Run fhir synchronizer immediately with given sync params
+   */
+  override suspend fun run(resourceSyncParams: ResourceSyncParams): Result {
+    return fhirSynchronizer.synchronize(resourceSyncParams)
+  }
+
+  /**
+   * Run fhir synchronizer immediately with default sync params configured on initialization
+   */
+  override suspend fun run(): Result {
+    return fhirSynchronizer.synchronize()
+  }
+
+  /**
+   * Subscribe to updates on fhir synchronizer sync progress
+   */
+  override fun subscribe(): StateFlow<Result> {
+    return fhirSynchronizer.state
+  }
+
+  override fun close() {//todo name?
     dispatcher.cancel()
   }
 }
