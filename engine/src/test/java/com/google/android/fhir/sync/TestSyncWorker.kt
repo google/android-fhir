@@ -17,16 +17,18 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
-import kotlin.reflect.KClass
+import androidx.work.WorkerParameters
+import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.resource.TestingUtils
+import org.hl7.fhir.r4.model.ResourceType
+import org.mockito.kotlin.mock
 
-interface SyncJob {
-  fun close()
-  fun poll(delay: Long, initialDelay: Long?): Flow<Result>
-  suspend fun <W : PeriodicSyncWorker> poll(repeatInterval: RepeatInterval, context: Context, clazz: Class<W>)
-  suspend fun run(): Result
-  suspend fun run(resourceSyncParams: ResourceSyncParams): Result
-  fun subscribe(): StateFlow<State>
+class TestSyncWorker(appContext: Context, workerParams: WorkerParameters) :
+  PeriodicSyncWorker(appContext, workerParams) {
+
+  override fun getSyncData() = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
+
+  override fun getDataSource() = TestingUtils.testDataSource
+
+  override fun getFhirEngine() = mock<FhirEngine>()
 }

@@ -55,7 +55,7 @@ class FhirSynchronizer(
   private val resourceSyncParams: ResourceSyncParams
 ) {
   private val _state: MutableStateFlow<State> = MutableStateFlow(State.Nothing(null))
-  val state: StateFlow<State> get() = _state
+  private val state: StateFlow<State> get() = _state
 
   init {
       var lastSyncDatetime: LocalDateTime
@@ -64,6 +64,10 @@ class FhirSynchronizer(
       }
 
     emit(State.Nothing(lastSyncDatetime))
+  }
+
+  fun subscribe(): StateFlow<State> {
+    return state
   }
 
   private fun emit(state: State){

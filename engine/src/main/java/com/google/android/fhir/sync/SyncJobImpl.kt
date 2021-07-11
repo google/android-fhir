@@ -16,9 +16,16 @@
 
 package com.google.android.fhir.sync
 
+import android.content.Context
 import android.util.Log
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.google.android.fhir.FhirEngine
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -26,10 +33,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
+import kotlin.reflect.KClass
 
 class SyncJobImpl(
   private val dispatcher: CoroutineDispatcher,
-  fhirEngine: FhirEngine,
+  private val fhirEngine: FhirEngine,
   dataSource: DataSource,
   resourceSyncParams: ResourceSyncParams) : SyncJob {
   private val TAG = javaClass.name
@@ -60,8 +70,18 @@ class SyncJobImpl(
   }
 
   @ExperimentalCoroutinesApi
-  override fun poll(delay: Long): Flow<Result> {
-    return poll(delay, null)
+  override suspend fun <W : PeriodicSyncWorker> poll(repeatInterval: RepeatInterval, context: Context, clazz: Class<W>) {
+    val periodicWorkRequest = PeriodicWorkRequest
+      .Builder(clazz, repeatInterval.interval, repeatInterval.timeUnit)
+      .setConstraints(Constraints.Builder().build())
+      .build()
+
+    WorkManager.getInstance(context)
+      .enqueueUniquePeriodicWork(
+        SyncWorkType.DOWNLOAD.workerName,
+        ExistingPeriodicWorkPolicy.KEEP,
+        periodicWorkRequest
+      )
   }
 
   /**
@@ -82,7 +102,7 @@ class SyncJobImpl(
    * Subscribe to updates on fhir synchronizer sync progress
    */
   override fun subscribe(): StateFlow<State> {
-    return fhirSynchronizer.state
+    return fhirSynchronizer.subscribe()
   }
 
   override fun close() {//todo name?

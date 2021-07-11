@@ -17,7 +17,11 @@
 package com.google.android.fhir.resource
 
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth
+import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.OperationOutcome
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
 import org.json.JSONArray
 import org.json.JSONObject
@@ -62,5 +66,32 @@ class TestingUtils constructor(private val iParser: IParser) {
     val inputStream = javaClass.getResourceAsStream(filename)
     val content = inputStream!!.bufferedReader(Charsets.UTF_8).readText()
     return JSONArray(content)
+  }
+
+  object testDataSource: DataSource {
+
+    override suspend fun loadData(path: String): Bundle {
+      return Bundle()
+    }
+
+    override suspend fun insert(
+      resourceType: String,
+      resourceId: String,
+      payload: String
+    ): Resource {
+      return Patient()
+    }
+
+    override suspend fun update(
+      resourceType: String,
+      resourceId: String,
+      payload: String
+    ): OperationOutcome {
+      return OperationOutcome()
+    }
+
+    override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
+      return OperationOutcome()
+    }
   }
 }

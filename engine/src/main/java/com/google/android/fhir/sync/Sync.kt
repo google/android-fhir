@@ -21,8 +21,17 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.android.fhir.FhirEngine
+import kotlinx.coroutines.CoroutineDispatcher
 
 object Sync {
+  fun basicSyncJob(
+    coroutineDispatcher: CoroutineDispatcher,
+    fhirEngine: FhirEngine,
+    dataSource: DataSource,
+    resourceSyncParams: ResourceSyncParams): SyncJob {
+    return SyncJobImpl(coroutineDispatcher, fhirEngine, dataSource, resourceSyncParams)
+  }
+
   suspend fun oneTimeSync(
     fhirEngine: FhirEngine,
     dataSource: DataSource,

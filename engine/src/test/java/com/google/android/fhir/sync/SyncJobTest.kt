@@ -16,54 +16,106 @@
 
 package com.google.android.fhir.sync
 
+import android.content.Context
 import android.os.Build
+import android.util.Log
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.Configuration
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.impl.utils.SynchronousExecutor
+import androidx.work.testing.TestListenableWorkerBuilder
+import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineBuilder
+import com.google.android.fhir.FhirServices
+import com.google.android.fhir.db.Database
+import com.google.android.fhir.impl.FhirEngineImpl
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Assert
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.Spy
+import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.time.temporal.TemporalUnit
 
+@ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class SyncJobTest {
-  @Mock
+  private lateinit var workManager: WorkManager
   private lateinit var fhirEngine: FhirEngine
+
+  @Mock
+  private lateinit var database: Database
 
   @Mock
   private lateinit var dataSource: DataSource
 
-  private lateinit var syncJob: SyncJobImpl
+  private lateinit var syncJob: SyncJob
 
   private val testDispatcher = TestCoroutineDispatcher()
+
+  private lateinit var context: Context
 
   @Before
   fun setup(){
     MockitoAnnotations.openMocks(this)
 
-    var resourceSyncParam = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
+    fhirEngine = FhirEngineImpl(database, ApplicationProvider.getApplicationContext())
 
-    syncJob = SyncJobImpl(testDispatcher, fhirEngine, dataSource, resourceSyncParam)
+    val resourceSyncParam = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
+
+    syncJob = Sync.basicSyncJob(testDispatcher, fhirEngine, dataSource, resourceSyncParam)
+
+    context = ApplicationProvider.getApplicationContext()
+
+    val config = Configuration.Builder()
+      .setMinimumLoggingLevel(Log.DEBUG)
+      .setExecutor(SynchronousExecutor())
+      .build()
+
+    // Initialize WorkManager for instrumentation tests.
+    WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
+    workManager = WorkManager.getInstance(context)
+  }
+
+  @Test
+  fun test() {
+    val worker = OneTimeWorkRequestBuilder<TestSyncWorker>().build()
+
+    workManager.enqueueUniqueWork("TEST_WORK", ExistingWorkPolicy.KEEP, worker).result.get()
+
+    val workInfo = workManager.getWorkInfosForUniqueWork("TEST_WORK").get()
+
+    assertTrue(workInfo[0].state.isFinished)
   }
 
   @Test
   fun `should run synchronizer and emit states accurately in sequence`() = runBlockingTest {
+    whenever(database.getAllLocalChanges()).thenReturn(listOf())
+    whenever(dataSource.loadData(any())).thenReturn(Bundle())
+
     val res = mutableListOf<State>()
 
     val job = launch {
@@ -89,13 +141,43 @@ class SyncJobTest {
   }
 
   @Test
+  fun `should run synchronizer and emit  with error accurately in sequence`() = runBlockingTest {
+    whenever(database.getAllLocalChanges()).thenReturn(listOf())
+    whenever(dataSource.loadData(any())).thenThrow(IllegalStateException::class.java)
+
+    val res = mutableListOf<State>()
+
+    val job = launch {
+      syncJob.subscribe().collect {
+        res.add(it)
+      }
+    }
+
+    syncJob.run()
+
+    // State transition for failed job as below
+    // Nothing, Started, InProgress, Error
+    assertTrue(res[0] is State.Nothing)
+    assertTrue(res[1] is State.Started)
+    assertTrue(res[2] is State.InProgress)
+    assertTrue(res[3] is State.Error)
+    assertEquals(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+      (res[3] as State.Error).lastSyncTimestamp.truncatedTo(ChronoUnit.SECONDS))
+
+    assertTrue((res[3] as State.Error).exceptions[0].exception is java.lang.IllegalStateException)
+    assertEquals(4, res.size)
+
+    job.cancel()
+  }
+
+  @Test
   fun `should poll accurately with given delay`() = runBlockingTest {
     // the duration to run the flow
     val duration = 1000L
     val delay = 100L
 
     // polling with given delay
-    val flow = syncJob.poll(delay)
+    val flow = syncJob.poll(delay, 1);
 
     launch {
       // consume elements generated in given duration and given delay
