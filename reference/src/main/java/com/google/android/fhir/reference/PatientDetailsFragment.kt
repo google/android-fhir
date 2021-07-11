@@ -26,6 +26,7 @@ import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
@@ -73,6 +74,7 @@ class PatientDetailsFragment : Fragment() {
     patientDetailsViewModel.livePatientObservation.observe(viewLifecycleOwner) {
       adapter.submitList(it)
     }
+    binding.apply { addScreener.setOnClickListener { onAddScreenerClick() } }
   }
 
   private fun setupPatientData(patientItem: PatientListViewModel.PatientItem?) {
@@ -94,6 +96,11 @@ class PatientDetailsFragment : Fragment() {
         setDisplayHomeAsUpEnabled(true)
       }
     }
+  }
+
+  private fun onAddScreenerClick() {
+    findNavController()
+      .navigate(PatientDetailsFragmentDirections.actionPatientDetailsToScreenEncounterFragment())
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {

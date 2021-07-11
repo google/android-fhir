@@ -75,7 +75,7 @@ dependencies {
   implementation(Dependencies.httpInterceptor)
   implementation(Dependencies.material)
   implementation(project(":engine"))
-  implementation(project(path = ":datacapture"))
+  implementation(project(":datacapture"))
 
   testImplementation(Dependencies.junit)
 }

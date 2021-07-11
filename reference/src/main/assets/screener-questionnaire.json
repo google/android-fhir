@@ -1,0 +1,559 @@
+{
+  "id": "5270e23a-17fc-46e1-9e4c-5dc8e4c98a17",
+  "url": "urn:uuid:30aa988e-7a63-43a3-9948-5d376bdaf57d",
+  "title": "Sample screener",
+  "status": "active",
+  "version": "0.0.1",
+  "publisher": "Fred Hersch (fredhersch@google.com)",
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "linkId-664321",
+      "text": "Symptoms",
+      "type": "group",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "text": "Do you have a history of fever?",
+          "type": "choice",
+          "linkId": "linkId-16617",
+          "required": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "Y",
+                "display": "Yes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "N",
+                "display": "No"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "DN",
+                "display": "Don't Know"
+              }
+            }
+          ]
+        },
+        {
+          "text": "Have you developed a cough recently?",
+          "type": "choice",
+          "linkId": "linkId-34503",
+          "required": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "Y",
+                "display": "Yes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "N",
+                "display": "No"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "DN",
+                "display": "Don't Know"
+              }
+            }
+          ]
+        },
+        {
+          "text": "Are you experiencing any shortness of breath?",
+          "type": "choice",
+          "linkId": "linkId-963404",
+          "required": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "Y",
+                "display": "Yes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "N",
+                "display": "No"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "DN",
+                "display": "Don't Know"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "Risk Factors",
+      "type": "group",
+      "linkId": "linkId-480381",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "text": "Do you smoke cigarettes?",
+          "type": "choice",
+          "linkId": "linkId-142748",
+          "required": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "Y",
+                "display": "Yes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "N",
+                "display": "No"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "Ex",
+                "display": "Ex-smoker"
+              }
+            }
+          ]
+        },
+        {
+          "text": "Have you traveled in the last 2 weeks?",
+          "type": "choice",
+          "linkId": "linkId-705141",
+          "required": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "Y",
+                "display": "Yes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "N",
+                "display": "No"
+              }
+            }
+          ]
+        },
+        {
+          "text": "Has anyone at home recently become unwell?",
+          "type": "choice",
+          "linkId": "linkId-840491",
+          "required": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "Y",
+                "display": "Yes"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "N",
+                "display": "No"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "Medical History",
+      "type": "group",
+      "linkId": "linkId-536888",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "type": "choice",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "required": true,
+          "repeats": true,
+          "linkId": "LinkId-324879",
+          "text": "Do you have any existing conditions",
+          "code": [],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "161527007",
+                "display": "Asthma",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "13645005",
+                "display": "Chronic Lung Disease",
+                "system": "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "35489007",
+                "display": "Depression",
+                "system" : "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "161445009",
+                "display": "Diabetes",
+                "system" : "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "161501007",
+                "display": "Hypertension",
+                "system" : "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "161450003",
+                "display": "High blood lipids",
+                "system" : "http://snomed.info/sct"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "COVID Vaccination",
+      "type": "group",
+      "linkId": "linkId-606156",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "text": "Have you been vaccinated against COVID?",
+          "type": "choice",
+          "linkId": "linkId-692362",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "NV",
+                "display": "Not vaccinated"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "PV",
+                "display": "Partially vaccinated"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "FV",
+                "display": "Fully vaccinated"
+              }
+            }
+          ]
+        },
+        {
+          "text": "Which vaccine did you receive?",
+          "type": "choice",
+          "linkId": "linkId-772710",
+          "enableWhen": [
+            {
+              "question": "linkId-692362",
+              "operator": "!=",
+              "answerCoding": {
+                "code": "NV"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "AZ",
+                "display": "AstraZeneca"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "Pfizer",
+                "display": "Pfizer BioNTech"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "Moderna",
+                "display": "Moderna"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "Temperature",
+      "type": "group",
+      "linkId": "linkId-650547",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "text": "Add instructions for capturing temperature",
+          "type": "display",
+          "linkId": "linkId-257584"
+        },
+        {
+          "text": "Record temperature",
+          "type": "decimal",
+          "linkId": "linkId-704342",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+              "valueDecimal": 35.0
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+              "valueDecimal": 45.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "text": "Pulse Oximetry",
+      "type": "group",
+      "linkId": "linkId-684884",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "text": "Instructions for using the pulse oximeter",
+          "type": "display",
+          "linkId": "linkId-588876"
+        },
+        {
+          "text": "Pulse oximetry reading",
+          "type": "integer",
+          "linkId": "linkId-351969",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+              "valueInteger": 60
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+              "valueInteger": 100
+            }
+          ]
+        },
+        {
+          "text": "Pulse (heart rate)",
+          "type": "integer",
+          "linkId": "linkId-885691",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+              "valueInteger": 30
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+              "valueInteger": 200
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
