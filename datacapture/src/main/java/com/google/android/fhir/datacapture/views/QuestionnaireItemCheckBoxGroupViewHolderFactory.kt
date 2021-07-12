@@ -21,6 +21,7 @@ import android.view.View
 import android.widget.CheckBox
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.choiceOrientation
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
 import com.google.android.flexbox.FlexDirection
@@ -54,6 +55,11 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
         checkboxGroupHeader.text = questionnaireItem.localizedText
         checkboxGroup.removeAllViews()
+        if (questionnaireItem.choiceOrientation == "horizontal") {
+          checkboxGroup.flexDirection = FlexDirection.ROW
+        } else {
+          checkboxGroup.flexDirection = FlexDirection.COLUMN
+        }
         questionnaireItem.answerOption.forEach { answerOption ->
           populateViewWithAnswerOption(answerOption)
         }
