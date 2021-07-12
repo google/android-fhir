@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.views
 
-import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
@@ -36,13 +35,11 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
       private lateinit var radioHeader: TextView
       private lateinit var radioGroup: RadioGroup
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
-      private lateinit var context: Context
 
       override fun init(itemView: View) {
         prefixTextView = itemView.findViewById(R.id.prefix)
         radioGroup = itemView.findViewById(R.id.radio_group)
         radioHeader = itemView.findViewById(R.id.radio_header)
-        context = itemView.context
       }
 
       override fun bind(questionnaireItemViewItem: QuestionnaireItemViewItem) {
