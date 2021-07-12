@@ -71,7 +71,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
 
         autoCompleteTextView.dropDownAnchor = textInputLayout.editText!!.id
         autoCompleteTextView.onItemClickListener =
-          AdapterView.OnItemClickListener { _, _, position, id ->
+          AdapterView.OnItemClickListener { _, _, position, _ ->
             val answer =
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value =

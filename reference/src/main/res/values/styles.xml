@@ -15,7 +15,10 @@
 -->
 <resources>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style
+        name="AppTheme"
+        parent="Theme.MaterialComponents.Light.DarkActionBar"
+    >
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -35,5 +38,20 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
     <style name="AppCard" parent="Widget.MaterialComponents.CardView">
         <item name="cardElevation">8dp</item>
+    </style>
+    <style name="AppTheme.PatientDetails">
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+    <style name="AppTheme.PatientDetails.headline">
+        <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
+    </style>
+    <style name="AppTheme.PatientDetails.Subtitle2">
+        <item name="android:textAppearance">?attr/textAppearanceSubtitle2</item>
+    </style>
+    <style name="AppTheme.PatientDetails.body2">
+        <item name="android:textAppearance">?attr/textAppearanceBody2</item>
     </style>
 </resources>

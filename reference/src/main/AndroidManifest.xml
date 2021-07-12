@@ -33,6 +33,7 @@
             android:name="com.google.android.fhir.reference.MainActivity"
             android:label="@string/title_patient_list"
             android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize"
         >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

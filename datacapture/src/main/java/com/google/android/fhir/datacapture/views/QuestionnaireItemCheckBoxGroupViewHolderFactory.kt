@@ -53,7 +53,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         } else {
           prefixTextView.visibility = View.GONE
         }
-        val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
+        val (questionnaireItem, _) = questionnaireItemViewItem
         checkboxGroupHeader.text = questionnaireItem.localizedText
         checkboxGroup.removeAllViews()
         if (questionnaireItem.choiceOrientation == "horizontal") {
