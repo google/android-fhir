@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture
 
+import com.google.android.fhir.datacapture.common.datatype.asStringValue
 import java.util.Locale
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Questionnaire
@@ -45,6 +46,24 @@ internal val Questionnaire.QuestionnaireItemComponent.itemControl: String?
       ITEM_CONTROL_RADIO_BUTTON,
     )
       .firstOrNull { it == code }
+  }
+
+internal const val CHOICE_ORIENTATION_HORIZONTAL = "horizontal"
+internal const val CHOICE_ORIENTATION_VERTICAL = "vertical"
+
+internal const val EXTENSION_CHOICE_ORIENTATION_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-choiceOrientation"
+
+internal val Questionnaire.QuestionnaireItemComponent.choiceOrientation: String?
+  get() {
+    val code =
+      this.extension
+        .firstOrNull { it.url == EXTENSION_CHOICE_ORIENTATION_URL }
+        ?.value
+        ?.asStringValue()
+    return listOf(CHOICE_ORIENTATION_HORIZONTAL, CHOICE_ORIENTATION_VERTICAL).firstOrNull {
+      it == code
+    }
   }
 
 /**

@@ -18,12 +18,15 @@ package com.google.android.fhir.datacapture.views
 
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.CheckBox
-import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.choiceOrientation
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexboxLayout
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -33,7 +36,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var checkboxGroupHeader: TextView
-      private lateinit var checkboxGroup: LinearLayout
+      private lateinit var checkboxGroup: FlexboxLayout
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {
@@ -53,6 +56,11 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         val (questionnaireItem, _) = questionnaireItemViewItem
         checkboxGroupHeader.text = questionnaireItem.localizedText
         checkboxGroup.removeAllViews()
+        if (questionnaireItem.choiceOrientation == "horizontal") {
+          checkboxGroup.flexDirection = FlexDirection.ROW
+        } else {
+          checkboxGroup.flexDirection = FlexDirection.COLUMN
+        }
         questionnaireItem.answerOption.forEach { answerOption ->
           populateViewWithAnswerOption(answerOption)
         }
@@ -81,6 +89,10 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
               }
             )
           }
+        }
+        if (questionnaireItemViewItem.questionnaireItem.choiceOrientation == "horizontal") {
+          (checkbox.layoutParams as ViewGroup.MarginLayoutParams).marginEnd =
+            checkboxGroup.context.resources.getDimension(R.dimen.check_box_item_gap).toInt()
         }
         checkboxGroup.addView(singleCheckBox)
       }
