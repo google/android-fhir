@@ -28,6 +28,15 @@ import org.apache.commons.compress.utils.IOUtils
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.utilities.npm.NpmPackage
 
+/**
+ * Manages extracting the fhir core package into app storage and loading it into memory. Extracting
+ * the fhir core package should preferably be done after installation since it is a long running
+ * operation that takes 1-2 minutes. Loading the package into memory also takes considerable time
+ * (20 seconds to 1 minutes) and should be preferably done at application start.
+ *
+ * However, both operations will be done automatically where required during StructureMap-based
+ * extraction
+ */
 object NpmPackageProvider {
 
   /**
@@ -73,6 +82,11 @@ object NpmPackageProvider {
     return npmPackage
   }
 
+  /**
+   * Decompresses the hl7.fhir.r4.core archived package into app storage.
+   *
+   * The whole process can take 1-2 minutes.
+   */
   private fun setupNpmPackage(context: Context) {
     val filename = "packages.fhir.org-hl7.fhir.r4.core-4.0.1.tgz"
     val outDir = getLocalFhirCorePackageDirectory(context)

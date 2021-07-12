@@ -19,8 +19,7 @@ package com.google.android.fhir.datacapture.utilities
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.mapping.ShadowNpmPackageProvider
-import com.google.common.truth.Truth
-import org.junit.Assert
+import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,51 +39,35 @@ class NpmPackageProviderTest {
 
   @Test
   fun `loadSimpleWorkerContext() should initialize contextR4`() {
-    Assert.assertThrows(UninitializedPropertyAccessException::class.java) {
-      NpmPackageProvider::contextR4.get()
-    }
-
     val npmPackage = NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
 
     NpmPackageProvider.loadSimpleWorkerContext(npmPackage)
 
-    Truth.assertThat(NpmPackageProvider.contextR4).isNotNull()
+    assertThat(NpmPackageProvider.contextR4).isNotNull()
   }
 
   @Test
   fun `loadNpmPackage() should initialize npmPackage`() {
-    Assert.assertThrows(UninitializedPropertyAccessException::class.java) {
-      NpmPackageProvider::npmPackage.get()
-    }
-
     NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
 
-    Truth.assertThat(NpmPackageProvider.npmPackage).isNotNull()
+    assertThat(NpmPackageProvider.npmPackage).isNotNull()
   }
 
   @Test
   fun `loadNpmPackage() should cache npmPackage`() {
-    Assert.assertThrows(UninitializedPropertyAccessException::class.java) {
-      NpmPackageProvider::npmPackage.get()
-    }
-
     val generatedNpmPackage =
       NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
 
-    Truth.assertThat(generatedNpmPackage).isEqualTo(NpmPackageProvider.npmPackage)
+    assertThat(generatedNpmPackage).isEqualTo(NpmPackageProvider.npmPackage)
   }
 
   @Test
   fun `loadSimpleWorkerContext() should cache SimpleWorkerContext`() {
-    Assert.assertThrows(UninitializedPropertyAccessException::class.java) {
-      NpmPackageProvider::contextR4.get()
-    }
-
     val generatedSimpleWorkerContext =
       NpmPackageProvider.loadSimpleWorkerContext(
         NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
       )
 
-    Truth.assertThat(generatedSimpleWorkerContext).isEqualTo(NpmPackageProvider.contextR4)
+    assertThat(generatedSimpleWorkerContext).isEqualTo(NpmPackageProvider.contextR4)
   }
 }
