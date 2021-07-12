@@ -17,6 +17,7 @@
 package com.google.android.fhir.index
 
 import com.google.android.fhir.index.entities.DateIndex
+import com.google.android.fhir.index.entities.DateTimeIndex
 import com.google.android.fhir.index.entities.NumberIndex
 import com.google.android.fhir.index.entities.PositionIndex
 import com.google.android.fhir.index.entities.QuantityIndex
@@ -37,6 +38,7 @@ internal data class ResourceIndices(
   val resourceId: String,
   val numberIndices: List<NumberIndex>,
   val dateIndices: List<DateIndex>,
+  val dateTimeIndices: List<DateTimeIndex>,
   val stringIndices: List<StringIndex>,
   val uriIndices: List<UriIndex>,
   val tokenIndices: List<TokenIndex>,
@@ -51,6 +53,7 @@ internal data class ResourceIndices(
     private val quantityIndices = mutableListOf<QuantityIndex>()
     private val uriIndices = mutableListOf<UriIndex>()
     private val dateIndices = mutableListOf<DateIndex>()
+    private val dateTimeIndices = mutableListOf<DateTimeIndex>()
     private val numberIndices = mutableListOf<NumberIndex>()
     private val positionIndices = mutableListOf<PositionIndex>()
 
@@ -66,6 +69,13 @@ internal data class ResourceIndices(
         return
       }
       dateIndices.add(dateIndex)
+    }
+
+    fun addDateTimeIndex(dateTimeIndex: DateTimeIndex) {
+      if (dateTimeIndices.contains(dateTimeIndex)) {
+        return
+      }
+      dateTimeIndices.add(dateTimeIndex)
     }
 
     fun addStringIndex(stringIndex: StringIndex) {
@@ -116,6 +126,7 @@ internal data class ResourceIndices(
         resourceId = resourceId,
         numberIndices = numberIndices.toList(),
         dateIndices = dateIndices.toList(),
+        dateTimeIndices = dateTimeIndices.toList(),
         stringIndices = stringIndices.toList(),
         uriIndices = uriIndices.toList(),
         tokenIndices = tokenIndices.toList(),

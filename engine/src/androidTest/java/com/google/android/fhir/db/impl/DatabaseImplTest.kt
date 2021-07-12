@@ -977,10 +977,7 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE) {
-              prefix = ParamPrefixEnum.STARTS_AFTER
-              value = DateTimeType("2013-03-14")
-            }
+            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.STARTS_AFTER)
           }
           .getQuery()
       )
@@ -999,10 +996,7 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE) {
-              prefix = ParamPrefixEnum.STARTS_AFTER
-              value = DateTimeType("2013-03-14")
-            }
+            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.STARTS_AFTER)
           }
           .getQuery()
       )
@@ -1021,10 +1015,7 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE) {
-              prefix = ParamPrefixEnum.ENDS_BEFORE
-              value = DateTimeType("2013-03-14")
-            }
+            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.ENDS_BEFORE)
           }
           .getQuery()
       )
@@ -1043,10 +1034,7 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE) {
-              prefix = ParamPrefixEnum.ENDS_BEFORE
-              value = DateTimeType("2013-03-14")
-            }
+            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.ENDS_BEFORE)
           }
           .getQuery()
       )
@@ -1065,10 +1053,7 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE) {
-              prefix = ParamPrefixEnum.NOT_EQUAL
-              value = DateTimeType("2013-03-14")
-            }
+            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.NOT_EQUAL)
           }
           .getQuery()
       )
@@ -1087,10 +1072,7 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE) {
-              prefix = ParamPrefixEnum.NOT_EQUAL
-              value = DateTimeType("2013-03-14")
-            }
+            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.NOT_EQUAL)
           }
           .getQuery()
       )
@@ -1108,12 +1090,7 @@ class DatabaseImplTest {
     val result =
       database.search<Patient>(
         Search(ResourceType.Patient)
-          .apply {
-            filter(Patient.DEATH_DATE) {
-              prefix = ParamPrefixEnum.EQUAL
-              value = DateTimeType("2013-03-14")
-            }
-          }
+          .apply { filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.EQUAL) }
           .getQuery()
       )
     assertThat(result.single().id).isEqualTo("Patient/1")
@@ -1130,12 +1107,7 @@ class DatabaseImplTest {
     val result =
       database.search<Patient>(
         Search(ResourceType.Patient)
-          .apply {
-            filter(Patient.DEATH_DATE) {
-              prefix = ParamPrefixEnum.EQUAL
-              value = DateTimeType("2013-03-14")
-            }
-          }
+          .apply { filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.EQUAL) }
           .getQuery()
       )
     assertThat(result).isEmpty()
@@ -1153,10 +1125,7 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE) {
-              prefix = ParamPrefixEnum.GREATERTHAN
-              value = DateTimeType("2013-03-14")
-            }
+            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.GREATERTHAN)
           }
           .getQuery()
       )
@@ -1175,10 +1144,7 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE) {
-              prefix = ParamPrefixEnum.GREATERTHAN
-              value = DateTimeType("2013-03-14")
-            }
+            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.GREATERTHAN)
           }
           .getQuery()
       )
@@ -1197,10 +1163,11 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE) {
-              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-              value = DateTimeType("2013-03-14")
-            }
+            filter(
+              Patient.DEATH_DATE,
+              DateTimeType("2013-03-14"),
+              ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+            )
           }
           .getQuery()
       )
@@ -1218,10 +1185,11 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE) {
-              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-              value = DateTimeType("2013-03-14")
-            }
+            filter(
+              Patient.DEATH_DATE,
+              DateTimeType("2013-03-14"),
+              ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+            )
           }
           .getQuery()
       )
@@ -1240,10 +1208,7 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE) {
-              prefix = ParamPrefixEnum.LESSTHAN
-              value = DateTimeType("2013-03-14")
-            }
+            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.LESSTHAN)
           }
           .getQuery()
       )
@@ -1262,10 +1227,7 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE) {
-              prefix = ParamPrefixEnum.LESSTHAN
-              value = DateTimeType("2013-03-14")
-            }
+            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.LESSTHAN)
           }
           .getQuery()
       )
@@ -1284,10 +1246,11 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE) {
-              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
-              value = DateTimeType("2013-03-14")
-            }
+            filter(
+              Patient.DEATH_DATE,
+              DateTimeType("2013-03-14"),
+              ParamPrefixEnum.LESSTHAN_OR_EQUALS
+            )
           }
           .getQuery()
       )
@@ -1306,10 +1269,11 @@ class DatabaseImplTest {
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply {
-            filter(Patient.DEATH_DATE) {
-              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
-              value = DateTimeType("2013-03-14")
-            }
+            filter(
+              Patient.DEATH_DATE,
+              DateTimeType("2013-03-14"),
+              ParamPrefixEnum.LESSTHAN_OR_EQUALS
+            )
           }
           .getQuery()
       )

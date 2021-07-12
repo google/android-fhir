@@ -18,7 +18,9 @@ package com.google.android.fhir.index
 
 import android.os.Build
 import ca.uhn.fhir.context.FhirContext
+import com.google.android.fhir.epochDay
 import com.google.android.fhir.index.entities.DateIndex
+import com.google.android.fhir.index.entities.DateTimeIndex
 import com.google.android.fhir.index.entities.NumberIndex
 import com.google.android.fhir.index.entities.PositionIndex
 import com.google.android.fhir.index.entities.QuantityIndex
@@ -78,9 +80,9 @@ class ResourceIndexerTest {
 
     val resourceIndices = ResourceIndexer.index(patient)
 
-    assertThat(resourceIndices.dateIndices)
+    assertThat(resourceIndices.dateTimeIndices)
       .contains(
-        DateIndex(
+        DateTimeIndex(
           "_lastUpdated",
           "Patient.meta.lastUpdated",
           InstantType("2001-09-01T23:09:09.000+05:30").value.time,
@@ -147,9 +149,8 @@ class ResourceIndexerTest {
       )
       .isFalse()
   }
-
   @Test
-  fun index_date_date() {
+  fun index_date() {
     val date = DateType("2001-09-01")
     val patient =
       Patient().apply {
@@ -164,14 +165,27 @@ class ResourceIndexerTest {
         DateIndex(
           "birthdate",
           "Patient.birthDate",
-          date.value.time,
-          date.precision.add(date.value, 1).time - 1
+          date.value.epochDay,
+          date.precision.add(date.value, 1).epochDay - 1
         )
       )
   }
 
   @Test
-  fun index_date_dateTime() {
+  fun index_date_null() {
+    val patient =
+      Patient().apply {
+        id = "non-null-id"
+        birthDate = null
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.dateIndices.any { it.name == "birthdate" }).isFalse()
+    assertThat(resourceIndices.dateIndices.any { it.path == "Patient.birthDate" }).isFalse()
+  }
+
+  @Test
+  fun index_dateTime_dateTime() {
     val dateTime = DateTimeType("2001-12-29T12:20:30+07:00")
     val observation =
       Observation().apply {
@@ -182,9 +196,9 @@ class ResourceIndexerTest {
     val resourceIndices = ResourceIndexer.index(observation)
 
     observation.effectiveDateTimeType
-    assertThat(resourceIndices.dateIndices)
+    assertThat(resourceIndices.dateTimeIndices)
       .contains(
-        DateIndex(
+        DateTimeIndex(
           "date",
           "Observation.effective",
           dateTime.value.time,
@@ -194,7 +208,7 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_date_instant() {
+  fun index_dateTime_instant() {
     val instant = InstantType("2001-03-04T23:30:00.910+05:30")
     val observation =
       Observation().apply {
@@ -204,12 +218,14 @@ class ResourceIndexerTest {
 
     val resourceIndices = ResourceIndexer.index(observation)
 
-    assertThat(resourceIndices.dateIndices)
-      .contains(DateIndex("date", "Observation.effective", instant.value.time, instant.value.time))
+    assertThat(resourceIndices.dateTimeIndices)
+      .contains(
+        DateTimeIndex("date", "Observation.effective", instant.value.time, instant.value.time)
+      )
   }
 
   @Test
-  fun index_date_period() {
+  fun index_dateTime_period() {
     val period =
       Period().apply {
         startElement = DateTimeType("2001-09-08T20:30:09+05:30")
@@ -223,9 +239,9 @@ class ResourceIndexerTest {
 
     val resourceIndices = ResourceIndexer.index(observation)
 
-    assertThat(resourceIndices.dateIndices)
+    assertThat(resourceIndices.dateTimeIndices)
       .contains(
-        DateIndex(
+        DateTimeIndex(
           "date",
           "Observation.effective",
           period.start.time,
@@ -235,7 +251,7 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_date_period_noStart() {
+  fun index_dateTime_period_noStart() {
     val period =
       Period().apply {
         startElement = null
@@ -249,9 +265,9 @@ class ResourceIndexerTest {
 
     val resourceIndices = ResourceIndexer.index(observation)
 
-    assertThat(resourceIndices.dateIndices)
+    assertThat(resourceIndices.dateTimeIndices)
       .contains(
-        DateIndex(
+        DateTimeIndex(
           "date",
           "Observation.effective",
           0,
@@ -261,7 +277,7 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_date_period_noEnd() {
+  fun index_dateTime_period_noEnd() {
     val period = Period().apply { startElement = DateTimeType("2001-09-08T20:30:09+05:30") }
     val observation =
       Observation().apply {
@@ -271,11 +287,11 @@ class ResourceIndexerTest {
 
     val resourceIndices = ResourceIndexer.index(observation)
 
-    assertThat(resourceIndices.dateIndices)
-      .contains(DateIndex("date", "Observation.effective", period.start.time, Long.MAX_VALUE))
+    assertThat(resourceIndices.dateTimeIndices)
+      .contains(DateTimeIndex("date", "Observation.effective", period.start.time, Long.MAX_VALUE))
   }
   @Test
-  fun index_date_timing() {
+  fun index_dateTime_timing() {
     val timing =
       Timing().apply {
         addEvent(DateTimeType("2001-11-05T21:53:10+09:00").value)
@@ -290,9 +306,9 @@ class ResourceIndexerTest {
 
     val resourceIndices = ResourceIndexer.index(observation)
 
-    assertThat(resourceIndices.dateIndices)
+    assertThat(resourceIndices.dateTimeIndices)
       .contains(
-        DateIndex(
+        DateTimeIndex(
           "date",
           "Observation.effective",
           timing.event.minOf { it.value.time },
@@ -302,7 +318,7 @@ class ResourceIndexerTest {
   }
 
   @Test
-  fun index_date_null() {
+  fun index_dateTime_null() {
     val observation =
       Observation().apply {
         id = "non-null-id"
@@ -310,8 +326,8 @@ class ResourceIndexerTest {
       }
     val resourceIndices = ResourceIndexer.index(observation)
 
-    assertThat(resourceIndices.dateIndices.any { it.name == "date" }).isFalse()
-    assertThat(resourceIndices.dateIndices.any { it.path == "Observation.effective" }).isFalse()
+    assertThat(resourceIndices.dateTimeIndices.any { it.name == "date" }).isFalse()
+    assertThat(resourceIndices.dateTimeIndices.any { it.path == "Observation.effective" }).isFalse()
   }
 
   @Test
@@ -703,9 +719,9 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.uriIndices).isEmpty()
 
-    assertThat(resourceIndices.dateIndices)
+    assertThat(resourceIndices.dateTimeIndices)
       .containsExactly(
-        DateIndex(
+        DateTimeIndex(
           "date",
           "Invoice.date",
           testInvoice.date.time,
@@ -750,9 +766,9 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.tokenIndices).isEmpty()
 
-    assertThat(resourceIndices.dateIndices)
+    assertThat(resourceIndices.dateTimeIndices)
       .containsExactly(
-        DateIndex(
+        DateTimeIndex(
           "date",
           "Questionnaire.date",
           testQuestionnaire.date.time,
@@ -787,8 +803,8 @@ class ResourceIndexerTest {
         DateIndex(
           "birthdate",
           "Patient.birthDate",
-          testPatient.birthDateElement.value.time,
-          testPatient.birthDateElement.precision.add(testPatient.birthDateElement.value, 1).time - 1
+          testPatient.birthDate.epochDay,
+          testPatient.birthDateElement.precision.add(testPatient.birthDate, 1).epochDay - 1
         )
       )
 
@@ -881,7 +897,7 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.uriIndices).isEmpty()
 
-    assertThat(resourceIndices.dateIndices).isEmpty()
+    assertThat(resourceIndices.dateTimeIndices).isEmpty()
 
     assertThat(resourceIndices.referenceIndices).isEmpty()
 
