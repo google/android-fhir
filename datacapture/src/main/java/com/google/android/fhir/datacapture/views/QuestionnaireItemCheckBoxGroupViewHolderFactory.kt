@@ -19,11 +19,12 @@ package com.google.android.fhir.datacapture.views
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.CheckBox
-import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexboxLayout
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -33,7 +34,7 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var checkboxGroupHeader: TextView
-      private lateinit var checkboxGroup: LinearLayout
+      private lateinit var checkboxGroup: FlexboxLayout
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {

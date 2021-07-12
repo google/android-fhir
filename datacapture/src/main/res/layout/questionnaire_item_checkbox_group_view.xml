@@ -46,12 +46,16 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <com.google.android.flexbox.FlexboxLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/checkbox_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        app:alignContent="flex_start"
+        app:alignItems="flex_start"
+        app:flexDirection="column"
+        app:flexWrap="wrap"
     >
-    </LinearLayout>
+    </com.google.android.flexbox.FlexboxLayout>
 
 </LinearLayout>
