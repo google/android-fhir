@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views
 
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
@@ -88,6 +89,10 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
               }
             )
           }
+        }
+        if (questionnaireItemViewItem.questionnaireItem.choiceOrientation == "horizontal") {
+          (checkbox.layoutParams as ViewGroup.MarginLayoutParams).marginEnd =
+            checkboxGroup.context.resources.getDimension(R.dimen.check_box_item_gap).toInt()
         }
         checkboxGroup.addView(singleCheckBox)
       }
