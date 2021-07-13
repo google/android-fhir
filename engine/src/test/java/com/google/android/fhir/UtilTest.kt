@@ -18,6 +18,10 @@ package com.google.android.fhir
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import junit.framework.TestCase
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -30,6 +34,19 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class UtilTest : TestCase() {
+
+  @Test
+  fun shouldFormatDate() {
+    val fixedDate = "Sat Jun 05 16:17:31 +0530 2021"
+    val formatter = DateTimeFormatter.ofPattern("EE MMM dd HH:mm:ss ZZ yyyy")
+    val parsedDate = ZonedDateTime.parse(fixedDate, formatter)
+
+    val simpleDateFormat =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXXXX", Locale.getDefault())
+        .withZone(ZoneId.systemDefault())
+    val expectedResult = simpleDateFormat.format(parsedDate.toInstant())
+    assertThat(parsedDate.toString()).isEqualTo(expectedResult)
+  }
 
   @Test
   fun logicalId_patient_missing_id_shouldReturnEmptyString() {
