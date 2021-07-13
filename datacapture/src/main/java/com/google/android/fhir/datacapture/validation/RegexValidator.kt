@@ -49,7 +49,7 @@ internal object RegexValidator :
           false
         }
       },
-    { extension: Extension, context: Context ->
+    { extension: Extension, _: Context ->
       "The answer doesn't match regular expression: " + extension.value.primitiveValue()
     }
   )

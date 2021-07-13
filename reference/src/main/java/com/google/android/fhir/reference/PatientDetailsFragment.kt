@@ -70,23 +70,28 @@ class PatientDetailsFragment : Fragment() {
           PatientDetailsViewModelFactory(requireActivity().application, fhirEngine, args.patientId)
         )
         .get(PatientDetailsViewModel::class.java)
-    patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) {
-      setupPatientData(view, it)
-    }
+    patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) { setupPatientData(it) }
     patientDetailsViewModel.livePatientObservation.observe(viewLifecycleOwner) {
       adapter.submitList(it)
     }
   }
 
-  private fun setupPatientData(view: View, patient: PatientListViewModel.PatientItem?) {
-    patient?.let {
-      binding.patientDetail.text = HtmlCompat.fromHtml(it.html, HtmlCompat.FROM_HTML_MODE_LEGACY)
-      binding.patientListItem.name.text = it.name
-      binding.patientListItem.dob.text = it.dob
-      binding.patientListItem.gender.text = it.phone
-
+  private fun setupPatientData(patientItem: PatientListViewModel.PatientItem?) {
+    patientItem?.let { patient ->
+      binding.patientDetail.apply {
+        text = HtmlCompat.fromHtml(patient.html, HtmlCompat.FROM_HTML_MODE_LEGACY)
+      }
+      binding.patientListItem.apply {
+        title.text = patient.name
+        gender.text = patient.gender
+        dob.text = patient.dob
+        phoneNumber.text = patient.phone
+        city.text = patient.city
+        country.text = patient.country
+        isActive.text = patient.isActive.toString()
+      }
       (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-        title = it.name
+        title = patient.name
         setDisplayHomeAsUpEnabled(true)
       }
     }
