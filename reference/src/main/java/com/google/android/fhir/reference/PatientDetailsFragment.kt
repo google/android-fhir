@@ -39,7 +39,8 @@ class PatientDetailsFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
   private lateinit var patientDetailsViewModel: PatientDetailsViewModel
   private val args: PatientDetailsFragmentArgs by navArgs()
-  private var _binding: PatientDetailBinding? = null
+  private var _binding:
+          PatientDetailBinding? = null
   private val binding
     get() = _binding!!
 

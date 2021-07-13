@@ -31,11 +31,13 @@
     >
         <argument android:name="patient_id" app:argType="string" />
     </fragment>
+
     <fragment
         android:id="@+id/addPatientFragment"
         android:label="@string/add_patient"
         android:name="com.google.android.fhir.reference.AddPatientFragment"
         tools:layout="@layout/add_patient_fragment"
     />
+
 
 </navigation>

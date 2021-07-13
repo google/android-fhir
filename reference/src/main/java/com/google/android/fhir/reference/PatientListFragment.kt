@@ -16,11 +16,10 @@
 
 package com.google.android.fhir.reference
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -31,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.reference.databinding.FragmentPatientListBinding
+import com.google.android.fhir.reference.ips.IPSCompositionActivity
 
 class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
@@ -47,6 +47,7 @@ class PatientListFragment : Fragment() {
   ): View? {
     _binding = FragmentPatientListBinding.inflate(inflater, container, false)
     val view = binding.root
+    setHasOptionsMenu(true)
     return view
   }
 
@@ -129,5 +130,21 @@ class PatientListFragment : Fragment() {
   private fun onAddPatientClick() {
     findNavController()
       .navigate(PatientListFragmentDirections.actionPatientListToAddPatientFragment())
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    super.onCreateOptionsMenu(menu, inflater)
+    inflater.inflate(R.menu.overflow_menu,menu)
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    when (item.itemId) {
+        R.id.ips_activity_menu-> {
+      val intent = Intent(requireContext(), IPSCompositionActivity::class.java)
+      requireContext().startActivity(intent)
+          return true
+    }
+    }
+    return super.onOptionsItemSelected(item)
   }
 }
