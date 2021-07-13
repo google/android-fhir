@@ -34,6 +34,7 @@ import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
@@ -89,6 +90,110 @@ class ResourceIndexerTest {
           InstantType("2001-09-01T23:09:09.000+05:30").value.time
         )
       )
+  }
+
+  @Test
+  fun index_profile() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setProfile(mutableListOf(CanonicalType("Profile/lipid")))
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.referenceIndices)
+      .contains(ReferenceIndex("_profile", "Patient.meta.profile", "Profile/lipid"))
+  }
+
+  @Test
+  fun index_profile_empty() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setProfile(mutableListOf(CanonicalType("")))
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+    assertThat(resourceIndices.referenceIndices.any { it.name == "_profile" }).isFalse()
+  }
+
+  @Test
+  fun index_tag() {
+    val codeString = "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    val systemString = "http://openmrs.org/concepts"
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setTag(mutableListOf(Coding(systemString, codeString, "display")))
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.tokenIndices)
+      .contains(TokenIndex("_tag", "Patient.meta.tag", systemString, codeString))
+  }
+
+  @Test
+  fun index_tag_empty() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setTag(mutableListOf(Coding("", "", "")))
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.tokenIndices.any { it.name == "_tag" }).isFalse()
+  }
+
+  @Test
+  fun index_security() {
+    val systemString = "http://terminology.hl7.org/CodeSystem/v3-ActCode"
+    val codeString = "DELAU"
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta =
+          Meta().setSecurity(mutableListOf(Coding(systemString, codeString, "Delete After Use")))
+      }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.tokenIndices)
+      .contains(TokenIndex("_security", "Patient.meta.security", systemString, codeString))
+  }
+
+  @Test
+  fun index_security_empty() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        meta = Meta().setSecurity(mutableListOf(Coding("", "", "")))
+      }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.tokenIndices.any { it.name == "_security" }).isFalse()
+  }
+
+  @Test
+  fun index_language() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        language = "EN"
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.stringIndices).contains(StringIndex("_language", "", "EN"))
+  }
+
+  @Test
+  fun index_language_empty() {
+    val patient =
+      Patient().apply {
+        id = "non-null-ID"
+        language = ""
+      }
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.stringIndices.any { it.name == "_language" }).isFalse()
   }
 
   @Test
