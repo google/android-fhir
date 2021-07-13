@@ -18,5 +18,5 @@
     android:ellipsize="end"
     android:maxLines="1"
     android:padding="@dimen/padding_drop_down"
-    android:textAppearance="?attr/textAppearanceSubtitle1"
+    android:textAppearance="?attr/dropDownTextAppearance"
 />
