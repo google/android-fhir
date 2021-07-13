@@ -19,6 +19,9 @@ package com.google.android.fhir.reference
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
@@ -30,7 +33,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.PatientListViewModel.PatientListViewModelFactory
+import com.google.android.fhir.reference.data.FhirPeriodicSyncWorker
 import com.google.android.fhir.reference.databinding.FragmentPatientListBinding
+import com.google.android.fhir.sync.Sync
+import com.google.android.material.snackbar.Snackbar
 
 class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
@@ -114,11 +120,32 @@ class PatientListFragment : Fragment() {
       )
 
     binding.apply { addPatient.setOnClickListener { onAddPatientClick() } }
+    setHasOptionsMenu(true)
   }
 
   override fun onDestroyView() {
     super.onDestroyView()
     _binding = null
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    inflater.inflate(R.menu.list_options_menu, menu)
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    return when (item.itemId) {
+      R.id.sync_resources -> {
+        Sync.oneTimeSync<FhirPeriodicSyncWorker>(requireContext())
+        Snackbar.make(
+            binding.patientListContainer.patientList,
+            R.string.message_syncing,
+            Snackbar.LENGTH_LONG
+          )
+          .show()
+        true
+      }
+      else -> false
+    }
   }
 
   private fun onPatientItemClicked(patientItem: PatientListViewModel.PatientItem) {
