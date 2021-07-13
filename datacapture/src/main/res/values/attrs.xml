@@ -22,6 +22,7 @@
     <attr name="radioButtonStyle" format="reference" />
     <attr name="dropDownHeaderTextAppearance" format="reference" />
     <attr name="dropDownTextAppearance" format="reference" />
+    <attr name="dropDownSelectedTextAppearance" format="reference" />
 
     <declare-styleable name="QuestionnaireTheme">
         <!-- The ID of the theme to be applied to the questionnaire. The referenced theme must

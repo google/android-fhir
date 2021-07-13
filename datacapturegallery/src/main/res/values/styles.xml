@@ -38,6 +38,9 @@
         <item
             name="dropDownTextAppearance"
         >@style/TextAppearance.MyQuestionnaire.DropDown</item>
+        <item
+            name="dropDownSelectedTextAppearance"
+        >@style/TextAppearance.MyQuestionnaire.DropDownSelected</item>
     </style>
 
     <style
@@ -92,6 +95,13 @@
 
     <style
         name="TextAppearance.MyQuestionnaire.DropDown"
+        parent="TextAppearance.MaterialComponents.Subtitle1"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style
+        name="TextAppearance.MyQuestionnaire.DropDownSelected"
         parent="TextAppearance.MaterialComponents.Subtitle1"
     >
         <item name="android:textColor">?attr/colorOnSurface</item>
