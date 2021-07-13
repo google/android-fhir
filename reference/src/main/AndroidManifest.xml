@@ -31,7 +31,7 @@
         android:theme="@style/AppTheme"
     >
         <activity
-            android:name="com.google.android.fhir.reference.ips.IPSActivity"
+            android:name="com.google.android.fhir.reference.ips.IPSCompositionActivity"
             android:label="FHIR Patients implementation"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="Instantiatable"

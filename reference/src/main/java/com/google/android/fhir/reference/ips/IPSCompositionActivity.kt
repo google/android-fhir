@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.fhir.reference.databinding.ActivityIpsBinding
 
-class IPSActivity : AppCompatActivity() {
+class IPSCompositionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityIpsBinding.inflate(layoutInflater)
