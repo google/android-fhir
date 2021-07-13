@@ -118,6 +118,11 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     sort = parameter
     this.order = order
   }
+
+  fun sort(parameter: DateClientParam, order: Order) {
+    sort = parameter
+    this.order = order
+  }
 }
 
 @SearchDslMarker
