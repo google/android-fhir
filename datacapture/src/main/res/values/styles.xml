@@ -41,5 +41,24 @@
             name="groupHeaderTextAppearance"
         >@style/TextAppearance.MaterialComponents.Headline6
         </item>
+        <item
+            name="checkBoxGroupHeaderTextAppearance"
+        >@style/TextAppearance.MaterialComponents.Subtitle2</item>
+        <item
+            name="checkBoxStyle"
+        >@style/Widget.AppCompat.CompoundButton.CheckBox
+        </item>
+        <item
+            name="radioGroupHeaderTextAppearance"
+        >@style/TextAppearance.MaterialComponents.Subtitle2</item>
+        <item
+            name="radioButtonStyle"
+        >@style/Widget.AppCompat.CompoundButton.RadioButton</item>
+        <item
+            name="dropDownHeaderTextAppearance"
+        >@style/TextAppearance.MaterialComponents.Subtitle2</item>
+        <item
+            name="dropDownTextAppearance"
+        >@style/TextAppearance.MaterialComponents.Subtitle1</item>
     </style>
 </resources>
