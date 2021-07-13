@@ -20,6 +20,7 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.mapping.ShadowNpmPackageProvider
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,6 +36,13 @@ class NpmPackageProviderTest {
   fun setUp() {
     ReflectionHelpers.setField(NpmPackageProvider, "npmPackage", null)
     ReflectionHelpers.setField(NpmPackageProvider, "contextR4", null)
+  }
+
+  @Test
+  fun `verify that npmPackage is not initialized`() {
+    Assert.assertThrows(UninitializedPropertyAccessException::class.java) {
+      NpmPackageProvider::npmPackage.get()
+    }
   }
 
   @Test

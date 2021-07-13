@@ -18,12 +18,11 @@ package com.google.android.fhir.datacapture.utilities
 
 import android.content.Context
 import android.os.Environment
-import android.util.Log
 import com.google.android.fhir.datacapture.mapping.NpmPackageInitializationError
-import com.google.android.fhir.datacapture.mapping.ResourceMapper
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStream
 import org.apache.commons.compress.utils.IOUtils
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.utilities.npm.NpmPackage
@@ -38,6 +37,8 @@ import org.hl7.fhir.utilities.npm.NpmPackage
  * extraction
  */
 object NpmPackageProvider {
+
+  private const val FHIR_R4_CORE_PACKAGE_FILENAME = "packages.fhir.org-hl7.fhir.r4.core-4.0.1.tgz"
 
   /**
    *
@@ -86,9 +87,10 @@ object NpmPackageProvider {
    * Decompresses the hl7.fhir.r4.core archived package into app storage.
    *
    * The whole process can take 1-2 minutes.
+   *
+   * @Throws NpmPackageInitializationError
    */
   private fun setupNpmPackage(context: Context) {
-    val filename = "packages.fhir.org-hl7.fhir.r4.core-4.0.1.tgz"
     val outDir = getLocalFhirCorePackageDirectory(context)
 
     if (File(outDir + "/package/package.json").exists()) {
@@ -98,13 +100,16 @@ object NpmPackageProvider {
     File(outDir).mkdirs()
 
     // Copy the tgz package to private app storage
+    var inputStream: InputStream? = null
+    var outputStream: FileOutputStream? = null
     try {
-      val inputStream = context.assets.open(filename)
-      val outputStream = FileOutputStream(File(getLocalNpmPackagesDirectory(context) + filename))
+      inputStream = context.assets.open(FHIR_R4_CORE_PACKAGE_FILENAME)
+      outputStream =
+        FileOutputStream(
+          File(getLocalNpmPackagesDirectory(context) + FHIR_R4_CORE_PACKAGE_FILENAME)
+        )
 
       IOUtils.copy(inputStream, outputStream)
-      IOUtils.closeQuietly(inputStream)
-      IOUtils.closeQuietly(outputStream)
     } catch (e: IOException) {
       // Delete the folders
       val packageDirectory = File(outDir)
@@ -112,15 +117,20 @@ object NpmPackageProvider {
         packageDirectory.delete()
       }
 
-      Log.e(ResourceMapper::class.java.name, e.stackTraceToString())
       throw NpmPackageInitializationError(
-        "Could not copy archived package [$filename] to app private storage",
+        "Could not copy archived package [$FHIR_R4_CORE_PACKAGE_FILENAME] to app private storage",
         e
       )
+    } finally {
+      IOUtils.closeQuietly(inputStream)
+      IOUtils.closeQuietly(outputStream)
     }
 
     // decompress the .tgz package
-    TarGzipUtility.decompress(getLocalNpmPackagesDirectory(context) + filename, File(outDir))
+    TarGzipUtility.decompress(
+      getLocalNpmPackagesDirectory(context) + FHIR_R4_CORE_PACKAGE_FILENAME,
+      File(outDir)
+    )
   }
 
   /** Generate the path to the local npm packages directory */

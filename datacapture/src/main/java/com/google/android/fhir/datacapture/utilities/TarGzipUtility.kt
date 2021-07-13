@@ -26,29 +26,30 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.utils.IOUtils
 
 /**
- * Provides utility for decompressing tar.gz or tgz files using the commons-io and commons-compress
- * libraries
+ * Utilities for decompressing tar.gz or tgz files using the commons-io and commons-compress
+ * libraries.
  */
 object TarGzipUtility {
 
   @Throws(IOException::class)
   fun decompress(compressedFilePath: String?, out: File?) {
-    TarArchiveInputStream(GzipCompressorInputStream(FileInputStream(compressedFilePath))).use { fin
-      ->
-      var entry: TarArchiveEntry?
-      // Fix `it` can be null
-      while (fin.nextTarEntry.also { entry = it } != null) {
-        if (entry!!.isDirectory) {
+    TarArchiveInputStream(GzipCompressorInputStream(FileInputStream(compressedFilePath))).use {
+      stream ->
+      var entry: TarArchiveEntry? = stream.nextTarEntry
+      while (entry != null) {
+        if (entry.isDirectory) {
           continue
         }
-        val curfile = File(out, entry!!.name)
-        val parent = curfile.parentFile
-        if (parent != null && !parent.exists()) {
-          parent.mkdirs()
-        }
-
-        IOUtils.copy(fin, FileOutputStream(curfile))
+        val file = File(out, entry.name).apply { makeParentDir() }
+        IOUtils.copy(stream, FileOutputStream(file))
+        entry = stream.nextTarEntry
       }
+    }
+  }
+
+  private fun File.makeParentDir() {
+    if (parentFile != null && !parentFile.exists()) {
+      parentFile.mkdirs()
     }
   }
 }

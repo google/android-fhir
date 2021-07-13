@@ -17,7 +17,7 @@
 package com.google.android.fhir.datacapture.mapping
 
 /** Thrown to indicate that the FHIR core package could not be initialized successfully */
-class NpmPackageInitializationError : RuntimeException {
+class NpmPackageInitializationError : Exception {
 
   constructor(cause: Throwable?) : super(cause)
 

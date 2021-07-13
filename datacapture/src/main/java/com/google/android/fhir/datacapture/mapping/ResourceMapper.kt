@@ -38,6 +38,7 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Resource
@@ -134,13 +135,17 @@ object ResourceMapper {
   ): Bundle {
     if (structureMapProvider == null || context == null) return Bundle()
     val contextR4 = NpmPackageProvider.loadSimpleWorkerContext(context)
+    contextR4.setExpansionProfile(Parameters())
 
-    val structureMap = structureMapProvider(questionnaire.targetStructureMap!!)
-
-    val structureMapUtilities = StructureMapUtilities(contextR4)
-    val targetResource = Bundle()
-    structureMapUtilities.transform(contextR4, questionnaireResponse, structureMap, targetResource)
-    return targetResource
+    return Bundle().apply {
+      StructureMapUtilities(contextR4)
+        .transform(
+          contextR4,
+          questionnaireResponse,
+          structureMapProvider(questionnaire.targetStructureMap!!),
+          this
+        )
+    }
   }
 
   /**
