@@ -20,6 +20,7 @@
     <attr name="checkBoxStyle" format="reference" />
     <attr name="radioGroupHeaderTextAppearance" format="reference" />
     <attr name="radioButtonStyle" format="reference" />
+    <attr name="dropDownHeaderTextAppearance" format="reference" />
     <attr name="dropDownTextAppearance" format="reference" />
 
     <declare-styleable name="QuestionnaireTheme">

@@ -33,6 +33,9 @@
             name="radioButtonStyle"
         >@style/Widget.MyQuestionnaire.RadioButton</item>
         <item
+            name="dropDownHeaderTextAppearance"
+        >@style/TextAppearance.MyQuestionnaire.DropDownHeader</item>
+        <item
             name="dropDownTextAppearance"
         >@style/TextAppearance.MyQuestionnaire.DropDown</item>
     </style>
@@ -78,6 +81,13 @@
         <item
             name="android:textAppearance"
         >@style/TextAppearance.AppCompat</item>
+    </style>
+
+    <style
+        name="TextAppearance.MyQuestionnaire.DropDownHeader"
+        parent="TextAppearance.MaterialComponents.Subtitle2"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
     <style

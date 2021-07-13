@@ -55,6 +55,9 @@
             name="radioButtonStyle"
         >@style/Widget.AppCompat.CompoundButton.RadioButton</item>
         <item
+            name="dropDownHeaderTextAppearance"
+        >@style/TextAppearance.MaterialComponents.Subtitle2</item>
+        <item
             name="dropDownTextAppearance"
         >@style/TextAppearance.MaterialComponents.Subtitle1</item>
     </style>
