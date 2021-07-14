@@ -70,9 +70,7 @@ class SyncJobTest {
   @Mock private lateinit var dataSource: DataSource
 
   private lateinit var syncJob: SyncJob
-
-  private val testDispatcher = TestCoroutineDispatcher()
-
+  
   private lateinit var context: Context
 
   @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
