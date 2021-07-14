@@ -31,6 +31,7 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.IntegerType
@@ -96,16 +97,26 @@ object ResourceMapper {
     question: Questionnaire.QuestionnaireItemComponent,
     resource: Resource
   ) {
-    val context = FhirContext.forR4()
-    val fhirPathEngine =
-      FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
     if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
       populateInitialValues(question.item, resource)
     } else {
       question.fetchExpression?.let { exp ->
-        val answerExtracted = fhirPathEngine.evaluate(resource, exp.expression)[0] as Type
-        question.initial =
-          mutableListOf(Questionnaire.QuestionnaireItemInitialComponent().setValue(answerExtracted))
+        val context = FhirContext.forR4()
+        val fhirPathEngine =
+          FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
+        val answerExtracted = fhirPathEngine.evaluate(resource, exp.expression)
+        answerExtracted.firstOrNull()?.let { answer ->
+          question.initial =
+            mutableListOf(
+              Questionnaire.QuestionnaireItemInitialComponent()
+                .setValue(
+                  when (answer) {
+                    is Enumeration<*> -> answer.toCoding()
+                    else -> answer as Type
+                  }
+                )
+            )
+        }
       }
     }
   }
@@ -348,5 +359,46 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
     getDeclaredField(name)
   } catch (ex: NoSuchFieldException) {
     return null
+  }
+}
+
+/**
+ * Invokes function specified by [functionName] on the calling object with the provided arguments
+ * [args]
+ */
+private fun Any.invokeFunction(functionName: String, vararg args: Any?): Any? =
+  this::class
+    .java
+    .declaredMethods
+    .firstOrNull { it.name == functionName }
+    ?.apply { isAccessible = true }
+    ?.invoke(this, *args)
+
+/**
+ * All the enums defined in [org.hl7.fhir.r4.model.Enumerations] have these common methods
+ * [fromCode, valueOf, values, getDefinition, getDisplay, getSystem, toCode]. This function converts
+ * the
+ */
+private fun Enumeration<*>.toCoding(): Coding {
+  val enumeration = this
+  return Coding().apply {
+    display =
+      if (enumeration.hasDisplay()) {
+        enumeration.display
+      } else {
+        enumeration.value.invokeFunction("getDisplay") as String?
+      }
+    code =
+      if (enumeration.hasCode()) {
+        enumeration.code
+      } else {
+        enumeration.value.invokeFunction("toCode") as String?
+      }
+    system =
+      if (enumeration.hasSystem()) {
+        enumeration.system
+      } else {
+        enumeration.value.invokeFunction("getSystem") as String?
+      }
   }
 }
