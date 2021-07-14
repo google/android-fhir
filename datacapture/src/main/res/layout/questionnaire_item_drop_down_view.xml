@@ -45,7 +45,7 @@
     </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        style="?attr/dropDownStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
     >

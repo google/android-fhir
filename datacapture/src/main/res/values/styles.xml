@@ -63,5 +63,8 @@
         <item
             name="dropDownSelectedTextAppearance"
         >@style/TextAppearance.MaterialComponents.Subtitle1</item>
+        <item
+            name="dropDownStyle"
+        >@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu</item>
     </style>
 </resources>

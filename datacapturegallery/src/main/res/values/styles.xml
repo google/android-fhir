@@ -41,6 +41,7 @@
         <item
             name="dropDownSelectedTextAppearance"
         >@style/TextAppearance.MyQuestionnaire.DropDownSelected</item>
+        <item name="dropDownStyle">@style/Widget.MyQuestionnaire.DropDown</item>
     </style>
 
     <style
@@ -106,4 +107,9 @@
     >
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
+
+    <style
+        name="Widget.MyQuestionnaire.DropDown"
+        parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+    />
 </resources>
