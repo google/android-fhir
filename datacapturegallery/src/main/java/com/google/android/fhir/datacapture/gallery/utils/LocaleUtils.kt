@@ -36,7 +36,7 @@ object LocaleUtils {
 
   fun updateContextResourceConfiguration(context: Context, language: String?): Configuration? {
     val resources: Resources = context.resources
-    val configuration: Configuration = resources.configuration
+    val configuration = Configuration(resources.configuration)
     try {
       val locale = Locale.forLanguageTag(language)
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
