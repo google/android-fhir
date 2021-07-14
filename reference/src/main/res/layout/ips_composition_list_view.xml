@@ -7,10 +7,13 @@
     tools:context=".ips.IPSListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
-        android:id="@+id/ips_fragment_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="IPS FRAGMENT ACTIVITY" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/ips_composition_list_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        tools:listitem="@layout/ips_composition_list_item"/>
+
 
 </LinearLayout>
