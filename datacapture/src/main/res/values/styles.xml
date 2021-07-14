@@ -66,5 +66,8 @@
         <item
             name="dropDownStyle"
         >@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu</item>
+        <item
+            name="editTextHeaderTextAppearance"
+        >@style/TextAppearance.MaterialComponents.Subtitle2</item>
     </style>
 </resources>

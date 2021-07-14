@@ -42,6 +42,9 @@
             name="dropDownSelectedTextAppearance"
         >@style/TextAppearance.MyQuestionnaire.DropDownSelected</item>
         <item name="dropDownStyle">@style/Widget.MyQuestionnaire.DropDown</item>
+        <item
+            name="editTextHeaderTextAppearance"
+        >@style/TextAppearance.MyQuestionnaire.EditTextHeader</item>
     </style>
 
     <style
@@ -112,4 +115,11 @@
         name="Widget.MyQuestionnaire.DropDown"
         parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
     />
+
+    <style
+        name="TextAppearance.MyQuestionnaire.EditTextHeader"
+        parent="TextAppearance.MaterialComponents.Subtitle2"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
 </resources>
