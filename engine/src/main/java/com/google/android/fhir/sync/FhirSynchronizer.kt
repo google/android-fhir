@@ -21,29 +21,30 @@ import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.isUploadSuccess
 import com.google.android.fhir.logicalId
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.runBlocking
+import java.time.LocalDateTime
+import kotlinx.coroutines.flow.MutableSharedFlow
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import java.time.LocalDateTime
 
 sealed class Result {
   object Success : Result()
-  data class Error (val exceptions: List<ResourceSyncException>): Result()
+  data class Error(val exceptions: List<ResourceSyncException>) : Result()
 }
 
 sealed class State {
-  data class Nothing (val lastSyncTimestamp: LocalDateTime?): State()
-  object Started: State()
+  data class Nothing(val lastSyncTimestamp: LocalDateTime?) : State()
+  object Started : State()
 
-  data class InProgress (val resourceType: ResourceType?): State()
-  data class Glitch (val exceptions: List<ResourceSyncException>): State()
+  data class InProgress(val resourceType: ResourceType?) : State()
+  data class Glitch(val exceptions: List<ResourceSyncException>) : State()
 
-  data class Success (val lastSyncTimestamp: LocalDateTime): State()
-  data class Error (val lastSyncTimestamp: LocalDateTime, val exceptions: List<ResourceSyncException>): State()
+  data class Success(val lastSyncTimestamp: LocalDateTime) : State()
+  data class Error(
+    val lastSyncTimestamp: LocalDateTime,
+    val exceptions: List<ResourceSyncException>
+  ) : State()
 }
 
 data class ResourceSyncException(val resourceType: ResourceType, val exception: Exception)
@@ -54,37 +55,35 @@ class FhirSynchronizer(
   private val dataSource: DataSource,
   private val resourceSyncParams: ResourceSyncParams
 ) {
-  private val _state: MutableStateFlow<State> = MutableStateFlow(State.Nothing(null))
-  private val state: StateFlow<State> get() = _state
+  private var flow: MutableSharedFlow<State>? = null
 
-  init {
-      var lastSyncDatetime: LocalDateTime
-      runBlocking {
-        lastSyncDatetime = fhirEngine.getLastSyncTimeStamp()
-      }
-
-    emit(State.Nothing(lastSyncDatetime))
+  private fun isSubscribed(): Boolean {
+    return flow != null
   }
 
-  fun subscribe(): StateFlow<State> {
-    return state
+  suspend fun subscribe(flow: MutableSharedFlow<State>) {
+    if (isSubscribed()) {
+      throw IllegalStateException("Already subscribed to a flow")
+    }
+
+    this.flow = flow
+
+    var lastSyncTimestamp = fhirEngine.getLastSyncTimeStamp()
+
+    emit(State.Nothing(lastSyncTimestamp))
   }
 
-  private fun emit(state: State){
-    _state.value = state
+  private suspend fun emit(state: State) {
+    flow?.emit(state)
   }
 
-  private suspend fun emitAndWrite(state: State){
+  private suspend fun emitResult(state: State) {
     fhirEngine.saveLastSyncTimeStamp(LocalDateTime.now())
 
-    _state.value = state
+    emit(state)
   }
 
   suspend fun synchronize(): Result {
-    return synchronize(resourceSyncParams)
-  }
-
-  suspend fun synchronize(resourceSyncParams: ResourceSyncParams): Result {
     emit(State.Started)
 
     val exceptions = mutableListOf<ResourceSyncException>()
@@ -108,11 +107,11 @@ class FhirSynchronizer(
     }
 
     return if (exceptions.isEmpty()) {
-      emitAndWrite(State.Success(LocalDateTime.now()))
+      emitResult(State.Success(LocalDateTime.now()))
 
       Result.Success
     } else {
-      emitAndWrite(State.Error(LocalDateTime.now(), exceptions))
+      emitResult(State.Error(LocalDateTime.now(), exceptions))
 
       Result.Error(exceptions)
     }

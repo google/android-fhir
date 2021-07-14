@@ -25,11 +25,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 
 object Sync {
   fun basicSyncJob(
-    coroutineDispatcher: CoroutineDispatcher,
     fhirEngine: FhirEngine,
     dataSource: DataSource,
     resourceSyncParams: ResourceSyncParams): SyncJob {
-    return SyncJobImpl(coroutineDispatcher, fhirEngine, dataSource, resourceSyncParams)
+    return SyncJobImpl(fhirEngine, dataSource, resourceSyncParams)
   }
 
   suspend fun oneTimeSync(
@@ -62,6 +61,7 @@ object Sync {
 
 /** Defines different types of synchronisation workers: download and upload */
 enum class SyncWorkType(val workerName: String) {
+  DOWNLOAD_UPLOAD("fhir-engine-download-upload-worker"),
   DOWNLOAD("download"),
   UPLOAD("upload")
 }

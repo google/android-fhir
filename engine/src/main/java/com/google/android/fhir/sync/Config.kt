@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync
 
 import androidx.work.Constraints
+import kotlinx.coroutines.flow.MutableSharedFlow
 import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
 import org.hl7.fhir.r4.model.ResourceType
@@ -50,14 +51,14 @@ data class SyncConfiguration(
 
 /** Configuration for period synchronisation */
 class PeriodicSyncConfiguration(
+  /** The interval at which the sync should be triggered in */
+  val repeat: RepeatInterval,
+
   /**
    * Constraints that specify the requirements needed before the synchronisation is triggered. E.g.
    * network type (Wifi, 3G etc), the device should be charging etc.
    */
   val syncConstraints: Constraints = Constraints.Builder().build(),
-
-  /** The interval at which the sync should be triggered in */
-  val repeat: RepeatInterval
 )
 
 data class RepeatInterval(

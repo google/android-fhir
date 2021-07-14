@@ -18,94 +18,106 @@ package com.google.android.fhir.sync
 
 import android.content.Context
 import android.util.Log
-import androidx.work.Constraints
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.asFlow
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
-import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.android.fhir.FhirEngine
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
-import kotlin.reflect.KClass
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 
 class SyncJobImpl(
-  private val dispatcher: CoroutineDispatcher,
   private val fhirEngine: FhirEngine,
-  dataSource: DataSource,
-  resourceSyncParams: ResourceSyncParams) : SyncJob {
+  private val dataSource: DataSource,
+  private val resourceSyncParams: ResourceSyncParams
+) : SyncJob {
   private val TAG = javaClass.name
 
-  private var fhirSynchronizer: FhirSynchronizer =
-    FhirSynchronizer(fhirEngine, dataSource, resourceSyncParams)
-
+  /** Periodically sync the data with given configuration for given worker class */
   @ExperimentalCoroutinesApi
-  override fun poll(delay: Long, initialDelay: Long?): Flow<Result> {
+  override fun <W : PeriodicSyncWorker> poll(
+    periodicSyncConfiguration: PeriodicSyncConfiguration,
+    context: Context,
+    clazz: Class<W>
+  ): Flow<MutableList<WorkInfo>> {
     Log.i(TAG, "Initiating polling")
 
-    return channelFlow {
-        if (initialDelay != null && initialDelay > 0) {
-          Log.i(TAG, "Injecting a delay of $initialDelay millis")
+    val periodicWorkRequest =
+      PeriodicWorkRequest.Builder(
+          clazz,
+          periodicSyncConfiguration.repeat.interval,
+          periodicSyncConfiguration.repeat.timeUnit
+        )
+        .setConstraints(periodicSyncConfiguration.syncConstraints)
+        .build()
 
-          delay(initialDelay)
-        }
+    val workerUniqueName = SyncWorkType.DOWNLOAD_UPLOAD.workerName
+    val workManager = WorkManager.getInstance(context)
 
-        while (!isClosedForSend) {
-          Log.i(TAG, "Running channel flow")
+    // Return LiveData as flow
+    val flow = workManager.getWorkInfosForUniqueWorkLiveData(workerUniqueName).asFlow()
+     // .map { convertToState(it) }
 
-          val result = Result.Success // todo//repository.getData()
-          send(result)
-          delay(delay)
-        }
-      }
-      .flowOn(dispatcher)
-  }
+    // now we lost track of job, do not have,
+    // and can not have an instance of fhir-synchronizer
+    // can not subscribe to any flow here
+    // that's why it emits progress inside doWork of worker
 
-  @ExperimentalCoroutinesApi
-  override suspend fun <W : PeriodicSyncWorker> poll(repeatInterval: RepeatInterval, context: Context, clazz: Class<W>) {
-    val periodicWorkRequest = PeriodicWorkRequest
-      .Builder(clazz, repeatInterval.interval, repeatInterval.timeUnit)
-      .setConstraints(Constraints.Builder().build())
-      .build()
-
-    WorkManager.getInstance(context)
-      .enqueueUniquePeriodicWork(
-        SyncWorkType.DOWNLOAD.workerName,
+    workManager.enqueueUniquePeriodicWork(
+        workerUniqueName,
         ExistingPeriodicWorkPolicy.KEEP,
         periodicWorkRequest
       )
+
+    return flow
+  }
+
+  override fun stateFlowFor(uniqueWorkerName: String, context: Context): Flow<State> {
+    return WorkManager.getInstance(context).getWorkInfosForUniqueWorkLiveData(uniqueWorkerName)
+      .asFlow()
+      .mapNotNull { convertToState(it) }
+  }
+
+  override fun workInfoFlowFor(uniqueWorkerName: String, context: Context): Flow<WorkInfo> {
+    return WorkManager.getInstance(context).getWorkInfosForUniqueWorkLiveData(uniqueWorkerName)
+      .asFlow()
+      .mapNotNull { if (it.isEmpty()) null else it[0] } // todo its always 0 ... would it be??
+  }
+
+  private fun convertToState(workInfos: MutableList<WorkInfo>): State? {
+    for (wi in workInfos) {
+      if(wi.state != WorkInfo.State.ENQUEUED && wi.progress.keyValueMap.isNotEmpty()){
+        val state = wi.progress.getString("StateType")!!
+        val stateData = wi.progress.getString("State")!!
+
+        val data: State = Gson().fromJson(stateData, Class.forName(state)) as State
+
+        return data
+      }
+    }
+    return null
   }
 
   /**
-   * Run fhir synchronizer immediately with given sync params
+   * Run fhir synchronizer immediately with default sync params configured on initialization and
+   * subscribe to given flow
    */
-  override suspend fun run(resourceSyncParams: ResourceSyncParams): Result {
-    return fhirSynchronizer.synchronize(resourceSyncParams)
-  }
+  override suspend fun run(subscribeTo: MutableSharedFlow<State>?): Result {
+    val fhirSynchronizer = FhirSynchronizer(fhirEngine, dataSource, resourceSyncParams)
 
-  /**
-   * Run fhir synchronizer immediately with default sync params configured on initialization
-   */
-  override suspend fun run(): Result {
+    if (subscribeTo != null) fhirSynchronizer.subscribe(subscribeTo)
+
     return fhirSynchronizer.synchronize()
-  }
-
-  /**
-   * Subscribe to updates on fhir synchronizer sync progress
-   */
-  override fun subscribe(): StateFlow<State> {
-    return fhirSynchronizer.subscribe()
-  }
-
-  override fun close() {//todo name?
-    dispatcher.cancel()
   }
 }

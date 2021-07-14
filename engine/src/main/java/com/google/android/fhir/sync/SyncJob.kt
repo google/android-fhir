@@ -17,16 +17,20 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import androidx.work.WorkInfo
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlin.reflect.KClass
 
 interface SyncJob {
-  fun close()
-  fun poll(delay: Long, initialDelay: Long?): Flow<Result>
-  suspend fun <W : PeriodicSyncWorker> poll(repeatInterval: RepeatInterval, context: Context, clazz: Class<W>)
-  suspend fun run(): Result
-  suspend fun run(resourceSyncParams: ResourceSyncParams): Result
-  fun subscribe(): StateFlow<State>
+  fun <W : PeriodicSyncWorker> poll(
+    periodicSyncConfiguration: PeriodicSyncConfiguration,
+    context: Context,
+    clazz: Class<W>
+  ): Flow<MutableList<WorkInfo>>
+
+  suspend fun run(subscribeTo: MutableSharedFlow<State>?): Result
+  fun workInfoFlowFor(uniqueWorkerName: String, context: Context): Flow<WorkInfo>
+  fun stateFlowFor(uniqueWorkerName: String, context: Context): Flow<State>
 }

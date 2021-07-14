@@ -19,58 +19,55 @@ package com.google.android.fhir.sync
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.Configuration
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.impl.utils.SynchronousExecutor
-import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.FhirEngineBuilder
-import com.google.android.fhir.FhirServices
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.impl.FhirEngineImpl
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ResourceType
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.Spy
 import org.mockito.kotlin.any
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
+import org.robolectric.annotation.LooperMode
 
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
+@LooperMode(LooperMode.Mode.PAUSED)
 class SyncJobTest {
   private lateinit var workManager: WorkManager
   private lateinit var fhirEngine: FhirEngine
 
-  @Mock
-  private lateinit var database: Database
+  @Mock private lateinit var database: Database
 
-  @Mock
-  private lateinit var dataSource: DataSource
+  @Mock private lateinit var dataSource: DataSource
 
   private lateinit var syncJob: SyncJob
 
@@ -78,22 +75,25 @@ class SyncJobTest {
 
   private lateinit var context: Context
 
+  @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
+
   @Before
-  fun setup(){
+  fun setup() {
     MockitoAnnotations.openMocks(this)
 
     fhirEngine = FhirEngineImpl(database, ApplicationProvider.getApplicationContext())
 
     val resourceSyncParam = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
 
-    syncJob = Sync.basicSyncJob(testDispatcher, fhirEngine, dataSource, resourceSyncParam)
+    syncJob = Sync.basicSyncJob(fhirEngine, dataSource, resourceSyncParam)
 
     context = ApplicationProvider.getApplicationContext()
 
-    val config = Configuration.Builder()
-      .setMinimumLoggingLevel(Log.DEBUG)
-      .setExecutor(SynchronousExecutor())
-      .build()
+    val config =
+      Configuration.Builder()
+        .setMinimumLoggingLevel(Log.DEBUG)
+        .setExecutor(SynchronousExecutor())
+        .build()
 
     // Initialize WorkManager for instrumentation tests.
     WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
@@ -101,14 +101,54 @@ class SyncJobTest {
   }
 
   @Test
-  fun test() {
-    val worker = OneTimeWorkRequestBuilder<TestSyncWorker>().build()
+  fun `should poll accurately with given delay`() = runBlockingTest {
+    whenever(database.getAllLocalChanges()).thenReturn(listOf())
+    whenever(dataSource.loadData(any())).thenReturn(Bundle())
 
-    workManager.enqueueUniqueWork("TEST_WORK", ExistingWorkPolicy.KEEP, worker).result.get()
+    val worker = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
 
-    val workInfo = workManager.getWorkInfosForUniqueWork("TEST_WORK").get()
+    val workInfoFlow = syncJob.workInfoFlowFor(SyncWorkType.DOWNLOAD_UPLOAD.workerName, context)
+    val stateFlow = syncJob.stateFlowFor(SyncWorkType.DOWNLOAD_UPLOAD.workerName, context)
 
-    assertTrue(workInfo[0].state.isFinished)
+    val workInfoList = mutableListOf<WorkInfo>()
+    val stateList = mutableListOf<State>()
+
+    val job1 = launch { workInfoFlow.toList(workInfoList) }
+
+    val job2 = launch { stateFlow.toList(stateList) }
+
+    workManager
+      .enqueueUniquePeriodicWork(
+        SyncWorkType.DOWNLOAD_UPLOAD.workerName,
+        ExistingPeriodicWorkPolicy.KEEP,
+        worker
+      )
+      .result
+      .get()
+
+    val testDriver = WorkManagerTestInitHelper.getTestDriver(context)!!
+    testDriver.setPeriodDelayMet(worker.id)
+
+    Thread.sleep(10000) // how to avoid it ???
+
+    // WorkInfos emitted by WorkManager are
+    // Enqueued, Running [1 on start],
+    // Running [4 from emitted progress],
+    // Enqueued for successful runs
+    assertTrue(workInfoList.size >= 4)
+
+    assertTrue(workInfoList[0].state == WorkInfo.State.ENQUEUED)
+    assertTrue(workInfoList[1].state == WorkInfo.State.RUNNING)
+    // 2nd last item is Running with progress State.Success
+    assertTrue(workInfoList[workInfoList.size-2].state == WorkInfo.State.RUNNING)
+    // last item is enqueued
+    assertTrue(workInfoList[workInfoList.size-1].state == WorkInfo.State.ENQUEUED)
+
+    // States are Nothing, Started, InProgress .... , Success
+    assertTrue(stateList[stateList.size-1] is State.Success)
+
+    job1.cancel()
+    job2.cancel()
   }
 
   @Test
@@ -118,13 +158,10 @@ class SyncJobTest {
 
     val res = mutableListOf<State>()
 
-    val job = launch {
-      syncJob.subscribe().collect {
-        res.add(it)
-      }
-    }
+    val flow = MutableSharedFlow<State>()
+    val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run()
+    syncJob.run(flow)
 
     // State transition for successful job as below
     // Nothing, Started, InProgress, Success
@@ -132,8 +169,10 @@ class SyncJobTest {
     assertTrue(res[1] is State.Started)
     assertTrue(res[2] is State.InProgress)
     assertTrue(res[3] is State.Success)
-    assertEquals(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
-      (res[3] as State.Success).lastSyncTimestamp.truncatedTo(ChronoUnit.SECONDS))
+    assertEquals(
+      LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+      (res[3] as State.Success).lastSyncTimestamp.truncatedTo(ChronoUnit.SECONDS)
+    )
 
     assertEquals(4, res.size)
 
@@ -147,13 +186,10 @@ class SyncJobTest {
 
     val res = mutableListOf<State>()
 
-    val job = launch {
-      syncJob.subscribe().collect {
-        res.add(it)
-      }
-    }
+    val flow = MutableSharedFlow<State>()
+    val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run()
+    syncJob.run(flow)
 
     // State transition for failed job as below
     // Nothing, Started, InProgress, Error
@@ -161,54 +197,14 @@ class SyncJobTest {
     assertTrue(res[1] is State.Started)
     assertTrue(res[2] is State.InProgress)
     assertTrue(res[3] is State.Error)
-    assertEquals(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
-      (res[3] as State.Error).lastSyncTimestamp.truncatedTo(ChronoUnit.SECONDS))
+    assertEquals(
+      LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+      (res[3] as State.Error).lastSyncTimestamp.truncatedTo(ChronoUnit.SECONDS)
+    )
 
     assertTrue((res[3] as State.Error).exceptions[0].exception is java.lang.IllegalStateException)
     assertEquals(4, res.size)
 
     job.cancel()
-  }
-
-  @Test
-  fun `should poll accurately with given delay`() = runBlockingTest {
-    // the duration to run the flow
-    val duration = 1000L
-    val delay = 100L
-
-    // polling with given delay
-    val flow = syncJob.poll(delay, 1);
-
-    launch {
-      // consume elements generated in given duration and given delay
-      val dataList = flow.take(10).toList()
-      assertEquals(dataList.size, 10)
-    }
-
-    // wait until job is completed
-    testDispatcher.advanceTimeBy(duration)
-
-    syncJob.close()
-  }
-
-  @Test
-  fun `should poll accurately with given delay and initial delay`() = runBlockingTest {
-    // the duration required to run the test
-    val duration = 1040L
-    val delay = 100L
-    val initialDelay = 40L
-
-    val flow = syncJob.poll(delay, initialDelay)
-
-    launch {
-      // consume elements generated in given duration and given delay
-      val dataList = flow.take(10).toList()
-      assertEquals(dataList.size, 10)
-    }
-
-    // wait until job is completed
-    testDispatcher.advanceTimeBy(duration)
-
-    syncJob.close()
   }
 }

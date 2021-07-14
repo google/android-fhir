@@ -121,6 +121,7 @@ dependencies {
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.guava)
   implementation(Dependencies.jsonToolsPatch)
+  implementation(Dependencies.Lifecycle.liveDataKtx)
 
   kapt(Dependencies.Room.compiler)
 
@@ -129,6 +130,7 @@ dependencies {
   testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0")
   testImplementation("androidx.work:work-testing:2.5.0")
   androidTestImplementation("androidx.work:work-testing:2.5.0")
+  testImplementation("androidx.arch.core:core-testing:2.1.0")
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
