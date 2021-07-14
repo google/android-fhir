@@ -14,7 +14,7 @@
  limitations under the License.
 -->
 <resources>
-    <string name="app_name">Data Capture Gallery</string>
-    <string name="submit_button_text">Submit</string>
-    <string name="select_language">Select Language</string>
+    <string name="app_name">Thư viện thu thập dữ liệu</string>
+    <string name="submit_button_text">Gửi</string>
+    <string name="select_language">Chọn ngôn ngữ</string>
 </resources>
