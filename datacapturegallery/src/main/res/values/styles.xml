@@ -45,6 +45,9 @@
         <item
             name="editTextHeaderTextAppearance"
         >@style/TextAppearance.MyQuestionnaire.EditTextHeader</item>
+        <item
+            name="editTextLayoutStyle"
+        >@style/Widget.MyQuestionnaire.EditText</item>
     </style>
 
     <style
@@ -122,4 +125,9 @@
     >
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
+
+    <style
+        name="Widget.MyQuestionnaire.EditText"
+        parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    />
 </resources>
