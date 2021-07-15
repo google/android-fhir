@@ -51,7 +51,7 @@ class NpmPackageProviderTest {
 
     NpmPackageProvider.loadSimpleWorkerContext(npmPackage)
 
-    assertThat(NpmPackageProvider.contextR4).isNotNull()
+    assertThat(NpmPackageProvider.simpleWorkerContext).isNotNull()
   }
 
   @Test
@@ -76,6 +76,6 @@ class NpmPackageProviderTest {
         NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
       )
 
-    assertThat(generatedSimpleWorkerContext).isEqualTo(NpmPackageProvider.contextR4)
+    assertThat(generatedSimpleWorkerContext).isEqualTo(NpmPackageProvider.simpleWorkerContext)
   }
 }

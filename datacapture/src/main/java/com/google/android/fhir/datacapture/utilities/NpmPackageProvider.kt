@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.utilities
 
 import android.content.Context
 import android.os.Environment
+import android.util.Log
 import com.google.android.fhir.datacapture.mapping.NpmPackageInitializationError
 import java.io.File
 import java.io.FileOutputStream
@@ -50,19 +51,19 @@ object NpmPackageProvider {
    * loaded.
    */
   lateinit var npmPackage: NpmPackage
-  lateinit var contextR4: SimpleWorkerContext
+  lateinit var simpleWorkerContext: SimpleWorkerContext
 
   fun loadSimpleWorkerContext(context: Context): SimpleWorkerContext {
     return loadSimpleWorkerContext(loadNpmPackage(context))
   }
 
   fun loadSimpleWorkerContext(npmPackage: NpmPackage): SimpleWorkerContext {
-    if (!this::contextR4.isInitialized) {
-      contextR4 =
+    if (!this::simpleWorkerContext.isInitialized) {
+      simpleWorkerContext =
         SimpleWorkerContext.fromPackage(npmPackage).apply { isCanRunWithoutTerminology = true }
     }
 
-    return contextR4
+    return simpleWorkerContext
   }
 
   /**
@@ -112,9 +113,13 @@ object NpmPackageProvider {
       IOUtils.copy(inputStream, outputStream)
     } catch (e: IOException) {
       // Delete the folders
-      val packageDirectory = File(outDir)
-      if (packageDirectory.exists()) {
-        packageDirectory.delete()
+      try {
+        val packageDirectory = File(outDir)
+        if (packageDirectory.exists()) {
+          packageDirectory.delete()
+        }
+      } catch (securityException: SecurityException) {
+        Log.e(NpmPackageProvider.javaClass.name, securityException.stackTraceToString())
       }
 
       throw NpmPackageInitializationError(
@@ -133,15 +138,12 @@ object NpmPackageProvider {
     )
   }
 
-  /** Generate the path to the local npm packages directory */
-  private fun getLocalNpmPackagesDirectory(context: Context): String {
-    val outDir =
-      Environment.getDataDirectory().getAbsolutePath() +
-        "/data/${context.applicationContext.packageName}/npm_packages/"
-    return outDir
-  }
+  /** Generates the path to the local npm packages directory. */
+  private fun getLocalNpmPackagesDirectory(context: Context): String =
+    Environment.getDataDirectory().getAbsolutePath() +
+      "/data/${context.applicationContext.packageName}/npm_packages/"
 
-  /** Generate the path to the local hl7.fhir.r4.core package */
+  /** Generates the path to the local hl7.fhir.r4.core package. */
   private fun getLocalFhirCorePackageDirectory(context: Context): String {
     return getLocalNpmPackagesDirectory(context) + "hl7.fhir.r4.core#4.0.1"
   }

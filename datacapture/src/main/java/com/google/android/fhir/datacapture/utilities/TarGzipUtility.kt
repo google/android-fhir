@@ -38,6 +38,7 @@ object TarGzipUtility {
       var entry: TarArchiveEntry? = stream.nextTarEntry
       while (entry != null) {
         if (entry.isDirectory) {
+          entry = stream.nextTarEntry
           continue
         }
         val file = File(out, entry.name).apply { makeParentDir() }

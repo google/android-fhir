@@ -124,8 +124,6 @@ object ResourceMapper {
    * either from persistence or a remote service. The [StructureMap] should strictly return a
    * [Bundle], failure to this an exception will be thrown. If a [StructureMapProvider] is not
    * passed, an empty [Bundle] object is returned
-   *
-   * @return [Bundle] containing the extracted [Resource]s
    */
   private fun extractByStructureMap(
     questionnaire: Questionnaire,
@@ -134,17 +132,13 @@ object ResourceMapper {
     context: Context?
   ): Bundle {
     if (structureMapProvider == null || context == null) return Bundle()
-    val contextR4 = NpmPackageProvider.loadSimpleWorkerContext(context)
-    contextR4.setExpansionProfile(Parameters())
+    val structureMap = structureMapProvider(questionnaire.targetStructureMap!!) ?: return Bundle()
+    val simpleWorkerContext = NpmPackageProvider.loadSimpleWorkerContext(context)
+    simpleWorkerContext.setExpansionProfile(Parameters())
 
     return Bundle().apply {
-      StructureMapUtilities(contextR4)
-        .transform(
-          contextR4,
-          questionnaireResponse,
-          structureMapProvider(questionnaire.targetStructureMap!!),
-          this
-        )
+      StructureMapUtilities(simpleWorkerContext)
+        .transform(simpleWorkerContext, questionnaireResponse, structureMap, this)
     }
   }
 
