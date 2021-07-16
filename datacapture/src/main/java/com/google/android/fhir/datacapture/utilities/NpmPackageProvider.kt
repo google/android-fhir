@@ -25,17 +25,16 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import org.apache.commons.compress.utils.IOUtils
-import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.utilities.npm.NpmPackage
 
 /**
  * Manages extracting the fhir core package into app storage and loading it into memory. Extracting
  * the fhir core package should preferably be done after installation since it is a long running
  * operation that takes 1-2 minutes. Loading the package into memory also takes considerable time
- * (20 seconds to 1 minutes) and should be preferably done at application start.
+ * (20 seconds to 1 minute) and should be preferably done at application start.
  *
  * However, both operations will be done automatically where required during StructureMap-based
- * extraction
+ * extraction.
  */
 object NpmPackageProvider {
 
@@ -51,20 +50,6 @@ object NpmPackageProvider {
    * loaded.
    */
   lateinit var npmPackage: NpmPackage
-  lateinit var simpleWorkerContext: SimpleWorkerContext
-
-  fun loadSimpleWorkerContext(context: Context): SimpleWorkerContext {
-    return loadSimpleWorkerContext(loadNpmPackage(context))
-  }
-
-  fun loadSimpleWorkerContext(npmPackage: NpmPackage): SimpleWorkerContext {
-    if (!this::simpleWorkerContext.isInitialized) {
-      simpleWorkerContext =
-        SimpleWorkerContext.fromPackage(npmPackage).apply { isCanRunWithoutTerminology = true }
-    }
-
-    return simpleWorkerContext
-  }
 
   /**
    * Decompresses the hl7.fhir.r4.core archived package into app storage and loads it into memory.
@@ -72,7 +57,7 @@ object NpmPackageProvider {
    * method can be called during initial app installation and run in the background so as to reduce
    * the time it takes for the whole process.
    *
-   * The whole process can take 1-3 minutes on a clean installation.
+   * The whole process can take 1-2 minutes on a clean installation.
    */
   fun loadNpmPackage(context: Context): NpmPackage {
     setupNpmPackage(context)

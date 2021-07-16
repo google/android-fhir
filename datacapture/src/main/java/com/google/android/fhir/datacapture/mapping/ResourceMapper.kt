@@ -21,7 +21,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
-import com.google.android.fhir.datacapture.utilities.NpmPackageProvider
+import com.google.android.fhir.datacapture.utilities.SimpleWorkerContextProvider
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -133,7 +133,7 @@ object ResourceMapper {
   ): Bundle {
     if (structureMapProvider == null || context == null) return Bundle()
     val structureMap = structureMapProvider(questionnaire.targetStructureMap!!) ?: return Bundle()
-    val simpleWorkerContext = NpmPackageProvider.loadSimpleWorkerContext(context)
+    val simpleWorkerContext = SimpleWorkerContextProvider.loadSimpleWorkerContext(context)
     simpleWorkerContext.setExpansionProfile(Parameters())
 
     return Bundle().apply {

@@ -35,7 +35,7 @@ class NpmPackageProviderTest {
   @Before
   fun setUp() {
     ReflectionHelpers.setField(NpmPackageProvider, "npmPackage", null)
-    ReflectionHelpers.setField(NpmPackageProvider, "contextR4", null)
+    ReflectionHelpers.setField(SimpleWorkerContextProvider, "simpleWorkerContext", null)
   }
 
   @Test
@@ -49,9 +49,9 @@ class NpmPackageProviderTest {
   fun `loadSimpleWorkerContext() should initialize contextR4`() {
     val npmPackage = NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
 
-    NpmPackageProvider.loadSimpleWorkerContext(npmPackage)
+    SimpleWorkerContextProvider.loadSimpleWorkerContext(npmPackage)
 
-    assertThat(NpmPackageProvider.simpleWorkerContext).isNotNull()
+    assertThat(SimpleWorkerContextProvider.simpleWorkerContext).isNotNull()
   }
 
   @Test
@@ -72,10 +72,11 @@ class NpmPackageProviderTest {
   @Test
   fun `loadSimpleWorkerContext() should cache SimpleWorkerContext`() {
     val generatedSimpleWorkerContext =
-      NpmPackageProvider.loadSimpleWorkerContext(
+      SimpleWorkerContextProvider.loadSimpleWorkerContext(
         NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
       )
 
-    assertThat(generatedSimpleWorkerContext).isEqualTo(NpmPackageProvider.simpleWorkerContext)
+    assertThat(generatedSimpleWorkerContext)
+      .isEqualTo(SimpleWorkerContextProvider.simpleWorkerContext)
   }
 }
