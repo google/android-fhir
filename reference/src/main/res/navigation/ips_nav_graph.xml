@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/ips_list_fragment"
-        android:name="com.google.android.fhir.reference.ips.IPSListFragment"
+        android:name="com.google.android.fhir.reference.ips.IPSCompositionListFragment"
         android:label="fragment_ips_list"
         tools:layout="@layout/ips_composition_list_view" />
 </navigation>

@@ -30,7 +30,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.reference.databinding.FragmentPatientListBinding
-import com.google.android.fhir.reference.ips.IPSCompositionActivity
+import com.google.android.fhir.reference.ips.IPSCompositionListActivity
 
 class PatientListFragment : Fragment() {
   private lateinit var fhirEngine: FhirEngine
@@ -140,7 +140,7 @@ class PatientListFragment : Fragment() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
         R.id.ips_activity_menu-> {
-      val intent = Intent(requireContext(), IPSCompositionActivity::class.java)
+      val intent = Intent(requireContext(), IPSCompositionListActivity::class.java)
       requireContext().startActivity(intent)
           return true
     }

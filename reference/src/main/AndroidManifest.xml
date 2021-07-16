@@ -31,11 +31,12 @@
         android:theme="@style/AppTheme"
     >
         <activity
-            android:name="com.google.android.fhir.reference.ips.IPSCompositionActivity"
+            android:name="com.google.android.fhir.reference.ips.IPSCompositionListActivity"
             android:label="FHIR Patients implementation"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="Instantiatable"
             android:parentActivityName=".MainActivity"/>
+
         <activity
             android:name="com.google.android.fhir.reference.MainActivity"
             android:label="@string/title_patient_list"

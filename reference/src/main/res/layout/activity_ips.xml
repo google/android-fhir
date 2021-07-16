@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ips.IPSCompositionActivity">
-    <fragment
+    tools:context=".ips.IPSCompositionListActivity">
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/ips_activity_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
