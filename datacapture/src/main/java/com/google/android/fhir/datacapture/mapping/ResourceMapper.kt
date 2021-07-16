@@ -22,7 +22,7 @@ import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
-import java.util.Locale
+import java.util.*
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
@@ -35,6 +35,7 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IdType
+import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -155,17 +156,19 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ) {
-    if (questionnaireItem.definition == null && questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      val expressionMap = questionnaireItem.itemContextNameToExpressionMap.values
-      if (expressionMap.isNotEmpty()) {
+
+    if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
+      if (questionnaireItem.itemContextNameToExpressionMap.values.isNotEmpty()) {
         val extractedResource =
-          (Class.forName("org.hl7.fhir.r4.model.${expressionMap.first()}")
-            .newInstance() as Resource).apply {
+          (Class.forName("org.hl7.fhir.r4.model.${questionnaireItem.itemContextNameToExpressionMap.values.first()}")
+            .newInstance() as Base).apply {
             extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
           }
-        bundle.apply {
-          addEntry().apply {
-            resource = extractedResource
+        if (extractedResource is Resource) {
+          bundle.apply {
+            addEntry().apply {
+              resource = extractedResource as Resource
+            }
           }
         }
       }
@@ -185,11 +188,11 @@ object ResourceMapper {
     if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
       val value: Base =
         (definitionField.nonParameterizedType.newInstance() as Base).apply {
-          extractFields(bundle,questionnaireItem.item, questionnaireResponseItem.item)
+          extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
         }
 
-      updateField(definitionField, value)
-    } else {
+        updateField(definitionField, value)
+      } else {
       if (questionnaireResponseItem.answer.isEmpty()) return
       val answer = questionnaireResponseItem.answer.first().value
 
