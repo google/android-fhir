@@ -70,16 +70,14 @@ class PatientDetailsFragment : Fragment() {
           PatientDetailsViewModelFactory(requireActivity().application, fhirEngine, args.patientId)
         )
         .get(PatientDetailsViewModel::class.java)
-    patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) {
-      setupPatientData(view, it)
-    }
+    patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) { setupPatientData(it) }
     patientDetailsViewModel.livePatientObservation.observe(viewLifecycleOwner) {
       adapter.submitList(it)
     }
     binding.apply { addScreener.setOnClickListener { onAddScreenerClick() } }
   }
 
-  private fun setupPatientData(view: View, patientItem: PatientListViewModel.PatientItem?) {
+  private fun setupPatientData(patientItem: PatientListViewModel.PatientItem?) {
     patientItem?.let { patient ->
       binding.patientDetail.apply {
         text = HtmlCompat.fromHtml(patient.html, HtmlCompat.FROM_HTML_MODE_LEGACY)

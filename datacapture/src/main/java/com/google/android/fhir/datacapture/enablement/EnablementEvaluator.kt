@@ -118,9 +118,7 @@ private fun evaluateEnableWhen(
   return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
     (questionnaireResponseItem.answer.size > 0) == enableWhen.answerBooleanType.booleanValue()
   } else {
-    questionnaireResponseItem.contains(
-      enableWhenTypeToPredicate(enableWhen, questionnaireItem.type)
-    )
+    questionnaireResponseItem.contains(enableWhenTypeToPredicate(enableWhen))
   }
 }
 
@@ -141,8 +139,7 @@ private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.contains(
  * @param type used to get value based on [Questionnaire.Item.TypeCode].
  */
 private fun enableWhenTypeToPredicate(
-  enableWhen: Questionnaire.QuestionnaireItemEnableWhenComponent,
-  type: Questionnaire.QuestionnaireItemType
+  enableWhen: Questionnaire.QuestionnaireItemEnableWhenComponent
 ): (QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> Boolean {
   when (val operator = enableWhen.operator) {
     Questionnaire.QuestionnaireItemOperator.EQUAL -> return {
