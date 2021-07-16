@@ -1,6 +1,4 @@
 {
-  "id": "5270e23a-17fc-46e1-9e4c-5dc8e4c98a17",
-  "url": "urn:uuid:30aa988e-7a63-43a3-9948-5d376bdaf57d",
   "title": "Sample screener",
   "status": "active",
   "version": "0.0.1",
@@ -8,7 +6,7 @@
   "resourceType": "Questionnaire",
   "item": [
     {
-      "linkId": "linkId-664321",
+      "linkId": "1.0.0",
       "text": "Symptoms",
       "type": "group",
       "extension": [
@@ -28,10 +26,12 @@
       ],
       "item": [
         {
-          "text": "Do you have a history of fever?",
+          "text": "In the past two weeks have you experienced ANY of these symptoms?",
           "type": "choice",
-          "linkId": "linkId-16617",
+          "code": [],
+          "linkId": "1.1.0",
           "required": true,
+          "repeats": true,
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -50,102 +50,30 @@
           "answerOption": [
             {
               "valueCoding": {
-                "code": "Y",
-                "display": "Yes"
+                "code": "386661006",
+                "display": "Fever",
+                "system": "http://snomed.info/sct"
               }
             },
             {
               "valueCoding": {
-                "code": "N",
-                "display": "No"
+                "code": "13645005",
+                "display": "Shortness of breath",
+                "system": "http://snomed.info/sct"
               }
             },
             {
               "valueCoding": {
-                "code": "DN",
-                "display": "Don't Know"
-              }
-            }
-          ]
-        },
-        {
-          "text": "Have you developed a cough recently?",
-          "type": "choice",
-          "linkId": "linkId-34503",
-          "required": true,
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-              "valueCodeableConcept": {
-                "coding": [
-                  {
-                    "system": "http://hl7.org/fhir/questionnaire-item-control",
-                    "code": "drop-down",
-                    "display": "Drop down"
-                  }
-                ],
-                "text": "Drop down"
-              }
-            }
-          ],
-          "answerOption": [
-            {
-              "valueCoding": {
-                "code": "Y",
-                "display": "Yes"
+                "code": "49727002",
+                "display": "Cough",
+                "system": "http://snomed.info/sct"
               }
             },
             {
               "valueCoding": {
-                "code": "N",
-                "display": "No"
-              }
-            },
-            {
-              "valueCoding": {
-                "code": "DN",
-                "display": "Don't Know"
-              }
-            }
-          ]
-        },
-        {
-          "text": "Are you experiencing any shortness of breath?",
-          "type": "choice",
-          "linkId": "linkId-963404",
-          "required": true,
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-              "valueCodeableConcept": {
-                "coding": [
-                  {
-                    "system": "http://hl7.org/fhir/questionnaire-item-control",
-                    "code": "drop-down",
-                    "display": "Drop down"
-                  }
-                ],
-                "text": "Drop down"
-              }
-            }
-          ],
-          "answerOption": [
-            {
-              "valueCoding": {
-                "code": "Y",
-                "display": "Yes"
-              }
-            },
-            {
-              "valueCoding": {
-                "code": "N",
-                "display": "No"
-              }
-            },
-            {
-              "valueCoding": {
-                "code": "DN",
-                "display": "Don't Know"
+                "code": "44169009",
+                "display": "Loss of smell",
+                "system": "http://snomed.info/sct"
               }
             }
           ]
@@ -155,7 +83,7 @@
     {
       "text": "Risk Factors",
       "type": "group",
-      "linkId": "linkId-480381",
+      "linkId": "2.0.0",
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -175,7 +103,7 @@
         {
           "text": "Do you smoke cigarettes?",
           "type": "choice",
-          "linkId": "linkId-142748",
+          "linkId": "2.1.0",
           "required": true,
           "extension": [
             {
@@ -195,20 +123,23 @@
           "answerOption": [
             {
               "valueCoding": {
-                "code": "Y",
-                "display": "Yes"
+                "code": "77176002",
+                "display": "Yes",
+                "system" : "http://snomed.info/sct"
               }
             },
             {
               "valueCoding": {
-                "code": "N",
-                "display": "No"
+                "code": "8517006",
+                "display": "Ex-smoker",
+                "system" : "http://snomed.info/sct"
               }
             },
             {
               "valueCoding": {
-                "code": "Ex",
-                "display": "Ex-smoker"
+                "code": "8392000",
+                "display": "Non-smoker",
+                "system" : "http://snomed.info/sct"
               }
             }
           ]
@@ -216,7 +147,7 @@
         {
           "text": "Have you traveled in the last 2 weeks?",
           "type": "choice",
-          "linkId": "linkId-705141",
+          "linkId": "2.2.0",
           "required": true,
           "extension": [
             {
@@ -251,7 +182,7 @@
         {
           "text": "Has anyone at home recently become unwell?",
           "type": "choice",
-          "linkId": "linkId-840491",
+          "linkId": "2.3.0",
           "required": true,
           "extension": [
             {
@@ -288,7 +219,7 @@
     {
       "text": "Medical History",
       "type": "group",
-      "linkId": "linkId-536888",
+      "linkId": "3.0.0",
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -324,7 +255,7 @@
           ],
           "required": true,
           "repeats": true,
-          "linkId": "LinkId-324879",
+          "linkId": "3.1.0",
           "text": "Do you have any existing conditions",
           "code": [],
           "answerOption": [
@@ -365,6 +296,13 @@
             },
             {
               "valueCoding": {
+                "code": "56265001",
+                "display": "Heart disease",
+                "system" : "http://snomed.info/sct"
+              }
+            },
+            {
+              "valueCoding": {
                 "code": "161450003",
                 "display": "High blood lipids",
                 "system" : "http://snomed.info/sct"
@@ -377,7 +315,7 @@
     {
       "text": "COVID Vaccination",
       "type": "group",
-      "linkId": "linkId-606156",
+      "linkId": "4.0.0",
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -397,25 +335,28 @@
         {
           "text": "Have you been vaccinated against COVID?",
           "type": "choice",
-          "linkId": "linkId-692362",
+          "linkId": "4.1.0",
           "required": true,
           "answerOption": [
             {
               "valueCoding": {
                 "code": "NV",
-                "display": "Not vaccinated"
+                "display": "Not vaccinated",
+                "system" : "custom"
               }
             },
             {
               "valueCoding": {
                 "code": "PV",
-                "display": "Partially vaccinated"
+                "display": "Partially vaccinated",
+                "system" : "custom"
               }
             },
             {
               "valueCoding": {
                 "code": "FV",
-                "display": "Fully vaccinated"
+                "display": "Fully vaccinated",
+                "system" : "custom"
               }
             }
           ]
@@ -423,13 +364,67 @@
         {
           "text": "Which vaccine did you receive?",
           "type": "choice",
-          "linkId": "linkId-772710",
+          "linkId": "4.1.1",
           "enableWhen": [
             {
-              "question": "linkId-692362",
-              "operator": "!=",
+              "question": "4.1.0",
+              "operator": "=",
               "answerCoding": {
-                "code": "NV"
+                "system" : "custom",
+                "code": "PV"
+              }
+            }
+          ],
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "AZ",
+                "display": "AstraZeneca",
+                "system" : "custom"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "Pfizer",
+                "display": "Pfizer BioNTech",
+                "system" : "custom"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "Moderna",
+                "display": "Moderna",
+                "system" : "custom"
+              }
+            }
+          ]
+        },
+        {
+          "text": "Date of first dose?",
+          "type": "date",
+          "linkId": "4.1.2",
+          "enableWhen": [
+            {
+              "question": "4.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "system" : "custom",
+                "code": "PV"
+              }
+            }
+          ]
+        },
+        {
+          "text": "Which vaccine did you receive?",
+          "type": "choice",
+          "linkId": "4.2.0",
+          "enableWhen": [
+            {
+              "question": "4.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "system" : "custom",
+                "code": "FV"
               }
             }
           ],
@@ -453,13 +448,28 @@
               }
             }
           ]
+        },
+        {
+          "text": "Date of last dose?",
+          "type": "date",
+          "linkId": "4.2.1",
+          "enableWhen": [
+            {
+              "question": "4.1.0",
+              "operator": "=",
+              "answerCoding": {
+                "system" : "custom",
+                "code": "FV"
+              }
+            }
+          ]
         }
       ]
     },
     {
       "text": "Temperature",
       "type": "group",
-      "linkId": "linkId-650547",
+      "linkId": "5.0.0",
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -479,12 +489,12 @@
         {
           "text": "Add instructions for capturing temperature",
           "type": "display",
-          "linkId": "linkId-257584"
+          "linkId": "5.0.1"
         },
         {
           "text": "Record temperature",
           "type": "decimal",
-          "linkId": "linkId-704342",
+          "linkId": "5.1.0",
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/minValue",
@@ -501,7 +511,7 @@
     {
       "text": "Pulse Oximetry",
       "type": "group",
-      "linkId": "linkId-684884",
+      "linkId": "6.0.0",
       "extension": [
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -521,12 +531,12 @@
         {
           "text": "Instructions for using the pulse oximeter",
           "type": "display",
-          "linkId": "linkId-588876"
+          "linkId": "6.0.1"
         },
         {
           "text": "Pulse oximetry reading",
           "type": "integer",
-          "linkId": "linkId-351969",
+          "linkId": "6.1.0",
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/minValue",
@@ -541,7 +551,7 @@
         {
           "text": "Pulse (heart rate)",
           "type": "integer",
-          "linkId": "linkId-885691",
+          "linkId": "6.2.0",
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/minValue",
