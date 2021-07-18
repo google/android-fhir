@@ -71,11 +71,15 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
             modifier = StringFilterModifier.CONTAINS
             value = nameQuery
           }
+        filter(Patient.ADDRESS_CITY) {
+          modifier = StringFilterModifier.MATCHES_EXACTLY
+          value = "NAIROBI"
+        }
         sort(Patient.GIVEN, Order.ASCENDING)
         count = 100
         from = 0
       }
-      .take(MAX_RESOURCE_COUNT)
+      .take(patientCount.value!!.toInt())
       .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
       .let { patients.addAll(it) }
     return patients
