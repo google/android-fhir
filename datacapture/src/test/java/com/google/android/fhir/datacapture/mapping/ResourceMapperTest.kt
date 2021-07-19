@@ -21,7 +21,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.ContactPoint
@@ -460,7 +460,10 @@ class ResourceMapperTest {
         org.hl7.fhir.r4.model.QuestionnaireResponse
 
     val patient =
-      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) as Patient
+      ResourceMapper.extract(
+        uriTestQuestionnaire,
+        uriTestQuestionnaireResponse
+      ).entry.first().resource as Patient
 
     assertThat(patient.birthDate).isEqualTo("2021-01-01".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isTrue()
@@ -705,7 +708,11 @@ class ResourceMapperTest {
         org.hl7.fhir.r4.model.QuestionnaireResponse
 
     val patient =
-      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse) as Patient
+      ResourceMapper.extract(
+        uriTestQuestionnaire,
+        uriTestQuestionnaireResponse
+      ).entry.first().resource as Patient
+
     assertThat(patient.birthDate).isEqualTo("2016-02-11".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isFalse()
     assertThat(patient.telecom.get(0).value).isNull()
