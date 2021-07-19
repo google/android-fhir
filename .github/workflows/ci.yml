@@ -91,13 +91,17 @@ jobs:
 
     - name: Build with Gradle
       if: matrix.api-level == 29 # don't run full build on older APIs
-      run: ./gradlew build
+      uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          script: ./gradlew build --info
     - name: Run Integration Tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: ${{ matrix.api-level }}
         arch: x86_64
-        script: ./gradlew connectedCheck --stacktrace
+        script: ./gradlew connectedCheck --info
     - name: Code coverage (via codecov.io)
       run: bash <(curl -s https://codecov.io/bash) -f engine/build/reports/coverage/debug/report.xml
     - name: Release artifacts to local repo
