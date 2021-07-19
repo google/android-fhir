@@ -35,7 +35,6 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IdType
-import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -190,18 +189,15 @@ object ResourceMapper {
         (definitionField.nonParameterizedType.newInstance() as Base).apply {
           extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
         }
-
-        updateField(definitionField, value)
-      } else {
+      updateField(definitionField, value)
+    } else {
       if (questionnaireResponseItem.answer.isEmpty()) return
-      val answer = questionnaireResponseItem.answer.first().value
-
       if (!definitionField.nonParameterizedType.isEnum) {
         // this is a low level type e.g. StringType
-        updateField(definitionField, answer)
+        updateField(definitionField, questionnaireResponseItem.answer)
       } else {
         // this is a high level type e.g. AdministrativeGender
-        updateFieldWithEnum(definitionField, answer)
+        updateFieldWithEnum(definitionField, questionnaireResponseItem.answer.first().value)
       }
     }
   }
@@ -236,17 +232,40 @@ private fun Base.updateFieldWithEnum(field: Field, value: Base) {
  */
 private fun Base.updateField(field: Field, value: Base) {
   val answerValue = generateAnswerWithCorrectType(value, field)
-
   try {
-    javaClass
-      .getMethod("set${field.name.capitalize(Locale.ROOT)}Element", field.type)
-      .invoke(this, answerValue)
+    updateElementWithAnswer(field, answerValue)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
-    javaClass
-      .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.type)
-      .invoke(this, if (field.isParameterized && field.isList) listOf(answerValue) else answerValue)
+    updateListFieldWithAnswer(field, listOf(answerValue))
   }
+}
+
+private fun Base.updateField(
+  field: Field,
+  answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
+) {
+  val answers = answers.map {
+    generateAnswerWithCorrectType(it.value, field)
+  }.toCollection(mutableListOf())
+
+  try {
+    updateElementWithAnswer(field, answers.first())
+  } catch (e: NoSuchMethodException) {
+    // some set methods expect a list of objects
+    updateListFieldWithAnswer(field, answers)
+  }
+}
+
+private fun Base.updateElementWithAnswer(field: Field, answerValue: Base) {
+  javaClass
+    .getMethod("set${field.name.capitalize(Locale.ROOT)}Element", field.type)
+    .invoke(this, answerValue)
+}
+
+private fun Base.updateListFieldWithAnswer(field: Field, answerValue: List<Base>) {
+  javaClass
+    .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.type)
+    .invoke(this, if (field.isParameterized && field.isList) answerValue else answerValue.first())
 }
 
 /**
