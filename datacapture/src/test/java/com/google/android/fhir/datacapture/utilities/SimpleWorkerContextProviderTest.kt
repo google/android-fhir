@@ -20,7 +20,6 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.mapping.ShadowNpmPackageProvider
 import com.google.common.truth.Truth.assertThat
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,32 +29,30 @@ import org.robolectric.util.ReflectionHelpers
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P], shadows = [ShadowNpmPackageProvider::class])
-class NpmPackageProviderTest {
+class SimpleWorkerContextProviderTest {
 
   @Before
   fun setUp() {
-    ReflectionHelpers.setField(NpmPackageProvider, "npmPackage", null)
+    ReflectionHelpers.setField(SimpleWorkerContextProvider, "simpleWorkerContext", null)
   }
 
   @Test
-  fun `verify that npmPackage is not initialized`() {
-    Assert.assertThrows(UninitializedPropertyAccessException::class.java) {
-      NpmPackageProvider::npmPackage.get()
-    }
+  fun `loadSimpleWorkerContext() should initialize contextR4`() {
+    val npmPackage = NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
+
+    SimpleWorkerContextProvider.loadSimpleWorkerContext(npmPackage)
+
+    assertThat(SimpleWorkerContextProvider.simpleWorkerContext).isNotNull()
   }
 
   @Test
-  fun `loadNpmPackage() should initialize npmPackage`() {
-    NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
+  fun `loadSimpleWorkerContext() should cache SimpleWorkerContext`() {
+    val generatedSimpleWorkerContext =
+      SimpleWorkerContextProvider.loadSimpleWorkerContext(
+        NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
+      )
 
-    assertThat(NpmPackageProvider.npmPackage).isNotNull()
-  }
-
-  @Test
-  fun `loadNpmPackage() should cache npmPackage`() {
-    val generatedNpmPackage =
-      NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
-
-    assertThat(generatedNpmPackage).isEqualTo(NpmPackageProvider.npmPackage)
+    assertThat(generatedSimpleWorkerContext)
+      .isEqualTo(SimpleWorkerContextProvider.simpleWorkerContext)
   }
 }

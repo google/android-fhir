@@ -43,14 +43,14 @@ object SimpleWorkerContextProvider {
 
   /**
    * Creates SimpleWorkerContext from [NpmPackage] stored in app storage, previously loaded into
-   * memory as an object
+   * memory as an object.
    *
    * The operations takes 20 seconds to 1 minute.
    */
   fun loadSimpleWorkerContext(npmPackage: NpmPackage): SimpleWorkerContext {
     if (!this::simpleWorkerContext.isInitialized) {
-      simpleWorkerContext =
-        SimpleWorkerContext.fromPackage(npmPackage).apply { isCanRunWithoutTerminology = true }
+      simpleWorkerContext = SimpleWorkerContext.fromPackage(npmPackage)
+      simpleWorkerContext.isCanRunWithoutTerminology = true
     }
 
     return simpleWorkerContext
