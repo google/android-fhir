@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.JsonPatch
 import com.github.fge.jsonpatch.diff.JsonDiff
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
-import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.Resource
 import org.json.JSONArray
 import org.json.JSONObject
@@ -96,7 +95,12 @@ internal object LocalChangeUtils {
         objectMapper.readValue(parser.encodeResourceToString(source), JsonNode::class.java),
         objectMapper.readValue(parser.encodeResourceToString(target), JsonNode::class.java)
       )
-    return JSONArray(jsonDiff.toString())
+     with(JSONArray(jsonDiff.toString())) {
+      val ignorePaths = setOf("/meta", "/text")
+       return@diff JSONArray((0 until length()).map { optJSONObject(it) }.filterNot {
+          ignorePaths.contains(it.optString("path"))
+        })
+    }
   }
 
   /**
