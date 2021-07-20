@@ -24,7 +24,7 @@ public object ParameterDefinitionConverter {
     hapiValue.setMinElement(min.toHapi())
     hapiValue.setMaxElement(max.toHapi())
     hapiValue.setDocumentationElement(documentation.toHapi())
-    hapiValue.setType(type.value)
+    //hapiValue.setTypeElement(type.toHapi())
     hapiValue.setProfileElement(profile.toHapi())
     return hapiValue
   }
@@ -39,7 +39,7 @@ public object ParameterDefinitionConverter {
     .setMin(minElement.toProto())
     .setMax(maxElement.toProto())
     .setDocumentation(documentationElement.toProto())
-    .setType(ParameterDefinition.TypeCode.newBuilder().setValue(type).build())
+    //.setType(typeElement.toProto())
     .setProfile(profileElement.toProto())
     .build()
     return protoValue

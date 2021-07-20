@@ -2,6 +2,8 @@ package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.CanonicalConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.CanonicalConverter.toProto
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toHapi
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CodingConverter.toHapi
@@ -85,7 +87,7 @@ public object DataRequirementConverter {
     val hapiValue = org.hl7.fhir.r4.model.DataRequirement()
     hapiValue.id = id.value 
     hapiValue.setExtension(extensionList.map{it.toHapi()})
-//    hapiValue.setType(type.value)
+    //hapiValue.setTypeElement(type.toHapi())
     hapiValue.setProfile(profileList.map{it.toHapi()})
     hapiValue.setSubject(subject.subjectToHapi())
     hapiValue.setMustSupport(mustSupportList.map{it.toHapi()})
@@ -100,7 +102,7 @@ public object DataRequirementConverter {
     val protoValue = DataRequirement.newBuilder()
     .setId(String.newBuilder().setValue(id))
     .addAllExtension(extension.map{it.toProto()})
-//    .setType(DataRequirement.TypeCode.newBuilder().setValue(type).build())
+    //.setType(typeElement.toProto())
     .addAllProfile(profile.map{it.toProto()})
     .setSubject(subject.subjectToProto())
     .addAllMustSupport(mustSupport.map{it.toProto()})

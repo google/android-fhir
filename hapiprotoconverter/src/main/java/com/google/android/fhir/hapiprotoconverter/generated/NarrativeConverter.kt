@@ -14,7 +14,7 @@ public object NarrativeConverter {
     hapiValue.id = id.value 
     hapiValue.setExtension(extensionList.map{it.toHapi()})
     hapiValue.setStatus(org.hl7.fhir.r4.model.Narrative.NarrativeStatus.valueOf(status.value.name.replace("_","")))
-//    hapiValue.setDiv(div.toHapi())
+    //hapiValue.setDiv(div.toHapi())
     return hapiValue
   }
 
@@ -24,7 +24,7 @@ public object NarrativeConverter {
     .addAllExtension(extension.map{it.toProto()})
     .setStatus(Narrative.StatusCode.newBuilder().setValue(NarrativeStatusCode.Value.valueOf(status.toCode().replace("-",
         "_").toUpperCase())).build())
-//    .setDiv(div.toProto())
+    //.setDiv(div.toProto())
     .build()
     return protoValue
   }

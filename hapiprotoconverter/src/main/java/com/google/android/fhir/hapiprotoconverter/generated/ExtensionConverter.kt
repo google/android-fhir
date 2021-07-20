@@ -322,9 +322,9 @@ public object ExtensionConverter {
     if (this.getDosage() != Dosage.newBuilder().defaultInstanceForType ) {
       return (this.getDosage()).toHapi()
     }
-    if (this.getMeta() != Meta.newBuilder().defaultInstanceForType ) {
-      return (this.getMeta()).toHapi()
-    }
+//    if (this.getMeta() != Meta.newBuilder().defaultInstanceForType ) {
+//      return (this.getMeta()).toHapi()
+//    }
     throw IllegalArgumentException("Extension.value[x]")
   }
 
@@ -478,7 +478,7 @@ public object ExtensionConverter {
       protoValue.setDosage(this.toProto())
     }
     if (this is org.hl7.fhir.r4.model.Meta) {
-      protoValue.setMeta(this.toProto())
+//      protoValue.setMeta(this.toProto())
     }
     return protoValue.build()
   }

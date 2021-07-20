@@ -16,7 +16,7 @@ public object ReferenceConverter {
     val hapiValue = org.hl7.fhir.r4.model.Reference()
     hapiValue.id = id.value 
     hapiValue.setExtension(extensionList.map{it.toHapi()})
-//    hapiValue.setReferenceElement(reference.toHapi())
+    //hapiValue.setReferenceElement(reference.toHapi())
     hapiValue.setTypeElement(type.toHapi())
     hapiValue.setIdentifier(identifier.toHapi())
     hapiValue.setDisplayElement(display.toHapi())
@@ -27,7 +27,7 @@ public object ReferenceConverter {
     val protoValue = Reference.newBuilder()
     .setId(String.newBuilder().setValue(id))
     .addAllExtension(extension.map{it.toProto()})
-//    .setReference(referenceElement.toProto())
+    //.setReference(referenceElement.toProto())
     .setType(typeElement.toProto())
     .setIdentifier(identifier.toProto())
     .setDisplay(displayElement.toProto())
