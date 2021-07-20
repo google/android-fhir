@@ -17,11 +17,17 @@
 package com.google.android.fhir.resource
 
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.SyncDownloadContext
+import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth
+import java.time.LocalDateTime
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
-import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
 import org.json.JSONArray
 import org.json.JSONObject
@@ -68,7 +74,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     return JSONArray(content)
   }
 
-  object testDataSource: DataSource {
+  object testDataSourceImpl : DataSource {
 
     override suspend fun loadData(path: String): Bundle {
       return Bundle()
@@ -79,7 +85,7 @@ class TestingUtils constructor(private val iParser: IParser) {
       resourceId: String,
       payload: String
     ): Resource {
-      return Patient()
+      return Observation()
     }
 
     override suspend fun update(
@@ -92,6 +98,64 @@ class TestingUtils constructor(private val iParser: IParser) {
 
     override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
       return OperationOutcome()
+    }
+  }
+
+  object testFhirEngineImpl : FhirEngine {
+    override suspend fun <R : Resource> save(vararg resource: R) {}
+
+    override suspend fun <R : Resource> update(resource: R) {}
+
+    override suspend fun <R : Resource> load(clazz: Class<R>, id: String): R {
+      return clazz.newInstance()
+    }
+
+    override suspend fun <R : Resource> remove(clazz: Class<R>, id: String) {}
+
+    override suspend fun <R : Resource> search(search: Search): List<R> {
+      return emptyList()
+    }
+
+    override suspend fun syncUpload(
+      upload: suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>
+    ) {}
+
+    override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {}
+
+    override suspend fun count(search: Search): Long {
+      return 0
+    }
+
+    override suspend fun getLastSyncTimeStamp(): LocalDateTime {
+      return LocalDateTime.now()
+    }
+
+    override suspend fun saveLastSyncTimeStamp(lastSyncTimestamp: LocalDateTime) {}
+  }
+
+  object testCorruptDatasource : DataSource {
+    override suspend fun loadData(path: String): Bundle {
+      throw Exception("Loading failed...")
+    }
+
+    override suspend fun insert(
+      resourceType: String,
+      resourceId: String,
+      payload: String
+    ): Resource {
+      throw Exception("Insertion failed...")
+    }
+
+    override suspend fun update(
+      resourceType: String,
+      resourceId: String,
+      payload: String
+    ): OperationOutcome {
+      throw Exception("Updating failed...")
+    }
+
+    override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
+      throw Exception("Deleting failed...")
     }
   }
 }

@@ -17,36 +17,31 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
+import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.sync.Result.Success
 import com.google.gson.Gson
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable.cancel
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.receiveAsFlow
-import net.sf.saxon.event.Sender.send
+import kotlinx.coroutines.launch
 
 /** A WorkManager Worker that handles periodic sync. */
-abstract class PeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
+abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
-
-  private lateinit var fhirSynchronizer: FhirSynchronizer
 
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDataSource(): DataSource
   abstract fun getSyncData(): ResourceSyncParams
 
-  init {
-    fhirSynchronizer = FhirSynchronizer(getFhirEngine(), getDataSource(), getSyncData())
-  }
+  private var fhirSynchronizer: FhirSynchronizer =
+    FhirSynchronizer(getFhirEngine(), getDataSource(), getSyncData())
 
   // worker job, initiated by WorkManager in background,
   // and application initiated this does not have any reference to this,
@@ -54,16 +49,11 @@ abstract class PeriodicSyncWorker(appContext: Context, workerParams: WorkerParam
   // so unless there is any static/companion singleton there is no way to access data without
   // WManager
   override suspend fun doWork(): Result {
-    // TODO handle retry
-
     val flow = MutableSharedFlow<State>()
 
-    // collect is suspend and hence can not be called without this async
     val job =
-      // is it correct to use async in this fashion ???
-      GlobalScope.async {
+      CoroutineScope(Dispatchers.Default).launch {
         flow.collect {
-
           // only here we can subscribe and emit Progress via WorkManager
           // now send Progress to work manager so caller app can listen
           setProgress(
@@ -73,26 +63,34 @@ abstract class PeriodicSyncWorker(appContext: Context, workerParams: WorkerParam
             )
           )
 
-          // not cancelling blocks the await below
-          // removing await just returns without collecting states completely
           if (it is State.Success || it is State.Error) {
-            cancel() // what is better way to stop or kill flow ???
+            this@launch.cancel()
           }
         }
       }
 
-    // is it right way to subscribe i.e. sending flow from here ???
     fhirSynchronizer.subscribe(flow)
 
     val result = fhirSynchronizer.synchronize()
 
-    // cancel from flow collect above throws exception and not cancelling blocks this
-    // removing await just returns without collecting states completely
-    kotlin.runCatching { job.await() }
+    // removing await/join just returns without collecting states completely
+    kotlin.runCatching { job.join() }.onFailure { Log.w(javaClass.name, it) }
 
-    if (result is Success) {
-      return Result.success()
+    /**
+     * In case of failure, we can check if its worth retrying and do retry based on
+     * [RetryConfiguration.maxRetries] set by user.
+     */
+    val retries = inputData.getInt(MAX_RETRIES_ALLOWED, 0)
+    return when {
+      result is Success -> {
+        Result.success()
+      }
+      retries > runAttemptCount -> {
+        Result.retry()
+      }
+      else -> {
+        Result.failure()
+      }
     }
-    return Result.failure()
   }
 }

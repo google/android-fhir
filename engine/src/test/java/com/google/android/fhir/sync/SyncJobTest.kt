@@ -39,7 +39,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ResourceType
@@ -62,30 +61,27 @@ import org.robolectric.annotation.LooperMode
 @Config(sdk = [Build.VERSION_CODES.P])
 @LooperMode(LooperMode.Mode.PAUSED)
 class SyncJobTest {
+  private val context: Context = ApplicationProvider.getApplicationContext()
+
   private lateinit var workManager: WorkManager
   private lateinit var fhirEngine: FhirEngine
 
   @Mock private lateinit var database: Database
-
   @Mock private lateinit var dataSource: DataSource
 
-  private lateinit var syncJob: SyncJob
-  
-  private lateinit var context: Context
-
   @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
+
+  private lateinit var syncJob: SyncJob
 
   @Before
   fun setup() {
     MockitoAnnotations.openMocks(this)
 
-    fhirEngine = FhirEngineImpl(database, ApplicationProvider.getApplicationContext())
+    fhirEngine = FhirEngineImpl(database, context)
 
     val resourceSyncParam = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
 
     syncJob = Sync.basicSyncJob(fhirEngine, dataSource, resourceSyncParam)
-
-    context = ApplicationProvider.getApplicationContext()
 
     val config =
       Configuration.Builder()
@@ -105,14 +101,15 @@ class SyncJobTest {
 
     val worker = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
 
+    // get flows return by work manager wrapper
     val workInfoFlow = syncJob.workInfoFlowFor(SyncWorkType.DOWNLOAD_UPLOAD.workerName, context)
     val stateFlow = syncJob.stateFlowFor(SyncWorkType.DOWNLOAD_UPLOAD.workerName, context)
 
     val workInfoList = mutableListOf<WorkInfo>()
     val stateList = mutableListOf<State>()
 
+    // convert flows to list to assert later
     val job1 = launch { workInfoFlow.toList(workInfoList) }
-
     val job2 = launch { stateFlow.toList(stateList) }
 
     workManager
@@ -127,23 +124,26 @@ class SyncJobTest {
     val testDriver = WorkManagerTestInitHelper.getTestDriver(context)!!
     testDriver.setPeriodDelayMet(worker.id)
 
-    Thread.sleep(10000) // how to avoid it ???
+    Thread.sleep(5000) // how to avoid it ???
 
     // WorkInfos emitted by WorkManager are
     // Enqueued, Running [1 on start],
     // Running [4 from emitted progress],
     // Enqueued for successful runs
-    assertTrue(workInfoList.size >= 4)
+    assertTrue(workInfoList.size == 7)
 
     assertTrue(workInfoList[0].state == WorkInfo.State.ENQUEUED)
     assertTrue(workInfoList[1].state == WorkInfo.State.RUNNING)
     // 2nd last item is Running with progress State.Success
-    assertTrue(workInfoList[workInfoList.size-2].state == WorkInfo.State.RUNNING)
+    assertTrue(workInfoList[workInfoList.size - 2].state == WorkInfo.State.RUNNING)
     // last item is enqueued
-    assertTrue(workInfoList[workInfoList.size-1].state == WorkInfo.State.ENQUEUED)
+    assertTrue(workInfoList[workInfoList.size - 1].state == WorkInfo.State.ENQUEUED)
 
     // States are Nothing, Started, InProgress .... , Success
-    assertTrue(stateList[stateList.size-1] is State.Success)
+    assertTrue(stateList[0] is State.Nothing)
+    assertTrue(stateList[1] is State.Started)
+    assertTrue(stateList[2] is State.InProgress)
+    assertTrue(stateList[3] is State.Success)
 
     job1.cancel()
     job2.cancel()
@@ -190,18 +190,20 @@ class SyncJobTest {
     syncJob.run(flow)
 
     // State transition for failed job as below
-    // Nothing, Started, InProgress, Error
+    // Nothing, Started, InProgress, Glitch, Error
     assertTrue(res[0] is State.Nothing)
     assertTrue(res[1] is State.Started)
     assertTrue(res[2] is State.InProgress)
-    assertTrue(res[3] is State.Error)
+    assertTrue(res[3] is State.Glitch)
+    assertTrue(res[4] is State.Error)
+
     assertEquals(
       LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
-      (res[3] as State.Error).lastSyncTimestamp.truncatedTo(ChronoUnit.SECONDS)
+      (res[4] as State.Error).lastSyncTimestamp.truncatedTo(ChronoUnit.SECONDS)
     )
 
-    assertTrue((res[3] as State.Error).exceptions[0].exception is java.lang.IllegalStateException)
-    assertEquals(4, res.size)
+    assertTrue((res[4] as State.Error).exceptions[0].exception is java.lang.IllegalStateException)
+    assertEquals(5, res.size)
 
     job.cancel()
   }

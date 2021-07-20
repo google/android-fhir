@@ -50,7 +50,7 @@ sealed class State {
 data class ResourceSyncException(val resourceType: ResourceType, val exception: Exception)
 
 /** Class that helps synchronize the data source and save it in the local database */
-class FhirSynchronizer(
+internal class FhirSynchronizer(
   private val fhirEngine: FhirEngine,
   private val dataSource: DataSource,
   private val resourceSyncParams: ResourceSyncParams
@@ -86,16 +86,24 @@ class FhirSynchronizer(
   suspend fun synchronize(): Result {
     emit(State.Started)
 
+    return listOf(upload(), download())
+      .filterIsInstance<Result.Error>()
+      .flatMap { it.exceptions }
+      .let {
+        if (it.isEmpty()) {
+          emitResult(State.Success(LocalDateTime.now()))
+
+          Result.Success
+        } else {
+          emitResult(State.Error(LocalDateTime.now(), it))
+
+          Result.Error(it)
+        }
+      }
+  }
+
+  private suspend fun download(): Result {
     val exceptions = mutableListOf<ResourceSyncException>()
-
-    val result = upload()
-
-    if (result is Result.Error) {
-      exceptions.addAll(result.exceptions)
-
-      emit(State.Glitch(exceptions))
-    }
-
     resourceSyncParams.forEach {
       emit(State.InProgress(it.key))
 
@@ -105,13 +113,10 @@ class FhirSynchronizer(
         exceptions.add(ResourceSyncException(it.key, exception))
       }
     }
-
     return if (exceptions.isEmpty()) {
-      emitResult(State.Success(LocalDateTime.now()))
-
       Result.Success
     } else {
-      emitResult(State.Error(LocalDateTime.now(), exceptions))
+      emit(State.Glitch(exceptions))
 
       Result.Error(exceptions)
     }
@@ -180,6 +185,8 @@ class FhirSynchronizer(
     return if (exceptions.isEmpty()) {
       Result.Success
     } else {
+      emit(State.Glitch(exceptions))
+
       Result.Error(exceptions)
     }
   }

@@ -18,6 +18,7 @@ package com.google.android.fhir.impl
 
 import android.content.Context
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.SharedPreferencesUtil
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
@@ -27,14 +28,13 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.toTimeZoneString
+import java.time.LocalDateTime
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import com.google.android.fhir.SharedPreferencesUtil
-import java.time.LocalDateTime
 
 /** Implementation of [FhirEngine]. */
-internal class FhirEngineImpl
-constructor(private val database: Database, context: Context) : FhirEngine {
+internal class FhirEngineImpl constructor(private val database: Database, context: Context) :
+  FhirEngine {
   val preferences = SharedPreferencesUtil.init(context)
 
   override suspend fun <R : Resource> save(vararg resource: R) {

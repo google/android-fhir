@@ -18,8 +18,6 @@ package com.google.android.fhir.sync
 
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.asFlow
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
@@ -27,14 +25,9 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.android.fhir.FhirEngine
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 
 class SyncJobImpl(
@@ -46,7 +39,7 @@ class SyncJobImpl(
 
   /** Periodically sync the data with given configuration for given worker class */
   @ExperimentalCoroutinesApi
-  override fun <W : PeriodicSyncWorker> poll(
+  override fun <W : FhirSyncWorker> poll(
     periodicSyncConfiguration: PeriodicSyncConfiguration,
     context: Context,
     clazz: Class<W>
@@ -67,7 +60,7 @@ class SyncJobImpl(
 
     // Return LiveData as flow
     val flow = workManager.getWorkInfosForUniqueWorkLiveData(workerUniqueName).asFlow()
-     // .map { convertToState(it) }
+    // .map { convertToState(it) }
 
     // now we lost track of job, do not have,
     // and can not have an instance of fhir-synchronizer
@@ -75,29 +68,31 @@ class SyncJobImpl(
     // that's why it emits progress inside doWork of worker
 
     workManager.enqueueUniquePeriodicWork(
-        workerUniqueName,
-        ExistingPeriodicWorkPolicy.KEEP,
-        periodicWorkRequest
-      )
+      workerUniqueName,
+      ExistingPeriodicWorkPolicy.KEEP,
+      periodicWorkRequest
+    )
 
     return flow
   }
 
   override fun stateFlowFor(uniqueWorkerName: String, context: Context): Flow<State> {
-    return WorkManager.getInstance(context).getWorkInfosForUniqueWorkLiveData(uniqueWorkerName)
+    return WorkManager.getInstance(context)
+      .getWorkInfosForUniqueWorkLiveData(uniqueWorkerName)
       .asFlow()
       .mapNotNull { convertToState(it) }
   }
 
   override fun workInfoFlowFor(uniqueWorkerName: String, context: Context): Flow<WorkInfo> {
-    return WorkManager.getInstance(context).getWorkInfosForUniqueWorkLiveData(uniqueWorkerName)
+    return WorkManager.getInstance(context)
+      .getWorkInfosForUniqueWorkLiveData(uniqueWorkerName)
       .asFlow()
       .mapNotNull { if (it.isEmpty()) null else it[0] } // todo its always 0 ... would it be??
   }
 
   private fun convertToState(workInfos: MutableList<WorkInfo>): State? {
     for (wi in workInfos) {
-      if(wi.state != WorkInfo.State.ENQUEUED && wi.progress.keyValueMap.isNotEmpty()){
+      if (wi.state != WorkInfo.State.ENQUEUED && wi.progress.keyValueMap.isNotEmpty()) {
         val state = wi.progress.getString("StateType")!!
         val stateData = wi.progress.getString("State")!!
 

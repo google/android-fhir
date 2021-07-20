@@ -24,11 +24,11 @@ import org.hl7.fhir.r4.model.ResourceType
 import org.mockito.kotlin.mock
 
 class TestSyncWorker(appContext: Context, workerParams: WorkerParameters) :
-  PeriodicSyncWorker(appContext, workerParams) {
+  FhirSyncWorker(appContext, workerParams) {
 
   override fun getSyncData() = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
 
-  override fun getDataSource() = TestingUtils.testDataSource
+  override fun getDataSource() = TestingUtils.testDataSourceImpl
 
   override fun getFhirEngine() = mock<FhirEngine>()
 }

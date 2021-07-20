@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.cqlreference
+package com.google.android.fhir
 
-import android.app.Application
-import android.content.Context
+import java.time.LocalDate
+import java.util.Date
 
-class FhirApplication : Application() {
-
-  val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
-
-  fun constructFhirEngine(): FhirEngine {
-    return FhirEngineBuilder(this).build()
-  }
-
-  companion object {
-    fun fhirEngine(context: Context) = (context.applicationContext as FhirApplication).fhirEngine
-  }
-}
+@Suppress("DEPRECATION") // java.util.Date API used by HAPI
+internal val Date.epochDay
+  get() = LocalDate.of(year + 1900, month + 1, date).toEpochDay()

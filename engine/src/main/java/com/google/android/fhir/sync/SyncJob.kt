@@ -18,13 +18,11 @@ package com.google.android.fhir.sync
 
 import android.content.Context
 import androidx.work.WorkInfo
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.StateFlow
 
 interface SyncJob {
-  fun <W : PeriodicSyncWorker> poll(
+  fun <W : FhirSyncWorker> poll(
     periodicSyncConfiguration: PeriodicSyncConfiguration,
     context: Context,
     clazz: Class<W>
