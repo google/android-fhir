@@ -16,9 +16,7 @@
 
 package com.google.android.fhir.datacapture.gallery
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
@@ -49,11 +47,11 @@ class MainActivity : AppCompatActivity() {
     return true
   }
 
-  private fun refreshToSelectedLanguage(language: LocaleUtils.Language, context: Activity) {
+  private fun refreshToSelectedLanguage(language: LocaleUtils.Language) {
 
     LocaleUtils.saveSelectedLanguage(language, sharedPreferences)
 
-    this reload context
+    this.recreate()
   }
 
   override fun attachBaseContext(baseContext: Context) {
@@ -78,16 +76,11 @@ class MainActivity : AppCompatActivity() {
     return when (item.itemId) {
       R.id.action_language -> {
         LocaleUtils.renderSelectLanguageDialog(this, languageList) { _, i ->
-          refreshToSelectedLanguage(languageList[i], this)
+          refreshToSelectedLanguage(languageList[i])
         }
         true
       }
       else -> super.onOptionsItemSelected(item)
     }
-  }
-
-  private infix fun Activity.reload(activity: Activity) {
-    val intent = Intent(activity, activity.javaClass)
-    activity.startActivity(intent)
   }
 }

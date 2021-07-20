@@ -53,11 +53,9 @@ object LocaleUtils {
   @RequiresApi(Build.VERSION_CODES.N)
   private fun updateResourcesLocaleConfiguration(context: Context, locale: Locale) {
     context.resources.configuration.also {
-      it.setLocale(locale)
-
       val localeList = LocaleList(locale)
-      LocaleList.setDefault(localeList)
       it.setLocales(localeList)
+      LocaleList.setDefault(it.locales)
 
       context.createConfigurationContext(it)
     }
