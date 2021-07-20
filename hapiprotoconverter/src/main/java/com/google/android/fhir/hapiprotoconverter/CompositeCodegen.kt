@@ -150,10 +150,14 @@ object CompositeCodegen {
       if (element.max.value == "0") {
         continue
       }
+      // TODO handle this
+      if (element.base.path.value == "DomainResource.contained"){
+        continue
+      }
       // name of the element // TODO change logic
       val elementName = getElementName(element)
       // if the name is itself skip
-      if (elementName == def.type.value) {
+      if (elementName.capitalizeFirst() == def.type.value) {
         continue
       }
       if (element.typeList.size > 1) {
@@ -169,7 +173,7 @@ object CompositeCodegen {
       }
       if (elementName == "id") {
         getToProtoBuilder(element)
-          .addStatement(".setId(%T.newBuilder().setValue(id))", if (def.kind.value == StructureDefinitionKindCode.Value.COMPLEX_TYPE) String::class else Id::class)
+          .addStatement(".setId(%T.newBuilder().setValue(id))", if (element.base.path.value == "Resource.id") Id::class else String::class)
         getToHapiBuilder(element).addStatement("hapiValue.id = id.value ")
         continue
       }
@@ -297,7 +301,7 @@ object CompositeCodegen {
       name
         .value
         .split("-")
-        .joinToString { it.capitalizeFirst() }
+        .joinToString("") { it.capitalizeFirst() }
         .replace("[^A-Za-z0-9]".toRegex(), "")
         .capitalizeFirst()
 
@@ -312,7 +316,7 @@ object CompositeCodegen {
       name
         .value
         .split("-")
-        .joinToString { it.capitalizeFirst() }
+        .joinToString("") { it.capitalizeFirst() }
         .replace("[^A-Za-z0-9]", "")
         .capitalizeFirst()
     if (filteredName.endsWith("ValueSets")) {
@@ -346,9 +350,9 @@ object CompositeCodegen {
   private fun getElementName(element: ElementDefinition): kotlin.String {
     // TODO change logic
     return if (element.hasExtension(explicitTypeName) ) {
-      element.getExtension(explicitTypeName).value.stringValue.value
+      element.getExtension(explicitTypeName).value.stringValue.value.lowerCaseFirst()
     } else {
-      element.id.value.split(".").last()
+      element.id.value.split(".").last().lowerCaseFirst()
     }
   }
 
@@ -421,7 +425,7 @@ object CompositeCodegen {
   ): List<FunSpec> {
     val (elementToProtoBuilder, elementToHapiBuilder) =
       getHapiProtoConverterFuncPair(
-        getElementName(element).removeSuffix(choiceTypeSuffixStructureDefinition),
+        element.path.value.split(".").joinToString("") { it.capitalizeFirst() }.removeSuffix(choiceTypeSuffixStructureDefinition),
         element.getChoiceTypeProtoClass(),
         element.getChoiceTypeHapiClass()
       )
@@ -560,7 +564,7 @@ object CompositeCodegen {
     val elementName = getElementName(element)
     val isCommon =
       element.binding.extensionList.any {
-        it.value.uri.value == uriCommon && it.value.boolean.value
+        it.url.value == uriCommon && it.value.boolean.value
       }
 
     if (!specialValueSet.contains(element.binding.valueSet.value)) {
@@ -642,7 +646,7 @@ object CompositeCodegen {
     return ClassName(hapiPackage, base.path.value.split(".").first().capitalizeFirst())
       .nestedClass(
         if (this.hasExtension(explicitTypeName)){
-          "${getElementName(this)}Component"
+          "${getElementName(this).capitalizeFirst()}Component"
         } else {
           "${
             this.base.path.value.split(".").dropLast(1)
@@ -736,11 +740,11 @@ fun main() {
         JsonFormat.getParser().merge(it.inputStream().reader(), StructureDefinition.newBuilder())
       CompositeCodegen.profileUrlMap[def.url.value] = def.build()
     }
-  CompositeCodegen.profileUrlMap.values // .filter { it.name.value == "MessageDefinition" }
+  CompositeCodegen.profileUrlMap.values  //.filter { it.name.value == "Extension"}
     .forEach { def ->
-    if ((  def.kind.value == StructureDefinitionKindCode.Value.COMPLEX_TYPE
-              //||
-      //def.kind.value == StructureDefinitionKindCode.Value.RESOURCE
+    if ((  // def.kind.value == StructureDefinitionKindCode.Value.COMPLEX_TYPE
+//              ||
+      def.kind.value == StructureDefinitionKindCode.Value.RESOURCE
               )
       && !def.abstract.value
     // &&
@@ -775,7 +779,7 @@ fun main1() {
 // CDS Hooks GuidanceResponse
 // CDS Hooks Service PlanDefinition
 // Clinical Document
-// Composition
+// TODO - Composition
 // CQF-Questionnaire
 // DataElement constraint on ElementDefinition data type
 // Family member history for genetics analysis
