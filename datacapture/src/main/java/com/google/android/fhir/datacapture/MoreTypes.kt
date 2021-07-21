@@ -28,6 +28,8 @@ import org.hl7.fhir.r4.model.Type
 internal fun equals(a: Type, b: Type): Boolean {
   if (a::class != b::class) return false
 
+  if (a === b) return true
+
   if (a.isPrimitive) return a.primitiveValue() == b.primitiveValue()
 
   // Codes with the same system and code values are considered equal even if they have different

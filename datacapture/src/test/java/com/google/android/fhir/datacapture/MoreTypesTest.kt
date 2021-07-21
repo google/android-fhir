@@ -40,12 +40,18 @@ class MoreTypesTest {
   }
 
   @Test
-  fun equals_primitiveTypes_shouldReturnTrue() {
+  fun equals_sameObject_shouldReturnTrue() {
+    val value = BooleanType(true)
+    assertThat(equals(value, value)).isTrue()
+  }
+
+  @Test
+  fun equals_samePrimitiveValue_shouldReturnTrue() {
     assertThat(equals(DecimalType(1.1), DecimalType(1.1))).isTrue()
   }
 
   @Test
-  fun equals_primitiveTypes_shouldReturnFalse() {
+  fun equals_differentPrimitiveValues_shouldReturnFalse() {
     assertThat(equals(DecimalType(1.1), DecimalType(1.2))).isFalse()
   }
 
