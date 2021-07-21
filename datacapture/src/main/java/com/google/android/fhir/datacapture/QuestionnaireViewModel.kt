@@ -80,7 +80,10 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   private val questionnaireResponseItemChangedCallback: (String) -> Unit = { linkId ->
     linkIdToQuestionnaireItemMap[linkId]?.let {
       if (it.hasNestedItemsWithinAnswers) {
-        linkIdToQuestionnaireResponseItemMap[linkId]!!.addNestedItemsToAnswer(it)
+        linkIdToQuestionnaireResponseItemMap[linkId]?.addNestedItemsToAnswer(it)
+        linkIdToQuestionnaireResponseItemMap[linkId]?.answer?.singleOrNull()?.item?.forEach {
+          linkIdToQuestionnaireResponseItemMap[it.linkId] = it
+        }
       }
     }
     modificationCount.value += 1
@@ -123,13 +126,16 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
   private fun createLinkIdToQuestionnaireResponseItemMap(
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-  ): Map<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+  ): MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
     val linkIdToQuestionnaireResponseItemMap =
       questionnaireResponseItemList.map { it.linkId to it }.toMap().toMutableMap()
     for (item in questionnaireResponseItemList) {
       linkIdToQuestionnaireResponseItemMap.putAll(
         createLinkIdToQuestionnaireResponseItemMap(item.item)
       )
+      item.answer.forEach {
+        createLinkIdToQuestionnaireResponseItemMap(it.item)
+      }
     }
     return linkIdToQuestionnaireResponseItemMap
   }
