@@ -119,8 +119,8 @@ private fun evaluateEnableWhen(
   return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
     questionnaireResponseItem.answer.isEmpty() != enableWhen.answerBooleanType.booleanValue()
   } else {
-    // The constraint is satisfied if it is satisfied by any answer to the question with the
-    // exception of the `Exists` operator.
+    // The `enableWhen` constraint evaluates to true if at least one answer has a value that
+    // satisfies the `enableWhen` operator and answer, with the exception of the `Exists` operator.
     // See https://www.hl7.org/fhir/valueset-questionnaire-enable-operator.html.
     questionnaireResponseItem.answer.any { enableWhen.predicate(it) }
   }
