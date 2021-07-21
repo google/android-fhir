@@ -106,7 +106,10 @@ internal class FhirSynchronizer(
       list.forEach {
         try {
           val response: Resource = doUpload(it.localChange)
-          if (response.logicalId == it.localChange.resourceId || response.isUploadSuccess()) {
+          if (response.logicalId == it.localChange.resourceId ||
+              (it.localChange.resourceType == response.resourceType.name) ||
+              response.isUploadSuccess()
+          ) {
             tokens.add(it.token)
           } else {
             // TODO improve exception message

@@ -75,10 +75,6 @@ constructor(private val database: Database, private val context: Context) : Fhir
   override suspend fun syncUpload(
     upload: (suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>)
   ) {
-    var localChanges = database.getAllLocalChanges()
-    while (localChanges.isNotEmpty()) {
-      upload(localChanges).forEach { database.deleteUpdates(it) }
-      localChanges = database.getAllLocalChanges()
-    }
+    upload(database.getAllLocalChanges()).forEach { database.deleteUpdates(it) }
   }
 }
