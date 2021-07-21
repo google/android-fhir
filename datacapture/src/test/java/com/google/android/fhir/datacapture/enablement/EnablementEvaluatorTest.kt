@@ -19,6 +19,8 @@ package com.google.android.fhir.datacapture.enablement
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
@@ -53,7 +55,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectsAnswer_answerExists_shouldReturnTrue() {
+  fun evaluate_expectAnswerExists_answerExists_shouldReturnTrue() {
     assertThat(
         EnablementEvaluator.evaluate(
           Questionnaire.QuestionnaireItemComponent()
@@ -80,7 +82,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectsAnswer_answerDoesNotExist_shouldReturnFalse() {
+  fun evaluate_expectAnswerExists_answerDoesNotExist_shouldReturnFalse() {
     assertThat(
         EnablementEvaluator.evaluate(
           Questionnaire.QuestionnaireItemComponent()
@@ -106,7 +108,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectsNoAnswer_answerExists_shouldReturnFalse() {
+  fun evaluate_expectAnswerDoesNotExist_answerExists_shouldReturnFalse() {
     assertThat(
         EnablementEvaluator.evaluate(
           Questionnaire.QuestionnaireItemComponent()
@@ -133,7 +135,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectsNoAnswer_answerDoesNotExist_shouldReturnTrue() {
+  fun evaluate_expectAnswerDoesNotExist_answerDoesNotExist_shouldReturnTrue() {
     assertThat(
         EnablementEvaluator.evaluate(
           Questionnaire.QuestionnaireItemComponent()
@@ -159,7 +161,201 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_anyEnableWhens_noneSatisfied_shouldReturnFalse() {
+  fun evaluate_expectAnswerEqualToValue_noAnswer_shouldReturnFalse() {
+    assertThat(
+        EnablementEvaluator.evaluate(
+          Questionnaire.QuestionnaireItemComponent()
+            .addEnableWhen(
+              Questionnaire.QuestionnaireItemEnableWhenComponent()
+                .setQuestion("q1")
+                .setOperator(Questionnaire.QuestionnaireItemOperator.EQUAL)
+                .setAnswer(BooleanType(true))
+            )
+            .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
+        ) {
+          if (it == "q1") {
+            QuestionnaireItemWithResponse(
+              Questionnaire.QuestionnaireItemComponent()
+                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent()
+            )
+          } else {
+            QuestionnaireItemWithResponse(null, null)
+          }
+        }
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_expectAnswerEqualToValue_someAnswerEqualToValue_shouldReturnTrue() {
+    assertThat(
+        EnablementEvaluator.evaluate(
+          Questionnaire.QuestionnaireItemComponent()
+            .addEnableWhen(
+              Questionnaire.QuestionnaireItemEnableWhenComponent()
+                .setQuestion("q1")
+                .setOperator(Questionnaire.QuestionnaireItemOperator.EQUAL)
+                .setAnswer(BooleanType(true))
+            )
+            .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
+        ) {
+          if (it == "q1") {
+            QuestionnaireItemWithResponse(
+              Questionnaire.QuestionnaireItemComponent()
+                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                .addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(BooleanType(true))
+                )
+                .addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(BooleanType(false))
+                )
+            )
+          } else {
+            QuestionnaireItemWithResponse(null, null)
+          }
+        }
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_expectAnswerEqualToValue_noAnswerEqualToValue_shouldReturnFalse() {
+    assertThat(
+        EnablementEvaluator.evaluate(
+          Questionnaire.QuestionnaireItemComponent()
+            .addEnableWhen(
+              Questionnaire.QuestionnaireItemEnableWhenComponent()
+                .setQuestion("q1")
+                .setOperator(Questionnaire.QuestionnaireItemOperator.EQUAL)
+                .setAnswer(BooleanType(true))
+            )
+            .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
+        ) {
+          if (it == "q1") {
+            QuestionnaireItemWithResponse(
+              Questionnaire.QuestionnaireItemComponent()
+                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                .addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(BooleanType(false))
+                )
+                .addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(BooleanType(false))
+                )
+            )
+          } else {
+            QuestionnaireItemWithResponse(null, null)
+          }
+        }
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_expectAnswerNotEqualToValue_noAnswer_shouldReturnFalse() {
+    assertThat(
+        EnablementEvaluator.evaluate(
+          Questionnaire.QuestionnaireItemComponent()
+            .addEnableWhen(
+              Questionnaire.QuestionnaireItemEnableWhenComponent()
+                .setQuestion("q1")
+                .setOperator(Questionnaire.QuestionnaireItemOperator.NOT_EQUAL)
+                .setAnswer(BooleanType(true))
+            )
+            .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
+        ) {
+          if (it == "q1") {
+            QuestionnaireItemWithResponse(
+              Questionnaire.QuestionnaireItemComponent()
+                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent()
+            )
+          } else {
+            QuestionnaireItemWithResponse(null, null)
+          }
+        }
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_expectAnswerNotEqualToValue_someAnswerNotEqualToValue_shouldReturnTrue() {
+    assertThat(
+        EnablementEvaluator.evaluate(
+          Questionnaire.QuestionnaireItemComponent()
+            .addEnableWhen(
+              Questionnaire.QuestionnaireItemEnableWhenComponent()
+                .setQuestion("q1")
+                .setOperator(Questionnaire.QuestionnaireItemOperator.NOT_EQUAL)
+                .setAnswer(BooleanType(true))
+            )
+            .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
+        ) {
+          if (it == "q1") {
+            QuestionnaireItemWithResponse(
+              Questionnaire.QuestionnaireItemComponent()
+                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                .addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(BooleanType(true))
+                )
+                .addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(BooleanType(false))
+                )
+            )
+          } else {
+            QuestionnaireItemWithResponse(null, null)
+          }
+        }
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_expectAnswerNotEqualToValue_noAnswerNotEqualToValue_shouldReturnFalse() {
+    assertThat(
+        EnablementEvaluator.evaluate(
+          Questionnaire.QuestionnaireItemComponent()
+            .addEnableWhen(
+              Questionnaire.QuestionnaireItemEnableWhenComponent()
+                .setQuestion("q1")
+                .setOperator(Questionnaire.QuestionnaireItemOperator.NOT_EQUAL)
+                .setAnswer(BooleanType(true))
+            )
+            .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
+        ) {
+          if (it == "q1") {
+            QuestionnaireItemWithResponse(
+              Questionnaire.QuestionnaireItemComponent()
+                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
+              QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                .addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(BooleanType(true))
+                )
+                .addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(BooleanType(true))
+                )
+            )
+          } else {
+            QuestionnaireItemWithResponse(null, null)
+          }
+        }
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_multipleEnableWhens_behaviorAny_noneSatisfied_shouldReturnFalse() {
     assertThat(
         EnablementEvaluator.evaluate(
           Questionnaire.QuestionnaireItemComponent()
@@ -197,7 +393,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_anyEnableWhens_oneSatisfied_shouldReturnTrue() {
+  fun evaluate_multipleEnableWhens_behaviorAny_someSatisfied_shouldReturnTrue() {
     assertThat(
         EnablementEvaluator.evaluate(
           Questionnaire.QuestionnaireItemComponent()
@@ -235,7 +431,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_allEnableWhens_someSatisfied_shouldReturnFalse() {
+  fun evaluate_multipleEnableWhens_behaviorAll_someSatisfied_shouldReturnFalse() {
     assertThat(
         EnablementEvaluator.evaluate(
           Questionnaire.QuestionnaireItemComponent()
@@ -273,7 +469,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_allEnableWhens_allSatisfied_shouldReturnTrue() {
+  fun evaluate_multipleEnableWhens_behaviorAll_allSatisfied_shouldReturnTrue() {
     assertThat(
         EnablementEvaluator.evaluate(
           Questionnaire.QuestionnaireItemComponent()
@@ -311,7 +507,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectsAnswer_answerEqual_shouldReturnTrue() {
+  fun evaluate_primitiveType_equal_shouldReturnTrue() {
     assertThat(
         EnablementEvaluator.evaluate(
           Questionnaire.QuestionnaireItemComponent()
@@ -319,22 +515,21 @@ class EnablementEvaluatorTest {
               Questionnaire.QuestionnaireItemEnableWhenComponent()
                 .setQuestion("q1")
                 .setOperator(Questionnaire.QuestionnaireItemOperator.EQUAL)
-                .setAnswer(BooleanType(true))
+                .setAnswer(IntegerType(123))
             )
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
-          if (it == "q1") {
-            QuestionnaireItemWithResponse(
-              Questionnaire.QuestionnaireItemComponent()
-                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
-              QuestionnaireResponse.QuestionnaireResponseItemComponent()
-                .addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                    .setValue(BooleanType(true))
-                )
-            )
-          } else {
-            QuestionnaireItemWithResponse(null, null)
+          when (it) {
+            "q1" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                  .addAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                      .setValue(IntegerType(123))
+                  )
+              )
+            else -> QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -342,7 +537,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectsAnswer_answerDoesNotEqual_shouldReturnFalse() {
+  fun evaluate_primitiveType_equal_shouldReturnFalse() {
     assertThat(
         EnablementEvaluator.evaluate(
           Questionnaire.QuestionnaireItemComponent()
@@ -350,22 +545,21 @@ class EnablementEvaluatorTest {
               Questionnaire.QuestionnaireItemEnableWhenComponent()
                 .setQuestion("q1")
                 .setOperator(Questionnaire.QuestionnaireItemOperator.EQUAL)
-                .setAnswer(BooleanType(true))
+                .setAnswer(IntegerType(123))
             )
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
-          if (it == "q1") {
-            QuestionnaireItemWithResponse(
-              Questionnaire.QuestionnaireItemComponent()
-                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
-              QuestionnaireResponse.QuestionnaireResponseItemComponent()
-                .addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                    .setValue(BooleanType(false))
-                )
-            )
-          } else {
-            QuestionnaireItemWithResponse(null, null)
+          when (it) {
+            "q1" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                  .addAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                      .setValue(IntegerType(321))
+                  )
+              )
+            else -> QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -373,43 +567,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectsAnswer_answerEqualOne_shouldReturnTrue() {
-    assertThat(
-        EnablementEvaluator.evaluate(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            type = Questionnaire.QuestionnaireItemType.BOOLEAN
-            addEnableWhen(
-              Questionnaire.QuestionnaireItemEnableWhenComponent()
-                .setQuestion("q1")
-                .setOperator(Questionnaire.QuestionnaireItemOperator.EQUAL)
-                .setAnswer(BooleanType(true))
-            )
-          }
-        ) {
-          if (it == "q1") {
-            QuestionnaireItemWithResponse(
-              Questionnaire.QuestionnaireItemComponent()
-                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
-              QuestionnaireResponse.QuestionnaireResponseItemComponent()
-                .addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                    .setValue(BooleanType(true))
-                )
-                .addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                    .setValue(BooleanType(false))
-                )
-            )
-          } else {
-            QuestionnaireItemWithResponse(null, null)
-          }
-        }
-      )
-      .isTrue()
-  }
-
-  @Test
-  fun evaluate_expectsAnswer_answerNotEqual_shouldReturnTrue() {
+  fun evaluate_primitiveType_notEqual_shouldReturnTrue() {
     assertThat(
         EnablementEvaluator.evaluate(
           Questionnaire.QuestionnaireItemComponent()
@@ -417,22 +575,21 @@ class EnablementEvaluatorTest {
               Questionnaire.QuestionnaireItemEnableWhenComponent()
                 .setQuestion("q1")
                 .setOperator(Questionnaire.QuestionnaireItemOperator.NOT_EQUAL)
-                .setAnswer(BooleanType(true))
+                .setAnswer(IntegerType(123))
             )
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
-          if (it == "q1") {
-            QuestionnaireItemWithResponse(
-              Questionnaire.QuestionnaireItemComponent()
-                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
-              QuestionnaireResponse.QuestionnaireResponseItemComponent()
-                .addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                    .setValue(BooleanType(false))
-                )
-            )
-          } else {
-            QuestionnaireItemWithResponse(null, null)
+          when (it) {
+            "q1" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                  .addAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                      .setValue(IntegerType(321))
+                  )
+              )
+            else -> QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -440,7 +597,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectsAnswer_answerDoesNotNotEqual_shouldReturnFalse() {
+  fun evaluate_primitiveType_notEqual_shouldReturnFalse() {
     assertThat(
         EnablementEvaluator.evaluate(
           Questionnaire.QuestionnaireItemComponent()
@@ -448,22 +605,21 @@ class EnablementEvaluatorTest {
               Questionnaire.QuestionnaireItemEnableWhenComponent()
                 .setQuestion("q1")
                 .setOperator(Questionnaire.QuestionnaireItemOperator.NOT_EQUAL)
-                .setAnswer(BooleanType(true))
+                .setAnswer(IntegerType(123))
             )
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
-          if (it == "q1") {
-            QuestionnaireItemWithResponse(
-              Questionnaire.QuestionnaireItemComponent()
-                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
-              QuestionnaireResponse.QuestionnaireResponseItemComponent()
-                .addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                    .setValue(BooleanType(true))
-                )
-            )
-          } else {
-            QuestionnaireItemWithResponse(null, null)
+          when (it) {
+            "q1" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                  .addAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                      .setValue(IntegerType(123))
+                  )
+              )
+            else -> QuestionnaireItemWithResponse(null, null)
           }
         }
       )
@@ -471,7 +627,97 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun evaluate_expectsAnswer_answerNotEqualOne_shouldReturnTrue() {
+  fun evaluate_codingType_equal_differentSystem_shouldReturnFalse() {
+    assertThat(
+        EnablementEvaluator.evaluate(
+          Questionnaire.QuestionnaireItemComponent()
+            .addEnableWhen(
+              Questionnaire.QuestionnaireItemEnableWhenComponent()
+                .setQuestion("q1")
+                .setOperator(Questionnaire.QuestionnaireItemOperator.EQUAL)
+                .setAnswer(Coding("system", "code", "display"))
+            )
+            .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
+        ) {
+          when (it) {
+            "q1" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                  .addAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                      .setValue(Coding("otherSystem", "code", "display"))
+                  )
+              )
+            else -> QuestionnaireItemWithResponse(null, null)
+          }
+        }
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_codingType_equal_differentCode_shouldReturnFalse() {
+    assertThat(
+        EnablementEvaluator.evaluate(
+          Questionnaire.QuestionnaireItemComponent()
+            .addEnableWhen(
+              Questionnaire.QuestionnaireItemEnableWhenComponent()
+                .setQuestion("q1")
+                .setOperator(Questionnaire.QuestionnaireItemOperator.EQUAL)
+                .setAnswer(Coding("system", "code", "display"))
+            )
+            .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
+        ) {
+          when (it) {
+            "q1" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                  .addAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                      .setValue(Coding("system", "otherCode", "display"))
+                  )
+              )
+            else -> QuestionnaireItemWithResponse(null, null)
+          }
+        }
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun evaluate_codingType_equal_differentDisplay_shouldReturnTrue() {
+    assertThat(
+        EnablementEvaluator.evaluate(
+          Questionnaire.QuestionnaireItemComponent()
+            .addEnableWhen(
+              Questionnaire.QuestionnaireItemEnableWhenComponent()
+                .setQuestion("q1")
+                .setOperator(Questionnaire.QuestionnaireItemOperator.EQUAL)
+                .setAnswer(Coding("system", "code", "display"))
+            )
+            .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
+        ) {
+          when (it) {
+            "q1" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                  .addAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                      .setValue(Coding("system", "code", "otherDisplay"))
+                  )
+              )
+            else -> QuestionnaireItemWithResponse(null, null)
+          }
+        }
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_codingType_notEqual_differentSystem_shouldReturnTrue() {
     assertThat(
         EnablementEvaluator.evaluate(
           Questionnaire.QuestionnaireItemComponent()
@@ -479,29 +725,84 @@ class EnablementEvaluatorTest {
               Questionnaire.QuestionnaireItemEnableWhenComponent()
                 .setQuestion("q1")
                 .setOperator(Questionnaire.QuestionnaireItemOperator.NOT_EQUAL)
-                .setAnswer(BooleanType(true))
+                .setAnswer(Coding("system", "code", "display"))
             )
             .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
         ) {
-          if (it == "q1") {
-            QuestionnaireItemWithResponse(
-              Questionnaire.QuestionnaireItemComponent()
-                .setType(Questionnaire.QuestionnaireItemType.BOOLEAN),
-              QuestionnaireResponse.QuestionnaireResponseItemComponent()
-                .addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                    .setValue(BooleanType(true))
-                )
-                .addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                    .setValue(BooleanType(false))
-                )
-            )
-          } else {
-            QuestionnaireItemWithResponse(null, null)
+          when (it) {
+            "q1" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                  .addAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                      .setValue(Coding("otherSystem", "code", "display"))
+                  )
+              )
+            else -> QuestionnaireItemWithResponse(null, null)
           }
         }
       )
       .isTrue()
+  }
+
+  @Test
+  fun evaluate_codingType_notEqual_differentCode_shouldReturnTrue() {
+    assertThat(
+        EnablementEvaluator.evaluate(
+          Questionnaire.QuestionnaireItemComponent()
+            .addEnableWhen(
+              Questionnaire.QuestionnaireItemEnableWhenComponent()
+                .setQuestion("q1")
+                .setOperator(Questionnaire.QuestionnaireItemOperator.NOT_EQUAL)
+                .setAnswer(Coding("system", "code", "display"))
+            )
+            .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
+        ) {
+          when (it) {
+            "q1" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                  .addAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                      .setValue(Coding("system", "otherCode", "display"))
+                  )
+              )
+            else -> QuestionnaireItemWithResponse(null, null)
+          }
+        }
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun evaluate_codingType_notEqual_differentDisplay_shouldReturnFalse() {
+    assertThat(
+        EnablementEvaluator.evaluate(
+          Questionnaire.QuestionnaireItemComponent()
+            .addEnableWhen(
+              Questionnaire.QuestionnaireItemEnableWhenComponent()
+                .setQuestion("q1")
+                .setOperator(Questionnaire.QuestionnaireItemOperator.NOT_EQUAL)
+                .setAnswer(Coding("system", "code", "display"))
+            )
+            .setType(Questionnaire.QuestionnaireItemType.BOOLEAN)
+        ) {
+          when (it) {
+            "q1" ->
+              QuestionnaireItemWithResponse(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent()
+                  .addAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                      .setValue(Coding("system", "code", "otherDisplay"))
+                  )
+              )
+            else -> QuestionnaireItemWithResponse(null, null)
+          }
+        }
+      )
+      .isFalse()
   }
 }
