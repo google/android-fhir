@@ -76,11 +76,14 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
 
-  /** Callback function to update the UI. */
+  /**
+   * Callback function to update the UI which takes the linkId of the question whose answer(s) has
+   * been changed.
+   */
   private val questionnaireResponseItemChangedCallback: (String) -> Unit = { linkId ->
-    linkIdToQuestionnaireItemMap[linkId]?.let {
-      if (it.hasNestedItemsWithinAnswers) {
-        linkIdToQuestionnaireResponseItemMap[linkId]?.addNestedItemsToAnswer(it)
+    linkIdToQuestionnaireItemMap[linkId]?.let { questionnaireItem ->
+      if (questionnaireItem.hasNestedItemsWithinAnswers) {
+        linkIdToQuestionnaireResponseItemMap[linkId]?.addNestedItemsToAnswer(questionnaireItem)
         linkIdToQuestionnaireResponseItemMap[linkId]?.answer?.singleOrNull()?.item?.forEach {
           linkIdToQuestionnaireResponseItemMap[it.linkId] = it
         }
@@ -89,8 +92,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
     modificationCount.value += 1
   }
 
-  private val pageFlow =
-    MutableStateFlow<QuestionnairePagination?>(questionnaire.getInitialPagination())
+  private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
 
   internal fun goToPreviousPage() {
     pageFlow.value = pageFlow.value!!.previousPage()
@@ -133,9 +135,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       linkIdToQuestionnaireResponseItemMap.putAll(
         createLinkIdToQuestionnaireResponseItemMap(item.item)
       )
-      item.answer.forEach {
-        createLinkIdToQuestionnaireResponseItemMap(it.item)
-      }
+      item.answer.forEach { createLinkIdToQuestionnaireResponseItemMap(it.item) }
     }
     return linkIdToQuestionnaireResponseItemMap
   }
@@ -218,7 +218,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
 /**
  * Traverse (DFS) through the list of questionnaire items and the list of questionnaire response
- * items and check if the linkid of the matching pairs of questionnaire item and questionnaire
+ * items and check if the linkId of the matching pairs of questionnaire item and questionnaire
  * response item are equal. The traverse is carried out in the two lists in tandem. The two lists
  * should be structurally identical.
  */
