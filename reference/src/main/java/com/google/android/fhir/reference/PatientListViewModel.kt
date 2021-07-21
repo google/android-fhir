@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.reference.data.DataSourceFactory
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.count
@@ -55,9 +56,10 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
 
   private suspend fun count(): Long {
     return fhirEngine.count<Patient> {
-      filter(Patient.ADDRESS_CITY) {
+      val countFilter = DataSourceFactory.countFilterData()
+      filter(countFilter.first) {
         modifier = StringFilterModifier.MATCHES_EXACTLY
-        value = "NAIROBI"
+        value = countFilter.second
       }
     }
   }
