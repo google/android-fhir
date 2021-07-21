@@ -23,6 +23,7 @@ import org.hl7.fhir.utilities.npm.NpmPackage
 import org.hl7.fhir.utilities.npm.ToolsVersion
 import org.robolectric.annotation.Implementation
 import org.robolectric.annotation.Implements
+import org.robolectric.util.ReflectionHelpers
 
 /**
  * Shadow of [ResourceMapper] class implementing original NPM package management for running on
@@ -39,7 +40,7 @@ class ShadowNpmPackageProvider {
       FilesystemPackageCacheManager(true, ToolsVersion.TOOLS_VERSION)
         .loadPackage("hl7.fhir.r4.core", "4.0.1")
 
-    NpmPackageProvider.npmPackage = npmPackage
-    return NpmPackageProvider.npmPackage
+    ReflectionHelpers.setField(NpmPackageProvider, "npmPackage", npmPackage)
+    return npmPackage
   }
 }

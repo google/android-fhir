@@ -49,7 +49,7 @@ object NpmPackageProvider {
    * Call [loadNpmPackage] to load it. The method handles skips the operation if it's already
    * loaded.
    */
-  lateinit var npmPackage: NpmPackage
+  private lateinit var npmPackage: NpmPackage
 
   /**
    * Decompresses the hl7.fhir.r4.core archived package into app storage and loads it into memory.
