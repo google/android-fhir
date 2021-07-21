@@ -28,7 +28,7 @@ import org.hl7.fhir.utilities.npm.NpmPackage
  */
 object SimpleWorkerContextProvider {
 
-  lateinit var simpleWorkerContext: SimpleWorkerContext
+  private lateinit var simpleWorkerContext: SimpleWorkerContext
 
   /**
    * Creates SimpleWorkerContext from [NpmPackage] stored in app storage. In case the [NpmPackage]
@@ -38,18 +38,9 @@ object SimpleWorkerContextProvider {
    * seconds to 1 minute .
    */
   fun loadSimpleWorkerContext(context: Context): SimpleWorkerContext {
-    return loadSimpleWorkerContext(NpmPackageProvider.loadNpmPackage(context))
-  }
-
-  /**
-   * Creates SimpleWorkerContext from [NpmPackage] stored in app storage, previously loaded into
-   * memory as an object.
-   *
-   * The operations takes 20 seconds to 1 minute.
-   */
-  fun loadSimpleWorkerContext(npmPackage: NpmPackage): SimpleWorkerContext {
     if (!this::simpleWorkerContext.isInitialized) {
-      simpleWorkerContext = SimpleWorkerContext.fromPackage(npmPackage)
+      simpleWorkerContext =
+        SimpleWorkerContext.fromPackage(NpmPackageProvider.loadNpmPackage(context))
       simpleWorkerContext.isCanRunWithoutTerminology = true
     }
 

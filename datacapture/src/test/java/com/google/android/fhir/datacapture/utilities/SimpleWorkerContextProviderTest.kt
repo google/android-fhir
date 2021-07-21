@@ -37,22 +37,17 @@ class SimpleWorkerContextProviderTest {
   }
 
   @Test
-  fun `loadSimpleWorkerContext() should initialize contextR4`() {
-    val npmPackage = NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
-
-    SimpleWorkerContextProvider.loadSimpleWorkerContext(npmPackage)
-
-    assertThat(SimpleWorkerContextProvider.simpleWorkerContext).isNotNull()
-  }
-
-  @Test
   fun `loadSimpleWorkerContext() should cache SimpleWorkerContext`() {
     val generatedSimpleWorkerContext =
       SimpleWorkerContextProvider.loadSimpleWorkerContext(
-        NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
+        ApplicationProvider.getApplicationContext()
       )
 
     assertThat(generatedSimpleWorkerContext)
-      .isEqualTo(SimpleWorkerContextProvider.simpleWorkerContext)
+      .isEqualTo(
+        SimpleWorkerContextProvider.loadSimpleWorkerContext(
+          ApplicationProvider.getApplicationContext()
+        )
+      )
   }
 }
