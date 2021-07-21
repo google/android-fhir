@@ -78,15 +78,16 @@ class MoreTypesTest {
     val exception =
       assertThrows(NotImplementedError::class.java) { equals(Attachment(), Attachment()) }
 
-    assertThat(exception.message).isEqualTo("Comparison for type ${Attachment::class.java} not supported.")
+    assertThat(exception.message)
+      .isEqualTo("Comparison for type ${Attachment::class.java} not supported.")
   }
 
   @Test
   fun equals_quantity_shouldThrowException() {
-    val exception =
-      assertThrows(NotImplementedError::class.java) { equals(Quantity(), Quantity()) }
+    val exception = assertThrows(NotImplementedError::class.java) { equals(Quantity(), Quantity()) }
 
-    assertThat(exception.message).isEqualTo("Comparison for type ${Quantity::class.java} not supported.")
+    assertThat(exception.message)
+      .isEqualTo("Comparison for type ${Quantity::class.java} not supported.")
   }
 
   @Test
@@ -94,6 +95,7 @@ class MoreTypesTest {
     val exception =
       assertThrows(NotImplementedError::class.java) { equals(Reference(), Reference()) }
 
-    assertThat(exception.message).isEqualTo("Comparison for type ${Reference::class.java} not supported.")
+    assertThat(exception.message)
+      .isEqualTo("Comparison for type ${Reference::class.java} not supported.")
   }
 }

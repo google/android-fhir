@@ -20,7 +20,6 @@ import com.google.android.fhir.datacapture.equals
 import java.lang.IllegalStateException
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import com.google.android.fhir.datacapture.equals
 
 /**
  * Evaluator for the enablement status of a [Questionnaire.QuestionnaireItemComponent]. Uses the
