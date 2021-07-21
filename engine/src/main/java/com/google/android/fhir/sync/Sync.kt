@@ -52,7 +52,7 @@ object Sync {
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
         SyncWorkType.DOWNLOAD.workerName,
-        ExistingWorkPolicy.KEEP,
+        ExistingWorkPolicy.REPLACE,
         createOneTimeWorkRequest<W>(retryConfiguration)
       )
   }
@@ -69,7 +69,7 @@ object Sync {
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
         SyncWorkType.DOWNLOAD.workerName,
-        ExistingPeriodicWorkPolicy.KEEP,
+        ExistingPeriodicWorkPolicy.REPLACE,
         createPeriodicWorkRequest<W>(periodicSyncConfiguration)
       )
   }
