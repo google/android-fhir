@@ -85,7 +85,9 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       if (questionnaireItem.hasNestedItemsWithinAnswers) {
         linkIdToQuestionnaireResponseItemMap[linkId]?.addNestedItemsToAnswer(questionnaireItem)
         linkIdToQuestionnaireResponseItemMap[linkId]?.answer?.singleOrNull()?.item?.forEach {
-          linkIdToQuestionnaireResponseItemMap[it.linkId] = it
+          questionnaireResponseItem ->
+          linkIdToQuestionnaireResponseItemMap[questionnaireResponseItem.linkId] =
+            questionnaireResponseItem
         }
       }
     }
