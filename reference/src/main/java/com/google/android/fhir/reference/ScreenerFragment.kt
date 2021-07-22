@@ -33,9 +33,9 @@ import androidx.navigation.fragment.NavHostFragment
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 
 /** A fragment class to show screener questionnaire screen. */
-class ScreenerEncounterFragment : Fragment(R.layout.screener_encounter_fragment) {
+class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
 
-  private val viewModel: ScreenerEncounterViewModel by viewModels()
+  private val viewModel: ScreenerViewModel by viewModels()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -99,10 +99,10 @@ class ScreenerEncounterFragment : Fragment(R.layout.screener_encounter_fragment)
         val builder = AlertDialog.Builder(it)
         builder.apply {
           setMessage(getString(R.string.cancel_questionnaire_message))
-          setPositiveButton(getString(R.string.yes)) { _, _ ->
-            NavHostFragment.findNavController(this@ScreenerEncounterFragment).navigateUp()
+          setPositiveButton(getString(android.R.string.yes)) { _, _ ->
+            NavHostFragment.findNavController(this@ScreenerFragment).navigateUp()
           }
-          setNegativeButton(getString(R.string.no)) { _, _ -> }
+          setNegativeButton(getString(android.R.string.no)) { _, _ -> }
         }
         builder.create()
       }

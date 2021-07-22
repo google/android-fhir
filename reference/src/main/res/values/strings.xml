@@ -26,9 +26,7 @@
   <string name="query_hint_patient_search">Find by Patient Name</string>
   <string
         name="cancel_questionnaire_message"
-    >Do you want to cancel current questionnaire?</string>
-  <string name="yes">Yes</string>
-  <string name="no">No</string>
+    >Are you sure you want to discard the answers?</string>
   <string name="patient_id">Id</string>
   <string name="patient_name">Name</string>
   <string name="patient_gender">Gender</string>

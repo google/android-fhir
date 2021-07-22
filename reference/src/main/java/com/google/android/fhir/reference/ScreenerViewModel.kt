@@ -24,9 +24,9 @@ import ca.uhn.fhir.context.FhirContext
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
-const val TAG = "ScreenerEncounterModel"
+const val TAG = "ScreenerViewModel"
 /** ViewModel for screener questionnaire screen {@link ScreenerEncounterFragment}. */
-class ScreenerEncounterViewModel(application: Application, private val state: SavedStateHandle) :
+class ScreenerViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
   val questionnaire: String
     get() = getQuestionnaireJson()
@@ -51,8 +51,7 @@ class ScreenerEncounterViewModel(application: Application, private val state: Sa
     questionnaireJson?.let {
       return it!!
     }
-    questionnaireJson =
-      readFileFromAssets(state[ScreenerEncounterFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+    questionnaireJson = readFileFromAssets(state[ScreenerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
     return questionnaireJson!!
   }
 

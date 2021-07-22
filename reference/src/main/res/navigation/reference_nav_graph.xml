@@ -39,7 +39,7 @@
   <fragment
         android:id="@+id/screenerEncounterFragment"
         android:label="Screen Encounter"
-        android:name="com.google.android.fhir.reference.ScreenerEncounterFragment"
+        android:name="com.google.android.fhir.reference.ScreenerFragment"
         tools:layout="@layout/screener_encounter_fragment"
     />
   <fragment
