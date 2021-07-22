@@ -59,7 +59,7 @@ object NpmPackageProvider {
    *
    * The whole process can take 1-2 minutes on a clean installation.
    */
-  fun loadNpmPackage(context: Context): NpmPackage {
+  suspend fun loadNpmPackage(context: Context): NpmPackage {
     setupNpmPackage(context)
 
     if (!this::npmPackage.isInitialized) {

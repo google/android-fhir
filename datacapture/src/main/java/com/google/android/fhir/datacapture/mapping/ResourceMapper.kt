@@ -22,10 +22,6 @@ import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
 import com.google.android.fhir.datacapture.utilities.SimpleWorkerContextProvider
-import java.lang.reflect.Field
-import java.lang.reflect.Method
-import java.lang.reflect.ParameterizedType
-import java.util.Locale
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
@@ -50,6 +46,10 @@ import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
+import java.lang.reflect.Field
+import java.lang.reflect.Method
+import java.lang.reflect.ParameterizedType
+import java.util.Locale
 
 /**
  * Maps [QuestionnaireResponse] s to FHIR resources and vice versa.
@@ -82,10 +82,10 @@ object ResourceMapper {
    * @return [Bundle] containing the extracted [Resource]s or empty Bundle if the extraction fails.
    * An exception might also be thrown in a few cases
    */
-  fun extract(
+  suspend fun extract(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    structureMapProvider: ((String) -> StructureMap?)? = null,
+    structureMapProvider: (suspend (String) -> StructureMap?)? = null,
     context: Context? = null
   ): Bundle {
     return if (questionnaire.targetStructureMap == null)
@@ -101,7 +101,7 @@ object ResourceMapper {
    * extracted resource. If the process completely fails, an error is thrown or a [Bundle]
    * containing empty [Resource] is returned
    */
-  private fun extractByDefinitions(
+  private suspend fun extractByDefinitions(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse
   ): Bundle {
@@ -131,10 +131,10 @@ object ResourceMapper {
    * [Bundle], failure to this an exception will be thrown. If a [StructureMapProvider] is not
    * passed, an empty [Bundle] object is returned
    */
-  private fun extractByStructureMap(
+  private suspend fun extractByStructureMap(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    structureMapProvider: ((String) -> StructureMap?)?,
+    structureMapProvider: (suspend (String) -> StructureMap?)?,
     context: Context?
   ): Bundle {
     if (structureMapProvider == null || context == null) return Bundle()
@@ -144,7 +144,12 @@ object ResourceMapper {
 
     return Bundle().apply {
       StructureMapUtilities(simpleWorkerContext)
-        .transform(simpleWorkerContext, questionnaireResponse, structureMap, this)
+        .transform(
+          /* appInfo= */ simpleWorkerContext,
+          /* source= */ questionnaireResponse,
+          /* map= */ structureMap,
+          /* target= */ this
+        )
     }
   }
 
@@ -152,7 +157,7 @@ object ResourceMapper {
    * Returns a `QuestionnaireResponse` to the [questionnaire] that is pre-filled from the [resource]
    * See http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population.
    */
-  fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
+  suspend fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
     populateInitialValues(questionnaire.item, resource)
     return QuestionnaireResponse().apply {
       item = questionnaire.item.map { it.createQuestionnaireResponseItem() }

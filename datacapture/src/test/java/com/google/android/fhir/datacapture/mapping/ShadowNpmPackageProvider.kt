@@ -33,7 +33,7 @@ import org.robolectric.util.ReflectionHelpers
 class ShadowNpmPackageProvider {
 
   @Implementation
-  fun loadNpmPackage(context: Context): NpmPackage {
+  suspend fun loadNpmPackage(context: Context): NpmPackage {
     // Package name manually checked from
     // https://simplifier.net/packages/hl7.fhir.r4.core/4.0.1
     val npmPackage =

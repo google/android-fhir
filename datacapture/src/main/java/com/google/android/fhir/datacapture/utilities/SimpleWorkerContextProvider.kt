@@ -37,7 +37,7 @@ object SimpleWorkerContextProvider {
    * The whole process can take 1-3 minutes on a clean installation, otherwise, it should take 20
    * seconds to 1 minute .
    */
-  fun loadSimpleWorkerContext(context: Context): SimpleWorkerContext {
+  suspend fun loadSimpleWorkerContext(context: Context): SimpleWorkerContext {
     if (!this::simpleWorkerContext.isInitialized) {
       simpleWorkerContext =
         SimpleWorkerContext.fromPackage(NpmPackageProvider.loadNpmPackage(context))
