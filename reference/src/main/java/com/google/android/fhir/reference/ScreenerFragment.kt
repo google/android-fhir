@@ -74,7 +74,7 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
   }
 
   private fun updateArguments() {
-    requireArguments().putString(QUESTIONNAIRE_FILE_PATH_KEY, "sample-screener-questionnaire.json")
+    requireArguments().putString(QUESTIONNAIRE_FILE_PATH_KEY, "screener-questionnaire.json")
   }
 
   private fun addQuestionnaireFragment() {
