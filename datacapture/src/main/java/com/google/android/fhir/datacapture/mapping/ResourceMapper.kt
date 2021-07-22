@@ -106,7 +106,9 @@ object ResourceMapper {
     questionnaireResponse: QuestionnaireResponse
   ): Bundle {
 
-//    TODO("Refactor the definition based extraction functions so that they are not extension functions of Base any more. Instead, a extraction context should be passed down during extraction.")
+    //    TODO("Refactor the definition based extraction functions so that they are not extension
+    // functions of Base any more. Instead, a extraction context should be passed down during
+    // extraction.")
     val bundle = Bundle()
     val className = questionnaire.itemContextNameToExpressionMap.values.first()
     val extractedResource =
