@@ -462,10 +462,11 @@ class ResourceMapperTest {
         QuestionnaireResponse
 
     val patient =
-      ResourceMapper.extract(
-        uriTestQuestionnaire,
-        uriTestQuestionnaireResponse
-      ).entry.first().resource as Patient
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse)
+        .entry
+        .first()
+        .resource as
+        Patient
 
     assertThat(patient.birthDate).isEqualTo("2021-01-01".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isTrue()
@@ -706,10 +707,11 @@ class ResourceMapperTest {
         QuestionnaireResponse
 
     val patient =
-      ResourceMapper.extract(
-        uriTestQuestionnaire,
-        uriTestQuestionnaireResponse
-      ).entry.first().resource as Patient
+      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse)
+        .entry
+        .first()
+        .resource as
+        Patient
 
     assertThat(patient.birthDate).isEqualTo("2016-02-11".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isFalse()

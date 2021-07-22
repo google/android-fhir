@@ -25,7 +25,7 @@ import com.google.android.fhir.datacapture.utilities.SimpleWorkerContextProvider
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
-import java.util.*
+import java.util.Locale
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
@@ -68,7 +68,6 @@ import org.hl7.fhir.r4.utils.StructureMapUtilities
  * WARNING: This is not production-ready.
  */
 object ResourceMapper {
-
 
   /**
    * Extract a FHIR resource from the [questionnaire] and [questionnaireResponse].
@@ -222,22 +221,20 @@ object ResourceMapper {
     if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
       if (questionnaireItem.itemContextNameToExpressionMap.values.isNotEmpty()) {
         val extractedResource =
-          (Class.forName("org.hl7.fhir.r4.model.${questionnaireItem.itemContextNameToExpressionMap.values.first()}")
-            .newInstance() as Base).apply {
-            extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
-          }
+          (Class.forName(
+                "org.hl7.fhir.r4.model.${questionnaireItem.itemContextNameToExpressionMap.values.first()}"
+              )
+              .newInstance() as
+              Base)
+            .apply { extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item) }
         if (extractedResource is Resource) {
-          bundle.apply {
-            addEntry().apply {
-              resource = extractedResource as Resource
-            }
-          }
+          bundle.apply { addEntry().apply { resource = extractedResource as Resource } }
         }
       }
     }
 
     if (questionnaireItem.definition == null) {
-      extractFields(bundle,questionnaireItem.item, questionnaireResponseItem.item)
+      extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
       return
     }
 
@@ -307,9 +304,8 @@ private fun Base.updateField(
   field: Field,
   answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
 ) {
-  val answers = answers.map {
-    generateAnswerWithCorrectType(it.value, field)
-  }.toCollection(mutableListOf())
+  val answers =
+    answers.map { generateAnswerWithCorrectType(it.value, field) }.toCollection(mutableListOf())
 
   try {
     updateElementWithAnswer(field, answers.first())
@@ -393,13 +389,15 @@ private val Questionnaire.itemContextNameToExpressionMap: Map<String, String>
     return itemContextExpressionMap(this.extension)
   }
 
-private val Questionnaire.QuestionnaireItemComponent.itemContextNameToExpressionMap: Map<String, String>
+private val Questionnaire.QuestionnaireItemComponent.itemContextNameToExpressionMap:
+  Map<String, String>
   get() {
     return itemContextExpressionMap(this.extension)
   }
 
 private fun itemContextExpressionMap(extensions: List<Extension>): Map<String, String> =
-  extensions.filter { it.url == ITEM_CONTEXT_EXTENSION_URL }
+  extensions
+    .filter { it.url == ITEM_CONTEXT_EXTENSION_URL }
     .map {
       val expression = it.value as Expression
       expression.name to expression.expression
