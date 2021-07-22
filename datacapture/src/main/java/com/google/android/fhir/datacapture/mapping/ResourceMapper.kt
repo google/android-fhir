@@ -36,6 +36,7 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Parameters
@@ -104,15 +105,20 @@ object ResourceMapper {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse
   ): Bundle {
+
+    //    TODO("Refactor the definition based extraction functions so that they are not extension
+    // functions of Base any more. Instead, a extraction context should be passed down during
+    // extraction.")
+    val bundle = Bundle()
     val className = questionnaire.itemContextNameToExpressionMap.values.first()
     val extractedResource =
       (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Resource).apply {
-        extractFields(questionnaire.item, questionnaireResponse.item)
+        extractFields(bundle, questionnaire.item, questionnaireResponse.item)
       }
 
-    return Bundle().apply {
+    return bundle.apply {
       type = Bundle.BundleType.TRANSACTION
-      addEntry(Bundle.BundleEntryComponent().apply { resource = extractedResource })
+      addEntry().apply { resource = extractedResource }
     }
   }
 
@@ -190,6 +196,7 @@ object ResourceMapper {
    * the corresponding questions in [questionnaireItemList]. This method handles nested fields.
    */
   private fun Base.extractFields(
+    bundle: Bundle,
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
   ) {
@@ -198,6 +205,7 @@ object ResourceMapper {
     while (questionnaireItemListIterator.hasNext() &&
       questionnaireResponseItemListIterator.hasNext()) {
       extractField(
+        bundle,
         questionnaireItemListIterator.next(),
         questionnaireResponseItemListIterator.next()
       )
@@ -209,11 +217,28 @@ object ResourceMapper {
    * [questionnaireItem]. This method handles nested fields.
    */
   private fun Base.extractField(
+    bundle: Bundle,
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ) {
+
+    if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
+      if (questionnaireItem.itemContextNameToExpressionMap.values.isNotEmpty()) {
+        val extractedResource =
+          (Class.forName(
+                "org.hl7.fhir.r4.model.${questionnaireItem.itemContextNameToExpressionMap.values.first()}"
+              )
+              .newInstance() as
+              Base)
+            .apply { extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item) }
+        if (extractedResource is Resource) {
+          bundle.apply { addEntry().apply { resource = extractedResource as Resource } }
+        }
+      }
+    }
+
     if (questionnaireItem.definition == null) {
-      extractFields(questionnaireItem.item, questionnaireResponseItem.item)
+      extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
       return
     }
 
@@ -226,20 +251,17 @@ object ResourceMapper {
     if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
       val value: Base =
         (definitionField.nonParameterizedType.newInstance() as Base).apply {
-          extractFields(questionnaireItem.item, questionnaireResponseItem.item)
+          extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
         }
-
       updateField(definitionField, value)
     } else {
       if (questionnaireResponseItem.answer.isEmpty()) return
-      val answer = questionnaireResponseItem.answer.first().value
-
       if (!definitionField.nonParameterizedType.isEnum) {
         // this is a low level type e.g. StringType
-        updateField(definitionField, answer)
+        updateField(definitionField, questionnaireResponseItem.answer)
       } else {
         // this is a high level type e.g. AdministrativeGender
-        updateFieldWithEnum(definitionField, answer)
+        updateFieldWithEnum(definitionField, questionnaireResponseItem.answer.first().value)
       }
     }
   }
@@ -274,17 +296,39 @@ private fun Base.updateFieldWithEnum(field: Field, value: Base) {
  */
 private fun Base.updateField(field: Field, value: Base) {
   val answerValue = generateAnswerWithCorrectType(value, field)
-
   try {
-    javaClass
-      .getMethod("set${field.name.capitalize(Locale.ROOT)}Element", field.type)
-      .invoke(this, answerValue)
+    updateFieldWithAnswer(field, answerValue)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
-    javaClass
-      .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.type)
-      .invoke(this, if (field.isParameterized && field.isList) listOf(answerValue) else answerValue)
+    updateListFieldWithAnswer(field, listOf(answerValue))
   }
+}
+
+private fun Base.updateField(
+  field: Field,
+  answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
+) {
+  val answers =
+    answers.map { generateAnswerWithCorrectType(it.value, field) }.toCollection(mutableListOf())
+
+  try {
+    updateFieldWithAnswer(field, answers.first())
+  } catch (e: NoSuchMethodException) {
+    // some set methods expect a list of objects
+    updateListFieldWithAnswer(field, answers)
+  }
+}
+
+private fun Base.updateFieldWithAnswer(field: Field, answerValue: Base) {
+  javaClass
+    .getMethod("set${field.name.capitalize(Locale.ROOT)}Element", field.type)
+    .invoke(this, answerValue)
+}
+
+private fun Base.updateListFieldWithAnswer(field: Field, answerValue: List<Base>) {
+  javaClass
+    .getMethod("set${field.name.capitalize(Locale.ROOT)}", field.type)
+    .invoke(this, if (field.isParameterized && field.isList) answerValue else answerValue.first())
 }
 
 /**
@@ -346,14 +390,23 @@ private fun Questionnaire.QuestionnaireItemType.getClass(): Class<out Base>? =
  */
 private val Questionnaire.itemContextNameToExpressionMap: Map<String, String>
   get() {
-    return this.extension
-      .filter { it.url == ITEM_CONTEXT_EXTENSION_URL }
-      .map {
-        val expression = it.value as Expression
-        expression.name to expression.expression
-      }
-      .toMap()
+    return itemContextExpressionMap(this.extension)
   }
+
+private val Questionnaire.QuestionnaireItemComponent.itemContextNameToExpressionMap:
+  Map<String, String>
+  get() {
+    return itemContextExpressionMap(this.extension)
+  }
+
+private fun itemContextExpressionMap(extensions: List<Extension>): Map<String, String> =
+  extensions
+    .filter { it.url == ITEM_CONTEXT_EXTENSION_URL }
+    .map {
+      val expression = it.value as Expression
+      expression.name to expression.expression
+    }
+    .toMap()
 
 /**
  * Extracts a list containing the resource name followed by field names leading to the destination
