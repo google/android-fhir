@@ -83,11 +83,13 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   private val questionnaireResponseItemChangedCallback: (String) -> Unit = { linkId ->
     linkIdToQuestionnaireItemMap[linkId]?.let { questionnaireItem ->
       if (questionnaireItem.hasNestedItemsWithinAnswers) {
-        linkIdToQuestionnaireResponseItemMap[linkId]?.addNestedItemsToAnswer(questionnaireItem)
-        linkIdToQuestionnaireResponseItemMap[linkId]?.answer?.singleOrNull()?.item?.forEach {
-          questionnaireResponseItem ->
-          linkIdToQuestionnaireResponseItemMap[questionnaireResponseItem.linkId] =
-            questionnaireResponseItem
+        linkIdToQuestionnaireResponseItemMap[linkId]?.let { questionnaireResponseItem ->
+          questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
+          questionnaireResponseItem.answer.singleOrNull()?.item?.forEach {
+            nestedQuestionnaireResponseItem ->
+            linkIdToQuestionnaireResponseItemMap[nestedQuestionnaireResponseItem.linkId] =
+              nestedQuestionnaireResponseItem
+          }
         }
       }
     }
