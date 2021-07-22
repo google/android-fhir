@@ -4,12 +4,34 @@
   "version": "0.0.1",
   "publisher": "Fred Hersch (fredhersch@google.com)",
   "resourceType": "Questionnaire",
+  "subjectType": [
+    "Encounter"
+  ],
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+      "valueExpression": {
+        "language": "application/x-fhir-query",
+        "expression": "Encounter",
+        "name": "encounter"
+      }
+    }
+  ],
   "item": [
     {
-      "linkId": "1.0.0",
       "text": "Symptoms",
+      "linkId": "1.0.0",
       "type": "group",
+      "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
       "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Observation",
+            "name": "symptoms"
+          }
+        },
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
           "valueCodeableConcept": {
@@ -32,6 +54,7 @@
           "linkId": "1.1.0",
           "required": true,
           "repeats": true,
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.category",
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -84,7 +107,16 @@
       "text": "Risk Factors",
       "type": "group",
       "linkId": "2.0.0",
+      "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
       "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Observation",
+            "name": "riskFactors"
+          }
+        },
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
           "valueCodeableConcept": {
@@ -105,6 +137,7 @@
           "type": "choice",
           "linkId": "2.1.0",
           "required": true,
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.category",
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -149,6 +182,7 @@
           "type": "choice",
           "linkId": "2.2.0",
           "required": true,
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.category",
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -184,6 +218,7 @@
           "type": "choice",
           "linkId": "2.3.0",
           "required": true,
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.category",
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -220,7 +255,16 @@
       "text": "Medical History",
       "type": "group",
       "linkId": "3.0.0",
+      "definition": "http://hl7.org/fhir/StructureDefinition/Condition",
       "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Condition",
+            "name": "medicalHistory"
+          }
+        },
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
           "valueCodeableConcept": {
@@ -238,6 +282,7 @@
       "item": [
         {
           "type": "choice",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Condition.category",
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -316,7 +361,16 @@
       "text": "COVID Vaccination",
       "type": "group",
       "linkId": "4.0.0",
+      "definition": "http://hl7.org/fhir/StructureDefinition/Immunization",
       "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Immunization",
+            "name": "vaccination"
+          }
+        },
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
           "valueCodeableConcept": {
@@ -470,7 +524,16 @@
       "text": "Temperature",
       "type": "group",
       "linkId": "5.0.0",
+      "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
       "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Observation",
+            "name": "pulse"
+          }
+        },
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
           "valueCodeableConcept": {
@@ -512,7 +575,16 @@
       "text": "Pulse Oximetry",
       "type": "group",
       "linkId": "6.0.0",
+      "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
       "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Observation",
+            "name": "pulse"
+          }
+        },
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
           "valueCodeableConcept": {

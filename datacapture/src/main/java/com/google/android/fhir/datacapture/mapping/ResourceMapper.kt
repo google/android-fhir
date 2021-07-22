@@ -119,19 +119,6 @@ object ResourceMapper {
     }
   }
 
-//  fun extract(questionnaire: Questionnaire, questionnaireResponse: QuestionnaireResponse): Bundle {
-//    val bundle = Bundle()
-//    return bundle.apply {
-//      addEntry().apply {
-//        val className = questionnaire.itemContextNameToExpressionMap.values.first()
-//        resource =
-//          (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Resource).apply {
-//            extractFields(bundle, questionnaire.item, questionnaireResponse.item)
-//          }
-//      }
-//    }
-//  }
-
   /**
    * Extracts a FHIR resource from the [questionnaire], [questionnaireResponse] and
    * [structureMapProvider] using the StructureMap-based extraction methodology.
