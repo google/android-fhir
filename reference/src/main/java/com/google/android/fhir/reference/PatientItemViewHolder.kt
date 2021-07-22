@@ -16,25 +16,32 @@
 
 package com.google.android.fhir.reference
 
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.reference.databinding.PatientListItemViewBinding
+import java.time.LocalDate
+import java.time.Period
+import org.hl7.fhir.utilities.DateTimeUtil
 
 class PatientItemViewHolder(private val binding: PatientListItemViewBinding) :
   RecyclerView.ViewHolder(binding.root) {
-  private val idView: TextView = binding.idPatientNumber
+  private val statusView: ImageView = binding.status
   private val nameView: TextView = binding.name
-  private val genderView: TextView = binding.gender
-  private val dobView: TextView = binding.dob
+  private val ageView: TextView = binding.age
+  private val idView: TextView = binding.id
 
   fun bindTo(
     patientItem: PatientListViewModel.PatientItem,
     onItemClicked: (PatientListViewModel.PatientItem) -> Unit
   ) {
-    this.idView.text = patientItem.id
+//    this.idView.text = patientItem.id
     this.nameView.text = patientItem.name
-    this.genderView.text = patientItem.gender
-    this.dobView.text = patientItem.dob
+    this.ageView.text = "${Period.between(
+      LocalDate.parse(patientItem.dob),
+      LocalDate.now()
+    ).years.let {  return@let if (it > 0) it else 1 }} years old"
+    this.idView.text = "Id: #---${patientItem.resourceId.substring(patientItem.resourceId.length - 3)}"
 
     this.itemView.setOnClickListener { onItemClicked(patientItem) }
   }
