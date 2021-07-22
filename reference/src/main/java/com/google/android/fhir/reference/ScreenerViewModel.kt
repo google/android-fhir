@@ -17,14 +17,24 @@
 package com.google.android.fhir.reference
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
+import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.datacapture.mapping.ResourceMapper
+import java.util.*
+import kotlinx.coroutines.launch
+import org.hl7.fhir.r4.model.Condition
+import org.hl7.fhir.r4.model.Encounter
+import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Resource
 
 const val TAG = "ScreenerViewModel"
+
 /** ViewModel for screener questionnaire screen {@link ScreenerEncounterFragment}. */
 class ScreenerViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
@@ -34,17 +44,35 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   private val questionnaireResource: Questionnaire
     get() = FhirContext.forR4().newJsonParser().parseResource(questionnaire) as Questionnaire
   private var questionnaireJson: String? = null
+  private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
 
   /**
    * Saves screener encounter questionnaire response into the application database.
    *
    * @param questionnaireResponse screener encounter questionnaire response
    */
-  fun saveScreenerEncounter(questionnaireResponse: QuestionnaireResponse) {
+  fun saveScreenerEncounter(questionnaireResponse: QuestionnaireResponse, patientId: String) {
     // TODO Extract the screener encounter resource and save into the database.
     // Extraction of screener questionnaire response approach is under review.
-    val response = FhirContext.forR4().newJsonParser().encodeResourceToString(questionnaireResponse)
-    Log.d(TAG, "saveScreenerEncounter: $response")
+//    val response = FhirContext.forR4().newJsonParser().encodeResourceToString(questionnaireResponse)
+//    Log.d(TAG, "saveScreenerEncounter: $response")
+
+    viewModelScope.launch {
+      val bundle = ResourceMapper.extract(questionnaireResource, questionnaireResponse)
+      val reference = Reference(patientId)
+      val symptoms = bundle.entry.first().resource as Observation
+      symptoms.subject = reference
+      val medicalHistory = bundle.entry[2].resource as Condition
+      medicalHistory.subject = reference
+      saveResourceToDatabase(medicalHistory)
+      val encounter = bundle.entry[6].resource as Encounter
+      encounter.subject = reference
+    }
+  }
+
+  private suspend fun saveResourceToDatabase(resource: Resource) {
+    resource.id = generateUuid()
+    fhirEngine.save(resource)
   }
 
   private fun getQuestionnaireJson(): String {
@@ -59,5 +87,9 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
     return getApplication<Application>().assets.open(filename).bufferedReader().use {
       it.readText()
     }
+  }
+
+  private fun generateUuid(): String {
+    return UUID.randomUUID().toString()
   }
 }

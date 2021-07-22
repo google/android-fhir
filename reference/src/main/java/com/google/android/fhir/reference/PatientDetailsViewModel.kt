@@ -33,7 +33,7 @@ import org.hl7.fhir.r4.model.Patient
 class PatientDetailsViewModel(
   application: Application,
   private val fhirEngine: FhirEngine,
-  private val patientId: String
+  val patientId: String
 ) : AndroidViewModel(application) {
 
   val livePatientData = liveData { emit(getPatient()) }

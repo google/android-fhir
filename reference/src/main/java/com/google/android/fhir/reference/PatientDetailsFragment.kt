@@ -100,7 +100,11 @@ class PatientDetailsFragment : Fragment() {
 
   private fun onAddScreenerClick() {
     findNavController()
-      .navigate(PatientDetailsFragmentDirections.actionPatientDetailsToScreenEncounterFragment())
+      .navigate(
+        PatientDetailsFragmentDirections.actionPatientDetailsToScreenEncounterFragment(
+          patientDetailsViewModel.patientId
+        )
+      )
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -30,12 +30,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 
 /** A fragment class to show screener questionnaire screen. */
 class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
 
   private val viewModel: ScreenerViewModel by viewModels()
+  private val args: ScreenerFragmentArgs by navArgs()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -89,7 +91,7 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
   private fun onSubmitAction() {
     val questionnaireFragment =
       childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
-    viewModel.saveScreenerEncounter(questionnaireFragment.getQuestionnaireResponse())
+    viewModel.saveScreenerEncounter(questionnaireFragment.getQuestionnaireResponse(),args.patientId)
     Toast.makeText(context, "questionnaire response is received.", Toast.LENGTH_SHORT).show()
   }
 
