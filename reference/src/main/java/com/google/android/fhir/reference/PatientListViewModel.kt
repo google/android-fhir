@@ -40,8 +40,8 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   AndroidViewModel(application) {
 
   val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
-  val patientCount = liveData { emit(count()) }
-
+//  val patientCount = liveData { emit(count()) }
+  val patientCount = MutableLiveData<Int>()
   init {
     fetchAndPost { getSearchResults() }
   }
@@ -51,7 +51,10 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   }
 
   private fun fetchAndPost(search: suspend () -> List<PatientItem>) {
-    viewModelScope.launch { liveSearchedPatients.value = search() }
+    viewModelScope.launch {
+      liveSearchedPatients.value = search()
+      patientCount.value = liveSearchedPatients.value!!.size
+    }
   }
 
   private suspend fun count(): Long {

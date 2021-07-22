@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#10156125"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/AppTheme.PatientDetails.headline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mary Odhiambo" />
+
+    <TextView
+        android:id="@+id/status"
+        style="@style/AppTheme.PatientDetails.body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+         android:text="@string/html_text"/>
+    <TextView
+        android:id="@+id/last_contact"
+        style="@style/AppTheme.PatientDetails.body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Last Contacted: none" />
+
+    <com.google.android.material.button.MaterialButton
+        android:textAppearance="?attr/textAppearanceBody2"
+        android:layout_margin="5dp"
+        android:text="Complete Survey"
+        android:id="@+id/screener"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+</LinearLayout>

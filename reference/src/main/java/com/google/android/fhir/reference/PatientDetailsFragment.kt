@@ -16,21 +16,27 @@
 
 package com.google.android.fhir.reference
 
+import android.graphics.Color
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.HtmlCompat
+import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.databinding.PatientDetailBinding
+import com.google.android.fhir.reference.databinding.PatientDetailsHeaderBinding
+import com.google.android.fhir.reference.databinding.PatientListItemViewBinding
+import com.google.android.material.card.MaterialCardView
 
 /**
  * A fragment representing a single Patient detail screen. This fragment is contained in a
@@ -60,41 +66,56 @@ class PatientDetailsFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    val recyclerView: RecyclerView = binding.observationList.observationList
-    val adapter = ObservationItemRecyclerViewAdapter()
-    recyclerView.adapter = adapter
     fhirEngine = FhirApplication.fhirEngine(requireContext())
     patientDetailsViewModel =
       ViewModelProvider(
-          this,
-          PatientDetailsViewModelFactory(requireActivity().application, fhirEngine, args.patientId)
-        )
+        this,
+        PatientDetailsViewModelFactory(requireActivity().application, fhirEngine, args.patientId)
+      )
         .get(PatientDetailsViewModel::class.java)
     patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) { setupPatientData(it) }
     patientDetailsViewModel.livePatientObservation.observe(viewLifecycleOwner) {
-      adapter.submitList(it)
     }
-    binding.apply { addScreener.setOnClickListener { onAddScreenerClick() } }
   }
 
   private fun setupPatientData(patientItem: PatientListViewModel.PatientItem?) {
     patientItem?.let { patient ->
-      binding.patientDetail.apply {
-        text = HtmlCompat.fromHtml(patient.html, HtmlCompat.FROM_HTML_MODE_LEGACY)
+      val container : LinearLayoutCompat = binding.container
+      val detailsCard = MaterialCardView(ContextThemeWrapper(container.context, R.style.CardView)).apply {
+        addView(LinearLayout(this.context).apply {
+          orientation = LinearLayout.VERTICAL
+          addView(HeaderItemViewHolder(PatientDetailsHeaderBinding.inflate(LayoutInflater.from(this.context), this, false)).apply {
+            binding.screener.setOnClickListener { onAddScreenerClick() }
+            bindTo(Model("Name", patient.name, type = 1))
+          }.itemView)
+          addView(lineView(this))
+          listOf(
+            Model("Mobile Number", patient.phone),
+            Model("ID Number", patient.resourceId),
+            Model("Address", "${patient.city}, ${patient.country} "),
+            Model("Date of Birth", patient.dob),
+            Model("Gender", patient.gender.capitalize()),
+          ).forEach {
+            addView(ChildItemViewHolder(PatientListItemViewBinding.inflate(LayoutInflater.from(this.context), this, false)).apply { bindTo(it)}.itemView)
+            addView(lineView(this))
+          }
+        })
       }
-      binding.patientListItem.apply {
-        title.text = patient.name
-        gender.text = patient.gender
-        dob.text = patient.dob
-        phoneNumber.text = patient.phone
-        city.text = patient.city
-        country.text = patient.country
-        isActive.text = patient.isActive.toString()
-      }
+      container.addView(detailsCard)
+      val param  = detailsCard.layoutParams as ViewGroup.MarginLayoutParams
+      param.setMargins(30)
       (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-        title = patient.name
+        title = "Patient Card"
         setDisplayHomeAsUpEnabled(true)
       }
+    }
+  }
+
+  private fun lineView(container: ViewGroup) : View {
+    return View(container.context).apply {
+      setBackgroundColor(Color.LTGRAY)
+      minimumWidth = ViewGroup.LayoutParams.MATCH_PARENT
+      minimumHeight = 2
     }
   }
 
