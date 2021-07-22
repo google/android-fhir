@@ -137,7 +137,11 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
       linkIdToQuestionnaireResponseItemMap.putAll(
         createLinkIdToQuestionnaireResponseItemMap(item.item)
       )
-      item.answer.forEach { createLinkIdToQuestionnaireResponseItemMap(it.item) }
+      item.answer.forEach {
+        linkIdToQuestionnaireResponseItemMap.putAll(
+          createLinkIdToQuestionnaireResponseItemMap(it.item)
+        )
+      }
     }
     return linkIdToQuestionnaireResponseItemMap
   }
