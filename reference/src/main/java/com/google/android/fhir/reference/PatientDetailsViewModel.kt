@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.liveData
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.search
+import java.util.concurrent.TimeUnit
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 
@@ -45,6 +46,7 @@ class PatientDetailsViewModel(
   }
 
   private suspend fun getPatientObservations(): List<PatientListViewModel.ObservationItem> {
+    Thread.sleep(TimeUnit.MILLISECONDS.toMillis(100))
     val observations: MutableList<PatientListViewModel.ObservationItem> = mutableListOf()
     fhirEngine
       .search<Observation> { filter(Observation.SUBJECT) { value = "Patient/$patientId" } }

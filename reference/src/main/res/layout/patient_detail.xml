@@ -14,32 +14,15 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<androidx.core.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    >
+    android:background="#f9f9f9">
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        <!--            <include-->
-        <!--                android:id="@+id/patient_list_item"-->
-        <!--                layout="@layout/patient_details_layout"-->
-        <!--            />-->
-<!--        <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-<!--            android:id="@+id/add_screener"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginBottom="12dp"-->
-<!--            android:layout_marginEnd="12dp"-->
-<!--            android:layout_gravity="bottom|end"-->
-<!--            android:clickable="true"-->
-<!--            app:srcCompat="@drawable/ic_baseline_add_24"-->
-<!--            />-->
     </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.core.widget.NestedScrollView>

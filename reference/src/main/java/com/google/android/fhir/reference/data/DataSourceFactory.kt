@@ -27,7 +27,7 @@ import org.hl7.fhir.r4.model.ResourceType
 
 class DataSourceFactory {
   companion object {
-    private const val DEFAULT_SOURCE = "hapi"
+    private const val DEFAULT_SOURCE = "gcp"
     fun createSource(type: String = DEFAULT_SOURCE): DataSource {
       return when (type) {
         "gcp" ->

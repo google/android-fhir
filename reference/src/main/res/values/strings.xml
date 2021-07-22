@@ -38,5 +38,6 @@
   <string name="add_patient">Add Patient</string>
   <string name="submit">Submit</string>
   <string name="message_syncing">Syncing…</string>
-  <string name="html_text">Current status: <font color="#156125">Recovered</font></string>
+  <string name="html_text">Current status: <font color="#ddd">UNKNOWN</font></string>
+<!--  <string name="html_text">Current status: <font color="#156125">Recovered</font></string>-->
 </resources>

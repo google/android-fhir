@@ -125,7 +125,10 @@ class PatientListFragment : Fragment() {
         }
       )
 
-    binding.apply { addPatient.setOnClickListener { onAddPatientClick() } }
+    binding.apply {
+      addPatient.setOnClickListener { onAddPatientClick() }
+      addPatient.setColorFilter(Color.WHITE)
+    }
     setHasOptionsMenu(true)
   }
 

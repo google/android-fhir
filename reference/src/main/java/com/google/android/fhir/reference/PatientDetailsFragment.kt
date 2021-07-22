@@ -26,6 +26,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.core.view.marginLeft
 import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -37,6 +38,7 @@ import com.google.android.fhir.reference.databinding.PatientDetailBinding
 import com.google.android.fhir.reference.databinding.PatientDetailsHeaderBinding
 import com.google.android.fhir.reference.databinding.PatientListItemViewBinding
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.textview.MaterialTextView
 
 /**
  * A fragment representing a single Patient detail screen. This fragment is contained in a
@@ -75,6 +77,26 @@ class PatientDetailsFragment : Fragment() {
         .get(PatientDetailsViewModel::class.java)
     patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) { setupPatientData(it) }
     patientDetailsViewModel.livePatientObservation.observe(viewLifecycleOwner) {
+      val observations  = it.map { Model(it.code, it.value) }
+      if (observations.isNotEmpty()) {
+        val container : LinearLayoutCompat = binding.container
+        container.addView(MaterialTextView(container.context).apply {
+          text = "Observations"
+          setPadding(30, 0, 0, 0)
+        })
+        val detailsCard = MaterialCardView(ContextThemeWrapper(container.context, R.style.CardView)).apply {
+          addView(LinearLayout(this.context).apply {
+            orientation = LinearLayout.VERTICAL
+            observations.forEach {
+              addView(ChildItemViewHolder(PatientListItemViewBinding.inflate(LayoutInflater.from(this.context), this, false)).apply { bindTo(it)}.itemView)
+              addView(lineView(this))
+            }
+          })
+        }
+        container.addView(detailsCard)
+        val param  = detailsCard.layoutParams as ViewGroup.MarginLayoutParams
+        param.setMargins(30)
+      }
     }
   }
 
