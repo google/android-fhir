@@ -105,6 +105,8 @@ object ResourceMapper {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse
   ): Bundle {
+
+//    TODO("Refactor the definition based extraction functions so that they are not extension functions of Base any more. Instead, a extraction context should be passed down during extraction.")
     val bundle = Bundle()
     val className = questionnaire.itemContextNameToExpressionMap.values.first()
     val extractedResource =
@@ -293,7 +295,7 @@ private fun Base.updateFieldWithEnum(field: Field, value: Base) {
 private fun Base.updateField(field: Field, value: Base) {
   val answerValue = generateAnswerWithCorrectType(value, field)
   try {
-    updateElementWithAnswer(field, answerValue)
+    updateFieldWithAnswer(field, answerValue)
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
     updateListFieldWithAnswer(field, listOf(answerValue))
@@ -308,14 +310,14 @@ private fun Base.updateField(
     answers.map { generateAnswerWithCorrectType(it.value, field) }.toCollection(mutableListOf())
 
   try {
-    updateElementWithAnswer(field, answers.first())
+    updateFieldWithAnswer(field, answers.first())
   } catch (e: NoSuchMethodException) {
     // some set methods expect a list of objects
     updateListFieldWithAnswer(field, answers)
   }
 }
 
-private fun Base.updateElementWithAnswer(field: Field, answerValue: Base) {
+private fun Base.updateFieldWithAnswer(field: Field, answerValue: Base) {
   javaClass
     .getMethod("set${field.name.capitalize(Locale.ROOT)}Element", field.type)
     .invoke(this, answerValue)
