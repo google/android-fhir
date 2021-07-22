@@ -18,13 +18,15 @@ package com.google.android.fhir.reference
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
-import java.util.*
+import java.util.UUID
 import kotlinx.coroutines.launch
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Observation
@@ -45,6 +47,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
     get() = FhirContext.forR4().newJsonParser().parseResource(questionnaire) as Questionnaire
   private var questionnaireJson: String? = null
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
+  val isResourcesSaved = MutableLiveData<Boolean>()
 
   /**
    * Saves screener encounter questionnaire response into the application database.
@@ -52,22 +55,32 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
    * @param questionnaireResponse screener encounter questionnaire response
    */
   fun saveScreenerEncounter(questionnaireResponse: QuestionnaireResponse, patientId: String) {
-    // TODO Extract the screener encounter resource and save into the database.
-    // Extraction of screener questionnaire response approach is under review.
-//    val response = FhirContext.forR4().newJsonParser().encodeResourceToString(questionnaireResponse)
-//    Log.d(TAG, "saveScreenerEncounter: $response")
-
     viewModelScope.launch {
       val bundle = ResourceMapper.extract(questionnaireResource, questionnaireResponse)
-      val reference = Reference(patientId)
-      val symptoms = bundle.entry.first().resource as Observation
-      symptoms.subject = reference
-      val medicalHistory = bundle.entry[2].resource as Condition
-      medicalHistory.subject = reference
-      saveResourceToDatabase(medicalHistory)
-      val encounter = bundle.entry[6].resource as Encounter
-      encounter.subject = reference
+      val reference = Reference("Patient/$patientId")
+      saveObservation(bundle, reference, index = 0)
+      saveCondition(bundle, reference, index = 2)
+      saveEncounter(bundle, reference, index = 6)
+      isResourcesSaved.value = true
     }
+  }
+
+  private suspend fun saveObservation(bundle: Bundle, reference: Reference, index: Int) {
+    val observation = bundle.entry[index].resource as Observation
+    observation.subject = reference
+    saveResourceToDatabase(observation)
+  }
+
+  private suspend fun saveCondition(bundle: Bundle, reference: Reference, index: Int) {
+    val condition = bundle.entry[index].resource as Condition
+    condition.subject = reference
+    saveResourceToDatabase(condition)
+  }
+
+  private suspend fun saveEncounter(bundle: Bundle, reference: Reference, index: Int) {
+    val encounter = bundle.entry[6].resource as Encounter
+    encounter.subject = reference
+    saveResourceToDatabase(encounter)
   }
 
   private suspend fun saveResourceToDatabase(resource: Resource) {

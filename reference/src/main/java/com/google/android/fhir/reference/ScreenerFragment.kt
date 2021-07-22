@@ -45,6 +45,7 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
     setHasOptionsMenu(true)
     updateArguments()
     onBackPressed()
+    observeResourcesSaveAction()
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
     }
@@ -91,7 +92,10 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
   private fun onSubmitAction() {
     val questionnaireFragment =
       childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
-    viewModel.saveScreenerEncounter(questionnaireFragment.getQuestionnaireResponse(),args.patientId)
+    viewModel.saveScreenerEncounter(
+      questionnaireFragment.getQuestionnaireResponse(),
+      args.patientId
+    )
     Toast.makeText(context, "questionnaire response is received.", Toast.LENGTH_SHORT).show()
   }
 
@@ -114,6 +118,17 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
   private fun onBackPressed() {
     activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner) {
       showCancelScreenerQuestionnaireAlertDialog()
+    }
+  }
+
+  private fun observeResourcesSaveAction() {
+    viewModel.isResourcesSaved.observe(viewLifecycleOwner) {
+      if (!it) {
+        Toast.makeText(requireContext(), "Inputs are missing.", Toast.LENGTH_SHORT).show()
+        return@observe
+      }
+      Toast.makeText(requireContext(), "Resources are saved.", Toast.LENGTH_SHORT).show()
+      NavHostFragment.findNavController(this).navigateUp()
     }
   }
 
