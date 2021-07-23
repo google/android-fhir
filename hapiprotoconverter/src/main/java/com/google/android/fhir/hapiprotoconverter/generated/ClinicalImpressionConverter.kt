@@ -42,7 +42,7 @@ public object ClinicalImpressionConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("ClinicalImpression.effective[x]")
+    throw IllegalArgumentException("Invalid Type for ClinicalImpression.effective[x]")
   }
 
   public fun Type.clinicalImpressionEffectiveToProto(): ClinicalImpression.EffectiveX {

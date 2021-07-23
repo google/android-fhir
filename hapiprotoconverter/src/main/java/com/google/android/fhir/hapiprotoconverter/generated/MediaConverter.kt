@@ -49,7 +49,7 @@ public object MediaConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("Media.created[x]")
+    throw IllegalArgumentException("Invalid Type for Media.created[x]")
   }
 
   public fun Type.mediaCreatedToProto(): Media.CreatedX {

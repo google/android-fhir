@@ -74,7 +74,7 @@ public object ResearchElementDefinitionConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("ResearchElementDefinition.subject[x]")
+    throw IllegalArgumentException("Invalid Type for ResearchElementDefinition.subject[x]")
   }
 
   public fun Type.researchElementDefinitionSubjectToProto(): ResearchElementDefinition.SubjectX {
@@ -103,7 +103,8 @@ public object ResearchElementDefinitionConverter {
     if (this.getDataRequirement() != DataRequirement.newBuilder().defaultInstanceForType ) {
       return (this.getDataRequirement()).toHapi()
     }
-    throw IllegalArgumentException("ResearchElementDefinition.characteristic.definition[x]")
+    throw
+        IllegalArgumentException("Invalid Type for ResearchElementDefinition.characteristic.definition[x]")
   }
 
   public fun Type.researchElementDefinitionCharacteristicDefinitionToProto():
@@ -139,7 +140,8 @@ public object ResearchElementDefinitionConverter {
     if (this.getTiming() != Timing.newBuilder().defaultInstanceForType ) {
       return (this.getTiming()).toHapi()
     }
-    throw IllegalArgumentException("ResearchElementDefinition.characteristic.studyEffective[x]")
+    throw
+        IllegalArgumentException("Invalid Type for ResearchElementDefinition.characteristic.studyEffective[x]")
   }
 
   public fun Type.researchElementDefinitionCharacteristicStudyEffectiveToProto():
@@ -176,7 +178,7 @@ public object ResearchElementDefinitionConverter {
       return (this.getTiming()).toHapi()
     }
     throw
-        IllegalArgumentException("ResearchElementDefinition.characteristic.participantEffective[x]")
+        IllegalArgumentException("Invalid Type for ResearchElementDefinition.characteristic.participantEffective[x]")
   }
 
   public fun Type.researchElementDefinitionCharacteristicParticipantEffectiveToProto():

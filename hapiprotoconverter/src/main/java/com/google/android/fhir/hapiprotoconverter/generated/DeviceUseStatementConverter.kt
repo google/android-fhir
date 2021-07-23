@@ -45,7 +45,7 @@ public object DeviceUseStatementConverter {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType ) {
       return (this.getDateTime()).toHapi()
     }
-    throw IllegalArgumentException("DeviceUseStatement.timing[x]")
+    throw IllegalArgumentException("Invalid Type for DeviceUseStatement.timing[x]")
   }
 
   public fun Type.deviceUseStatementTimingToProto(): DeviceUseStatement.TimingX {

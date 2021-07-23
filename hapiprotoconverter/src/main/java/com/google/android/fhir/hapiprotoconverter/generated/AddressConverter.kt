@@ -4,8 +4,6 @@ import com.google.android.fhir.hapiprotoconverter.generated.ExtensionConverter.t
 import com.google.android.fhir.hapiprotoconverter.generated.ExtensionConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.PeriodConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.PeriodConverter.toProto
-import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHapi
-import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.fhir.r4.core.Address
 import com.google.fhir.r4.core.AddressTypeCode
 import com.google.fhir.r4.core.AddressUseCode

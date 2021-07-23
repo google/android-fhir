@@ -53,7 +53,7 @@ public object EventDefinitionConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("EventDefinition.subject[x]")
+    throw IllegalArgumentException("Invalid Type for EventDefinition.subject[x]")
   }
 
   public fun Type.eventDefinitionSubjectToProto(): EventDefinition.SubjectX {

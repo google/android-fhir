@@ -56,7 +56,7 @@ public object MedicationRequestConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("MedicationRequest.reported[x]")
+    throw IllegalArgumentException("Invalid Type for MedicationRequest.reported[x]")
   }
 
   public fun Type.medicationRequestReportedToProto(): MedicationRequest.ReportedX {
@@ -77,7 +77,7 @@ public object MedicationRequestConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("MedicationRequest.medication[x]")
+    throw IllegalArgumentException("Invalid Type for MedicationRequest.medication[x]")
   }
 
   public fun Type.medicationRequestMedicationToProto(): MedicationRequest.MedicationX {
@@ -99,7 +99,7 @@ public object MedicationRequestConverter {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    throw IllegalArgumentException("MedicationRequest.substitution.allowed[x]")
+    throw IllegalArgumentException("Invalid Type for MedicationRequest.substitution.allowed[x]")
   }
 
   public fun Type.medicationRequestSubstitutionAllowedToProto():

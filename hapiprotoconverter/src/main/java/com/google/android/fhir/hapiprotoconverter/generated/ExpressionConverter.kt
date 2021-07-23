@@ -21,7 +21,6 @@ public object ExpressionConverter {
     hapiValue.setDescriptionElement(description.toHapi())
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setLanguageElement(language.toHapi())
-    hapiValue.setExpressionElement(expression.toHapi())
     hapiValue.setReferenceElement(reference.toHapi())
     return hapiValue
   }
@@ -33,7 +32,6 @@ public object ExpressionConverter {
     .setDescription(descriptionElement.toProto())
     .setName(nameElement.toProto())
     .setLanguage(languageElement.toProto())
-    .setExpression(expressionElement.toProto())
     .setReference(referenceElement.toProto())
     .build()
     return protoValue

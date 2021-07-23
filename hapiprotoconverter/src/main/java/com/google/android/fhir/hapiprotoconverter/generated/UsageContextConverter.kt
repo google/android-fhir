@@ -22,7 +22,7 @@ import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.Type
 
 public object UsageContextConverter {
-  public fun UsageContext.ValueX.valueToHapi(): Type {
+  public fun UsageContext.ValueX.usageContextValueToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
@@ -35,10 +35,10 @@ public object UsageContextConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("UsageContext.value[x]")
+    throw IllegalArgumentException("Invalid Type for UsageContext.value[x]")
   }
 
-  public fun Type.valueToProto(): UsageContext.ValueX {
+  public fun Type.usageContextValueToProto(): UsageContext.ValueX {
     val protoValue = UsageContext.ValueX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
       protoValue.setCodeableConcept(this.toProto())
@@ -60,7 +60,7 @@ public object UsageContextConverter {
     hapiValue.id = id.value 
     hapiValue.setExtension(extensionList.map{it.toHapi()})
     hapiValue.setCode(code.toHapi())
-    hapiValue.setValue(value.valueToHapi())
+    hapiValue.setValue(value.usageContextValueToHapi())
     return hapiValue
   }
 
@@ -69,7 +69,7 @@ public object UsageContextConverter {
     .setId(String.newBuilder().setValue(id))
     .addAllExtension(extension.map{it.toProto()})
     .setCode(code.toProto())
-    .setValue(value.valueToProto())
+    .setValue(value.usageContextValueToProto())
     .build()
     return protoValue
   }

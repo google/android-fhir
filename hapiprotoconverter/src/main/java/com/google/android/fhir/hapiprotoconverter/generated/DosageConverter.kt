@@ -30,17 +30,17 @@ import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Type
 
 public object DosageConverter {
-  public fun Dosage.AsNeededX.asNeededToHapi(): Type {
+  public fun Dosage.AsNeededX.dosageAsNeededToHapi(): Type {
     if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType ) {
       return (this.getBoolean()).toHapi()
     }
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    throw IllegalArgumentException("Dosage.asNeeded[x]")
+    throw IllegalArgumentException("Invalid Type for Dosage.asNeeded[x]")
   }
 
-  public fun Type.asNeededToProto(): Dosage.AsNeededX {
+  public fun Type.dosageAsNeededToProto(): Dosage.AsNeededX {
     val protoValue = Dosage.AsNeededX.newBuilder()
     if (this is BooleanType) {
       protoValue.setBoolean(this.toProto())
@@ -51,17 +51,17 @@ public object DosageConverter {
     return protoValue.build()
   }
 
-  public fun Dosage.DoseAndRate.DoseX.doseToHapi(): Type {
+  public fun Dosage.DoseAndRate.DoseX.dosageDoseAndRateDoseToHapi(): Type {
     if (this.getRange() != Range.newBuilder().defaultInstanceForType ) {
       return (this.getRange()).toHapi()
     }
     if (this.getQuantity() != SimpleQuantity.newBuilder().defaultInstanceForType ) {
       return (this.getQuantity()).toHapi()
     }
-    throw IllegalArgumentException("Dosage.doseAndRate.dose[x]")
+    throw IllegalArgumentException("Invalid Type for Dosage.doseAndRate.dose[x]")
   }
 
-  public fun Type.doseToProto(): Dosage.DoseAndRate.DoseX {
+  public fun Type.dosageDoseAndRateDoseToProto(): Dosage.DoseAndRate.DoseX {
     val protoValue = Dosage.DoseAndRate.DoseX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Range) {
       protoValue.setRange(this.toProto())
@@ -72,7 +72,7 @@ public object DosageConverter {
     return protoValue.build()
   }
 
-  public fun Dosage.DoseAndRate.RateX.rateToHapi(): Type {
+  public fun Dosage.DoseAndRate.RateX.dosageDoseAndRateRateToHapi(): Type {
     if (this.getRatio() != Ratio.newBuilder().defaultInstanceForType ) {
       return (this.getRatio()).toHapi()
     }
@@ -82,10 +82,10 @@ public object DosageConverter {
     if (this.getQuantity() != SimpleQuantity.newBuilder().defaultInstanceForType ) {
       return (this.getQuantity()).toHapi()
     }
-    throw IllegalArgumentException("Dosage.doseAndRate.rate[x]")
+    throw IllegalArgumentException("Invalid Type for Dosage.doseAndRate.rate[x]")
   }
 
-  public fun Type.rateToProto(): Dosage.DoseAndRate.RateX {
+  public fun Type.dosageDoseAndRateRateToProto(): Dosage.DoseAndRate.RateX {
     val protoValue = Dosage.DoseAndRate.RateX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Ratio) {
       protoValue.setRatio(this.toProto())
@@ -109,7 +109,7 @@ public object DosageConverter {
     hapiValue.setAdditionalInstruction(additionalInstructionList.map{it.toHapi()})
     hapiValue.setPatientInstructionElement(patientInstruction.toHapi())
     hapiValue.setTiming(timing.toHapi())
-    hapiValue.setAsNeeded(asNeeded.asNeededToHapi())
+    hapiValue.setAsNeeded(asNeeded.dosageAsNeededToHapi())
     hapiValue.setSite(site.toHapi())
     hapiValue.setRoute(route.toHapi())
     hapiValue.setMethod(method.toHapi())
@@ -130,7 +130,7 @@ public object DosageConverter {
     .addAllAdditionalInstruction(additionalInstruction.map{it.toProto()})
     .setPatientInstruction(patientInstructionElement.toProto())
     .setTiming(timing.toProto())
-    .setAsNeeded(asNeeded.asNeededToProto())
+    .setAsNeeded(asNeeded.dosageAsNeededToProto())
     .setSite(site.toProto())
     .setRoute(route.toProto())
     .setMethod(method.toProto())
@@ -148,8 +148,8 @@ public object DosageConverter {
     .setId(String.newBuilder().setValue(id))
     .addAllExtension(extension.map{it.toProto()})
     .setType(type.toProto())
-    .setDose(dose.doseToProto())
-    .setRate(rate.rateToProto())
+    .setDose(dose.dosageDoseAndRateDoseToProto())
+    .setRate(rate.dosageDoseAndRateRateToProto())
     .build()
     return protoValue
   }
@@ -159,8 +159,8 @@ public object DosageConverter {
     hapiValue.id = id.value 
     hapiValue.setExtension(extensionList.map{it.toHapi()})
     hapiValue.setType(type.toHapi())
-    hapiValue.setDose(dose.doseToHapi())
-    hapiValue.setRate(rate.rateToHapi())
+    hapiValue.setDose(dose.dosageDoseAndRateDoseToHapi())
+    hapiValue.setRate(rate.dosageDoseAndRateRateToHapi())
     return hapiValue
   }
 }

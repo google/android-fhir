@@ -142,7 +142,7 @@ public object SubstanceSourceMaterialConverter {
     .addAllModifierExtension(modifierExtension.map{it.toProto()})
     .setKingdom(kingdom.toProto())
     .setPhylum(phylum.toProto())
-    .setClass(class.toProto())
+    .setClassValue(class_.toProto())
     .setOrder(order.toProto())
     .build()
     return protoValue
@@ -227,7 +227,7 @@ public object SubstanceSourceMaterialConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setKingdom(kingdom.toHapi())
     hapiValue.setPhylum(phylum.toHapi())
-    hapiValue.setClass(class.toHapi())
+    hapiValue.setClass_(classValue.toHapi())
     hapiValue.setOrder(order.toHapi())
     return hapiValue
   }

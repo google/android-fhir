@@ -61,7 +61,7 @@ public object AllergyIntoleranceConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("AllergyIntolerance.onset[x]")
+    throw IllegalArgumentException("Invalid Type for AllergyIntolerance.onset[x]")
   }
 
   public fun Type.allergyIntoleranceOnsetToProto(): AllergyIntolerance.OnsetX {

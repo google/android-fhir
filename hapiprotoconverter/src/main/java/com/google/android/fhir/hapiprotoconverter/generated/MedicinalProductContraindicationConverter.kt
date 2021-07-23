@@ -34,7 +34,8 @@ public object MedicinalProductContraindicationConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("MedicinalProductContraindication.otherTherapy.medication[x]")
+    throw
+        IllegalArgumentException("Invalid Type for MedicinalProductContraindication.otherTherapy.medication[x]")
   }
 
   public fun Type.medicinalProductContraindicationOtherTherapyMedicationToProto():

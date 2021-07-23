@@ -174,7 +174,7 @@ import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.model.UuidType
 
 public object ExtensionConverter {
-  public fun Extension.ValueX.valueToHapi(): Type {
+  public fun Extension.ValueX.extensionValueToHapi(): Type {
     if (this.getBase64Binary() != Base64Binary.newBuilder().defaultInstanceForType ) {
       return (this.getBase64Binary()).toHapi()
     }
@@ -322,13 +322,13 @@ public object ExtensionConverter {
     if (this.getDosage() != Dosage.newBuilder().defaultInstanceForType ) {
       return (this.getDosage()).toHapi()
     }
-//    if (this.getMeta() != Meta.newBuilder().defaultInstanceForType ) {
-//      return (this.getMeta()).toHapi()
-//    }
-    throw IllegalArgumentException("Extension.value[x]")
+    if (this.getMeta() != Meta.newBuilder().defaultInstanceForType ) {
+      return (this.getMeta()).toHapi()
+    }
+    throw IllegalArgumentException("Invalid Type for Extension.value[x]")
   }
 
-  public fun Type.valueToProto(): Extension.ValueX {
+  public fun Type.extensionValueToProto(): Extension.ValueX {
     val protoValue = Extension.ValueX.newBuilder()
     if (this is Base64BinaryType) {
       protoValue.setBase64Binary(this.toProto())
@@ -478,7 +478,7 @@ public object ExtensionConverter {
       protoValue.setDosage(this.toProto())
     }
     if (this is org.hl7.fhir.r4.model.Meta) {
-//      protoValue.setMeta(this.toProto())
+      protoValue.setMeta(this.toProto())
     }
     return protoValue.build()
   }
@@ -486,18 +486,16 @@ public object ExtensionConverter {
   public fun Extension.toHapi(): org.hl7.fhir.r4.model.Extension {
     val hapiValue = org.hl7.fhir.r4.model.Extension()
     hapiValue.id = id.value 
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
     hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setValue(value.valueToHapi())
+    hapiValue.setValue(value.extensionValueToHapi())
     return hapiValue
   }
 
   public fun org.hl7.fhir.r4.model.Extension.toProto(): Extension {
     val protoValue = Extension.newBuilder()
     .setId(String.newBuilder().setValue(id))
-    .addAllExtension(extension.map{it.toProto()})
     .setUrl(urlElement.toProto())
-    .setValue(value.valueToProto())
+    .setValue(value.extensionValueToProto())
     .build()
     return protoValue
   }

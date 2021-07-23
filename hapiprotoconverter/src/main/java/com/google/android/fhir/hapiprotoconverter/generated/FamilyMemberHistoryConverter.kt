@@ -60,7 +60,7 @@ public object FamilyMemberHistoryConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("FamilyMemberHistory.born[x]")
+    throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.born[x]")
   }
 
   public fun Type.familyMemberHistoryBornToProto(): FamilyMemberHistory.BornX {
@@ -87,7 +87,7 @@ public object FamilyMemberHistoryConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("FamilyMemberHistory.age[x]")
+    throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.age[x]")
   }
 
   public fun Type.familyMemberHistoryAgeToProto(): FamilyMemberHistory.AgeX {
@@ -120,7 +120,7 @@ public object FamilyMemberHistoryConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("FamilyMemberHistory.deceased[x]")
+    throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.deceased[x]")
   }
 
   public fun Type.familyMemberHistoryDeceasedToProto(): FamilyMemberHistory.DeceasedX {
@@ -156,7 +156,7 @@ public object FamilyMemberHistoryConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("FamilyMemberHistory.condition.onset[x]")
+    throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.condition.onset[x]")
   }
 
   public fun Type.familyMemberHistoryConditionOnsetToProto(): FamilyMemberHistory.Condition.OnsetX {

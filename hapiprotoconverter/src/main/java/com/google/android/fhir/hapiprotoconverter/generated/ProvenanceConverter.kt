@@ -40,7 +40,7 @@ public object ProvenanceConverter {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType ) {
       return (this.getDateTime()).toHapi()
     }
-    throw IllegalArgumentException("Provenance.occurred[x]")
+    throw IllegalArgumentException("Invalid Type for Provenance.occurred[x]")
   }
 
   public fun Type.provenanceOccurredToProto(): Provenance.OccurredX {

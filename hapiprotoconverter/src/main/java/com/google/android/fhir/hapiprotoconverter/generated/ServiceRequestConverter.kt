@@ -65,7 +65,7 @@ public object ServiceRequestConverter {
     if (this.getRange() != Range.newBuilder().defaultInstanceForType ) {
       return (this.getRange()).toHapi()
     }
-    throw IllegalArgumentException("ServiceRequest.quantity[x]")
+    throw IllegalArgumentException("Invalid Type for ServiceRequest.quantity[x]")
   }
 
   public fun Type.serviceRequestQuantityToProto(): ServiceRequest.QuantityX {
@@ -92,7 +92,7 @@ public object ServiceRequestConverter {
     if (this.getTiming() != Timing.newBuilder().defaultInstanceForType ) {
       return (this.getTiming()).toHapi()
     }
-    throw IllegalArgumentException("ServiceRequest.occurrence[x]")
+    throw IllegalArgumentException("Invalid Type for ServiceRequest.occurrence[x]")
   }
 
   public fun Type.serviceRequestOccurrenceToProto(): ServiceRequest.OccurrenceX {
@@ -116,7 +116,7 @@ public object ServiceRequestConverter {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    throw IllegalArgumentException("ServiceRequest.asNeeded[x]")
+    throw IllegalArgumentException("Invalid Type for ServiceRequest.asNeeded[x]")
   }
 
   public fun Type.serviceRequestAsNeededToProto(): ServiceRequest.AsNeededX {

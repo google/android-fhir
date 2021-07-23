@@ -73,7 +73,7 @@ public object RequestGroupConverter {
     if (this.getRange() != Range.newBuilder().defaultInstanceForType ) {
       return (this.getRange()).toHapi()
     }
-    throw IllegalArgumentException("RequestGroup.action.relatedAction.offset[x]")
+    throw IllegalArgumentException("Invalid Type for RequestGroup.action.relatedAction.offset[x]")
   }
 
   public fun Type.requestGroupActionRelatedActionOffsetToProto():
@@ -107,7 +107,7 @@ public object RequestGroupConverter {
     if (this.getTiming() != Timing.newBuilder().defaultInstanceForType ) {
       return (this.getTiming()).toHapi()
     }
-    throw IllegalArgumentException("RequestGroup.action.timing[x]")
+    throw IllegalArgumentException("Invalid Type for RequestGroup.action.timing[x]")
   }
 
   public fun Type.requestGroupActionTimingToProto(): RequestGroup.Action.TimingX {

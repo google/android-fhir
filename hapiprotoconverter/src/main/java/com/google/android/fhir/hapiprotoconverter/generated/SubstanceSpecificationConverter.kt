@@ -51,7 +51,7 @@ public object SubstanceSpecificationConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("SubstanceSpecification.moiety.amount[x]")
+    throw IllegalArgumentException("Invalid Type for SubstanceSpecification.moiety.amount[x]")
   }
 
   public fun Type.substanceSpecificationMoietyAmountToProto():
@@ -75,7 +75,8 @@ public object SubstanceSpecificationConverter {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    throw IllegalArgumentException("SubstanceSpecification.property.definingSubstance[x]")
+    throw
+        IllegalArgumentException("Invalid Type for SubstanceSpecification.property.definingSubstance[x]")
   }
 
   public fun Type.substanceSpecificationPropertyDefiningSubstanceToProto():
@@ -98,7 +99,7 @@ public object SubstanceSpecificationConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("SubstanceSpecification.property.amount[x]")
+    throw IllegalArgumentException("Invalid Type for SubstanceSpecification.property.amount[x]")
   }
 
   public fun Type.substanceSpecificationPropertyAmountToProto():
@@ -122,7 +123,8 @@ public object SubstanceSpecificationConverter {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    throw IllegalArgumentException("SubstanceSpecification.relationship.substance[x]")
+    throw
+        IllegalArgumentException("Invalid Type for SubstanceSpecification.relationship.substance[x]")
   }
 
   public fun Type.substanceSpecificationRelationshipSubstanceToProto():
@@ -152,7 +154,7 @@ public object SubstanceSpecificationConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("SubstanceSpecification.relationship.amount[x]")
+    throw IllegalArgumentException("Invalid Type for SubstanceSpecification.relationship.amount[x]")
   }
 
   public fun Type.substanceSpecificationRelationshipAmountToProto():

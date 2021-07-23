@@ -41,7 +41,8 @@ public object ImmunizationRecommendationConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("ImmunizationRecommendation.recommendation.doseNumber[x]")
+    throw
+        IllegalArgumentException("Invalid Type for ImmunizationRecommendation.recommendation.doseNumber[x]")
   }
 
   public fun Type.immunizationRecommendationRecommendationDoseNumberToProto():
@@ -65,7 +66,8 @@ public object ImmunizationRecommendationConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("ImmunizationRecommendation.recommendation.seriesDoses[x]")
+    throw
+        IllegalArgumentException("Invalid Type for ImmunizationRecommendation.recommendation.seriesDoses[x]")
   }
 
   public fun Type.immunizationRecommendationRecommendationSeriesDosesToProto():

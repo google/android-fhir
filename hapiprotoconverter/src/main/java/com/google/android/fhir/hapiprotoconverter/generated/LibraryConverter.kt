@@ -57,7 +57,7 @@ public object LibraryConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Library.subject[x]")
+    throw IllegalArgumentException("Invalid Type for Library.subject[x]")
   }
 
   public fun Type.librarySubjectToProto(): Library.SubjectX {

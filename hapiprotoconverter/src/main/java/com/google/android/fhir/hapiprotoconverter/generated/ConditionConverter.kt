@@ -57,7 +57,7 @@ public object ConditionConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("Condition.onset[x]")
+    throw IllegalArgumentException("Invalid Type for Condition.onset[x]")
   }
 
   public fun Type.conditionOnsetToProto(): Condition.OnsetX {
@@ -96,7 +96,7 @@ public object ConditionConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("Condition.abatement[x]")
+    throw IllegalArgumentException("Invalid Type for Condition.abatement[x]")
   }
 
   public fun Type.conditionAbatementToProto(): Condition.AbatementX {

@@ -46,7 +46,7 @@ public object SupplyDeliveryConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("SupplyDelivery.suppliedItem.item[x]")
+    throw IllegalArgumentException("Invalid Type for SupplyDelivery.suppliedItem.item[x]")
   }
 
   public fun Type.supplyDeliverySuppliedItemItemToProto(): SupplyDelivery.SuppliedItem.ItemX {
@@ -70,7 +70,7 @@ public object SupplyDeliveryConverter {
     if (this.getTiming() != Timing.newBuilder().defaultInstanceForType ) {
       return (this.getTiming()).toHapi()
     }
-    throw IllegalArgumentException("SupplyDelivery.occurrence[x]")
+    throw IllegalArgumentException("Invalid Type for SupplyDelivery.occurrence[x]")
   }
 
   public fun Type.supplyDeliveryOccurrenceToProto(): SupplyDelivery.OccurrenceX {

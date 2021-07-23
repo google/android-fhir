@@ -54,7 +54,7 @@ public object CommunicationRequestConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("CommunicationRequest.payload.content[x]")
+    throw IllegalArgumentException("Invalid Type for CommunicationRequest.payload.content[x]")
   }
 
   public fun Type.communicationRequestPayloadContentToProto():
@@ -79,7 +79,7 @@ public object CommunicationRequestConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("CommunicationRequest.occurrence[x]")
+    throw IllegalArgumentException("Invalid Type for CommunicationRequest.occurrence[x]")
   }
 
   public fun Type.communicationRequestOccurrenceToProto(): CommunicationRequest.OccurrenceX {

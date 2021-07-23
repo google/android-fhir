@@ -93,7 +93,7 @@ public object PlanDefinitionConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("PlanDefinition.subject[x]")
+    throw IllegalArgumentException("Invalid Type for PlanDefinition.subject[x]")
   }
 
   public fun Type.planDefinitionSubjectToProto(): PlanDefinition.SubjectX {
@@ -117,7 +117,7 @@ public object PlanDefinitionConverter {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    throw IllegalArgumentException("PlanDefinition.goal.target.detail[x]")
+    throw IllegalArgumentException("Invalid Type for PlanDefinition.goal.target.detail[x]")
   }
 
   public fun Type.planDefinitionGoalTargetDetailToProto(): PlanDefinition.Goal.Target.DetailX {
@@ -141,7 +141,7 @@ public object PlanDefinitionConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("PlanDefinition.action.subject[x]")
+    throw IllegalArgumentException("Invalid Type for PlanDefinition.action.subject[x]")
   }
 
   public fun Type.planDefinitionActionSubjectToProto(): PlanDefinition.Action.SubjectX {
@@ -164,7 +164,7 @@ public object PlanDefinitionConverter {
     if (this.getRange() != Range.newBuilder().defaultInstanceForType ) {
       return (this.getRange()).toHapi()
     }
-    throw IllegalArgumentException("PlanDefinition.action.relatedAction.offset[x]")
+    throw IllegalArgumentException("Invalid Type for PlanDefinition.action.relatedAction.offset[x]")
   }
 
   public fun Type.planDefinitionActionRelatedActionOffsetToProto():
@@ -198,7 +198,7 @@ public object PlanDefinitionConverter {
     if (this.getTiming() != Timing.newBuilder().defaultInstanceForType ) {
       return (this.getTiming()).toHapi()
     }
-    throw IllegalArgumentException("PlanDefinition.action.timing[x]")
+    throw IllegalArgumentException("Invalid Type for PlanDefinition.action.timing[x]")
   }
 
   public fun Type.planDefinitionActionTimingToProto(): PlanDefinition.Action.TimingX {
@@ -231,7 +231,7 @@ public object PlanDefinitionConverter {
     if (this.getUri() != Uri.newBuilder().defaultInstanceForType ) {
       return (this.getUri()).toHapi()
     }
-    throw IllegalArgumentException("PlanDefinition.action.definition[x]")
+    throw IllegalArgumentException("Invalid Type for PlanDefinition.action.definition[x]")
   }
 
   public fun Type.planDefinitionActionDefinitionToProto(): PlanDefinition.Action.DefinitionX {

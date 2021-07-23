@@ -51,7 +51,7 @@ public object ImmunizationConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("Immunization.occurrence[x]")
+    throw IllegalArgumentException("Invalid Type for Immunization.occurrence[x]")
   }
 
   public fun Type.immunizationOccurrenceToProto(): Immunization.OccurrenceX {
@@ -73,7 +73,7 @@ public object ImmunizationConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("Immunization.protocolApplied.doseNumber[x]")
+    throw IllegalArgumentException("Invalid Type for Immunization.protocolApplied.doseNumber[x]")
   }
 
   public fun Type.immunizationProtocolAppliedDoseNumberToProto():
@@ -97,7 +97,7 @@ public object ImmunizationConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("Immunization.protocolApplied.seriesDoses[x]")
+    throw IllegalArgumentException("Invalid Type for Immunization.protocolApplied.seriesDoses[x]")
   }
 
   public fun Type.immunizationProtocolAppliedSeriesDosesToProto():

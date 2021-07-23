@@ -68,7 +68,7 @@ public object ClaimConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("Claim.supportingInfo.timing[x]")
+    throw IllegalArgumentException("Invalid Type for Claim.supportingInfo.timing[x]")
   }
 
   public fun Type.claimSupportingInfoTimingToProto(): Claim.SupportingInfo.TimingX {
@@ -98,7 +98,7 @@ public object ClaimConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Claim.supportingInfo.value[x]")
+    throw IllegalArgumentException("Invalid Type for Claim.supportingInfo.value[x]")
   }
 
   public fun Type.claimSupportingInfoValueToProto(): Claim.SupportingInfo.ValueX {
@@ -128,7 +128,7 @@ public object ClaimConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Claim.diagnosis.diagnosis[x]")
+    throw IllegalArgumentException("Invalid Type for Claim.diagnosis.diagnosis[x]")
   }
 
   public fun Type.claimDiagnosisDiagnosisToProto(): Claim.Diagnosis.DiagnosisX {
@@ -149,7 +149,7 @@ public object ClaimConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Claim.procedure.procedure[x]")
+    throw IllegalArgumentException("Invalid Type for Claim.procedure.procedure[x]")
   }
 
   public fun Type.claimProcedureProcedureToProto(): Claim.Procedure.ProcedureX {
@@ -170,7 +170,7 @@ public object ClaimConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Claim.accident.location[x]")
+    throw IllegalArgumentException("Invalid Type for Claim.accident.location[x]")
   }
 
   public fun Type.claimAccidentLocationToProto(): Claim.Accident.LocationX {
@@ -191,7 +191,7 @@ public object ClaimConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("Claim.item.serviced[x]")
+    throw IllegalArgumentException("Invalid Type for Claim.item.serviced[x]")
   }
 
   public fun Type.claimItemServicedToProto(): Claim.Item.ServicedX {
@@ -215,7 +215,7 @@ public object ClaimConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Claim.item.location[x]")
+    throw IllegalArgumentException("Invalid Type for Claim.item.location[x]")
   }
 
   public fun Type.claimItemLocationToProto(): Claim.Item.LocationX {

@@ -209,16 +209,11 @@ object PrimitiveCodegen {
     functionsList.add(0, toProtoBuilder.build())
     functionsList.add(1, toHapiBuilder.build())
 
-    fileBuilder
-      .addType(
-        TypeSpec.objectBuilder(def.id.value.capitalize() + "Converter")
-          .addFunctions(functionsList)
-          .addKdoc(
+    functionsList.forEach{fileBuilder.addFunction(it)}
+          fileBuilder.addComment(
             "contains functions that convert between the hapi and proto representations of ${def.id.value}"
           )
           .build()
-      )
-      .build()
       .writeTo(outLocation)
   }
 

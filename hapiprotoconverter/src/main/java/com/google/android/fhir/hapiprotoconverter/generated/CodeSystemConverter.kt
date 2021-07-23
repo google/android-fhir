@@ -83,7 +83,7 @@ public object CodeSystemConverter {
     if (this.getDecimal() != Decimal.newBuilder().defaultInstanceForType ) {
       return (this.getDecimal()).toHapi()
     }
-    throw IllegalArgumentException("CodeSystem.concept.property.value[x]")
+    throw IllegalArgumentException("Invalid Type for CodeSystem.concept.property.value[x]")
   }
 
   public fun Type.codeSystemConceptPropertyValueToProto(): CodeSystem.Concept.Property.ValueX {

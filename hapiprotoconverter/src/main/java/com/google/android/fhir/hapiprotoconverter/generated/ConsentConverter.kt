@@ -45,7 +45,7 @@ public object ConsentConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Consent.source[x]")
+    throw IllegalArgumentException("Invalid Type for Consent.source[x]")
   }
 
   public fun Type.consentSourceToProto(): Consent.SourceX {
@@ -135,7 +135,7 @@ public object ConsentConverter {
     return protoValue
   }
 
-  public fun org.hl7.fhir.r4.model.Consent.ProvisionComponent.toProto(): Consent.Provision {
+  public fun org.hl7.fhir.r4.model.Consent.provisionComponent.toProto(): Consent.Provision {
     val protoValue = Consent.Provision.newBuilder()
     .setId(String.newBuilder().setValue(id))
     .addAllExtension(extension.map{it.toProto()})
@@ -156,7 +156,7 @@ public object ConsentConverter {
     return protoValue
   }
 
-  public fun org.hl7.fhir.r4.model.Consent..toProto():
+  public fun org.hl7.fhir.r4.model.Consent.provisionActorComponent.toProto():
       Consent.Provision.ProvisionActor {
     val protoValue = Consent.Provision.ProvisionActor.newBuilder()
     .setId(String.newBuilder().setValue(id))
@@ -168,7 +168,7 @@ public object ConsentConverter {
     return protoValue
   }
 
-  public fun org.hl7.fhir.r4.model.Consent.ProvisionDataComponent.toProto():
+  public fun org.hl7.fhir.r4.model.Consent.provisionDataComponent.toProto():
       Consent.Provision.ProvisionData {
     val protoValue = Consent.Provision.ProvisionData.newBuilder()
     .setId(String.newBuilder().setValue(id))
@@ -203,14 +203,14 @@ public object ConsentConverter {
     return hapiValue
   }
 
-  public fun Consent.Provision.toHapi(): org.hl7.fhir.r4.model.Consent.ProvisionComponent {
-    val hapiValue = org.hl7.fhir.r4.model.Consent.ProvisionComponent()
+  public fun Consent.Provision.toHapi(): org.hl7.fhir.r4.model.Consent.provisionComponent {
+    val hapiValue = org.hl7.fhir.r4.model.Consent.provisionComponent()
     hapiValue.id = id.value 
     hapiValue.setExtension(extensionList.map{it.toHapi()})
     hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setType(org.hl7.fhir.r4.model.Consent.ConsentProvisionType.valueOf(type.value.name.replace("_","")))
     hapiValue.setPeriod(period.toHapi())
-    hapiValue.setProvisionActor(provisionActorList.map{it.toHapi()})
+    hapiValue.setActor(actorList.map{it.toHapi()})
     hapiValue.setAction(actionList.map{it.toHapi()})
     hapiValue.setSecurityLabel(securityLabelList.map{it.toHapi()})
     hapiValue.setPurpose(purposeList.map{it.toHapi()})
@@ -223,8 +223,8 @@ public object ConsentConverter {
   }
 
   public fun Consent.Provision.ProvisionActor.toHapi():
-      org.hl7.fhir.r4.model.Consent.ProvisionActorComponent {
-    val hapiValue = org.hl7.fhir.r4.model.Consent.ProvisionActorComponent()
+      org.hl7.fhir.r4.model.Consent.provisionActorComponent {
+    val hapiValue = org.hl7.fhir.r4.model.Consent.provisionActorComponent()
     hapiValue.id = id.value 
     hapiValue.setExtension(extensionList.map{it.toHapi()})
     hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
@@ -234,8 +234,8 @@ public object ConsentConverter {
   }
 
   public fun Consent.Provision.ProvisionData.toHapi():
-      org.hl7.fhir.r4.model.Consent.ProvisionDataComponent {
-    val hapiValue = org.hl7.fhir.r4.model.Consent.ProvisionDataComponent()
+      org.hl7.fhir.r4.model.Consent.provisionDataComponent {
+    val hapiValue = org.hl7.fhir.r4.model.Consent.provisionDataComponent()
     hapiValue.id = id.value 
     hapiValue.setExtension(extensionList.map{it.toHapi()})
     hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})

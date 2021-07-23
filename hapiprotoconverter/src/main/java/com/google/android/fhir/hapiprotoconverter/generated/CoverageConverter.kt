@@ -45,7 +45,7 @@ public object CoverageConverter {
     if (this.getMoney() != Money.newBuilder().defaultInstanceForType ) {
       return (this.getMoney()).toHapi()
     }
-    throw IllegalArgumentException("Coverage.costToBeneficiary.value[x]")
+    throw IllegalArgumentException("Invalid Type for Coverage.costToBeneficiary.value[x]")
   }
 
   public fun Type.coverageCostToBeneficiaryValueToProto(): Coverage.CostToBeneficiary.ValueX {

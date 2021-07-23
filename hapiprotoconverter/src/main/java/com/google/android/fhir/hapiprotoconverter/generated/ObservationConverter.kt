@@ -84,7 +84,7 @@ public object ObservationConverter {
     if (this.getInstant() != Instant.newBuilder().defaultInstanceForType ) {
       return (this.getInstant()).toHapi()
     }
-    throw IllegalArgumentException("Observation.effective[x]")
+    throw IllegalArgumentException("Invalid Type for Observation.effective[x]")
   }
 
   public fun Type.observationEffectiveToProto(): Observation.EffectiveX {
@@ -138,7 +138,7 @@ public object ObservationConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("Observation.value[x]")
+    throw IllegalArgumentException("Invalid Type for Observation.value[x]")
   }
 
   public fun Type.observationValueToProto(): Observation.ValueX {
@@ -213,7 +213,7 @@ public object ObservationConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("Observation.component.value[x]")
+    throw IllegalArgumentException("Invalid Type for Observation.component.value[x]")
   }
 
   public fun Type.observationComponentValueToProto(): Observation.Component.ValueX {

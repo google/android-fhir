@@ -60,7 +60,7 @@ public object ProcedureConverter {
     if (this.getRange() != Range.newBuilder().defaultInstanceForType ) {
       return (this.getRange()).toHapi()
     }
-    throw IllegalArgumentException("Procedure.performed[x]")
+    throw IllegalArgumentException("Invalid Type for Procedure.performed[x]")
   }
 
   public fun Type.procedurePerformedToProto(): Procedure.PerformedX {

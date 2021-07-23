@@ -34,7 +34,8 @@ public object MedicinalProductInteractionConverter {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    throw IllegalArgumentException("MedicinalProductInteraction.interactant.item[x]")
+    throw
+        IllegalArgumentException("Invalid Type for MedicinalProductInteraction.interactant.item[x]")
   }
 
   public fun Type.medicinalProductInteractionInteractantItemToProto():

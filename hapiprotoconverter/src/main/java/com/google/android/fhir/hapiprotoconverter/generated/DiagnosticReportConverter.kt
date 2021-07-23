@@ -44,7 +44,7 @@ public object DiagnosticReportConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("DiagnosticReport.effective[x]")
+    throw IllegalArgumentException("Invalid Type for DiagnosticReport.effective[x]")
   }
 
   public fun Type.diagnosticReportEffectiveToProto(): DiagnosticReport.EffectiveX {

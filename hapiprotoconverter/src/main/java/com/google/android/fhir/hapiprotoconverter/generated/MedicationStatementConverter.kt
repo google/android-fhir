@@ -43,7 +43,7 @@ public object MedicationStatementConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("MedicationStatement.medication[x]")
+    throw IllegalArgumentException("Invalid Type for MedicationStatement.medication[x]")
   }
 
   public fun Type.medicationStatementMedicationToProto(): MedicationStatement.MedicationX {
@@ -64,7 +64,7 @@ public object MedicationStatementConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("MedicationStatement.effective[x]")
+    throw IllegalArgumentException("Invalid Type for MedicationStatement.effective[x]")
   }
 
   public fun Type.medicationStatementEffectiveToProto(): MedicationStatement.EffectiveX {

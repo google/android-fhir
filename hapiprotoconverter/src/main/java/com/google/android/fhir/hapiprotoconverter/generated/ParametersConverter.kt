@@ -329,7 +329,7 @@ public object ParametersConverter {
     if (this.getMeta() != Meta.newBuilder().defaultInstanceForType ) {
       return (this.getMeta()).toHapi()
     }
-    throw IllegalArgumentException("Parameters.parameter.value[x]")
+    throw IllegalArgumentException("Invalid Type for Parameters.parameter.value[x]")
   }
 
   public fun Type.parametersParameterValueToProto(): Parameters.Parameter.ValueX {

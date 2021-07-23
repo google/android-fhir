@@ -44,7 +44,8 @@ public object SubstanceReferenceInformationConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("SubstanceReferenceInformation.target.amount[x]")
+    throw
+        IllegalArgumentException("Invalid Type for SubstanceReferenceInformation.target.amount[x]")
   }
 
   public fun Type.substanceReferenceInformationTargetAmountToProto():

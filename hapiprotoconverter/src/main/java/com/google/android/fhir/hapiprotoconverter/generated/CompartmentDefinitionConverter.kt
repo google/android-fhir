@@ -108,7 +108,6 @@ public object CompartmentDefinitionConverter {
     hapiValue.id = id.value 
     hapiValue.setExtension(extensionList.map{it.toHapi()})
     hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
-    hapiValue.setCode(Enumerations.ResourceType.valueOf(code.value.name.replace("_","")).display)
     hapiValue.setParam(paramList.map{it.toHapi()})
     hapiValue.setDocumentationElement(documentation.toHapi())
     return hapiValue

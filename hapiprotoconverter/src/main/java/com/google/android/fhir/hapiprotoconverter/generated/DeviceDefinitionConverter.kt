@@ -47,7 +47,7 @@ public object DeviceDefinitionConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("DeviceDefinition.manufacturer[x]")
+    throw IllegalArgumentException("Invalid Type for DeviceDefinition.manufacturer[x]")
   }
 
   public fun Type.deviceDefinitionManufacturerToProto(): DeviceDefinition.ManufacturerX {

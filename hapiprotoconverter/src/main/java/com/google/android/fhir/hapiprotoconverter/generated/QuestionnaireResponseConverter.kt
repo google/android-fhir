@@ -101,7 +101,7 @@ public object QuestionnaireResponseConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("QuestionnaireResponse.item.answer.value[x]")
+    throw IllegalArgumentException("Invalid Type for QuestionnaireResponse.item.answer.value[x]")
   }
 
   public fun Type.questionnaireResponseItemAnswerValueToProto():

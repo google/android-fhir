@@ -44,7 +44,7 @@ public object MessageHeaderConverter {
     if (this.getUri() != Uri.newBuilder().defaultInstanceForType ) {
       return (this.getUri()).toHapi()
     }
-    throw IllegalArgumentException("MessageHeader.event[x]")
+    throw IllegalArgumentException("Invalid Type for MessageHeader.event[x]")
   }
 
   public fun Type.messageHeaderEventToProto(): MessageHeader.EventX {

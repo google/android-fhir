@@ -54,7 +54,7 @@ public object CoverageEligibilityRequestConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("CoverageEligibilityRequest.serviced[x]")
+    throw IllegalArgumentException("Invalid Type for CoverageEligibilityRequest.serviced[x]")
   }
 
   public fun Type.coverageEligibilityRequestServicedToProto():
@@ -78,7 +78,8 @@ public object CoverageEligibilityRequestConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("CoverageEligibilityRequest.item.diagnosis.diagnosis[x]")
+    throw
+        IllegalArgumentException("Invalid Type for CoverageEligibilityRequest.item.diagnosis.diagnosis[x]")
   }
 
   public fun Type.coverageEligibilityRequestItemDiagnosisDiagnosisToProto():

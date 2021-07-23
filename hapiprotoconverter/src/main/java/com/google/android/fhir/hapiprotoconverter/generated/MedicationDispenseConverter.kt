@@ -44,7 +44,7 @@ public object MedicationDispenseConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("MedicationDispense.statusReason[x]")
+    throw IllegalArgumentException("Invalid Type for MedicationDispense.statusReason[x]")
   }
 
   public fun Type.medicationDispenseStatusReasonToProto(): MedicationDispense.StatusReasonX {
@@ -65,7 +65,7 @@ public object MedicationDispenseConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("MedicationDispense.medication[x]")
+    throw IllegalArgumentException("Invalid Type for MedicationDispense.medication[x]")
   }
 
   public fun Type.medicationDispenseMedicationToProto(): MedicationDispense.MedicationX {

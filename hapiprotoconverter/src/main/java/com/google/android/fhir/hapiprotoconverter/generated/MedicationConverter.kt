@@ -41,7 +41,7 @@ public object MedicationConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Medication.ingredient.item[x]")
+    throw IllegalArgumentException("Invalid Type for Medication.ingredient.item[x]")
   }
 
   public fun Type.medicationIngredientItemToProto(): Medication.Ingredient.ItemX {

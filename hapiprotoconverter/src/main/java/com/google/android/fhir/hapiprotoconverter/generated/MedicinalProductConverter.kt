@@ -42,7 +42,8 @@ public object MedicinalProductConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("MedicinalProduct.specialDesignation.indication[x]")
+    throw
+        IllegalArgumentException("Invalid Type for MedicinalProduct.specialDesignation.indication[x]")
   }
 
   public fun Type.medicinalProductSpecialDesignationIndicationToProto():

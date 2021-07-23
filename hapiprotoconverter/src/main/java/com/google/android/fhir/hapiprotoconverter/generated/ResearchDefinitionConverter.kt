@@ -53,7 +53,7 @@ public object ResearchDefinitionConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("ResearchDefinition.subject[x]")
+    throw IllegalArgumentException("Invalid Type for ResearchDefinition.subject[x]")
   }
 
   public fun Type.researchDefinitionSubjectToProto(): ResearchDefinition.SubjectX {

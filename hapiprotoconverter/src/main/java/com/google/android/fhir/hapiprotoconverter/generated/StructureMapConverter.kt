@@ -340,7 +340,8 @@ public object StructureMapConverter {
     if (this.getMeta() != Meta.newBuilder().defaultInstanceForType ) {
       return (this.getMeta()).toHapi()
     }
-    throw IllegalArgumentException("StructureMap.group.rule.source.defaultValue[x]")
+    throw
+        IllegalArgumentException("Invalid Type for StructureMap.group.rule.source.defaultValue[x]")
   }
 
   public fun Type.structureMapGroupRuleSourceDefaultValueToProto():
@@ -517,7 +518,8 @@ public object StructureMapConverter {
     if (this.getDecimal() != Decimal.newBuilder().defaultInstanceForType ) {
       return (this.getDecimal()).toHapi()
     }
-    throw IllegalArgumentException("StructureMap.group.rule.target.parameter.value[x]")
+    throw
+        IllegalArgumentException("Invalid Type for StructureMap.group.rule.target.parameter.value[x]")
   }
 
   public fun Type.structureMapGroupRuleTargetParameterValueToProto():

@@ -49,7 +49,7 @@ public object RiskAssessmentConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("RiskAssessment.occurrence[x]")
+    throw IllegalArgumentException("Invalid Type for RiskAssessment.occurrence[x]")
   }
 
   public fun Type.riskAssessmentOccurrenceToProto(): RiskAssessment.OccurrenceX {
@@ -71,7 +71,7 @@ public object RiskAssessmentConverter {
     if (this.getRange() != Range.newBuilder().defaultInstanceForType ) {
       return (this.getRange()).toHapi()
     }
-    throw IllegalArgumentException("RiskAssessment.prediction.probability[x]")
+    throw IllegalArgumentException("Invalid Type for RiskAssessment.prediction.probability[x]")
   }
 
   public fun Type.riskAssessmentPredictionProbabilityToProto():
@@ -93,7 +93,7 @@ public object RiskAssessmentConverter {
     if (this.getRange() != Range.newBuilder().defaultInstanceForType ) {
       return (this.getRange()).toHapi()
     }
-    throw IllegalArgumentException("RiskAssessment.prediction.when[x]")
+    throw IllegalArgumentException("Invalid Type for RiskAssessment.prediction.when[x]")
   }
 
   public fun Type.riskAssessmentPredictionWhenToProto(): RiskAssessment.Prediction.WhenX {

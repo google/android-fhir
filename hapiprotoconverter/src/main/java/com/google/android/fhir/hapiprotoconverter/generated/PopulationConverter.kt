@@ -14,17 +14,17 @@ import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.Type
 
 public object PopulationConverter {
-  public fun Population.AgeX.ageToHapi(): Type {
+  public fun Population.AgeX.populationAgeToHapi(): Type {
     if (this.getRange() != Range.newBuilder().defaultInstanceForType ) {
       return (this.getRange()).toHapi()
     }
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    throw IllegalArgumentException("Population.age[x]")
+    throw IllegalArgumentException("Invalid Type for Population.age[x]")
   }
 
-  public fun Type.ageToProto(): Population.AgeX {
+  public fun Type.populationAgeToProto(): Population.AgeX {
     val protoValue = Population.AgeX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Range) {
       protoValue.setRange(this.toProto())
@@ -40,7 +40,7 @@ public object PopulationConverter {
     hapiValue.id = id.value 
     hapiValue.setExtension(extensionList.map{it.toHapi()})
     hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
-    hapiValue.setAge(age.ageToHapi())
+    hapiValue.setAge(age.populationAgeToHapi())
     hapiValue.setGender(gender.toHapi())
     hapiValue.setRace(race.toHapi())
     hapiValue.setPhysiologicalCondition(physiologicalCondition.toHapi())
@@ -52,7 +52,7 @@ public object PopulationConverter {
     .setId(String.newBuilder().setValue(id))
     .addAllExtension(extension.map{it.toProto()})
     .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .setAge(age.ageToProto())
+    .setAge(age.populationAgeToProto())
     .setGender(gender.toProto())
     .setRace(race.toProto())
     .setPhysiologicalCondition(physiologicalCondition.toProto())

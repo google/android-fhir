@@ -80,7 +80,7 @@ public object ExplanationOfBenefitConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("ExplanationOfBenefit.supportingInfo.timing[x]")
+    throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.supportingInfo.timing[x]")
   }
 
   public fun Type.explanationOfBenefitSupportingInfoTimingToProto():
@@ -113,7 +113,7 @@ public object ExplanationOfBenefitConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("ExplanationOfBenefit.supportingInfo.value[x]")
+    throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.supportingInfo.value[x]")
   }
 
   public fun Type.explanationOfBenefitSupportingInfoValueToProto():
@@ -146,7 +146,7 @@ public object ExplanationOfBenefitConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("ExplanationOfBenefit.diagnosis.diagnosis[x]")
+    throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.diagnosis.diagnosis[x]")
   }
 
   public fun Type.explanationOfBenefitDiagnosisDiagnosisToProto():
@@ -170,7 +170,7 @@ public object ExplanationOfBenefitConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("ExplanationOfBenefit.procedure.procedure[x]")
+    throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.procedure.procedure[x]")
   }
 
   public fun Type.explanationOfBenefitProcedureProcedureToProto():
@@ -193,7 +193,7 @@ public object ExplanationOfBenefitConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("ExplanationOfBenefit.accident.location[x]")
+    throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.accident.location[x]")
   }
 
   public fun Type.explanationOfBenefitAccidentLocationToProto():
@@ -215,7 +215,7 @@ public object ExplanationOfBenefitConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("ExplanationOfBenefit.item.serviced[x]")
+    throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.item.serviced[x]")
   }
 
   public fun Type.explanationOfBenefitItemServicedToProto(): ExplanationOfBenefit.Item.ServicedX {
@@ -239,7 +239,7 @@ public object ExplanationOfBenefitConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("ExplanationOfBenefit.item.location[x]")
+    throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.item.location[x]")
   }
 
   public fun Type.explanationOfBenefitItemLocationToProto(): ExplanationOfBenefit.Item.LocationX {
@@ -264,7 +264,7 @@ public object ExplanationOfBenefitConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("ExplanationOfBenefit.addItem.serviced[x]")
+    throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.addItem.serviced[x]")
   }
 
   public fun Type.explanationOfBenefitAddItemServicedToProto():
@@ -290,7 +290,7 @@ public object ExplanationOfBenefitConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("ExplanationOfBenefit.addItem.location[x]")
+    throw IllegalArgumentException("Invalid Type for ExplanationOfBenefit.addItem.location[x]")
   }
 
   public fun Type.explanationOfBenefitAddItemLocationToProto():
@@ -320,7 +320,8 @@ public object ExplanationOfBenefitConverter {
     if (this.getMoney() != Money.newBuilder().defaultInstanceForType ) {
       return (this.getMoney()).toHapi()
     }
-    throw IllegalArgumentException("ExplanationOfBenefit.benefitBalance.financial.allowed[x]")
+    throw
+        IllegalArgumentException("Invalid Type for ExplanationOfBenefit.benefitBalance.financial.allowed[x]")
   }
 
   public fun Type.explanationOfBenefitBenefitBalanceFinancialAllowedToProto():
@@ -347,7 +348,8 @@ public object ExplanationOfBenefitConverter {
     if (this.getMoney() != Money.newBuilder().defaultInstanceForType ) {
       return (this.getMoney()).toHapi()
     }
-    throw IllegalArgumentException("ExplanationOfBenefit.benefitBalance.financial.used[x]")
+    throw
+        IllegalArgumentException("Invalid Type for ExplanationOfBenefit.benefitBalance.financial.used[x]")
   }
 
   public fun Type.explanationOfBenefitBenefitBalanceFinancialUsedToProto():

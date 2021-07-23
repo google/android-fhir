@@ -109,7 +109,7 @@ public object QuestionnaireConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Questionnaire.item.enableWhen.answer[x]")
+    throw IllegalArgumentException("Invalid Type for Questionnaire.item.enableWhen.answer[x]")
   }
 
   public fun Type.questionnaireItemEnableWhenAnswerToProto():
@@ -168,7 +168,7 @@ public object QuestionnaireConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Questionnaire.item.answerOption.value[x]")
+    throw IllegalArgumentException("Invalid Type for Questionnaire.item.answerOption.value[x]")
   }
 
   public fun Type.questionnaireItemAnswerOptionValueToProto():
@@ -232,7 +232,7 @@ public object QuestionnaireConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Questionnaire.item.initial.value[x]")
+    throw IllegalArgumentException("Invalid Type for Questionnaire.item.initial.value[x]")
   }
 
   public fun Type.questionnaireItemInitialValueToProto(): Questionnaire.Item.Initial.ValueX {

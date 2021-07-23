@@ -18,17 +18,17 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 public object AnnotationConverter {
-  public fun Annotation.AuthorX.authorToHapi(): Type {
+  public fun Annotation.AuthorX.annotationAuthorToHapi(): Type {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("Annotation.author[x]")
+    throw IllegalArgumentException("Invalid Type for Annotation.author[x]")
   }
 
-  public fun Type.authorToProto(): Annotation.AuthorX {
+  public fun Type.annotationAuthorToProto(): Annotation.AuthorX {
     val protoValue = Annotation.AuthorX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Reference) {
       protoValue.setReference(this.toProto())
@@ -43,7 +43,7 @@ public object AnnotationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Annotation()
     hapiValue.id = id.value 
     hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setAuthor(author.authorToHapi())
+    hapiValue.setAuthor(author.annotationAuthorToHapi())
     hapiValue.setTimeElement(time.toHapi())
     hapiValue.setTextElement(text.toHapi())
     return hapiValue
@@ -53,7 +53,7 @@ public object AnnotationConverter {
     val protoValue = Annotation.newBuilder()
     .setId(String.newBuilder().setValue(id))
     .addAllExtension(extension.map{it.toProto()})
-    .setAuthor(author.authorToProto())
+    .setAuthor(author.annotationAuthorToProto())
     .setTime(timeElement.toProto())
     .setText(textElement.toProto())
     .build()

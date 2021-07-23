@@ -50,7 +50,8 @@ public object NutritionOrderConverter {
     if (this.getRatio() != Ratio.newBuilder().defaultInstanceForType ) {
       return (this.getRatio()).toHapi()
     }
-    throw IllegalArgumentException("NutritionOrder.enteralFormula.administration.rate[x]")
+    throw
+        IllegalArgumentException("Invalid Type for NutritionOrder.enteralFormula.administration.rate[x]")
   }
 
   public fun Type.nutritionOrderEnteralFormulaAdministrationRateToProto():

@@ -58,7 +58,7 @@ public object GroupConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Group.characteristic.value[x]")
+    throw IllegalArgumentException("Invalid Type for Group.characteristic.value[x]")
   }
 
   public fun Type.groupCharacteristicValueToProto(): Group.Characteristic.ValueX {

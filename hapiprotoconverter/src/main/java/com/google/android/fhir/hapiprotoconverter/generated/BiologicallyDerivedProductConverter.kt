@@ -48,7 +48,8 @@ public object BiologicallyDerivedProductConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("BiologicallyDerivedProduct.collection.collected[x]")
+    throw
+        IllegalArgumentException("Invalid Type for BiologicallyDerivedProduct.collection.collected[x]")
   }
 
   public fun Type.biologicallyDerivedProductCollectionCollectedToProto():
@@ -72,7 +73,7 @@ public object BiologicallyDerivedProductConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("BiologicallyDerivedProduct.processing.time[x]")
+    throw IllegalArgumentException("Invalid Type for BiologicallyDerivedProduct.processing.time[x]")
   }
 
   public fun Type.biologicallyDerivedProductProcessingTimeToProto():
@@ -96,7 +97,8 @@ public object BiologicallyDerivedProductConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("BiologicallyDerivedProduct.manipulation.time[x]")
+    throw
+        IllegalArgumentException("Invalid Type for BiologicallyDerivedProduct.manipulation.time[x]")
   }
 
   public fun Type.biologicallyDerivedProductManipulationTimeToProto():

@@ -54,7 +54,7 @@ public object MessageDefinitionConverter {
     if (this.getUri() != Uri.newBuilder().defaultInstanceForType ) {
       return (this.getUri()).toHapi()
     }
-    throw IllegalArgumentException("MessageDefinition.event[x]")
+    throw IllegalArgumentException("Invalid Type for MessageDefinition.event[x]")
   }
 
   public fun Type.messageDefinitionEventToProto(): MessageDefinition.EventX {

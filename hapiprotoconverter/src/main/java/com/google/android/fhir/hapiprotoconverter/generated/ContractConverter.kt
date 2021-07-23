@@ -91,7 +91,7 @@ public object ContractConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Contract.topic[x]")
+    throw IllegalArgumentException("Invalid Type for Contract.topic[x]")
   }
 
   public fun Type.contractTopicToProto(): Contract.TopicX {
@@ -112,7 +112,7 @@ public object ContractConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Contract.term.topic[x]")
+    throw IllegalArgumentException("Invalid Type for Contract.term.topic[x]")
   }
 
   public fun Type.contractTermTopicToProto(): Contract.Term.TopicX {
@@ -163,7 +163,7 @@ public object ContractConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Contract.term.offer.answer.value[x]")
+    throw IllegalArgumentException("Invalid Type for Contract.term.offer.answer.value[x]")
   }
 
   public fun Type.contractTermOfferAnswerValueToProto(): Contract.Term.Offer.Answer.ValueX {
@@ -215,7 +215,7 @@ public object ContractConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Contract.term.asset.valuedItem.entity[x]")
+    throw IllegalArgumentException("Invalid Type for Contract.term.asset.valuedItem.entity[x]")
   }
 
   public fun Type.contractTermAssetValuedItemEntityToProto():
@@ -240,7 +240,7 @@ public object ContractConverter {
     if (this.getTiming() != Timing.newBuilder().defaultInstanceForType ) {
       return (this.getTiming()).toHapi()
     }
-    throw IllegalArgumentException("Contract.term.action.occurrence[x]")
+    throw IllegalArgumentException("Invalid Type for Contract.term.action.occurrence[x]")
   }
 
   public fun Type.contractTermActionOccurrenceToProto(): Contract.Term.Action.OccurrenceX {
@@ -264,7 +264,7 @@ public object ContractConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Contract.friendly.content[x]")
+    throw IllegalArgumentException("Invalid Type for Contract.friendly.content[x]")
   }
 
   public fun Type.contractFriendlyContentToProto(): Contract.Friendly.ContentX {
@@ -285,7 +285,7 @@ public object ContractConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Contract.legal.content[x]")
+    throw IllegalArgumentException("Invalid Type for Contract.legal.content[x]")
   }
 
   public fun Type.contractLegalContentToProto(): Contract.Legal.ContentX {
@@ -306,7 +306,7 @@ public object ContractConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Contract.rule.content[x]")
+    throw IllegalArgumentException("Invalid Type for Contract.rule.content[x]")
   }
 
   public fun Type.contractRuleContentToProto(): Contract.Rule.ContentX {
@@ -327,7 +327,7 @@ public object ContractConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Contract.legallyBinding[x]")
+    throw IllegalArgumentException("Invalid Type for Contract.legallyBinding[x]")
   }
 
   public fun Type.contractLegallyBindingToProto(): Contract.LegallyBindingX {

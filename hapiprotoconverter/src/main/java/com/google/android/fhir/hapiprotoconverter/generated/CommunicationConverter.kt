@@ -48,7 +48,7 @@ public object CommunicationConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Communication.payload.content[x]")
+    throw IllegalArgumentException("Invalid Type for Communication.payload.content[x]")
   }
 
   public fun Type.communicationPayloadContentToProto(): Communication.Payload.ContentX {

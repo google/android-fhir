@@ -59,7 +59,7 @@ public object CarePlanConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("CarePlan.activity.detail.scheduled[x]")
+    throw IllegalArgumentException("Invalid Type for CarePlan.activity.detail.scheduled[x]")
   }
 
   public fun Type.carePlanActivityDetailScheduledToProto(): CarePlan.Activity.Detail.ScheduledX {
@@ -83,7 +83,7 @@ public object CarePlanConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("CarePlan.activity.detail.product[x]")
+    throw IllegalArgumentException("Invalid Type for CarePlan.activity.detail.product[x]")
   }
 
   public fun Type.carePlanActivityDetailProductToProto(): CarePlan.Activity.Detail.ProductX {

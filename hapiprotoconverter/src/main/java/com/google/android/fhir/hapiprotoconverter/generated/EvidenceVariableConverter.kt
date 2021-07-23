@@ -92,7 +92,7 @@ public object EvidenceVariableConverter {
     if (this.getTriggerDefinition() != TriggerDefinition.newBuilder().defaultInstanceForType ) {
       return (this.getTriggerDefinition()).toHapi()
     }
-    throw IllegalArgumentException("EvidenceVariable.characteristic.definition[x]")
+    throw IllegalArgumentException("Invalid Type for EvidenceVariable.characteristic.definition[x]")
   }
 
   public fun Type.evidenceVariableCharacteristicDefinitionToProto():
@@ -134,7 +134,8 @@ public object EvidenceVariableConverter {
     if (this.getTiming() != Timing.newBuilder().defaultInstanceForType ) {
       return (this.getTiming()).toHapi()
     }
-    throw IllegalArgumentException("EvidenceVariable.characteristic.participantEffective[x]")
+    throw
+        IllegalArgumentException("Invalid Type for EvidenceVariable.characteristic.participantEffective[x]")
   }
 
   public fun Type.evidenceVariableCharacteristicParticipantEffectiveToProto():

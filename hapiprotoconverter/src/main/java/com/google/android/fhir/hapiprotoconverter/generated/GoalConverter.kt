@@ -61,7 +61,7 @@ public object GoalConverter {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    throw IllegalArgumentException("Goal.start[x]")
+    throw IllegalArgumentException("Invalid Type for Goal.start[x]")
   }
 
   public fun Type.goalStartToProto(): Goal.StartX {
@@ -97,7 +97,7 @@ public object GoalConverter {
     if (this.getRatio() != Ratio.newBuilder().defaultInstanceForType ) {
       return (this.getRatio()).toHapi()
     }
-    throw IllegalArgumentException("Goal.target.detail[x]")
+    throw IllegalArgumentException("Invalid Type for Goal.target.detail[x]")
   }
 
   public fun Type.goalTargetDetailToProto(): Goal.Target.DetailX {
@@ -133,7 +133,7 @@ public object GoalConverter {
     if (this.getDuration() != Duration.newBuilder().defaultInstanceForType ) {
       return (this.getDuration()).toHapi()
     }
-    throw IllegalArgumentException("Goal.target.due[x]")
+    throw IllegalArgumentException("Invalid Type for Goal.target.due[x]")
   }
 
   public fun Type.goalTargetDueToProto(): Goal.Target.DueX {

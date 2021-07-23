@@ -16,20 +16,17 @@
 
 package com.google.android.fhir.hapiprotoconverter
 
-import com.google.fhir.common.JsonFormat
 import com.google.fhir.r4.core.ElementDefinition
 import com.google.fhir.r4.core.Extension
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.StructureDefinition
-import com.google.fhir.r4.core.StructureDefinitionKindCode
 import com.google.fhir.r4.core.ValueSet
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.TypeSpec
 import java.io.File
-import kotlin.math.exp
 
 object CompositeCodegen {
 
@@ -49,7 +46,7 @@ object CompositeCodegen {
       "http://hl7.org/fhir/ValueSet/mimetypes|4.0.1",
       "http://hl7.org/fhir/ValueSet/currencies|4.0.1"
     )
-
+// Map of valueSet url that are renamed in Fhir protos
   private val CODE_SYSTEM_RENAMES =
     mapOf(
       "http://hl7.org/fhir/secondary-finding" to "ObservationSecondaryFindingCode",
@@ -61,11 +58,11 @@ object CompositeCodegen {
       "http://hl7.org/fhir/CodeSystem/medication-statement-status" to
         "MedicationStatementStatusCodes"
     )
-
-  private const val protoPackage = "com.google.fhir.r4.core"
-
-  const val hapiPackage = "org.hl7.fhir.r4.model"
-
+  // proto package that contains the structures
+  internal const val protoPackage = "com.google.fhir.r4.core"
+  // hapi packages that contains teh structures
+  internal const val hapiPackage = "org.hl7.fhir.r4.model"
+  // uri that specifies if a valueset is in the the common Enumerations Class
   private const val uriCommon =
     "http://hl7.org/fhir/StructureDefinition/elementdefinition-isCommonBinding"
   private const val uriBindingName =
@@ -77,19 +74,29 @@ object CompositeCodegen {
   // will be used in backbone elements
   private const val explicitTypeName =
     "http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name"
-
+  // package that contains all converters
   private const val converterPackage = "com.google.android.fhir.hapiprotoconverter.generated"
+  // template for when the max value of an element is 1 ( in protos )
   private const val singleMethodTemplate = ".set%L"
+  // template for when the max value of an element is > 1 ( in protos )
   private const val multipleMethodTemplate = ".addAll%L"
-
+  // class where all common enums are in Hapi
   private val commonEnumClass = ClassName(hapiPackage, "Enumerations")
 
+  private val RESERVED_FIELD_NAMES_JAVA =
+    listOf("assert", "for", "hasAnswer", "package", "string", "class")
+  private val RESERVED_FIELD_NAME_KOTLIN = listOf("when")
+
+  /**
+   * @param def structure definition of the resource/complex-type that needs to be generated
+   * @param outLocation file where the converter object will be generated
+   */
+
   fun generate(def: StructureDefinition, outLocation: File? = null) {
-    // TODO support backbone elements properly
-    // TODO handle Money.currency
     // TODO Map all value sets instead of using toCode() and valueOf() ( currently works )
     // TODO raise issue on kotlin poet repository about nested class imports while using import
     // aliases (currently works)
+
     // hapi name of the Resource / datatype
     val hapiName = def.id.value.capitalizeFirst()
     // proto name of the Resource / datatype
@@ -98,10 +105,8 @@ object CompositeCodegen {
     val hapiClass = ClassName(hapiPackage, hapiName)
     // hapi name of the Resource / datatype
     val protoClass = ClassName(protoPackage, protoName)
-
     // file builder for file that contains the converter object
     val fileBuilder = FileSpec.builder(converterPackage, "${protoName}Converter")
-
     // the class (object) that will contain the convert functions
     val complexConverterClass = ClassName(converterPackage, "${protoName}Converter")
 
@@ -110,7 +115,7 @@ object CompositeCodegen {
 
     // map of backbone element names to a pair of functions that convert them to hapi and protobufs
     // respectively
-    val backboneElementMap = mutableMapOf<kotlin.String, Pair<FunSpec.Builder, FunSpec.Builder>>()
+    val backboneElementMap = mutableMapOf<kotlin.String, BackBoneElementData>()
 
     // function builder that will convert to proto from a hapi value
     val toProtoBuilder =
@@ -130,23 +135,22 @@ object CompositeCodegen {
     // builder or base)
     fun getToProtoBuilder(element: ElementDefinition): FunSpec.Builder {
       if (backboneElementMap.containsKey(element.path.value.substringBeforeLast("."))) {
-        return backboneElementMap[element.path.value.substringBeforeLast(".")]!!.first
+        return backboneElementMap[element.path.value.substringBeforeLast(".")]!!.hapiBuilder
       }
       return toProtoBuilder
     }
-
     // inner function to get hapiBuilder from the name of the element ( used to get backbone builder
     // or base)
     fun getToHapiBuilder(element: ElementDefinition): FunSpec.Builder {
       if (backboneElementMap.containsKey(element.path.value.substringBeforeLast("."))) {
-        return backboneElementMap[element.path.value.substringBeforeLast(".")]!!.second
+        return backboneElementMap[element.path.value.substringBeforeLast(".")]!!.protoBuilder
       }
       return toHapiBuilder
     }
 
     // Iterate over elementList
     for (element in def.snapshot.elementList) {
-
+    // Igenore elements that have 0 as the max value
       if (element.max.value == "0") {
         continue
       }
@@ -154,12 +158,13 @@ object CompositeCodegen {
       if (element.base.path.value == "DomainResource.contained"){
         continue
       }
-      // name of the element // TODO change logic
+      // name of the element
       val elementName = getElementName(element)
       // if the name is itself skip
       if (elementName.capitalizeFirst() == def.type.value) {
         continue
       }
+      // handle choice type
       if (element.typeList.size > 1) {
         functionsList.addAll(
           handleChoiceType(
@@ -171,21 +176,25 @@ object CompositeCodegen {
         )
         continue
       }
+      // handle id separately
       if (elementName == "id") {
         getToProtoBuilder(element)
           .addStatement(".setId(%T.newBuilder().setValue(id))", if (element.base.path.value == "Resource.id") Id::class else String::class)
         getToHapiBuilder(element).addStatement("hapiValue.id = id.value ")
         continue
       }
+      // handle contentReference type
       if (element.contentReference.value != "") {
         val isSingle = element.max.value == "1"
         if (isSingle) {
+
           getToProtoBuilder(element)
             .addStatement(
               "$singleMethodTemplate(%L.toProto())",
               getElementName(element).capitalizeFirst(),
               getElementName(element)
             )
+
           getToHapiBuilder(element)
             .addStatement(
               "hapiValue$singleMethodTemplate(%L.toHapi())",
@@ -193,12 +202,14 @@ object CompositeCodegen {
               getElementName(element)
             )
         } else {
+
           getToProtoBuilder(element)
             .addStatement(
               "$multipleMethodTemplate(%L.map{it.toProto()})",
               getElementName(element).capitalizeFirst(),
               getElementName(element)
             )
+
           getToHapiBuilder(element)
             .addStatement(
               "hapiValue$singleMethodTemplate(%L.map{it.toHapi()})",
@@ -206,16 +217,13 @@ object CompositeCodegen {
               getElementName(element) + "List"
             )
         }
-        //
-        // org.hl7.fhir.r4.model.Invoice().setTotalPriceComponent().totalPriceComponent
-        //
-        // Invoice.newBuilder().addAllTotalPriceComponent().build().totalPriceComponentList
         continue
       }
       // Handle the case when it is a backbone element
       if (normalizeType(element.typeList.single()) == "BackboneElement" ||
           normalizeType(element.typeList.single()) == "Element"
       ) {
+
         handleBackBoneElementTypes(
           element,
           getToHapiBuilder(element),
@@ -248,16 +256,14 @@ object CompositeCodegen {
     // TODO there is definitely a better way to do this just can't figure it out at the time
     functionsList.addAll(
       backboneElementMap.values.map {
-        it.first.addStatement(".build()").addStatement("return protoValue").build()
+        it.protoBuilder.addStatement(".build()").addStatement("return protoValue").build()
       }
     )
     functionsList.addAll(
-      backboneElementMap.values.map { it.second.addStatement("return hapiValue").build() }
+      backboneElementMap.values.map { it.hapiBuilder.addStatement("return hapiValue").build() }
     )
-    fileBuilder
-      .addType(
-        TypeSpec.objectBuilder(complexConverterClass.simpleName).addFunctions(functionsList).build()
-      )
+    functionsList.forEach{fileBuilder.addFunction(it)}
+      fileBuilder
       .build()
       .writeTo(outLocation!!)
   }
@@ -295,6 +301,9 @@ object CompositeCodegen {
     }
     throw IllegalArgumentException("element is not in valueSetUrlMap")
   }
+  /**
+   * 
+   */
 
   private fun getCodeSystemName(name: String): kotlin.String {
     val filteredName =
@@ -346,9 +355,11 @@ object CompositeCodegen {
     }
     throw java.lang.IllegalArgumentException("Unable to deduce typename for profile: $profileUrl")
   }
-
+  /**
+   * @param element the element definition of an element
+   * @returns the name of [element]
+   */
   private fun getElementName(element: ElementDefinition): kotlin.String {
-    // TODO change logic
     return if (element.hasExtension(explicitTypeName) ) {
       element.getExtension(explicitTypeName).value.stringValue.value.lowerCaseFirst()
     } else {
@@ -416,7 +427,14 @@ object CompositeCodegen {
       )
     }
   }
-
+/**
+ * @param element element definition of a choice type
+ * @param hapiBuilder hapi FunctionBuilder of type that contains the choice type
+ * @param protoBuilder proto FunctionBuilder of type that contains the choice type
+ * @param fileBuilder FileBuilder for the file that will contain [hapiBuilder] & [protoBuilder]
+ *
+ * @returns a list of FunctionBuilders that convert [element] from hapi to proto and vice versa
+ * */
   private fun handleChoiceType(
     element: ElementDefinition,
     hapiBuilder: FunSpec.Builder,
@@ -480,7 +498,7 @@ object CompositeCodegen {
     elementToHapiBuilder.addStatement(
       "throw %T(%S)",
       IllegalArgumentException::class,
-      element.path.value
+      "Invalid Type for ${element.path.value}"
     )
     protoBuilder.addStatement(
       "$singleMethodTemplate(%L.%N())",
@@ -502,7 +520,7 @@ object CompositeCodegen {
     element: ElementDefinition,
     hapiBuilder: FunSpec.Builder,
     protoBuilder: FunSpec.Builder,
-    backboneElementMap: MutableMap<kotlin.String, Pair<FunSpec.Builder, FunSpec.Builder>>
+    backboneElementMap: MutableMap<kotlin.String, BackBoneElementData>
   ) {
     // create a new entry in the backbone element map
     val isSingle = element.max.value == "1"
@@ -547,10 +565,13 @@ object CompositeCodegen {
         element.getBackBoneHapiClass()
       )
     backboneElementMap[element.path.value] =
+      BackBoneElementData(
       toProtoBuilder.addStatement(
         "val protoValue = %T.newBuilder()",
         element.getBackBoneProtoClass()
-      ) to toHapiBuilder.addStatement("val hapiValue = %T()", element.getBackBoneHapiClass())
+      ), element.getBackBoneProtoClass().canonicalName,
+        toHapiBuilder.addStatement("val hapiValue = %T()", element.getBackBoneHapiClass())
+        ,element.getBackBoneHapiClass().canonicalName)
   }
 
   private fun handleCodeType(
@@ -662,7 +683,7 @@ object CompositeCodegen {
         listOf(outerDataTypeName) +
           this.path.value.split(".").drop(1).dropLast(1).map { it.capitalizeFirst() }
       )
-      .nestedClass(getElementName(this).capitalizeFirst() + "Code")
+      .nestedClass(if (binding.valueSet.value in CODE_SYSTEM_RENAMES.keys ) CODE_SYSTEM_RENAMES[binding.valueSet.value]!! else getElementName(this).capitalizeFirst() + "Code")
   }
 
   private fun ElementDefinition.getHapiCodeClass(isCommon: Boolean): ClassName {
@@ -712,76 +733,11 @@ object CompositeCodegen {
 
   private const val choiceTypeSuffixStructureDefinition = "[x]"
   private const val choiceTypeSuffixProto = "X"
+private data class BackBoneElementData(
+  val protoBuilder: FunSpec.Builder,
+  val protoName : kotlin.String,
+  val hapiBuilder: FunSpec.Builder,
+  val hapiName: kotlin.String
+)
 }
 
-// Ignore code after this
-fun main() {
-  File("C:\\Users\\Aditya\\Desktop\\fhir-spec\\site").listFiles()!!
-    .filter {
-      it.name.startsWith("valueset-") &&
-        !it.name.startsWith("valueset-extensions-") &&
-        !it.name.equals("valueset-questionnaire.canonical.json") &&
-        !it.name.equals("valueset-questionnaire.json") &&
-        it.name.endsWith(".json")
-    }
-    .forEach {
-      try {
-        val def = JsonFormat.getParser().merge(it.inputStream().reader(), ValueSet.newBuilder())
-        CompositeCodegen.valueSetUrlMap[def.url.value] = def.build()
-      } catch (e: Exception) {
-        println(it.name)
-      }
-    }
-
-  File("hapiprotoconverter\\sampledata\\").listFiles()!!
-    .filter { it.name.endsWith(".profile.json") && !it.name.endsWith("-genetics.profile.json") }
-    .forEach {
-      val def =
-        JsonFormat.getParser().merge(it.inputStream().reader(), StructureDefinition.newBuilder())
-      CompositeCodegen.profileUrlMap[def.url.value] = def.build()
-    }
-  CompositeCodegen.profileUrlMap.values  //.filter { it.name.value == "Extension"}
-    .forEach { def ->
-    if ((  // def.kind.value == StructureDefinitionKindCode.Value.COMPLEX_TYPE
-//              ||
-      def.kind.value == StructureDefinitionKindCode.Value.RESOURCE
-              )
-      && !def.abstract.value
-    // &&
-    // def.status.value == PublicationStatusCode.Value.ACTIVE
-    ) {
-      try {
-        CompositeCodegen.generate(def, File("hapiprotoconverter\\src\\main\\java"))
-      } catch (e: Exception) {
-        println(def.name.value)
-      }
-    }
-  }
-}
-
-fun main1() {
-  File("C:\\Users\\Aditya\\Desktop\\fhir-spec\\site").listFiles()!!
-    .filter { !it.name.endsWith(".json") }
-    .forEach { it.delete() }
-}
-
-// Types that don't or rather work aren't generated
-// Attachment - mimeType
-// ElementDefinition - mimeType
-// Expression - ExpressionLanguage
-// Signature - mimeType
-// TODO handle conversion simpleQuantity to Quantity
-
-
-
-// profiles that cannot be generated ( apart from -genetics.json profiles)
-// Profile for Catalog
-// CDS Hooks GuidanceResponse
-// CDS Hooks Service PlanDefinition
-// Clinical Document
-// TODO - Composition
-// CQF-Questionnaire
-// DataElement constraint on ElementDefinition data type
-// Family member history for genetics analysis
-// Profile for HLA Genotyping Results
-// TODO MessageDefinition - Done

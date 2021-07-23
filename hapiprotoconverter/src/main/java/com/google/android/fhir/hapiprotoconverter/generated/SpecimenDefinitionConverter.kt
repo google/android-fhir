@@ -47,7 +47,8 @@ public object SpecimenDefinitionConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("SpecimenDefinition.typeTested.container.minimumVolume[x]")
+    throw
+        IllegalArgumentException("Invalid Type for SpecimenDefinition.typeTested.container.minimumVolume[x]")
   }
 
   public fun Type.specimenDefinitionTypeTestedContainerMinimumVolumeToProto():
@@ -71,7 +72,8 @@ public object SpecimenDefinitionConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("SpecimenDefinition.typeTested.container.additive.additive[x]")
+    throw
+        IllegalArgumentException("Invalid Type for SpecimenDefinition.typeTested.container.additive.additive[x]")
   }
 
   public fun Type.specimenDefinitionTypeTestedContainerAdditiveAdditiveToProto():

@@ -39,7 +39,8 @@ public object MedicinalProductAuthorizationConverter {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType ) {
       return (this.getDateTime()).toHapi()
     }
-    throw IllegalArgumentException("MedicinalProductAuthorization.procedure.date[x]")
+    throw
+        IllegalArgumentException("Invalid Type for MedicinalProductAuthorization.procedure.date[x]")
   }
 
   public fun Type.medicinalProductAuthorizationProcedureDateToProto():

@@ -56,7 +56,7 @@ public object MeasureConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Measure.subject[x]")
+    throw IllegalArgumentException("Invalid Type for Measure.subject[x]")
   }
 
   public fun Type.measureSubjectToProto(): Measure.SubjectX {

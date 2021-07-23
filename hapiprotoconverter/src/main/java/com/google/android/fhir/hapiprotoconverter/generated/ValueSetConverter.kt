@@ -35,6 +35,7 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toProto
 import com.google.fhir.r4.core.Boolean
+import com.google.fhir.r4.core.ClaimResponse
 import com.google.fhir.r4.core.Code
 import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Decimal
@@ -79,7 +80,7 @@ public object ValueSetConverter {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType ) {
       return (this.getDateTime()).toHapi()
     }
-    throw IllegalArgumentException("ValueSet.expansion.parameter.value[x]")
+    throw IllegalArgumentException("Invalid Type for ValueSet.expansion.parameter.value[x]")
   }
 
   public fun Type.valueSetExpansionParameterValueToProto(): ValueSet.Expansion.Parameter.ValueX {
@@ -187,11 +188,10 @@ public object ValueSetConverter {
       ValueSet.Compose.ConceptSet {
     val protoValue = ValueSet.Compose.ConceptSet.newBuilder()
     .setId(String.newBuilder().setValue(id))
-      .addAllConept
-//    .addAllExtension(extension.map{it.toProto()})
-//    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-//    .setSystem(systemElement.toProto())
-//    .setVersion(versionElement.toProto())
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setSystem(systemElement.toProto())
+    .setVersion(versionElement.toProto())
     .addAllConceptReference(conceptReference.map{it.toProto()})
     .addAllFilter(filter.map{it.toProto()})
     .build()
@@ -199,7 +199,7 @@ public object ValueSetConverter {
   }
 
   public fun org.hl7.fhir.r4.model.ValueSet.ConceptReferenceComponent.toProto():
-      ValueSet.Compose..ConceptReference {
+      ValueSet.Compose.Include.ConceptReference {
     val protoValue = ValueSet.Compose.Include.ConceptReference.newBuilder()
     .setId(String.newBuilder().setValue(id))
     .addAllExtension(extension.map{it.toProto()})

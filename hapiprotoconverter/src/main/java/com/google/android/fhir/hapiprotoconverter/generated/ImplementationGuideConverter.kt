@@ -62,7 +62,8 @@ public object ImplementationGuideConverter {
     if (this.getCanonical() != Canonical.newBuilder().defaultInstanceForType ) {
       return (this.getCanonical()).toHapi()
     }
-    throw IllegalArgumentException("ImplementationGuide.definition.resource.example[x]")
+    throw
+        IllegalArgumentException("Invalid Type for ImplementationGuide.definition.resource.example[x]")
   }
 
   public fun Type.implementationGuideDefinitionResourceExampleToProto():
@@ -86,7 +87,7 @@ public object ImplementationGuideConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("ImplementationGuide.definition.page.name[x]")
+    throw IllegalArgumentException("Invalid Type for ImplementationGuide.definition.page.name[x]")
   }
 
   public fun Type.implementationGuideDefinitionPageNameToProto():
@@ -110,7 +111,8 @@ public object ImplementationGuideConverter {
     if (this.getCanonical() != Canonical.newBuilder().defaultInstanceForType ) {
       return (this.getCanonical()).toHapi()
     }
-    throw IllegalArgumentException("ImplementationGuide.manifest.resource.example[x]")
+    throw
+        IllegalArgumentException("Invalid Type for ImplementationGuide.manifest.resource.example[x]")
   }
 
   public fun Type.implementationGuideManifestResourceExampleToProto():

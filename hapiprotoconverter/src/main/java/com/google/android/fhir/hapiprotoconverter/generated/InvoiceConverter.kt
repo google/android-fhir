@@ -48,7 +48,7 @@ public object InvoiceConverter {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    throw IllegalArgumentException("Invoice.lineItem.chargeItem[x]")
+    throw IllegalArgumentException("Invalid Type for Invoice.lineItem.chargeItem[x]")
   }
 
   public fun Type.invoiceLineItemChargeItemToProto(): Invoice.LineItem.ChargeItemX {

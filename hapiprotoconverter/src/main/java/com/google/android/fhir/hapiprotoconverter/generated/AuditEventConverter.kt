@@ -46,7 +46,7 @@ public object AuditEventConverter {
     if (this.getBase64Binary() != Base64Binary.newBuilder().defaultInstanceForType ) {
       return (this.getBase64Binary()).toHapi()
     }
-    throw IllegalArgumentException("AuditEvent.entity.detail.value[x]")
+    throw IllegalArgumentException("Invalid Type for AuditEvent.entity.detail.value[x]")
   }
 
   public fun Type.auditEventEntityDetailValueToProto(): AuditEvent.Entity.Detail.ValueX {

@@ -32,7 +32,7 @@ import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.Type
 
 public object TimingConverter {
-  public fun Timing.Repeat.BoundsX.boundsToHapi(): Type {
+  public fun Timing.Repeat.BoundsX.timingRepeatBoundsToHapi(): Type {
     if (this.getDuration() != Duration.newBuilder().defaultInstanceForType ) {
       return (this.getDuration()).toHapi()
     }
@@ -42,10 +42,10 @@ public object TimingConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("Timing.repeat.bounds[x]")
+    throw IllegalArgumentException("Invalid Type for Timing.repeat.bounds[x]")
   }
 
-  public fun Type.boundsToProto(): Timing.Repeat.BoundsX {
+  public fun Type.timingRepeatBoundsToProto(): Timing.Repeat.BoundsX {
     val protoValue = Timing.Repeat.BoundsX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Duration) {
       protoValue.setDuration(this.toProto())
@@ -86,7 +86,7 @@ public object TimingConverter {
     val protoValue = Timing.Repeat.newBuilder()
     .setId(String.newBuilder().setValue(id))
     .addAllExtension(extension.map{it.toProto()})
-    .setBounds(bounds.boundsToProto())
+    .setBounds(bounds.timingRepeatBoundsToProto())
     .setCount(countElement.toProto())
     .setCountMax(countMaxElement.toProto())
     .setDuration(durationElement.toProto())
@@ -113,7 +113,7 @@ public object TimingConverter {
     val hapiValue = org.hl7.fhir.r4.model.Timing.TimingRepeatComponent()
     hapiValue.id = id.value 
     hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setBounds(bounds.boundsToHapi())
+    hapiValue.setBounds(bounds.timingRepeatBoundsToHapi())
     hapiValue.setCountElement(count.toHapi())
     hapiValue.setCountMaxElement(countMax.toHapi())
     hapiValue.setDurationElement(duration.toHapi())

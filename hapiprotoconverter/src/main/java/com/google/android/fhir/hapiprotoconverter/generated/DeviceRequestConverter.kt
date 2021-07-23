@@ -59,7 +59,7 @@ public object DeviceRequestConverter {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    throw IllegalArgumentException("DeviceRequest.code[x]")
+    throw IllegalArgumentException("Invalid Type for DeviceRequest.code[x]")
   }
 
   public fun Type.deviceRequestCodeToProto(): DeviceRequest.CodeX {
@@ -86,7 +86,7 @@ public object DeviceRequestConverter {
     if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType ) {
       return (this.getBoolean()).toHapi()
     }
-    throw IllegalArgumentException("DeviceRequest.parameter.value[x]")
+    throw IllegalArgumentException("Invalid Type for DeviceRequest.parameter.value[x]")
   }
 
   public fun Type.deviceRequestParameterValueToProto(): DeviceRequest.Parameter.ValueX {
@@ -116,7 +116,7 @@ public object DeviceRequestConverter {
     if (this.getTiming() != Timing.newBuilder().defaultInstanceForType ) {
       return (this.getTiming()).toHapi()
     }
-    throw IllegalArgumentException("DeviceRequest.occurrence[x]")
+    throw IllegalArgumentException("Invalid Type for DeviceRequest.occurrence[x]")
   }
 
   public fun Type.deviceRequestOccurrenceToProto(): DeviceRequest.OccurrenceX {

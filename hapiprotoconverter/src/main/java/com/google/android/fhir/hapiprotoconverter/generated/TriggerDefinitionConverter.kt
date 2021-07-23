@@ -29,7 +29,7 @@ import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Type
 
 public object TriggerDefinitionConverter {
-  public fun TriggerDefinition.TimingX.timingToHapi(): Type {
+  public fun TriggerDefinition.TimingX.triggerDefinitionTimingToHapi(): Type {
     if (this.getTiming() != Timing.newBuilder().defaultInstanceForType ) {
       return (this.getTiming()).toHapi()
     }
@@ -42,10 +42,10 @@ public object TriggerDefinitionConverter {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType ) {
       return (this.getDateTime()).toHapi()
     }
-    throw IllegalArgumentException("TriggerDefinition.timing[x]")
+    throw IllegalArgumentException("Invalid Type for TriggerDefinition.timing[x]")
   }
 
-  public fun Type.timingToProto(): TriggerDefinition.TimingX {
+  public fun Type.triggerDefinitionTimingToProto(): TriggerDefinition.TimingX {
     val protoValue = TriggerDefinition.TimingX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Timing) {
       protoValue.setTiming(this.toProto())
@@ -68,7 +68,7 @@ public object TriggerDefinitionConverter {
     hapiValue.setExtension(extensionList.map{it.toHapi()})
     hapiValue.setType(org.hl7.fhir.r4.model.TriggerDefinition.TriggerType.valueOf(type.value.name.replace("_","")))
     hapiValue.setNameElement(name.toHapi())
-    hapiValue.setTiming(timing.timingToHapi())
+    hapiValue.setTiming(timing.triggerDefinitionTimingToHapi())
     hapiValue.setData(dataList.map{it.toHapi()})
     hapiValue.setCondition(condition.toHapi())
     return hapiValue
@@ -81,7 +81,7 @@ public object TriggerDefinitionConverter {
     .setType(TriggerDefinition.TypeCode.newBuilder().setValue(TriggerTypeCode.Value.valueOf(type.toCode().replace("-",
         "_").toUpperCase())).build())
     .setName(nameElement.toProto())
-    .setTiming(timing.timingToProto())
+    .setTiming(timing.triggerDefinitionTimingToProto())
     .addAllData(data.map{it.toProto()})
     .setCondition(condition.toProto())
     .build()

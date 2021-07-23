@@ -57,7 +57,7 @@ public object PatientConverter {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType ) {
       return (this.getDateTime()).toHapi()
     }
-    throw IllegalArgumentException("Patient.deceased[x]")
+    throw IllegalArgumentException("Invalid Type for Patient.deceased[x]")
   }
 
   public fun Type.patientDeceasedToProto(): Patient.DeceasedX {
@@ -78,7 +78,7 @@ public object PatientConverter {
     if (this.getInteger() != Integer.newBuilder().defaultInstanceForType ) {
       return (this.getInteger()).toHapi()
     }
-    throw IllegalArgumentException("Patient.multipleBirth[x]")
+    throw IllegalArgumentException("Invalid Type for Patient.multipleBirth[x]")
   }
 
   public fun Type.patientMultipleBirthToProto(): Patient.MultipleBirthX {

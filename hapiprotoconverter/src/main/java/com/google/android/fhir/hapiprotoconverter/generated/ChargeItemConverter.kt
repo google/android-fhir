@@ -58,7 +58,7 @@ public object ChargeItemConverter {
     if (this.getTiming() != Timing.newBuilder().defaultInstanceForType ) {
       return (this.getTiming()).toHapi()
     }
-    throw IllegalArgumentException("ChargeItem.occurrence[x]")
+    throw IllegalArgumentException("Invalid Type for ChargeItem.occurrence[x]")
   }
 
   public fun Type.chargeItemOccurrenceToProto(): ChargeItem.OccurrenceX {
@@ -82,7 +82,7 @@ public object ChargeItemConverter {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    throw IllegalArgumentException("ChargeItem.product[x]")
+    throw IllegalArgumentException("Invalid Type for ChargeItem.product[x]")
   }
 
   public fun Type.chargeItemProductToProto(): ChargeItem.ProductX {

@@ -42,7 +42,7 @@ public object SubstanceConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Substance.ingredient.substance[x]")
+    throw IllegalArgumentException("Invalid Type for Substance.ingredient.substance[x]")
   }
 
   public fun Type.substanceIngredientSubstanceToProto(): Substance.Ingredient.SubstanceX {

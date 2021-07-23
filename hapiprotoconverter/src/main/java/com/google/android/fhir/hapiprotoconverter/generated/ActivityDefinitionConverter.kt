@@ -80,7 +80,7 @@ public object ActivityDefinitionConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("ActivityDefinition.subject[x]")
+    throw IllegalArgumentException("Invalid Type for ActivityDefinition.subject[x]")
   }
 
   public fun Type.activityDefinitionSubjectToProto(): ActivityDefinition.SubjectX {
@@ -113,7 +113,7 @@ public object ActivityDefinitionConverter {
     if (this.getDuration() != Duration.newBuilder().defaultInstanceForType ) {
       return (this.getDuration()).toHapi()
     }
-    throw IllegalArgumentException("ActivityDefinition.timing[x]")
+    throw IllegalArgumentException("Invalid Type for ActivityDefinition.timing[x]")
   }
 
   public fun Type.activityDefinitionTimingToProto(): ActivityDefinition.TimingX {
@@ -146,7 +146,7 @@ public object ActivityDefinitionConverter {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    throw IllegalArgumentException("ActivityDefinition.product[x]")
+    throw IllegalArgumentException("Invalid Type for ActivityDefinition.product[x]")
   }
 
   public fun Type.activityDefinitionProductToProto(): ActivityDefinition.ProductX {

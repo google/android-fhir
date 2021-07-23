@@ -41,7 +41,7 @@ public object DetectedIssueConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("DetectedIssue.identified[x]")
+    throw IllegalArgumentException("Invalid Type for DetectedIssue.identified[x]")
   }
 
   public fun Type.detectedIssueIdentifiedToProto(): DetectedIssue.IdentifiedX {

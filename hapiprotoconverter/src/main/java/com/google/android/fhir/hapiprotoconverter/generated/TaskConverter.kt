@@ -181,7 +181,7 @@ import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.model.UuidType
 
 public object TaskConverter {
-  public fun Task.Input.ValueX.taskInputValueToHapi(): Type {
+  public fun Task.Parameter.ValueX.taskInputValueToHapi(): Type {
     if (this.getBase64Binary() != Base64Binary.newBuilder().defaultInstanceForType ) {
       return (this.getBase64Binary()).toHapi()
     }
@@ -332,11 +332,11 @@ public object TaskConverter {
     if (this.getMeta() != Meta.newBuilder().defaultInstanceForType ) {
       return (this.getMeta()).toHapi()
     }
-    throw IllegalArgumentException("Task.input.value[x]")
+    throw IllegalArgumentException("Invalid Type for Task.input.value[x]")
   }
 
-  public fun Type.taskInputValueToProto(): Task.Input.ValueX {
-    val protoValue = Task.Input.ValueX.newBuilder()
+  public fun Type.taskInputValueToProto(): Task.Parameter.ValueX {
+    val protoValue = Task.Parameter.ValueX.newBuilder()
     if (this is Base64BinaryType) {
       protoValue.setBase64Binary(this.toProto())
     }
@@ -641,7 +641,7 @@ public object TaskConverter {
     if (this.getMeta() != Meta.newBuilder().defaultInstanceForType ) {
       return (this.getMeta()).toHapi()
     }
-    throw IllegalArgumentException("Task.output.value[x]")
+    throw IllegalArgumentException("Invalid Type for Task.output.value[x]")
   }
 
   public fun Type.taskOutputValueToProto(): Task.Output.ValueX {
@@ -822,7 +822,7 @@ public object TaskConverter {
     hapiValue.setCode(code.toHapi())
     hapiValue.setDescriptionElement(description.toHapi())
     hapiValue.setFocus(focus.toHapi())
-    hapiValue.setFor(for.toHapi())
+    hapiValue.setFor(forValue.toHapi())
     hapiValue.setEncounter(encounter.toHapi())
     hapiValue.setExecutionPeriod(executionPeriod.toHapi())
     hapiValue.setAuthoredOnElement(authoredOn.toHapi())
@@ -837,7 +837,7 @@ public object TaskConverter {
     hapiValue.setNote(noteList.map{it.toHapi()})
     hapiValue.setRelevantHistory(relevantHistoryList.map{it.toHapi()})
     hapiValue.setRestriction(restriction.toHapi())
-    hapiValue.setParameter(parameterList.map{it.toHapi()})
+    hapiValue.setInput(inputList.map{it.toHapi()})
     hapiValue.setOutput(outputList.map{it.toHapi()})
     return hapiValue
   }
@@ -868,7 +868,7 @@ public object TaskConverter {
     .setCode(code.toProto())
     .setDescription(descriptionElement.toProto())
     .setFocus(focus.toProto())
-    .setFor(for.toProto())
+    .setForValue(`for`.toProto())
     .setEncounter(encounter.toProto())
     .setExecutionPeriod(executionPeriod.toProto())
     .setAuthoredOn(authoredOnElement.toProto())
@@ -883,7 +883,7 @@ public object TaskConverter {
     .addAllNote(note.map{it.toProto()})
     .addAllRelevantHistory(relevantHistory.map{it.toProto()})
     .setRestriction(restriction.toProto())
-    .addAllParameter(parameter.map{it.toProto()})
+    .addAllInput(input.map{it.toProto()})
     .addAllOutput(output.map{it.toProto()})
     .build()
     return protoValue

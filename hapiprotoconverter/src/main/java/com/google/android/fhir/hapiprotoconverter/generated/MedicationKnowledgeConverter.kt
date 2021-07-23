@@ -53,7 +53,7 @@ public object MedicationKnowledgeConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("MedicationKnowledge.ingredient.item[x]")
+    throw IllegalArgumentException("Invalid Type for MedicationKnowledge.ingredient.item[x]")
   }
 
   public fun Type.medicationKnowledgeIngredientItemToProto(): MedicationKnowledge.Ingredient.ItemX {
@@ -76,7 +76,8 @@ public object MedicationKnowledgeConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("MedicationKnowledge.administrationGuidelines.indication[x]")
+    throw
+        IllegalArgumentException("Invalid Type for MedicationKnowledge.administrationGuidelines.indication[x]")
   }
 
   public fun Type.medicationKnowledgeAdministrationGuidelinesIndicationToProto():
@@ -101,7 +102,7 @@ public object MedicationKnowledgeConverter {
       return (this.getQuantity()).toHapi()
     }
     throw
-        IllegalArgumentException("MedicationKnowledge.administrationGuidelines.patientCharacteristics.characteristic[x]")
+        IllegalArgumentException("Invalid Type for MedicationKnowledge.administrationGuidelines.patientCharacteristics.characteristic[x]")
   }
 
   public
@@ -133,7 +134,8 @@ public object MedicationKnowledgeConverter {
     if (this.getBase64Binary() != Base64Binary.newBuilder().defaultInstanceForType ) {
       return (this.getBase64Binary()).toHapi()
     }
-    throw IllegalArgumentException("MedicationKnowledge.drugCharacteristic.value[x]")
+    throw
+        IllegalArgumentException("Invalid Type for MedicationKnowledge.drugCharacteristic.value[x]")
   }
 
   public fun Type.medicationKnowledgeDrugCharacteristicValueToProto():

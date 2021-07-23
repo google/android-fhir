@@ -54,7 +54,7 @@ public object SupplyRequestConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("SupplyRequest.item[x]")
+    throw IllegalArgumentException("Invalid Type for SupplyRequest.item[x]")
   }
 
   public fun Type.supplyRequestItemToProto(): SupplyRequest.ItemX {
@@ -81,7 +81,7 @@ public object SupplyRequestConverter {
     if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType ) {
       return (this.getBoolean()).toHapi()
     }
-    throw IllegalArgumentException("SupplyRequest.parameter.value[x]")
+    throw IllegalArgumentException("Invalid Type for SupplyRequest.parameter.value[x]")
   }
 
   public fun Type.supplyRequestParameterValueToProto(): SupplyRequest.Parameter.ValueX {
@@ -111,7 +111,7 @@ public object SupplyRequestConverter {
     if (this.getTiming() != Timing.newBuilder().defaultInstanceForType ) {
       return (this.getTiming()).toHapi()
     }
-    throw IllegalArgumentException("SupplyRequest.occurrence[x]")
+    throw IllegalArgumentException("Invalid Type for SupplyRequest.occurrence[x]")
   }
 
   public fun Type.supplyRequestOccurrenceToProto(): SupplyRequest.OccurrenceX {

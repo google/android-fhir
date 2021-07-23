@@ -35,17 +35,17 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 public object DataRequirementConverter {
-  public fun DataRequirement.SubjectX.subjectToHapi(): Type {
+  public fun DataRequirement.SubjectX.dataRequirementSubjectToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("DataRequirement.subject[x]")
+    throw IllegalArgumentException("Invalid Type for DataRequirement.subject[x]")
   }
 
-  public fun Type.subjectToProto(): DataRequirement.SubjectX {
+  public fun Type.dataRequirementSubjectToProto(): DataRequirement.SubjectX {
     val protoValue = DataRequirement.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
       protoValue.setCodeableConcept(this.toProto())
@@ -56,7 +56,7 @@ public object DataRequirementConverter {
     return protoValue.build()
   }
 
-  public fun DataRequirement.DateFilter.ValueX.valueToHapi(): Type {
+  public fun DataRequirement.DateFilter.ValueX.dataRequirementDateFilterValueToHapi(): Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType ) {
       return (this.getDateTime()).toHapi()
     }
@@ -66,10 +66,10 @@ public object DataRequirementConverter {
     if (this.getDuration() != Duration.newBuilder().defaultInstanceForType ) {
       return (this.getDuration()).toHapi()
     }
-    throw IllegalArgumentException("DataRequirement.dateFilter.value[x]")
+    throw IllegalArgumentException("Invalid Type for DataRequirement.dateFilter.value[x]")
   }
 
-  public fun Type.valueToProto(): DataRequirement.DateFilter.ValueX {
+  public fun Type.dataRequirementDateFilterValueToProto(): DataRequirement.DateFilter.ValueX {
     val protoValue = DataRequirement.DateFilter.ValueX.newBuilder()
     if (this is DateTimeType) {
       protoValue.setDateTime(this.toProto())
@@ -87,9 +87,8 @@ public object DataRequirementConverter {
     val hapiValue = org.hl7.fhir.r4.model.DataRequirement()
     hapiValue.id = id.value 
     hapiValue.setExtension(extensionList.map{it.toHapi()})
-    //hapiValue.setTypeElement(type.toHapi())
     hapiValue.setProfile(profileList.map{it.toHapi()})
-    hapiValue.setSubject(subject.subjectToHapi())
+    hapiValue.setSubject(subject.dataRequirementSubjectToHapi())
     hapiValue.setMustSupport(mustSupportList.map{it.toHapi()})
     hapiValue.setCodeFilter(codeFilterList.map{it.toHapi()})
     hapiValue.setDateFilter(dateFilterList.map{it.toHapi()})
@@ -102,9 +101,8 @@ public object DataRequirementConverter {
     val protoValue = DataRequirement.newBuilder()
     .setId(String.newBuilder().setValue(id))
     .addAllExtension(extension.map{it.toProto()})
-    //.setType(typeElement.toProto())
     .addAllProfile(profile.map{it.toProto()})
-    .setSubject(subject.subjectToProto())
+    .setSubject(subject.dataRequirementSubjectToProto())
     .addAllMustSupport(mustSupport.map{it.toProto()})
     .addAllCodeFilter(codeFilter.map{it.toProto()})
     .addAllDateFilter(dateFilter.map{it.toProto()})
@@ -134,7 +132,7 @@ public object DataRequirementConverter {
     .addAllExtension(extension.map{it.toProto()})
     .setPath(pathElement.toProto())
     .setSearchParam(searchParamElement.toProto())
-    .setValue(value.valueToProto())
+    .setValue(value.dataRequirementDateFilterValueToProto())
     .build()
     return protoValue
   }
@@ -170,7 +168,7 @@ public object DataRequirementConverter {
     hapiValue.setExtension(extensionList.map{it.toHapi()})
     hapiValue.setPathElement(path.toHapi())
     hapiValue.setSearchParamElement(searchParam.toHapi())
-    hapiValue.setValue(value.valueToHapi())
+    hapiValue.setValue(value.dataRequirementDateFilterValueToHapi())
     return hapiValue
   }
 

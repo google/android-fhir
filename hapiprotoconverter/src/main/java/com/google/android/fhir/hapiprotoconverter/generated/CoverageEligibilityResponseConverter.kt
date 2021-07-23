@@ -56,7 +56,7 @@ public object CoverageEligibilityResponseConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("CoverageEligibilityResponse.serviced[x]")
+    throw IllegalArgumentException("Invalid Type for CoverageEligibilityResponse.serviced[x]")
   }
 
   public fun Type.coverageEligibilityResponseServicedToProto():
@@ -83,7 +83,8 @@ public object CoverageEligibilityResponseConverter {
     if (this.getMoney() != Money.newBuilder().defaultInstanceForType ) {
       return (this.getMoney()).toHapi()
     }
-    throw IllegalArgumentException("CoverageEligibilityResponse.insurance.item.benefit.allowed[x]")
+    throw
+        IllegalArgumentException("Invalid Type for CoverageEligibilityResponse.insurance.item.benefit.allowed[x]")
   }
 
   public fun Type.coverageEligibilityResponseInsuranceItemBenefitAllowedToProto():
@@ -113,7 +114,8 @@ public object CoverageEligibilityResponseConverter {
     if (this.getMoney() != Money.newBuilder().defaultInstanceForType ) {
       return (this.getMoney()).toHapi()
     }
-    throw IllegalArgumentException("CoverageEligibilityResponse.insurance.item.benefit.used[x]")
+    throw
+        IllegalArgumentException("Invalid Type for CoverageEligibilityResponse.insurance.item.benefit.used[x]")
   }
 
   public fun Type.coverageEligibilityResponseInsuranceItemBenefitUsedToProto():

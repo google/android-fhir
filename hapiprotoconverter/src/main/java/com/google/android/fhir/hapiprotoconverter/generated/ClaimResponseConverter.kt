@@ -57,18 +57,18 @@ import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
 public object ClaimResponseConverter {
-  public fun ClaimResponse.AddItem.ServicedX.claimResponseAddItemServicedToHapi(): Type {
+  public fun ClaimResponse.AddedItem.ServicedX.claimResponseAddItemServicedToHapi(): Type {
     if (this.getDate() != Date.newBuilder().defaultInstanceForType ) {
       return (this.getDate()).toHapi()
     }
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("ClaimResponse.addItem.serviced[x]")
+    throw IllegalArgumentException("Invalid Type for ClaimResponse.addItem.serviced[x]")
   }
 
-  public fun Type.claimResponseAddItemServicedToProto(): ClaimResponse.AddItem.ServicedX {
-    val protoValue = ClaimResponse.AddItem.ServicedX.newBuilder()
+  public fun Type.claimResponseAddItemServicedToProto(): ClaimResponse.AddedItem.ServicedX {
+    val protoValue = ClaimResponse.AddedItem.ServicedX.newBuilder()
     if (this is DateType) {
       protoValue.setDate(this.toProto())
     }
@@ -78,7 +78,7 @@ public object ClaimResponseConverter {
     return protoValue.build()
   }
 
-  public fun ClaimResponse.AddItem.LocationX.claimResponseAddItemLocationToHapi(): Type {
+  public fun ClaimResponse.AddedItem.LocationX.claimResponseAddItemLocationToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
@@ -88,11 +88,11 @@ public object ClaimResponseConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("ClaimResponse.addItem.location[x]")
+    throw IllegalArgumentException("Invalid Type for ClaimResponse.addItem.location[x]")
   }
 
-  public fun Type.claimResponseAddItemLocationToProto(): ClaimResponse.AddItem.LocationX {
-    val protoValue = ClaimResponse.AddItem.LocationX.newBuilder()
+  public fun Type.claimResponseAddItemLocationToProto(): ClaimResponse.AddedItem.LocationX {
+    val protoValue = ClaimResponse.AddedItem.LocationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
       protoValue.setCodeableConcept(this.toProto())
     }
@@ -172,7 +172,7 @@ public object ClaimResponseConverter {
     .setPreAuthPeriod(preAuthPeriod.toProto())
     .setPayeeType(payeeType.toProto())
     .addAllItem(item.map{it.toProto()})
-    .addAllAddedItem(addedItem.map{it.toProto()})
+    .addAllAddItem(addItem.map{it.toProto()})
     .addAllAdjudication(adjudication.map{it.toProto()})
     .addAllTotal(total.map{it.toProto()})
     .setPayment(payment.toProto())
@@ -229,8 +229,8 @@ public object ClaimResponseConverter {
   }
 
   public fun org.hl7.fhir.r4.model.ClaimResponse.SubDetailComponent.toProto():
-      ClaimResponse.Item.Detail.SubDetail {
-    val protoValue = ClaimResponse.Item.Detail.SubDetail.newBuilder()
+      ClaimResponse.Item.ItemDetail.SubDetail {
+    val protoValue = ClaimResponse.Item.ItemDetail.SubDetail.newBuilder()
     .setId(String.newBuilder().setValue(id))
     .addAllExtension(extension.map{it.toProto()})
     .addAllModifierExtension(modifierExtension.map{it.toProto()})
@@ -270,8 +270,8 @@ public object ClaimResponseConverter {
   }
 
   public fun org.hl7.fhir.r4.model.ClaimResponse.AddedItemDetailComponent.toProto():
-      ClaimResponse.AddItem.AddedItemDetail {
-    val protoValue = ClaimResponse.AddItem.AddedItemDetail.newBuilder()
+      ClaimResponse.AddedItem.AddedItemDetail {
+    val protoValue = ClaimResponse.AddedItem.AddedItemDetail.newBuilder()
     .setId(String.newBuilder().setValue(id))
     .addAllExtension(extension.map{it.toProto()})
     .addAllModifierExtension(modifierExtension.map{it.toProto()})
@@ -289,8 +289,8 @@ public object ClaimResponseConverter {
   }
 
   public fun org.hl7.fhir.r4.model.ClaimResponse.AddedItemSubDetailComponent.toProto():
-      ClaimResponse.AddItem.Detail.AddedItemSubDetail {
-    val protoValue = ClaimResponse.AddItem.Detail.AddedItemSubDetail.newBuilder()
+      ClaimResponse.AddedItem.AddedItemDetail.AddedItemSubDetail {
+    val protoValue = ClaimResponse.AddedItem.Detail.AddedItemSubDetail.newBuilder()
     .setId(String.newBuilder().setValue(id))
     .addAllExtension(extension.map{it.toProto()})
     .addAllModifierExtension(modifierExtension.map{it.toProto()})
@@ -338,7 +338,7 @@ public object ClaimResponseConverter {
     .addAllExtension(extension.map{it.toProto()})
     .addAllModifierExtension(modifierExtension.map{it.toProto()})
     .setNumber(numberElement.toProto())
-    .setType(ClaimResponse.ProcessNote.TypeCode.newBuilder().setValue(NoteTypeCode.Value.valueOf(type.toCode().replace("-",
+    .setType(ClaimResponse.Note.TypeCode.newBuilder().setValue(NoteTypeCode.Value.valueOf(type.toCode().replace("-",
         "_").toUpperCase())).build())
     .setText(textElement.toProto())
     .setLanguage(language.toProto())
@@ -411,7 +411,7 @@ public object ClaimResponseConverter {
     return hapiValue
   }
 
-  public fun ClaimResponse.Item.Detail.SubDetail.toHapi():
+  public fun ClaimResponse.Item.ItemDetail.SubDetail.toHapi():
       org.hl7.fhir.r4.model.ClaimResponse.SubDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.ClaimResponse.SubDetailComponent()
     hapiValue.id = id.value 
@@ -450,7 +450,7 @@ public object ClaimResponseConverter {
     return hapiValue
   }
 
-  public fun ClaimResponse.AddItem.AddedItemDetail.toHapi():
+  public fun ClaimResponse.AddedItem.AddedItemDetail.toHapi():
       org.hl7.fhir.r4.model.ClaimResponse.AddedItemDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.ClaimResponse.AddedItemDetailComponent()
     hapiValue.id = id.value 
@@ -468,7 +468,7 @@ public object ClaimResponseConverter {
     return hapiValue
   }
 
-  public fun ClaimResponse.AddItem.Detail.AddedItemSubDetail.toHapi():
+  public fun ClaimResponse.AddedItem.AddedItemDetail.AddedItemSubDetail.toHapi():
       org.hl7.fhir.r4.model.ClaimResponse.AddedItemSubDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.ClaimResponse.AddedItemSubDetailComponent()
     hapiValue.id = id.value 

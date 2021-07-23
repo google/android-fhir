@@ -50,7 +50,7 @@ public object ConceptMapConverter {
     if (this.getCanonical() != Canonical.newBuilder().defaultInstanceForType ) {
       return (this.getCanonical()).toHapi()
     }
-    throw IllegalArgumentException("ConceptMap.source[x]")
+    throw IllegalArgumentException("Invalid Type for ConceptMap.source[x]")
   }
 
   public fun Type.conceptMapSourceToProto(): ConceptMap.SourceX {
@@ -71,7 +71,7 @@ public object ConceptMapConverter {
     if (this.getCanonical() != Canonical.newBuilder().defaultInstanceForType ) {
       return (this.getCanonical()).toHapi()
     }
-    throw IllegalArgumentException("ConceptMap.target[x]")
+    throw IllegalArgumentException("Invalid Type for ConceptMap.target[x]")
   }
 
   public fun Type.conceptMapTargetToProto(): ConceptMap.TargetX {
@@ -193,8 +193,8 @@ public object ConceptMapConverter {
   }
 
   public fun org.hl7.fhir.r4.model.ConceptMap.OtherElementComponent.toProto():
-      ConceptMap.Group.SourceElement {
-    val protoValue = ConceptMap.Group.Element.Target.OtherElement.newBuilder()
+      ConceptMap.Group.SourceElement.TargetElement.OtherElement {
+    val protoValue = ConceptMap.Group.SourceElement.TargetElement.OtherElement.newBuilder()
     .setId(String.newBuilder().setValue(id))
     .addAllExtension(extension.map{it.toProto()})
     .addAllModifierExtension(modifierExtension.map{it.toProto()})
@@ -247,7 +247,7 @@ public object ConceptMapConverter {
     return hapiValue
   }
 
-  public fun ConceptMap.Group.Element.TargetElement.toHapi():
+  public fun ConceptMap.Group.SourceElement.TargetElement.toHapi():
       org.hl7.fhir.r4.model.ConceptMap.TargetElementComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.TargetElementComponent()
     hapiValue.id = id.value 
@@ -262,7 +262,7 @@ public object ConceptMapConverter {
     return hapiValue
   }
 
-  public fun ConceptMap.Group.Element.Target.OtherElement.toHapi():
+  public fun ConceptMap.Group.SourceElement.TargetElement.OtherElement.toHapi():
       org.hl7.fhir.r4.model.ConceptMap.OtherElementComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.OtherElementComponent()
     hapiValue.id = id.value 

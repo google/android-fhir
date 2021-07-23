@@ -19,7 +19,7 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 public object SubstanceAmountConverter {
-  public fun SubstanceAmount.AmountX.amountToHapi(): Type {
+  public fun SubstanceAmount.AmountX.substanceAmountAmountToHapi(): Type {
     if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType ) {
       return (this.getQuantity()).toHapi()
     }
@@ -29,10 +29,10 @@ public object SubstanceAmountConverter {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    throw IllegalArgumentException("SubstanceAmount.amount[x]")
+    throw IllegalArgumentException("Invalid Type for SubstanceAmount.amount[x]")
   }
 
-  public fun Type.amountToProto(): SubstanceAmount.AmountX {
+  public fun Type.substanceAmountAmountToProto(): SubstanceAmount.AmountX {
     val protoValue = SubstanceAmount.AmountX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Quantity) {
       protoValue.setQuantity(this.toProto())
@@ -51,7 +51,7 @@ public object SubstanceAmountConverter {
     hapiValue.id = id.value 
     hapiValue.setExtension(extensionList.map{it.toHapi()})
     hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
-    hapiValue.setAmount(amount.amountToHapi())
+    hapiValue.setAmount(amount.substanceAmountAmountToHapi())
     hapiValue.setAmountType(amountType.toHapi())
     hapiValue.setAmountTextElement(amountText.toHapi())
     hapiValue.setReferenceRange(referenceRange.toHapi())
@@ -63,7 +63,7 @@ public object SubstanceAmountConverter {
     .setId(String.newBuilder().setValue(id))
     .addAllExtension(extension.map{it.toProto()})
     .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .setAmount(amount.amountToProto())
+    .setAmount(amount.substanceAmountAmountToProto())
     .setAmountType(amountType.toProto())
     .setAmountText(amountTextElement.toProto())
     .setReferenceRange(referenceRange.toProto())

@@ -50,7 +50,7 @@ public object SpecimenConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("Specimen.collection.collected[x]")
+    throw IllegalArgumentException("Invalid Type for Specimen.collection.collected[x]")
   }
 
   public fun Type.specimenCollectionCollectedToProto(): Specimen.Collection.CollectedX {
@@ -71,7 +71,7 @@ public object SpecimenConverter {
     if (this.getDuration() != Duration.newBuilder().defaultInstanceForType ) {
       return (this.getDuration()).toHapi()
     }
-    throw IllegalArgumentException("Specimen.collection.fastingStatus[x]")
+    throw IllegalArgumentException("Invalid Type for Specimen.collection.fastingStatus[x]")
   }
 
   public fun Type.specimenCollectionFastingStatusToProto(): Specimen.Collection.FastingStatusX {
@@ -92,7 +92,7 @@ public object SpecimenConverter {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    throw IllegalArgumentException("Specimen.processing.time[x]")
+    throw IllegalArgumentException("Invalid Type for Specimen.processing.time[x]")
   }
 
   public fun Type.specimenProcessingTimeToProto(): Specimen.Processing.TimeX {
@@ -113,7 +113,7 @@ public object SpecimenConverter {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
-    throw IllegalArgumentException("Specimen.container.additive[x]")
+    throw IllegalArgumentException("Invalid Type for Specimen.container.additive[x]")
   }
 
   public fun Type.specimenContainerAdditiveToProto(): Specimen.Container.AdditiveX {

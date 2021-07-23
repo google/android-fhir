@@ -46,7 +46,7 @@ public object GuidanceResponseConverter {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    throw IllegalArgumentException("GuidanceResponse.module[x]")
+    throw IllegalArgumentException("Invalid Type for GuidanceResponse.module[x]")
   }
 
   public fun Type.guidanceResponseModuleToProto(): GuidanceResponse.ModuleX {
