@@ -70,6 +70,9 @@
             name="editTextHeaderTextAppearance"
         >@style/TextAppearance.MaterialComponents.Subtitle2</item>
         <item
+            name="editTextInputTextAppearance"
+        >@style/TextAppearance.MaterialComponents.Subtitle1</item>
+        <item
             name="editTextLayoutStyle"
         >@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
     </style>

@@ -55,6 +55,7 @@
     >
 
         <com.google.android.material.textfield.TextInputEditText
+            style="?attr/editTextInputTextAppearance"
             android:id="@+id/textInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

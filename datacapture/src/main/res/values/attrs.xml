@@ -25,6 +25,7 @@
     <attr name="dropDownSelectedTextAppearance" format="reference" />
     <attr name="dropDownStyle" format="reference" />
     <attr name="editTextHeaderTextAppearance" format="reference" />
+    <attr name="editTextInputTextAppearance" format="reference" />
     <attr name="editTextLayoutStyle" format="reference" />
 
     <declare-styleable name="QuestionnaireTheme">
