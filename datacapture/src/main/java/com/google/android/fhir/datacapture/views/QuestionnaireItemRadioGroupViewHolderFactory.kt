@@ -19,12 +19,16 @@ package com.google.android.fhir.datacapture.views
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.TextView
+import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_HORIZONTAL
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.choiceOrientation
+import com.google.android.fhir.datacapture.custom.FlexRadioGroup
 import com.google.android.fhir.datacapture.displayString
 import com.google.android.fhir.datacapture.localizedPrefix
 import com.google.android.fhir.datacapture.localizedText
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexboxLayout
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object QuestionnaireItemRadioGroupViewHolderFactory :
@@ -53,6 +57,10 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
         val (questionnaireItem, questionnaireResponseItem) = questionnaireItemViewItem
         val answer = questionnaireResponseItem.answer.singleOrNull()?.valueCoding
         radioHeader.text = questionnaireItem.localizedText
+        radioGroup.flexDirection =
+          if (questionnaireItem.choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL)
+            FlexDirection.ROW
+          else FlexDirection.COLUMN
         radioGroup.removeAllViews()
         radioGroup.setOnCheckedChangeListener(null)
         var index = 0
