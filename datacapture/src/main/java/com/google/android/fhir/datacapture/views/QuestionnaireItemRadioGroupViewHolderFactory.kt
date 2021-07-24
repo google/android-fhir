@@ -70,10 +70,28 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
               id = index++ // Use the answer option index as radio button ID
               text = it.displayString
               layoutParams =
-                ViewGroup.LayoutParams(
-                  ViewGroup.LayoutParams.MATCH_PARENT,
-                  ViewGroup.LayoutParams.WRAP_CONTENT
-                )
+                if (questionnaireItem.choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL)
+                  FlexboxLayout.LayoutParams(
+                      ViewGroup.LayoutParams.WRAP_CONTENT,
+                      ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    .apply {
+                      setMargins(
+                        0,
+                        0,
+                        radioGroup
+                          .context
+                          .resources
+                          .getDimension(R.dimen.radio_button_item_gap)
+                          .toInt(),
+                        0
+                      )
+                    }
+                else
+                  FlexboxLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                  )
               isChecked = it.valueCoding.equalsDeep(answer)
             }
           )
