@@ -33,7 +33,7 @@ internal object QuestionnaireItemRadioGroupViewHolderFactory :
     object : QuestionnaireItemViewHolderDelegate {
       private lateinit var prefixTextView: TextView
       private lateinit var radioHeader: TextView
-      private lateinit var radioGroup: RadioGroup
+      private lateinit var radioGroup: FlexRadioGroup
       private lateinit var questionnaireItemViewItem: QuestionnaireItemViewItem
 
       override fun init(itemView: View) {

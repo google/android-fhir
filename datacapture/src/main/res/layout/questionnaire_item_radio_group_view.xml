@@ -46,9 +46,14 @@
 
     </LinearLayout>
 
-    <RadioGroup
+    <com.google.android.fhir.datacapture.custom.FlexRadioGroup
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/radio_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:alignContent="flex_start"
+        app:alignItems="flex_start"
+        app:flexDirection="column"
+        app:flexWrap="wrap"
     />
 </LinearLayout>
