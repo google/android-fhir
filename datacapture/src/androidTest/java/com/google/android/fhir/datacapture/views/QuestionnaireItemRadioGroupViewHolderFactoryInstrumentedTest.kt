@@ -18,13 +18,13 @@ package com.google.android.fhir.datacapture.views
 
 import android.widget.FrameLayout
 import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.custom.FlexRadioGroup
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
@@ -95,7 +95,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
       ) {}
     )
 
-    val radioGroup = viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group)
+    val radioGroup = viewHolder.itemView.findViewById<FlexRadioGroup>(R.id.radio_group)
     assertThat(radioGroup.childCount).isEqualTo(2)
     val radioButton1 = radioGroup.getChildAt(0) as RadioButton
     assertThat(radioButton1.text).isEqualTo("Coding 1")
@@ -119,7 +119,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
     )
 
     val radioButton =
-      viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0) as RadioButton
+      viewHolder.itemView.findViewById<FlexRadioGroup>(R.id.radio_group).getChildAt(0) as RadioButton
     assertThat(radioButton.isChecked).isFalse()
   }
 
@@ -151,13 +151,13 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
     )
 
     assertThat(
-        (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0) as
+        (viewHolder.itemView.findViewById<FlexRadioGroup>(R.id.radio_group).getChildAt(0) as
             RadioButton)
           .isChecked
       )
       .isTrue()
     assertThat(
-        (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(1) as
+        (viewHolder.itemView.findViewById<FlexRadioGroup>(R.id.radio_group).getChildAt(1) as
             RadioButton)
           .isChecked
       )
@@ -179,7 +179,7 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0).performClick()
+    viewHolder.itemView.findViewById<FlexRadioGroup>(R.id.radio_group).getChildAt(0).performClick()
 
     val answer = questionnaireItemViewItem.questionnaireResponseItem.answer
     assertThat(answer.size).isEqualTo(1)
@@ -206,16 +206,16 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
       ) {}
     viewHolder.bind(questionnaireItemViewItem)
-    viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0).performClick()
+    viewHolder.itemView.findViewById<FlexRadioGroup>(R.id.radio_group).getChildAt(0).performClick()
 
     assertThat(
-        (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(0) as
+        (viewHolder.itemView.findViewById<FlexRadioGroup>(R.id.radio_group).getChildAt(0) as
             RadioButton)
           .isChecked
       )
       .isTrue()
     assertThat(
-        (viewHolder.itemView.findViewById<RadioGroup>(R.id.radio_group).getChildAt(1) as
+        (viewHolder.itemView.findViewById<FlexRadioGroup>(R.id.radio_group).getChildAt(1) as
             RadioButton)
           .isChecked
       )
