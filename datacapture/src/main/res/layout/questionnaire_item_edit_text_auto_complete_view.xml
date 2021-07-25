@@ -76,7 +76,7 @@
         >
 
             <com.google.android.material.textfield.TextInputEditText
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="?attr/editTextInputTextAppearance"
                 android:id="@+id/textInputEditText"
                 android:layout_width="wrap_content"
                 android:minEms="5"
