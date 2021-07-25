@@ -17,8 +17,6 @@
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.PrimitiveTestData
-import com.google.android.fhir.hapiprotoconverter.generated.DecimalConverter.toHapi
-import com.google.android.fhir.hapiprotoconverter.generated.DecimalConverter.toProto
 import com.google.common.truth.Truth
 import com.google.fhir.r4.core.Decimal
 import kotlin.Any

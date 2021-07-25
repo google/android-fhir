@@ -17,8 +17,6 @@
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.PrimitiveTestData
-import com.google.android.fhir.hapiprotoconverter.generated.CanonicalConverter.toHapi
-import com.google.android.fhir.hapiprotoconverter.generated.CanonicalConverter.toProto
 import com.google.common.truth.Truth
 import com.google.fhir.r4.core.Canonical
 import kotlin.Any

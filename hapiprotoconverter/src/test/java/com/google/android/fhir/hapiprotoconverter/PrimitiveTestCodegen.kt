@@ -26,7 +26,6 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
@@ -42,7 +41,7 @@ object PrimitiveTestCodegen {
   private const val hapiPackage = "org.hl7.fhir.r4.model"
   private val TIME_LIKE_TEST = listOf("date", "dateTime", "instant")
   private const val TIME_LIKE_TEST_TEMPLATE =
-    "%1T.assertThat(proto.%2M().precision).isEquivalentAccordingToCompareTo(hapi.precision)\n%1T.assertThat(proto.%2M().timeZone.id).isEqualTo(hapi.timeZone.id)\n"
+    "%1T.assertThat(proto.toHapi().precision).isEquivalentAccordingToCompareTo(hapi.precision)\n%1T.assertThat(proto.toHapi().timeZone.id).isEqualTo(hapi.timeZone.id)\n"
 
   @SuppressLint("DefaultLocale")
   fun generate(def: StructureDefinition, outLocation: File? = null) {
@@ -59,14 +58,14 @@ object PrimitiveTestCodegen {
         "${protoName}ConverterTest"
       )
 
-    val primitiveConverterClass =
+    val primitiveConverterTestClass =
       ClassName(
         "com.google.android.fhir.hapiprotoconverter.generated",
         def.id.value.capitalize() + "ConverterTest"
       )
 
     val testClass =
-      TypeSpec.classBuilder(primitiveConverterClass.simpleName)
+      TypeSpec.classBuilder(primitiveConverterTestClass.simpleName)
         .addAnnotation(
           AnnotationSpec.builder(RunWith::class)
             .addMember("%T::class", Parameterized::class)
@@ -89,22 +88,11 @@ object PrimitiveTestCodegen {
       protoName.toUpperCase()
     )
 
-    toProtoBuilder.addCode(
-      "%T.assertThat(hapi.%M()).isEqualTo(proto)",
-      Truth::class,
-      MemberName(
-        "com.google.android.fhir.hapiprotoconverter.generated.${def.id.value.capitalize()}Converter",
-        "toProto"
-      )
-    )
+    toProtoBuilder.addCode("%T.assertThat(hapi.toProto()).isEqualTo(proto)", Truth::class)
 
     toHapiBuilder.addStatement(
-      "${if (def.id.value in TIME_LIKE_TEST) TIME_LIKE_TEST_TEMPLATE else "" }%1T.assertThat(proto.%2M().value).isEqualTo(hapi.value)",
-      Truth::class,
-      MemberName(
-        "com.google.android.fhir.hapiprotoconverter.generated.${def.id.value.capitalize()}Converter",
-        "toHapi"
-      )
+      "${if (def.id.value in TIME_LIKE_TEST) TIME_LIKE_TEST_TEMPLATE else "" }%1T.assertThat(proto.toHapi().value).isEqualTo(hapi.value)",
+      Truth::class
     )
     val testClassConstructor = FunSpec.constructorBuilder()
 

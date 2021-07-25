@@ -17,8 +17,6 @@
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.PrimitiveTestData
-import com.google.android.fhir.hapiprotoconverter.generated.DateConverter.toHapi
-import com.google.android.fhir.hapiprotoconverter.generated.DateConverter.toProto
 import com.google.common.truth.Truth
 import com.google.fhir.r4.core.Date
 import kotlin.Any
