@@ -43,8 +43,8 @@
         />
 
         <TextView
+            style="?attr/autoCompleteHeaderTextAppearance"
             android:id="@+id/group_header"
-            style="?attr/groupHeaderTextAppearance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:layout_conversion_absoluteHeight="19dp"

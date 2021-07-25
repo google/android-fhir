@@ -51,6 +51,9 @@
         <item
             name="editTextLayoutStyle"
         >@style/Widget.MyQuestionnaire.EditText</item>
+        <item
+            name="autoCompleteHeaderTextAppearance"
+        >@style/TextAppearance.MyQuestionnaire.AutoCompleteHeader</item>
     </style>
 
     <style
@@ -137,6 +140,13 @@
     <style
         name="TextAppearance.MyQuestionnaire.EditTextInput"
         parent="TextAppearance.MaterialComponents.Subtitle1"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style
+        name="TextAppearance.MyQuestionnaire.AutoCompleteHeader"
+        parent="TextAppearance.MaterialComponents.Subtitle2"
     >
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
