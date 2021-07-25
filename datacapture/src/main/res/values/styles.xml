@@ -78,5 +78,8 @@
         <item
             name="autoCompleteHeaderTextAppearance"
         >@style/TextAppearance.MaterialComponents.Subtitle2</item>
+        <item
+            name="chipStyle"
+        >@style/Widget.MaterialComponents.Chip.Entry</item>
     </style>
 </resources>

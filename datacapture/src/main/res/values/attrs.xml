@@ -28,6 +28,7 @@
     <attr name="editTextInputTextAppearance" format="reference" />
     <attr name="editTextLayoutStyle" format="reference" />
     <attr name="autoCompleteHeaderTextAppearance" format="reference" />
+    <attr name="chipStyle" format="reference" />
 
     <declare-styleable name="QuestionnaireTheme">
         <!-- The ID of the theme to be applied to the questionnaire. The referenced theme must
