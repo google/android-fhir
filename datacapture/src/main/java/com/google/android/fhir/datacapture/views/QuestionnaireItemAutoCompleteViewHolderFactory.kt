@@ -149,7 +149,7 @@ internal object QuestionnaireItemAutoCompleteViewHolderFactory :
         val adapter =
           ArrayAdapter(
             chipContainer.context,
-            android.R.layout.simple_dropdown_item_1line,
+            R.layout.questionnaire_item_drop_down_list,
             answerOptionString
           )
         autoCompleteTextView.setAdapter(adapter)
