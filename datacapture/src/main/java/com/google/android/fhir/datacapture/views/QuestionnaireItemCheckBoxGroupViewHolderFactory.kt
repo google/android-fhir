@@ -21,6 +21,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import com.google.android.fhir.datacapture.CHOICE_ORIENTATION_HORIZONTAL
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.choiceOrientation
 import com.google.android.fhir.datacapture.localizedPrefix
@@ -55,12 +56,11 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
         }
         val (questionnaireItem, _) = questionnaireItemViewItem
         checkboxGroupHeader.text = questionnaireItem.localizedText
+        checkboxGroup.flexDirection =
+          if (questionnaireItem.choiceOrientation == CHOICE_ORIENTATION_HORIZONTAL)
+            FlexDirection.ROW
+          else FlexDirection.COLUMN
         checkboxGroup.removeAllViews()
-        if (questionnaireItem.choiceOrientation == "horizontal") {
-          checkboxGroup.flexDirection = FlexDirection.ROW
-        } else {
-          checkboxGroup.flexDirection = FlexDirection.COLUMN
-        }
         questionnaireItem.answerOption.forEach { answerOption ->
           populateViewWithAnswerOption(answerOption)
         }
@@ -90,7 +90,9 @@ internal object QuestionnaireItemCheckBoxGroupViewHolderFactory :
             )
           }
         }
-        if (questionnaireItemViewItem.questionnaireItem.choiceOrientation == "horizontal") {
+        if (questionnaireItemViewItem.questionnaireItem.choiceOrientation ==
+            CHOICE_ORIENTATION_HORIZONTAL
+        ) {
           (checkbox.layoutParams as ViewGroup.MarginLayoutParams).marginEnd =
             checkboxGroup.context.resources.getDimension(R.dimen.check_box_item_gap).toInt()
         }
