@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.mapping
 
 import android.content.Context
+import android.util.Log
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
@@ -25,7 +26,7 @@ import com.google.android.fhir.datacapture.utilities.SimpleWorkerContextProvider
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
-import java.util.Locale
+import java.util.*
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
@@ -221,7 +222,7 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ) {
-
+    Log.d("ResourceMapper", "extractField: type ${questionnaireItem.type}")
     if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
       if (questionnaireItem.itemContextNameToExpressionMap.values.isNotEmpty()) {
         val extractedResource =
@@ -230,32 +231,50 @@ object ResourceMapper {
               )
               .newInstance() as
               Base)
-            .apply { extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item) }
+        Log.d("ResourceMapper", "extractField: multiple resource ${extractedResource.isResource}")
         if (extractedResource is Resource) {
+          extractedResource.apply { extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item) }
           bundle.apply { addEntry().apply { resource = extractedResource as Resource } }
         }
+
+//            .apply { extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item) }
+//        if (extractedResource is Resource) {
+//          bundle.apply { addEntry().apply { resource = extractedResource as Resource } }
+//        }
       }
     }
-
+    Log.d("ResourceMapper", "extractField: definition ${questionnaireItem.definition}")
     if (questionnaireItem.definition == null) {
       extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
       return
     }
 
     val targetFieldName = questionnaireItem.definitionFieldName ?: return
+    Log.d("ResourceMapper", "extractField: target field $targetFieldName")
     if (targetFieldName.isEmpty()) {
       return
     }
 
     val definitionField = questionnaireItem.getDefinitionField ?: return
+    Log.d("ResourceMapper", "extractField: definitionField ${definitionField.name}")
     if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      val value: Base =
-        (definitionField.nonParameterizedType.newInstance() as Base).apply {
-          extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
-        }
-      updateField(definitionField, value)
+      if (questionnaireItem.itemContextNameToExpressionMap.values.isNotEmpty() && questionnaireItem.itemContextNameToExpressionMap.values.first() == "Quantity") {
+        val value: Base = (Class.forName(
+          "org.hl7.fhir.r4.model.${questionnaireItem.itemContextNameToExpressionMap.values.first()}"
+        )
+          .newInstance() as Base).apply { extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item) }
+        updateField(definitionField, value)
+      }else {
+        val value: Base =
+          (definitionField.nonParameterizedType.newInstance() as Base).apply {
+            extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
+          }
+        Log.d("ResourceMapper", "extractField: update anser for grpoup ${value}")
+        updateField(definitionField, value)
+      }
     } else {
       if (questionnaireResponseItem.answer.isEmpty()) return
+      Log.d("ResourceMapper", "extractField: update anser ${questionnaireResponseItem.answer.first()}")
       if (!definitionField.nonParameterizedType.isEnum) {
         // this is a low level type e.g. StringType
         updateField(definitionField, questionnaireResponseItem.answer)
@@ -431,15 +450,20 @@ private val Questionnaire.QuestionnaireItemComponent.definitionPath: List<String
  */
 private val Questionnaire.QuestionnaireItemComponent.getDefinitionField: Field?
   get() {
+    definitionPath?.forEach {
+      Log.d("ResourceMapper", "getDefinitionField: definitionPath $it")
+    }
     val path = definitionPath ?: return null
     if (path.size < 2) return null
     val resourceClass: Class<*> = Class.forName("org.hl7.fhir.r4.model.${path[0]}")
     val definitionField: Field = resourceClass.getFieldOrNull(path[1]) ?: return null
-
+    Log.d("ResourceMapper", "getDefinitionField: definitionField ${definitionField.name}")
     return path.drop(2).fold(definitionField) { field: Field?, nestedFieldName: String ->
+      Log.d("ResourceMapper", "getDefinitionField: fold  ${field?.name} $nestedFieldName")
       field?.nonParameterizedType?.getFieldOrNull(nestedFieldName)
     }
   }
+
 
 /**
  * See

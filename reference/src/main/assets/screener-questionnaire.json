@@ -524,6 +524,13 @@
       "text": "Temperature",
       "type": "group",
       "linkId": "5.0.0",
+      "code": [
+        {
+          "code": "8310-5",
+          "display": "Temperature",
+          "system": "http://loinc.org"
+        }
+      ],
       "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
       "extension": [
         {
@@ -531,7 +538,7 @@
           "valueExpression": {
             "language": "application/x-fhir-query",
             "expression": "Observation",
-            "name": "pulse"
+            "name": "temperature"
           }
         },
         {
@@ -555,17 +562,70 @@
           "linkId": "5.0.1"
         },
         {
-          "text": "Record temperature",
-          "type": "decimal",
-          "linkId": "5.1.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.value",
           "extension": [
             {
-              "url": "http://hl7.org/fhir/StructureDefinition/minValue",
-              "valueDecimal": 35.0
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Quantity",
+                "name": "quantity"
+              }
+            }
+          ],
+          "item": [
+            {
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.value.value",
+              "text": "Record temperature",
+              "type": "decimal",
+              "linkId": "5.1.0",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                  "valueDecimal": 35.0
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                  "valueDecimal": 45.0
+                }
+              ]
             },
             {
-              "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
-              "valueDecimal": 45.0
+              "text": "Unit",
+              "type": "choice",
+              "linkId": "5.2.0",
+              "required": true,
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.value",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "drop-down",
+                        "display": "Drop down"
+                      }
+                    ],
+                    "text": "Drop down"
+                  }
+                }
+              ],
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "F",
+                    "display": "F"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "code": "C",
+                    "display": "C"
+                  }
+                }
+              ]
             }
           ]
         }
@@ -575,6 +635,13 @@
       "text": "Pulse Oximetry",
       "type": "group",
       "linkId": "6.0.0",
+      "code" : [
+        {
+          "code" : "59408-5",
+          "display" : "Oxygen Saturation",
+          "system" : "http://loinc.org"
+        }
+      ],
       "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
       "extension": [
         {
@@ -606,32 +673,109 @@
           "linkId": "6.0.1"
         },
         {
-          "text": "Pulse oximetry reading",
-          "type": "integer",
-          "linkId": "6.1.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.value",
           "extension": [
             {
-              "url": "http://hl7.org/fhir/StructureDefinition/minValue",
-              "valueInteger": 60
-            },
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Quantity",
+                "name": "quantity"
+              }
+            }
+          ],
+          "item": [
             {
-              "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
-              "valueInteger": 100
+              "text": "Pulse oximetry reading",
+              "type": "integer",
+              "linkId": "6.1.0",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.value.value",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                  "valueInteger": 60
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                  "valueInteger": 100
+                }
+              ]
             }
           ]
+        }
+      ]
+    },
+    {
+      "text": "Pulse (heart rate)",
+      "type": "group",
+      "linkId": "7.0.0",
+      "code" : [
+        {
+          "code" : "8867-4",
+          "display" : "Heart rate",
+          "system" : "http://loinc.org"
+        }
+      ],
+      "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Observation",
+            "name": "heart"
+          }
         },
         {
-          "text": "Pulse (heart rate)",
-          "type": "integer",
-          "linkId": "6.2.0",
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "text": "Instructions for using the pulse (heart rate)",
+          "type": "display",
+          "linkId": "7.0.1"
+        },
+        {
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.value",
           "extension": [
             {
-              "url": "http://hl7.org/fhir/StructureDefinition/minValue",
-              "valueInteger": 30
-            },
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Quantity",
+                "name": "quantity"
+              }
+            }
+          ],
+          "item": [
             {
-              "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
-              "valueInteger": 200
+              "text": "Pulse (heart rate) reading",
+              "type": "integer",
+              "linkId": "7.1.0",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.value.value",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                  "valueInteger": 30
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                  "valueInteger": 200
+                }
+              ]
             }
           ]
         }
