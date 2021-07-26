@@ -119,7 +119,8 @@ class QuestionnaireItemRadioGroupViewHolderFactoryInstrumentedTest {
     )
 
     val radioButton =
-      viewHolder.itemView.findViewById<FlexRadioGroup>(R.id.radio_group).getChildAt(0) as RadioButton
+      viewHolder.itemView.findViewById<FlexRadioGroup>(R.id.radio_group).getChildAt(0) as
+        RadioButton
     assertThat(radioButton.isChecked).isFalse()
   }
 
