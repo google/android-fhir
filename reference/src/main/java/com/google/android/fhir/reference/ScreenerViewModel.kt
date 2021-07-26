@@ -58,9 +58,10 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
     viewModelScope.launch {
       val bundle = ResourceMapper.extract(questionnaireResource, questionnaireResponse)
       val reference = Reference("Patient/$patientId")
-      saveObservation(bundle, reference, index = 0)
-      saveCondition(bundle, reference, index = 2)
-      saveEncounter(bundle, reference, index = 6)
+      val index = ScreenerQuestionnaireIndex()
+      saveObservation(bundle, reference, index.observation)
+      saveCondition(bundle, reference, index.condition)
+      saveEncounter(bundle, reference, index.encounter)
       isResourcesSaved.value = true
     }
   }
@@ -78,7 +79,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   }
 
   private suspend fun saveEncounter(bundle: Bundle, reference: Reference, index: Int) {
-    val encounter = bundle.entry[6].resource as Encounter
+    val encounter = bundle.entry[index].resource as Encounter
     encounter.subject = reference
     saveResourceToDatabase(encounter)
   }
@@ -104,5 +105,12 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
 
   private fun generateUuid(): String {
     return UUID.randomUUID().toString()
+  }
+
+  // TODO refactor resource index while accessing resources from bundle.
+  class ScreenerQuestionnaireIndex {
+    val observation: Int = 0
+    val condition: Int = 2
+    val encounter: Int = 6
   }
 }
