@@ -236,6 +236,7 @@ private fun validateQuestionnaireResponseItems(
     if (questionnaireItem.type.equals(Questionnaire.QuestionnaireItemType.GROUP)) {
       validateQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
     } else {
+      if (questionnaireResponseItem.answer.isNotEmpty())
       validateQuestionnaireResponseItems(
         questionnaireItem.item,
         questionnaireResponseItem.answer.first().item
