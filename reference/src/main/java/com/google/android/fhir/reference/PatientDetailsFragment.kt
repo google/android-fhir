@@ -76,6 +76,7 @@ class PatientDetailsFragment : Fragment() {
     patientDetailsViewModel.livePatientObservation.observe(viewLifecycleOwner) {
       adapter.submitList(it)
     }
+    binding.apply { addScreener.setOnClickListener { onAddScreenerClick() } }
   }
 
   private fun setupPatientData(patientItem: PatientListViewModel.PatientItem?) {
@@ -99,10 +100,15 @@ class PatientDetailsFragment : Fragment() {
     }
   }
 
+  private fun onAddScreenerClick() {
+    findNavController()
+      .navigate(PatientDetailsFragmentDirections.actionPatientDetailsToScreenEncounterFragment())
+  }
+
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     inflater.inflate(R.menu.details_options_menu, menu)
   }
-
+    
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       android.R.id.home -> {
