@@ -251,10 +251,10 @@ private fun validateQuestionnaireResponseItems(
       validateQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
     } else {
       if (questionnaireResponseItem.answer.isNotEmpty())
-      validateQuestionnaireResponseItems(
-        questionnaireItem.item,
-        questionnaireResponseItem.answer.first().item
-      )
+        validateQuestionnaireResponseItems(
+          questionnaireItem.item,
+          questionnaireResponseItem.answer.first().item
+        )
     }
   }
   if (questionnaireItemListIterator.hasNext() xor questionnaireResponseItemListIterator.hasNext()) {

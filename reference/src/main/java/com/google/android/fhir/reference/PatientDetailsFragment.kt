@@ -108,7 +108,7 @@ class PatientDetailsFragment : Fragment() {
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     inflater.inflate(R.menu.details_options_menu, menu)
   }
-    
+
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       android.R.id.home -> {
