@@ -73,6 +73,7 @@ dependencies {
   implementation(Dependencies.Retrofit.gsonConverter)
   implementation(Dependencies.Retrofit.retrofitMock)
   implementation(Dependencies.httpInterceptor)
+  implementation(Dependencies.http)
   implementation(Dependencies.material)
   implementation(project(":engine"))
   implementation(project(":datacapture"))

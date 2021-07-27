@@ -78,7 +78,8 @@ object Dependencies {
 
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val guava = "com.google.guava:guava:${Versions.guava}"
-  const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.httpInterceptor}"
+  const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.http}"
+  const val http = "com.squareup.okhttp3:okhttp:${Versions.http}"
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
   const val material = "com.google.android.material:material:${Versions.material}"
 
@@ -137,7 +138,7 @@ object Dependencies {
     const val desugarJdkLibs = "1.0.9"
     const val guava = "28.2-android"
     const val hapiFhir = "5.4.0"
-    const val httpInterceptor = "4.0.0"
+    const val http = "4.9.1"
     const val jsonToolsPatch = "1.13"
     const val material = "1.3.0"
     const val retrofit = "2.7.2"
