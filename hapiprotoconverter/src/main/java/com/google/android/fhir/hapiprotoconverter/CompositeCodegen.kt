@@ -25,7 +25,7 @@ import com.google.fhir.r4.core.ValueSet
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.KModifier
 import java.io.File
 
 object CompositeCodegen {
@@ -46,7 +46,7 @@ object CompositeCodegen {
       "http://hl7.org/fhir/ValueSet/mimetypes|4.0.1",
       "http://hl7.org/fhir/ValueSet/currencies|4.0.1"
     )
-// Map of valueSet url that are renamed in Fhir protos
+  // Map of valueSet url that are renamed in Fhir protos
   private val CODE_SYSTEM_RENAMES =
     mapOf(
       "http://hl7.org/fhir/secondary-finding" to "ObservationSecondaryFindingCode",
@@ -91,7 +91,6 @@ object CompositeCodegen {
    * @param def structure definition of the resource/complex-type that needs to be generated
    * @param outLocation file where the converter object will be generated
    */
-
   fun generate(def: StructureDefinition, outLocation: File? = null) {
     // TODO Map all value sets instead of using toCode() and valueOf() ( currently works )
     // TODO raise issue on kotlin poet repository about nested class imports while using import
@@ -135,7 +134,7 @@ object CompositeCodegen {
     // builder or base)
     fun getToProtoBuilder(element: ElementDefinition): FunSpec.Builder {
       if (backboneElementMap.containsKey(element.path.value.substringBeforeLast("."))) {
-        return backboneElementMap[element.path.value.substringBeforeLast(".")]!!.hapiBuilder
+        return backboneElementMap[element.path.value.substringBeforeLast(".")]!!.protoBuilder
       }
       return toProtoBuilder
     }
@@ -143,43 +142,41 @@ object CompositeCodegen {
     // or base)
     fun getToHapiBuilder(element: ElementDefinition): FunSpec.Builder {
       if (backboneElementMap.containsKey(element.path.value.substringBeforeLast("."))) {
-        return backboneElementMap[element.path.value.substringBeforeLast(".")]!!.protoBuilder
+        return backboneElementMap[element.path.value.substringBeforeLast(".")]!!.hapiBuilder
       }
       return toHapiBuilder
     }
 
     // Iterate over elementList
     for (element in def.snapshot.elementList) {
-    // Igenore elements that have 0 as the max value
+      // Igenore elements that have 0 as the max value
       if (element.max.value == "0") {
         continue
       }
       // TODO handle this
-      if (element.base.path.value == "DomainResource.contained"){
+      if (element.base.path.value == "DomainResource.contained") {
         continue
       }
       // name of the element
       val elementName = getElementName(element)
       // if the name is itself skip
-      if (elementName.capitalizeFirst() == def.type.value) {
+      if (elementName.capitalizeFirst() == def.type.value.capitalizeFirst()) {
         continue
       }
       // handle choice type
       if (element.typeList.size > 1) {
         functionsList.addAll(
-          handleChoiceType(
-            element,
-            getToHapiBuilder(element),
-            getToProtoBuilder(element),
-            fileBuilder
-          )
+          handleChoiceType(element, getToHapiBuilder(element), getToProtoBuilder(element))
         )
         continue
       }
       // handle id separately
-      if (elementName == "id") {
+      if (elementName.lowerCaseFirst() == "id") {
         getToProtoBuilder(element)
-          .addStatement(".setId(%T.newBuilder().setValue(id))", if (element.base.path.value == "Resource.id") Id::class else String::class)
+          .addStatement(
+            ".setId(%T.newBuilder().setValue(id))",
+            if (element.base.path.value == "Resource.id") Id::class else String::class
+          )
         getToHapiBuilder(element).addStatement("hapiValue.id = id.value ")
         continue
       }
@@ -192,14 +189,14 @@ object CompositeCodegen {
             .addStatement(
               "$singleMethodTemplate(%L.toProto())",
               getElementName(element).capitalizeFirst(),
-              getElementName(element)
+              getElementName(element).lowerCaseFirst()
             )
 
           getToHapiBuilder(element)
             .addStatement(
               "hapiValue$singleMethodTemplate(%L.toHapi())",
               getElementName(element).capitalizeFirst(),
-              getElementName(element)
+              getElementName(element).lowerCaseFirst()
             )
         } else {
 
@@ -207,14 +204,14 @@ object CompositeCodegen {
             .addStatement(
               "$multipleMethodTemplate(%L.map{it.toProto()})",
               getElementName(element).capitalizeFirst(),
-              getElementName(element)
+              getElementName(element).lowerCaseFirst()
             )
 
           getToHapiBuilder(element)
             .addStatement(
               "hapiValue$singleMethodTemplate(%L.map{it.toHapi()})",
               getElementName(element).capitalizeFirst(),
-              getElementName(element) + "List"
+              getElementName(element).lowerCaseFirst() + "List"
             )
         }
         continue
@@ -239,13 +236,7 @@ object CompositeCodegen {
         handleCodeType(element, getToHapiBuilder(element), getToProtoBuilder(element), protoName)
       } else {
         // element will be either another resource or a datatype
-        handleOtherType(
-          element,
-          getToHapiBuilder(element),
-          getToProtoBuilder(element),
-          fileBuilder,
-          hapiName
-        )
+        handleOtherType(element, getToHapiBuilder(element), getToProtoBuilder(element))
       }
     }
     toProtoBuilder.addStatement(".build()")
@@ -262,10 +253,8 @@ object CompositeCodegen {
     functionsList.addAll(
       backboneElementMap.values.map { it.hapiBuilder.addStatement("return hapiValue").build() }
     )
-    functionsList.forEach{fileBuilder.addFunction(it)}
-      fileBuilder
-      .build()
-      .writeTo(outLocation!!)
+    functionsList.forEach { fileBuilder.addFunction(it) }
+    fileBuilder.build().writeTo(outLocation!!)
   }
 
   // TODO fix this and improve code
@@ -302,9 +291,7 @@ object CompositeCodegen {
     throw IllegalArgumentException("element is not in valueSetUrlMap")
   }
   /**
-   * 
    */
-
   private fun getCodeSystemName(name: String): kotlin.String {
     val filteredName =
       name
@@ -360,19 +347,17 @@ object CompositeCodegen {
    * @returns the name of [element]
    */
   private fun getElementName(element: ElementDefinition): kotlin.String {
-    return if (element.hasExtension(explicitTypeName) ) {
-      element.getExtension(explicitTypeName).value.stringValue.value.lowerCaseFirst()
+    return if (element.hasExtension(explicitTypeName)) {
+      element.getExtension(explicitTypeName).value.stringValue.value
     } else {
-      element.id.value.split(".").last().lowerCaseFirst()
+      element.id.value.split(".").last().capitalizeFirst()
     }
   }
 
   private fun handleOtherType(
     element: ElementDefinition,
     hapiBuilder: FunSpec.Builder,
-    protoBuilder: FunSpec.Builder,
-    fileBuilder: FileSpec.Builder,
-    hapiName: kotlin.String
+    protoBuilder: FunSpec.Builder
   ) {
     val isSingle = element.max.value == "1"
     val elementName = getElementName(element)
@@ -380,7 +365,7 @@ object CompositeCodegen {
       protoBuilder.addStatement(
         "$singleMethodTemplate(${if (element.typeList.first().profileList.isNotEmpty()) "( %L as %T )" else "%L%L"}.toProto())",
         elementName.capitalizeFirst(),
-        elementName +
+        elementName.lowerCaseFirst() +
           if (normalizeType(element.typeList.single()).lowerCaseFirst() in
               GeneratorUtils.primitiveTypeList
           )
@@ -398,13 +383,13 @@ object CompositeCodegen {
           )
             "Element"
           else "",
-        elementName,
+        elementName.lowerCaseFirst(),
       )
     } else {
       protoBuilder.addStatement(
         "$multipleMethodTemplate(%L.map{${if (element.typeList.first().profileList.isNotEmpty()) "( it as %T  )" else "it%L"}.toProto()})",
         elementName.capitalizeFirst(),
-        elementName,
+        elementName.lowerCaseFirst(),
         if (element.typeList.first().profileList.isNotEmpty())
           ClassName(hapiPackage, normalizeType(element.typeList.first()))
         else ""
@@ -412,42 +397,34 @@ object CompositeCodegen {
       hapiBuilder.addStatement(
         "hapiValue$singleMethodTemplate(%L.map{it.toHapi()})",
         elementName.capitalizeFirst(),
-        elementName + "List",
-      )
-    }
-    // add respective imports to the file
-    if (normalizeType(element.typeList.single()).capitalizeFirst() != hapiName) {
-      fileBuilder.addImport(
-        ClassName(converterPackage, "${normalizeType(element.typeList.single())}Converter"),
-        "toProto"
-      )
-      fileBuilder.addImport(
-        ClassName(converterPackage, "${normalizeType(element.typeList.single())}Converter"),
-        "toHapi"
+        elementName.lowerCaseFirst() + "List",
       )
     }
   }
-/**
- * @param element element definition of a choice type
- * @param hapiBuilder hapi FunctionBuilder of type that contains the choice type
- * @param protoBuilder proto FunctionBuilder of type that contains the choice type
- * @param fileBuilder FileBuilder for the file that will contain [hapiBuilder] & [protoBuilder]
- *
- * @returns a list of FunctionBuilders that convert [element] from hapi to proto and vice versa
- * */
+  /**
+   * @param element element definition of a choice type
+   * @param hapiBuilder hapi FunctionBuilder of type that contains the choice type
+   * @param protoBuilder proto FunctionBuilder of type that contains the choice type
+   * @param fileBuilder FileBuilder for the file that will contain [hapiBuilder] & [protoBuilder]
+   *
+   * @returns a list of FunctionBuilders that convert [element] from hapi to proto and vice versa
+   */
   private fun handleChoiceType(
     element: ElementDefinition,
     hapiBuilder: FunSpec.Builder,
-    protoBuilder: FunSpec.Builder,
-    fileBuilder: FileSpec.Builder
+    protoBuilder: FunSpec.Builder
   ): List<FunSpec> {
     val (elementToProtoBuilder, elementToHapiBuilder) =
       getHapiProtoConverterFuncPair(
-        element.path.value.split(".").joinToString("") { it.capitalizeFirst() }.removeSuffix(choiceTypeSuffixStructureDefinition),
+        element
+          .path
+          .value
+          .split(".")
+          .joinToString("") { it.capitalizeFirst() }
+          .removeSuffix(choiceTypeSuffixStructureDefinition),
         element.getChoiceTypeProtoClass(),
         element.getChoiceTypeHapiClass()
       )
-
     elementToProtoBuilder.addStatement(
       "val protoValue = %T.newBuilder()",
       element.getChoiceTypeProtoClass()
@@ -479,19 +456,6 @@ object CompositeCodegen {
         if (normalizeType(type) == "String") "StringValue" else type.code.value.capitalizeFirst(),
       )
       elementToHapiBuilder.endControlFlow()
-
-      // add imports if it is not the same element
-      if (normalizeType(type) != element.id.value.split(".").last().capitalizeFirst()) {
-
-        fileBuilder.addImport(
-          ClassName(converterPackage, "${normalizeType(type)}Converter"),
-          "toProto"
-        )
-        fileBuilder.addImport(
-          ClassName(converterPackage, "${normalizeType(type)}Converter"),
-          "toHapi"
-        )
-      }
     }
     elementToProtoBuilder.addStatement("return protoValue.build()")
 
@@ -503,13 +467,13 @@ object CompositeCodegen {
     protoBuilder.addStatement(
       "$singleMethodTemplate(%L.%N())",
       getElementName(element).removeSuffix(choiceTypeSuffixStructureDefinition).capitalizeFirst(),
-      getElementName(element).removeSuffix(choiceTypeSuffixStructureDefinition),
+      getElementName(element).removeSuffix(choiceTypeSuffixStructureDefinition).lowerCaseFirst(),
       elementToProtoBuilder.build()
     )
     hapiBuilder.addStatement(
       "hapiValue$singleMethodTemplate(%L.%N())",
       getElementName(element).removeSuffix(choiceTypeSuffixStructureDefinition).capitalizeFirst(),
-      getElementName(element).removeSuffix(choiceTypeSuffixStructureDefinition),
+      getElementName(element).removeSuffix(choiceTypeSuffixStructureDefinition).lowerCaseFirst(),
       elementToHapiBuilder.build()
     )
 
@@ -522,15 +486,24 @@ object CompositeCodegen {
     protoBuilder: FunSpec.Builder,
     backboneElementMap: MutableMap<kotlin.String, BackBoneElementData>
   ) {
+    val (toProtoBuilder, toHapiBuilder) =
+      getHapiProtoConverterFuncPair(
+        "",
+        element.getBackBoneProtoClass(
+          backboneElementMap[element.path.value.substringBeforeLast(".")]
+        ),
+        element.getBackBoneHapiClass(
+          backboneElementMap[element.path.value.substringBeforeLast(".")]
+        )
+      )
     // create a new entry in the backbone element map
     val isSingle = element.max.value == "1"
     val elementName = getElementName(element)
-
     if (isSingle) {
       protoBuilder.addStatement(
         "$singleMethodTemplate(${if (element.typeList.first().profileList.isNotEmpty()) "( %L as %T )" else "%L%L"}.toProto())",
         elementName.capitalizeFirst(),
-        elementName,
+        elementName.lowerCaseFirst(),
         if (element.typeList.first().profileList.isNotEmpty())
           normalizeType(element.typeList.first())
         else ""
@@ -538,14 +511,14 @@ object CompositeCodegen {
       hapiBuilder.addStatement(
         "hapiValue$singleMethodTemplate(%L.toHapi())",
         elementName.capitalizeFirst(),
-        elementName
+        elementName.lowerCaseFirst()
       )
     } else {
 
       protoBuilder.addStatement(
         "$multipleMethodTemplate(%L.map{${if (element.typeList.first().profileList.isNotEmpty()) "( it as %T  )" else "it%L"}.toProto()})",
         elementName.capitalizeFirst(),
-        elementName,
+        elementName.lowerCaseFirst(),
         if (element.typeList.first().profileList.isNotEmpty())
           normalizeType(element.typeList.first())
         else ""
@@ -554,24 +527,33 @@ object CompositeCodegen {
       hapiBuilder.addStatement(
         "hapiValue$singleMethodTemplate(%L.map{it.toHapi()})",
         elementName.capitalizeFirst(),
-        elementName + "List"
+        elementName.lowerCaseFirst() + "List"
       )
     }
 
-    val (toProtoBuilder, toHapiBuilder) =
-      getHapiProtoConverterFuncPair(
-        "",
-        element.getBackBoneProtoClass(),
-        element.getBackBoneHapiClass()
-      )
     backboneElementMap[element.path.value] =
       BackBoneElementData(
-      toProtoBuilder.addStatement(
-        "val protoValue = %T.newBuilder()",
-        element.getBackBoneProtoClass()
-      ), element.getBackBoneProtoClass().canonicalName,
-        toHapiBuilder.addStatement("val hapiValue = %T()", element.getBackBoneHapiClass())
-        ,element.getBackBoneHapiClass().canonicalName)
+        toProtoBuilder.addStatement(
+          "val protoValue = %T.newBuilder()",
+          element.getBackBoneProtoClass(
+            backboneElementMap[element.path.value.substringBeforeLast(".")]
+          )
+        ),
+        element
+          .getBackBoneProtoClass(backboneElementMap[element.path.value.substringBeforeLast(".")])
+          .canonicalName
+          .removePrefix("$protoPackage."),
+        toHapiBuilder.addStatement(
+          "val hapiValue = %T()",
+          element.getBackBoneHapiClass(
+            backboneElementMap[element.path.value.substringBeforeLast(".")]
+          )
+        ),
+        element
+          .getBackBoneHapiClass(backboneElementMap[element.path.value.substringBeforeLast(".")])
+          .canonicalName
+          .removePrefix("$hapiPackage.")
+      )
   }
 
   private fun handleCodeType(
@@ -584,9 +566,7 @@ object CompositeCodegen {
     val isSingle = element.max.value == "1"
     val elementName = getElementName(element)
     val isCommon =
-      element.binding.extensionList.any {
-        it.url.value == uriCommon && it.value.boolean.value
-      }
+      element.binding.extensionList.any { it.url.value == uriCommon && it.value.boolean.value }
 
     if (!specialValueSet.contains(element.binding.valueSet.value)) {
       if (isSingle) {
@@ -598,27 +578,26 @@ object CompositeCodegen {
           element.getProtoCodeClass(protoName),
           // KotlinPoet.ClassName
           Class.forName(getEnumNameFromElement(element).reflectionName()),
-          elementName
+          elementName.lowerCaseFirst()
         )
         hapiBuilder.addStatement(
           "hapiValue$singleMethodTemplate(%T.valueOf(%L.value.name.replace(\"_\",\"\")))",
           elementName.capitalizeFirst(),
           element.getHapiCodeClass(isCommon),
-          // TODO change this
-          elementName
+          elementName.lowerCaseFirst()
         )
       } else {
         // handle case when enum is repeated
         protoBuilder.addStatement(
           "$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.value.toCode().replace(\"-\", \"_\").toUpperCase())).build()})",
           elementName.capitalizeFirst(),
-          elementName,
+          elementName.lowerCaseFirst(),
           element.getProtoCodeClass(protoName),
           Class.forName(getEnumNameFromElement(element).reflectionName())
         )
         hapiBuilder.addStatement(
           "%L.map{hapiValue.add%L(%T.valueOf(it.value.name.replace(\"_\",\"\")))}",
-          elementName + "List",
+          elementName.lowerCaseFirst() + "List",
           elementName.capitalizeFirst(),
           element.getHapiCodeClass(isCommon)
         )
@@ -631,50 +610,47 @@ object CompositeCodegen {
           // Using this just to make sure codes are present in hapi and fhir protos TODO change to
           element.getProtoCodeClass(protoName),
           // KotlinPoet.ClassName
-          elementName
+          elementName.lowerCaseFirst()
         )
         hapiBuilder.addStatement(
           "hapiValue$singleMethodTemplate(%L.value)",
           elementName.capitalizeFirst(),
-          elementName
+          elementName.lowerCaseFirst()
         )
       } else {
         protoBuilder.addStatement(
           "$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(it).build()})",
           elementName.capitalizeFirst(),
-          elementName,
+          elementName.lowerCaseFirst(),
           element.getProtoCodeClass(protoName)
         )
 
         hapiBuilder.addStatement(
           "%L.map{hapiValue.add%L(it)}",
-          elementName + "List",
+          elementName.lowerCaseFirst() + "List",
           elementName.capitalizeFirst()
         )
       }
     }
   }
 
-  private fun ElementDefinition.getBackBoneProtoClass(): ClassName {
-    return ClassName(
-        protoPackage,
-        this.base.path.value.split(".").dropLast(1).map { it.capitalizeFirst() }
-      )
-      .nestedClass(getElementName(this).capitalizeFirst())
+  private fun ElementDefinition.getBackBoneProtoClass(data: BackBoneElementData?): ClassName {
+    return ClassName(protoPackage, data?.protoName ?: this.path.value.substringBeforeLast("."))
+      .nestedClass(getElementName(this))
   }
 
-  private fun ElementDefinition.getBackBoneHapiClass(): ClassName {
+  private fun ElementDefinition.getBackBoneHapiClass(data: BackBoneElementData?): ClassName {
     return ClassName(hapiPackage, base.path.value.split(".").first().capitalizeFirst())
       .nestedClass(
-        if (this.hasExtension(explicitTypeName)){
-          "${getElementName(this).capitalizeFirst()}Component"
+        if (this.hasExtension(explicitTypeName)) {
+          "${getElementName(this)}Component"
         } else {
-          "${
-            this.base.path.value.split(".").dropLast(1)
+          "${ data?.hapiName?.removeSuffix("Component")?.removePrefix(base.path.value.split(".").first().capitalizeFirst())
+            ?: this.base.path.value.split(".").dropLast(1)
               .joinToString("") { it.capitalizeFirst() }
-          }${getElementName(this).capitalizeFirst()}Component"
-        })
-
+          }${getElementName(this)}Component"
+        }
+      )
   }
 
   private fun ElementDefinition.getProtoCodeClass(outerDataTypeName: kotlin.String): ClassName {
@@ -683,13 +659,20 @@ object CompositeCodegen {
         listOf(outerDataTypeName) +
           this.path.value.split(".").drop(1).dropLast(1).map { it.capitalizeFirst() }
       )
-      .nestedClass(if (binding.valueSet.value in CODE_SYSTEM_RENAMES.keys ) CODE_SYSTEM_RENAMES[binding.valueSet.value]!! else getElementName(this).capitalizeFirst() + "Code")
+      .nestedClass(
+        if (binding.valueSet.value in CODE_SYSTEM_RENAMES.keys)
+          CODE_SYSTEM_RENAMES[binding.valueSet.value]!!
+        else
+          getElementName(this).capitalizeFirst() +
+            if (getElementName(this).capitalizeFirst().endsWith("Code", ignoreCase = true)) ""
+            else "Code"
+      )
   }
 
   private fun ElementDefinition.getHapiCodeClass(isCommon: Boolean): ClassName {
     return (if (isCommon) commonEnumClass
       else ClassName(hapiPackage, base.path.value.split(".").first().capitalizeFirst()))
-      .nestedClass(binding.extensionList[0].value.stringValue.value)
+      .nestedClass(binding.extensionList[0].value.stringValue.value.capitalizeFirst())
   }
 
   private fun ElementDefinition.getChoiceTypeProtoClass(): ClassName {
@@ -707,10 +690,10 @@ object CompositeCodegen {
     return ClassName(hapiPackage, "Type")
   }
 
-  private fun ElementDefinition.hasExtension(uri: kotlin.String) : Boolean {
-    return extensionList.any{it.url.value ==  uri}
+  private fun ElementDefinition.hasExtension(uri: kotlin.String): Boolean {
+    return extensionList.any { it.url.value == uri }
   }
-  private fun ElementDefinition.getExtension(uri : kotlin.String) : Extension {
+  private fun ElementDefinition.getExtension(uri: kotlin.String): Extension {
     return extensionList.single { it.url.value == uri }
   }
   private fun getHapiProtoConverterFuncPair(
@@ -721,8 +704,12 @@ object CompositeCodegen {
 
     return FunSpec.builder("${funcName}ToProto".lowerCaseFirst())
       .receiver(hapiClass)
-      .returns(protoClass) to
-      FunSpec.builder("${funcName}ToHapi".lowerCaseFirst()).receiver(protoClass).returns(hapiClass)
+      .returns(protoClass)
+      .addModifiers(KModifier.PRIVATE) to
+      FunSpec.builder("${funcName}ToHapi".lowerCaseFirst())
+        .receiver(protoClass)
+        .returns(hapiClass)
+        .addModifiers(KModifier.PRIVATE)
   }
 
   private fun CharSequence.lowerCaseFirst() =
@@ -733,11 +720,10 @@ object CompositeCodegen {
 
   private const val choiceTypeSuffixStructureDefinition = "[x]"
   private const val choiceTypeSuffixProto = "X"
-private data class BackBoneElementData(
-  val protoBuilder: FunSpec.Builder,
-  val protoName : kotlin.String,
-  val hapiBuilder: FunSpec.Builder,
-  val hapiName: kotlin.String
-)
+  private data class BackBoneElementData(
+    val protoBuilder: FunSpec.Builder,
+    val protoName: kotlin.String,
+    val hapiBuilder: FunSpec.Builder,
+    val hapiName: kotlin.String
+  )
 }
-
