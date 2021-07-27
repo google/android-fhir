@@ -29,7 +29,6 @@
         android:name="com.google.android.fhir.reference.PatientDetailsFragment"
         tools:layout="@layout/patient_detail"
     >
-        <argument android:name="patient_id" app:argType="string" />
         <action
             android:id="@+id/navigate_to_edit_patient"
             app:destination="@id/editPatientFragment"
