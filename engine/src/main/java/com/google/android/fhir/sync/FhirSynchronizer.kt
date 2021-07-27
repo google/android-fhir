@@ -16,12 +16,14 @@
 
 package com.google.android.fhir.sync
 
+import android.content.Context
+import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.isUploadSuccess
 import com.google.android.fhir.logicalId
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
@@ -29,33 +31,35 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
+  val timestamp: OffsetDateTime = OffsetDateTime.now()
+
   object Success : Result()
   data class Error(val exceptions: List<ResourceSyncException>) : Result()
 }
 
 sealed class State {
-  data class Nothing(val lastSyncTimestamp: LocalDateTime?) : State()
+  data class Nothing(val lastSyncTimestamp: OffsetDateTime?) : State()
+
   object Started : State()
 
   data class InProgress(val resourceType: ResourceType?) : State()
   data class Glitch(val exceptions: List<ResourceSyncException>) : State()
 
-  data class Success(val lastSyncTimestamp: LocalDateTime) : State()
-  data class Error(
-    val lastSyncTimestamp: LocalDateTime,
-    val exceptions: List<ResourceSyncException>
-  ) : State()
+  data class Finished(val result: Result.Success) : State()
+  data class Failed(val result: Result.Error) : State()
 }
 
 data class ResourceSyncException(val resourceType: ResourceType, val exception: Exception)
 
 /** Class that helps synchronize the data source and save it in the local database */
 internal class FhirSynchronizer(
+  context: Context,
   private val fhirEngine: FhirEngine,
   private val dataSource: DataSource,
   private val resourceSyncParams: ResourceSyncParams
 ) {
   private var flow: MutableSharedFlow<State>? = null
+  private val datastoreUtil = DatastoreUtil(context)
 
   private fun isSubscribed(): Boolean {
     return flow != null
@@ -68,8 +72,7 @@ internal class FhirSynchronizer(
 
     this.flow = flow
 
-    var lastSyncTimestamp = fhirEngine.getLastSyncTimeStamp()
-
+    val lastSyncTimestamp = datastoreUtil.readLastSyncTimestamp()
     emit(State.Nothing(lastSyncTimestamp))
   }
 
@@ -77,10 +80,15 @@ internal class FhirSynchronizer(
     flow?.emit(state)
   }
 
-  private suspend fun emitResult(state: State) {
-    fhirEngine.saveLastSyncTimeStamp(LocalDateTime.now())
+  private suspend fun emitResult(result: Result): Result {
+    datastoreUtil.writeLastSyncTimestamp(result.timestamp)
 
-    emit(state)
+    when (result) {
+      is Result.Success -> emit(State.Finished(result))
+      is Result.Error -> emit(State.Failed(result))
+    }
+
+    return result
   }
 
   suspend fun synchronize(): Result {
@@ -91,13 +99,9 @@ internal class FhirSynchronizer(
       .flatMap { it.exceptions }
       .let {
         if (it.isEmpty()) {
-          emitResult(State.Success(LocalDateTime.now()))
-
-          Result.Success
+          emitResult(Result.Success)
         } else {
-          emitResult(State.Error(LocalDateTime.now(), it))
-
-          Result.Error(it)
+          emitResult(Result.Error(it))
         }
       }
   }

@@ -34,8 +34,8 @@ class SyncTest {
   class PassingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
     FhirSyncWorker(appContext, workerParams) {
 
-    override fun getFhirEngine(): FhirEngine = TestingUtils.testFhirEngineImpl
-    override fun getDataSource(): DataSource = TestingUtils.testDataSourceImpl
+    override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
+    override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
     override fun getSyncData(): ResourceSyncParams = mapOf()
   }
 

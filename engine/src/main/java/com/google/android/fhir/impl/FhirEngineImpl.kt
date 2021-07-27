@@ -17,8 +17,8 @@
 package com.google.android.fhir.impl
 
 import android.content.Context
+import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.SharedPreferencesUtil
 import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
@@ -28,15 +28,13 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.toTimeZoneString
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /** Implementation of [FhirEngine]. */
-internal class FhirEngineImpl constructor(private val database: Database, context: Context) :
+internal class FhirEngineImpl(private val database: Database, private val context: Context) :
   FhirEngine {
-  val preferences = SharedPreferencesUtil.init(context)
-
   override suspend fun <R : Resource> save(vararg resource: R) {
     database.insert(*resource)
   }
@@ -61,12 +59,8 @@ internal class FhirEngineImpl constructor(private val database: Database, contex
     return search.count(database)
   }
 
-  override suspend fun getLastSyncTimeStamp(): LocalDateTime {
-    return preferences.readTimestamp(LAST_SYNC_TIMESTAMP)
-  }
-
-  override suspend fun saveLastSyncTimeStamp(lastSyncTimestamp: LocalDateTime) {
-    preferences.write(LAST_SYNC_TIMESTAMP, lastSyncTimestamp)
+  override suspend fun getLastSyncTimeStamp(): OffsetDateTime? {
+    return DatastoreUtil(context).readLastSyncTimestamp()
   }
 
   override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {
@@ -92,9 +86,5 @@ internal class FhirEngineImpl constructor(private val database: Database, contex
       upload(localChanges).forEach { database.deleteUpdates(it) }
       localChanges = database.getAllLocalChanges()
     }
-  }
-
-  companion object {
-    private const val LAST_SYNC_TIMESTAMP = "LAST_SYNC_TIMESTAMP"
   }
 }

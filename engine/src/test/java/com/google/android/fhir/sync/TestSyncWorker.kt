@@ -28,7 +28,7 @@ class TestSyncWorker(appContext: Context, workerParams: WorkerParameters) :
 
   override fun getSyncData() = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
 
-  override fun getDataSource() = TestingUtils.testDataSourceImpl
+  override fun getDataSource() = TestingUtils.TestDataSourceImpl
 
   override fun getFhirEngine() = mock<FhirEngine>()
 }

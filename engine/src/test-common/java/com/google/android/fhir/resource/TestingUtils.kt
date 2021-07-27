@@ -24,7 +24,7 @@ import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -74,7 +74,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     return JSONArray(content)
   }
 
-  object testDataSourceImpl : DataSource {
+  object TestDataSourceImpl : DataSource {
 
     override suspend fun loadData(path: String): Bundle {
       return Bundle()
@@ -101,7 +101,7 @@ class TestingUtils constructor(private val iParser: IParser) {
     }
   }
 
-  object testFhirEngineImpl : FhirEngine {
+  object TestFhirEngineImpl : FhirEngine {
     override suspend fun <R : Resource> save(vararg resource: R) {}
 
     override suspend fun <R : Resource> update(resource: R) {}
@@ -126,14 +126,12 @@ class TestingUtils constructor(private val iParser: IParser) {
       return 0
     }
 
-    override suspend fun getLastSyncTimeStamp(): LocalDateTime {
-      return LocalDateTime.now()
+    override suspend fun getLastSyncTimeStamp(): OffsetDateTime? {
+      return OffsetDateTime.now()
     }
-
-    override suspend fun saveLastSyncTimeStamp(lastSyncTimestamp: LocalDateTime) {}
   }
 
-  object testCorruptDatasource : DataSource {
+  object TestCorruptDatasource : DataSource {
     override suspend fun loadData(path: String): Bundle {
       throw Exception("Loading failed...")
     }

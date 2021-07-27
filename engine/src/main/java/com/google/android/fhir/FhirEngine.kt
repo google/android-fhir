@@ -20,7 +20,7 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.search.Search
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -82,10 +82,7 @@ interface FhirEngine {
   suspend fun count(search: Search): Long
 
   /** Returns the timestamp when data was last synchronized */
-  suspend fun getLastSyncTimeStamp(): LocalDateTime
-
-  /** Saves the timestamp when data was last synchronized */
-  suspend fun saveLastSyncTimeStamp(lastSyncTimestamp: LocalDateTime)
+  suspend fun getLastSyncTimeStamp(): OffsetDateTime?
 }
 
 interface SyncDownloadContext {

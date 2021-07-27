@@ -28,11 +28,11 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.impl.FhirEngineImpl
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
+import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -42,15 +42,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ResourceType
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
@@ -62,12 +59,13 @@ import org.robolectric.annotation.LooperMode
 @LooperMode(LooperMode.Mode.PAUSED)
 class SyncJobTest {
   private val context: Context = ApplicationProvider.getApplicationContext()
+  private val datastoreUtil = DatastoreUtil(context)
 
   private lateinit var workManager: WorkManager
   private lateinit var fhirEngine: FhirEngine
 
-  @Mock private lateinit var database: Database
-  @Mock private lateinit var dataSource: DataSource
+  private val database = mock<Database>()
+  private val dataSource = mock<DataSource>()
 
   @get:Rule var instantExecutorRule = InstantTaskExecutorRule()
 
@@ -75,13 +73,11 @@ class SyncJobTest {
 
   @Before
   fun setup() {
-    MockitoAnnotations.openMocks(this)
-
     fhirEngine = FhirEngineImpl(database, context)
 
     val resourceSyncParam = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
 
-    syncJob = Sync.basicSyncJob(fhirEngine, dataSource, resourceSyncParam)
+    syncJob = Sync.basicSyncJob(context, fhirEngine, dataSource, resourceSyncParam)
 
     val config =
       Configuration.Builder()
@@ -102,8 +98,8 @@ class SyncJobTest {
     val worker = PeriodicWorkRequestBuilder<TestSyncWorker>(15, TimeUnit.MINUTES).build()
 
     // get flows return by work manager wrapper
-    val workInfoFlow = syncJob.workInfoFlowFor(SyncWorkType.DOWNLOAD_UPLOAD.workerName, context)
-    val stateFlow = syncJob.stateFlowFor(SyncWorkType.DOWNLOAD_UPLOAD.workerName, context)
+    val workInfoFlow = syncJob.workInfoFlow()
+    val stateFlow = syncJob.stateFlow()
 
     val workInfoList = mutableListOf<WorkInfo>()
     val stateList = mutableListOf<State>()
@@ -121,29 +117,26 @@ class SyncJobTest {
       .result
       .get()
 
-    val testDriver = WorkManagerTestInitHelper.getTestDriver(context)!!
-    testDriver.setPeriodDelayMet(worker.id)
-
     Thread.sleep(5000) // how to avoid it ???
 
-    // WorkInfos emitted by WorkManager are
-    // Enqueued, Running [1 on start],
-    // Running [4 from emitted progress],
-    // Enqueued for successful runs
-    assertTrue(workInfoList.size == 7)
+    assertThat(workInfoList).hasSize(7)
+    assertThat(workInfoList.map { it.state })
+      .containsExactly(
+        WorkInfo.State.ENQUEUED, // waiting for turn
+        WorkInfo.State.RUNNING, // worker launched
+        WorkInfo.State.RUNNING, // progress emitted State.Nothing
+        WorkInfo.State.RUNNING, // progress emitted State.Started
+        WorkInfo.State.RUNNING, // progress emitted State.InProgress
+        WorkInfo.State.RUNNING, // progress emitted State.Success
+        WorkInfo.State.ENQUEUED // waiting again for next turn
+      )
+      .inOrder()
 
-    assertTrue(workInfoList[0].state == WorkInfo.State.ENQUEUED)
-    assertTrue(workInfoList[1].state == WorkInfo.State.RUNNING)
-    // 2nd last item is Running with progress State.Success
-    assertTrue(workInfoList[workInfoList.size - 2].state == WorkInfo.State.RUNNING)
-    // last item is enqueued
-    assertTrue(workInfoList[workInfoList.size - 1].state == WorkInfo.State.ENQUEUED)
-
-    // States are Nothing, Started, InProgress .... , Success
-    assertTrue(stateList[0] is State.Nothing)
-    assertTrue(stateList[1] is State.Started)
-    assertTrue(stateList[2] is State.InProgress)
-    assertTrue(stateList[3] is State.Success)
+    // States are Nothing, Started, InProgress .... , Finished (Success)
+    assertThat(stateList[0]).isInstanceOf(State.Nothing::class.java)
+    assertThat(stateList[1]).isInstanceOf(State.Started::class.java)
+    assertThat(stateList[2]).isInstanceOf(State.InProgress::class.java)
+    assertThat(stateList[3]).isInstanceOf(State.Finished::class.java)
 
     job1.cancel()
     job2.cancel()
@@ -162,17 +155,17 @@ class SyncJobTest {
     syncJob.run(flow)
 
     // State transition for successful job as below
-    // Nothing, Started, InProgress, Success
-    assertTrue(res[0] is State.Nothing)
-    assertTrue(res[1] is State.Started)
-    assertTrue(res[2] is State.InProgress)
-    assertTrue(res[3] is State.Success)
-    assertEquals(
-      LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
-      (res[3] as State.Success).lastSyncTimestamp.truncatedTo(ChronoUnit.SECONDS)
-    )
+    // Nothing, Started, InProgress, Finished (Success)
+    assertThat(res[0]).isInstanceOf(State.Nothing::class.java)
+    assertThat(res[1]).isInstanceOf(State.Started::class.java)
+    assertThat(res[2]).isInstanceOf(State.InProgress::class.java)
+    assertThat(res[3]).isInstanceOf(State.Finished::class.java)
 
-    assertEquals(4, res.size)
+    val success = (res[3] as State.Finished).result
+
+    assertThat(success.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
+
+    assertThat(res).hasSize(4)
 
     job.cancel()
   }
@@ -185,25 +178,26 @@ class SyncJobTest {
     val res = mutableListOf<State>()
 
     val flow = MutableSharedFlow<State>()
+
     val job = launch { flow.collect { res.add(it) } }
 
     syncJob.run(flow)
 
     // State transition for failed job as below
-    // Nothing, Started, InProgress, Glitch, Error
-    assertTrue(res[0] is State.Nothing)
-    assertTrue(res[1] is State.Started)
-    assertTrue(res[2] is State.InProgress)
-    assertTrue(res[3] is State.Glitch)
-    assertTrue(res[4] is State.Error)
+    // Nothing, Started, InProgress, Glitch, Failed (Error)
+    assertThat(res[0]).isInstanceOf(State.Nothing::class.java)
+    assertThat(res[1]).isInstanceOf(State.Started::class.java)
+    assertThat(res[2]).isInstanceOf(State.InProgress::class.java)
+    assertThat(res[3]).isInstanceOf(State.Glitch::class.java)
+    assertThat(res[4]).isInstanceOf(State.Failed::class.java)
 
-    assertEquals(
-      LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
-      (res[4] as State.Error).lastSyncTimestamp.truncatedTo(ChronoUnit.SECONDS)
-    )
+    val error = (res[4] as State.Failed).result
 
-    assertTrue((res[4] as State.Error).exceptions[0].exception is java.lang.IllegalStateException)
-    assertEquals(5, res.size)
+    assertThat(error.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
+
+    assertThat(error.exceptions[0].exception)
+      .isInstanceOf(java.lang.IllegalStateException::class.java)
+    assertThat(res).hasSize(5)
 
     job.cancel()
   }

@@ -41,29 +41,24 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   abstract fun getSyncData(): ResourceSyncParams
 
   private var fhirSynchronizer: FhirSynchronizer =
-    FhirSynchronizer(getFhirEngine(), getDataSource(), getSyncData())
+    FhirSynchronizer(appContext, getFhirEngine(), getDataSource(), getSyncData())
 
-  // worker job, initiated by WorkManager in background,
-  // and application initiated this does not have any reference to this,
-  // and can not get any reference from work manager,
-  // so unless there is any static/companion singleton there is no way to access data without
-  // WManager
   override suspend fun doWork(): Result {
     val flow = MutableSharedFlow<State>()
 
     val job =
       CoroutineScope(Dispatchers.Default).launch {
         flow.collect {
-          // only here we can subscribe and emit Progress via WorkManager
           // now send Progress to work manager so caller app can listen
           setProgress(
             workDataOf(
-              "StateType" to it::class.java.name, // only way of knowing what class is
-              "State" to Gson().toJson(it) // we can convert it back to state of above type
+              // send serialized state and type so that consumer can convert it back
+              "StateType" to it::class.java.name,
+              "State" to Gson().toJson(it)
             )
           )
 
-          if (it is State.Success || it is State.Error) {
+          if (it is State.Finished) {
             this@launch.cancel()
           }
         }
@@ -73,7 +68,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
 
     val result = fhirSynchronizer.synchronize()
 
-    // removing await/join just returns without collecting states completely
+    // await/join is needed to collect states completely
     kotlin.runCatching { job.join() }.onFailure { Log.w(javaClass.name, it) }
 
     /**

@@ -29,11 +29,12 @@ import com.google.android.fhir.FhirEngine
 
 object Sync {
   fun basicSyncJob(
+    context: Context,
     fhirEngine: FhirEngine,
     dataSource: DataSource,
     resourceSyncParams: ResourceSyncParams
   ): SyncJob {
-    return SyncJobImpl(fhirEngine, dataSource, resourceSyncParams)
+    return SyncJobImpl(context, fhirEngine, dataSource, resourceSyncParams)
   }
 
   /**
@@ -42,11 +43,12 @@ object Sync {
    * retry
    */
   suspend fun oneTimeSync(
+    context: Context,
     fhirEngine: FhirEngine,
     dataSource: DataSource,
     resourceSyncParams: ResourceSyncParams
   ): Result {
-    return FhirSynchronizer(fhirEngine, dataSource, resourceSyncParams).synchronize()
+    return FhirSynchronizer(context, fhirEngine, dataSource, resourceSyncParams).synchronize()
   }
 
   /**

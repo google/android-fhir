@@ -24,6 +24,8 @@ object Dependencies {
     const val fragmentKtx = "androidx.fragment:fragment-ktx:${Versions.Androidx.fragmentKtx}"
     const val recyclerView = "androidx.recyclerview:recyclerview:${Versions.Androidx.recyclerView}"
     const val workRuntimeKtx = "androidx.work:work-runtime-ktx:${Versions.Androidx.workRuntimeKtx}"
+    const val datastorePref =
+      "androidx.datastore:datastore-preferences:${Versions.Androidx.datastorePref}"
   }
 
   object Cql {
@@ -43,6 +45,8 @@ object Dependencies {
     const val kotlinCoroutinesCore =
       "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.Kotlin.kotlinCoroutinesCore}"
     const val kotlinTestJunit = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.Kotlin.stdlib}"
+    const val kotlinCoroutinesTest =
+      "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.kotlinCoroutinesCore}"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.Kotlin.stdlib}"
   }
 
@@ -87,6 +91,7 @@ object Dependencies {
     const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
     const val workTestingRuntimeKtx =
       "androidx.work:work-testing:${Versions.Androidx.workRuntimeKtx}"
+    const val archCore = "androidx.arch.core:core-testing:${Versions.AndroidxTest.archCore}"
   }
 
   object Espresso {
@@ -111,6 +116,7 @@ object Dependencies {
       const val recyclerView = "1.1.0"
       const val room = "2.3.0"
       const val workRuntimeKtx = "2.5.0"
+      const val datastorePref = "1.0.0-rc02"
     }
 
     object Cql {
@@ -135,6 +141,7 @@ object Dependencies {
 
     object AndroidxTest {
       const val core = "1.2.0"
+      const val archCore = "2.1.0"
       const val extJunit = "1.1.2"
       const val rules = "1.1.0"
       const val runner = "1.1.0"
