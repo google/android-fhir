@@ -22,6 +22,10 @@ import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
 import com.google.android.fhir.datacapture.utilities.SimpleWorkerContextProvider
+import java.lang.reflect.Field
+import java.lang.reflect.Method
+import java.lang.reflect.ParameterizedType
+import java.util.Locale
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
@@ -46,10 +50,6 @@ import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
-import java.lang.reflect.Field
-import java.lang.reflect.Method
-import java.lang.reflect.ParameterizedType
-import java.util.Locale
 
 /**
  * Maps [QuestionnaireResponse] s to FHIR resources and vice versa.
@@ -144,12 +144,7 @@ object ResourceMapper {
 
     return Bundle().apply {
       StructureMapUtilities(simpleWorkerContext)
-        .transform(
-          simpleWorkerContext,
-          questionnaireResponse,
-          structureMap,
-          this
-        )
+        .transform(simpleWorkerContext, questionnaireResponse, structureMap, this)
     }
   }
 
