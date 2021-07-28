@@ -22,10 +22,6 @@ import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
 import com.google.android.fhir.datacapture.utilities.SimpleWorkerContextProvider
-import java.lang.reflect.Field
-import java.lang.reflect.Method
-import java.lang.reflect.ParameterizedType
-import java.util.Locale
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
@@ -50,6 +46,10 @@ import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
+import java.lang.reflect.Field
+import java.lang.reflect.Method
+import java.lang.reflect.ParameterizedType
+import java.util.Locale
 
 /**
  * Maps [QuestionnaireResponse] s to FHIR resources and vice versa.
@@ -145,10 +145,10 @@ object ResourceMapper {
     return Bundle().apply {
       StructureMapUtilities(simpleWorkerContext)
         .transform(
-          /* appInfo= */ simpleWorkerContext,
-          /* source= */ questionnaireResponse,
-          /* map= */ structureMap,
-          /* target= */ this
+          simpleWorkerContext,
+          questionnaireResponse,
+          structureMap,
+          this
         )
     }
   }
@@ -164,14 +164,14 @@ object ResourceMapper {
     }
   }
 
-  private fun populateInitialValues(
+  private suspend fun populateInitialValues(
     questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
     resource: Resource
   ) {
     questionnaireItems.forEach { populateInitialValue(it, resource) }
   }
 
-  private fun populateInitialValue(
+  private suspend fun populateInitialValue(
     question: Questionnaire.QuestionnaireItemComponent,
     resource: Resource
   ) {
@@ -200,7 +200,7 @@ object ResourceMapper {
    * Extracts answer values from [questionnaireResponseItemList] and updates the fields defined in
    * the corresponding questions in [questionnaireItemList]. This method handles nested fields.
    */
-  private fun Base.extractFields(
+  private suspend fun Base.extractFields(
     bundle: Bundle,
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
@@ -221,7 +221,7 @@ object ResourceMapper {
    * Extracts the answer value from [questionnaireResponseItem] and updates the field defined in
    * [questionnaireItem]. This method handles nested fields.
    */
-  private fun Base.extractField(
+  private suspend fun Base.extractField(
     bundle: Bundle,
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent

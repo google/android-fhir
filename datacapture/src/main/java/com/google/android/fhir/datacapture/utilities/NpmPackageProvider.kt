@@ -20,12 +20,12 @@ import android.content.Context
 import android.os.Environment
 import android.util.Log
 import com.google.android.fhir.datacapture.mapping.NpmPackageInitializationError
+import org.apache.commons.compress.utils.IOUtils
+import org.hl7.fhir.utilities.npm.NpmPackage
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
-import org.apache.commons.compress.utils.IOUtils
-import org.hl7.fhir.utilities.npm.NpmPackage
 
 /**
  * Manages extracting the fhir core package into app storage and loading it into memory. Extracting
@@ -76,7 +76,7 @@ object NpmPackageProvider {
    *
    * @Throws NpmPackageInitializationError
    */
-  private fun setupNpmPackage(context: Context) {
+  private suspend fun setupNpmPackage(context: Context) {
     val outDir = getLocalFhirCorePackageDirectory(context)
 
     if (File(outDir + "/package/package.json").exists()) {
