@@ -113,10 +113,9 @@ object ResourceMapper {
     val bundle = Bundle()
     val className = questionnaire.itemContextNameToExpressionMap.values.first()
     val extractedResource =
-      (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Resource)
-    extractedResource.apply {
-      extractFields(bundle, questionnaire.item, questionnaireResponse.item)
-    }
+      (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Resource).apply {
+        extractFields(bundle, questionnaire.item, questionnaireResponse.item)
+      }
 
     return bundle.apply {
       type = Bundle.BundleType.TRANSACTION
@@ -477,8 +476,10 @@ private fun Questionnaire.QuestionnaireItemComponent.getNestedFieldOfChoiceType(
  * Returns true if choice data type of declared field present at given choiceTypeFieldIndex in
  * definition.
  *
- * @param choiceTypeFieldIndex index of field present in definition e.g
- * #Observation.quantityValue.value
+ * e.g #Observation.quantityValue.value field quantityValue is choice of data type and
+ * choiceTypeFieldIndex is 1.
+ *
+ * @param choiceTypeFieldIndex index of field present in definition
  */
 private fun Questionnaire.QuestionnaireItemComponent.isChoiceType(
   choiceTypeFieldIndex: Int
@@ -495,10 +496,12 @@ private fun Questionnaire.QuestionnaireItemComponent.isChoiceType(
 
 /**
  * Retrieves details about the target field defined in
- * [org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent.definition]
+ * [org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent.definition].
+ *
+ * e.g #Observation.quantityValue.value field index is 1 for quantityValue.
  *
  * @param resourceClass which has declared field
- * @param fieldIndex index of field present in definition e.g #Observation.quantityValue.value
+ * @param fieldIndex index of field present in definition
  */
 private fun Questionnaire.QuestionnaireItemComponent.getFieldOrNull(
   resourceClass: Class<*>,
