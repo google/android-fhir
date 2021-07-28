@@ -57,7 +57,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     return fhirEngine.count<Patient> {
       filter(Patient.ADDRESS_CITY) {
         modifier = StringFilterModifier.MATCHES_EXACTLY
-        value = "NAIROBI"
+        values += "NAIROBI"
       }
     }
   }
@@ -69,7 +69,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
         if (nameQuery.isNotEmpty())
           filter(Patient.NAME) {
             modifier = StringFilterModifier.CONTAINS
-            value = nameQuery
+            values += nameQuery
           }
         sort(Patient.GIVEN, Order.ASCENDING)
         count = 100

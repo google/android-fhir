@@ -384,7 +384,7 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { value = "eve" } }.getQuery()
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { values += "eve" } }.getQuery()
       )
 
     assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
@@ -400,7 +400,7 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { value = "eve" } }.getQuery()
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN) { values += "eve" } }.getQuery()
       )
 
     assertThat(result).isEmpty()
@@ -419,7 +419,7 @@ class DatabaseImplTest {
         Search(ResourceType.Patient)
           .apply {
             filter(Patient.GIVEN) {
-              value = "Eve"
+              values += "Eve"
               modifier = StringFilterModifier.MATCHES_EXACTLY
             }
           }
@@ -442,7 +442,7 @@ class DatabaseImplTest {
         Search(ResourceType.Patient)
           .apply {
             filter(Patient.GIVEN) {
-              value = "Eve"
+              values += "Eve"
               modifier = StringFilterModifier.MATCHES_EXACTLY
             }
           }
@@ -466,7 +466,7 @@ class DatabaseImplTest {
         Search(ResourceType.Patient)
           .apply {
             filter(Patient.GIVEN) {
-              value = "Eve"
+              values += "Eve"
               modifier = StringFilterModifier.CONTAINS
             }
           }
@@ -489,7 +489,7 @@ class DatabaseImplTest {
         Search(ResourceType.Patient)
           .apply {
             filter(Patient.GIVEN) {
-              value = "eve"
+              values += "eve"
               modifier = StringFilterModifier.CONTAINS
             }
           }
@@ -516,7 +516,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.EQUAL
-              value = BigDecimal("100")
+              values += BigDecimal("100")
             }
           }
           .getQuery()
@@ -542,7 +542,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.EQUAL
-              value = BigDecimal("100")
+              values += BigDecimal("100")
             }
           }
           .getQuery()
@@ -568,7 +568,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.NOT_EQUAL
-              value = BigDecimal("100")
+              values += BigDecimal("100")
             }
           }
           .getQuery()
@@ -593,7 +593,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.NOT_EQUAL
-              value = BigDecimal("100")
+              values += BigDecimal("100")
             }
           }
           .getQuery()
@@ -619,7 +619,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.GREATERTHAN
-              value = BigDecimal("99.5")
+              values += BigDecimal("99.5")
             }
           }
           .getQuery()
@@ -645,7 +645,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.GREATERTHAN
-              value = BigDecimal("99.5")
+              values += BigDecimal("99.5")
             }
           }
           .getQuery()
@@ -671,7 +671,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-              value = BigDecimal("99.5")
+              values += BigDecimal("99.5")
             }
           }
           .getQuery()
@@ -697,7 +697,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-              value = BigDecimal("99.5")
+              values += BigDecimal("99.5")
             }
           }
           .getQuery()
@@ -723,7 +723,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.LESSTHAN
-              value = BigDecimal("99.5")
+              values += BigDecimal("99.5")
             }
           }
           .getQuery()
@@ -749,7 +749,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.LESSTHAN
-              value = BigDecimal("99.5")
+              values += BigDecimal("99.5")
             }
           }
           .getQuery()
@@ -775,7 +775,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
-              value = BigDecimal("99.5")
+              values += BigDecimal("99.5")
             }
           }
           .getQuery()
@@ -800,7 +800,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
-              value = BigDecimal("99.5")
+              values += BigDecimal("99.5")
             }
           }
           .getQuery()
@@ -826,7 +826,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.ENDS_BEFORE
-              value = BigDecimal("99.5")
+              values += BigDecimal("99.5")
             }
           }
           .getQuery()
@@ -852,7 +852,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.ENDS_BEFORE
-              value = BigDecimal("99.5")
+              values += BigDecimal("99.5")
             }
           }
           .getQuery()
@@ -878,7 +878,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.STARTS_AFTER
-              value = BigDecimal("99.5")
+              values += BigDecimal("99.5")
             }
           }
           .getQuery()
@@ -904,7 +904,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.STARTS_AFTER
-              value = BigDecimal("99.5")
+              values += BigDecimal("99.5")
             }
           }
           .getQuery()
@@ -930,7 +930,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.APPROXIMATE
-              value = BigDecimal("100")
+              values += BigDecimal("100")
             }
           }
           .getQuery()
@@ -956,7 +956,7 @@ class DatabaseImplTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.APPROXIMATE
-              value = BigDecimal("100")
+              values += BigDecimal("100")
             }
           }
           .getQuery()

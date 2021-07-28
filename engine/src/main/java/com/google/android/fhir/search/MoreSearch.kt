@@ -111,12 +111,15 @@ fun StringFilter.query(type: ResourceType): SearchQuery {
       StringFilterModifier.MATCHES_EXACTLY -> "= ?"
       StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
     }
+
+  val indexValueClause = values.joinToString(" OR ", transform = { "index_value $condition" })
+
   return SearchQuery(
     """
     SELECT resourceId FROM StringIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value $condition 
+    WHERE resourceType = ? AND index_name = ? AND ($indexValueClause) 
     """,
-    listOf(type.name, parameter.paramName, value!!)
+    listOf(type.name, parameter.paramName) + values
   )
 }
 
@@ -125,57 +128,68 @@ fun StringFilter.query(type: ResourceType): SearchQuery {
  */
 fun NumberFilter.query(type: ResourceType): SearchQuery {
 
-  val conditionParamPair = getConditionParamPair(prefix, value!!)
+  val conditionParamPairs = getConditionParamPair(prefix, values)
+  val conditions =
+    conditionParamPairs.map { conditionParam -> conditionParam.condition }.joinToString(" OR ")
 
   return SearchQuery(
     """
      SELECT resourceId FROM NumberIndexEntity
-     WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
+     WHERE resourceType = ? AND index_name = ? AND ($conditions)
        """,
-    listOf(type.name, parameter.paramName) + conditionParamPair.params
+    listOf(type.name, parameter.paramName) +
+      conditionParamPairs.map { conditionParam -> conditionParam.params }.flatten()
   )
 }
 
 fun ReferenceFilter.query(type: ResourceType): SearchQuery {
+  val conditionString = values.joinToString(" OR ", transform = { "index_value = ?" })
   return SearchQuery(
     """
     SELECT resourceId FROM ReferenceIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value = ?
+    WHERE resourceType = ? AND index_name = ? AND ($conditionString)
     """,
-    listOf(type.name, parameter!!.paramName, value!!)
+    listOf(type.name, parameter!!.paramName, values)
   )
 }
 
 fun DateFilter.query(type: ResourceType): SearchQuery {
-  val conditionParamPair = getConditionParamPair(prefix, value!!)
+  val conditionParamPairs = getConditionParamPair(prefix, values)
+  val conditions =
+    conditionParamPairs.map { conditionParam -> conditionParam.condition }.joinToString(" OR ")
   return SearchQuery(
     """
     SELECT resourceId FROM DateIndexEntity 
-    WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
+    WHERE resourceType = ? AND index_name = ? AND ($conditions)
     """,
-    listOf(type.name, parameter.paramName) + conditionParamPair.params
+    listOf(type.name, parameter.paramName) +
+      conditionParamPairs.map { conditionParam -> conditionParam.params }.flatten()
   )
 }
 
 fun DateTimeFilter.query(type: ResourceType): SearchQuery {
-  val conditionParamPair = getConditionParamPair(prefix, value!!)
+  val conditionParamPairs = getConditionParamPair(prefix, values)
+  val conditions =
+    conditionParamPairs.map { conditionParam -> conditionParam.condition }.joinToString(" OR ")
   return SearchQuery(
     """
     SELECT resourceId FROM DateTimeIndexEntity 
-    WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
+    WHERE resourceType = ? AND index_name = ? AND ($conditions)
     """,
-    listOf(type.name, parameter.paramName) + conditionParamPair.params
+    listOf(type.name, parameter.paramName) +
+      conditionParamPairs.map { conditionParam -> conditionParam.params }.flatten()
   )
 }
 
 fun TokenFilter.query(type: ResourceType): SearchQuery {
+  val conditions = codes.joinToString(" OR ", transform = { "index_value = ?" })
   return SearchQuery(
     """
     SELECT resourceId FROM TokenIndexEntity
-    WHERE resourceType = ? AND index_name = ? AND index_value = ?
+    WHERE resourceType = ? AND index_name = ? AND ($conditions)
     AND IFNULL(index_system,'') = ? 
     """,
-    listOfNotNull(type.name, parameter!!.paramName, code, uri ?: "")
+    listOfNotNull(type.name, parameter!!.paramName) + codes + (uri ?: "")
   )
 }
 
@@ -195,71 +209,90 @@ val Order?.sqlString: String
       null -> ""
     }
 
-private fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): ConditionParam<Long> {
-  val start = value.rangeEpochDays.first
-  val end = value.rangeEpochDays.last
-  return when (prefix) {
-    ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
-    // see https://github.com/google/android-fhir/issues/568
-    // https://www.hl7.org/fhir/search.html#prefix
-    ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
-    ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
-    ParamPrefixEnum.NOT_EQUAL ->
-      ConditionParam(
-        "index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?",
-        start,
-        end,
-        start,
-        end
-      )
-    ParamPrefixEnum.EQUAL ->
-      ConditionParam(
-        "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
-        start,
-        end,
-        start,
-        end
-      )
-    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to > ?", end)
-    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_to >= ?", start)
-    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_from < ?", start)
-    ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ConditionParam("index_from <= ?", end)
-  }
-}
-
+@JvmName("getConditionParamPair1")
 private fun getConditionParamPair(
   prefix: ParamPrefixEnum,
-  value: DateTimeType
-): ConditionParam<Long> {
-  val start = value.rangeEpochMillis.first
-  val end = value.rangeEpochMillis.last
-  return when (prefix) {
-    ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
-    // see https://github.com/google/android-fhir/issues/568
-    // https://www.hl7.org/fhir/search.html#prefix
-    ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
-    ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
-    ParamPrefixEnum.NOT_EQUAL ->
-      ConditionParam(
-        "index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?",
-        start,
-        end,
-        start,
-        end
-      )
-    ParamPrefixEnum.EQUAL ->
-      ConditionParam(
-        "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
-        start,
-        end,
-        start,
-        end
-      )
-    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to > ?", end)
-    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_to >= ?", start)
-    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_from < ?", start)
-    ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ConditionParam("index_from <= ?", end)
+  values: MutableList<DateType>
+): MutableList<ConditionParam<Long>> {
+  val conditionParams: MutableList<ConditionParam<Long>> = mutableListOf()
+
+  values.forEach { value ->
+    val start = value.rangeEpochDays.first
+    val end = value.rangeEpochDays.last
+    conditionParams +=
+      when (prefix) {
+        ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
+        // see https://github.com/google/android-fhir/issues/568
+        // https://www.hl7.org/fhir/search.html#prefix
+        ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
+        ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
+        ParamPrefixEnum.NOT_EQUAL ->
+          ConditionParam(
+            "index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?",
+            start,
+            end,
+            start,
+            end
+          )
+        ParamPrefixEnum.EQUAL ->
+          ConditionParam(
+            "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
+            start,
+            end,
+            start,
+            end
+          )
+        ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to > ?", end)
+        ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_to >= ?", start)
+        ParamPrefixEnum.LESSTHAN -> ConditionParam("index_from < ?", start)
+        ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ConditionParam("index_from <= ?", end)
+      }
   }
+
+  return conditionParams
+}
+
+@JvmName("getConditionParamPair2")
+private fun getConditionParamPair(
+  prefix: ParamPrefixEnum,
+  values: MutableList<DateTimeType>
+): MutableList<ConditionParam<Long>> {
+  val conditionParams: MutableList<ConditionParam<Long>> = mutableListOf()
+
+  values.forEach { value ->
+    val start = value.rangeEpochMillis.first
+    val end = value.rangeEpochMillis.last
+    conditionParams +=
+      when (prefix) {
+        ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
+        // see https://github.com/google/android-fhir/issues/568
+        // https://www.hl7.org/fhir/search.html#prefix
+        ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
+        ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
+        ParamPrefixEnum.NOT_EQUAL ->
+          ConditionParam(
+            "index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?",
+            start,
+            end,
+            start,
+            end
+          )
+        ParamPrefixEnum.EQUAL ->
+          ConditionParam(
+            "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
+            start,
+            end,
+            start,
+            end
+          )
+        ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to > ?", end)
+        ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_to >= ?", start)
+        ParamPrefixEnum.LESSTHAN -> ConditionParam("index_from < ?", start)
+        ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ConditionParam("index_from <= ?", end)
+      }
+  }
+
+  return conditionParams
 }
 
 /**
@@ -268,51 +301,60 @@ private fun getConditionParamPair(
  */
 private fun getConditionParamPair(
   prefix: ParamPrefixEnum?,
-  value: BigDecimal
-): ConditionParam<Double> {
+  values: MutableList<BigDecimal>
+): MutableList<ConditionParam<Double>> {
   // Ends_Before and Starts_After are not used with integer values. see
   // https://www.hl7.org/fhir/search.html#prefix
-  require(
-    value.scale() > 0 ||
-      (prefix != ParamPrefixEnum.STARTS_AFTER && prefix != ParamPrefixEnum.ENDS_BEFORE)
-  ) { "Prefix $prefix not allowed for Integer type" }
-  return when (prefix) {
-    ParamPrefixEnum.EQUAL, null -> {
-      val precision = value.getRange()
-      ConditionParam(
-        "index_value >= ? AND index_value < ?",
-        (value - precision).toDouble(),
-        (value + precision).toDouble()
-      )
-    }
-    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_value > ?", value.toDouble())
-    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_value >= ?", value.toDouble())
-    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_value < ?", value.toDouble())
-    ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ConditionParam("index_value <= ?", value.toDouble())
-    ParamPrefixEnum.NOT_EQUAL -> {
-      val precision = value.getRange()
-      ConditionParam(
-        "index_value < ? OR index_value >= ?",
-        (value - precision).toDouble(),
-        (value + precision).toDouble()
-      )
-    }
-    ParamPrefixEnum.ENDS_BEFORE -> {
-      ConditionParam("index_value < ?", value.toDouble())
-    }
-    ParamPrefixEnum.STARTS_AFTER -> {
-      ConditionParam("index_value > ?", value.toDouble())
-    }
-    // Approximate to a 10% range see https://www.hl7.org/fhir/search.html#prefix
-    ParamPrefixEnum.APPROXIMATE -> {
-      val range = value.divide(BigDecimal(10))
-      ConditionParam(
-        "index_value >= ? AND index_value <= ?",
-        (value - range).toDouble(),
-        (value + range).toDouble()
-      )
-    }
+  val conditionalParams: MutableList<ConditionParam<Double>> = mutableListOf()
+
+  values.forEach { value ->
+    require(
+      value.scale() > 0 ||
+        (prefix != ParamPrefixEnum.STARTS_AFTER && prefix != ParamPrefixEnum.ENDS_BEFORE)
+    ) { "Prefix $prefix not allowed for Integer type" }
+    conditionalParams.add(
+      when (prefix) {
+        ParamPrefixEnum.EQUAL, null -> {
+          val precision = value.getRange()
+          ConditionParam(
+            "(index_value >= ? AND index_value < ?)",
+            (value - precision).toDouble(),
+            (value + precision).toDouble()
+          )
+        }
+        ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_value > ?", value.toDouble())
+        ParamPrefixEnum.GREATERTHAN_OR_EQUALS ->
+          ConditionParam("index_value >= ?", value.toDouble())
+        ParamPrefixEnum.LESSTHAN -> ConditionParam("index_value < ?", value.toDouble())
+        ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ConditionParam("index_value <= ?", value.toDouble())
+        ParamPrefixEnum.NOT_EQUAL -> {
+          val precision = value.getRange()
+          ConditionParam(
+            "index_value < ? OR index_value >= ?",
+            (value - precision).toDouble(),
+            (value + precision).toDouble()
+          )
+        }
+        ParamPrefixEnum.ENDS_BEFORE -> {
+          ConditionParam("index_value < ?", value.toDouble())
+        }
+        ParamPrefixEnum.STARTS_AFTER -> {
+          ConditionParam("index_value > ?", value.toDouble())
+        }
+        // Approximate to a 10% range see https://www.hl7.org/fhir/search.html#prefix
+        ParamPrefixEnum.APPROXIMATE -> {
+          val range = value.divide(BigDecimal(10))
+          ConditionParam(
+            "(index_value >= ? AND index_value <= ?)",
+            (value - range).toDouble(),
+            (value + range).toDouble()
+          )
+        }
+      }
+    )
   }
+
+  return conditionalParams
 }
 
 /**

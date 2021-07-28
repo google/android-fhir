@@ -47,7 +47,7 @@ class PatientDetailsViewModel(
   private suspend fun getPatientObservations(): List<PatientListViewModel.ObservationItem> {
     val observations: MutableList<PatientListViewModel.ObservationItem> = mutableListOf()
     fhirEngine
-      .search<Observation> { filter(Observation.SUBJECT) { value = "Patient/$patientId" } }
+      .search<Observation> { filter(Observation.SUBJECT) { values += "Patient/$patientId" } }
       .take(MAX_RESOURCE_COUNT)
       .mapIndexed { index, fhirPatient -> createObservationItem(index + 1, fhirPatient) }
       .let { observations.addAll(it) }

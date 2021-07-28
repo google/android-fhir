@@ -76,40 +76,13 @@ class SearchTest {
 
   @Test
   fun search_string_default() {
-    val query =
-      Search(ResourceType.Patient)
-        .apply { filter(Patient.ADDRESS) { value = "someValue" } }
-        .getQuery()
 
-    assertThat(query.query)
-      .isEqualTo(
-        """
-        SELECT a.serializedResource
-        FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceId IN (
-        SELECT resourceId FROM StringIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
-        )
-        """.trimIndent()
-      )
-    assertThat(query.args)
-      .containsExactly(
-        ResourceType.Patient.name,
-        ResourceType.Patient.name,
-        Patient.ADDRESS.paramName,
-        "someValue"
-      )
-  }
-
-  @Test
-  fun search_string_exact() {
     val query =
       Search(ResourceType.Patient)
         .apply {
-          filter(Patient.ADDRESS) {
-            modifier = StringFilterModifier.MATCHES_EXACTLY
-            value = "someValue"
+          filter(stringParameter = Patient.ADDRESS) {
+            values += "someValue"
+            or("some other value")
           }
         }
         .getQuery()
@@ -122,7 +95,41 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM StringIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value LIKE ? || '%' COLLATE NOCASE OR index_value LIKE ? || '%' COLLATE NOCASE)
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .containsExactly(
+        ResourceType.Patient.name,
+        ResourceType.Patient.name,
+        Patient.ADDRESS.paramName,
+        "someValue",
+        "some other value"
+      )
+  }
+
+  @Test
+  fun search_string_exact() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.ADDRESS) {
+            modifier = StringFilterModifier.MATCHES_EXACTLY
+            values += "someValue"
+          }
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ?)
         )
         """.trimIndent()
       )
@@ -142,7 +149,7 @@ class SearchTest {
         .apply {
           filter(Patient.ADDRESS) {
             modifier = StringFilterModifier.CONTAINS
-            value = "someValue"
+            values += "someValue"
           }
         }
         .getQuery()
@@ -155,7 +162,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM StringIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value LIKE '%' || ? || '%' COLLATE NOCASE
+        WHERE resourceType = ? AND index_name = ? AND (index_value LIKE '%' || ? || '%' COLLATE NOCASE)
         )
         """.trimIndent()
       )
@@ -209,7 +216,7 @@ class SearchTest {
   @Test
   fun search_filter() {
     val query =
-      Search(ResourceType.Patient).apply { filter(Patient.FAMILY) { value = "Jones" } }.getQuery()
+      Search(ResourceType.Patient).apply { filter(Patient.FAMILY) { values += "Jones" } }.getQuery()
 
     assertThat(query.query)
       .isEqualTo(
@@ -219,7 +226,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM StringIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
+        WHERE resourceType = ? AND index_name = ? AND (index_value LIKE ? || '%' COLLATE NOCASE)
         )
         """.trimIndent()
       )
@@ -254,7 +261,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ?)
         AND IFNULL(index_system,'') = ?
         )
         """.trimIndent()
@@ -291,7 +298,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ?)
         AND IFNULL(index_system,'') = ?
         )
         """.trimIndent()
@@ -324,7 +331,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ?)
         AND IFNULL(index_system,'') = ?
         )
         """.trimIndent()
@@ -364,7 +371,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ?)
         AND IFNULL(index_system,'') = ?
         )
         """.trimIndent()
@@ -403,7 +410,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ?)
         AND IFNULL(index_system,'') = ?
         )
         """.trimIndent()
@@ -432,7 +439,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ?)
         AND IFNULL(index_system,'') = ?
         )
         """.trimIndent()
@@ -461,7 +468,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ?)
         AND IFNULL(index_system,'') = ?
         )
         """.trimIndent()
@@ -493,7 +500,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ?)
         AND IFNULL(index_system,'') = ?
         )
         """.trimIndent()
@@ -523,7 +530,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ?)
         AND IFNULL(index_system,'') = ?
         )
         """.trimIndent()
@@ -555,7 +562,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_from > ?
+        WHERE resourceType = ? AND index_name = ? AND (index_from > ?)
         )
         """.trimIndent()
       )
@@ -586,7 +593,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_to < ?
+        WHERE resourceType = ? AND index_name = ? AND (index_to < ?)
         )
         """.trimIndent()
       )
@@ -617,7 +624,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?
+        WHERE resourceType = ? AND index_name = ? AND (index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?)
         )
         """.trimIndent()
       )
@@ -651,7 +658,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?
+        WHERE resourceType = ? AND index_name = ? AND (index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?)
         )
         """.trimIndent()
       )
@@ -685,7 +692,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_to > ?
+        WHERE resourceType = ? AND index_name = ? AND (index_to > ?)
         )
         """.trimIndent()
       )
@@ -718,7 +725,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_to >= ?
+        WHERE resourceType = ? AND index_name = ? AND (index_to >= ?)
         )
         """.trimIndent()
       )
@@ -736,6 +743,11 @@ class SearchTest {
 
   @Test
   fun search_date_less() {
+
+    var da =
+      DateFilter(Patient.BIRTHDATE, ParamPrefixEnum.LESSTHAN, mutableListOf(DateType("2013-03-14")))
+    da = da.or(DateType("2021-03-14"))
+
     val query =
       Search(ResourceType.Patient)
         .apply { filter(Patient.BIRTHDATE, DateType("2013-03-14"), ParamPrefixEnum.LESSTHAN) }
@@ -749,7 +761,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_from < ?
+        WHERE resourceType = ? AND index_name = ? AND (index_from < ?)
         )
         """.trimIndent()
       )
@@ -782,7 +794,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_from <= ?
+        WHERE resourceType = ? AND index_name = ? AND (index_from <= ?)
         )
         """.trimIndent()
       )
@@ -815,7 +827,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateTimeIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_from > ?
+        WHERE resourceType = ? AND index_name = ? AND (index_from > ?)
         )
         """.trimIndent()
       )
@@ -848,7 +860,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateTimeIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_to < ?
+        WHERE resourceType = ? AND index_name = ? AND (index_to < ?)
         )
         """.trimIndent()
       )
@@ -879,7 +891,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateTimeIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?
+        WHERE resourceType = ? AND index_name = ? AND (index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?)
         )
         """.trimIndent()
       )
@@ -913,7 +925,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateTimeIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?
+        WHERE resourceType = ? AND index_name = ? AND (index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?)
         )
         """.trimIndent()
       )
@@ -949,7 +961,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateTimeIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_to > ?
+        WHERE resourceType = ? AND index_name = ? AND (index_to > ?)
         )
         """.trimIndent()
       )
@@ -986,7 +998,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateTimeIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_to >= ?
+        WHERE resourceType = ? AND index_name = ? AND (index_to >= ?)
         )
         """.trimIndent()
       )
@@ -1017,7 +1029,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateTimeIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_from < ?
+        WHERE resourceType = ? AND index_name = ? AND (index_from < ?)
         )
         """.trimIndent()
       )
@@ -1050,7 +1062,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateTimeIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_from <= ?
+        WHERE resourceType = ? AND index_name = ? AND (index_from <= ?)
         )
         """.trimIndent()
       )
@@ -1129,7 +1141,7 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient)
         .apply {
-          filter(Patient.FAMILY) { value = "Jones" }
+          filter(Patient.FAMILY) { values += "Jones" }
           sort(Patient.GIVEN, Order.ASCENDING)
           count = 10
           from = 20
@@ -1146,7 +1158,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM StringIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
+        WHERE resourceType = ? AND index_name = ? AND (index_value LIKE ? || '%' COLLATE NOCASE)
         )
         ORDER BY b.index_value ASC
         LIMIT ? OFFSET ?
@@ -1181,7 +1193,7 @@ class SearchTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.EQUAL
-              value = x.first
+              values += x.first
             }
           }
           .getQuery()
@@ -1193,7 +1205,7 @@ class SearchTest {
           WHERE a.resourceType = ?
           AND a.resourceId IN (
           SELECT resourceId FROM NumberIndexEntity
-          WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value < ?
+          WHERE resourceType = ? AND index_name = ? AND ((index_value >= ? AND index_value < ?))
           )
           """.trimIndent()
         )
@@ -1218,7 +1230,7 @@ class SearchTest {
         .apply {
           filter(RiskAssessment.PROBABILITY) {
             prefix = ParamPrefixEnum.NOT_EQUAL
-            value = BigDecimal("100.00")
+            values += BigDecimal("100.00")
           }
         }
         .getQuery()
@@ -1230,7 +1242,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value < ? OR index_value >= ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value < ? OR index_value >= ?)
         )
         """.trimIndent()
       )
@@ -1254,7 +1266,7 @@ class SearchTest {
         .apply {
           filter(RiskAssessment.PROBABILITY) {
             prefix = ParamPrefixEnum.GREATERTHAN
-            value = BigDecimal("100.00")
+            values += BigDecimal("100.00")
           }
         }
         .getQuery()
@@ -1266,7 +1278,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value > ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value > ?)
         )
         """.trimIndent()
       )
@@ -1288,7 +1300,7 @@ class SearchTest {
         .apply {
           filter(RiskAssessment.PROBABILITY) {
             prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-            value = BigDecimal("100.00")
+            values += BigDecimal("100.00")
           }
         }
         .getQuery()
@@ -1300,7 +1312,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value >= ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value >= ?)
         )
         """.trimIndent()
       )
@@ -1322,7 +1334,7 @@ class SearchTest {
         .apply {
           filter(RiskAssessment.PROBABILITY) {
             prefix = ParamPrefixEnum.LESSTHAN
-            value = BigDecimal("100.00")
+            values += BigDecimal("100.00")
           }
         }
         .getQuery()
@@ -1334,7 +1346,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value < ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value < ?)
         )
         """.trimIndent()
       )
@@ -1356,7 +1368,7 @@ class SearchTest {
         .apply {
           filter(RiskAssessment.PROBABILITY) {
             prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
-            value = BigDecimal("100.00")
+            values += BigDecimal("100.00")
           }
         }
         .getQuery()
@@ -1368,7 +1380,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value <= ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value <= ?)
         )
         """.trimIndent()
       )
@@ -1392,7 +1404,7 @@ class SearchTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.ENDS_BEFORE
-              value = BigDecimal("100")
+              values += BigDecimal("100")
             }
           }
           .getQuery()
@@ -1407,7 +1419,7 @@ class SearchTest {
         .apply {
           filter(RiskAssessment.PROBABILITY) {
             prefix = ParamPrefixEnum.ENDS_BEFORE
-            value = BigDecimal("100.00")
+            values += BigDecimal("100.00")
           }
         }
         .getQuery()
@@ -1419,7 +1431,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value < ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value < ?)
         )
         """.trimIndent()
       )
@@ -1443,7 +1455,7 @@ class SearchTest {
           .apply {
             filter(RiskAssessment.PROBABILITY) {
               prefix = ParamPrefixEnum.STARTS_AFTER
-              value = BigDecimal("100")
+              values += BigDecimal("100")
             }
           }
           .getQuery()
@@ -1459,7 +1471,7 @@ class SearchTest {
         .apply {
           filter(RiskAssessment.PROBABILITY) {
             prefix = ParamPrefixEnum.STARTS_AFTER
-            value = BigDecimal("100.00")
+            values += BigDecimal("100.00")
           }
         }
         .getQuery()
@@ -1471,7 +1483,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value > ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value > ?)
         )
         """.trimIndent()
       )
@@ -1493,7 +1505,7 @@ class SearchTest {
         .apply {
           filter(RiskAssessment.PROBABILITY) {
             prefix = ParamPrefixEnum.APPROXIMATE
-            value = BigDecimal("100.00")
+            values += BigDecimal("100.00")
           }
         }
         .getQuery()
@@ -1505,7 +1517,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value >= ? AND index_value <= ?
+        WHERE resourceType = ? AND index_name = ? AND ((index_value >= ? AND index_value <= ?))
         )
         """.trimIndent()
       )

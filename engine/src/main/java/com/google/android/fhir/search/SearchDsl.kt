@@ -62,7 +62,7 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     date: DateType,
     prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
   ) {
-    dateFilter.add(DateFilter(dateParameter, prefix, date))
+    dateFilter.add(DateFilter(dateParameter, prefix, mutableListOf(date)))
   }
 
   fun filter(
@@ -70,38 +70,50 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     dateTime: DateTimeType,
     prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
   ) {
-    dateTimeFilter.add(DateTimeFilter(dateParameter, prefix, dateTime))
+    dateTimeFilter.add(DateTimeFilter(dateParameter, prefix, mutableListOf(dateTime)))
   }
 
   fun filter(filter: TokenClientParam, coding: Coding) =
-    tokenFilters.add(TokenFilter(parameter = filter, uri = coding.system, code = coding.code))
+    tokenFilters.add(
+      TokenFilter(parameter = filter, uri = coding.system, codes = mutableListOf(coding.code))
+    )
 
   fun filter(filter: TokenClientParam, codeableConcept: CodeableConcept) =
     codeableConcept.coding.forEach {
-      tokenFilters.add(TokenFilter(parameter = filter, uri = it.system, code = it.code))
+      tokenFilters.add(
+        TokenFilter(parameter = filter, uri = it.system, codes = mutableListOf(it.code))
+      )
     }
 
   fun filter(filter: TokenClientParam, identifier: Identifier) =
     tokenFilters.add(
-      TokenFilter(parameter = filter, uri = identifier.system, code = identifier.value)
+      TokenFilter(
+        parameter = filter,
+        uri = identifier.system,
+        codes = mutableListOf(identifier.value)
+      )
     )
 
   fun filter(filter: TokenClientParam, contactPoint: ContactPoint) =
     tokenFilters.add(
-      TokenFilter(parameter = filter, uri = contactPoint.use?.toCode(), code = contactPoint.value)
+      TokenFilter(
+        parameter = filter,
+        uri = contactPoint.use?.toCode(),
+        codes = mutableListOf(contactPoint.value)
+      )
     )
 
   fun filter(filter: TokenClientParam, codeType: CodeType) =
-    tokenFilters.add(TokenFilter(parameter = filter, code = codeType.value))
+    tokenFilters.add(TokenFilter(parameter = filter, codes = mutableListOf(codeType.value)))
 
   fun filter(filter: TokenClientParam, boolean: Boolean) =
-    tokenFilters.add(TokenFilter(parameter = filter, code = boolean.toString()))
+    tokenFilters.add(TokenFilter(parameter = filter, codes = mutableListOf(boolean.toString())))
 
   fun filter(filter: TokenClientParam, uriType: UriType) =
-    tokenFilters.add(TokenFilter(parameter = filter, code = uriType.value))
+    tokenFilters.add(TokenFilter(parameter = filter, codes = mutableListOf(uriType.value)))
 
   fun filter(filter: TokenClientParam, string: String) =
-    tokenFilters.add(TokenFilter(parameter = filter, code = string))
+    tokenFilters.add(TokenFilter(parameter = filter, codes = mutableListOf(string)))
 
   fun filter(numberParameter: NumberClientParam, init: NumberFilter.() -> Unit) {
     val filter = NumberFilter(numberParameter)
@@ -124,35 +136,77 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
 data class StringFilter(
   val parameter: StringClientParam,
   var modifier: StringFilterModifier = StringFilterModifier.STARTS_WITH,
-  var value: String? = null
-)
+  override val values: MutableList<String> = mutableListOf()
+) : BaseFilter<String, StringFilter>() {
+  override fun getThis(): StringFilter = this
+}
 
 @SearchDslMarker
 data class DateFilter(
   val parameter: DateClientParam,
   var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
-  var value: DateType? = null
-)
+  override val values: MutableList<DateType> = mutableListOf()
+) : BaseFilter<DateType, DateFilter>() {
+
+  override fun getThis(): DateFilter {
+    return this
+  }
+}
+
+/*fun <T> BaseFilter<T>.or(value: T) : BaseFilter<T> {
+  if (values == null) {
+    values = mutableListOf()
+  }
+
+  values?.add(value)
+  return this
+}*/
 
 @SearchDslMarker
 data class DateTimeFilter(
   val parameter: DateClientParam,
   var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
-  var value: DateTimeType? = null
-)
+  override val values: MutableList<DateTimeType> = mutableListOf()
+) : BaseFilter<DateTimeType, DateTimeFilter>() {
+  override fun getThis(): DateTimeFilter = this
+}
 
 @SearchDslMarker
-data class ReferenceFilter(val parameter: ReferenceClientParam?, var value: String? = null)
+data class ReferenceFilter(
+  val parameter: ReferenceClientParam?,
+  override val values: MutableList<String> = mutableListOf()
+) : BaseFilter<String, ReferenceFilter>() {
+  override fun getThis(): ReferenceFilter = this
+}
 
 @SearchDslMarker
 data class NumberFilter(
   val parameter: NumberClientParam,
   var prefix: ParamPrefixEnum? = null,
-  var value: BigDecimal? = null
-)
+  override val values: MutableList<BigDecimal> = mutableListOf()
+) : BaseFilter<BigDecimal, NumberFilter>() {
+  override fun getThis(): NumberFilter = this
+}
 
 @SearchDslMarker
-data class TokenFilter(val parameter: TokenClientParam?, var uri: String? = null, var code: String)
+data class TokenFilter(
+  val parameter: TokenClientParam?,
+  var uri: String? = null,
+  val codes: MutableList<String> = mutableListOf()
+) : BaseFilter<String, TokenFilter>(codes) {
+  override fun getThis(): TokenFilter = this
+}
+
+abstract class BaseFilter<T, S : BaseFilter<T, S>>(
+  open val values: MutableList<T> = mutableListOf()
+) {
+  fun or(value: T): S {
+    values.add(value)
+    return getThis()
+  }
+
+  abstract fun getThis(): S
+}
 
 enum class Order {
   ASCENDING,
