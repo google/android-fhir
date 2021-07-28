@@ -30,6 +30,7 @@ import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
@@ -112,9 +113,10 @@ object ResourceMapper {
     val bundle = Bundle()
     val className = questionnaire.itemContextNameToExpressionMap.values.first()
     val extractedResource =
-      (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Resource).apply {
-        extractFields(bundle, questionnaire.item, questionnaireResponse.item)
-      }
+      (Class.forName("org.hl7.fhir.r4.model.$className").newInstance() as Resource)
+    extractedResource.apply {
+      extractFields(bundle, questionnaire.item, questionnaireResponse.item)
+    }
 
     return bundle.apply {
       type = Bundle.BundleType.TRANSACTION
@@ -221,22 +223,22 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
   ) {
-
     if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
       if (questionnaireItem.itemContextNameToExpressionMap.values.isNotEmpty()) {
         val extractedResource =
           (Class.forName(
-                "org.hl7.fhir.r4.model.${questionnaireItem.itemContextNameToExpressionMap.values.first()}"
-              )
-              .newInstance() as
-              Base)
-            .apply { extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item) }
+              "org.hl7.fhir.r4.model.${questionnaireItem.itemContextNameToExpressionMap.values.first()}"
+            )
+            .newInstance() as
+            Base)
         if (extractedResource is Resource) {
+          extractedResource.apply {
+            extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
+          }
           bundle.apply { addEntry().apply { resource = extractedResource as Resource } }
         }
       }
     }
-
     if (questionnaireItem.definition == null) {
       extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
       return
@@ -249,11 +251,22 @@ object ResourceMapper {
 
     val definitionField = questionnaireItem.getDefinitionField ?: return
     if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      val value: Base =
-        (definitionField.nonParameterizedType.newInstance() as Base).apply {
-          extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
-        }
-      updateField(definitionField, value)
+      if (questionnaireItem.isChoiceType(choiceTypeFieldIndex = 1)) {
+        val value: Base =
+          (Class.forName(
+                "org.hl7.fhir.r4.model.${questionnaireItem.itemContextNameToExpressionMap.values.first()}"
+              )
+              .newInstance() as
+              Base)
+            .apply { extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item) }
+        updateField(definitionField, value)
+      } else {
+        val value: Base =
+          (definitionField.nonParameterizedType.newInstance() as Base).apply {
+            extractFields(bundle, questionnaireItem.item, questionnaireResponseItem.item)
+          }
+        updateField(definitionField, value)
+      }
     } else {
       if (questionnaireResponseItem.answer.isEmpty()) return
       if (!definitionField.nonParameterizedType.isEnum) {
@@ -349,6 +362,11 @@ private fun generateAnswerWithCorrectType(answer: Base, fieldType: Field): Base 
         return IdType(answer.value)
       }
     }
+    CodeType::class.java -> {
+      if (answer is Coding) {
+        return CodeType(answer.code)
+      }
+    }
   }
 
   return answer
@@ -434,12 +452,64 @@ private val Questionnaire.QuestionnaireItemComponent.getDefinitionField: Field?
     val path = definitionPath ?: return null
     if (path.size < 2) return null
     val resourceClass: Class<*> = Class.forName("org.hl7.fhir.r4.model.${path[0]}")
-    val definitionField: Field = resourceClass.getFieldOrNull(path[1]) ?: return null
-
+    val definitionField: Field = getFieldOrNull(resourceClass, 1) ?: return null
+    if (isChoiceType(choiceTypeFieldIndex = 1) && path.size > 2) {
+      return getNestedFieldOfChoiceType()
+    }
     return path.drop(2).fold(definitionField) { field: Field?, nestedFieldName: String ->
       field?.nonParameterizedType?.getFieldOrNull(nestedFieldName)
     }
   }
+
+/**
+ * Returns nested declared field of choice data type field if present in definition. e.g returns
+ * "value" field for definition #Observation.quantityValue.value
+ */
+private fun Questionnaire.QuestionnaireItemComponent.getNestedFieldOfChoiceType(): Field? {
+  val path = definitionPath ?: return null
+  if (path.size < 3 || !path[1].startsWith(CHOICE_DATA_TYPE_CONSTANT_NAME)) return null
+  val typeChoice = path[1].substringAfter(CHOICE_DATA_TYPE_CONSTANT_NAME)
+  val resourceClass: Class<*> = Class.forName("org.hl7.fhir.r4.model.$typeChoice")
+  return resourceClass.getFieldOrNull(path[2])
+}
+
+/**
+ * Returns true if choice data type of declared field present at given choiceTypeFieldIndex in
+ * definition.
+ *
+ * @param choiceTypeFieldIndex index of field present in definition e.g
+ * #Observation.quantityValue.value
+ */
+private fun Questionnaire.QuestionnaireItemComponent.isChoiceType(
+  choiceTypeFieldIndex: Int
+): Boolean {
+  val path = definitionPath ?: return false
+  if (path.size <= choiceTypeFieldIndex) {
+    return false
+  }
+  if (path[choiceTypeFieldIndex].startsWith(CHOICE_DATA_TYPE_CONSTANT_NAME)) {
+    return true
+  }
+  return false
+}
+
+/**
+ * Retrieves details about the target field defined in
+ * [org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent.definition]
+ *
+ * @param resourceClass which has declared field
+ * @param fieldIndex index of field present in definition e.g #Observation.quantityValue.value
+ */
+private fun Questionnaire.QuestionnaireItemComponent.getFieldOrNull(
+  resourceClass: Class<*>,
+  fieldIndex: Int
+): Field? {
+  val path = definitionPath ?: return null
+  if (isChoiceType(fieldIndex)) {
+    return resourceClass.getFieldOrNull(CHOICE_DATA_TYPE_CONSTANT_NAME)
+  }
+  return resourceClass.getFieldOrNull(path[fieldIndex])
+}
 
 /**
  * See
@@ -451,6 +521,8 @@ private const val ITEM_CONTEXT_EXTENSION_URL: String =
 
 private const val ITEM_INITIAL_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
+
+private const val CHOICE_DATA_TYPE_CONSTANT_NAME = "value"
 
 private val Field.isList: Boolean
   get() = isParameterized && type == List::class.java
