@@ -26,6 +26,7 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
@@ -51,7 +52,16 @@ object PrimitiveTestCodegen {
 
     val hapiName = "${def.id.value.capitalize()}Type"
     val protoName = def.id.value.capitalize()
-
+    val toProto =
+      MemberName(
+        ClassName("com.google.android.fhir.hapiprotoconverter.generated", "${protoName}Converter"),
+        "toProto"
+      )
+    val toHapi =
+      MemberName(
+        ClassName("com.google.android.fhir.hapiprotoconverter.generated", "${protoName}Converter"),
+        "toHapi"
+      )
     val fileBuilder =
       FileSpec.builder(
         "com.google.android.fhir.hapiprotoconverter.generated",
@@ -88,10 +98,11 @@ object PrimitiveTestCodegen {
       protoName.toUpperCase()
     )
 
-    toProtoBuilder.addCode("%T.assertThat(hapi.toProto()).isEqualTo(proto)", Truth::class)
+    toProtoBuilder.addCode("%T.assertThat(hapi.%M()).isEqualTo(proto)", Truth::class, toProto)
     toHapiBuilder.addStatement(
-      "${if (def.id.value in TIME_LIKE_TEST) TIME_LIKE_TEST_TEMPLATE else "" }%1T.assertThat(proto.toHapi().value).isEqualTo(hapi.value)",
+      "${if (def.id.value in TIME_LIKE_TEST) TIME_LIKE_TEST_TEMPLATE else "" }%1T.assertThat(proto.%2M().value).isEqualTo(hapi.value)",
       Truth::class,
+      toHapi
     )
     val testClassConstructor = FunSpec.constructorBuilder()
 

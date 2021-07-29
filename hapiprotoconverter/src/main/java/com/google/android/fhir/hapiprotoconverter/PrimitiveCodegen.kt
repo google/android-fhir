@@ -27,6 +27,7 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.TypeSpec
 import java.io.File
 import java.time.Instant
 import java.time.LocalTime
@@ -69,7 +70,7 @@ object PrimitiveCodegen {
         "com.google.android.fhir.hapiprotoconverter.generated",
         "${protoName}Converter"
       )
-
+    val converterSpecBuilder = TypeSpec.objectBuilder("${protoName}Converter")
     // List of functions to be added to the file
     val functionsList = mutableListOf<FunSpec>()
 
@@ -208,8 +209,9 @@ object PrimitiveCodegen {
     functionsList.add(0, toProtoBuilder.build())
     functionsList.add(1, toHapiBuilder.build())
 
-    functionsList.forEach { fileBuilder.addFunction(it) }
+    functionsList.forEach { converterSpecBuilder.addFunction(it) }
     fileBuilder
+      .addType(converterSpecBuilder.build())
       .addComment(
         "contains functions that convert between the hapi and proto representations of ${def.id.value}"
       )
@@ -217,7 +219,7 @@ object PrimitiveCodegen {
       .writeTo(outLocation)
   }
 
-  fun FunSpec.Builder.addProtoStatement(param: String, method: String, vararg args: Any) {
+  private fun FunSpec.Builder.addProtoStatement(param: String, method: String, vararg args: Any) {
     this.addStatement("if ($param!=null) protoValue.$method", *args, param)
   }
 }

@@ -48,12 +48,10 @@ fun main() {
         JsonFormat.getParser().merge(it.inputStream().reader(), StructureDefinition.newBuilder())
       CompositeCodegen.profileUrlMap[def.url.value] = def.build()
     }
-  CompositeCodegen.profileUrlMap.values // .filter { it.name.value == "TestReport"}
+  CompositeCodegen.profileUrlMap.values // .filter { it.name.value == "ElementDefinition "}
     .forEach { def ->
-    if ((def.kind.value == StructureDefinitionKindCode.Value.COMPLEX_TYPE
-              //||
-        //def.kind.value == StructureDefinitionKindCode.Value.RESOURCE
-              ) && !def.abstract.value
+    if ((def.kind.value == StructureDefinitionKindCode.Value.COMPLEX_TYPE ||
+        def.kind.value == StructureDefinitionKindCode.Value.RESOURCE) && !def.abstract.value
     // &&
     // def.status.value == PublicationStatusCode.Value.ACTIVE
     ) {
@@ -61,6 +59,7 @@ fun main() {
         Class.forName(
           ClassName(CompositeCodegen.hapiPackage, def.id.value.capitalize()).reflectionName()
         )
+
         Class.forName(
           ClassName(CompositeCodegen.protoPackage, def.id.value.capitalize()).reflectionName()
         )
