@@ -35,17 +35,19 @@ internal fun String.checkForKotlinKeyWord(): String {
   return this
 }
 
-/** returns string with the first character in lowercase
+/**
+ * returns string with the first character in lowercase
  *
  * for example, if the string is Proto it will return proto
- * */
+ */
 internal fun CharSequence.lowerCaseFirst() =
   (if (this[0].isUpperCase()) this[0] + 32 else this[0]).toChar().toString() + this.drop(1)
 
-/** returns string with the first character in uppercase
+/**
+ * returns string with the first character in uppercase
  *
  * for example, if the string is proto it will return Proto
- * */
+ */
 internal fun CharSequence.capitalizeFirst() =
   (if (this[0].isLowerCase()) this[0] - 32 else this[0]).toChar().toString() + this.drop(1)
 
@@ -53,7 +55,7 @@ internal fun CharSequence.capitalizeFirst() =
  * returns title case notation of a string in camelCase
  *
  * For example ProtoFHIR will return ProtoFhir
- * */
+ */
 internal fun String.resolveAcronyms(): String {
 
   val matcher: Matcher = ACRONYM_PATTERN.matcher(this)

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.AttachmentConverter.toHapi
@@ -26,40 +42,41 @@ import com.google.fhir.r4.core.Id
 public object BodyStructureConverter {
   public fun BodyStructure.toHapi(): org.hl7.fhir.r4.model.BodyStructure {
     val hapiValue = org.hl7.fhir.r4.model.BodyStructure()
-    hapiValue.id = id.value 
+    hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
     hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
-    hapiValue.setIdentifier(identifierList.map{it.toHapi()})
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setActiveElement(active.toHapi())
     hapiValue.setMorphology(morphology.toHapi())
     hapiValue.setLocation(location.toHapi())
-    hapiValue.setLocationQualifier(locationQualifierList.map{it.toHapi()})
+    hapiValue.setLocationQualifier(locationQualifierList.map { it.toHapi() })
     hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setImage(imageList.map{it.toHapi()})
+    hapiValue.setImage(imageList.map { it.toHapi() })
     hapiValue.setPatient(patient.toHapi())
     return hapiValue
   }
 
   public fun org.hl7.fhir.r4.model.BodyStructure.toProto(): BodyStructure {
-    val protoValue = BodyStructure.newBuilder()
-    .setId(Id.newBuilder().setValue(id))
-    .setMeta(meta.toProto())
-    .setImplicitRules(implicitRulesElement.toProto())
-    .setText(text.toProto())
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .addAllIdentifier(identifier.map{it.toProto()})
-    .setActive(activeElement.toProto())
-    .setMorphology(morphology.toProto())
-    .setLocation(location.toProto())
-    .addAllLocationQualifier(locationQualifier.map{it.toProto()})
-    .setDescription(descriptionElement.toProto())
-    .addAllImage(image.map{it.toProto()})
-    .setPatient(patient.toProto())
-    .build()
+    val protoValue =
+      BodyStructure.newBuilder()
+        .setId(Id.newBuilder().setValue(id))
+        .setMeta(meta.toProto())
+        .setImplicitRules(implicitRulesElement.toProto())
+        .setText(text.toProto())
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .addAllIdentifier(identifier.map { it.toProto() })
+        .setActive(activeElement.toProto())
+        .setMorphology(morphology.toProto())
+        .setLocation(location.toProto())
+        .addAllLocationQualifier(locationQualifier.map { it.toProto() })
+        .setDescription(descriptionElement.toProto())
+        .addAllImage(image.map { it.toProto() })
+        .setPatient(patient.toProto())
+        .build()
     return protoValue
   }
 }

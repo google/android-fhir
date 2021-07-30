@@ -49,36 +49,35 @@ internal fun handleOtherType(
   fileBuilder.addImport(toHapi.enclosingClassName!!, toHapi.simpleName)
   if (isSingle) {
     protoBuilder.addStatement(
-      "${singleMethodTemplate}(${if (element.typeList.first().profileList.isNotEmpty()) "( %L as %T )" else "%L%L"}.toProto())",
+      "$singleMethodTemplate(${if (element.typeList.first().profileList.isNotEmpty()) "( %L as %T )" else "%L%L"}.toProto())",
       element.getProtoMethodName(),
-      element.getHapiFieldName(isPrimitive = element.typeList.single().normalizeType().lowerCaseFirst() in primitiveTypeList)
-        ,
+      element.getHapiFieldName(
+        isPrimitive =
+          element.typeList.single().normalizeType().lowerCaseFirst() in primitiveTypeList
+      ),
       if (element.typeList.first().profileList.isNotEmpty())
-        ClassName(
-          hapiPackage,
-          element.typeList.first().normalizeType()
-        )
+        ClassName(hapiPackage, element.typeList.first().normalizeType())
       else ""
     )
     hapiBuilder.addStatement(
-      "hapiValue${singleMethodTemplate}(%L.toHapi())",
-      element.getHapiMethodName(isPrimitive = element.typeList.single().normalizeType().lowerCaseFirst() in primitiveTypeList),
+      "hapiValue$singleMethodTemplate(%L.toHapi())",
+      element.getHapiMethodName(
+        isPrimitive =
+          element.typeList.single().normalizeType().lowerCaseFirst() in primitiveTypeList
+      ),
       element.getProtoFieldName(),
     )
   } else {
     protoBuilder.addStatement(
-      "${multipleMethodTemplate}(%L.map{${if (element.typeList.first().profileList.isNotEmpty()) "( it as %T  )" else "it%L"}.toProto()})",
+      "$multipleMethodTemplate(%L.map{${if (element.typeList.first().profileList.isNotEmpty()) "( it as %T  )" else "it%L"}.toProto()})",
       element.getProtoMethodName(),
-     element.getHapiFieldName(),
+      element.getHapiFieldName(),
       if (element.typeList.first().profileList.isNotEmpty())
-        ClassName(
-          hapiPackage,
-          element.typeList.first().normalizeType()
-        )
+        ClassName(hapiPackage, element.typeList.first().normalizeType())
       else ""
     )
     hapiBuilder.addStatement(
-      "hapiValue${singleMethodTemplate}(%L.map{it.toHapi()})",
+      "hapiValue$singleMethodTemplate(%L.map{it.toHapi()})",
       element.getHapiMethodName(),
       element.getProtoFieldName(isRepeated = true)
     )

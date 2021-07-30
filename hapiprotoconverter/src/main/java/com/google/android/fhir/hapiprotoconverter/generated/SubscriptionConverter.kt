@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.ContactPointConverter.toHapi
@@ -26,14 +42,18 @@ import com.google.fhir.r4.core.SubscriptionStatusCode
 public object SubscriptionConverter {
   public fun Subscription.toHapi(): org.hl7.fhir.r4.model.Subscription {
     val hapiValue = org.hl7.fhir.r4.model.Subscription()
-    hapiValue.id = id.value 
+    hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
     hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
-    hapiValue.setStatus(org.hl7.fhir.r4.model.Subscription.SubscriptionStatus.valueOf(status.value.name.replace("_","")))
-    hapiValue.setContact(contactList.map{it.toHapi()})
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setStatus(
+      org.hl7.fhir.r4.model.Subscription.SubscriptionStatus.valueOf(
+        status.value.name.replace("_", "")
+      )
+    )
+    hapiValue.setContact(contactList.map { it.toHapi() })
     hapiValue.setEndElement(end.toHapi())
     hapiValue.setReasonElement(reason.toHapi())
     hapiValue.setCriteriaElement(criteria.toHapi())
@@ -43,50 +63,68 @@ public object SubscriptionConverter {
   }
 
   public fun org.hl7.fhir.r4.model.Subscription.toProto(): Subscription {
-    val protoValue = Subscription.newBuilder()
-    .setId(Id.newBuilder().setValue(id))
-    .setMeta(meta.toProto())
-    .setImplicitRules(implicitRulesElement.toProto())
-    .setText(text.toProto())
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .setStatus(Subscription.StatusCode.newBuilder().setValue(SubscriptionStatusCode.Value.valueOf(status.toCode().replace("-",
-        "_").toUpperCase())).build())
-    .addAllContact(contact.map{it.toProto()})
-    .setEnd(endElement.toProto())
-    .setReason(reasonElement.toProto())
-    .setCriteria(criteriaElement.toProto())
-    .setError(errorElement.toProto())
-    .setChannel(channel.toProto())
-    .build()
+    val protoValue =
+      Subscription.newBuilder()
+        .setId(Id.newBuilder().setValue(id))
+        .setMeta(meta.toProto())
+        .setImplicitRules(implicitRulesElement.toProto())
+        .setText(text.toProto())
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setStatus(
+          Subscription.StatusCode.newBuilder()
+            .setValue(
+              SubscriptionStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+            )
+            .build()
+        )
+        .addAllContact(contact.map { it.toProto() })
+        .setEnd(endElement.toProto())
+        .setReason(reasonElement.toProto())
+        .setCriteria(criteriaElement.toProto())
+        .setError(errorElement.toProto())
+        .setChannel(channel.toProto())
+        .build()
     return protoValue
   }
 
   private fun org.hl7.fhir.r4.model.Subscription.SubscriptionChannelComponent.toProto():
-      Subscription.Channel {
-    val protoValue = Subscription.Channel.newBuilder()
-    .setId(String.newBuilder().setValue(id))
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .setType(Subscription.Channel.TypeCode.newBuilder().setValue(SubscriptionChannelTypeCode.Value.valueOf(type.toCode().replace("-",
-        "_").toUpperCase())).build())
-    .setEndpoint(endpointElement.toProto())
-    .setPayload(Subscription.Channel.PayloadCode.newBuilder().setValue(payload).build())
-    .addAllHeader(header.map{it.toProto()})
-    .build()
+    Subscription.Channel {
+    val protoValue =
+      Subscription.Channel.newBuilder()
+        .setId(String.newBuilder().setValue(id))
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setType(
+          Subscription.Channel.TypeCode.newBuilder()
+            .setValue(
+              SubscriptionChannelTypeCode.Value.valueOf(
+                type.toCode().replace("-", "_").toUpperCase()
+              )
+            )
+            .build()
+        )
+        .setEndpoint(endpointElement.toProto())
+        .setPayload(Subscription.Channel.PayloadCode.newBuilder().setValue(payload).build())
+        .addAllHeader(header.map { it.toProto() })
+        .build()
     return protoValue
   }
 
   private fun Subscription.Channel.toHapi():
-      org.hl7.fhir.r4.model.Subscription.SubscriptionChannelComponent {
+    org.hl7.fhir.r4.model.Subscription.SubscriptionChannelComponent {
     val hapiValue = org.hl7.fhir.r4.model.Subscription.SubscriptionChannelComponent()
-    hapiValue.id = id.value 
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
-    hapiValue.setType(org.hl7.fhir.r4.model.Subscription.SubscriptionChannelType.valueOf(type.value.name.replace("_","")))
+    hapiValue.id = id.value
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setType(
+      org.hl7.fhir.r4.model.Subscription.SubscriptionChannelType.valueOf(
+        type.value.name.replace("_", "")
+      )
+    )
     hapiValue.setEndpointElement(endpoint.toHapi())
     hapiValue.setPayload(payload.value)
-    hapiValue.setHeader(headerList.map{it.toHapi()})
+    hapiValue.setHeader(headerList.map { it.toHapi() })
     return hapiValue
   }
 }

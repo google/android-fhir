@@ -46,7 +46,7 @@ internal fun handleCodeType(
     if (isSingle) {
       // if enum isSingle
       protoBuilder.addStatement(
-        "${singleMethodTemplate}(%T.newBuilder().setValue(%T.valueOf(%L.toCode().replace(\"-\", \"_\").toUpperCase())).build())",
+        "$singleMethodTemplate(%T.newBuilder().setValue(%T.valueOf(%L.toCode().replace(\"-\", \"_\").toUpperCase())).build())",
         element.getProtoMethodName(),
         // Using this just to make sure codes are present in hapi and fhir protos TODO change to
         element.getProtoCodeClass(
@@ -58,7 +58,7 @@ internal fun handleCodeType(
         element.getHapiFieldName()
       )
       hapiBuilder.addStatement(
-        "hapiValue${singleMethodTemplate}(%T.valueOf(%L.value.name.replace(\"_\",\"\")))",
+        "hapiValue$singleMethodTemplate(%T.valueOf(%L.value.name.replace(\"_\",\"\")))",
         element.getHapiMethodName(),
         element.getHapiCodeClass(isCommon),
         element.getProtoFieldName()
@@ -66,9 +66,9 @@ internal fun handleCodeType(
     } else {
       // handle case when enum is repeated
       protoBuilder.addStatement(
-        "${multipleMethodTemplate}(%L.map{%T.newBuilder().setValue(%T.valueOf(it.value.toCode().replace(\"-\", \"_\").toUpperCase())).build()})",
+        "$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.value.toCode().replace(\"-\", \"_\").toUpperCase())).build()})",
         element.getProtoMethodName(),
-       element.getHapiFieldName(),
+        element.getHapiFieldName(),
         element.getProtoCodeClass(
           protoName,
           backboneElementMap[element.path.value.substringBeforeLast(".")]
@@ -87,7 +87,7 @@ internal fun handleCodeType(
   else {
     if (isSingle) {
       protoBuilder.addStatement(
-        "${singleMethodTemplate}(%T.newBuilder().setValue(%L).build())",
+        "$singleMethodTemplate(%T.newBuilder().setValue(%L).build())",
         element.getProtoMethodName(),
         // Using this just to make sure codes are present in hapi and fhir protos TODO change to
         element.getProtoCodeClass(
@@ -98,15 +98,13 @@ internal fun handleCodeType(
         element.getHapiFieldName()
       )
       hapiBuilder.addStatement(
-        "hapiValue${singleMethodTemplate}(%L.value)",
+        "hapiValue$singleMethodTemplate(%L.value)",
         element.getHapiMethodName(),
         element.getProtoFieldName()
       )
-    }
-
-    else {
+    } else {
       protoBuilder.addStatement(
-        "${multipleMethodTemplate}(%L.map{%T.newBuilder().setValue(it.value).build()})",
+        "$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(it.value).build()})",
         element.getProtoMethodName(),
         element.getHapiFieldName(),
         element.getProtoCodeClass(
@@ -162,7 +160,8 @@ private fun getEnumNameFromElement(element: ElementDefinition): ClassName {
 
 private fun getCodeSystemName(name: String): kotlin.String {
   val filteredName =
-    name.value
+    name
+      .value
       .split("-")
       .joinToString("") { it.capitalizeFirst() }
       .replace("[^A-Za-z0-9]".toRegex(), "")
@@ -171,18 +170,21 @@ private fun getCodeSystemName(name: String): kotlin.String {
   if (filteredName.endsWith("Codes")) {
     return filteredName.substring(0, filteredName.length - 1)
   }
-  return if (filteredName.endsWith("Code", ignoreCase = true)) filteredName else "${filteredName}Code"
+  return if (filteredName.endsWith("Code", ignoreCase = true)) filteredName
+  else "${filteredName}Code"
 }
 
 private fun getValueSetName(name: String): kotlin.String {
   val filteredName =
-    name.value
+    name
+      .value
       .split("-")
       .joinToString("") { it.capitalizeFirst() }
       .replace("[^A-Za-z0-9]", "")
       .capitalizeFirst()
-  if (filteredName.endsWith("ValueSets",ignoreCase = true)) {
+  if (filteredName.endsWith("ValueSets", ignoreCase = true)) {
     return filteredName.substring(0, filteredName.length - 1)
   }
-  return if (filteredName.endsWith("ValueSet",ignoreCase = true)) filteredName else "${filteredName}ValueSet"
+  return if (filteredName.endsWith("ValueSet", ignoreCase = true)) filteredName
+  else "${filteredName}ValueSet"
 }

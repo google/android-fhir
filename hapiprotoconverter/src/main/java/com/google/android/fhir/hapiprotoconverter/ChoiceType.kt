@@ -65,51 +65,37 @@ internal fun handleChoiceType(
       ClassName(
         hapiPackage,
         type.normalizeType() +
-          if (type.normalizeType().lowerCaseFirst() in
-              primitiveTypeList
-          )
-            "Type"
-          else ""
+          if (type.normalizeType().lowerCaseFirst() in primitiveTypeList) "Type" else ""
       )
     )
     val toProto =
       MemberName(
-        ClassName(
-          converterPackage,
-          "${
-          type.normalizeType().capitalizeFirst()}Converter"
-        ),
+        ClassName(converterPackage, "${type.normalizeType().capitalizeFirst()}Converter"),
         "toProto"
       )
     val toHapi =
       MemberName(
-        ClassName(
-          converterPackage,
-          "${
-          type.normalizeType().capitalizeFirst()}Converter"
-        ),
+        ClassName(converterPackage, "${type.normalizeType().capitalizeFirst()}Converter"),
         "toHapi"
       )
+
     fileBuilder.addImport(toProto.enclosingClassName!!, toProto.simpleName)
     fileBuilder.addImport(toHapi.enclosingClassName!!, toHapi.simpleName)
 
     elementToProtoBuilder.addStatement(
-      "protoValue${singleMethodTemplate}(this.toProto())",
-      if (type.normalizeType() == "String") "StringValue"
-      else type.code.value.capitalizeFirst()
+      "protoValue$singleMethodTemplate(this.toProto())",
+      if (type.normalizeType() == "String") "StringValue" else type.code.value.capitalizeFirst()
     )
     elementToProtoBuilder.endControlFlow()
 
     elementToHapiBuilder.beginControlFlow(
       "if (this.get%L() != %T.newBuilder().defaultInstanceForType )",
-      if (type.normalizeType() == "String") "StringValue"
-      else type.code.value.capitalizeFirst(),
+      if (type.normalizeType() == "String") "StringValue" else type.code.value.capitalizeFirst(),
       ClassName(protoPackage, type.normalizeType())
     )
     elementToHapiBuilder.addStatement(
       "return (this.get%L()).toHapi()",
-      if (type.normalizeType() == "String") "StringValue"
-      else type.code.value.capitalizeFirst()
+      if (type.normalizeType() == "String") "StringValue" else type.code.value.capitalizeFirst()
     )
     elementToHapiBuilder.endControlFlow()
   }
@@ -121,18 +107,15 @@ internal fun handleChoiceType(
     "Invalid Type for ${element.path.value}"
   )
   protoBuilder.addStatement(
-    "${singleMethodTemplate}(%L.%N())",
-    element
-      .getProtoMethodName(),
-    element
-      .getHapiFieldName(),
+    "$singleMethodTemplate(%L.%N())",
+    element.getProtoMethodName(),
+    element.getHapiFieldName(),
     elementToProtoBuilder.build()
   )
   hapiBuilder.addStatement(
-    "hapiValue${singleMethodTemplate}(%L.%N())",
+    "hapiValue$singleMethodTemplate(%L.%N())",
     element.getHapiMethodName(),
-    element
-      .getProtoFieldName(),
+    element.getProtoFieldName(),
     elementToHapiBuilder.build()
   )
 

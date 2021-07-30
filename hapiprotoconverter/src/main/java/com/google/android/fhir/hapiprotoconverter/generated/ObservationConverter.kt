@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.AnnotationConverter.toHapi
@@ -71,16 +87,16 @@ import org.hl7.fhir.r4.model.Type
 
 public object ObservationConverter {
   private fun Observation.EffectiveX.observationEffectiveToHapi(): Type {
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType ) {
+    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
       return (this.getDateTime()).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
+    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
       return (this.getPeriod()).toHapi()
     }
-    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType ) {
+    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType) {
       return (this.getTiming()).toHapi()
     }
-    if (this.getInstant() != Instant.newBuilder().defaultInstanceForType ) {
+    if (this.getInstant() != Instant.newBuilder().defaultInstanceForType) {
       return (this.getInstant()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Observation.effective[x]")
@@ -104,37 +120,37 @@ public object ObservationConverter {
   }
 
   private fun Observation.ValueX.observationValueToHapi(): Type {
-    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType ) {
+    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
       return (this.getQuantity()).toHapi()
     }
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
+    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
+    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
       return (this.getStringValue()).toHapi()
     }
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType ) {
+    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
       return (this.getBoolean()).toHapi()
     }
-    if (this.getInteger() != Integer.newBuilder().defaultInstanceForType ) {
+    if (this.getInteger() != Integer.newBuilder().defaultInstanceForType) {
       return (this.getInteger()).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType ) {
+    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
       return (this.getRange()).toHapi()
     }
-    if (this.getRatio() != Ratio.newBuilder().defaultInstanceForType ) {
+    if (this.getRatio() != Ratio.newBuilder().defaultInstanceForType) {
       return (this.getRatio()).toHapi()
     }
-    if (this.getSampledData() != SampledData.newBuilder().defaultInstanceForType ) {
+    if (this.getSampledData() != SampledData.newBuilder().defaultInstanceForType) {
       return (this.getSampledData()).toHapi()
     }
-    if (this.getTime() != Time.newBuilder().defaultInstanceForType ) {
+    if (this.getTime() != Time.newBuilder().defaultInstanceForType) {
       return (this.getTime()).toHapi()
     }
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType ) {
+    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
       return (this.getDateTime()).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
+    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
       return (this.getPeriod()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Observation.value[x]")
@@ -179,37 +195,37 @@ public object ObservationConverter {
   }
 
   private fun Observation.Component.ValueX.observationComponentValueToHapi(): Type {
-    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType ) {
+    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
       return (this.getQuantity()).toHapi()
     }
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
+    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
+    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
       return (this.getStringValue()).toHapi()
     }
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType ) {
+    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
       return (this.getBoolean()).toHapi()
     }
-    if (this.getInteger() != Integer.newBuilder().defaultInstanceForType ) {
+    if (this.getInteger() != Integer.newBuilder().defaultInstanceForType) {
       return (this.getInteger()).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType ) {
+    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
       return (this.getRange()).toHapi()
     }
-    if (this.getRatio() != Ratio.newBuilder().defaultInstanceForType ) {
+    if (this.getRatio() != Ratio.newBuilder().defaultInstanceForType) {
       return (this.getRatio()).toHapi()
     }
-    if (this.getSampledData() != SampledData.newBuilder().defaultInstanceForType ) {
+    if (this.getSampledData() != SampledData.newBuilder().defaultInstanceForType) {
       return (this.getSampledData()).toHapi()
     }
-    if (this.getTime() != Time.newBuilder().defaultInstanceForType ) {
+    if (this.getTime() != Time.newBuilder().defaultInstanceForType) {
       return (this.getTime()).toHapi()
     }
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType ) {
+    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
       return (this.getDateTime()).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
+    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
       return (this.getPeriod()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Observation.component.value[x]")
@@ -255,131 +271,143 @@ public object ObservationConverter {
 
   public fun Observation.toHapi(): org.hl7.fhir.r4.model.Observation {
     val hapiValue = org.hl7.fhir.r4.model.Observation()
-    hapiValue.id = id.value 
+    hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
     hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
-    hapiValue.setIdentifier(identifierList.map{it.toHapi()})
-    hapiValue.setBasedOn(basedOnList.map{it.toHapi()})
-    hapiValue.setPartOf(partOfList.map{it.toHapi()})
-    hapiValue.setStatus(org.hl7.fhir.r4.model.Observation.ObservationStatus.valueOf(status.value.name.replace("_","")))
-    hapiValue.setCategory(categoryList.map{it.toHapi()})
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+    hapiValue.setPartOf(partOfList.map { it.toHapi() })
+    hapiValue.setStatus(
+      org.hl7.fhir.r4.model.Observation.ObservationStatus.valueOf(
+        status.value.name.replace("_", "")
+      )
+    )
+    hapiValue.setCategory(categoryList.map { it.toHapi() })
     hapiValue.setCode(code.toHapi())
     hapiValue.setSubject(subject.toHapi())
-    hapiValue.setFocus(focusList.map{it.toHapi()})
+    hapiValue.setFocus(focusList.map { it.toHapi() })
     hapiValue.setEncounter(encounter.toHapi())
     hapiValue.setEffective(effective.observationEffectiveToHapi())
     hapiValue.setIssuedElement(issued.toHapi())
-    hapiValue.setPerformer(performerList.map{it.toHapi()})
+    hapiValue.setPerformer(performerList.map { it.toHapi() })
     hapiValue.setValue(value.observationValueToHapi())
     hapiValue.setDataAbsentReason(dataAbsentReason.toHapi())
-    hapiValue.setInterpretation(interpretationList.map{it.toHapi()})
-    hapiValue.setNote(noteList.map{it.toHapi()})
+    hapiValue.setInterpretation(interpretationList.map { it.toHapi() })
+    hapiValue.setNote(noteList.map { it.toHapi() })
     hapiValue.setBodySite(bodySite.toHapi())
     hapiValue.setMethod(method.toHapi())
     hapiValue.setSpecimen(specimen.toHapi())
     hapiValue.setDevice(device.toHapi())
-    hapiValue.setReferenceRange(referenceRangeList.map{it.toHapi()})
-    hapiValue.setHasMember(hasMemberList.map{it.toHapi()})
-    hapiValue.setDerivedFrom(derivedFromList.map{it.toHapi()})
-    hapiValue.setComponent(componentList.map{it.toHapi()})
+    hapiValue.setReferenceRange(referenceRangeList.map { it.toHapi() })
+    hapiValue.setHasMember(hasMemberList.map { it.toHapi() })
+    hapiValue.setDerivedFrom(derivedFromList.map { it.toHapi() })
+    hapiValue.setComponent(componentList.map { it.toHapi() })
     return hapiValue
   }
 
   public fun org.hl7.fhir.r4.model.Observation.toProto(): Observation {
-    val protoValue = Observation.newBuilder()
-    .setId(Id.newBuilder().setValue(id))
-    .setMeta(meta.toProto())
-    .setImplicitRules(implicitRulesElement.toProto())
-    .setText(text.toProto())
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .addAllIdentifier(identifier.map{it.toProto()})
-    .addAllBasedOn(basedOn.map{it.toProto()})
-    .addAllPartOf(partOf.map{it.toProto()})
-    .setStatus(Observation.StatusCode.newBuilder().setValue(ObservationStatusCode.Value.valueOf(status.toCode().replace("-",
-        "_").toUpperCase())).build())
-    .addAllCategory(category.map{it.toProto()})
-    .setCode(code.toProto())
-    .setSubject(subject.toProto())
-    .addAllFocus(focus.map{it.toProto()})
-    .setEncounter(encounter.toProto())
-    .setEffective(effective.observationEffectiveToProto())
-    .setIssued(issuedElement.toProto())
-    .addAllPerformer(performer.map{it.toProto()})
-    .setValue(value.observationValueToProto())
-    .setDataAbsentReason(dataAbsentReason.toProto())
-    .addAllInterpretation(interpretation.map{it.toProto()})
-    .addAllNote(note.map{it.toProto()})
-    .setBodySite(bodySite.toProto())
-    .setMethod(method.toProto())
-    .setSpecimen(specimen.toProto())
-    .setDevice(device.toProto())
-    .addAllReferenceRange(referenceRange.map{it.toProto()})
-    .addAllHasMember(hasMember.map{it.toProto()})
-    .addAllDerivedFrom(derivedFrom.map{it.toProto()})
-    .addAllComponent(component.map{it.toProto()})
-    .build()
+    val protoValue =
+      Observation.newBuilder()
+        .setId(Id.newBuilder().setValue(id))
+        .setMeta(meta.toProto())
+        .setImplicitRules(implicitRulesElement.toProto())
+        .setText(text.toProto())
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .addAllIdentifier(identifier.map { it.toProto() })
+        .addAllBasedOn(basedOn.map { it.toProto() })
+        .addAllPartOf(partOf.map { it.toProto() })
+        .setStatus(
+          Observation.StatusCode.newBuilder()
+            .setValue(
+              ObservationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+            )
+            .build()
+        )
+        .addAllCategory(category.map { it.toProto() })
+        .setCode(code.toProto())
+        .setSubject(subject.toProto())
+        .addAllFocus(focus.map { it.toProto() })
+        .setEncounter(encounter.toProto())
+        .setEffective(effective.observationEffectiveToProto())
+        .setIssued(issuedElement.toProto())
+        .addAllPerformer(performer.map { it.toProto() })
+        .setValue(value.observationValueToProto())
+        .setDataAbsentReason(dataAbsentReason.toProto())
+        .addAllInterpretation(interpretation.map { it.toProto() })
+        .addAllNote(note.map { it.toProto() })
+        .setBodySite(bodySite.toProto())
+        .setMethod(method.toProto())
+        .setSpecimen(specimen.toProto())
+        .setDevice(device.toProto())
+        .addAllReferenceRange(referenceRange.map { it.toProto() })
+        .addAllHasMember(hasMember.map { it.toProto() })
+        .addAllDerivedFrom(derivedFrom.map { it.toProto() })
+        .addAllComponent(component.map { it.toProto() })
+        .build()
     return protoValue
   }
 
   private fun org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent.toProto():
-      Observation.ReferenceRange {
-    val protoValue = Observation.ReferenceRange.newBuilder()
-    .setId(String.newBuilder().setValue(id))
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .setLow(( low as SimpleQuantity ).toProto())
-    .setHigh(( high as SimpleQuantity ).toProto())
-    .setType(type.toProto())
-    .addAllAppliesTo(appliesTo.map{it.toProto()})
-    .setAge(age.toProto())
-    .setText(textElement.toProto())
-    .build()
+    Observation.ReferenceRange {
+    val protoValue =
+      Observation.ReferenceRange.newBuilder()
+        .setId(String.newBuilder().setValue(id))
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setLow((low as SimpleQuantity).toProto())
+        .setHigh((high as SimpleQuantity).toProto())
+        .setType(type.toProto())
+        .addAllAppliesTo(appliesTo.map { it.toProto() })
+        .setAge(age.toProto())
+        .setText(textElement.toProto())
+        .build()
     return protoValue
   }
 
   private fun org.hl7.fhir.r4.model.Observation.ObservationComponentComponent.toProto():
-      Observation.Component {
-    val protoValue = Observation.Component.newBuilder()
-    .setId(String.newBuilder().setValue(id))
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .setCode(code.toProto())
-    .setValue(value.observationComponentValueToProto())
-    .setDataAbsentReason(dataAbsentReason.toProto())
-    .addAllInterpretation(interpretation.map{it.toProto()})
-    .build()
+    Observation.Component {
+    val protoValue =
+      Observation.Component.newBuilder()
+        .setId(String.newBuilder().setValue(id))
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setCode(code.toProto())
+        .setValue(value.observationComponentValueToProto())
+        .setDataAbsentReason(dataAbsentReason.toProto())
+        .addAllInterpretation(interpretation.map { it.toProto() })
+        .build()
     return protoValue
   }
 
   private fun Observation.ReferenceRange.toHapi():
-      org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent {
+    org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent {
     val hapiValue = org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent()
-    hapiValue.id = id.value 
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
+    hapiValue.id = id.value
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setLow(low.toHapi())
     hapiValue.setHigh(high.toHapi())
     hapiValue.setType(type.toHapi())
-    hapiValue.setAppliesTo(appliesToList.map{it.toHapi()})
+    hapiValue.setAppliesTo(appliesToList.map { it.toHapi() })
     hapiValue.setAge(age.toHapi())
     hapiValue.setTextElement(text.toHapi())
     return hapiValue
   }
 
   private fun Observation.Component.toHapi():
-      org.hl7.fhir.r4.model.Observation.ObservationComponentComponent {
+    org.hl7.fhir.r4.model.Observation.ObservationComponentComponent {
     val hapiValue = org.hl7.fhir.r4.model.Observation.ObservationComponentComponent()
-    hapiValue.id = id.value 
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
+    hapiValue.id = id.value
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setCode(code.toHapi())
     hapiValue.setValue(value.observationComponentValueToHapi())
     hapiValue.setDataAbsentReason(dataAbsentReason.toHapi())
-    hapiValue.setInterpretation(interpretationList.map{it.toHapi()})
+    hapiValue.setInterpretation(interpretationList.map { it.toHapi() })
     return hapiValue
   }
 }

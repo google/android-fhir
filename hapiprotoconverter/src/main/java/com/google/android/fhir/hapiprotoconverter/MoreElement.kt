@@ -45,53 +45,56 @@ internal fun ElementDefinition.getElementName(): String {
   }
 }
 
+/** @returns the ClassName for choiceType hapi */
 internal fun ElementDefinition.getChoiceTypeHapiClass(): ClassName {
   return ClassName(hapiPackage, "Type")
 }
 
+/** check if element has extension [uri] */
 internal fun ElementDefinition.hasExtension(uri: String): Boolean {
   return extensionList.any { it.url.value == uri }
 }
-
+/** get extension of element of [uri] */
 internal fun ElementDefinition.getExtension(uri: String): Extension {
   return extensionList.single { it.url.value == uri }
 }
-
+/** get hapi method name for getter/setter */
 internal fun ElementDefinition.getHapiMethodName(isPrimitive: Boolean = false): String {
   return (if (getElementMethodName().lowerCaseFirst() in listOf("class"))
-    "${getElementMethodName()}_"
-  else getElementMethodName()).capitalizeFirst() + if (isPrimitive) "Element" else ""
+      "${getElementMethodName()}_"
+    else getElementMethodName())
+    .capitalizeFirst() + if (isPrimitive) "Element" else ""
 }
 
-internal fun ElementDefinition.getHapiFieldName(isPrimitive: Boolean= false) : String {
+/** get hapi field name */
+internal fun ElementDefinition.getHapiFieldName(isPrimitive: Boolean = false): String {
   return ((if (getElementMethodName().lowerCaseFirst() in listOf("class"))
-    "${getElementMethodName()}_"
-  else getElementMethodName().capitalizeFirst()).lowerCaseFirst()+ if (isPrimitive) "Element" else "").checkForKotlinKeyWord()
+        "${getElementMethodName()}_"
+      else getElementMethodName().capitalizeFirst())
+      .lowerCaseFirst() + if (isPrimitive) "Element" else "")
+    .checkForKotlinKeyWord()
 }
 
+/** get ClassName for BackBone protoClass */
 internal fun ElementDefinition.getBackBoneProtoClass(
   data: CompositeCodegen.BackBoneElementData?
 ): ClassName {
   return ClassName(
       protoPackage,
       data?.protoName
-        ?: path.value.substringBeforeLast(".").split(".").joinToString(".") {
-          it.capitalizeFirst()
-        }
+        ?: path.value.substringBeforeLast(".").split(".").joinToString(".") { it.capitalizeFirst() }
     )
     .nestedClass(
-      if (getElementName().equals("code",ignoreCase = true)) "CodeType"
+      if (getElementName().equals("code", ignoreCase = true)) "CodeType"
       else getElementName().capitalizeFirst()
     )
 }
 
+/** get ClassName for BackBone hapiClass */
 internal fun ElementDefinition.getBackBoneHapiClass(
   data: CompositeCodegen.BackBoneElementData?
 ): ClassName {
-  return ClassName(
-      hapiPackage,
-      base.path.value.split(".").first().capitalizeFirst()
-    )
+  return ClassName(hapiPackage, base.path.value.split(".").first().capitalizeFirst())
     .nestedClass(
       if (hasExtension(explicitTypeName)) {
         "${getElementName()}Component"
@@ -104,6 +107,7 @@ internal fun ElementDefinition.getBackBoneHapiClass(
     )
 }
 
+/** get ClassName for Code protoClass */
 internal fun ElementDefinition.getProtoCodeClass(
   outerDataTypeName: String,
   data: CompositeCodegen.BackBoneElementData?
@@ -111,8 +115,9 @@ internal fun ElementDefinition.getProtoCodeClass(
   return ClassName(
       protoPackage,
       data?.protoName
-        ?: (listOf(outerDataTypeName) + path.value.split(".").drop(1).dropLast(1))
-          .joinToString(".") { it.capitalizeFirst() }
+        ?: (listOf(outerDataTypeName) + path.value.split(".").drop(1).dropLast(1)).joinToString(
+          "."
+        ) { it.capitalizeFirst() }
     )
     .nestedClass(
       when {
@@ -130,13 +135,14 @@ internal fun ElementDefinition.getProtoCodeClass(
 // class where all common enums are in Hapi
 private val commonEnumClass = ClassName(hapiPackage, "Enumerations")
 
+/** get ClassName for Code hapiClass */
 internal fun ElementDefinition.getHapiCodeClass(isCommon: Boolean): ClassName {
   return (if (isCommon) commonEnumClass
-    else
-      ClassName(hapiPackage, base.path.value.split(".").first().capitalizeFirst()))
+    else ClassName(hapiPackage, base.path.value.split(".").first().capitalizeFirst()))
     .nestedClass(binding.extensionList[0].value.stringValue.value.capitalizeFirst())
 }
 
+/** @returns the ClassName for choiceProto hapi */
 internal fun ElementDefinition.getChoiceTypeProtoClass(
   data: CompositeCodegen.BackBoneElementData?
 ): ClassName {
@@ -147,8 +153,7 @@ internal fun ElementDefinition.getChoiceTypeProtoClass(
         data.protoName,
         path
           .value
-          .split(".")
-          .last()
+          .substringAfterLast(".")
           .replace(choiceTypeSuffixStructureDefinition, choiceTypeSuffixProto)
           .capitalizeFirst()
       )
@@ -161,24 +166,27 @@ internal fun ElementDefinition.getChoiceTypeProtoClass(
   )
 }
 
-internal fun ElementDefinition.getElementMethodName(): String {
+private fun ElementDefinition.getElementMethodName(): String {
   return path.value.substringAfterLast(".").removeSuffix(choiceTypeSuffixStructureDefinition)
 }
 
+/** get proto method name for getter/setter */
 internal fun ElementDefinition.getProtoMethodName(): String {
-  return(
-    if (getElementMethodName().lowerCaseFirst() in listOf("class", "assert", "for"))
+  return (if (getElementMethodName().lowerCaseFirst() in listOf("class", "assert", "for"))
       "${getElementMethodName()}Value"
-    else getElementMethodName()).resolveAcronyms().capitalizeFirst()
+    else getElementMethodName())
+    .resolveAcronyms()
+    .capitalizeFirst()
 }
 
-internal fun ElementDefinition.getProtoFieldName(isRepeated:Boolean = false): String {
-  return((
-    if (getElementMethodName().lowerCaseFirst() in listOf("class", "assert", "for"))
-      "${getElementMethodName()}Value"
-    else getElementMethodName()
-          ).resolveAcronyms().lowerCaseFirst() +
-  if (isRepeated)"List" else "").checkForKotlinKeyWord()
+/** get proto  field name */
+internal fun ElementDefinition.getProtoFieldName(isRepeated: Boolean = false): String {
+  return ((if (getElementMethodName().lowerCaseFirst() in listOf("class", "assert", "for"))
+        "${getElementMethodName()}Value"
+      else getElementMethodName())
+      .resolveAcronyms()
+      .lowerCaseFirst() + if (isRepeated) "List" else "")
+    .checkForKotlinKeyWord()
 }
 
 internal fun ElementDefinition.TypeRef.normalizeType(): String {

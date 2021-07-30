@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.AnnotationConverter.toHapi
@@ -50,10 +66,10 @@ import org.hl7.fhir.r4.model.Type
 
 public object MedicationRequestConverter {
   private fun MedicationRequest.ReportedX.medicationRequestReportedToHapi(): Type {
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType ) {
+    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
       return (this.getBoolean()).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
+    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
       return (this.getReference()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MedicationRequest.reported[x]")
@@ -71,10 +87,10 @@ public object MedicationRequestConverter {
   }
 
   private fun MedicationRequest.MedicationX.medicationRequestMedicationToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
+    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
+    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
       return (this.getReference()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MedicationRequest.medication[x]")
@@ -92,18 +108,18 @@ public object MedicationRequestConverter {
   }
 
   private fun MedicationRequest.Substitution.AllowedX.medicationRequestSubstitutionAllowedToHapi():
-      Type {
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType ) {
+    Type {
+    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
       return (this.getBoolean()).toHapi()
     }
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
+    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MedicationRequest.substitution.allowed[x]")
   }
 
   private fun Type.medicationRequestSubstitutionAllowedToProto():
-      MedicationRequest.Substitution.AllowedX {
+    MedicationRequest.Substitution.AllowedX {
     val protoValue = MedicationRequest.Substitution.AllowedX.newBuilder()
     if (this is BooleanType) {
       protoValue.setBoolean(this.toProto())
@@ -116,145 +132,177 @@ public object MedicationRequestConverter {
 
   public fun MedicationRequest.toHapi(): org.hl7.fhir.r4.model.MedicationRequest {
     val hapiValue = org.hl7.fhir.r4.model.MedicationRequest()
-    hapiValue.id = id.value 
+    hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
     hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
-    hapiValue.setIdentifier(identifierList.map{it.toHapi()})
-    hapiValue.setStatus(org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestStatus.valueOf(status.value.name.replace("_","")))
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    hapiValue.setStatus(
+      org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestStatus.valueOf(
+        status.value.name.replace("_", "")
+      )
+    )
     hapiValue.setStatusReason(statusReason.toHapi())
-    hapiValue.setIntent(org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestIntent.valueOf(intent.value.name.replace("_","")))
-    hapiValue.setCategory(categoryList.map{it.toHapi()})
-    hapiValue.setPriority(org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestPriority.valueOf(priority.value.name.replace("_","")))
+    hapiValue.setIntent(
+      org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestIntent.valueOf(
+        intent.value.name.replace("_", "")
+      )
+    )
+    hapiValue.setCategory(categoryList.map { it.toHapi() })
+    hapiValue.setPriority(
+      org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestPriority.valueOf(
+        priority.value.name.replace("_", "")
+      )
+    )
     hapiValue.setDoNotPerformElement(doNotPerform.toHapi())
     hapiValue.setReported(reported.medicationRequestReportedToHapi())
     hapiValue.setMedication(medication.medicationRequestMedicationToHapi())
     hapiValue.setSubject(subject.toHapi())
     hapiValue.setEncounter(encounter.toHapi())
-    hapiValue.setSupportingInformation(supportingInformationList.map{it.toHapi()})
+    hapiValue.setSupportingInformation(supportingInformationList.map { it.toHapi() })
     hapiValue.setAuthoredOnElement(authoredOn.toHapi())
     hapiValue.setRequester(requester.toHapi())
     hapiValue.setPerformer(performer.toHapi())
     hapiValue.setPerformerType(performerType.toHapi())
     hapiValue.setRecorder(recorder.toHapi())
-    hapiValue.setReasonCode(reasonCodeList.map{it.toHapi()})
-    hapiValue.setReasonReference(reasonReferenceList.map{it.toHapi()})
-    hapiValue.setInstantiatesCanonical(instantiatesCanonicalList.map{it.toHapi()})
-    hapiValue.setInstantiatesUri(instantiatesUriList.map{it.toHapi()})
-    hapiValue.setBasedOn(basedOnList.map{it.toHapi()})
+    hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+    hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+    hapiValue.setInstantiatesCanonical(instantiatesCanonicalList.map { it.toHapi() })
+    hapiValue.setInstantiatesUri(instantiatesUriList.map { it.toHapi() })
+    hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
     hapiValue.setGroupIdentifier(groupIdentifier.toHapi())
     hapiValue.setCourseOfTherapyType(courseOfTherapyType.toHapi())
-    hapiValue.setInsurance(insuranceList.map{it.toHapi()})
-    hapiValue.setNote(noteList.map{it.toHapi()})
-    hapiValue.setDosageInstruction(dosageInstructionList.map{it.toHapi()})
+    hapiValue.setInsurance(insuranceList.map { it.toHapi() })
+    hapiValue.setNote(noteList.map { it.toHapi() })
+    hapiValue.setDosageInstruction(dosageInstructionList.map { it.toHapi() })
     hapiValue.setDispenseRequest(dispenseRequest.toHapi())
     hapiValue.setSubstitution(substitution.toHapi())
     hapiValue.setPriorPrescription(priorPrescription.toHapi())
-    hapiValue.setDetectedIssue(detectedIssueList.map{it.toHapi()})
-    hapiValue.setEventHistory(eventHistoryList.map{it.toHapi()})
+    hapiValue.setDetectedIssue(detectedIssueList.map { it.toHapi() })
+    hapiValue.setEventHistory(eventHistoryList.map { it.toHapi() })
     return hapiValue
   }
 
   public fun org.hl7.fhir.r4.model.MedicationRequest.toProto(): MedicationRequest {
-    val protoValue = MedicationRequest.newBuilder()
-    .setId(Id.newBuilder().setValue(id))
-    .setMeta(meta.toProto())
-    .setImplicitRules(implicitRulesElement.toProto())
-    .setText(text.toProto())
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .addAllIdentifier(identifier.map{it.toProto()})
-    .setStatus(MedicationRequest.StatusCode.newBuilder().setValue(MedicationrequestStatusCode.Value.valueOf(status.toCode().replace("-",
-        "_").toUpperCase())).build())
-    .setStatusReason(statusReason.toProto())
-    .setIntent(MedicationRequest.IntentCode.newBuilder().setValue(MedicationRequestIntentCode.Value.valueOf(intent.toCode().replace("-",
-        "_").toUpperCase())).build())
-    .addAllCategory(category.map{it.toProto()})
-    .setPriority(MedicationRequest.PriorityCode.newBuilder().setValue(RequestPriorityCode.Value.valueOf(priority.toCode().replace("-",
-        "_").toUpperCase())).build())
-    .setDoNotPerform(doNotPerformElement.toProto())
-    .setReported(reported.medicationRequestReportedToProto())
-    .setMedication(medication.medicationRequestMedicationToProto())
-    .setSubject(subject.toProto())
-    .setEncounter(encounter.toProto())
-    .addAllSupportingInformation(supportingInformation.map{it.toProto()})
-    .setAuthoredOn(authoredOnElement.toProto())
-    .setRequester(requester.toProto())
-    .setPerformer(performer.toProto())
-    .setPerformerType(performerType.toProto())
-    .setRecorder(recorder.toProto())
-    .addAllReasonCode(reasonCode.map{it.toProto()})
-    .addAllReasonReference(reasonReference.map{it.toProto()})
-    .addAllInstantiatesCanonical(instantiatesCanonical.map{it.toProto()})
-    .addAllInstantiatesUri(instantiatesUri.map{it.toProto()})
-    .addAllBasedOn(basedOn.map{it.toProto()})
-    .setGroupIdentifier(groupIdentifier.toProto())
-    .setCourseOfTherapyType(courseOfTherapyType.toProto())
-    .addAllInsurance(insurance.map{it.toProto()})
-    .addAllNote(note.map{it.toProto()})
-    .addAllDosageInstruction(dosageInstruction.map{it.toProto()})
-    .setDispenseRequest(dispenseRequest.toProto())
-    .setSubstitution(substitution.toProto())
-    .setPriorPrescription(priorPrescription.toProto())
-    .addAllDetectedIssue(detectedIssue.map{it.toProto()})
-    .addAllEventHistory(eventHistory.map{it.toProto()})
-    .build()
+    val protoValue =
+      MedicationRequest.newBuilder()
+        .setId(Id.newBuilder().setValue(id))
+        .setMeta(meta.toProto())
+        .setImplicitRules(implicitRulesElement.toProto())
+        .setText(text.toProto())
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .addAllIdentifier(identifier.map { it.toProto() })
+        .setStatus(
+          MedicationRequest.StatusCode.newBuilder()
+            .setValue(
+              MedicationrequestStatusCode.Value.valueOf(
+                status.toCode().replace("-", "_").toUpperCase()
+              )
+            )
+            .build()
+        )
+        .setStatusReason(statusReason.toProto())
+        .setIntent(
+          MedicationRequest.IntentCode.newBuilder()
+            .setValue(
+              MedicationRequestIntentCode.Value.valueOf(
+                intent.toCode().replace("-", "_").toUpperCase()
+              )
+            )
+            .build()
+        )
+        .addAllCategory(category.map { it.toProto() })
+        .setPriority(
+          MedicationRequest.PriorityCode.newBuilder()
+            .setValue(
+              RequestPriorityCode.Value.valueOf(priority.toCode().replace("-", "_").toUpperCase())
+            )
+            .build()
+        )
+        .setDoNotPerform(doNotPerformElement.toProto())
+        .setReported(reported.medicationRequestReportedToProto())
+        .setMedication(medication.medicationRequestMedicationToProto())
+        .setSubject(subject.toProto())
+        .setEncounter(encounter.toProto())
+        .addAllSupportingInformation(supportingInformation.map { it.toProto() })
+        .setAuthoredOn(authoredOnElement.toProto())
+        .setRequester(requester.toProto())
+        .setPerformer(performer.toProto())
+        .setPerformerType(performerType.toProto())
+        .setRecorder(recorder.toProto())
+        .addAllReasonCode(reasonCode.map { it.toProto() })
+        .addAllReasonReference(reasonReference.map { it.toProto() })
+        .addAllInstantiatesCanonical(instantiatesCanonical.map { it.toProto() })
+        .addAllInstantiatesUri(instantiatesUri.map { it.toProto() })
+        .addAllBasedOn(basedOn.map { it.toProto() })
+        .setGroupIdentifier(groupIdentifier.toProto())
+        .setCourseOfTherapyType(courseOfTherapyType.toProto())
+        .addAllInsurance(insurance.map { it.toProto() })
+        .addAllNote(note.map { it.toProto() })
+        .addAllDosageInstruction(dosageInstruction.map { it.toProto() })
+        .setDispenseRequest(dispenseRequest.toProto())
+        .setSubstitution(substitution.toProto())
+        .setPriorPrescription(priorPrescription.toProto())
+        .addAllDetectedIssue(detectedIssue.map { it.toProto() })
+        .addAllEventHistory(eventHistory.map { it.toProto() })
+        .build()
     return protoValue
   }
 
-  private
-      fun org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestComponent.toProto():
-      MedicationRequest.DispenseRequest {
-    val protoValue = MedicationRequest.DispenseRequest.newBuilder()
-    .setId(String.newBuilder().setValue(id))
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .setInitialFill(initialFill.toProto())
-    .setDispenseInterval(dispenseInterval.toProto())
-    .setValidityPeriod(validityPeriod.toProto())
-    .setNumberOfRepeatsAllowed(numberOfRepeatsAllowedElement.toProto())
-    .setQuantity(( quantity as SimpleQuantity ).toProto())
-    .setExpectedSupplyDuration(expectedSupplyDuration.toProto())
-    .setPerformer(performer.toProto())
-    .build()
+  private fun org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestComponent.toProto():
+    MedicationRequest.DispenseRequest {
+    val protoValue =
+      MedicationRequest.DispenseRequest.newBuilder()
+        .setId(String.newBuilder().setValue(id))
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setInitialFill(initialFill.toProto())
+        .setDispenseInterval(dispenseInterval.toProto())
+        .setValidityPeriod(validityPeriod.toProto())
+        .setNumberOfRepeatsAllowed(numberOfRepeatsAllowedElement.toProto())
+        .setQuantity((quantity as SimpleQuantity).toProto())
+        .setExpectedSupplyDuration(expectedSupplyDuration.toProto())
+        .setPerformer(performer.toProto())
+        .build()
     return protoValue
   }
 
-  private
-      fun org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestInitialFillComponent.toProto():
-      MedicationRequest.DispenseRequest.InitialFill {
-    val protoValue = MedicationRequest.DispenseRequest.InitialFill.newBuilder()
-    .setId(String.newBuilder().setValue(id))
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .setQuantity(( quantity as SimpleQuantity ).toProto())
-    .setDuration(duration.toProto())
-    .build()
+  private fun org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestInitialFillComponent.toProto():
+    MedicationRequest.DispenseRequest.InitialFill {
+    val protoValue =
+      MedicationRequest.DispenseRequest.InitialFill.newBuilder()
+        .setId(String.newBuilder().setValue(id))
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setQuantity((quantity as SimpleQuantity).toProto())
+        .setDuration(duration.toProto())
+        .build()
     return protoValue
   }
 
-  private
-      fun org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestSubstitutionComponent.toProto():
-      MedicationRequest.Substitution {
-    val protoValue = MedicationRequest.Substitution.newBuilder()
-    .setId(String.newBuilder().setValue(id))
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .setAllowed(allowed.medicationRequestSubstitutionAllowedToProto())
-    .setReason(reason.toProto())
-    .build()
+  private fun org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestSubstitutionComponent.toProto():
+    MedicationRequest.Substitution {
+    val protoValue =
+      MedicationRequest.Substitution.newBuilder()
+        .setId(String.newBuilder().setValue(id))
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setAllowed(allowed.medicationRequestSubstitutionAllowedToProto())
+        .setReason(reason.toProto())
+        .build()
     return protoValue
   }
 
   private fun MedicationRequest.DispenseRequest.toHapi():
-      org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestComponent {
+    org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestComponent {
     val hapiValue =
-        org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestComponent()
-    hapiValue.id = id.value 
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
+      org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestComponent()
+    hapiValue.id = id.value
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setInitialFill(initialFill.toHapi())
     hapiValue.setDispenseInterval(dispenseInterval.toHapi())
     hapiValue.setValidityPeriod(validityPeriod.toHapi())
@@ -266,23 +314,23 @@ public object MedicationRequestConverter {
   }
 
   private fun MedicationRequest.DispenseRequest.InitialFill.toHapi():
-      org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestInitialFillComponent {
+    org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestInitialFillComponent {
     val hapiValue =
-        org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestInitialFillComponent()
-    hapiValue.id = id.value 
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
+      org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestDispenseRequestInitialFillComponent()
+    hapiValue.id = id.value
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setQuantity(quantity.toHapi())
     hapiValue.setDuration(duration.toHapi())
     return hapiValue
   }
 
   private fun MedicationRequest.Substitution.toHapi():
-      org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestSubstitutionComponent {
+    org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestSubstitutionComponent {
     val hapiValue = org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestSubstitutionComponent()
-    hapiValue.id = id.value 
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
+    hapiValue.id = id.value
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setAllowed(allowed.medicationRequestSubstitutionAllowedToHapi())
     hapiValue.setReason(reason.toHapi())
     return hapiValue

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toHapi
@@ -24,21 +40,21 @@ import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.Type
 
 public object MedicinalProductInteractionConverter {
-  private
-      fun MedicinalProductInteraction.Interactant.ItemX.medicinalProductInteractionInteractantItemToHapi():
-      Type {
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
+  private fun MedicinalProductInteraction.Interactant.ItemX.medicinalProductInteractionInteractantItemToHapi():
+    Type {
+    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
       return (this.getReference()).toHapi()
     }
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
+    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
     }
-    throw
-        IllegalArgumentException("Invalid Type for MedicinalProductInteraction.interactant.item[x]")
+    throw IllegalArgumentException(
+      "Invalid Type for MedicinalProductInteraction.interactant.item[x]"
+    )
   }
 
   private fun Type.medicinalProductInteractionInteractantItemToProto():
-      MedicinalProductInteraction.Interactant.ItemX {
+    MedicinalProductInteraction.Interactant.ItemX {
     val protoValue = MedicinalProductInteraction.Interactant.ItemX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Reference) {
       protoValue.setReference(this.toProto())
@@ -50,17 +66,17 @@ public object MedicinalProductInteractionConverter {
   }
 
   public fun MedicinalProductInteraction.toHapi():
-      org.hl7.fhir.r4.model.MedicinalProductInteraction {
+    org.hl7.fhir.r4.model.MedicinalProductInteraction {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductInteraction()
-    hapiValue.id = id.value 
+    hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
     hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
-    hapiValue.setSubject(subjectList.map{it.toHapi()})
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setSubject(subjectList.map { it.toHapi() })
     hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setInteractant(interactantList.map{it.toHapi()})
+    hapiValue.setInteractant(interactantList.map { it.toHapi() })
     hapiValue.setType(type.toHapi())
     hapiValue.setEffect(effect.toHapi())
     hapiValue.setIncidence(incidence.toHapi())
@@ -69,44 +85,46 @@ public object MedicinalProductInteractionConverter {
   }
 
   public fun org.hl7.fhir.r4.model.MedicinalProductInteraction.toProto():
-      MedicinalProductInteraction {
-    val protoValue = MedicinalProductInteraction.newBuilder()
-    .setId(Id.newBuilder().setValue(id))
-    .setMeta(meta.toProto())
-    .setImplicitRules(implicitRulesElement.toProto())
-    .setText(text.toProto())
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .addAllSubject(subject.map{it.toProto()})
-    .setDescription(descriptionElement.toProto())
-    .addAllInteractant(interactant.map{it.toProto()})
-    .setType(type.toProto())
-    .setEffect(effect.toProto())
-    .setIncidence(incidence.toProto())
-    .setManagement(management.toProto())
-    .build()
+    MedicinalProductInteraction {
+    val protoValue =
+      MedicinalProductInteraction.newBuilder()
+        .setId(Id.newBuilder().setValue(id))
+        .setMeta(meta.toProto())
+        .setImplicitRules(implicitRulesElement.toProto())
+        .setText(text.toProto())
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .addAllSubject(subject.map { it.toProto() })
+        .setDescription(descriptionElement.toProto())
+        .addAllInteractant(interactant.map { it.toProto() })
+        .setType(type.toProto())
+        .setEffect(effect.toProto())
+        .setIncidence(incidence.toProto())
+        .setManagement(management.toProto())
+        .build()
     return protoValue
   }
 
-  private
-      fun org.hl7.fhir.r4.model.MedicinalProductInteraction.MedicinalProductInteractionInteractantComponent.toProto():
-      MedicinalProductInteraction.Interactant {
-    val protoValue = MedicinalProductInteraction.Interactant.newBuilder()
-    .setId(String.newBuilder().setValue(id))
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .setItem(item.medicinalProductInteractionInteractantItemToProto())
-    .build()
+  private fun org.hl7.fhir.r4.model.MedicinalProductInteraction.MedicinalProductInteractionInteractantComponent.toProto():
+    MedicinalProductInteraction.Interactant {
+    val protoValue =
+      MedicinalProductInteraction.Interactant.newBuilder()
+        .setId(String.newBuilder().setValue(id))
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setItem(item.medicinalProductInteractionInteractantItemToProto())
+        .build()
     return protoValue
   }
 
   private fun MedicinalProductInteraction.Interactant.toHapi():
-      org.hl7.fhir.r4.model.MedicinalProductInteraction.MedicinalProductInteractionInteractantComponent {
+    org.hl7.fhir.r4.model.MedicinalProductInteraction.MedicinalProductInteractionInteractantComponent {
     val hapiValue =
-        org.hl7.fhir.r4.model.MedicinalProductInteraction.MedicinalProductInteractionInteractantComponent()
-    hapiValue.id = id.value 
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
+      org.hl7.fhir.r4.model.MedicinalProductInteraction
+        .MedicinalProductInteractionInteractantComponent()
+    hapiValue.id = id.value
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setItem(item.medicinalProductInteractionInteractantItemToHapi())
     return hapiValue
   }

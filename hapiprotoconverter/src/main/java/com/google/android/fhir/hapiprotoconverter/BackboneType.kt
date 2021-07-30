@@ -33,28 +33,26 @@ internal fun handleBackBoneElementTypes(
       ),
       element.getBackBoneHapiClass(backboneElementMap[element.path.value.substringBeforeLast(".")])
     )
-  // create a new entry in the backbone element map
-  val isSingle = element.max.value == "1"
 
-  if (isSingle) {
+  if (element.max.value == "1") {
     protoBuilder.addStatement(
-      "${singleMethodTemplate}(${if (element.typeList.first().profileList.isNotEmpty()) "( %L as %T )" else "%L%L"}.toProto())",
-     element.getProtoMethodName(),
+      "$singleMethodTemplate(${if (element.typeList.first().profileList.isNotEmpty()) "( %L as %T )" else "%L%L"}.toProto())",
+      element.getProtoMethodName(),
       element.getHapiFieldName(),
       if (element.typeList.first().profileList.isNotEmpty())
         element.typeList.first().normalizeType()
       else ""
     )
     hapiBuilder.addStatement(
-      "hapiValue${singleMethodTemplate}(%L.toHapi())",
+      "hapiValue$singleMethodTemplate(%L.toHapi())",
       element.getHapiMethodName(),
       element.getProtoFieldName()
     )
   } else {
 
     protoBuilder.addStatement(
-      "${multipleMethodTemplate}(%L.map{${if (element.typeList.first().profileList.isNotEmpty()) "( it as %T  )" else "it%L"}.toProto()})",
-    element.getProtoMethodName(),
+      "$multipleMethodTemplate(%L.map{${if (element.typeList.first().profileList.isNotEmpty()) "( it as %T  )" else "it%L"}.toProto()})",
+      element.getProtoMethodName(),
       element.getHapiFieldName(),
       if (element.typeList.first().profileList.isNotEmpty())
         element.typeList.first().normalizeType()
@@ -62,7 +60,7 @@ internal fun handleBackBoneElementTypes(
     )
 
     hapiBuilder.addStatement(
-      "hapiValue${singleMethodTemplate}(%L.map{it.toHapi()})",
+      "hapiValue$singleMethodTemplate(%L.map{it.toHapi()})",
       element.getHapiMethodName(),
       element.getProtoFieldName(isRepeated = true),
     )
@@ -79,7 +77,7 @@ internal fun handleBackBoneElementTypes(
       element
         .getBackBoneProtoClass(backboneElementMap[element.path.value.substringBeforeLast(".")])
         .canonicalName
-        .removePrefix("${protoPackage}."),
+        .removePrefix("$protoPackage."),
       toHapiBuilder.addStatement(
         "val hapiValue = %T()",
         element.getBackBoneHapiClass(
@@ -89,6 +87,6 @@ internal fun handleBackBoneElementTypes(
       element
         .getBackBoneHapiClass(backboneElementMap[element.path.value.substringBeforeLast(".")])
         .canonicalName
-        .removePrefix("${hapiPackage}.")
+        .removePrefix("$hapiPackage.")
     )
 }

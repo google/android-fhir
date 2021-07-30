@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toHapi
@@ -50,18 +66,18 @@ import org.hl7.fhir.r4.model.UnsignedIntType
 
 public object CoverageEligibilityResponseConverter {
   private fun CoverageEligibilityResponse.ServicedX.coverageEligibilityResponseServicedToHapi():
-      Type {
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType ) {
+    Type {
+    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
       return (this.getDate()).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
+    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
       return (this.getPeriod()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for CoverageEligibilityResponse.serviced[x]")
   }
 
   private fun Type.coverageEligibilityResponseServicedToProto():
-      CoverageEligibilityResponse.ServicedX {
+    CoverageEligibilityResponse.ServicedX {
     val protoValue = CoverageEligibilityResponse.ServicedX.newBuilder()
     if (this is DateType) {
       protoValue.setDate(this.toProto())
@@ -72,24 +88,24 @@ public object CoverageEligibilityResponseConverter {
     return protoValue.build()
   }
 
-  private
-      fun CoverageEligibilityResponse.Insurance.Items.Benefit.AllowedX.coverageEligibilityResponseInsuranceItemBenefitAllowedToHapi():
-      Type {
-    if (this.getUnsignedInt() != UnsignedInt.newBuilder().defaultInstanceForType ) {
+  private fun CoverageEligibilityResponse.Insurance.Items.Benefit.AllowedX.coverageEligibilityResponseInsuranceItemBenefitAllowedToHapi():
+    Type {
+    if (this.getUnsignedInt() != UnsignedInt.newBuilder().defaultInstanceForType) {
       return (this.getUnsignedInt()).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
+    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
       return (this.getStringValue()).toHapi()
     }
-    if (this.getMoney() != Money.newBuilder().defaultInstanceForType ) {
+    if (this.getMoney() != Money.newBuilder().defaultInstanceForType) {
       return (this.getMoney()).toHapi()
     }
-    throw
-        IllegalArgumentException("Invalid Type for CoverageEligibilityResponse.insurance.item.benefit.allowed[x]")
+    throw IllegalArgumentException(
+      "Invalid Type for CoverageEligibilityResponse.insurance.item.benefit.allowed[x]"
+    )
   }
 
   private fun Type.coverageEligibilityResponseInsuranceItemBenefitAllowedToProto():
-      CoverageEligibilityResponse.Insurance.Items.Benefit.AllowedX {
+    CoverageEligibilityResponse.Insurance.Items.Benefit.AllowedX {
     val protoValue = CoverageEligibilityResponse.Insurance.Items.Benefit.AllowedX.newBuilder()
     if (this is UnsignedIntType) {
       protoValue.setUnsignedInt(this.toProto())
@@ -103,24 +119,24 @@ public object CoverageEligibilityResponseConverter {
     return protoValue.build()
   }
 
-  private
-      fun CoverageEligibilityResponse.Insurance.Items.Benefit.UsedX.coverageEligibilityResponseInsuranceItemBenefitUsedToHapi():
-      Type {
-    if (this.getUnsignedInt() != UnsignedInt.newBuilder().defaultInstanceForType ) {
+  private fun CoverageEligibilityResponse.Insurance.Items.Benefit.UsedX.coverageEligibilityResponseInsuranceItemBenefitUsedToHapi():
+    Type {
+    if (this.getUnsignedInt() != UnsignedInt.newBuilder().defaultInstanceForType) {
       return (this.getUnsignedInt()).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
+    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
       return (this.getStringValue()).toHapi()
     }
-    if (this.getMoney() != Money.newBuilder().defaultInstanceForType ) {
+    if (this.getMoney() != Money.newBuilder().defaultInstanceForType) {
       return (this.getMoney()).toHapi()
     }
-    throw
-        IllegalArgumentException("Invalid Type for CoverageEligibilityResponse.insurance.item.benefit.used[x]")
+    throw IllegalArgumentException(
+      "Invalid Type for CoverageEligibilityResponse.insurance.item.benefit.used[x]"
+    )
   }
 
   private fun Type.coverageEligibilityResponseInsuranceItemBenefitUsedToProto():
-      CoverageEligibilityResponse.Insurance.Items.Benefit.UsedX {
+    CoverageEligibilityResponse.Insurance.Items.Benefit.UsedX {
     val protoValue = CoverageEligibilityResponse.Insurance.Items.Benefit.UsedX.newBuilder()
     if (this is UnsignedIntType) {
       protoValue.setUnsignedInt(this.toProto())
@@ -135,147 +151,185 @@ public object CoverageEligibilityResponseConverter {
   }
 
   public fun CoverageEligibilityResponse.toHapi():
-      org.hl7.fhir.r4.model.CoverageEligibilityResponse {
+    org.hl7.fhir.r4.model.CoverageEligibilityResponse {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityResponse()
-    hapiValue.id = id.value 
+    hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
     hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
-    hapiValue.setIdentifier(identifierList.map{it.toHapi()})
-    hapiValue.setStatus(org.hl7.fhir.r4.model.CoverageEligibilityResponse.EligibilityResponseStatus.valueOf(status.value.name.replace("_","")))
-    purposeList.map{hapiValue.addPurpose(org.hl7.fhir.r4.model.CoverageEligibilityResponse.EligibilityResponsePurpose.valueOf(it.value.name.replace("_","")))}
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    hapiValue.setStatus(
+      org.hl7.fhir.r4.model.CoverageEligibilityResponse.EligibilityResponseStatus.valueOf(
+        status.value.name.replace("_", "")
+      )
+    )
+    purposeList.map {
+      hapiValue.addPurpose(
+        org.hl7.fhir.r4.model.CoverageEligibilityResponse.EligibilityResponsePurpose.valueOf(
+          it.value.name.replace("_", "")
+        )
+      )
+    }
     hapiValue.setPatient(patient.toHapi())
     hapiValue.setServiced(serviced.coverageEligibilityResponseServicedToHapi())
     hapiValue.setCreatedElement(created.toHapi())
     hapiValue.setRequestor(requestor.toHapi())
     hapiValue.setRequest(request.toHapi())
-    hapiValue.setOutcome(Enumerations.RemittanceOutcome.valueOf(outcome.value.name.replace("_","")))
+    hapiValue.setOutcome(
+      Enumerations.RemittanceOutcome.valueOf(outcome.value.name.replace("_", ""))
+    )
     hapiValue.setDispositionElement(disposition.toHapi())
     hapiValue.setInsurer(insurer.toHapi())
-    hapiValue.setInsurance(insuranceList.map{it.toHapi()})
+    hapiValue.setInsurance(insuranceList.map { it.toHapi() })
     hapiValue.setPreAuthRefElement(preAuthRef.toHapi())
     hapiValue.setForm(form.toHapi())
-    hapiValue.setError(errorList.map{it.toHapi()})
+    hapiValue.setError(errorList.map { it.toHapi() })
     return hapiValue
   }
 
   public fun org.hl7.fhir.r4.model.CoverageEligibilityResponse.toProto():
-      CoverageEligibilityResponse {
-    val protoValue = CoverageEligibilityResponse.newBuilder()
-    .setId(Id.newBuilder().setValue(id))
-    .setMeta(meta.toProto())
-    .setImplicitRules(implicitRulesElement.toProto())
-    .setText(text.toProto())
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .addAllIdentifier(identifier.map{it.toProto()})
-    .setStatus(CoverageEligibilityResponse.StatusCode.newBuilder().setValue(FinancialResourceStatusCode.Value.valueOf(status.toCode().replace("-",
-        "_").toUpperCase())).build())
-    .addAllPurpose(purpose.map{CoverageEligibilityResponse.PurposeCode.newBuilder().setValue(EligibilityResponsePurposeCode.Value.valueOf(it.value.toCode().replace("-",
-        "_").toUpperCase())).build()})
-    .setPatient(patient.toProto())
-    .setServiced(serviced.coverageEligibilityResponseServicedToProto())
-    .setCreated(createdElement.toProto())
-    .setRequestor(requestor.toProto())
-    .setRequest(request.toProto())
-    .setOutcome(CoverageEligibilityResponse.OutcomeCode.newBuilder().setValue(ClaimProcessingCode.Value.valueOf(outcome.toCode().replace("-",
-        "_").toUpperCase())).build())
-    .setDisposition(dispositionElement.toProto())
-    .setInsurer(insurer.toProto())
-    .addAllInsurance(insurance.map{it.toProto()})
-    .setPreAuthRef(preAuthRefElement.toProto())
-    .setForm(form.toProto())
-    .addAllError(error.map{it.toProto()})
-    .build()
+    CoverageEligibilityResponse {
+    val protoValue =
+      CoverageEligibilityResponse.newBuilder()
+        .setId(Id.newBuilder().setValue(id))
+        .setMeta(meta.toProto())
+        .setImplicitRules(implicitRulesElement.toProto())
+        .setText(text.toProto())
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .addAllIdentifier(identifier.map { it.toProto() })
+        .setStatus(
+          CoverageEligibilityResponse.StatusCode.newBuilder()
+            .setValue(
+              FinancialResourceStatusCode.Value.valueOf(
+                status.toCode().replace("-", "_").toUpperCase()
+              )
+            )
+            .build()
+        )
+        .addAllPurpose(
+          purpose.map {
+            CoverageEligibilityResponse.PurposeCode.newBuilder()
+              .setValue(
+                EligibilityResponsePurposeCode.Value.valueOf(
+                  it.value.toCode().replace("-", "_").toUpperCase()
+                )
+              )
+              .build()
+          }
+        )
+        .setPatient(patient.toProto())
+        .setServiced(serviced.coverageEligibilityResponseServicedToProto())
+        .setCreated(createdElement.toProto())
+        .setRequestor(requestor.toProto())
+        .setRequest(request.toProto())
+        .setOutcome(
+          CoverageEligibilityResponse.OutcomeCode.newBuilder()
+            .setValue(
+              ClaimProcessingCode.Value.valueOf(outcome.toCode().replace("-", "_").toUpperCase())
+            )
+            .build()
+        )
+        .setDisposition(dispositionElement.toProto())
+        .setInsurer(insurer.toProto())
+        .addAllInsurance(insurance.map { it.toProto() })
+        .setPreAuthRef(preAuthRefElement.toProto())
+        .setForm(form.toProto())
+        .addAllError(error.map { it.toProto() })
+        .build()
     return protoValue
   }
 
   private fun org.hl7.fhir.r4.model.CoverageEligibilityResponse.InsuranceComponent.toProto():
-      CoverageEligibilityResponse.Insurance {
-    val protoValue = CoverageEligibilityResponse.Insurance.newBuilder()
-    .setId(String.newBuilder().setValue(id))
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .setCoverage(coverage.toProto())
-    .setInforce(inforceElement.toProto())
-    .setBenefitPeriod(benefitPeriod.toProto())
-    .addAllItem(item.map{it.toProto()})
-    .build()
+    CoverageEligibilityResponse.Insurance {
+    val protoValue =
+      CoverageEligibilityResponse.Insurance.newBuilder()
+        .setId(String.newBuilder().setValue(id))
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setCoverage(coverage.toProto())
+        .setInforce(inforceElement.toProto())
+        .setBenefitPeriod(benefitPeriod.toProto())
+        .addAllItem(item.map { it.toProto() })
+        .build()
     return protoValue
   }
 
   private fun org.hl7.fhir.r4.model.CoverageEligibilityResponse.ItemsComponent.toProto():
-      CoverageEligibilityResponse.Insurance.Items {
-    val protoValue = CoverageEligibilityResponse.Insurance.Items.newBuilder()
-    .setId(String.newBuilder().setValue(id))
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .setCategory(category.toProto())
-    .setProductOrService(productOrService.toProto())
-    .addAllModifier(modifier.map{it.toProto()})
-    .setProvider(provider.toProto())
-    .setExcluded(excludedElement.toProto())
-    .setName(nameElement.toProto())
-    .setDescription(descriptionElement.toProto())
-    .setNetwork(network.toProto())
-    .setUnit(unit.toProto())
-    .setTerm(term.toProto())
-    .addAllBenefit(benefit.map{it.toProto()})
-    .setAuthorizationRequired(authorizationRequiredElement.toProto())
-    .addAllAuthorizationSupporting(authorizationSupporting.map{it.toProto()})
-    .setAuthorizationUrl(authorizationUrlElement.toProto())
-    .build()
+    CoverageEligibilityResponse.Insurance.Items {
+    val protoValue =
+      CoverageEligibilityResponse.Insurance.Items.newBuilder()
+        .setId(String.newBuilder().setValue(id))
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setCategory(category.toProto())
+        .setProductOrService(productOrService.toProto())
+        .addAllModifier(modifier.map { it.toProto() })
+        .setProvider(provider.toProto())
+        .setExcluded(excludedElement.toProto())
+        .setName(nameElement.toProto())
+        .setDescription(descriptionElement.toProto())
+        .setNetwork(network.toProto())
+        .setUnit(unit.toProto())
+        .setTerm(term.toProto())
+        .addAllBenefit(benefit.map { it.toProto() })
+        .setAuthorizationRequired(authorizationRequiredElement.toProto())
+        .addAllAuthorizationSupporting(authorizationSupporting.map { it.toProto() })
+        .setAuthorizationUrl(authorizationUrlElement.toProto())
+        .build()
     return protoValue
   }
 
   private fun org.hl7.fhir.r4.model.CoverageEligibilityResponse.BenefitComponent.toProto():
-      CoverageEligibilityResponse.Insurance.Items.Benefit {
-    val protoValue = CoverageEligibilityResponse.Insurance.Items.Benefit.newBuilder()
-    .setId(String.newBuilder().setValue(id))
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .setType(type.toProto())
-    .setAllowed(allowed.coverageEligibilityResponseInsuranceItemBenefitAllowedToProto())
-    .setUsed(used.coverageEligibilityResponseInsuranceItemBenefitUsedToProto())
-    .build()
+    CoverageEligibilityResponse.Insurance.Items.Benefit {
+    val protoValue =
+      CoverageEligibilityResponse.Insurance.Items.Benefit.newBuilder()
+        .setId(String.newBuilder().setValue(id))
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setType(type.toProto())
+        .setAllowed(allowed.coverageEligibilityResponseInsuranceItemBenefitAllowedToProto())
+        .setUsed(used.coverageEligibilityResponseInsuranceItemBenefitUsedToProto())
+        .build()
     return protoValue
   }
 
   private fun org.hl7.fhir.r4.model.CoverageEligibilityResponse.ErrorsComponent.toProto():
-      CoverageEligibilityResponse.Errors {
-    val protoValue = CoverageEligibilityResponse.Errors.newBuilder()
-    .setId(String.newBuilder().setValue(id))
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .setCode(code.toProto())
-    .build()
+    CoverageEligibilityResponse.Errors {
+    val protoValue =
+      CoverageEligibilityResponse.Errors.newBuilder()
+        .setId(String.newBuilder().setValue(id))
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setCode(code.toProto())
+        .build()
     return protoValue
   }
 
   private fun CoverageEligibilityResponse.Insurance.toHapi():
-      org.hl7.fhir.r4.model.CoverageEligibilityResponse.InsuranceComponent {
+    org.hl7.fhir.r4.model.CoverageEligibilityResponse.InsuranceComponent {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityResponse.InsuranceComponent()
-    hapiValue.id = id.value 
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
+    hapiValue.id = id.value
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setCoverage(coverage.toHapi())
     hapiValue.setInforceElement(inforce.toHapi())
     hapiValue.setBenefitPeriod(benefitPeriod.toHapi())
-    hapiValue.setItem(itemList.map{it.toHapi()})
+    hapiValue.setItem(itemList.map { it.toHapi() })
     return hapiValue
   }
 
   private fun CoverageEligibilityResponse.Insurance.Items.toHapi():
-      org.hl7.fhir.r4.model.CoverageEligibilityResponse.ItemsComponent {
+    org.hl7.fhir.r4.model.CoverageEligibilityResponse.ItemsComponent {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityResponse.ItemsComponent()
-    hapiValue.id = id.value 
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
+    hapiValue.id = id.value
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setCategory(category.toHapi())
     hapiValue.setProductOrService(productOrService.toHapi())
-    hapiValue.setModifier(modifierList.map{it.toHapi()})
+    hapiValue.setModifier(modifierList.map { it.toHapi() })
     hapiValue.setProvider(provider.toHapi())
     hapiValue.setExcludedElement(excluded.toHapi())
     hapiValue.setNameElement(name.toHapi())
@@ -283,19 +337,19 @@ public object CoverageEligibilityResponseConverter {
     hapiValue.setNetwork(network.toHapi())
     hapiValue.setUnit(unit.toHapi())
     hapiValue.setTerm(term.toHapi())
-    hapiValue.setBenefit(benefitList.map{it.toHapi()})
+    hapiValue.setBenefit(benefitList.map { it.toHapi() })
     hapiValue.setAuthorizationRequiredElement(authorizationRequired.toHapi())
-    hapiValue.setAuthorizationSupporting(authorizationSupportingList.map{it.toHapi()})
+    hapiValue.setAuthorizationSupporting(authorizationSupportingList.map { it.toHapi() })
     hapiValue.setAuthorizationUrlElement(authorizationUrl.toHapi())
     return hapiValue
   }
 
   private fun CoverageEligibilityResponse.Insurance.Items.Benefit.toHapi():
-      org.hl7.fhir.r4.model.CoverageEligibilityResponse.BenefitComponent {
+    org.hl7.fhir.r4.model.CoverageEligibilityResponse.BenefitComponent {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityResponse.BenefitComponent()
-    hapiValue.id = id.value 
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
+    hapiValue.id = id.value
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setType(type.toHapi())
     hapiValue.setAllowed(allowed.coverageEligibilityResponseInsuranceItemBenefitAllowedToHapi())
     hapiValue.setUsed(used.coverageEligibilityResponseInsuranceItemBenefitUsedToHapi())
@@ -303,11 +357,11 @@ public object CoverageEligibilityResponseConverter {
   }
 
   private fun CoverageEligibilityResponse.Errors.toHapi():
-      org.hl7.fhir.r4.model.CoverageEligibilityResponse.ErrorsComponent {
+    org.hl7.fhir.r4.model.CoverageEligibilityResponse.ErrorsComponent {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityResponse.ErrorsComponent()
-    hapiValue.id = id.value 
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
+    hapiValue.id = id.value
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setCode(code.toHapi())
     return hapiValue
   }

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toHapi
@@ -23,16 +39,16 @@ import org.hl7.fhir.r4.model.Type
 
 public object UsageContextConverter {
   private fun UsageContext.ValueX.usageContextValueToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
+    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
     }
-    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType ) {
+    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
       return (this.getQuantity()).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType ) {
+    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
       return (this.getRange()).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
+    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
       return (this.getReference()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for UsageContext.value[x]")
@@ -57,20 +73,21 @@ public object UsageContextConverter {
 
   public fun UsageContext.toHapi(): org.hl7.fhir.r4.model.UsageContext {
     val hapiValue = org.hl7.fhir.r4.model.UsageContext()
-    hapiValue.id = id.value 
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.id = id.value
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setCode(code.toHapi())
     hapiValue.setValue(value.usageContextValueToHapi())
     return hapiValue
   }
 
   public fun org.hl7.fhir.r4.model.UsageContext.toProto(): UsageContext {
-    val protoValue = UsageContext.newBuilder()
-    .setId(String.newBuilder().setValue(id))
-    .addAllExtension(extension.map{it.toProto()})
-    .setCode(code.toProto())
-    .setValue(value.usageContextValueToProto())
-    .build()
+    val protoValue =
+      UsageContext.newBuilder()
+        .setId(String.newBuilder().setValue(id))
+        .addAllExtension(extension.map { it.toProto() })
+        .setCode(code.toProto())
+        .setValue(value.usageContextValueToProto())
+        .build()
     return protoValue
   }
 }

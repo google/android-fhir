@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.AnnotationConverter.toHapi
@@ -54,10 +70,10 @@ import org.hl7.fhir.r4.model.Type
 
 public object GoalConverter {
   private fun Goal.StartX.goalStartToHapi(): Type {
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType ) {
+    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
       return (this.getDate()).toHapi()
     }
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
+    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Goal.start[x]")
@@ -75,25 +91,25 @@ public object GoalConverter {
   }
 
   private fun Goal.Target.DetailX.goalTargetDetailToHapi(): Type {
-    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType ) {
+    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
       return (this.getQuantity()).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType ) {
+    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
       return (this.getRange()).toHapi()
     }
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
+    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
+    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
       return (this.getStringValue()).toHapi()
     }
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType ) {
+    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
       return (this.getBoolean()).toHapi()
     }
-    if (this.getInteger() != Integer.newBuilder().defaultInstanceForType ) {
+    if (this.getInteger() != Integer.newBuilder().defaultInstanceForType) {
       return (this.getInteger()).toHapi()
     }
-    if (this.getRatio() != Ratio.newBuilder().defaultInstanceForType ) {
+    if (this.getRatio() != Ratio.newBuilder().defaultInstanceForType) {
       return (this.getRatio()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Goal.target.detail[x]")
@@ -126,10 +142,10 @@ public object GoalConverter {
   }
 
   private fun Goal.Target.DueX.goalTargetDueToHapi(): Type {
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType ) {
+    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
       return (this.getDate()).toHapi()
     }
-    if (this.getDuration() != Duration.newBuilder().defaultInstanceForType ) {
+    if (this.getDuration() != Duration.newBuilder().defaultInstanceForType) {
       return (this.getDuration()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Goal.target.due[x]")
@@ -148,77 +164,90 @@ public object GoalConverter {
 
   public fun Goal.toHapi(): org.hl7.fhir.r4.model.Goal {
     val hapiValue = org.hl7.fhir.r4.model.Goal()
-    hapiValue.id = id.value 
+    hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
     hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
-    hapiValue.setIdentifier(identifierList.map{it.toHapi()})
-    hapiValue.setLifecycleStatus(org.hl7.fhir.r4.model.Goal.GoalLifecycleStatus.valueOf(lifecycleStatus.value.name.replace("_","")))
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    hapiValue.setLifecycleStatus(
+      org.hl7.fhir.r4.model.Goal.GoalLifecycleStatus.valueOf(
+        lifecycleStatus.value.name.replace("_", "")
+      )
+    )
     hapiValue.setAchievementStatus(achievementStatus.toHapi())
-    hapiValue.setCategory(categoryList.map{it.toHapi()})
+    hapiValue.setCategory(categoryList.map { it.toHapi() })
     hapiValue.setPriority(priority.toHapi())
     hapiValue.setDescription(description.toHapi())
     hapiValue.setSubject(subject.toHapi())
     hapiValue.setStart(start.goalStartToHapi())
-    hapiValue.setTarget(targetList.map{it.toHapi()})
+    hapiValue.setTarget(targetList.map { it.toHapi() })
     hapiValue.setStatusDateElement(statusDate.toHapi())
     hapiValue.setStatusReasonElement(statusReason.toHapi())
     hapiValue.setExpressedBy(expressedBy.toHapi())
-    hapiValue.setAddresses(addressesList.map{it.toHapi()})
-    hapiValue.setNote(noteList.map{it.toHapi()})
-    hapiValue.setOutcomeCode(outcomeCodeList.map{it.toHapi()})
-    hapiValue.setOutcomeReference(outcomeReferenceList.map{it.toHapi()})
+    hapiValue.setAddresses(addressesList.map { it.toHapi() })
+    hapiValue.setNote(noteList.map { it.toHapi() })
+    hapiValue.setOutcomeCode(outcomeCodeList.map { it.toHapi() })
+    hapiValue.setOutcomeReference(outcomeReferenceList.map { it.toHapi() })
     return hapiValue
   }
 
   public fun org.hl7.fhir.r4.model.Goal.toProto(): Goal {
-    val protoValue = Goal.newBuilder()
-    .setId(Id.newBuilder().setValue(id))
-    .setMeta(meta.toProto())
-    .setImplicitRules(implicitRulesElement.toProto())
-    .setText(text.toProto())
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .addAllIdentifier(identifier.map{it.toProto()})
-    .setLifecycleStatus(Goal.LifecycleStatusCode.newBuilder().setValue(GoalLifecycleStatusCode.Value.valueOf(lifecycleStatus.toCode().replace("-",
-        "_").toUpperCase())).build())
-    .setAchievementStatus(achievementStatus.toProto())
-    .addAllCategory(category.map{it.toProto()})
-    .setPriority(priority.toProto())
-    .setDescription(description.toProto())
-    .setSubject(subject.toProto())
-    .setStart(start.goalStartToProto())
-    .addAllTarget(target.map{it.toProto()})
-    .setStatusDate(statusDateElement.toProto())
-    .setStatusReason(statusReasonElement.toProto())
-    .setExpressedBy(expressedBy.toProto())
-    .addAllAddresses(addresses.map{it.toProto()})
-    .addAllNote(note.map{it.toProto()})
-    .addAllOutcomeCode(outcomeCode.map{it.toProto()})
-    .addAllOutcomeReference(outcomeReference.map{it.toProto()})
-    .build()
+    val protoValue =
+      Goal.newBuilder()
+        .setId(Id.newBuilder().setValue(id))
+        .setMeta(meta.toProto())
+        .setImplicitRules(implicitRulesElement.toProto())
+        .setText(text.toProto())
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .addAllIdentifier(identifier.map { it.toProto() })
+        .setLifecycleStatus(
+          Goal.LifecycleStatusCode.newBuilder()
+            .setValue(
+              GoalLifecycleStatusCode.Value.valueOf(
+                lifecycleStatus.toCode().replace("-", "_").toUpperCase()
+              )
+            )
+            .build()
+        )
+        .setAchievementStatus(achievementStatus.toProto())
+        .addAllCategory(category.map { it.toProto() })
+        .setPriority(priority.toProto())
+        .setDescription(description.toProto())
+        .setSubject(subject.toProto())
+        .setStart(start.goalStartToProto())
+        .addAllTarget(target.map { it.toProto() })
+        .setStatusDate(statusDateElement.toProto())
+        .setStatusReason(statusReasonElement.toProto())
+        .setExpressedBy(expressedBy.toProto())
+        .addAllAddresses(addresses.map { it.toProto() })
+        .addAllNote(note.map { it.toProto() })
+        .addAllOutcomeCode(outcomeCode.map { it.toProto() })
+        .addAllOutcomeReference(outcomeReference.map { it.toProto() })
+        .build()
     return protoValue
   }
 
   private fun org.hl7.fhir.r4.model.Goal.GoalTargetComponent.toProto(): Goal.Target {
-    val protoValue = Goal.Target.newBuilder()
-    .setId(String.newBuilder().setValue(id))
-    .addAllExtension(extension.map{it.toProto()})
-    .addAllModifierExtension(modifierExtension.map{it.toProto()})
-    .setMeasure(measure.toProto())
-    .setDetail(detail.goalTargetDetailToProto())
-    .setDue(due.goalTargetDueToProto())
-    .build()
+    val protoValue =
+      Goal.Target.newBuilder()
+        .setId(String.newBuilder().setValue(id))
+        .addAllExtension(extension.map { it.toProto() })
+        .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setMeasure(measure.toProto())
+        .setDetail(detail.goalTargetDetailToProto())
+        .setDue(due.goalTargetDueToProto())
+        .build()
     return protoValue
   }
 
   private fun Goal.Target.toHapi(): org.hl7.fhir.r4.model.Goal.GoalTargetComponent {
     val hapiValue = org.hl7.fhir.r4.model.Goal.GoalTargetComponent()
-    hapiValue.id = id.value 
-    hapiValue.setExtension(extensionList.map{it.toHapi()})
-    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
+    hapiValue.id = id.value
+    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setMeasure(measure.toHapi())
     hapiValue.setDetail(detail.goalTargetDetailToHapi())
     hapiValue.setDue(due.goalTargetDueToHapi())

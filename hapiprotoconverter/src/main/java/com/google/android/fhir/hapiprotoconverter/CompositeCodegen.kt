@@ -176,7 +176,7 @@ object CompositeCodegen {
       }
       // Handle the case when it is a backbone element
       if (element.typeList.single().normalizeType() == "BackboneElement" ||
-        element.typeList.single().normalizeType() == "Element"
+          element.typeList.single().normalizeType() == "Element"
       ) {
 
         handleBackBoneElementTypes(
@@ -240,5 +240,9 @@ object CompositeCodegen {
   }
 
   data class BackBoneElementData(
-    val protoBuilder: FunSpec.Builder, val protoName: kotlin.String, val hapiBuilder: FunSpec.Builder, val hapiName: kotlin.String)
+    val protoBuilder: FunSpec.Builder,
+    val protoName: kotlin.String,
+    val hapiBuilder: FunSpec.Builder,
+    val hapiName: kotlin.String
+  )
 }

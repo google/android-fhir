@@ -16,36 +16,36 @@
 
 package com.google.android.fhir.hapiprotoconverter
 
-  internal val primitiveTypeList =
-    listOf(
-      "base64Binary",
-      "boolean",
-      "canonical",
-      "code",
-      "date",
-      "dateTime",
-      "decimal",
-      "id",
-      "instant",
-      "integer",
-      "markdown",
-      "oid",
-      "positiveInt",
-      "string",
-      "time",
-      "unsignedInt",
-      "uri",
-      "url",
-      "uuid",
-      //      "xhtml"
-      )
+internal val primitiveTypeList =
+  listOf(
+    "base64Binary",
+    "boolean",
+    "canonical",
+    "code",
+    "date",
+    "dateTime",
+    "decimal",
+    "id",
+    "instant",
+    "integer",
+    "markdown",
+    "oid",
+    "positiveInt",
+    "string",
+    "time",
+    "unsignedInt",
+    "uri",
+    "url",
+    "uuid",
+    //      "xhtml"
+    )
 
-  // package that contains all converters
-  internal const val converterPackage = "com.google.android.fhir.hapiprotoconverter.generated"
-  // template for when the max value of an element is 1 ( in protos )
-  internal const val singleMethodTemplate = ".set%L"
-  // template for when the max value of an element is > 1 ( in protos )
-  internal const val multipleMethodTemplate = ".addAll%L"
+// package that contains all converters
+internal const val converterPackage = "com.google.android.fhir.hapiprotoconverter.generated"
+// template for when the max value of an element is 1 ( in protos )
+internal const val singleMethodTemplate = ".set%L"
+// template for when the max value of an element is > 1 ( in protos )
+internal const val multipleMethodTemplate = ".addAll%L"
 
 // TODO handle these
 internal val ignoreValueSet =
