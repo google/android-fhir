@@ -48,7 +48,7 @@ fun main() {
         JsonFormat.getParser().merge(it.inputStream().reader(), StructureDefinition.newBuilder())
       CompositeCodegen.profileUrlMap[def.url.value] = def.build()
     }
-  CompositeCodegen.profileUrlMap.values // .filter { it.name.value == "ElementDefinition "}
+  CompositeCodegen.profileUrlMap.values  //.filter { it.name.value == "Timing"}
     .forEach { def ->
     if ((def.kind.value == StructureDefinitionKindCode.Value.COMPLEX_TYPE ||
         def.kind.value == StructureDefinitionKindCode.Value.RESOURCE) && !def.abstract.value
@@ -57,14 +57,15 @@ fun main() {
     ) {
       try {
         Class.forName(
-          ClassName(CompositeCodegen.hapiPackage, def.id.value.capitalize()).reflectionName()
+          ClassName(hapiPackage, def.id.value.capitalize()).reflectionName()
         )
 
         Class.forName(
-          ClassName(CompositeCodegen.protoPackage, def.id.value.capitalize()).reflectionName()
+          ClassName(protoPackage, def.id.value.capitalize()).reflectionName()
         )
         CompositeCodegen.generate(def, File("hapiprotoconverter\\src\\main\\java"))
       } catch (e: Exception) {
+       // throw e
         if (e is ClassNotFoundException) {
           println("${def.id.value} Class not found")
         } else {

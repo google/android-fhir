@@ -1,19 +1,3 @@
-/*
- * Copyright 2020 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toHapi
@@ -61,10 +45,10 @@ import org.hl7.fhir.r4.model.UriType
 
 public object MessageDefinitionConverter {
   private fun MessageDefinition.EventX.messageDefinitionEventToHapi(): Type {
-    if (this.getCoding() != Coding.newBuilder().defaultInstanceForType) {
+    if (this.getCoding() != Coding.newBuilder().defaultInstanceForType ) {
       return (this.getCoding()).toHapi()
     }
-    if (this.getUri() != Uri.newBuilder().defaultInstanceForType) {
+    if (this.getUri() != Uri.newBuilder().defaultInstanceForType ) {
       return (this.getUri()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for MessageDefinition.event[x]")
@@ -83,134 +67,110 @@ public object MessageDefinitionConverter {
 
   public fun MessageDefinition.toHapi(): org.hl7.fhir.r4.model.MessageDefinition {
     val hapiValue = org.hl7.fhir.r4.model.MessageDefinition()
-    hapiValue.id = id.value
+    hapiValue.id = id.value 
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
     hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    hapiValue.setIdentifier(identifierList.map{it.toHapi()})
     hapiValue.setVersionElement(version.toHapi())
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setTitleElement(title.toHapi())
-    hapiValue.setReplaces(replacesList.map { it.toHapi() })
-    hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_", "")))
+    hapiValue.setReplaces(replacesList.map{it.toHapi()})
+    hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_","")))
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
     hapiValue.setPublisherElement(publisher.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
+    hapiValue.setContact(contactList.map{it.toHapi()})
     hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setUseContext(useContextList.map { it.toHapi() })
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    hapiValue.setUseContext(useContextList.map{it.toHapi()})
+    hapiValue.setJurisdiction(jurisdictionList.map{it.toHapi()})
     hapiValue.setPurposeElement(purpose.toHapi())
     hapiValue.setCopyrightElement(copyright.toHapi())
     hapiValue.setBaseElement(base.toHapi())
-    hapiValue.setParent(parentList.map { it.toHapi() })
+    hapiValue.setParent(parentList.map{it.toHapi()})
     hapiValue.setEvent(event.messageDefinitionEventToHapi())
-    hapiValue.setCategory(
-      org.hl7.fhir.r4.model.MessageDefinition.MessageSignificanceCategory.valueOf(
-        category.value.name.replace("_", "")
-      )
-    )
-    hapiValue.setFocus(focusList.map { it.toHapi() })
-    hapiValue.setAllowedResponse(allowedResponseList.map { it.toHapi() })
-    hapiValue.setGraph(graphList.map { it.toHapi() })
+    hapiValue.setCategory(org.hl7.fhir.r4.model.MessageDefinition.MessageSignificanceCategory.valueOf(category.value.name.replace("_","")))
+    hapiValue.setFocus(focusList.map{it.toHapi()})
+    hapiValue.setResponseRequired(org.hl7.fhir.r4.model.MessageDefinition.MessageheaderResponseRequest.valueOf(responseRequired.value.name.replace("_","")))
+    hapiValue.setAllowedResponse(allowedResponseList.map{it.toHapi()})
+    hapiValue.setGraph(graphList.map{it.toHapi()})
     return hapiValue
   }
 
   public fun org.hl7.fhir.r4.model.MessageDefinition.toProto(): MessageDefinition {
-    val protoValue =
-      MessageDefinition.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUrl(urlElement.toProto())
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setVersion(versionElement.toProto())
-        .setName(nameElement.toProto())
-        .setTitle(titleElement.toProto())
-        .addAllReplaces(replaces.map { it.toProto() })
-        .setStatus(
-          MessageDefinition.StatusCode.newBuilder()
-            .setValue(
-              PublicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
-            )
-            .build()
-        )
-        .setExperimental(experimentalElement.toProto())
-        .setDate(dateElement.toProto())
-        .setPublisher(publisherElement.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .addAllUseContext(useContext.map { it.toProto() })
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .setPurpose(purposeElement.toProto())
-        .setCopyright(copyrightElement.toProto())
-        .setBase(baseElement.toProto())
-        .addAllParent(parent.map { it.toProto() })
-        .setEvent(event.messageDefinitionEventToProto())
-        .setCategory(
-          MessageDefinition.CategoryCode.newBuilder()
-            .setValue(
-              MessageSignificanceCategoryCode.Value.valueOf(
-                category.toCode().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .addAllFocus(focus.map { it.toProto() })
-        .setResponseRequired(
-          MessageDefinition.ResponseRequiredCode.newBuilder()
-            .setValue(
-              MessageheaderResponseRequestCode.Value.valueOf(
-                responseRequired.toCode().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .addAllAllowedResponse(allowedResponse.map { it.toProto() })
-        .addAllGraph(graph.map { it.toProto() })
-        .build()
+    val protoValue = MessageDefinition.newBuilder()
+    .setId(Id.newBuilder().setValue(id))
+    .setMeta(meta.toProto())
+    .setImplicitRules(implicitRulesElement.toProto())
+    .setText(text.toProto())
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setUrl(urlElement.toProto())
+    .addAllIdentifier(identifier.map{it.toProto()})
+    .setVersion(versionElement.toProto())
+    .setName(nameElement.toProto())
+    .setTitle(titleElement.toProto())
+    .addAllReplaces(replaces.map{it.toProto()})
+    .setStatus(MessageDefinition.StatusCode.newBuilder().setValue(PublicationStatusCode.Value.valueOf(status.toCode().replace("-",
+        "_").toUpperCase())).build())
+    .setExperimental(experimentalElement.toProto())
+    .setDate(dateElement.toProto())
+    .setPublisher(publisherElement.toProto())
+    .addAllContact(contact.map{it.toProto()})
+    .setDescription(descriptionElement.toProto())
+    .addAllUseContext(useContext.map{it.toProto()})
+    .addAllJurisdiction(jurisdiction.map{it.toProto()})
+    .setPurpose(purposeElement.toProto())
+    .setCopyright(copyrightElement.toProto())
+    .setBase(baseElement.toProto())
+    .addAllParent(parent.map{it.toProto()})
+    .setEvent(event.messageDefinitionEventToProto())
+    .setCategory(MessageDefinition.CategoryCode.newBuilder().setValue(MessageSignificanceCategoryCode.Value.valueOf(category.toCode().replace("-",
+        "_").toUpperCase())).build())
+    .addAllFocus(focus.map{it.toProto()})
+    .setResponseRequired(MessageDefinition.ResponseRequiredCode.newBuilder().setValue(MessageheaderResponseRequestCode.Value.valueOf(responseRequired.toCode().replace("-",
+        "_").toUpperCase())).build())
+    .addAllAllowedResponse(allowedResponse.map{it.toProto()})
+    .addAllGraph(graph.map{it.toProto()})
+    .build()
     return protoValue
   }
 
   private fun org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionFocusComponent.toProto():
-    MessageDefinition.Focus {
-    val protoValue =
-      MessageDefinition.Focus.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setProfile(profileElement.toProto())
-        .setMin(minElement.toProto())
-        .setMax(maxElement.toProto())
-        .build()
+      MessageDefinition.Focus {
+    val protoValue = MessageDefinition.Focus.newBuilder()
+    .setId(String.newBuilder().setValue(id))
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setProfile(profileElement.toProto())
+    .setMin(minElement.toProto())
+    .setMax(maxElement.toProto())
+    .build()
     return protoValue
   }
 
-  private fun org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionAllowedResponseComponent.toProto():
-    MessageDefinition.AllowedResponse {
-    val protoValue =
-      MessageDefinition.AllowedResponse.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setMessage(messageElement.toProto())
-        .setSituation(situationElement.toProto())
-        .build()
+  private
+      fun org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionAllowedResponseComponent.toProto():
+      MessageDefinition.AllowedResponse {
+    val protoValue = MessageDefinition.AllowedResponse.newBuilder()
+    .setId(String.newBuilder().setValue(id))
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setMessage(messageElement.toProto())
+    .setSituation(situationElement.toProto())
+    .build()
     return protoValue
   }
 
   private fun MessageDefinition.Focus.toHapi():
-    org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionFocusComponent {
+      org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionFocusComponent {
     val hapiValue = org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionFocusComponent()
-    hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.id = id.value 
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setProfileElement(profile.toHapi())
     hapiValue.setMinElement(min.toHapi())
     hapiValue.setMaxElement(max.toHapi())
@@ -218,12 +178,12 @@ public object MessageDefinitionConverter {
   }
 
   private fun MessageDefinition.AllowedResponse.toHapi():
-    org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionAllowedResponseComponent {
+      org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionAllowedResponseComponent {
     val hapiValue =
-      org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionAllowedResponseComponent()
-    hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionAllowedResponseComponent()
+    hapiValue.id = id.value 
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setMessageElement(message.toHapi())
     hapiValue.setSituationElement(situation.toHapi())
     return hapiValue

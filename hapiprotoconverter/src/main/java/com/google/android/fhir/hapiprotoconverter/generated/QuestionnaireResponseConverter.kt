@@ -1,19 +1,3 @@
-/*
- * Copyright 2020 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.AttachmentConverter.toHapi
@@ -80,48 +64,48 @@ import org.hl7.fhir.r4.model.UriType
 
 public object QuestionnaireResponseConverter {
   private fun QuestionnaireResponse.Item.Answer.ValueX.questionnaireResponseItemAnswerValueToHapi():
-    Type {
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
+      Type {
+    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType ) {
       return (this.getBoolean()).toHapi()
     }
-    if (this.getDecimal() != Decimal.newBuilder().defaultInstanceForType) {
+    if (this.getDecimal() != Decimal.newBuilder().defaultInstanceForType ) {
       return (this.getDecimal()).toHapi()
     }
-    if (this.getInteger() != Integer.newBuilder().defaultInstanceForType) {
+    if (this.getInteger() != Integer.newBuilder().defaultInstanceForType ) {
       return (this.getInteger()).toHapi()
     }
-    if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
+    if (this.getDate() != Date.newBuilder().defaultInstanceForType ) {
       return (this.getDate()).toHapi()
     }
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
+    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType ) {
       return (this.getDateTime()).toHapi()
     }
-    if (this.getTime() != Time.newBuilder().defaultInstanceForType) {
+    if (this.getTime() != Time.newBuilder().defaultInstanceForType ) {
       return (this.getTime()).toHapi()
     }
-    if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
+    if (this.getStringValue() != String.newBuilder().defaultInstanceForType ) {
       return (this.getStringValue()).toHapi()
     }
-    if (this.getUri() != Uri.newBuilder().defaultInstanceForType) {
+    if (this.getUri() != Uri.newBuilder().defaultInstanceForType ) {
       return (this.getUri()).toHapi()
     }
-    if (this.getAttachment() != Attachment.newBuilder().defaultInstanceForType) {
+    if (this.getAttachment() != Attachment.newBuilder().defaultInstanceForType ) {
       return (this.getAttachment()).toHapi()
     }
-    if (this.getCoding() != Coding.newBuilder().defaultInstanceForType) {
+    if (this.getCoding() != Coding.newBuilder().defaultInstanceForType ) {
       return (this.getCoding()).toHapi()
     }
-    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
+    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType ) {
       return (this.getQuantity()).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
+    if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for QuestionnaireResponse.item.answer.value[x]")
   }
 
   private fun Type.questionnaireResponseItemAnswerValueToProto():
-    QuestionnaireResponse.Item.Answer.ValueX {
+      QuestionnaireResponse.Item.Answer.ValueX {
     val protoValue = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
     if (this is BooleanType) {
       protoValue.setBoolean(this.toProto())
@@ -164,109 +148,97 @@ public object QuestionnaireResponseConverter {
 
   public fun QuestionnaireResponse.toHapi(): org.hl7.fhir.r4.model.QuestionnaireResponse {
     val hapiValue = org.hl7.fhir.r4.model.QuestionnaireResponse()
-    hapiValue.id = id.value
+    hapiValue.id = id.value 
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
     hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setIdentifier(identifier.toHapi())
-    hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
-    hapiValue.setPartOf(partOfList.map { it.toHapi() })
+    hapiValue.setBasedOn(basedOnList.map{it.toHapi()})
+    hapiValue.setPartOf(partOfList.map{it.toHapi()})
     hapiValue.setQuestionnaireElement(questionnaire.toHapi())
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseStatus.valueOf(
-        status.value.name.replace("_", "")
-      )
-    )
+    hapiValue.setStatus(org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseStatus.valueOf(status.value.name.replace("_","")))
     hapiValue.setSubject(subject.toHapi())
     hapiValue.setEncounter(encounter.toHapi())
     hapiValue.setAuthoredElement(authored.toHapi())
     hapiValue.setAuthor(author.toHapi())
     hapiValue.setSource(source.toHapi())
-    hapiValue.setItem(itemList.map { it.toHapi() })
+    hapiValue.setItem(itemList.map{it.toHapi()})
     return hapiValue
   }
 
   public fun org.hl7.fhir.r4.model.QuestionnaireResponse.toProto(): QuestionnaireResponse {
-    val protoValue =
-      QuestionnaireResponse.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setIdentifier(identifier.toProto())
-        .addAllBasedOn(basedOn.map { it.toProto() })
-        .addAllPartOf(partOf.map { it.toProto() })
-        .setQuestionnaire(questionnaireElement.toProto())
-        .setStatus(
-          QuestionnaireResponse.StatusCode.newBuilder()
-            .setValue(
-              QuestionnaireResponseStatusCode.Value.valueOf(
-                status.toCode().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setSubject(subject.toProto())
-        .setEncounter(encounter.toProto())
-        .setAuthored(authoredElement.toProto())
-        .setAuthor(author.toProto())
-        .setSource(source.toProto())
-        .addAllItem(item.map { it.toProto() })
-        .build()
+    val protoValue = QuestionnaireResponse.newBuilder()
+    .setId(Id.newBuilder().setValue(id))
+    .setMeta(meta.toProto())
+    .setImplicitRules(implicitRulesElement.toProto())
+    .setText(text.toProto())
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setIdentifier(identifier.toProto())
+    .addAllBasedOn(basedOn.map{it.toProto()})
+    .addAllPartOf(partOf.map{it.toProto()})
+    .setQuestionnaire(questionnaireElement.toProto())
+    .setStatus(QuestionnaireResponse.StatusCode.newBuilder().setValue(QuestionnaireResponseStatusCode.Value.valueOf(status.toCode().replace("-",
+        "_").toUpperCase())).build())
+    .setSubject(subject.toProto())
+    .setEncounter(encounter.toProto())
+    .setAuthored(authoredElement.toProto())
+    .setAuthor(author.toProto())
+    .setSource(source.toProto())
+    .addAllItem(item.map{it.toProto()})
+    .build()
     return protoValue
   }
 
-  private fun org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent.toProto():
-    QuestionnaireResponse.Item {
-    val protoValue =
-      QuestionnaireResponse.Item.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setLinkId(linkIdElement.toProto())
-        .setDefinition(definitionElement.toProto())
-        .setText(textElement.toProto())
-        .addAllAnswer(answer.map { it.toProto() })
-        .build()
+  private
+      fun org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent.toProto():
+      QuestionnaireResponse.Item {
+    val protoValue = QuestionnaireResponse.Item.newBuilder()
+    .setId(String.newBuilder().setValue(id))
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setLinkId(linkIdElement.toProto())
+    .setDefinition(definitionElement.toProto())
+    .setText(textElement.toProto())
+    .addAllAnswer(answer.map{it.toProto()})
+    .build()
     return protoValue
   }
 
-  private fun org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.toProto():
-    QuestionnaireResponse.Item.Answer {
-    val protoValue =
-      QuestionnaireResponse.Item.Answer.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setValue(value.questionnaireResponseItemAnswerValueToProto())
-        .build()
+  private
+      fun org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.toProto():
+      QuestionnaireResponse.Item.Answer {
+    val protoValue = QuestionnaireResponse.Item.Answer.newBuilder()
+    .setId(String.newBuilder().setValue(id))
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setValue(value.questionnaireResponseItemAnswerValueToProto())
+    .build()
     return protoValue
   }
 
   private fun QuestionnaireResponse.Item.toHapi():
-    org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent {
+      org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent()
-    hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.id = id.value 
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setLinkIdElement(linkId.toHapi())
     hapiValue.setDefinitionElement(definition.toHapi())
     hapiValue.setTextElement(text.toHapi())
-    hapiValue.setAnswer(answerList.map { it.toHapi() })
+    hapiValue.setAnswer(answerList.map{it.toHapi()})
     return hapiValue
   }
 
   private fun QuestionnaireResponse.Item.Answer.toHapi():
-    org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent {
+      org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent {
     val hapiValue =
-      org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-    hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+    hapiValue.id = id.value 
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setValue(value.questionnaireResponseItemAnswerValueToHapi())
     return hapiValue
   }

@@ -1,19 +1,3 @@
-/*
- * Copyright 2020 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toHapi
@@ -50,10 +34,10 @@ import org.hl7.fhir.r4.model.Type
 
 public object MedicationConverter {
   private fun Medication.Ingredient.ItemX.medicationIngredientItemToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
+    if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for Medication.ingredient.item[x]")
@@ -72,85 +56,75 @@ public object MedicationConverter {
 
   public fun Medication.toHapi(): org.hl7.fhir.r4.model.Medication {
     val hapiValue = org.hl7.fhir.r4.model.Medication()
-    hapiValue.id = id.value
+    hapiValue.id = id.value 
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
     hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
+    hapiValue.setIdentifier(identifierList.map{it.toHapi()})
     hapiValue.setCode(code.toHapi())
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Medication.MedicationStatus.valueOf(status.value.name.replace("_", ""))
-    )
+    hapiValue.setStatus(org.hl7.fhir.r4.model.Medication.MedicationStatus.valueOf(status.value.name.replace("_","")))
     hapiValue.setManufacturer(manufacturer.toHapi())
     hapiValue.setForm(form.toHapi())
     hapiValue.setAmount(amount.toHapi())
-    hapiValue.setIngredient(ingredientList.map { it.toHapi() })
+    hapiValue.setIngredient(ingredientList.map{it.toHapi()})
     hapiValue.setBatch(batch.toHapi())
     return hapiValue
   }
 
   public fun org.hl7.fhir.r4.model.Medication.toProto(): Medication {
-    val protoValue =
-      Medication.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setCode(code.toProto())
-        .setStatus(
-          Medication.StatusCode.newBuilder()
-            .setValue(
-              MedicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
-            )
-            .build()
-        )
-        .setManufacturer(manufacturer.toProto())
-        .setForm(form.toProto())
-        .setAmount(amount.toProto())
-        .addAllIngredient(ingredient.map { it.toProto() })
-        .setBatch(batch.toProto())
-        .build()
+    val protoValue = Medication.newBuilder()
+    .setId(Id.newBuilder().setValue(id))
+    .setMeta(meta.toProto())
+    .setImplicitRules(implicitRulesElement.toProto())
+    .setText(text.toProto())
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .addAllIdentifier(identifier.map{it.toProto()})
+    .setCode(code.toProto())
+    .setStatus(Medication.StatusCode.newBuilder().setValue(MedicationStatusCode.Value.valueOf(status.toCode().replace("-",
+        "_").toUpperCase())).build())
+    .setManufacturer(manufacturer.toProto())
+    .setForm(form.toProto())
+    .setAmount(amount.toProto())
+    .addAllIngredient(ingredient.map{it.toProto()})
+    .setBatch(batch.toProto())
+    .build()
     return protoValue
   }
 
   private fun org.hl7.fhir.r4.model.Medication.MedicationIngredientComponent.toProto():
-    Medication.Ingredient {
-    val protoValue =
-      Medication.Ingredient.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setItem(item.medicationIngredientItemToProto())
-        .setIsActive(isActiveElement.toProto())
-        .setStrength(strength.toProto())
-        .build()
+      Medication.Ingredient {
+    val protoValue = Medication.Ingredient.newBuilder()
+    .setId(String.newBuilder().setValue(id))
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setItem(item.medicationIngredientItemToProto())
+    .setIsActive(isActiveElement.toProto())
+    .setStrength(strength.toProto())
+    .build()
     return protoValue
   }
 
   private fun org.hl7.fhir.r4.model.Medication.MedicationBatchComponent.toProto():
-    Medication.Batch {
-    val protoValue =
-      Medication.Batch.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setLotNumber(lotNumberElement.toProto())
-        .setExpirationDate(expirationDateElement.toProto())
-        .build()
+      Medication.Batch {
+    val protoValue = Medication.Batch.newBuilder()
+    .setId(String.newBuilder().setValue(id))
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setLotNumber(lotNumberElement.toProto())
+    .setExpirationDate(expirationDateElement.toProto())
+    .build()
     return protoValue
   }
 
   private fun Medication.Ingredient.toHapi():
-    org.hl7.fhir.r4.model.Medication.MedicationIngredientComponent {
+      org.hl7.fhir.r4.model.Medication.MedicationIngredientComponent {
     val hapiValue = org.hl7.fhir.r4.model.Medication.MedicationIngredientComponent()
-    hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.id = id.value 
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setItem(item.medicationIngredientItemToHapi())
     hapiValue.setIsActiveElement(isActive.toHapi())
     hapiValue.setStrength(strength.toHapi())
@@ -159,9 +133,9 @@ public object MedicationConverter {
 
   private fun Medication.Batch.toHapi(): org.hl7.fhir.r4.model.Medication.MedicationBatchComponent {
     val hapiValue = org.hl7.fhir.r4.model.Medication.MedicationBatchComponent()
-    hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.id = id.value 
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setLotNumberElement(lotNumber.toHapi())
     hapiValue.setExpirationDateElement(expirationDate.toHapi())
     return hapiValue

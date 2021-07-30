@@ -15,7 +15,7 @@
  */
 
 package com.google.android.fhir.hapiprotoconverter
-object GeneratorUtils {
+
   internal val primitiveTypeList =
     listOf(
       "base64Binary",
@@ -39,4 +39,33 @@ object GeneratorUtils {
       "uuid",
       //      "xhtml"
       )
-}
+
+  // package that contains all converters
+  internal const val converterPackage = "com.google.android.fhir.hapiprotoconverter.generated"
+  // template for when the max value of an element is 1 ( in protos )
+  internal const val singleMethodTemplate = ".set%L"
+  // template for when the max value of an element is > 1 ( in protos )
+  internal const val multipleMethodTemplate = ".addAll%L"
+
+// TODO handle these
+internal val ignoreValueSet =
+  listOf(
+    "http://hl7.org/fhir/ValueSet/languages",
+    "http://hl7.org/fhir/ValueSet/expression-language",
+    "http://hl7.org/fhir/ValueSet/all-types|4.0.1",
+    "http://hl7.org/fhir/ValueSet/guide-parameter-code|4.0.1",
+    "http://hl7.org/fhir/ValueSet/resource-types|4.0.1",
+    "http://hl7.org/fhir/ValueSet/defined-types|4.0.1",
+    "http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1"
+  )
+
+// proto package that contains the structures
+internal const val protoPackage = "com.google.fhir.r4.core"
+// hapi package that contains the structures
+internal const val hapiPackage = "org.hl7.fhir.r4.model"
+// uri that specifies if a valueset is in the the common Enumerations Class
+internal const val uriBindingName =
+  "http://hl7.org/fhir/StructureDefinition/elementdefinition-bindingName"
+internal const val FHIRPATH_TYPE_PREFIX = "http://hl7.org/fhirpath/"
+internal const val FHIR_TYPE_EXTENSION_URL =
+  "http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type"

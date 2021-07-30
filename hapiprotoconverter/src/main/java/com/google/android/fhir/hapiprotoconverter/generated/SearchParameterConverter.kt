@@ -1,19 +1,3 @@
-/*
- * Copyright 2020 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toHapi
@@ -55,147 +39,98 @@ import org.hl7.fhir.r4.model.Enumerations
 public object SearchParameterConverter {
   public fun SearchParameter.toHapi(): org.hl7.fhir.r4.model.SearchParameter {
     val hapiValue = org.hl7.fhir.r4.model.SearchParameter()
-    hapiValue.id = id.value
+    hapiValue.id = id.value 
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
     hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setUrlElement(url.toHapi())
     hapiValue.setVersionElement(version.toHapi())
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setDerivedFromElement(derivedFrom.toHapi())
-    hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_", "")))
+    hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_","")))
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
     hapiValue.setPublisherElement(publisher.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
+    hapiValue.setContact(contactList.map{it.toHapi()})
     hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setUseContext(useContextList.map { it.toHapi() })
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    hapiValue.setUseContext(useContextList.map{it.toHapi()})
+    hapiValue.setJurisdiction(jurisdictionList.map{it.toHapi()})
     hapiValue.setPurposeElement(purpose.toHapi())
     hapiValue.setCodeElement(code.toHapi())
-    hapiValue.setType(Enumerations.SearchParamType.valueOf(type.value.name.replace("_", "")))
+    hapiValue.setType(Enumerations.SearchParamType.valueOf(type.value.name.replace("_","")))
     hapiValue.setExpressionElement(expression.toHapi())
     hapiValue.setXpathElement(xpath.toHapi())
-    hapiValue.setXpathUsage(
-      org.hl7.fhir.r4.model.SearchParameter.XPathUsageType.valueOf(
-        xpathUsage.value.name.replace("_", "")
-      )
-    )
+    hapiValue.setXpathUsage(org.hl7.fhir.r4.model.SearchParameter.XPathUsageType.valueOf(xpathUsage.value.name.replace("_","")))
     hapiValue.setMultipleOrElement(multipleOr.toHapi())
     hapiValue.setMultipleAndElement(multipleAnd.toHapi())
-    comparatorList.map {
-      hapiValue.addComparator(
-        org.hl7.fhir.r4.model.SearchParameter.SearchComparator.valueOf(
-          it.value.name.replace("_", "")
-        )
-      )
-    }
-    modifierList.map {
-      hapiValue.addModifier(
-        org.hl7.fhir.r4.model.SearchParameter.SearchModifierCode.valueOf(
-          it.value.name.replace("_", "")
-        )
-      )
-    }
-    hapiValue.setChain(chainList.map { it.toHapi() })
-    hapiValue.setComponent(componentList.map { it.toHapi() })
+    comparatorList.map{hapiValue.addComparator(org.hl7.fhir.r4.model.SearchParameter.SearchComparator.valueOf(it.value.name.replace("_","")))}
+    modifierList.map{hapiValue.addModifier(org.hl7.fhir.r4.model.SearchParameter.SearchModifierCode.valueOf(it.value.name.replace("_","")))}
+    hapiValue.setChain(chainList.map{it.toHapi()})
+    hapiValue.setComponent(componentList.map{it.toHapi()})
     return hapiValue
   }
 
   public fun org.hl7.fhir.r4.model.SearchParameter.toProto(): SearchParameter {
-    val protoValue =
-      SearchParameter.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUrl(urlElement.toProto())
-        .setVersion(versionElement.toProto())
-        .setName(nameElement.toProto())
-        .setDerivedFrom(derivedFromElement.toProto())
-        .setStatus(
-          SearchParameter.StatusCode.newBuilder()
-            .setValue(
-              PublicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
-            )
-            .build()
-        )
-        .setExperimental(experimentalElement.toProto())
-        .setDate(dateElement.toProto())
-        .setPublisher(publisherElement.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .addAllUseContext(useContext.map { it.toProto() })
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .setPurpose(purposeElement.toProto())
-        .setCode(codeElement.toProto())
-        .setType(
-          SearchParameter.TypeCode.newBuilder()
-            .setValue(
-              SearchParamTypeCode.Value.valueOf(type.toCode().replace("-", "_").toUpperCase())
-            )
-            .build()
-        )
-        .setExpression(expressionElement.toProto())
-        .setXpath(xpathElement.toProto())
-        .setXpathUsage(
-          SearchParameter.XpathUsageCode.newBuilder()
-            .setValue(
-              XPathUsageTypeCode.Value.valueOf(xpathUsage.toCode().replace("-", "_").toUpperCase())
-            )
-            .build()
-        )
-        .setMultipleOr(multipleOrElement.toProto())
-        .setMultipleAnd(multipleAndElement.toProto())
-        .addAllComparator(
-          comparator.map {
-            SearchParameter.ComparatorCode.newBuilder()
-              .setValue(
-                SearchComparatorCode.Value.valueOf(
-                  it.value.toCode().replace("-", "_").toUpperCase()
-                )
-              )
-              .build()
-          }
-        )
-        .addAllModifier(
-          modifier.map {
-            SearchParameter.ModifierCode.newBuilder()
-              .setValue(
-                SearchModifierCode.Value.valueOf(it.value.toCode().replace("-", "_").toUpperCase())
-              )
-              .build()
-          }
-        )
-        .addAllChain(chain.map { it.toProto() })
-        .addAllComponent(component.map { it.toProto() })
-        .build()
+    val protoValue = SearchParameter.newBuilder()
+    .setId(Id.newBuilder().setValue(id))
+    .setMeta(meta.toProto())
+    .setImplicitRules(implicitRulesElement.toProto())
+    .setText(text.toProto())
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setUrl(urlElement.toProto())
+    .setVersion(versionElement.toProto())
+    .setName(nameElement.toProto())
+    .setDerivedFrom(derivedFromElement.toProto())
+    .setStatus(SearchParameter.StatusCode.newBuilder().setValue(PublicationStatusCode.Value.valueOf(status.toCode().replace("-",
+        "_").toUpperCase())).build())
+    .setExperimental(experimentalElement.toProto())
+    .setDate(dateElement.toProto())
+    .setPublisher(publisherElement.toProto())
+    .addAllContact(contact.map{it.toProto()})
+    .setDescription(descriptionElement.toProto())
+    .addAllUseContext(useContext.map{it.toProto()})
+    .addAllJurisdiction(jurisdiction.map{it.toProto()})
+    .setPurpose(purposeElement.toProto())
+    .setCode(codeElement.toProto())
+    .setType(SearchParameter.TypeCode.newBuilder().setValue(SearchParamTypeCode.Value.valueOf(type.toCode().replace("-",
+        "_").toUpperCase())).build())
+    .setExpression(expressionElement.toProto())
+    .setXpath(xpathElement.toProto())
+    .setXpathUsage(SearchParameter.XpathUsageCode.newBuilder().setValue(XPathUsageTypeCode.Value.valueOf(xpathUsage.toCode().replace("-",
+        "_").toUpperCase())).build())
+    .setMultipleOr(multipleOrElement.toProto())
+    .setMultipleAnd(multipleAndElement.toProto())
+    .addAllComparator(comparator.map{SearchParameter.ComparatorCode.newBuilder().setValue(SearchComparatorCode.Value.valueOf(it.value.toCode().replace("-",
+        "_").toUpperCase())).build()})
+    .addAllModifier(modifier.map{SearchParameter.ModifierCode.newBuilder().setValue(SearchModifierCode.Value.valueOf(it.value.toCode().replace("-",
+        "_").toUpperCase())).build()})
+    .addAllChain(chain.map{it.toProto()})
+    .addAllComponent(component.map{it.toProto()})
+    .build()
     return protoValue
   }
 
   private fun org.hl7.fhir.r4.model.SearchParameter.SearchParameterComponentComponent.toProto():
-    SearchParameter.Component {
-    val protoValue =
-      SearchParameter.Component.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setDefinition(definitionElement.toProto())
-        .setExpression(expressionElement.toProto())
-        .build()
+      SearchParameter.Component {
+    val protoValue = SearchParameter.Component.newBuilder()
+    .setId(String.newBuilder().setValue(id))
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setDefinition(definitionElement.toProto())
+    .setExpression(expressionElement.toProto())
+    .build()
     return protoValue
   }
 
   private fun SearchParameter.Component.toHapi():
-    org.hl7.fhir.r4.model.SearchParameter.SearchParameterComponentComponent {
+      org.hl7.fhir.r4.model.SearchParameter.SearchParameterComponentComponent {
     val hapiValue = org.hl7.fhir.r4.model.SearchParameter.SearchParameterComponentComponent()
-    hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.id = id.value 
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setDefinitionElement(definition.toHapi())
     hapiValue.setExpressionElement(expression.toHapi())
     return hapiValue

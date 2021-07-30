@@ -22,7 +22,7 @@ import com.google.fhir.r4.core.StructureDefinitionKindCode
 import java.io.File
 
 fun main() {
-  for (x in GeneratorUtils.primitiveTypeList) {
+  for (x in primitiveTypeList) {
     val file = File("hapiprotoconverter\\src\\main\\java")
     // This is temp will parse files
     PrimitiveCodegen.generate(

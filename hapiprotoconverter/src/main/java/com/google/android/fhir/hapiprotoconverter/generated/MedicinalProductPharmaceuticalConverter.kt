@@ -1,19 +1,3 @@
-/*
- * Copyright 2020 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toHapi
@@ -46,156 +30,152 @@ import com.google.fhir.r4.core.String
 
 public object MedicinalProductPharmaceuticalConverter {
   public fun MedicinalProductPharmaceutical.toHapi():
-    org.hl7.fhir.r4.model.MedicinalProductPharmaceutical {
+      org.hl7.fhir.r4.model.MedicinalProductPharmaceutical {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductPharmaceutical()
-    hapiValue.id = id.value
+    hapiValue.id = id.value 
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
     hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
+    hapiValue.setIdentifier(identifierList.map{it.toHapi()})
     hapiValue.setAdministrableDoseForm(administrableDoseForm.toHapi())
     hapiValue.setUnitOfPresentation(unitOfPresentation.toHapi())
-    hapiValue.setIngredient(ingredientList.map { it.toHapi() })
-    hapiValue.setDevice(deviceList.map { it.toHapi() })
-    hapiValue.setCharacteristics(characteristicsList.map { it.toHapi() })
-    hapiValue.setRouteOfAdministration(routeOfAdministrationList.map { it.toHapi() })
+    hapiValue.setIngredient(ingredientList.map{it.toHapi()})
+    hapiValue.setDevice(deviceList.map{it.toHapi()})
+    hapiValue.setCharacteristics(characteristicsList.map{it.toHapi()})
+    hapiValue.setRouteOfAdministration(routeOfAdministrationList.map{it.toHapi()})
     return hapiValue
   }
 
   public fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.toProto():
-    MedicinalProductPharmaceutical {
-    val protoValue =
-      MedicinalProductPharmaceutical.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setAdministrableDoseForm(administrableDoseForm.toProto())
-        .setUnitOfPresentation(unitOfPresentation.toProto())
-        .addAllIngredient(ingredient.map { it.toProto() })
-        .addAllDevice(device.map { it.toProto() })
-        .addAllCharacteristics(characteristics.map { it.toProto() })
-        .addAllRouteOfAdministration(routeOfAdministration.map { it.toProto() })
-        .build()
+      MedicinalProductPharmaceutical {
+    val protoValue = MedicinalProductPharmaceutical.newBuilder()
+    .setId(Id.newBuilder().setValue(id))
+    .setMeta(meta.toProto())
+    .setImplicitRules(implicitRulesElement.toProto())
+    .setText(text.toProto())
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .addAllIdentifier(identifier.map{it.toProto()})
+    .setAdministrableDoseForm(administrableDoseForm.toProto())
+    .setUnitOfPresentation(unitOfPresentation.toProto())
+    .addAllIngredient(ingredient.map{it.toProto()})
+    .addAllDevice(device.map{it.toProto()})
+    .addAllCharacteristics(characteristics.map{it.toProto()})
+    .addAllRouteOfAdministration(routeOfAdministration.map{it.toProto()})
+    .build()
     return protoValue
   }
 
-  private fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalCharacteristicsComponent.toProto():
-    MedicinalProductPharmaceutical.Characteristics {
-    val protoValue =
-      MedicinalProductPharmaceutical.Characteristics.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(code.toProto())
-        .setStatus(status.toProto())
-        .build()
+  private
+      fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalCharacteristicsComponent.toProto():
+      MedicinalProductPharmaceutical.Characteristics {
+    val protoValue = MedicinalProductPharmaceutical.Characteristics.newBuilder()
+    .setId(String.newBuilder().setValue(id))
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setCode(code.toProto())
+    .setStatus(status.toProto())
+    .build()
     return protoValue
   }
 
-  private fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationComponent.toProto():
-    MedicinalProductPharmaceutical.RouteOfAdministration {
-    val protoValue =
-      MedicinalProductPharmaceutical.RouteOfAdministration.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(code.toProto())
-        .setFirstDose(firstDose.toProto())
-        .setMaxSingleDose(maxSingleDose.toProto())
-        .setMaxDosePerDay(maxDosePerDay.toProto())
-        .setMaxDosePerTreatmentPeriod(maxDosePerTreatmentPeriod.toProto())
-        .setMaxTreatmentPeriod(maxTreatmentPeriod.toProto())
-        .addAllTargetSpecies(targetSpecies.map { it.toProto() })
-        .build()
+  private
+      fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationComponent.toProto():
+      MedicinalProductPharmaceutical.RouteOfAdministration {
+    val protoValue = MedicinalProductPharmaceutical.RouteOfAdministration.newBuilder()
+    .setId(String.newBuilder().setValue(id))
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setCode(code.toProto())
+    .setFirstDose(firstDose.toProto())
+    .setMaxSingleDose(maxSingleDose.toProto())
+    .setMaxDosePerDay(maxDosePerDay.toProto())
+    .setMaxDosePerTreatmentPeriod(maxDosePerTreatmentPeriod.toProto())
+    .setMaxTreatmentPeriod(maxTreatmentPeriod.toProto())
+    .addAllTargetSpecies(targetSpecies.map{it.toProto()})
+    .build()
     return protoValue
   }
 
-  private fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesComponent.toProto():
-    MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies {
-    val protoValue =
-      MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(code.toProto())
-        .addAllWithdrawalPeriod(withdrawalPeriod.map { it.toProto() })
-        .build()
+  private
+      fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesComponent.toProto():
+      MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies {
+    val protoValue = MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies.newBuilder()
+    .setId(String.newBuilder().setValue(id))
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setCode(code.toProto())
+    .addAllWithdrawalPeriod(withdrawalPeriod.map{it.toProto()})
+    .build()
     return protoValue
   }
 
-  private fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesWithdrawalPeriodComponent.toProto():
-    MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies.WithdrawalPeriod {
+  private
+      fun org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesWithdrawalPeriodComponent.toProto():
+      MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies.WithdrawalPeriod {
     val protoValue =
-      MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies.WithdrawalPeriod
-        .newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setTissue(tissue.toProto())
-        .setValue(value.toProto())
-        .setSupportingInformation(supportingInformationElement.toProto())
-        .build()
+        MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies.WithdrawalPeriod.newBuilder()
+    .setId(String.newBuilder().setValue(id))
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setTissue(tissue.toProto())
+    .setValue(value.toProto())
+    .setSupportingInformation(supportingInformationElement.toProto())
+    .build()
     return protoValue
   }
 
   private fun MedicinalProductPharmaceutical.Characteristics.toHapi():
-    org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalCharacteristicsComponent {
+      org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalCharacteristicsComponent {
     val hapiValue =
-      org.hl7.fhir.r4.model.MedicinalProductPharmaceutical
-        .MedicinalProductPharmaceuticalCharacteristicsComponent()
-    hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalCharacteristicsComponent()
+    hapiValue.id = id.value 
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setCode(code.toHapi())
     hapiValue.setStatus(status.toHapi())
     return hapiValue
   }
 
   private fun MedicinalProductPharmaceutical.RouteOfAdministration.toHapi():
-    org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationComponent {
+      org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationComponent {
     val hapiValue =
-      org.hl7.fhir.r4.model.MedicinalProductPharmaceutical
-        .MedicinalProductPharmaceuticalRouteOfAdministrationComponent()
-    hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationComponent()
+    hapiValue.id = id.value 
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setCode(code.toHapi())
     hapiValue.setFirstDose(firstDose.toHapi())
     hapiValue.setMaxSingleDose(maxSingleDose.toHapi())
     hapiValue.setMaxDosePerDay(maxDosePerDay.toHapi())
     hapiValue.setMaxDosePerTreatmentPeriod(maxDosePerTreatmentPeriod.toHapi())
     hapiValue.setMaxTreatmentPeriod(maxTreatmentPeriod.toHapi())
-    hapiValue.setTargetSpecies(targetSpeciesList.map { it.toHapi() })
+    hapiValue.setTargetSpecies(targetSpeciesList.map{it.toHapi()})
     return hapiValue
   }
 
   private fun MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies.toHapi():
-    org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesComponent {
+      org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesComponent {
     val hapiValue =
-      org.hl7.fhir.r4.model.MedicinalProductPharmaceutical
-        .MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesComponent()
-    hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesComponent()
+    hapiValue.id = id.value 
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setCode(code.toHapi())
-    hapiValue.setWithdrawalPeriod(withdrawalPeriodList.map { it.toHapi() })
+    hapiValue.setWithdrawalPeriod(withdrawalPeriodList.map{it.toHapi()})
     return hapiValue
   }
 
-  private fun MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies.WithdrawalPeriod.toHapi():
-    org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesWithdrawalPeriodComponent {
+  private
+      fun MedicinalProductPharmaceutical.RouteOfAdministration.TargetSpecies.WithdrawalPeriod.toHapi():
+      org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesWithdrawalPeriodComponent {
     val hapiValue =
-      org.hl7.fhir.r4.model.MedicinalProductPharmaceutical
-        .MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesWithdrawalPeriodComponent()
-    hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+        org.hl7.fhir.r4.model.MedicinalProductPharmaceutical.MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesWithdrawalPeriodComponent()
+    hapiValue.id = id.value 
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setTissue(tissue.toHapi())
     hapiValue.setValue(value.toHapi())
     hapiValue.setSupportingInformationElement(supportingInformation.toHapi())

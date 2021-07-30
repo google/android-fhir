@@ -143,7 +143,7 @@ private fun FunSpec.Builder.addConstructorParameter(
 }
 
 fun main() {
-  for (x in GeneratorUtils.primitiveTypeList) {
+  for (x in primitiveTypeList) {
     val file = File("hapiprotoconverter\\src\\test\\java")
     // This is temp will parse files
     PrimitiveTestCodegen.generate(

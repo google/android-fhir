@@ -1,19 +1,3 @@
-/*
- * Copyright 2020 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.AttachmentConverter.toHapi
@@ -52,10 +36,10 @@ import org.hl7.fhir.r4.model.Type
 
 public object DiagnosticReportConverter {
   private fun DiagnosticReport.EffectiveX.diagnosticReportEffectiveToHapi(): Type {
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
+    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType ) {
       return (this.getDateTime()).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
+    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for DiagnosticReport.effective[x]")
@@ -74,95 +58,82 @@ public object DiagnosticReportConverter {
 
   public fun DiagnosticReport.toHapi(): org.hl7.fhir.r4.model.DiagnosticReport {
     val hapiValue = org.hl7.fhir.r4.model.DiagnosticReport()
-    hapiValue.id = id.value
+    hapiValue.id = id.value 
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
     hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus.valueOf(
-        status.value.name.replace("_", "")
-      )
-    )
-    hapiValue.setCategory(categoryList.map { it.toHapi() })
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
+    hapiValue.setIdentifier(identifierList.map{it.toHapi()})
+    hapiValue.setBasedOn(basedOnList.map{it.toHapi()})
+    hapiValue.setStatus(org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus.valueOf(status.value.name.replace("_","")))
+    hapiValue.setCategory(categoryList.map{it.toHapi()})
     hapiValue.setCode(code.toHapi())
     hapiValue.setSubject(subject.toHapi())
     hapiValue.setEncounter(encounter.toHapi())
     hapiValue.setEffective(effective.diagnosticReportEffectiveToHapi())
     hapiValue.setIssuedElement(issued.toHapi())
-    hapiValue.setPerformer(performerList.map { it.toHapi() })
-    hapiValue.setResultsInterpreter(resultsInterpreterList.map { it.toHapi() })
-    hapiValue.setSpecimen(specimenList.map { it.toHapi() })
-    hapiValue.setResult(resultList.map { it.toHapi() })
-    hapiValue.setImagingStudy(imagingStudyList.map { it.toHapi() })
-    hapiValue.setMedia(mediaList.map { it.toHapi() })
+    hapiValue.setPerformer(performerList.map{it.toHapi()})
+    hapiValue.setResultsInterpreter(resultsInterpreterList.map{it.toHapi()})
+    hapiValue.setSpecimen(specimenList.map{it.toHapi()})
+    hapiValue.setResult(resultList.map{it.toHapi()})
+    hapiValue.setImagingStudy(imagingStudyList.map{it.toHapi()})
+    hapiValue.setMedia(mediaList.map{it.toHapi()})
     hapiValue.setConclusionElement(conclusion.toHapi())
-    hapiValue.setConclusionCode(conclusionCodeList.map { it.toHapi() })
-    hapiValue.setPresentedForm(presentedFormList.map { it.toHapi() })
+    hapiValue.setConclusionCode(conclusionCodeList.map{it.toHapi()})
+    hapiValue.setPresentedForm(presentedFormList.map{it.toHapi()})
     return hapiValue
   }
 
   public fun org.hl7.fhir.r4.model.DiagnosticReport.toProto(): DiagnosticReport {
-    val protoValue =
-      DiagnosticReport.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .addAllBasedOn(basedOn.map { it.toProto() })
-        .setStatus(
-          DiagnosticReport.StatusCode.newBuilder()
-            .setValue(
-              DiagnosticReportStatusCode.Value.valueOf(
-                status.toCode().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .addAllCategory(category.map { it.toProto() })
-        .setCode(code.toProto())
-        .setSubject(subject.toProto())
-        .setEncounter(encounter.toProto())
-        .setEffective(effective.diagnosticReportEffectiveToProto())
-        .setIssued(issuedElement.toProto())
-        .addAllPerformer(performer.map { it.toProto() })
-        .addAllResultsInterpreter(resultsInterpreter.map { it.toProto() })
-        .addAllSpecimen(specimen.map { it.toProto() })
-        .addAllResult(result.map { it.toProto() })
-        .addAllImagingStudy(imagingStudy.map { it.toProto() })
-        .addAllMedia(media.map { it.toProto() })
-        .setConclusion(conclusionElement.toProto())
-        .addAllConclusionCode(conclusionCode.map { it.toProto() })
-        .addAllPresentedForm(presentedForm.map { it.toProto() })
-        .build()
+    val protoValue = DiagnosticReport.newBuilder()
+    .setId(Id.newBuilder().setValue(id))
+    .setMeta(meta.toProto())
+    .setImplicitRules(implicitRulesElement.toProto())
+    .setText(text.toProto())
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .addAllIdentifier(identifier.map{it.toProto()})
+    .addAllBasedOn(basedOn.map{it.toProto()})
+    .setStatus(DiagnosticReport.StatusCode.newBuilder().setValue(DiagnosticReportStatusCode.Value.valueOf(status.toCode().replace("-",
+        "_").toUpperCase())).build())
+    .addAllCategory(category.map{it.toProto()})
+    .setCode(code.toProto())
+    .setSubject(subject.toProto())
+    .setEncounter(encounter.toProto())
+    .setEffective(effective.diagnosticReportEffectiveToProto())
+    .setIssued(issuedElement.toProto())
+    .addAllPerformer(performer.map{it.toProto()})
+    .addAllResultsInterpreter(resultsInterpreter.map{it.toProto()})
+    .addAllSpecimen(specimen.map{it.toProto()})
+    .addAllResult(result.map{it.toProto()})
+    .addAllImagingStudy(imagingStudy.map{it.toProto()})
+    .addAllMedia(media.map{it.toProto()})
+    .setConclusion(conclusionElement.toProto())
+    .addAllConclusionCode(conclusionCode.map{it.toProto()})
+    .addAllPresentedForm(presentedForm.map{it.toProto()})
+    .build()
     return protoValue
   }
 
   private fun org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportMediaComponent.toProto():
-    DiagnosticReport.Media {
-    val protoValue =
-      DiagnosticReport.Media.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setComment(commentElement.toProto())
-        .setLink(link.toProto())
-        .build()
+      DiagnosticReport.Media {
+    val protoValue = DiagnosticReport.Media.newBuilder()
+    .setId(String.newBuilder().setValue(id))
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setComment(commentElement.toProto())
+    .setLink(link.toProto())
+    .build()
     return protoValue
   }
 
   private fun DiagnosticReport.Media.toHapi():
-    org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportMediaComponent {
+      org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportMediaComponent {
     val hapiValue = org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportMediaComponent()
-    hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.id = id.value 
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setCommentElement(comment.toHapi())
     hapiValue.setLink(link.toHapi())
     return hapiValue

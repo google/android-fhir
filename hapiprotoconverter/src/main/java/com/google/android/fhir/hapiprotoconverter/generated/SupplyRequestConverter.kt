@@ -1,19 +1,3 @@
-/*
- * Copyright 2020 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toHapi
@@ -63,10 +47,10 @@ import org.hl7.fhir.r4.model.Type
 
 public object SupplyRequestConverter {
   private fun SupplyRequest.ItemX.supplyRequestItemToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
+    if (this.getReference() != Reference.newBuilder().defaultInstanceForType ) {
       return (this.getReference()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for SupplyRequest.item[x]")
@@ -84,16 +68,16 @@ public object SupplyRequestConverter {
   }
 
   private fun SupplyRequest.Parameter.ValueX.supplyRequestParameterValueToHapi(): Type {
-    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
+    if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType ) {
       return (this.getCodeableConcept()).toHapi()
     }
-    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
+    if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType ) {
       return (this.getQuantity()).toHapi()
     }
-    if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
+    if (this.getRange() != Range.newBuilder().defaultInstanceForType ) {
       return (this.getRange()).toHapi()
     }
-    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
+    if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType ) {
       return (this.getBoolean()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for SupplyRequest.parameter.value[x]")
@@ -117,13 +101,13 @@ public object SupplyRequestConverter {
   }
 
   private fun SupplyRequest.OccurrenceX.supplyRequestOccurrenceToHapi(): Type {
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
+    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType ) {
       return (this.getDateTime()).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
+    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType) {
+    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType ) {
       return (this.getTiming()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for SupplyRequest.occurrence[x]")
@@ -145,97 +129,77 @@ public object SupplyRequestConverter {
 
   public fun SupplyRequest.toHapi(): org.hl7.fhir.r4.model.SupplyRequest {
     val hapiValue = org.hl7.fhir.r4.model.SupplyRequest()
-    hapiValue.id = id.value
+    hapiValue.id = id.value 
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
     hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestStatus.valueOf(
-        status.value.name.replace("_", "")
-      )
-    )
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
+    hapiValue.setIdentifier(identifierList.map{it.toHapi()})
+    hapiValue.setStatus(org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestStatus.valueOf(status.value.name.replace("_","")))
     hapiValue.setCategory(category.toHapi())
-    hapiValue.setPriority(
-      org.hl7.fhir.r4.model.SupplyRequest.RequestPriority.valueOf(
-        priority.value.name.replace("_", "")
-      )
-    )
+    hapiValue.setPriority(org.hl7.fhir.r4.model.SupplyRequest.RequestPriority.valueOf(priority.value.name.replace("_","")))
     hapiValue.setItem(item.supplyRequestItemToHapi())
     hapiValue.setQuantity(quantity.toHapi())
-    hapiValue.setParameter(parameterList.map { it.toHapi() })
+    hapiValue.setParameter(parameterList.map{it.toHapi()})
     hapiValue.setOccurrence(occurrence.supplyRequestOccurrenceToHapi())
     hapiValue.setAuthoredOnElement(authoredOn.toHapi())
     hapiValue.setRequester(requester.toHapi())
-    hapiValue.setSupplier(supplierList.map { it.toHapi() })
-    hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
-    hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+    hapiValue.setSupplier(supplierList.map{it.toHapi()})
+    hapiValue.setReasonCode(reasonCodeList.map{it.toHapi()})
+    hapiValue.setReasonReference(reasonReferenceList.map{it.toHapi()})
     hapiValue.setDeliverFrom(deliverFrom.toHapi())
     hapiValue.setDeliverTo(deliverTo.toHapi())
     return hapiValue
   }
 
   public fun org.hl7.fhir.r4.model.SupplyRequest.toProto(): SupplyRequest {
-    val protoValue =
-      SupplyRequest.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setStatus(
-          SupplyRequest.StatusCode.newBuilder()
-            .setValue(
-              SupplyRequestStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
-            )
-            .build()
-        )
-        .setCategory(category.toProto())
-        .setPriority(
-          SupplyRequest.PriorityCode.newBuilder()
-            .setValue(
-              RequestPriorityCode.Value.valueOf(priority.toCode().replace("-", "_").toUpperCase())
-            )
-            .build()
-        )
-        .setItem(item.supplyRequestItemToProto())
-        .setQuantity(quantity.toProto())
-        .addAllParameter(parameter.map { it.toProto() })
-        .setOccurrence(occurrence.supplyRequestOccurrenceToProto())
-        .setAuthoredOn(authoredOnElement.toProto())
-        .setRequester(requester.toProto())
-        .addAllSupplier(supplier.map { it.toProto() })
-        .addAllReasonCode(reasonCode.map { it.toProto() })
-        .addAllReasonReference(reasonReference.map { it.toProto() })
-        .setDeliverFrom(deliverFrom.toProto())
-        .setDeliverTo(deliverTo.toProto())
-        .build()
+    val protoValue = SupplyRequest.newBuilder()
+    .setId(Id.newBuilder().setValue(id))
+    .setMeta(meta.toProto())
+    .setImplicitRules(implicitRulesElement.toProto())
+    .setText(text.toProto())
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .addAllIdentifier(identifier.map{it.toProto()})
+    .setStatus(SupplyRequest.StatusCode.newBuilder().setValue(SupplyRequestStatusCode.Value.valueOf(status.toCode().replace("-",
+        "_").toUpperCase())).build())
+    .setCategory(category.toProto())
+    .setPriority(SupplyRequest.PriorityCode.newBuilder().setValue(RequestPriorityCode.Value.valueOf(priority.toCode().replace("-",
+        "_").toUpperCase())).build())
+    .setItem(item.supplyRequestItemToProto())
+    .setQuantity(quantity.toProto())
+    .addAllParameter(parameter.map{it.toProto()})
+    .setOccurrence(occurrence.supplyRequestOccurrenceToProto())
+    .setAuthoredOn(authoredOnElement.toProto())
+    .setRequester(requester.toProto())
+    .addAllSupplier(supplier.map{it.toProto()})
+    .addAllReasonCode(reasonCode.map{it.toProto()})
+    .addAllReasonReference(reasonReference.map{it.toProto()})
+    .setDeliverFrom(deliverFrom.toProto())
+    .setDeliverTo(deliverTo.toProto())
+    .build()
     return protoValue
   }
 
   private fun org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestParameterComponent.toProto():
-    SupplyRequest.Parameter {
-    val protoValue =
-      SupplyRequest.Parameter.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(code.toProto())
-        .setValue(value.supplyRequestParameterValueToProto())
-        .build()
+      SupplyRequest.Parameter {
+    val protoValue = SupplyRequest.Parameter.newBuilder()
+    .setId(String.newBuilder().setValue(id))
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .setCode(code.toProto())
+    .setValue(value.supplyRequestParameterValueToProto())
+    .build()
     return protoValue
   }
 
   private fun SupplyRequest.Parameter.toHapi():
-    org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestParameterComponent {
+      org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestParameterComponent {
     val hapiValue = org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestParameterComponent()
-    hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.id = id.value 
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
     hapiValue.setCode(code.toHapi())
     hapiValue.setValue(value.supplyRequestParameterValueToHapi())
     return hapiValue

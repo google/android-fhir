@@ -1,19 +1,3 @@
-/*
- * Copyright 2020 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.AnnotationConverter.toHapi
@@ -50,13 +34,13 @@ import org.hl7.fhir.r4.model.Type
 
 public object DeviceUseStatementConverter {
   private fun DeviceUseStatement.TimingX.deviceUseStatementTimingToHapi(): Type {
-    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType) {
+    if (this.getTiming() != Timing.newBuilder().defaultInstanceForType ) {
       return (this.getTiming()).toHapi()
     }
-    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
+    if (this.getPeriod() != Period.newBuilder().defaultInstanceForType ) {
       return (this.getPeriod()).toHapi()
     }
-    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
+    if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType ) {
       return (this.getDateTime()).toHapi()
     }
     throw IllegalArgumentException("Invalid Type for DeviceUseStatement.timing[x]")
@@ -78,63 +62,51 @@ public object DeviceUseStatementConverter {
 
   public fun DeviceUseStatement.toHapi(): org.hl7.fhir.r4.model.DeviceUseStatement {
     val hapiValue = org.hl7.fhir.r4.model.DeviceUseStatement()
-    hapiValue.id = id.value
+    hapiValue.id = id.value 
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
     hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
-    hapiValue.setStatus(
-      org.hl7.fhir.r4.model.DeviceUseStatement.DeviceUseStatementStatus.valueOf(
-        status.value.name.replace("_", "")
-      )
-    )
+    hapiValue.setExtension(extensionList.map{it.toHapi()})
+    hapiValue.setModifierExtension(modifierExtensionList.map{it.toHapi()})
+    hapiValue.setIdentifier(identifierList.map{it.toHapi()})
+    hapiValue.setBasedOn(basedOnList.map{it.toHapi()})
+    hapiValue.setStatus(org.hl7.fhir.r4.model.DeviceUseStatement.DeviceUseStatementStatus.valueOf(status.value.name.replace("_","")))
     hapiValue.setSubject(subject.toHapi())
-    hapiValue.setDerivedFrom(derivedFromList.map { it.toHapi() })
+    hapiValue.setDerivedFrom(derivedFromList.map{it.toHapi()})
     hapiValue.setTiming(timing.deviceUseStatementTimingToHapi())
     hapiValue.setRecordedOnElement(recordedOn.toHapi())
     hapiValue.setSource(source.toHapi())
     hapiValue.setDevice(device.toHapi())
-    hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
-    hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+    hapiValue.setReasonCode(reasonCodeList.map{it.toHapi()})
+    hapiValue.setReasonReference(reasonReferenceList.map{it.toHapi()})
     hapiValue.setBodySite(bodySite.toHapi())
-    hapiValue.setNote(noteList.map { it.toHapi() })
+    hapiValue.setNote(noteList.map{it.toHapi()})
     return hapiValue
   }
 
   public fun org.hl7.fhir.r4.model.DeviceUseStatement.toProto(): DeviceUseStatement {
-    val protoValue =
-      DeviceUseStatement.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .addAllBasedOn(basedOn.map { it.toProto() })
-        .setStatus(
-          DeviceUseStatement.StatusCode.newBuilder()
-            .setValue(
-              DeviceUseStatementStatusCode.Value.valueOf(
-                status.toCode().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setSubject(subject.toProto())
-        .addAllDerivedFrom(derivedFrom.map { it.toProto() })
-        .setTiming(timing.deviceUseStatementTimingToProto())
-        .setRecordedOn(recordedOnElement.toProto())
-        .setSource(source.toProto())
-        .setDevice(device.toProto())
-        .addAllReasonCode(reasonCode.map { it.toProto() })
-        .addAllReasonReference(reasonReference.map { it.toProto() })
-        .setBodySite(bodySite.toProto())
-        .addAllNote(note.map { it.toProto() })
-        .build()
+    val protoValue = DeviceUseStatement.newBuilder()
+    .setId(Id.newBuilder().setValue(id))
+    .setMeta(meta.toProto())
+    .setImplicitRules(implicitRulesElement.toProto())
+    .setText(text.toProto())
+    .addAllExtension(extension.map{it.toProto()})
+    .addAllModifierExtension(modifierExtension.map{it.toProto()})
+    .addAllIdentifier(identifier.map{it.toProto()})
+    .addAllBasedOn(basedOn.map{it.toProto()})
+    .setStatus(DeviceUseStatement.StatusCode.newBuilder().setValue(DeviceUseStatementStatusCode.Value.valueOf(status.toCode().replace("-",
+        "_").toUpperCase())).build())
+    .setSubject(subject.toProto())
+    .addAllDerivedFrom(derivedFrom.map{it.toProto()})
+    .setTiming(timing.deviceUseStatementTimingToProto())
+    .setRecordedOn(recordedOnElement.toProto())
+    .setSource(source.toProto())
+    .setDevice(device.toProto())
+    .addAllReasonCode(reasonCode.map{it.toProto()})
+    .addAllReasonReference(reasonReference.map{it.toProto()})
+    .setBodySite(bodySite.toProto())
+    .addAllNote(note.map{it.toProto()})
+    .build()
     return protoValue
   }
 }
