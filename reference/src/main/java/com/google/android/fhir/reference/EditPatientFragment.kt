@@ -50,10 +50,10 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
     viewModel.livePatientData.observe(viewLifecycleOwner) { addQuestionnaireFragment(it) }
     viewModel.isPatientSaved.observe(viewLifecycleOwner) {
       if (!it) {
-        Toast.makeText(requireContext(), "Inputs are missing.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), R.string.message_input_missing, Toast.LENGTH_SHORT).show()
         return@observe
       }
-      Toast.makeText(requireContext(), "Patient is updated.", Toast.LENGTH_SHORT).show()
+      Toast.makeText(requireContext(), R.string.message_patient_updated, Toast.LENGTH_SHORT).show()
       NavHostFragment.findNavController(this).navigateUp()
     }
   }

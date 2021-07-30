@@ -22,6 +22,7 @@ import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
 import com.google.android.fhir.datacapture.utilities.SimpleWorkerContextProvider
+import com.google.android.fhir.datacapture.utilities.toCoding
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -184,7 +185,7 @@ object ResourceMapper {
         answerExtracted.firstOrNull()?.let { answer ->
           question.initial =
             mutableListOf(
-              Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asType())
+              Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
             )
         }
       }
@@ -480,62 +481,13 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
 }
 
 /**
- * Invokes function specified by [functionName] on the calling object with the provided arguments
- * [args]
- */
-private fun Any.invokeFunction(
-  functionName: String,
-  parameterTypes: List<Class<*>> = listOf(),
-  vararg args: Any?
-): Any? =
-  this::class
-    .java
-    .getDeclaredMethod(functionName, *parameterTypes.toTypedArray())
-    .apply { isAccessible = true }
-    .invoke(this, *args)
-
-/**
- * All the enums defined in [org.hl7.fhir.r4.model.Enumerations] have these common methods
- * [fromCode, valueOf, values, getDefinition, getDisplay, getSystem, toCode]. This function converts
- * the high level [org.hl7.fhir.r4.model.Enumerations] of something like
- * [org.hl7.fhir.r4.model.Enumerations.AdministrativeGender] into a corresponding [Coding]. The
- * reason we use reflection here to get the actual value is that [Enumeration] provides a default
- * implementation for some of the apis like [Enumeration.getDisplay] and always return null. So as
- * client, we have to call the desired api on the GenericType passed to the [Enumeration] and get
- * the desired value by calling the api's as described above.
- */
-private fun Enumeration<*>.toCoding(): Coding {
-  val enumeration = this
-  return Coding().apply {
-    display =
-      if (enumeration.hasDisplay()) {
-        enumeration.display
-      } else {
-        enumeration.value.invokeFunction("getDisplay") as String?
-      }
-    code =
-      if (enumeration.hasCode()) {
-        enumeration.code
-      } else {
-        enumeration.value.invokeFunction("toCode") as String?
-      }
-    system =
-      if (enumeration.hasSystem()) {
-        enumeration.system
-      } else {
-        enumeration.value.invokeFunction("getSystem") as String?
-      }
-  }
-}
-
-/**
  * Returns the [Base] object as a [Type] as expected by
  * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue]. Also,
  * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue] only takes a certain [Type]
  * objects and throws exception otherwise. This extension function takes care of the conversion
  * based on the input and expected [Type].
  */
-private fun Base.asType(): Type {
+private fun Base.asExpectedType(): Type {
   return when (this) {
     is Enumeration<*> -> toCoding()
     else -> this as Type
