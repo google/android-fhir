@@ -25,8 +25,10 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toPr
 import com.google.fhir.r4.core.HumanName
 import com.google.fhir.r4.core.NameUseCode
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object HumanNameConverter {
+  @JvmStatic
   public fun HumanName.toHapi(): org.hl7.fhir.r4.model.HumanName {
     val hapiValue = org.hl7.fhir.r4.model.HumanName()
     hapiValue.id = id.value
@@ -43,6 +45,7 @@ public object HumanNameConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.HumanName.toProto(): HumanName {
     val protoValue =
       HumanName.newBuilder()

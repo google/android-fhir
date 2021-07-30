@@ -59,12 +59,14 @@ import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 public object FamilyMemberHistoryConverter {
+  @JvmStatic
   private fun FamilyMemberHistory.BornX.familyMemberHistoryBornToHapi(): Type {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
       return (this.getPeriod()).toHapi()
@@ -78,6 +80,7 @@ public object FamilyMemberHistoryConverter {
     throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.born[x]")
   }
 
+  @JvmStatic
   private fun Type.familyMemberHistoryBornToProto(): FamilyMemberHistory.BornX {
     val protoValue = FamilyMemberHistory.BornX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Period) {
@@ -92,6 +95,7 @@ public object FamilyMemberHistoryConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun FamilyMemberHistory.AgeX.familyMemberHistoryAgeToHapi(): Type {
     if (this.getAge() != Age.newBuilder().defaultInstanceForType) {
       return (this.getAge()).toHapi()
@@ -105,6 +109,7 @@ public object FamilyMemberHistoryConverter {
     throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.age[x]")
   }
 
+  @JvmStatic
   private fun Type.familyMemberHistoryAgeToProto(): FamilyMemberHistory.AgeX {
     val protoValue = FamilyMemberHistory.AgeX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Age) {
@@ -119,6 +124,7 @@ public object FamilyMemberHistoryConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun FamilyMemberHistory.DeceasedX.familyMemberHistoryDeceasedToHapi(): Type {
     if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
       return (this.getBoolean()).toHapi()
@@ -138,6 +144,7 @@ public object FamilyMemberHistoryConverter {
     throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.deceased[x]")
   }
 
+  @JvmStatic
   private fun Type.familyMemberHistoryDeceasedToProto(): FamilyMemberHistory.DeceasedX {
     val protoValue = FamilyMemberHistory.DeceasedX.newBuilder()
     if (this is BooleanType) {
@@ -158,6 +165,7 @@ public object FamilyMemberHistoryConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun FamilyMemberHistory.Condition.OnsetX.familyMemberHistoryConditionOnsetToHapi(): Type {
     if (this.getAge() != Age.newBuilder().defaultInstanceForType) {
       return (this.getAge()).toHapi()
@@ -174,6 +182,7 @@ public object FamilyMemberHistoryConverter {
     throw IllegalArgumentException("Invalid Type for FamilyMemberHistory.condition.onset[x]")
   }
 
+  @JvmStatic
   private fun Type.familyMemberHistoryConditionOnsetToProto():
     FamilyMemberHistory.Condition.OnsetX {
     val protoValue = FamilyMemberHistory.Condition.OnsetX.newBuilder()
@@ -192,6 +201,7 @@ public object FamilyMemberHistoryConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun FamilyMemberHistory.toHapi(): org.hl7.fhir.r4.model.FamilyMemberHistory {
     val hapiValue = org.hl7.fhir.r4.model.FamilyMemberHistory()
     hapiValue.id = id.value
@@ -225,6 +235,7 @@ public object FamilyMemberHistoryConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.FamilyMemberHistory.toProto(): FamilyMemberHistory {
     val protoValue =
       FamilyMemberHistory.newBuilder()
@@ -262,6 +273,7 @@ public object FamilyMemberHistoryConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.FamilyMemberHistory.FamilyMemberHistoryConditionComponent.toProto():
     FamilyMemberHistory.Condition {
     val protoValue =
@@ -278,6 +290,7 @@ public object FamilyMemberHistoryConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun FamilyMemberHistory.Condition.toHapi():
     org.hl7.fhir.r4.model.FamilyMemberHistory.FamilyMemberHistoryConditionComponent {
     val hapiValue =

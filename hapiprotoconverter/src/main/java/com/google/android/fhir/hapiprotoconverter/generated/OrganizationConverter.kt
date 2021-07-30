@@ -43,8 +43,10 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Organization
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object OrganizationConverter {
+  @JvmStatic
   public fun Organization.toHapi(): org.hl7.fhir.r4.model.Organization {
     val hapiValue = org.hl7.fhir.r4.model.Organization()
     hapiValue.id = id.value
@@ -66,6 +68,7 @@ public object OrganizationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Organization.toProto(): Organization {
     val protoValue =
       Organization.newBuilder()
@@ -89,6 +92,7 @@ public object OrganizationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Organization.OrganizationContactComponent.toProto():
     Organization.Contact {
     val protoValue =
@@ -104,6 +108,7 @@ public object OrganizationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun Organization.Contact.toHapi():
     org.hl7.fhir.r4.model.Organization.OrganizationContactComponent {
     val hapiValue = org.hl7.fhir.r4.model.Organization.OrganizationContactComponent()

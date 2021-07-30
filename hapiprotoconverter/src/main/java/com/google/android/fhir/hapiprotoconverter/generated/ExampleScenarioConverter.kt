@@ -51,9 +51,11 @@ import com.google.fhir.r4.core.ExampleScenarioActorTypeCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 public object ExampleScenarioConverter {
+  @JvmStatic
   public fun ExampleScenario.toHapi(): org.hl7.fhir.r4.model.ExampleScenario {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario()
     hapiValue.id = id.value
@@ -82,6 +84,7 @@ public object ExampleScenarioConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.ExampleScenario.toProto(): ExampleScenario {
     val protoValue =
       ExampleScenario.newBuilder()
@@ -118,6 +121,7 @@ public object ExampleScenarioConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioActorComponent.toProto():
     ExampleScenario.Actor {
     val protoValue =
@@ -141,6 +145,7 @@ public object ExampleScenarioConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceComponent.toProto():
     ExampleScenario.Instance {
     val protoValue =
@@ -157,6 +162,7 @@ public object ExampleScenarioConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceVersionComponent.toProto():
     ExampleScenario.Instance.Version {
     val protoValue =
@@ -170,6 +176,7 @@ public object ExampleScenarioConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceContainedInstanceComponent.toProto():
     ExampleScenario.Instance.ContainedInstance {
     val protoValue =
@@ -183,6 +190,7 @@ public object ExampleScenarioConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessComponent.toProto():
     ExampleScenario.Process {
     val protoValue =
@@ -199,6 +207,7 @@ public object ExampleScenarioConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepComponent.toProto():
     ExampleScenario.Process.Step {
     val protoValue =
@@ -213,6 +222,7 @@ public object ExampleScenarioConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepOperationComponent.toProto():
     ExampleScenario.Process.Step.Operation {
     val protoValue =
@@ -232,6 +242,7 @@ public object ExampleScenarioConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepAlternativeComponent.toProto():
     ExampleScenario.Process.Step.Alternative {
     val protoValue =
@@ -245,6 +256,7 @@ public object ExampleScenarioConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun ExampleScenario.Actor.toHapi():
     org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioActorComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioActorComponent()
@@ -262,6 +274,7 @@ public object ExampleScenarioConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ExampleScenario.Instance.toHapi():
     org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceComponent()
@@ -276,6 +289,7 @@ public object ExampleScenarioConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ExampleScenario.Instance.Version.toHapi():
     org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceVersionComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceVersionComponent()
@@ -287,6 +301,7 @@ public object ExampleScenarioConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ExampleScenario.Instance.ContainedInstance.toHapi():
     org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioInstanceContainedInstanceComponent {
     val hapiValue =
@@ -299,6 +314,7 @@ public object ExampleScenarioConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ExampleScenario.Process.toHapi():
     org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessComponent()
@@ -313,6 +329,7 @@ public object ExampleScenarioConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ExampleScenario.Process.Step.toHapi():
     org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepComponent {
     val hapiValue = org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepComponent()
@@ -325,6 +342,7 @@ public object ExampleScenarioConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ExampleScenario.Process.Step.Operation.toHapi():
     org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepOperationComponent {
     val hapiValue =
@@ -343,6 +361,7 @@ public object ExampleScenarioConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ExampleScenario.Process.Step.Alternative.toHapi():
     org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioProcessStepAlternativeComponent {
     val hapiValue =

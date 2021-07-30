@@ -17,10 +17,12 @@
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.fhir.r4.core.Decimal
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DecimalType
 
 public object DecimalConverter {
   /** returns the proto Decimal equivalent of the hapi DecimalType */
+  @JvmStatic
   public fun DecimalType.toProto(): Decimal {
     val protoValue = Decimal.newBuilder()
     if (valueAsString != null) protoValue.setValue(valueAsString)
@@ -28,6 +30,7 @@ public object DecimalConverter {
   }
 
   /** returns the hapi DecimalType equivalent of the proto Decimal */
+  @JvmStatic
   public fun Decimal.toHapi(): DecimalType {
     val hapiValue = DecimalType()
     hapiValue.valueAsString = value

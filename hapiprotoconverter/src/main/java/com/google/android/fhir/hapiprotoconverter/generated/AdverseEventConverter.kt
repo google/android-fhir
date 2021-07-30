@@ -39,8 +39,10 @@ import com.google.fhir.r4.core.AdverseEvent.SuspectEntity
 import com.google.fhir.r4.core.AdverseEventActualityCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object AdverseEventConverter {
+  @JvmStatic
   public fun AdverseEvent.toHapi(): org.hl7.fhir.r4.model.AdverseEvent {
     val hapiValue = org.hl7.fhir.r4.model.AdverseEvent()
     hapiValue.id = id.value
@@ -76,6 +78,7 @@ public object AdverseEventConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.AdverseEvent.toProto(): AdverseEvent {
     val protoValue =
       AdverseEvent.newBuilder()
@@ -117,6 +120,7 @@ public object AdverseEventConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.AdverseEvent.AdverseEventSuspectEntityComponent.toProto():
     AdverseEvent.SuspectEntity {
     val protoValue =
@@ -130,6 +134,7 @@ public object AdverseEventConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.AdverseEvent.AdverseEventSuspectEntityCausalityComponent.toProto():
     AdverseEvent.SuspectEntity.Causality {
     val protoValue =
@@ -145,6 +150,7 @@ public object AdverseEventConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun AdverseEvent.SuspectEntity.toHapi():
     org.hl7.fhir.r4.model.AdverseEvent.AdverseEventSuspectEntityComponent {
     val hapiValue = org.hl7.fhir.r4.model.AdverseEvent.AdverseEventSuspectEntityComponent()
@@ -156,6 +162,7 @@ public object AdverseEventConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun AdverseEvent.SuspectEntity.Causality.toHapi():
     org.hl7.fhir.r4.model.AdverseEvent.AdverseEventSuspectEntityCausalityComponent {
     val hapiValue = org.hl7.fhir.r4.model.AdverseEvent.AdverseEventSuspectEntityCausalityComponent()

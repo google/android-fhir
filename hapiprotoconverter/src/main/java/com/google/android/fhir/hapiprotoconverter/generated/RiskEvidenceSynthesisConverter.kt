@@ -58,9 +58,11 @@ import com.google.fhir.r4.core.RiskEvidenceSynthesis
 import com.google.fhir.r4.core.RiskEvidenceSynthesis.Certainty
 import com.google.fhir.r4.core.RiskEvidenceSynthesis.RiskEstimate
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 public object RiskEvidenceSynthesisConverter {
+  @JvmStatic
   public fun RiskEvidenceSynthesis.toHapi(): org.hl7.fhir.r4.model.RiskEvidenceSynthesis {
     val hapiValue = org.hl7.fhir.r4.model.RiskEvidenceSynthesis()
     hapiValue.id = id.value
@@ -103,6 +105,7 @@ public object RiskEvidenceSynthesisConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.RiskEvidenceSynthesis.toProto(): RiskEvidenceSynthesis {
     val protoValue =
       RiskEvidenceSynthesis.newBuilder()
@@ -153,6 +156,7 @@ public object RiskEvidenceSynthesisConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisSampleSizeComponent.toProto():
     RiskEvidenceSynthesis.SampleSize {
     val protoValue =
@@ -167,6 +171,7 @@ public object RiskEvidenceSynthesisConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisRiskEstimateComponent.toProto():
     RiskEvidenceSynthesis.RiskEstimate {
     val protoValue =
@@ -185,6 +190,7 @@ public object RiskEvidenceSynthesisConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisRiskEstimatePrecisionEstimateComponent.toProto():
     RiskEvidenceSynthesis.RiskEstimate.PrecisionEstimate {
     val protoValue =
@@ -200,6 +206,7 @@ public object RiskEvidenceSynthesisConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisCertaintyComponent.toProto():
     RiskEvidenceSynthesis.Certainty {
     val protoValue =
@@ -214,6 +221,7 @@ public object RiskEvidenceSynthesisConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisCertaintyCertaintySubcomponentComponent.toProto():
     RiskEvidenceSynthesis.Certainty.CertaintySubcomponent {
     val protoValue =
@@ -228,6 +236,7 @@ public object RiskEvidenceSynthesisConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun RiskEvidenceSynthesis.SampleSize.toHapi():
     org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisSampleSizeComponent {
     val hapiValue =
@@ -241,6 +250,7 @@ public object RiskEvidenceSynthesisConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun RiskEvidenceSynthesis.RiskEstimate.toHapi():
     org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisRiskEstimateComponent {
     val hapiValue =
@@ -258,6 +268,7 @@ public object RiskEvidenceSynthesisConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun RiskEvidenceSynthesis.RiskEstimate.PrecisionEstimate.toHapi():
     org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisRiskEstimatePrecisionEstimateComponent {
     val hapiValue =
@@ -273,6 +284,7 @@ public object RiskEvidenceSynthesisConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun RiskEvidenceSynthesis.Certainty.toHapi():
     org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisCertaintyComponent {
     val hapiValue =
@@ -286,6 +298,7 @@ public object RiskEvidenceSynthesisConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun RiskEvidenceSynthesis.Certainty.CertaintySubcomponent.toHapi():
     org.hl7.fhir.r4.model.RiskEvidenceSynthesis.RiskEvidenceSynthesisCertaintyCertaintySubcomponentComponent {
     val hapiValue =

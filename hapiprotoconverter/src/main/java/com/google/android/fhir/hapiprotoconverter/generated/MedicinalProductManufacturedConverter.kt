@@ -34,8 +34,10 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.MedicinalProductManufactured
+import kotlin.jvm.JvmStatic
 
 public object MedicinalProductManufacturedConverter {
+  @JvmStatic
   public fun MedicinalProductManufactured.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductManufactured {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductManufactured()
@@ -55,6 +57,7 @@ public object MedicinalProductManufacturedConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.MedicinalProductManufactured.toProto():
     MedicinalProductManufactured {
     val protoValue =

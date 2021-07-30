@@ -53,11 +53,13 @@ import com.google.fhir.r4.core.Procedure
 import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 public object ProcedureConverter {
+  @JvmStatic
   private fun Procedure.PerformedX.procedurePerformedToHapi(): Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
       return (this.getDateTime()).toHapi()
@@ -77,6 +79,7 @@ public object ProcedureConverter {
     throw IllegalArgumentException("Invalid Type for Procedure.performed[x]")
   }
 
+  @JvmStatic
   private fun Type.procedurePerformedToProto(): Procedure.PerformedX {
     val protoValue = Procedure.PerformedX.newBuilder()
     if (this is DateTimeType) {
@@ -97,6 +100,7 @@ public object ProcedureConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun Procedure.toHapi(): org.hl7.fhir.r4.model.Procedure {
     val hapiValue = org.hl7.fhir.r4.model.Procedure()
     hapiValue.id = id.value
@@ -138,6 +142,7 @@ public object ProcedureConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Procedure.toProto(): Procedure {
     val protoValue =
       Procedure.newBuilder()
@@ -185,6 +190,7 @@ public object ProcedureConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Procedure.ProcedurePerformerComponent.toProto():
     Procedure.Performer {
     val protoValue =
@@ -199,6 +205,7 @@ public object ProcedureConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Procedure.ProcedureFocalDeviceComponent.toProto():
     Procedure.FocalDevice {
     val protoValue =
@@ -212,6 +219,7 @@ public object ProcedureConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun Procedure.Performer.toHapi():
     org.hl7.fhir.r4.model.Procedure.ProcedurePerformerComponent {
     val hapiValue = org.hl7.fhir.r4.model.Procedure.ProcedurePerformerComponent()
@@ -224,6 +232,7 @@ public object ProcedureConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Procedure.FocalDevice.toHapi():
     org.hl7.fhir.r4.model.Procedure.ProcedureFocalDeviceComponent {
     val hapiValue = org.hl7.fhir.r4.model.Procedure.ProcedureFocalDeviceComponent()

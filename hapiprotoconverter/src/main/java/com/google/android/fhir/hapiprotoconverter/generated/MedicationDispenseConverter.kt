@@ -47,10 +47,12 @@ import com.google.fhir.r4.core.MedicationDispenseStatusCode
 import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
 public object MedicationDispenseConverter {
+  @JvmStatic
   private fun MedicationDispense.StatusReasonX.medicationDispenseStatusReasonToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
@@ -61,6 +63,7 @@ public object MedicationDispenseConverter {
     throw IllegalArgumentException("Invalid Type for MedicationDispense.statusReason[x]")
   }
 
+  @JvmStatic
   private fun Type.medicationDispenseStatusReasonToProto(): MedicationDispense.StatusReasonX {
     val protoValue = MedicationDispense.StatusReasonX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -72,6 +75,7 @@ public object MedicationDispenseConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun MedicationDispense.MedicationX.medicationDispenseMedicationToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
@@ -82,6 +86,7 @@ public object MedicationDispenseConverter {
     throw IllegalArgumentException("Invalid Type for MedicationDispense.medication[x]")
   }
 
+  @JvmStatic
   private fun Type.medicationDispenseMedicationToProto(): MedicationDispense.MedicationX {
     val protoValue = MedicationDispense.MedicationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -93,6 +98,7 @@ public object MedicationDispenseConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun MedicationDispense.toHapi(): org.hl7.fhir.r4.model.MedicationDispense {
     val hapiValue = org.hl7.fhir.r4.model.MedicationDispense()
     hapiValue.id = id.value
@@ -132,6 +138,7 @@ public object MedicationDispenseConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.MedicationDispense.toProto(): MedicationDispense {
     val protoValue =
       MedicationDispense.newBuilder()
@@ -177,6 +184,7 @@ public object MedicationDispenseConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationDispense.MedicationDispensePerformerComponent.toProto():
     MedicationDispense.Performer {
     val protoValue =
@@ -190,6 +198,7 @@ public object MedicationDispenseConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicationDispense.MedicationDispenseSubstitutionComponent.toProto():
     MedicationDispense.Substitution {
     val protoValue =
@@ -205,6 +214,7 @@ public object MedicationDispenseConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun MedicationDispense.Performer.toHapi():
     org.hl7.fhir.r4.model.MedicationDispense.MedicationDispensePerformerComponent {
     val hapiValue = org.hl7.fhir.r4.model.MedicationDispense.MedicationDispensePerformerComponent()
@@ -216,6 +226,7 @@ public object MedicationDispenseConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun MedicationDispense.Substitution.toHapi():
     org.hl7.fhir.r4.model.MedicationDispense.MedicationDispenseSubstitutionComponent {
     val hapiValue =

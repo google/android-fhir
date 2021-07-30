@@ -26,8 +26,10 @@ import com.google.android.fhir.hapiprotoconverter.generated.PeriodConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.PeriodConverter.toProto
 import com.google.fhir.r4.core.MarketingStatus
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object MarketingStatusConverter {
+  @JvmStatic
   public fun MarketingStatus.toHapi(): org.hl7.fhir.r4.model.MarketingStatus {
     val hapiValue = org.hl7.fhir.r4.model.MarketingStatus()
     hapiValue.id = id.value
@@ -41,6 +43,7 @@ public object MarketingStatusConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.MarketingStatus.toProto(): MarketingStatus {
     val protoValue =
       MarketingStatus.newBuilder()

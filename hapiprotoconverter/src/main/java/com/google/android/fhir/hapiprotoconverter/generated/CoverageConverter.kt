@@ -50,9 +50,11 @@ import com.google.fhir.r4.core.Money
 import com.google.fhir.r4.core.SimpleQuantity
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
 public object CoverageConverter {
+  @JvmStatic
   private fun Coverage.CostToBeneficiary.ValueX.coverageCostToBeneficiaryValueToHapi(): Type {
     if (this.getQuantity() != SimpleQuantity.newBuilder().defaultInstanceForType) {
       return (this.getQuantity()).toHapi()
@@ -63,6 +65,7 @@ public object CoverageConverter {
     throw IllegalArgumentException("Invalid Type for Coverage.costToBeneficiary.value[x]")
   }
 
+  @JvmStatic
   private fun Type.coverageCostToBeneficiaryValueToProto(): Coverage.CostToBeneficiary.ValueX {
     val protoValue = Coverage.CostToBeneficiary.ValueX.newBuilder()
     if (this is org.hl7.fhir.r4.model.SimpleQuantity) {
@@ -74,6 +77,7 @@ public object CoverageConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun Coverage.toHapi(): org.hl7.fhir.r4.model.Coverage {
     val hapiValue = org.hl7.fhir.r4.model.Coverage()
     hapiValue.id = id.value
@@ -104,6 +108,7 @@ public object CoverageConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Coverage.toProto(): Coverage {
     val protoValue =
       Coverage.newBuilder()
@@ -142,6 +147,7 @@ public object CoverageConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Coverage.ClassComponent.toProto(): Coverage.Class {
     val protoValue =
       Coverage.Class.newBuilder()
@@ -155,6 +161,7 @@ public object CoverageConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Coverage.CostToBeneficiaryComponent.toProto():
     Coverage.CostToBeneficiary {
     val protoValue =
@@ -169,6 +176,7 @@ public object CoverageConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Coverage.ExemptionComponent.toProto():
     Coverage.CostToBeneficiary.Exemption {
     val protoValue =
@@ -182,6 +190,7 @@ public object CoverageConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun Coverage.Class.toHapi(): org.hl7.fhir.r4.model.Coverage.ClassComponent {
     val hapiValue = org.hl7.fhir.r4.model.Coverage.ClassComponent()
     hapiValue.id = id.value
@@ -193,6 +202,7 @@ public object CoverageConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Coverage.CostToBeneficiary.toHapi():
     org.hl7.fhir.r4.model.Coverage.CostToBeneficiaryComponent {
     val hapiValue = org.hl7.fhir.r4.model.Coverage.CostToBeneficiaryComponent()
@@ -205,6 +215,7 @@ public object CoverageConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Coverage.CostToBeneficiary.Exemption.toHapi():
     org.hl7.fhir.r4.model.Coverage.ExemptionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Coverage.ExemptionComponent()

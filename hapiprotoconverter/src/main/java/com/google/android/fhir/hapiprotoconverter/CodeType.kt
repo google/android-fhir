@@ -124,20 +124,13 @@ internal fun handleCodeType(
 
 private fun getEnumNameFromElement(element: ElementDefinition): ClassName {
   if (element.hasBinding() && element.binding.hasValueSet()) {
-    // TODO handle code system renames
 
-    if (CompositeCodegen.valueSetUrlMap[element.binding.valueSet.value.split("|").first()]!!
-        .hasCompose() &&
-        CompositeCodegen.valueSetUrlMap[element.binding.valueSet.value.split("|").first()]!!
-          .compose
-          .includeList
-          .size == 1 &&
-        CompositeCodegen.valueSetUrlMap[element.binding.valueSet.value.split("|").first()]!!
-          .compose
-          .includeList
-          .single()
-          .conceptList
-          .isEmpty()
+    val elementEntry =
+      CompositeCodegen.valueSetUrlMap[element.binding.valueSet.value.split("|").first()]!!
+
+    if (elementEntry.hasCompose() &&
+        elementEntry.compose.includeList.size == 1 &&
+        elementEntry.compose.includeList.single().conceptList.isEmpty()
     ) {
       return ClassName(
         protoPackage,

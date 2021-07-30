@@ -35,9 +35,11 @@ import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.UsageContext
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
 public object UsageContextConverter {
+  @JvmStatic
   private fun UsageContext.ValueX.usageContextValueToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
@@ -54,6 +56,7 @@ public object UsageContextConverter {
     throw IllegalArgumentException("Invalid Type for UsageContext.value[x]")
   }
 
+  @JvmStatic
   private fun Type.usageContextValueToProto(): UsageContext.ValueX {
     val protoValue = UsageContext.ValueX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -71,6 +74,7 @@ public object UsageContextConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun UsageContext.toHapi(): org.hl7.fhir.r4.model.UsageContext {
     val hapiValue = org.hl7.fhir.r4.model.UsageContext()
     hapiValue.id = id.value
@@ -80,6 +84,7 @@ public object UsageContextConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.UsageContext.toProto(): UsageContext {
     val protoValue =
       UsageContext.newBuilder()

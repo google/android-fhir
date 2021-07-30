@@ -54,9 +54,11 @@ import com.google.fhir.r4.core.OperationParameterUseCode
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.SearchParamTypeCode
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 public object OperationDefinitionConverter {
+  @JvmStatic
   public fun OperationDefinition.toHapi(): org.hl7.fhir.r4.model.OperationDefinition {
     val hapiValue = org.hl7.fhir.r4.model.OperationDefinition()
     hapiValue.id = id.value
@@ -97,6 +99,7 @@ public object OperationDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.OperationDefinition.toProto(): OperationDefinition {
     val protoValue =
       OperationDefinition.newBuilder()
@@ -147,6 +150,7 @@ public object OperationDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterComponent.toProto():
     OperationDefinition.Parameter {
     val protoValue =
@@ -179,6 +183,7 @@ public object OperationDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterBindingComponent.toProto():
     OperationDefinition.Parameter.Binding {
     val protoValue =
@@ -198,6 +203,7 @@ public object OperationDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterReferencedFromComponent.toProto():
     OperationDefinition.Parameter.ReferencedFrom {
     val protoValue =
@@ -211,6 +217,7 @@ public object OperationDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionOverloadComponent.toProto():
     OperationDefinition.Overload {
     val protoValue =
@@ -224,6 +231,7 @@ public object OperationDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun OperationDefinition.Parameter.toHapi():
     org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterComponent {
     val hapiValue =
@@ -249,6 +257,7 @@ public object OperationDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun OperationDefinition.Parameter.Binding.toHapi():
     org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterBindingComponent {
     val hapiValue =
@@ -263,6 +272,7 @@ public object OperationDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun OperationDefinition.Parameter.ReferencedFrom.toHapi():
     org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterReferencedFromComponent {
     val hapiValue =
@@ -276,6 +286,7 @@ public object OperationDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun OperationDefinition.Overload.toHapi():
     org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionOverloadComponent {
     val hapiValue = org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionOverloadComponent()

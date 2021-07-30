@@ -64,11 +64,13 @@ import com.google.fhir.r4.core.RequestStatusCode
 import com.google.fhir.r4.core.ServiceRequest
 import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 public object ServiceRequestConverter {
+  @JvmStatic
   private fun ServiceRequest.QuantityX.serviceRequestQuantityToHapi(): Type {
     if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
       return (this.getQuantity()).toHapi()
@@ -82,6 +84,7 @@ public object ServiceRequestConverter {
     throw IllegalArgumentException("Invalid Type for ServiceRequest.quantity[x]")
   }
 
+  @JvmStatic
   private fun Type.serviceRequestQuantityToProto(): ServiceRequest.QuantityX {
     val protoValue = ServiceRequest.QuantityX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Quantity) {
@@ -96,6 +99,7 @@ public object ServiceRequestConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun ServiceRequest.OccurrenceX.serviceRequestOccurrenceToHapi(): Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
       return (this.getDateTime()).toHapi()
@@ -109,6 +113,7 @@ public object ServiceRequestConverter {
     throw IllegalArgumentException("Invalid Type for ServiceRequest.occurrence[x]")
   }
 
+  @JvmStatic
   private fun Type.serviceRequestOccurrenceToProto(): ServiceRequest.OccurrenceX {
     val protoValue = ServiceRequest.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
@@ -123,6 +128,7 @@ public object ServiceRequestConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun ServiceRequest.AsNeededX.serviceRequestAsNeededToHapi(): Type {
     if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
       return (this.getBoolean()).toHapi()
@@ -133,6 +139,7 @@ public object ServiceRequestConverter {
     throw IllegalArgumentException("Invalid Type for ServiceRequest.asNeeded[x]")
   }
 
+  @JvmStatic
   private fun Type.serviceRequestAsNeededToProto(): ServiceRequest.AsNeededX {
     val protoValue = ServiceRequest.AsNeededX.newBuilder()
     if (this is BooleanType) {
@@ -144,6 +151,7 @@ public object ServiceRequestConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun ServiceRequest.toHapi(): org.hl7.fhir.r4.model.ServiceRequest {
     val hapiValue = org.hl7.fhir.r4.model.ServiceRequest()
     hapiValue.id = id.value
@@ -200,6 +208,7 @@ public object ServiceRequestConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.ServiceRequest.toProto(): ServiceRequest {
     val protoValue =
       ServiceRequest.newBuilder()

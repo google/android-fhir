@@ -45,8 +45,10 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PractitionerRole
 import com.google.fhir.r4.core.PractitionerRole.AvailableTime
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object PractitionerRoleConverter {
+  @JvmStatic
   public fun PractitionerRole.toHapi(): org.hl7.fhir.r4.model.PractitionerRole {
     val hapiValue = org.hl7.fhir.r4.model.PractitionerRole()
     hapiValue.id = id.value
@@ -72,6 +74,7 @@ public object PractitionerRoleConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.PractitionerRole.toProto(): PractitionerRole {
     val protoValue =
       PractitionerRole.newBuilder()
@@ -99,6 +102,7 @@ public object PractitionerRoleConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.PractitionerRole.PractitionerRoleAvailableTimeComponent.toProto():
     PractitionerRole.AvailableTime {
     val protoValue =
@@ -122,6 +126,7 @@ public object PractitionerRoleConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.PractitionerRole.PractitionerRoleNotAvailableComponent.toProto():
     PractitionerRole.NotAvailable {
     val protoValue =
@@ -135,6 +140,7 @@ public object PractitionerRoleConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun PractitionerRole.AvailableTime.toHapi():
     org.hl7.fhir.r4.model.PractitionerRole.PractitionerRoleAvailableTimeComponent {
     val hapiValue = org.hl7.fhir.r4.model.PractitionerRole.PractitionerRoleAvailableTimeComponent()
@@ -152,6 +158,7 @@ public object PractitionerRoleConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun PractitionerRole.NotAvailable.toHapi():
     org.hl7.fhir.r4.model.PractitionerRole.PractitionerRoleNotAvailableComponent {
     val hapiValue = org.hl7.fhir.r4.model.PractitionerRole.PractitionerRoleNotAvailableComponent()

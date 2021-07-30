@@ -52,11 +52,13 @@ import com.google.fhir.r4.core.Base64Binary
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Base64BinaryType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 public object AuditEventConverter {
+  @JvmStatic
   private fun AuditEvent.Entity.Detail.ValueX.auditEventEntityDetailValueToHapi(): Type {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
       return (this.getStringValue()).toHapi()
@@ -67,6 +69,7 @@ public object AuditEventConverter {
     throw IllegalArgumentException("Invalid Type for AuditEvent.entity.detail.value[x]")
   }
 
+  @JvmStatic
   private fun Type.auditEventEntityDetailValueToProto(): AuditEvent.Entity.Detail.ValueX {
     val protoValue = AuditEvent.Entity.Detail.ValueX.newBuilder()
     if (this is StringType) {
@@ -78,6 +81,7 @@ public object AuditEventConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun AuditEvent.toHapi(): org.hl7.fhir.r4.model.AuditEvent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent()
     hapiValue.id = id.value
@@ -106,6 +110,7 @@ public object AuditEventConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.AuditEvent.toProto(): AuditEvent {
     val protoValue =
       AuditEvent.newBuilder()
@@ -142,6 +147,7 @@ public object AuditEventConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentComponent.toProto():
     AuditEvent.Agent {
     val protoValue =
@@ -164,6 +170,7 @@ public object AuditEventConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentNetworkComponent.toProto():
     AuditEvent.Agent.Network {
     val protoValue =
@@ -185,6 +192,7 @@ public object AuditEventConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.AuditEvent.AuditEventSourceComponent.toProto():
     AuditEvent.Source {
     val protoValue =
@@ -199,6 +207,7 @@ public object AuditEventConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityComponent.toProto():
     AuditEvent.Entity {
     val protoValue =
@@ -219,6 +228,7 @@ public object AuditEventConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityDetailComponent.toProto():
     AuditEvent.Entity.Detail {
     val protoValue =
@@ -232,6 +242,7 @@ public object AuditEventConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun AuditEvent.Agent.toHapi(): org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentComponent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentComponent()
     hapiValue.id = id.value
@@ -251,6 +262,7 @@ public object AuditEventConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun AuditEvent.Agent.Network.toHapi():
     org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentNetworkComponent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentNetworkComponent()
@@ -266,6 +278,7 @@ public object AuditEventConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun AuditEvent.Source.toHapi():
     org.hl7.fhir.r4.model.AuditEvent.AuditEventSourceComponent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent.AuditEventSourceComponent()
@@ -278,6 +291,7 @@ public object AuditEventConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun AuditEvent.Entity.toHapi():
     org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityComponent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityComponent()
@@ -296,6 +310,7 @@ public object AuditEventConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun AuditEvent.Entity.Detail.toHapi():
     org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.AuditEvent.AuditEventEntityDetailComponent()

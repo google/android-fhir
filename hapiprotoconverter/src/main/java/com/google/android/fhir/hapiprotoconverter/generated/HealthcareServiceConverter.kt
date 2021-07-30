@@ -49,8 +49,10 @@ import com.google.fhir.r4.core.HealthcareService
 import com.google.fhir.r4.core.HealthcareService.AvailableTime
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object HealthcareServiceConverter {
+  @JvmStatic
   public fun HealthcareService.toHapi(): org.hl7.fhir.r4.model.HealthcareService {
     val hapiValue = org.hl7.fhir.r4.model.HealthcareService()
     hapiValue.id = id.value
@@ -86,6 +88,7 @@ public object HealthcareServiceConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.HealthcareService.toProto(): HealthcareService {
     val protoValue =
       HealthcareService.newBuilder()
@@ -123,6 +126,7 @@ public object HealthcareServiceConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceEligibilityComponent.toProto():
     HealthcareService.Eligibility {
     val protoValue =
@@ -136,6 +140,7 @@ public object HealthcareServiceConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceAvailableTimeComponent.toProto():
     HealthcareService.AvailableTime {
     val protoValue =
@@ -159,6 +164,7 @@ public object HealthcareServiceConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceNotAvailableComponent.toProto():
     HealthcareService.NotAvailable {
     val protoValue =
@@ -172,6 +178,7 @@ public object HealthcareServiceConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun HealthcareService.Eligibility.toHapi():
     org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceEligibilityComponent {
     val hapiValue = org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceEligibilityComponent()
@@ -183,6 +190,7 @@ public object HealthcareServiceConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun HealthcareService.AvailableTime.toHapi():
     org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceAvailableTimeComponent {
     val hapiValue =
@@ -201,6 +209,7 @@ public object HealthcareServiceConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun HealthcareService.NotAvailable.toHapi():
     org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceNotAvailableComponent {
     val hapiValue = org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceNotAvailableComponent()

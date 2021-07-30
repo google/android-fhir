@@ -29,9 +29,11 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Age
 import com.google.fhir.r4.core.QuantityComparatorCode
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Quantity
 
 public object AgeConverter {
+  @JvmStatic
   public fun Age.toHapi(): org.hl7.fhir.r4.model.Age {
     val hapiValue = org.hl7.fhir.r4.model.Age()
     hapiValue.id = id.value
@@ -46,6 +48,7 @@ public object AgeConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Age.toProto(): Age {
     val protoValue =
       Age.newBuilder()

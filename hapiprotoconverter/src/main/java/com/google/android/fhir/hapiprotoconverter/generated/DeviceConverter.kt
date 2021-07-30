@@ -50,8 +50,10 @@ import com.google.fhir.r4.core.FHIRDeviceStatusCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.UDIEntryTypeCode
+import kotlin.jvm.JvmStatic
 
 public object DeviceConverter {
+  @JvmStatic
   public fun Device.toHapi(): org.hl7.fhir.r4.model.Device {
     val hapiValue = org.hl7.fhir.r4.model.Device()
     hapiValue.id = id.value
@@ -91,6 +93,7 @@ public object DeviceConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Device.toProto(): Device {
     val protoValue =
       Device.newBuilder()
@@ -136,6 +139,7 @@ public object DeviceConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Device.DeviceUdiCarrierComponent.toProto(): Device.UdiCarrier {
     val protoValue =
       Device.UdiCarrier.newBuilder()
@@ -158,6 +162,7 @@ public object DeviceConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Device.DeviceDeviceNameComponent.toProto(): Device.DeviceName {
     val protoValue =
       Device.DeviceName.newBuilder()
@@ -176,6 +181,7 @@ public object DeviceConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Device.DeviceSpecializationComponent.toProto():
     Device.Specialization {
     val protoValue =
@@ -189,6 +195,7 @@ public object DeviceConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Device.DeviceVersionComponent.toProto(): Device.Version {
     val protoValue =
       Device.Version.newBuilder()
@@ -202,6 +209,7 @@ public object DeviceConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Device.DevicePropertyComponent.toProto(): Device.Property {
     val protoValue =
       Device.Property.newBuilder()
@@ -215,6 +223,7 @@ public object DeviceConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun Device.UdiCarrier.toHapi(): org.hl7.fhir.r4.model.Device.DeviceUdiCarrierComponent {
     val hapiValue = org.hl7.fhir.r4.model.Device.DeviceUdiCarrierComponent()
     hapiValue.id = id.value
@@ -231,6 +240,7 @@ public object DeviceConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Device.DeviceName.toHapi(): org.hl7.fhir.r4.model.Device.DeviceDeviceNameComponent {
     val hapiValue = org.hl7.fhir.r4.model.Device.DeviceDeviceNameComponent()
     hapiValue.id = id.value
@@ -243,6 +253,7 @@ public object DeviceConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Device.Specialization.toHapi():
     org.hl7.fhir.r4.model.Device.DeviceSpecializationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Device.DeviceSpecializationComponent()
@@ -254,6 +265,7 @@ public object DeviceConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Device.Version.toHapi(): org.hl7.fhir.r4.model.Device.DeviceVersionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Device.DeviceVersionComponent()
     hapiValue.id = id.value
@@ -265,6 +277,7 @@ public object DeviceConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Device.Property.toHapi(): org.hl7.fhir.r4.model.Device.DevicePropertyComponent {
     val hapiValue = org.hl7.fhir.r4.model.Device.DevicePropertyComponent()
     hapiValue.id = id.value

@@ -38,8 +38,10 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.BodyStructure
 import com.google.fhir.r4.core.Id
+import kotlin.jvm.JvmStatic
 
 public object BodyStructureConverter {
+  @JvmStatic
   public fun BodyStructure.toHapi(): org.hl7.fhir.r4.model.BodyStructure {
     val hapiValue = org.hl7.fhir.r4.model.BodyStructure()
     hapiValue.id = id.value
@@ -59,6 +61,7 @@ public object BodyStructureConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.BodyStructure.toProto(): BodyStructure {
     val protoValue =
       BodyStructure.newBuilder()

@@ -42,11 +42,13 @@ import com.google.fhir.r4.core.ImmunizationRecommendation.Recommendation
 import com.google.fhir.r4.core.PositiveInt
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.PositiveIntType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 public object ImmunizationRecommendationConverter {
+  @JvmStatic
   private fun ImmunizationRecommendation.Recommendation.DoseNumberX.immunizationRecommendationRecommendationDoseNumberToHapi():
     Type {
     if (this.getPositiveInt() != PositiveInt.newBuilder().defaultInstanceForType) {
@@ -60,6 +62,7 @@ public object ImmunizationRecommendationConverter {
     )
   }
 
+  @JvmStatic
   private fun Type.immunizationRecommendationRecommendationDoseNumberToProto():
     ImmunizationRecommendation.Recommendation.DoseNumberX {
     val protoValue = ImmunizationRecommendation.Recommendation.DoseNumberX.newBuilder()
@@ -72,6 +75,7 @@ public object ImmunizationRecommendationConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun ImmunizationRecommendation.Recommendation.SeriesDosesX.immunizationRecommendationRecommendationSeriesDosesToHapi():
     Type {
     if (this.getPositiveInt() != PositiveInt.newBuilder().defaultInstanceForType) {
@@ -85,6 +89,7 @@ public object ImmunizationRecommendationConverter {
     )
   }
 
+  @JvmStatic
   private fun Type.immunizationRecommendationRecommendationSeriesDosesToProto():
     ImmunizationRecommendation.Recommendation.SeriesDosesX {
     val protoValue = ImmunizationRecommendation.Recommendation.SeriesDosesX.newBuilder()
@@ -97,6 +102,7 @@ public object ImmunizationRecommendationConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun ImmunizationRecommendation.toHapi(): org.hl7.fhir.r4.model.ImmunizationRecommendation {
     val hapiValue = org.hl7.fhir.r4.model.ImmunizationRecommendation()
     hapiValue.id = id.value
@@ -113,6 +119,7 @@ public object ImmunizationRecommendationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.ImmunizationRecommendation.toProto():
     ImmunizationRecommendation {
     val protoValue =
@@ -132,6 +139,7 @@ public object ImmunizationRecommendationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent.toProto():
     ImmunizationRecommendation.Recommendation {
     val protoValue =
@@ -155,6 +163,7 @@ public object ImmunizationRecommendationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationDateCriterionComponent.toProto():
     ImmunizationRecommendation.Recommendation.DateCriterion {
     val protoValue =
@@ -168,6 +177,7 @@ public object ImmunizationRecommendationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun ImmunizationRecommendation.Recommendation.toHapi():
     org.hl7.fhir.r4.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent {
     val hapiValue =
@@ -193,6 +203,7 @@ public object ImmunizationRecommendationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ImmunizationRecommendation.Recommendation.DateCriterion.toHapi():
     org.hl7.fhir.r4.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationDateCriterionComponent {
     val hapiValue =

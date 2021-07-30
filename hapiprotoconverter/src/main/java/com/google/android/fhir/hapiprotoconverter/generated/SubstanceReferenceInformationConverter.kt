@@ -43,10 +43,12 @@ import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.SubstanceReferenceInformation
 import com.google.fhir.r4.core.SubstanceReferenceInformation.Target
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 public object SubstanceReferenceInformationConverter {
+  @JvmStatic
   private fun SubstanceReferenceInformation.Target.AmountX.substanceReferenceInformationTargetAmountToHapi():
     Type {
     if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
@@ -63,6 +65,7 @@ public object SubstanceReferenceInformationConverter {
     )
   }
 
+  @JvmStatic
   private fun Type.substanceReferenceInformationTargetAmountToProto():
     SubstanceReferenceInformation.Target.AmountX {
     val protoValue = SubstanceReferenceInformation.Target.AmountX.newBuilder()
@@ -78,6 +81,7 @@ public object SubstanceReferenceInformationConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun SubstanceReferenceInformation.toHapi():
     org.hl7.fhir.r4.model.SubstanceReferenceInformation {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceReferenceInformation()
@@ -95,6 +99,7 @@ public object SubstanceReferenceInformationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.SubstanceReferenceInformation.toProto():
     SubstanceReferenceInformation {
     val protoValue =
@@ -114,6 +119,7 @@ public object SubstanceReferenceInformationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceReferenceInformation.SubstanceReferenceInformationGeneComponent.toProto():
     SubstanceReferenceInformation.Gene {
     val protoValue =
@@ -128,6 +134,7 @@ public object SubstanceReferenceInformationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceReferenceInformation.SubstanceReferenceInformationGeneElementComponent.toProto():
     SubstanceReferenceInformation.GeneElement {
     val protoValue =
@@ -142,6 +149,7 @@ public object SubstanceReferenceInformationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceReferenceInformation.SubstanceReferenceInformationClassificationComponent.toProto():
     SubstanceReferenceInformation.Classification {
     val protoValue =
@@ -157,6 +165,7 @@ public object SubstanceReferenceInformationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceReferenceInformation.SubstanceReferenceInformationTargetComponent.toProto():
     SubstanceReferenceInformation.Target {
     val protoValue =
@@ -176,6 +185,7 @@ public object SubstanceReferenceInformationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun SubstanceReferenceInformation.Gene.toHapi():
     org.hl7.fhir.r4.model.SubstanceReferenceInformation.SubstanceReferenceInformationGeneComponent {
     val hapiValue =
@@ -190,6 +200,7 @@ public object SubstanceReferenceInformationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceReferenceInformation.GeneElement.toHapi():
     org.hl7.fhir.r4.model.SubstanceReferenceInformation.SubstanceReferenceInformationGeneElementComponent {
     val hapiValue =
@@ -204,6 +215,7 @@ public object SubstanceReferenceInformationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceReferenceInformation.Classification.toHapi():
     org.hl7.fhir.r4.model.SubstanceReferenceInformation.SubstanceReferenceInformationClassificationComponent {
     val hapiValue =
@@ -219,6 +231,7 @@ public object SubstanceReferenceInformationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceReferenceInformation.Target.toHapi():
     org.hl7.fhir.r4.model.SubstanceReferenceInformation.SubstanceReferenceInformationTargetComponent {
     val hapiValue =

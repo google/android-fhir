@@ -17,10 +17,12 @@
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.fhir.r4.core.UnsignedInt
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.UnsignedIntType
 
 public object UnsignedIntConverter {
   /** returns the proto UnsignedInt equivalent of the hapi UnsignedIntType */
+  @JvmStatic
   public fun UnsignedIntType.toProto(): UnsignedInt {
     val protoValue = UnsignedInt.newBuilder()
     if (value != null) protoValue.setValue(value)
@@ -28,6 +30,7 @@ public object UnsignedIntConverter {
   }
 
   /** returns the hapi UnsignedIntType equivalent of the proto UnsignedInt */
+  @JvmStatic
   public fun UnsignedInt.toHapi(): UnsignedIntType {
     val hapiValue = UnsignedIntType()
     hapiValue.value = value

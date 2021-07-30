@@ -53,10 +53,12 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 public object BiologicallyDerivedProductConverter {
+  @JvmStatic
   private fun BiologicallyDerivedProduct.Collection.CollectedX.biologicallyDerivedProductCollectionCollectedToHapi():
     Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
@@ -70,6 +72,7 @@ public object BiologicallyDerivedProductConverter {
     )
   }
 
+  @JvmStatic
   private fun Type.biologicallyDerivedProductCollectionCollectedToProto():
     BiologicallyDerivedProduct.Collection.CollectedX {
     val protoValue = BiologicallyDerivedProduct.Collection.CollectedX.newBuilder()
@@ -82,6 +85,7 @@ public object BiologicallyDerivedProductConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun BiologicallyDerivedProduct.Processing.TimeX.biologicallyDerivedProductProcessingTimeToHapi():
     Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
@@ -93,6 +97,7 @@ public object BiologicallyDerivedProductConverter {
     throw IllegalArgumentException("Invalid Type for BiologicallyDerivedProduct.processing.time[x]")
   }
 
+  @JvmStatic
   private fun Type.biologicallyDerivedProductProcessingTimeToProto():
     BiologicallyDerivedProduct.Processing.TimeX {
     val protoValue = BiologicallyDerivedProduct.Processing.TimeX.newBuilder()
@@ -105,6 +110,7 @@ public object BiologicallyDerivedProductConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun BiologicallyDerivedProduct.Manipulation.TimeX.biologicallyDerivedProductManipulationTimeToHapi():
     Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
@@ -118,6 +124,7 @@ public object BiologicallyDerivedProductConverter {
     )
   }
 
+  @JvmStatic
   private fun Type.biologicallyDerivedProductManipulationTimeToProto():
     BiologicallyDerivedProduct.Manipulation.TimeX {
     val protoValue = BiologicallyDerivedProduct.Manipulation.TimeX.newBuilder()
@@ -130,6 +137,7 @@ public object BiologicallyDerivedProductConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun BiologicallyDerivedProduct.toHapi(): org.hl7.fhir.r4.model.BiologicallyDerivedProduct {
     val hapiValue = org.hl7.fhir.r4.model.BiologicallyDerivedProduct()
     hapiValue.id = id.value
@@ -160,6 +168,7 @@ public object BiologicallyDerivedProductConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.BiologicallyDerivedProduct.toProto():
     BiologicallyDerivedProduct {
     val protoValue =
@@ -201,6 +210,7 @@ public object BiologicallyDerivedProductConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductCollectionComponent.toProto():
     BiologicallyDerivedProduct.Collection {
     val protoValue =
@@ -215,6 +225,7 @@ public object BiologicallyDerivedProductConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductProcessingComponent.toProto():
     BiologicallyDerivedProduct.Processing {
     val protoValue =
@@ -230,6 +241,7 @@ public object BiologicallyDerivedProductConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductManipulationComponent.toProto():
     BiologicallyDerivedProduct.Manipulation {
     val protoValue =
@@ -243,6 +255,7 @@ public object BiologicallyDerivedProductConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductStorageComponent.toProto():
     BiologicallyDerivedProduct.Storage {
     val protoValue =
@@ -266,6 +279,7 @@ public object BiologicallyDerivedProductConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun BiologicallyDerivedProduct.Collection.toHapi():
     org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductCollectionComponent {
     val hapiValue =
@@ -280,6 +294,7 @@ public object BiologicallyDerivedProductConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun BiologicallyDerivedProduct.Processing.toHapi():
     org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductProcessingComponent {
     val hapiValue =
@@ -295,6 +310,7 @@ public object BiologicallyDerivedProductConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun BiologicallyDerivedProduct.Manipulation.toHapi():
     org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductManipulationComponent {
     val hapiValue =
@@ -308,6 +324,7 @@ public object BiologicallyDerivedProductConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun BiologicallyDerivedProduct.Storage.toHapi():
     org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductStorageComponent {
     val hapiValue =

@@ -26,8 +26,10 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Binary
 import com.google.fhir.r4.core.Id
+import kotlin.jvm.JvmStatic
 
 public object BinaryConverter {
+  @JvmStatic
   public fun Binary.toHapi(): org.hl7.fhir.r4.model.Binary {
     val hapiValue = org.hl7.fhir.r4.model.Binary()
     hapiValue.id = id.value
@@ -39,6 +41,7 @@ public object BinaryConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Binary.toProto(): Binary {
     val protoValue =
       Binary.newBuilder()

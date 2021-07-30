@@ -46,9 +46,11 @@ import com.google.fhir.r4.core.Timing
 import com.google.fhir.r4.core.Timing.Repeat
 import com.google.fhir.r4.core.UnitsOfTimeValueSet
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
 public object TimingConverter {
+  @JvmStatic
   private fun Timing.Repeat.BoundsX.timingRepeatBoundsToHapi(): Type {
     if (this.getDuration() != Duration.newBuilder().defaultInstanceForType) {
       return (this.getDuration()).toHapi()
@@ -62,6 +64,7 @@ public object TimingConverter {
     throw IllegalArgumentException("Invalid Type for Timing.repeat.bounds[x]")
   }
 
+  @JvmStatic
   private fun Type.timingRepeatBoundsToProto(): Timing.Repeat.BoundsX {
     val protoValue = Timing.Repeat.BoundsX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Duration) {
@@ -76,6 +79,7 @@ public object TimingConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun Timing.toHapi(): org.hl7.fhir.r4.model.Timing {
     val hapiValue = org.hl7.fhir.r4.model.Timing()
     hapiValue.id = id.value
@@ -87,6 +91,7 @@ public object TimingConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Timing.toProto(): Timing {
     val protoValue =
       Timing.newBuilder()
@@ -100,6 +105,7 @@ public object TimingConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Timing.TimingRepeatComponent.toProto(): Timing.Repeat {
     val protoValue =
       Timing.Repeat.newBuilder()
@@ -154,6 +160,7 @@ public object TimingConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun Timing.Repeat.toHapi(): org.hl7.fhir.r4.model.Timing.TimingRepeatComponent {
     val hapiValue = org.hl7.fhir.r4.model.Timing.TimingRepeatComponent()
     hapiValue.id = id.value

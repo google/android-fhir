@@ -181,6 +181,7 @@ import com.google.fhir.r4.core.Url
 import com.google.fhir.r4.core.UsageContext
 import com.google.fhir.r4.core.Uuid
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Base64BinaryType
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CanonicalType
@@ -204,6 +205,7 @@ import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.model.UuidType
 
 public object ElementDefinitionConverter {
+  @JvmStatic
   private fun ElementDefinition.DefaultValueX.elementDefinitionDefaultValueToHapi(): Type {
     if (this.getBase64Binary() != Base64Binary.newBuilder().defaultInstanceForType) {
       return (this.getBase64Binary()).toHapi()
@@ -355,6 +357,7 @@ public object ElementDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for ElementDefinition.defaultValue[x]")
   }
 
+  @JvmStatic
   private fun Type.elementDefinitionDefaultValueToProto(): ElementDefinition.DefaultValueX {
     val protoValue = ElementDefinition.DefaultValueX.newBuilder()
     if (this is Base64BinaryType) {
@@ -507,6 +510,7 @@ public object ElementDefinitionConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun ElementDefinition.FixedX.elementDefinitionFixedToHapi(): Type {
     if (this.getBase64Binary() != Base64Binary.newBuilder().defaultInstanceForType) {
       return (this.getBase64Binary()).toHapi()
@@ -658,6 +662,7 @@ public object ElementDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for ElementDefinition.fixed[x]")
   }
 
+  @JvmStatic
   private fun Type.elementDefinitionFixedToProto(): ElementDefinition.FixedX {
     val protoValue = ElementDefinition.FixedX.newBuilder()
     if (this is Base64BinaryType) {
@@ -810,6 +815,7 @@ public object ElementDefinitionConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun ElementDefinition.PatternX.elementDefinitionPatternToHapi(): Type {
     if (this.getBase64Binary() != Base64Binary.newBuilder().defaultInstanceForType) {
       return (this.getBase64Binary()).toHapi()
@@ -961,6 +967,7 @@ public object ElementDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for ElementDefinition.pattern[x]")
   }
 
+  @JvmStatic
   private fun Type.elementDefinitionPatternToProto(): ElementDefinition.PatternX {
     val protoValue = ElementDefinition.PatternX.newBuilder()
     if (this is Base64BinaryType) {
@@ -1113,6 +1120,7 @@ public object ElementDefinitionConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun ElementDefinition.Example.ValueX.elementDefinitionExampleValueToHapi(): Type {
     if (this.getBase64Binary() != Base64Binary.newBuilder().defaultInstanceForType) {
       return (this.getBase64Binary()).toHapi()
@@ -1264,6 +1272,7 @@ public object ElementDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for ElementDefinition.example.value[x]")
   }
 
+  @JvmStatic
   private fun Type.elementDefinitionExampleValueToProto(): ElementDefinition.Example.ValueX {
     val protoValue = ElementDefinition.Example.ValueX.newBuilder()
     if (this is Base64BinaryType) {
@@ -1416,6 +1425,7 @@ public object ElementDefinitionConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun ElementDefinition.MinValueX.elementDefinitionMinValueToHapi(): Type {
     if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
       return (this.getDate()).toHapi()
@@ -1447,6 +1457,7 @@ public object ElementDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for ElementDefinition.minValue[x]")
   }
 
+  @JvmStatic
   private fun Type.elementDefinitionMinValueToProto(): ElementDefinition.MinValueX {
     val protoValue = ElementDefinition.MinValueX.newBuilder()
     if (this is DateType) {
@@ -1479,6 +1490,7 @@ public object ElementDefinitionConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun ElementDefinition.MaxValueX.elementDefinitionMaxValueToHapi(): Type {
     if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
       return (this.getDate()).toHapi()
@@ -1510,6 +1522,7 @@ public object ElementDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for ElementDefinition.maxValue[x]")
   }
 
+  @JvmStatic
   private fun Type.elementDefinitionMaxValueToProto(): ElementDefinition.MaxValueX {
     val protoValue = ElementDefinition.MaxValueX.newBuilder()
     if (this is DateType) {
@@ -1542,6 +1555,7 @@ public object ElementDefinitionConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun ElementDefinition.toHapi(): org.hl7.fhir.r4.model.ElementDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ElementDefinition()
     hapiValue.id = id.value
@@ -1590,6 +1604,7 @@ public object ElementDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.ElementDefinition.toProto(): ElementDefinition {
     val protoValue =
       ElementDefinition.newBuilder()
@@ -1644,6 +1659,7 @@ public object ElementDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionSlicingComponent.toProto():
     ElementDefinition.Slicing {
     val protoValue =
@@ -1664,6 +1680,7 @@ public object ElementDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionSlicingDiscriminatorComponent.toProto():
     ElementDefinition.Slicing.Discriminator {
     val protoValue =
@@ -1682,6 +1699,7 @@ public object ElementDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionBaseComponent.toProto():
     ElementDefinition.Base {
     val protoValue =
@@ -1695,6 +1713,7 @@ public object ElementDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ElementDefinition.TypeRefComponent.toProto():
     ElementDefinition.TypeRef {
     val protoValue =
@@ -1726,6 +1745,7 @@ public object ElementDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionExampleComponent.toProto():
     ElementDefinition.Example {
     val protoValue =
@@ -1738,6 +1758,7 @@ public object ElementDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionConstraintComponent.toProto():
     ElementDefinition.Constraint {
     val protoValue =
@@ -1763,6 +1784,7 @@ public object ElementDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionBindingComponent.toProto():
     ElementDefinition.ElementDefinitionBinding {
     val protoValue =
@@ -1782,6 +1804,7 @@ public object ElementDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionMappingComponent.toProto():
     ElementDefinition.Mapping {
     val protoValue =
@@ -1796,6 +1819,7 @@ public object ElementDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun ElementDefinition.Slicing.toHapi():
     org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionSlicingComponent {
     val hapiValue = org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionSlicingComponent()
@@ -1812,6 +1836,7 @@ public object ElementDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ElementDefinition.Slicing.Discriminator.toHapi():
     org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionSlicingDiscriminatorComponent {
     val hapiValue =
@@ -1827,6 +1852,7 @@ public object ElementDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ElementDefinition.Base.toHapi():
     org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionBaseComponent {
     val hapiValue = org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionBaseComponent()
@@ -1838,6 +1864,7 @@ public object ElementDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ElementDefinition.TypeRef.toHapi():
     org.hl7.fhir.r4.model.ElementDefinition.TypeRefComponent {
     val hapiValue = org.hl7.fhir.r4.model.ElementDefinition.TypeRefComponent()
@@ -1861,6 +1888,7 @@ public object ElementDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ElementDefinition.Example.toHapi():
     org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionExampleComponent {
     val hapiValue = org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionExampleComponent()
@@ -1871,6 +1899,7 @@ public object ElementDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ElementDefinition.Constraint.toHapi():
     org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionConstraintComponent {
     val hapiValue = org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionConstraintComponent()
@@ -1890,6 +1919,7 @@ public object ElementDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ElementDefinition.ElementDefinitionBinding.toHapi():
     org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionBindingComponent {
     val hapiValue = org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionBindingComponent()
@@ -1903,6 +1933,7 @@ public object ElementDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ElementDefinition.Mapping.toHapi():
     org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionMappingComponent {
     val hapiValue = org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionMappingComponent()

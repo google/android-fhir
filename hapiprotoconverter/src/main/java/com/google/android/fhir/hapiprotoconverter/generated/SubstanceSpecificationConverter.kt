@@ -59,10 +59,12 @@ import com.google.fhir.r4.core.SubstanceSpecification.Relationship
 import com.google.fhir.r4.core.SubstanceSpecification.Structure
 import com.google.fhir.r4.core.SubstanceSpecification.Structure.Isotope
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 public object SubstanceSpecificationConverter {
+  @JvmStatic
   private fun SubstanceSpecification.Moiety.AmountX.substanceSpecificationMoietyAmountToHapi():
     Type {
     if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
@@ -74,6 +76,7 @@ public object SubstanceSpecificationConverter {
     throw IllegalArgumentException("Invalid Type for SubstanceSpecification.moiety.amount[x]")
   }
 
+  @JvmStatic
   private fun Type.substanceSpecificationMoietyAmountToProto():
     SubstanceSpecification.Moiety.AmountX {
     val protoValue = SubstanceSpecification.Moiety.AmountX.newBuilder()
@@ -86,6 +89,7 @@ public object SubstanceSpecificationConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun SubstanceSpecification.Property.DefiningSubstanceX.substanceSpecificationPropertyDefiningSubstanceToHapi():
     Type {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
@@ -99,6 +103,7 @@ public object SubstanceSpecificationConverter {
     )
   }
 
+  @JvmStatic
   private fun Type.substanceSpecificationPropertyDefiningSubstanceToProto():
     SubstanceSpecification.Property.DefiningSubstanceX {
     val protoValue = SubstanceSpecification.Property.DefiningSubstanceX.newBuilder()
@@ -111,6 +116,7 @@ public object SubstanceSpecificationConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun SubstanceSpecification.Property.AmountX.substanceSpecificationPropertyAmountToHapi():
     Type {
     if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
@@ -122,6 +128,7 @@ public object SubstanceSpecificationConverter {
     throw IllegalArgumentException("Invalid Type for SubstanceSpecification.property.amount[x]")
   }
 
+  @JvmStatic
   private fun Type.substanceSpecificationPropertyAmountToProto():
     SubstanceSpecification.Property.AmountX {
     val protoValue = SubstanceSpecification.Property.AmountX.newBuilder()
@@ -134,6 +141,7 @@ public object SubstanceSpecificationConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun SubstanceSpecification.Relationship.SubstanceX.substanceSpecificationRelationshipSubstanceToHapi():
     Type {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
@@ -147,6 +155,7 @@ public object SubstanceSpecificationConverter {
     )
   }
 
+  @JvmStatic
   private fun Type.substanceSpecificationRelationshipSubstanceToProto():
     SubstanceSpecification.Relationship.SubstanceX {
     val protoValue = SubstanceSpecification.Relationship.SubstanceX.newBuilder()
@@ -159,6 +168,7 @@ public object SubstanceSpecificationConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun SubstanceSpecification.Relationship.AmountX.substanceSpecificationRelationshipAmountToHapi():
     Type {
     if (this.getQuantity() != Quantity.newBuilder().defaultInstanceForType) {
@@ -176,6 +186,7 @@ public object SubstanceSpecificationConverter {
     throw IllegalArgumentException("Invalid Type for SubstanceSpecification.relationship.amount[x]")
   }
 
+  @JvmStatic
   private fun Type.substanceSpecificationRelationshipAmountToProto():
     SubstanceSpecification.Relationship.AmountX {
     val protoValue = SubstanceSpecification.Relationship.AmountX.newBuilder()
@@ -194,6 +205,7 @@ public object SubstanceSpecificationConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun SubstanceSpecification.toHapi(): org.hl7.fhir.r4.model.SubstanceSpecification {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceSpecification()
     hapiValue.id = id.value
@@ -223,6 +235,7 @@ public object SubstanceSpecificationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.SubstanceSpecification.toProto(): SubstanceSpecification {
     val protoValue =
       SubstanceSpecification.newBuilder()
@@ -254,6 +267,7 @@ public object SubstanceSpecificationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationMoietyComponent.toProto():
     SubstanceSpecification.Moiety {
     val protoValue =
@@ -272,6 +286,7 @@ public object SubstanceSpecificationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationPropertyComponent.toProto():
     SubstanceSpecification.Property {
     val protoValue =
@@ -290,6 +305,7 @@ public object SubstanceSpecificationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureComponent.toProto():
     SubstanceSpecification.Structure {
     val protoValue =
@@ -308,6 +324,7 @@ public object SubstanceSpecificationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureIsotopeComponent.toProto():
     SubstanceSpecification.Structure.Isotope {
     val protoValue =
@@ -324,6 +341,7 @@ public object SubstanceSpecificationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureIsotopeMolecularWeightComponent.toProto():
     SubstanceSpecification.Structure.Isotope.MolecularWeight {
     val protoValue =
@@ -338,6 +356,7 @@ public object SubstanceSpecificationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureRepresentationComponent.toProto():
     SubstanceSpecification.Structure.Representation {
     val protoValue =
@@ -352,6 +371,7 @@ public object SubstanceSpecificationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationCodeComponent.toProto():
     SubstanceSpecification.CodeType {
     val protoValue =
@@ -368,6 +388,7 @@ public object SubstanceSpecificationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationNameComponent.toProto():
     SubstanceSpecification.Name {
     val protoValue =
@@ -388,6 +409,7 @@ public object SubstanceSpecificationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationNameOfficialComponent.toProto():
     SubstanceSpecification.Name.Official {
     val protoValue =
@@ -402,6 +424,7 @@ public object SubstanceSpecificationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationRelationshipComponent.toProto():
     SubstanceSpecification.Relationship {
     val protoValue =
@@ -420,6 +443,7 @@ public object SubstanceSpecificationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun SubstanceSpecification.Moiety.toHapi():
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationMoietyComponent {
     val hapiValue =
@@ -437,6 +461,7 @@ public object SubstanceSpecificationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceSpecification.Property.toHapi():
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationPropertyComponent {
     val hapiValue =
@@ -454,6 +479,7 @@ public object SubstanceSpecificationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceSpecification.Structure.toHapi():
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureComponent {
     val hapiValue =
@@ -471,6 +497,7 @@ public object SubstanceSpecificationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceSpecification.Structure.Isotope.toHapi():
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureIsotopeComponent {
     val hapiValue =
@@ -486,6 +513,7 @@ public object SubstanceSpecificationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceSpecification.Structure.Isotope.MolecularWeight.toHapi():
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureIsotopeMolecularWeightComponent {
     val hapiValue =
@@ -500,6 +528,7 @@ public object SubstanceSpecificationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceSpecification.Structure.Representation.toHapi():
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureRepresentationComponent {
     val hapiValue =
@@ -514,6 +543,7 @@ public object SubstanceSpecificationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceSpecification.CodeType.toHapi():
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationCodeComponent {
     val hapiValue =
@@ -529,6 +559,7 @@ public object SubstanceSpecificationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceSpecification.Name.toHapi():
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationNameComponent {
     val hapiValue =
@@ -548,6 +579,7 @@ public object SubstanceSpecificationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceSpecification.Name.Official.toHapi():
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationNameOfficialComponent {
     val hapiValue =
@@ -561,6 +593,7 @@ public object SubstanceSpecificationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceSpecification.Relationship.toHapi():
     org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationRelationshipComponent {
     val hapiValue =

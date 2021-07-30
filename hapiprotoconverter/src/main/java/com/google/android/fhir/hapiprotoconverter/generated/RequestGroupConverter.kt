@@ -77,10 +77,12 @@ import com.google.fhir.r4.core.RequestStatusCode
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 public object RequestGroupConverter {
+  @JvmStatic
   private fun RequestGroup.Action.RelatedAction.OffsetX.requestGroupActionRelatedActionOffsetToHapi():
     Type {
     if (this.getDuration() != Duration.newBuilder().defaultInstanceForType) {
@@ -92,6 +94,7 @@ public object RequestGroupConverter {
     throw IllegalArgumentException("Invalid Type for RequestGroup.action.relatedAction.offset[x]")
   }
 
+  @JvmStatic
   private fun Type.requestGroupActionRelatedActionOffsetToProto():
     RequestGroup.Action.RelatedAction.OffsetX {
     val protoValue = RequestGroup.Action.RelatedAction.OffsetX.newBuilder()
@@ -104,6 +107,7 @@ public object RequestGroupConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun RequestGroup.Action.TimingX.requestGroupActionTimingToHapi(): Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
       return (this.getDateTime()).toHapi()
@@ -126,6 +130,7 @@ public object RequestGroupConverter {
     throw IllegalArgumentException("Invalid Type for RequestGroup.action.timing[x]")
   }
 
+  @JvmStatic
   private fun Type.requestGroupActionTimingToProto(): RequestGroup.Action.TimingX {
     val protoValue = RequestGroup.Action.TimingX.newBuilder()
     if (this is DateTimeType) {
@@ -149,6 +154,7 @@ public object RequestGroupConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun RequestGroup.toHapi(): org.hl7.fhir.r4.model.RequestGroup {
     val hapiValue = org.hl7.fhir.r4.model.RequestGroup()
     hapiValue.id = id.value
@@ -186,6 +192,7 @@ public object RequestGroupConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.RequestGroup.toProto(): RequestGroup {
     val protoValue =
       RequestGroup.newBuilder()
@@ -235,6 +242,7 @@ public object RequestGroupConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionComponent.toProto():
     RequestGroup.Action {
     val protoValue =
@@ -310,6 +318,7 @@ public object RequestGroupConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionConditionComponent.toProto():
     RequestGroup.Action.Condition {
     val protoValue =
@@ -329,6 +338,7 @@ public object RequestGroupConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionRelatedActionComponent.toProto():
     RequestGroup.Action.RelatedAction {
     val protoValue =
@@ -351,6 +361,7 @@ public object RequestGroupConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun RequestGroup.Action.toHapi():
     org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionComponent()
@@ -402,6 +413,7 @@ public object RequestGroupConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun RequestGroup.Action.Condition.toHapi():
     org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionConditionComponent {
     val hapiValue = org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionConditionComponent()
@@ -417,6 +429,7 @@ public object RequestGroupConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun RequestGroup.Action.RelatedAction.toHapi():
     org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionRelatedActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.RequestGroup.RequestGroupActionRelatedActionComponent()

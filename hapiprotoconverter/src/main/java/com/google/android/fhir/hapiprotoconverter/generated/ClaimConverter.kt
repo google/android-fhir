@@ -74,6 +74,7 @@ import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.UseCode
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.SimpleQuantity
@@ -81,6 +82,7 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 public object ClaimConverter {
+  @JvmStatic
   private fun Claim.SupportingInformation.TimingX.claimSupportingInfoTimingToHapi(): Type {
     if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
       return (this.getDate()).toHapi()
@@ -91,6 +93,7 @@ public object ClaimConverter {
     throw IllegalArgumentException("Invalid Type for Claim.supportingInfo.timing[x]")
   }
 
+  @JvmStatic
   private fun Type.claimSupportingInfoTimingToProto(): Claim.SupportingInformation.TimingX {
     val protoValue = Claim.SupportingInformation.TimingX.newBuilder()
     if (this is DateType) {
@@ -102,6 +105,7 @@ public object ClaimConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Claim.SupportingInformation.ValueX.claimSupportingInfoValueToHapi(): Type {
     if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
       return (this.getBoolean()).toHapi()
@@ -121,6 +125,7 @@ public object ClaimConverter {
     throw IllegalArgumentException("Invalid Type for Claim.supportingInfo.value[x]")
   }
 
+  @JvmStatic
   private fun Type.claimSupportingInfoValueToProto(): Claim.SupportingInformation.ValueX {
     val protoValue = Claim.SupportingInformation.ValueX.newBuilder()
     if (this is BooleanType) {
@@ -141,6 +146,7 @@ public object ClaimConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Claim.Diagnosis.DiagnosisX.claimDiagnosisDiagnosisToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
@@ -151,6 +157,7 @@ public object ClaimConverter {
     throw IllegalArgumentException("Invalid Type for Claim.diagnosis.diagnosis[x]")
   }
 
+  @JvmStatic
   private fun Type.claimDiagnosisDiagnosisToProto(): Claim.Diagnosis.DiagnosisX {
     val protoValue = Claim.Diagnosis.DiagnosisX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -162,6 +169,7 @@ public object ClaimConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Claim.Procedure.ProcedureX.claimProcedureProcedureToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
@@ -172,6 +180,7 @@ public object ClaimConverter {
     throw IllegalArgumentException("Invalid Type for Claim.procedure.procedure[x]")
   }
 
+  @JvmStatic
   private fun Type.claimProcedureProcedureToProto(): Claim.Procedure.ProcedureX {
     val protoValue = Claim.Procedure.ProcedureX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -183,6 +192,7 @@ public object ClaimConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Claim.Accident.LocationX.claimAccidentLocationToHapi(): Type {
     if (this.getAddress() != Address.newBuilder().defaultInstanceForType) {
       return (this.getAddress()).toHapi()
@@ -193,6 +203,7 @@ public object ClaimConverter {
     throw IllegalArgumentException("Invalid Type for Claim.accident.location[x]")
   }
 
+  @JvmStatic
   private fun Type.claimAccidentLocationToProto(): Claim.Accident.LocationX {
     val protoValue = Claim.Accident.LocationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Address) {
@@ -204,6 +215,7 @@ public object ClaimConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Claim.Item.ServicedX.claimItemServicedToHapi(): Type {
     if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
       return (this.getDate()).toHapi()
@@ -214,6 +226,7 @@ public object ClaimConverter {
     throw IllegalArgumentException("Invalid Type for Claim.item.serviced[x]")
   }
 
+  @JvmStatic
   private fun Type.claimItemServicedToProto(): Claim.Item.ServicedX {
     val protoValue = Claim.Item.ServicedX.newBuilder()
     if (this is DateType) {
@@ -225,6 +238,7 @@ public object ClaimConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Claim.Item.LocationX.claimItemLocationToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
@@ -238,6 +252,7 @@ public object ClaimConverter {
     throw IllegalArgumentException("Invalid Type for Claim.item.location[x]")
   }
 
+  @JvmStatic
   private fun Type.claimItemLocationToProto(): Claim.Item.LocationX {
     val protoValue = Claim.Item.LocationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -252,6 +267,7 @@ public object ClaimConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun Claim.toHapi(): org.hl7.fhir.r4.model.Claim {
     val hapiValue = org.hl7.fhir.r4.model.Claim()
     hapiValue.id = id.value
@@ -292,6 +308,7 @@ public object ClaimConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Claim.toProto(): Claim {
     val protoValue =
       Claim.newBuilder()
@@ -344,6 +361,7 @@ public object ClaimConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.RelatedClaimComponent.toProto(): Claim.RelatedClaim {
     val protoValue =
       Claim.RelatedClaim.newBuilder()
@@ -356,6 +374,7 @@ public object ClaimConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.PayeeComponent.toProto(): Claim.Payee {
     val protoValue =
       Claim.Payee.newBuilder()
@@ -368,6 +387,7 @@ public object ClaimConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.CareTeamComponent.toProto(): Claim.CareTeam {
     val protoValue =
       Claim.CareTeam.newBuilder()
@@ -383,6 +403,7 @@ public object ClaimConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.SupportingInformationComponent.toProto():
     Claim.SupportingInformation {
     val protoValue =
@@ -400,6 +421,7 @@ public object ClaimConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.DiagnosisComponent.toProto(): Claim.Diagnosis {
     val protoValue =
       Claim.Diagnosis.newBuilder()
@@ -415,6 +437,7 @@ public object ClaimConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.ProcedureComponent.toProto(): Claim.Procedure {
     val protoValue =
       Claim.Procedure.newBuilder()
@@ -430,6 +453,7 @@ public object ClaimConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.InsuranceComponent.toProto(): Claim.Insurance {
     val protoValue =
       Claim.Insurance.newBuilder()
@@ -447,6 +471,7 @@ public object ClaimConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.AccidentComponent.toProto(): Claim.Accident {
     val protoValue =
       Claim.Accident.newBuilder()
@@ -460,6 +485,7 @@ public object ClaimConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.ItemComponent.toProto(): Claim.Item {
     val protoValue =
       Claim.Item.newBuilder()
@@ -491,6 +517,7 @@ public object ClaimConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.DetailComponent.toProto(): Claim.Item.Detail {
     val protoValue =
       Claim.Item.Detail.newBuilder()
@@ -513,6 +540,7 @@ public object ClaimConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.SubDetailComponent.toProto():
     Claim.Item.Detail.SubDetail {
     val protoValue =
@@ -535,6 +563,7 @@ public object ClaimConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun Claim.RelatedClaim.toHapi(): org.hl7.fhir.r4.model.Claim.RelatedClaimComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.RelatedClaimComponent()
     hapiValue.id = id.value
@@ -545,6 +574,7 @@ public object ClaimConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Claim.Payee.toHapi(): org.hl7.fhir.r4.model.Claim.PayeeComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.PayeeComponent()
     hapiValue.id = id.value
@@ -555,6 +585,7 @@ public object ClaimConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Claim.CareTeam.toHapi(): org.hl7.fhir.r4.model.Claim.CareTeamComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.CareTeamComponent()
     hapiValue.id = id.value
@@ -568,6 +599,7 @@ public object ClaimConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Claim.SupportingInformation.toHapi():
     org.hl7.fhir.r4.model.Claim.SupportingInformationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.SupportingInformationComponent()
@@ -583,6 +615,7 @@ public object ClaimConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Claim.Diagnosis.toHapi(): org.hl7.fhir.r4.model.Claim.DiagnosisComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.DiagnosisComponent()
     hapiValue.id = id.value
@@ -596,6 +629,7 @@ public object ClaimConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Claim.Procedure.toHapi(): org.hl7.fhir.r4.model.Claim.ProcedureComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.ProcedureComponent()
     hapiValue.id = id.value
@@ -609,6 +643,7 @@ public object ClaimConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Claim.Insurance.toHapi(): org.hl7.fhir.r4.model.Claim.InsuranceComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.InsuranceComponent()
     hapiValue.id = id.value
@@ -624,6 +659,7 @@ public object ClaimConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Claim.Accident.toHapi(): org.hl7.fhir.r4.model.Claim.AccidentComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.AccidentComponent()
     hapiValue.id = id.value
@@ -635,6 +671,7 @@ public object ClaimConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Claim.Item.toHapi(): org.hl7.fhir.r4.model.Claim.ItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.ItemComponent()
     hapiValue.id = id.value
@@ -664,6 +701,7 @@ public object ClaimConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Claim.Item.Detail.toHapi(): org.hl7.fhir.r4.model.Claim.DetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.DetailComponent()
     hapiValue.id = id.value
@@ -684,6 +722,7 @@ public object ClaimConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Claim.Item.Detail.SubDetail.toHapi(): org.hl7.fhir.r4.model.Claim.SubDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.SubDetailComponent()
     hapiValue.id = id.value

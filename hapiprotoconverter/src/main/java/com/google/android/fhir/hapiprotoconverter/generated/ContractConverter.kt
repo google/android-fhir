@@ -96,6 +96,7 @@ import com.google.fhir.r4.core.Time
 import com.google.fhir.r4.core.Timing
 import com.google.fhir.r4.core.Uri
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
@@ -108,6 +109,7 @@ import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
 public object ContractConverter {
+  @JvmStatic
   private fun Contract.TopicX.contractTopicToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
@@ -118,6 +120,7 @@ public object ContractConverter {
     throw IllegalArgumentException("Invalid Type for Contract.topic[x]")
   }
 
+  @JvmStatic
   private fun Type.contractTopicToProto(): Contract.TopicX {
     val protoValue = Contract.TopicX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -129,6 +132,7 @@ public object ContractConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Contract.Term.TopicX.contractTermTopicToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
@@ -139,6 +143,7 @@ public object ContractConverter {
     throw IllegalArgumentException("Invalid Type for Contract.term.topic[x]")
   }
 
+  @JvmStatic
   private fun Type.contractTermTopicToProto(): Contract.Term.TopicX {
     val protoValue = Contract.Term.TopicX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -150,6 +155,7 @@ public object ContractConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Contract.Term.ContractOffer.Answer.ValueX.contractTermOfferAnswerValueToHapi(): Type {
     if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
       return (this.getBoolean()).toHapi()
@@ -190,6 +196,7 @@ public object ContractConverter {
     throw IllegalArgumentException("Invalid Type for Contract.term.offer.answer.value[x]")
   }
 
+  @JvmStatic
   private fun Type.contractTermOfferAnswerValueToProto():
     Contract.Term.ContractOffer.Answer.ValueX {
     val protoValue = Contract.Term.ContractOffer.Answer.ValueX.newBuilder()
@@ -232,6 +239,7 @@ public object ContractConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Contract.Term.ContractAsset.ValuedItem.EntityX.contractTermAssetValuedItemEntityToHapi():
     Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
@@ -243,6 +251,7 @@ public object ContractConverter {
     throw IllegalArgumentException("Invalid Type for Contract.term.asset.valuedItem.entity[x]")
   }
 
+  @JvmStatic
   private fun Type.contractTermAssetValuedItemEntityToProto():
     Contract.Term.ContractAsset.ValuedItem.EntityX {
     val protoValue = Contract.Term.ContractAsset.ValuedItem.EntityX.newBuilder()
@@ -255,6 +264,7 @@ public object ContractConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Contract.Term.Action.OccurrenceX.contractTermActionOccurrenceToHapi(): Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
       return (this.getDateTime()).toHapi()
@@ -268,6 +278,7 @@ public object ContractConverter {
     throw IllegalArgumentException("Invalid Type for Contract.term.action.occurrence[x]")
   }
 
+  @JvmStatic
   private fun Type.contractTermActionOccurrenceToProto(): Contract.Term.Action.OccurrenceX {
     val protoValue = Contract.Term.Action.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
@@ -282,6 +293,7 @@ public object ContractConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Contract.FriendlyLanguage.ContentX.contractFriendlyContentToHapi(): Type {
     if (this.getAttachment() != Attachment.newBuilder().defaultInstanceForType) {
       return (this.getAttachment()).toHapi()
@@ -292,6 +304,7 @@ public object ContractConverter {
     throw IllegalArgumentException("Invalid Type for Contract.friendly.content[x]")
   }
 
+  @JvmStatic
   private fun Type.contractFriendlyContentToProto(): Contract.FriendlyLanguage.ContentX {
     val protoValue = Contract.FriendlyLanguage.ContentX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Attachment) {
@@ -303,6 +316,7 @@ public object ContractConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Contract.LegalLanguage.ContentX.contractLegalContentToHapi(): Type {
     if (this.getAttachment() != Attachment.newBuilder().defaultInstanceForType) {
       return (this.getAttachment()).toHapi()
@@ -313,6 +327,7 @@ public object ContractConverter {
     throw IllegalArgumentException("Invalid Type for Contract.legal.content[x]")
   }
 
+  @JvmStatic
   private fun Type.contractLegalContentToProto(): Contract.LegalLanguage.ContentX {
     val protoValue = Contract.LegalLanguage.ContentX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Attachment) {
@@ -324,6 +339,7 @@ public object ContractConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Contract.ComputableLanguage.ContentX.contractRuleContentToHapi(): Type {
     if (this.getAttachment() != Attachment.newBuilder().defaultInstanceForType) {
       return (this.getAttachment()).toHapi()
@@ -334,6 +350,7 @@ public object ContractConverter {
     throw IllegalArgumentException("Invalid Type for Contract.rule.content[x]")
   }
 
+  @JvmStatic
   private fun Type.contractRuleContentToProto(): Contract.ComputableLanguage.ContentX {
     val protoValue = Contract.ComputableLanguage.ContentX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Attachment) {
@@ -345,6 +362,7 @@ public object ContractConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Contract.LegallyBindingX.contractLegallyBindingToHapi(): Type {
     if (this.getAttachment() != Attachment.newBuilder().defaultInstanceForType) {
       return (this.getAttachment()).toHapi()
@@ -355,6 +373,7 @@ public object ContractConverter {
     throw IllegalArgumentException("Invalid Type for Contract.legallyBinding[x]")
   }
 
+  @JvmStatic
   private fun Type.contractLegallyBindingToProto(): Contract.LegallyBindingX {
     val protoValue = Contract.LegallyBindingX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Attachment) {
@@ -366,6 +385,7 @@ public object ContractConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun Contract.toHapi(): org.hl7.fhir.r4.model.Contract {
     val hapiValue = org.hl7.fhir.r4.model.Contract()
     hapiValue.id = id.value
@@ -412,6 +432,7 @@ public object ContractConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Contract.toProto(): Contract {
     val protoValue =
       Contract.newBuilder()
@@ -466,6 +487,7 @@ public object ContractConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Contract.ContentDefinitionComponent.toProto():
     Contract.ContentDefinition {
     val protoValue =
@@ -491,6 +513,7 @@ public object ContractConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Contract.TermComponent.toProto(): Contract.Term {
     val protoValue =
       Contract.Term.newBuilder()
@@ -512,6 +535,7 @@ public object ContractConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Contract.SecurityLabelComponent.toProto():
     Contract.Term.SecurityLabel {
     val protoValue =
@@ -527,6 +551,7 @@ public object ContractConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Contract.ContractOfferComponent.toProto():
     Contract.Term.ContractOffer {
     val protoValue =
@@ -548,6 +573,7 @@ public object ContractConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Contract.ContractPartyComponent.toProto():
     Contract.Term.ContractOffer.ContractParty {
     val protoValue =
@@ -561,6 +587,7 @@ public object ContractConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Contract.AnswerComponent.toProto():
     Contract.Term.ContractOffer.Answer {
     val protoValue =
@@ -573,6 +600,7 @@ public object ContractConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Contract.ContractAssetComponent.toProto():
     Contract.Term.ContractAsset {
     val protoValue =
@@ -598,6 +626,7 @@ public object ContractConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Contract.AssetContextComponent.toProto():
     Contract.Term.ContractAsset.AssetContext {
     val protoValue =
@@ -612,6 +641,7 @@ public object ContractConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Contract.ValuedItemComponent.toProto():
     Contract.Term.ContractAsset.ValuedItem {
     val protoValue =
@@ -637,6 +667,7 @@ public object ContractConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Contract.ActionComponent.toProto(): Contract.Term.Action {
     val protoValue =
       Contract.Term.Action.newBuilder()
@@ -668,6 +699,7 @@ public object ContractConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Contract.ActionSubjectComponent.toProto():
     Contract.Term.Action.ActionSubject {
     val protoValue =
@@ -681,6 +713,7 @@ public object ContractConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Contract.SignatoryComponent.toProto(): Contract.Signatory {
     val protoValue =
       Contract.Signatory.newBuilder()
@@ -694,6 +727,7 @@ public object ContractConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Contract.FriendlyLanguageComponent.toProto():
     Contract.FriendlyLanguage {
     val protoValue =
@@ -706,6 +740,7 @@ public object ContractConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Contract.LegalLanguageComponent.toProto():
     Contract.LegalLanguage {
     val protoValue =
@@ -718,6 +753,7 @@ public object ContractConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Contract.ComputableLanguageComponent.toProto():
     Contract.ComputableLanguage {
     val protoValue =
@@ -730,6 +766,7 @@ public object ContractConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun Contract.ContentDefinition.toHapi():
     org.hl7.fhir.r4.model.Contract.ContentDefinitionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ContentDefinitionComponent()
@@ -749,6 +786,7 @@ public object ContractConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Contract.Term.toHapi(): org.hl7.fhir.r4.model.Contract.TermComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.TermComponent()
     hapiValue.id = id.value
@@ -768,6 +806,7 @@ public object ContractConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Contract.Term.SecurityLabel.toHapi():
     org.hl7.fhir.r4.model.Contract.SecurityLabelComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.SecurityLabelComponent()
@@ -781,6 +820,7 @@ public object ContractConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Contract.Term.ContractOffer.toHapi():
     org.hl7.fhir.r4.model.Contract.ContractOfferComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ContractOfferComponent()
@@ -800,6 +840,7 @@ public object ContractConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Contract.Term.ContractOffer.ContractParty.toHapi():
     org.hl7.fhir.r4.model.Contract.ContractPartyComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ContractPartyComponent()
@@ -811,6 +852,7 @@ public object ContractConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Contract.Term.ContractOffer.Answer.toHapi():
     org.hl7.fhir.r4.model.Contract.AnswerComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.AnswerComponent()
@@ -821,6 +863,7 @@ public object ContractConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Contract.Term.ContractAsset.toHapi():
     org.hl7.fhir.r4.model.Contract.ContractAssetComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ContractAssetComponent()
@@ -844,6 +887,7 @@ public object ContractConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Contract.Term.ContractAsset.AssetContext.toHapi():
     org.hl7.fhir.r4.model.Contract.AssetContextComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.AssetContextComponent()
@@ -856,6 +900,7 @@ public object ContractConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Contract.Term.ContractAsset.ValuedItem.toHapi():
     org.hl7.fhir.r4.model.Contract.ValuedItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ValuedItemComponent()
@@ -879,6 +924,7 @@ public object ContractConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Contract.Term.Action.toHapi(): org.hl7.fhir.r4.model.Contract.ActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ActionComponent()
     hapiValue.id = id.value
@@ -908,6 +954,7 @@ public object ContractConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Contract.Term.Action.ActionSubject.toHapi():
     org.hl7.fhir.r4.model.Contract.ActionSubjectComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ActionSubjectComponent()
@@ -919,6 +966,7 @@ public object ContractConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Contract.Signatory.toHapi(): org.hl7.fhir.r4.model.Contract.SignatoryComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.SignatoryComponent()
     hapiValue.id = id.value
@@ -930,6 +978,7 @@ public object ContractConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Contract.FriendlyLanguage.toHapi():
     org.hl7.fhir.r4.model.Contract.FriendlyLanguageComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.FriendlyLanguageComponent()
@@ -940,6 +989,7 @@ public object ContractConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Contract.LegalLanguage.toHapi():
     org.hl7.fhir.r4.model.Contract.LegalLanguageComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.LegalLanguageComponent()
@@ -950,6 +1000,7 @@ public object ContractConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Contract.ComputableLanguage.toHapi():
     org.hl7.fhir.r4.model.Contract.ComputableLanguageComponent {
     val hapiValue = org.hl7.fhir.r4.model.Contract.ComputableLanguageComponent()

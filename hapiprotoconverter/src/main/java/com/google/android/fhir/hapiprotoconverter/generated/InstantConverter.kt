@@ -21,10 +21,12 @@ import com.google.fhir.r4.core.Instant
 import java.time.Instant as InstantUtil
 import java.util.Date
 import java.util.TimeZone
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.InstantType
 
 public object InstantConverter {
   /** returns the proto Instant equivalent of the hapi InstantType */
+  @JvmStatic
   public fun InstantType.toProto(): Instant {
     val protoValue = Instant.newBuilder()
     if (timeZone.id != null) protoValue.setTimezone(timeZone.id)
@@ -34,6 +36,7 @@ public object InstantConverter {
   }
 
   /** returns the hapi InstantType equivalent of the proto Instant */
+  @JvmStatic
   public fun Instant.toHapi(): InstantType {
     val hapiValue = InstantType()
     hapiValue.timeZone = TimeZone.getTimeZone(timezone)
@@ -43,6 +46,7 @@ public object InstantConverter {
   }
 
   /** converts the hapi temporal precision to Instant.Precision */
+  @JvmStatic
   private fun TemporalPrecisionEnum.toProtoPrecision(): Instant.Precision =
     when (this) {
       TemporalPrecisionEnum.SECOND -> Instant.Precision.SECOND
@@ -51,6 +55,7 @@ public object InstantConverter {
     }
 
   /** converts the Instant.Precision to hapi Temporal Precision */
+  @JvmStatic
   private fun Instant.Precision.toHapiPrecision(): TemporalPrecisionEnum =
     when (this) {
       Instant.Precision.SECOND -> TemporalPrecisionEnum.SECOND

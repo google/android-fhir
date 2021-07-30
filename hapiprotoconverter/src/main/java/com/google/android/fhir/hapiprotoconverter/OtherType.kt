@@ -47,6 +47,7 @@ internal fun handleOtherType(
     )
   fileBuilder.addImport(toProto.enclosingClassName!!, toProto.simpleName)
   fileBuilder.addImport(toHapi.enclosingClassName!!, toHapi.simpleName)
+
   if (isSingle) {
     protoBuilder.addStatement(
       "$singleMethodTemplate(${if (element.typeList.first().profileList.isNotEmpty()) "( %L as %T )" else "%L%L"}.toProto())",

@@ -47,9 +47,11 @@ import com.google.fhir.r4.core.ObservationDefinition
 import com.google.fhir.r4.core.ObservationDefinition.QualifiedInterval
 import com.google.fhir.r4.core.ObservationRangeCategoryCode
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 public object ObservationDefinitionConverter {
+  @JvmStatic
   public fun ObservationDefinition.toHapi(): org.hl7.fhir.r4.model.ObservationDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ObservationDefinition()
     hapiValue.id = id.value
@@ -80,6 +82,7 @@ public object ObservationDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.ObservationDefinition.toProto(): ObservationDefinition {
     val protoValue =
       ObservationDefinition.newBuilder()
@@ -116,6 +119,7 @@ public object ObservationDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ObservationDefinition.ObservationDefinitionQuantitativeDetailsComponent.toProto():
     ObservationDefinition.QuantitativeDetails {
     val protoValue =
@@ -131,6 +135,7 @@ public object ObservationDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ObservationDefinition.ObservationDefinitionQualifiedIntervalComponent.toProto():
     ObservationDefinition.QualifiedInterval {
     val protoValue =
@@ -166,6 +171,7 @@ public object ObservationDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun ObservationDefinition.QuantitativeDetails.toHapi():
     org.hl7.fhir.r4.model.ObservationDefinition.ObservationDefinitionQuantitativeDetailsComponent {
     val hapiValue =
@@ -181,6 +187,7 @@ public object ObservationDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ObservationDefinition.QualifiedInterval.toHapi():
     org.hl7.fhir.r4.model.ObservationDefinition.ObservationDefinitionQualifiedIntervalComponent {
     val hapiValue =

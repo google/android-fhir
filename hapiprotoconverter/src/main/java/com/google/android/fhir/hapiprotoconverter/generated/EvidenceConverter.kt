@@ -51,9 +51,11 @@ import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverte
 import com.google.fhir.r4.core.Evidence
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PublicationStatusCode
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 public object EvidenceConverter {
+  @JvmStatic
   public fun Evidence.toHapi(): org.hl7.fhir.r4.model.Evidence {
     val hapiValue = org.hl7.fhir.r4.model.Evidence()
     hapiValue.id = id.value
@@ -93,6 +95,7 @@ public object EvidenceConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Evidence.toProto(): Evidence {
     val protoValue =
       Evidence.newBuilder()

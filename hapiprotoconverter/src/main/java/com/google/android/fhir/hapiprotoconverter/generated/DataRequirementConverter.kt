@@ -47,10 +47,12 @@ import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.SortDirectionCode
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 public object DataRequirementConverter {
+  @JvmStatic
   private fun DataRequirement.SubjectX.dataRequirementSubjectToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
@@ -61,6 +63,7 @@ public object DataRequirementConverter {
     throw IllegalArgumentException("Invalid Type for DataRequirement.subject[x]")
   }
 
+  @JvmStatic
   private fun Type.dataRequirementSubjectToProto(): DataRequirement.SubjectX {
     val protoValue = DataRequirement.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -72,6 +75,7 @@ public object DataRequirementConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun DataRequirement.DateFilter.ValueX.dataRequirementDateFilterValueToHapi(): Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
       return (this.getDateTime()).toHapi()
@@ -85,6 +89,7 @@ public object DataRequirementConverter {
     throw IllegalArgumentException("Invalid Type for DataRequirement.dateFilter.value[x]")
   }
 
+  @JvmStatic
   private fun Type.dataRequirementDateFilterValueToProto(): DataRequirement.DateFilter.ValueX {
     val protoValue = DataRequirement.DateFilter.ValueX.newBuilder()
     if (this is DateTimeType) {
@@ -99,6 +104,7 @@ public object DataRequirementConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun DataRequirement.toHapi(): org.hl7.fhir.r4.model.DataRequirement {
     val hapiValue = org.hl7.fhir.r4.model.DataRequirement()
     hapiValue.id = id.value
@@ -113,6 +119,7 @@ public object DataRequirementConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.DataRequirement.toProto(): DataRequirement {
     val protoValue =
       DataRequirement.newBuilder()
@@ -129,6 +136,7 @@ public object DataRequirementConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.DataRequirement.DataRequirementCodeFilterComponent.toProto():
     DataRequirement.CodeFilter {
     val protoValue =
@@ -143,6 +151,7 @@ public object DataRequirementConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.DataRequirement.DataRequirementDateFilterComponent.toProto():
     DataRequirement.DateFilter {
     val protoValue =
@@ -156,6 +165,7 @@ public object DataRequirementConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.DataRequirement.DataRequirementSortComponent.toProto():
     DataRequirement.Sort {
     val protoValue =
@@ -174,6 +184,7 @@ public object DataRequirementConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun DataRequirement.CodeFilter.toHapi():
     org.hl7.fhir.r4.model.DataRequirement.DataRequirementCodeFilterComponent {
     val hapiValue = org.hl7.fhir.r4.model.DataRequirement.DataRequirementCodeFilterComponent()
@@ -186,6 +197,7 @@ public object DataRequirementConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun DataRequirement.DateFilter.toHapi():
     org.hl7.fhir.r4.model.DataRequirement.DataRequirementDateFilterComponent {
     val hapiValue = org.hl7.fhir.r4.model.DataRequirement.DataRequirementDateFilterComponent()
@@ -197,6 +209,7 @@ public object DataRequirementConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun DataRequirement.Sort.toHapi():
     org.hl7.fhir.r4.model.DataRequirement.DataRequirementSortComponent {
     val hapiValue = org.hl7.fhir.r4.model.DataRequirement.DataRequirementSortComponent()

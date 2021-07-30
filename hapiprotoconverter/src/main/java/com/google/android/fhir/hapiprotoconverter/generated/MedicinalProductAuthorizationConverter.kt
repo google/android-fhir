@@ -41,10 +41,12 @@ import com.google.fhir.r4.core.MedicinalProductAuthorization.Procedure
 import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 public object MedicinalProductAuthorizationConverter {
+  @JvmStatic
   private fun MedicinalProductAuthorization.Procedure.DateX.medicinalProductAuthorizationProcedureDateToHapi():
     Type {
     if (this.getPeriod() != Period.newBuilder().defaultInstanceForType) {
@@ -58,6 +60,7 @@ public object MedicinalProductAuthorizationConverter {
     )
   }
 
+  @JvmStatic
   private fun Type.medicinalProductAuthorizationProcedureDateToProto():
     MedicinalProductAuthorization.Procedure.DateX {
     val protoValue = MedicinalProductAuthorization.Procedure.DateX.newBuilder()
@@ -70,6 +73,7 @@ public object MedicinalProductAuthorizationConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun MedicinalProductAuthorization.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductAuthorization {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductAuthorization()
@@ -98,6 +102,7 @@ public object MedicinalProductAuthorizationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.MedicinalProductAuthorization.toProto():
     MedicinalProductAuthorization {
     val protoValue =
@@ -128,6 +133,7 @@ public object MedicinalProductAuthorizationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductAuthorization.MedicinalProductAuthorizationJurisdictionalAuthorizationComponent.toProto():
     MedicinalProductAuthorization.JurisdictionalAuthorization {
     val protoValue =
@@ -144,6 +150,7 @@ public object MedicinalProductAuthorizationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductAuthorization.MedicinalProductAuthorizationProcedureComponent.toProto():
     MedicinalProductAuthorization.Procedure {
     val protoValue =
@@ -158,6 +165,7 @@ public object MedicinalProductAuthorizationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun MedicinalProductAuthorization.JurisdictionalAuthorization.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductAuthorization.MedicinalProductAuthorizationJurisdictionalAuthorizationComponent {
     val hapiValue =
@@ -174,6 +182,7 @@ public object MedicinalProductAuthorizationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun MedicinalProductAuthorization.Procedure.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductAuthorization.MedicinalProductAuthorizationProcedureComponent {
     val hapiValue =

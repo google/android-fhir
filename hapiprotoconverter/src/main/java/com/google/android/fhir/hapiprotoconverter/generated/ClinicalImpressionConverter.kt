@@ -45,10 +45,12 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 public object ClinicalImpressionConverter {
+  @JvmStatic
   private fun ClinicalImpression.EffectiveX.clinicalImpressionEffectiveToHapi(): Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
       return (this.getDateTime()).toHapi()
@@ -59,6 +61,7 @@ public object ClinicalImpressionConverter {
     throw IllegalArgumentException("Invalid Type for ClinicalImpression.effective[x]")
   }
 
+  @JvmStatic
   private fun Type.clinicalImpressionEffectiveToProto(): ClinicalImpression.EffectiveX {
     val protoValue = ClinicalImpression.EffectiveX.newBuilder()
     if (this is DateTimeType) {
@@ -70,6 +73,7 @@ public object ClinicalImpressionConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun ClinicalImpression.toHapi(): org.hl7.fhir.r4.model.ClinicalImpression {
     val hapiValue = org.hl7.fhir.r4.model.ClinicalImpression()
     hapiValue.id = id.value
@@ -105,6 +109,7 @@ public object ClinicalImpressionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.ClinicalImpression.toProto(): ClinicalImpression {
     val protoValue =
       ClinicalImpression.newBuilder()
@@ -146,6 +151,7 @@ public object ClinicalImpressionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionInvestigationComponent.toProto():
     ClinicalImpression.Investigation {
     val protoValue =
@@ -159,6 +165,7 @@ public object ClinicalImpressionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionFindingComponent.toProto():
     ClinicalImpression.Finding {
     val protoValue =
@@ -173,6 +180,7 @@ public object ClinicalImpressionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun ClinicalImpression.Investigation.toHapi():
     org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionInvestigationComponent {
     val hapiValue =
@@ -185,6 +193,7 @@ public object ClinicalImpressionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ClinicalImpression.Finding.toHapi():
     org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionFindingComponent {
     val hapiValue = org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionFindingComponent()

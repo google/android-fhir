@@ -170,6 +170,7 @@ import com.google.fhir.r4.core.Url
 import com.google.fhir.r4.core.UsageContext
 import com.google.fhir.r4.core.Uuid
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Base64BinaryType
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CanonicalType
@@ -192,6 +193,7 @@ import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.model.UuidType
 
 public object ParametersConverter {
+  @JvmStatic
   private fun Parameters.Parameter.ValueX.parametersParameterValueToHapi(): Type {
     if (this.getBase64Binary() != Base64Binary.newBuilder().defaultInstanceForType) {
       return (this.getBase64Binary()).toHapi()
@@ -343,6 +345,7 @@ public object ParametersConverter {
     throw IllegalArgumentException("Invalid Type for Parameters.parameter.value[x]")
   }
 
+  @JvmStatic
   private fun Type.parametersParameterValueToProto(): Parameters.Parameter.ValueX {
     val protoValue = Parameters.Parameter.ValueX.newBuilder()
     if (this is Base64BinaryType) {
@@ -495,6 +498,7 @@ public object ParametersConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun Parameters.toHapi(): org.hl7.fhir.r4.model.Parameters {
     val hapiValue = org.hl7.fhir.r4.model.Parameters()
     hapiValue.id = id.value
@@ -504,6 +508,7 @@ public object ParametersConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Parameters.toProto(): Parameters {
     val protoValue =
       Parameters.newBuilder()
@@ -515,6 +520,7 @@ public object ParametersConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Parameters.ParametersParameterComponent.toProto():
     Parameters.Parameter {
     val protoValue =
@@ -528,6 +534,7 @@ public object ParametersConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun Parameters.Parameter.toHapi():
     org.hl7.fhir.r4.model.Parameters.ParametersParameterComponent {
     val hapiValue = org.hl7.fhir.r4.model.Parameters.ParametersParameterComponent()

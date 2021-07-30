@@ -68,6 +68,7 @@ import com.google.fhir.r4.core.ValueSet.Compose.ConceptSet.Filter
 import com.google.fhir.r4.core.ValueSet.Expansion
 import com.google.fhir.r4.core.ValueSet.Expansion.Parameter
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.DateTimeType
@@ -79,6 +80,7 @@ import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
 public object ValueSetConverter {
+  @JvmStatic
   private fun ValueSet.Expansion.Parameter.ValueX.valueSetExpansionParameterValueToHapi(): Type {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
       return (this.getStringValue()).toHapi()
@@ -104,6 +106,7 @@ public object ValueSetConverter {
     throw IllegalArgumentException("Invalid Type for ValueSet.expansion.parameter.value[x]")
   }
 
+  @JvmStatic
   private fun Type.valueSetExpansionParameterValueToProto(): ValueSet.Expansion.Parameter.ValueX {
     val protoValue = ValueSet.Expansion.Parameter.ValueX.newBuilder()
     if (this is StringType) {
@@ -130,6 +133,7 @@ public object ValueSetConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun ValueSet.toHapi(): org.hl7.fhir.r4.model.ValueSet {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet()
     hapiValue.id = id.value
@@ -159,6 +163,7 @@ public object ValueSetConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.ValueSet.toProto(): ValueSet {
     val protoValue =
       ValueSet.newBuilder()
@@ -196,6 +201,7 @@ public object ValueSetConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ValueSet.ValueSetComposeComponent.toProto(): ValueSet.Compose {
     val protoValue =
       ValueSet.Compose.newBuilder()
@@ -209,6 +215,7 @@ public object ValueSetConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ValueSet.ConceptSetComponent.toProto():
     ValueSet.Compose.ConceptSet {
     val protoValue =
@@ -224,6 +231,7 @@ public object ValueSetConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ValueSet.ConceptReferenceComponent.toProto():
     ValueSet.Compose.ConceptSet.ConceptReference {
     val protoValue =
@@ -238,6 +246,7 @@ public object ValueSetConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ValueSet.ConceptReferenceDesignationComponent.toProto():
     ValueSet.Compose.ConceptSet.ConceptReference.Designation {
     val protoValue =
@@ -251,6 +260,7 @@ public object ValueSetConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ValueSet.ConceptSetFilterComponent.toProto():
     ValueSet.Compose.ConceptSet.Filter {
     val protoValue =
@@ -269,6 +279,7 @@ public object ValueSetConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionComponent.toProto():
     ValueSet.Expansion {
     val protoValue =
@@ -286,6 +297,7 @@ public object ValueSetConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionParameterComponent.toProto():
     ValueSet.Expansion.Parameter {
     val protoValue =
@@ -299,6 +311,7 @@ public object ValueSetConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionContainsComponent.toProto():
     ValueSet.Expansion.Contains {
     val protoValue =
@@ -316,6 +329,7 @@ public object ValueSetConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun ValueSet.Compose.toHapi(): org.hl7.fhir.r4.model.ValueSet.ValueSetComposeComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ValueSetComposeComponent()
     hapiValue.id = id.value
@@ -327,6 +341,7 @@ public object ValueSetConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ValueSet.Compose.ConceptSet.toHapi():
     org.hl7.fhir.r4.model.ValueSet.ConceptSetComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ConceptSetComponent()
@@ -340,6 +355,7 @@ public object ValueSetConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ValueSet.Compose.ConceptSet.ConceptReference.toHapi():
     org.hl7.fhir.r4.model.ValueSet.ConceptReferenceComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ConceptReferenceComponent()
@@ -352,6 +368,7 @@ public object ValueSetConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ValueSet.Compose.ConceptSet.ConceptReference.Designation.toHapi():
     org.hl7.fhir.r4.model.ValueSet.ConceptReferenceDesignationComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ConceptReferenceDesignationComponent()
@@ -363,6 +380,7 @@ public object ValueSetConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ValueSet.Compose.ConceptSet.Filter.toHapi():
     org.hl7.fhir.r4.model.ValueSet.ConceptSetFilterComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ConceptSetFilterComponent()
@@ -377,6 +395,7 @@ public object ValueSetConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ValueSet.Expansion.toHapi():
     org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionComponent()
@@ -392,6 +411,7 @@ public object ValueSetConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ValueSet.Expansion.Parameter.toHapi():
     org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionParameterComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionParameterComponent()
@@ -403,6 +423,7 @@ public object ValueSetConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ValueSet.Expansion.Contains.toHapi():
     org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionContainsComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionContainsComponent()

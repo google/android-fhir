@@ -58,11 +58,13 @@ import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
 public object CoverageEligibilityRequestConverter {
+  @JvmStatic
   private fun CoverageEligibilityRequest.ServicedX.coverageEligibilityRequestServicedToHapi():
     Type {
     if (this.getDate() != Date.newBuilder().defaultInstanceForType) {
@@ -74,6 +76,7 @@ public object CoverageEligibilityRequestConverter {
     throw IllegalArgumentException("Invalid Type for CoverageEligibilityRequest.serviced[x]")
   }
 
+  @JvmStatic
   private fun Type.coverageEligibilityRequestServicedToProto():
     CoverageEligibilityRequest.ServicedX {
     val protoValue = CoverageEligibilityRequest.ServicedX.newBuilder()
@@ -86,6 +89,7 @@ public object CoverageEligibilityRequestConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun CoverageEligibilityRequest.Details.Diagnosis.DiagnosisX.coverageEligibilityRequestItemDiagnosisDiagnosisToHapi():
     Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
@@ -99,6 +103,7 @@ public object CoverageEligibilityRequestConverter {
     )
   }
 
+  @JvmStatic
   private fun Type.coverageEligibilityRequestItemDiagnosisDiagnosisToProto():
     CoverageEligibilityRequest.Details.Diagnosis.DiagnosisX {
     val protoValue = CoverageEligibilityRequest.Details.Diagnosis.DiagnosisX.newBuilder()
@@ -111,6 +116,7 @@ public object CoverageEligibilityRequestConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun CoverageEligibilityRequest.toHapi(): org.hl7.fhir.r4.model.CoverageEligibilityRequest {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityRequest()
     hapiValue.id = id.value
@@ -146,6 +152,7 @@ public object CoverageEligibilityRequestConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.CoverageEligibilityRequest.toProto():
     CoverageEligibilityRequest {
     val protoValue =
@@ -192,6 +199,7 @@ public object CoverageEligibilityRequestConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.CoverageEligibilityRequest.SupportingInformationComponent.toProto():
     CoverageEligibilityRequest.SupportingInformation {
     val protoValue =
@@ -206,6 +214,7 @@ public object CoverageEligibilityRequestConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.CoverageEligibilityRequest.InsuranceComponent.toProto():
     CoverageEligibilityRequest.Insurance {
     val protoValue =
@@ -220,6 +229,7 @@ public object CoverageEligibilityRequestConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.CoverageEligibilityRequest.DetailsComponent.toProto():
     CoverageEligibilityRequest.Details {
     val protoValue =
@@ -241,6 +251,7 @@ public object CoverageEligibilityRequestConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.CoverageEligibilityRequest.DiagnosisComponent.toProto():
     CoverageEligibilityRequest.Details.Diagnosis {
     val protoValue =
@@ -253,6 +264,7 @@ public object CoverageEligibilityRequestConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun CoverageEligibilityRequest.SupportingInformation.toHapi():
     org.hl7.fhir.r4.model.CoverageEligibilityRequest.SupportingInformationComponent {
     val hapiValue =
@@ -266,6 +278,7 @@ public object CoverageEligibilityRequestConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun CoverageEligibilityRequest.Insurance.toHapi():
     org.hl7.fhir.r4.model.CoverageEligibilityRequest.InsuranceComponent {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityRequest.InsuranceComponent()
@@ -278,6 +291,7 @@ public object CoverageEligibilityRequestConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun CoverageEligibilityRequest.Details.toHapi():
     org.hl7.fhir.r4.model.CoverageEligibilityRequest.DetailsComponent {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityRequest.DetailsComponent()
@@ -297,6 +311,7 @@ public object CoverageEligibilityRequestConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun CoverageEligibilityRequest.Details.Diagnosis.toHapi():
     org.hl7.fhir.r4.model.CoverageEligibilityRequest.DiagnosisComponent {
     val hapiValue = org.hl7.fhir.r4.model.CoverageEligibilityRequest.DiagnosisComponent()

@@ -22,8 +22,10 @@ import com.google.android.fhir.hapiprotoconverter.generated.ExtensionConverter.t
 import com.google.android.fhir.hapiprotoconverter.generated.ExtensionConverter.toProto
 import com.google.fhir.r4.core.Money
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object MoneyConverter {
+  @JvmStatic
   public fun Money.toHapi(): org.hl7.fhir.r4.model.Money {
     val hapiValue = org.hl7.fhir.r4.model.Money()
     hapiValue.id = id.value
@@ -33,6 +35,7 @@ public object MoneyConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Money.toProto(): Money {
     val protoValue =
       Money.newBuilder()

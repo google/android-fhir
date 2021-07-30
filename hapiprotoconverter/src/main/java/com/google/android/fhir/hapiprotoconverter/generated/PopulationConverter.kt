@@ -27,9 +27,11 @@ import com.google.fhir.r4.core.Population
 import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
 public object PopulationConverter {
+  @JvmStatic
   private fun Population.AgeX.populationAgeToHapi(): Type {
     if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
       return (this.getRange()).toHapi()
@@ -40,6 +42,7 @@ public object PopulationConverter {
     throw IllegalArgumentException("Invalid Type for Population.age[x]")
   }
 
+  @JvmStatic
   private fun Type.populationAgeToProto(): Population.AgeX {
     val protoValue = Population.AgeX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Range) {
@@ -51,6 +54,7 @@ public object PopulationConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun Population.toHapi(): org.hl7.fhir.r4.model.Population {
     val hapiValue = org.hl7.fhir.r4.model.Population()
     hapiValue.id = id.value
@@ -63,6 +67,7 @@ public object PopulationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Population.toProto(): Population {
     val protoValue =
       Population.newBuilder()

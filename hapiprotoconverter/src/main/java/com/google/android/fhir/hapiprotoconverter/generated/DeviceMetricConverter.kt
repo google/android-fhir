@@ -43,8 +43,10 @@ import com.google.fhir.r4.core.DeviceMetricColorCode
 import com.google.fhir.r4.core.DeviceMetricOperationalStatusCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object DeviceMetricConverter {
+  @JvmStatic
   public fun DeviceMetric.toHapi(): org.hl7.fhir.r4.model.DeviceMetric {
     val hapiValue = org.hl7.fhir.r4.model.DeviceMetric()
     hapiValue.id = id.value
@@ -78,6 +80,7 @@ public object DeviceMetricConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.DeviceMetric.toProto(): DeviceMetric {
     val protoValue =
       DeviceMetric.newBuilder()
@@ -123,6 +126,7 @@ public object DeviceMetricConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCalibrationComponent.toProto():
     DeviceMetric.Calibration {
     val protoValue =
@@ -153,6 +157,7 @@ public object DeviceMetricConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun DeviceMetric.Calibration.toHapi():
     org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCalibrationComponent {
     val hapiValue = org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCalibrationComponent()

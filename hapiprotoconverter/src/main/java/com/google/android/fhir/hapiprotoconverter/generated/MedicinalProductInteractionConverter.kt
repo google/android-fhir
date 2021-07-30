@@ -37,9 +37,11 @@ import com.google.fhir.r4.core.MedicinalProductInteraction.Interactant
 import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
 public object MedicinalProductInteractionConverter {
+  @JvmStatic
   private fun MedicinalProductInteraction.Interactant.ItemX.medicinalProductInteractionInteractantItemToHapi():
     Type {
     if (this.getReference() != Reference.newBuilder().defaultInstanceForType) {
@@ -53,6 +55,7 @@ public object MedicinalProductInteractionConverter {
     )
   }
 
+  @JvmStatic
   private fun Type.medicinalProductInteractionInteractantItemToProto():
     MedicinalProductInteraction.Interactant.ItemX {
     val protoValue = MedicinalProductInteraction.Interactant.ItemX.newBuilder()
@@ -65,6 +68,7 @@ public object MedicinalProductInteractionConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun MedicinalProductInteraction.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductInteraction {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductInteraction()
@@ -84,6 +88,7 @@ public object MedicinalProductInteractionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.MedicinalProductInteraction.toProto():
     MedicinalProductInteraction {
     val protoValue =
@@ -105,6 +110,7 @@ public object MedicinalProductInteractionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductInteraction.MedicinalProductInteractionInteractantComponent.toProto():
     MedicinalProductInteraction.Interactant {
     val protoValue =
@@ -117,6 +123,7 @@ public object MedicinalProductInteractionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun MedicinalProductInteraction.Interactant.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductInteraction.MedicinalProductInteractionInteractantComponent {
     val hapiValue =

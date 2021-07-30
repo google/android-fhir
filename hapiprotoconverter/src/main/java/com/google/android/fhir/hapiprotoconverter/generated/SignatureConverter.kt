@@ -28,8 +28,10 @@ import com.google.android.fhir.hapiprotoconverter.generated.ReferenceConverter.t
 import com.google.android.fhir.hapiprotoconverter.generated.ReferenceConverter.toProto
 import com.google.fhir.r4.core.Signature
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object SignatureConverter {
+  @JvmStatic
   public fun Signature.toHapi(): org.hl7.fhir.r4.model.Signature {
     val hapiValue = org.hl7.fhir.r4.model.Signature()
     hapiValue.id = id.value
@@ -44,6 +46,7 @@ public object SignatureConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Signature.toProto(): Signature {
     val protoValue =
       Signature.newBuilder()

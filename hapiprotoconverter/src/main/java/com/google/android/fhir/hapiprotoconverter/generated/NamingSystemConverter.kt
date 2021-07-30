@@ -47,9 +47,11 @@ import com.google.fhir.r4.core.NamingSystemIdentifierTypeCode
 import com.google.fhir.r4.core.NamingSystemTypeCode
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 public object NamingSystemConverter {
+  @JvmStatic
   public fun NamingSystem.toHapi(): org.hl7.fhir.r4.model.NamingSystem {
     val hapiValue = org.hl7.fhir.r4.model.NamingSystem()
     hapiValue.id = id.value
@@ -76,6 +78,7 @@ public object NamingSystemConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.NamingSystem.toProto(): NamingSystem {
     val protoValue =
       NamingSystem.newBuilder()
@@ -114,6 +117,7 @@ public object NamingSystemConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.NamingSystem.NamingSystemUniqueIdComponent.toProto():
     NamingSystem.UniqueId {
     val protoValue =
@@ -138,6 +142,7 @@ public object NamingSystemConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun NamingSystem.UniqueId.toHapi():
     org.hl7.fhir.r4.model.NamingSystem.NamingSystemUniqueIdComponent {
     val hapiValue = org.hl7.fhir.r4.model.NamingSystem.NamingSystemUniqueIdComponent()

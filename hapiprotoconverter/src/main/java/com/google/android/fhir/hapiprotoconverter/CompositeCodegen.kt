@@ -33,9 +33,6 @@ object CompositeCodegen {
   val valueSetUrlMap = mutableMapOf<kotlin.String, ValueSet>()
   val profileUrlMap = mutableMapOf<kotlin.String, StructureDefinition>()
 
-  private val RESERVED_FIELD_NAMES_JAVA =
-    listOf("assert", "for", "hasAnswer", "package", "string", "class")
-
   /**
    * @param def structure definition of the resource/complex-type that needs to be generated
    * @param outLocation file where the converter object will be generated
@@ -62,6 +59,7 @@ object CompositeCodegen {
     // function builder that will convert to proto from a hapi value
     val toProtoBuilder =
       FunSpec.builder("toProto")
+        .addAnnotation(JvmStatic::class)
         .receiver(hapiClass)
         .returns(protoClass)
         .addStatement("val protoValue = %T.newBuilder()", protoClass)
@@ -69,6 +67,7 @@ object CompositeCodegen {
     // function builder that will convert to hapi from a proto value
     val toHapiBuilder =
       FunSpec.builder("toHapi")
+        .addAnnotation(JvmStatic::class)
         .receiver(protoClass)
         .returns(hapiClass)
         .addStatement("val hapiValue = %T()", hapiClass)
@@ -230,10 +229,12 @@ object CompositeCodegen {
   ): Pair<FunSpec.Builder, FunSpec.Builder> {
 
     return FunSpec.builder("${funcName}ToProto".lowerCaseFirst())
+      .addAnnotation(JvmStatic::class)
       .receiver(hapiClass)
       .returns(protoClass)
       .addModifiers(KModifier.PRIVATE) to
       FunSpec.builder("${funcName}ToHapi".lowerCaseFirst())
+        .addAnnotation(JvmStatic::class)
         .receiver(protoClass)
         .returns(hapiClass)
         .addModifiers(KModifier.PRIVATE)

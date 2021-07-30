@@ -61,10 +61,12 @@ import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Type
 
 public object MeasureConverter {
+  @JvmStatic
   private fun Measure.SubjectX.measureSubjectToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
@@ -75,6 +77,7 @@ public object MeasureConverter {
     throw IllegalArgumentException("Invalid Type for Measure.subject[x]")
   }
 
+  @JvmStatic
   private fun Type.measureSubjectToProto(): Measure.SubjectX {
     val protoValue = Measure.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -86,6 +89,7 @@ public object MeasureConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun Measure.toHapi(): org.hl7.fhir.r4.model.Measure {
     val hapiValue = org.hl7.fhir.r4.model.Measure()
     hapiValue.id = id.value
@@ -138,6 +142,7 @@ public object MeasureConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Measure.toProto(): Measure {
     val protoValue =
       Measure.newBuilder()
@@ -198,6 +203,7 @@ public object MeasureConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Measure.MeasureGroupComponent.toProto(): Measure.Group {
     val protoValue =
       Measure.Group.newBuilder()
@@ -212,6 +218,7 @@ public object MeasureConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Measure.MeasureGroupPopulationComponent.toProto():
     Measure.Group.Population {
     val protoValue =
@@ -226,6 +233,7 @@ public object MeasureConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Measure.MeasureGroupStratifierComponent.toProto():
     Measure.Group.Stratifier {
     val protoValue =
@@ -241,6 +249,7 @@ public object MeasureConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Measure.MeasureGroupStratifierComponentComponent.toProto():
     Measure.Group.Stratifier.Component {
     val protoValue =
@@ -255,6 +264,7 @@ public object MeasureConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Measure.MeasureSupplementalDataComponent.toProto():
     Measure.SupplementalData {
     val protoValue =
@@ -270,6 +280,7 @@ public object MeasureConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun Measure.Group.toHapi(): org.hl7.fhir.r4.model.Measure.MeasureGroupComponent {
     val hapiValue = org.hl7.fhir.r4.model.Measure.MeasureGroupComponent()
     hapiValue.id = id.value
@@ -282,6 +293,7 @@ public object MeasureConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Measure.Group.Population.toHapi():
     org.hl7.fhir.r4.model.Measure.MeasureGroupPopulationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Measure.MeasureGroupPopulationComponent()
@@ -294,6 +306,7 @@ public object MeasureConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Measure.Group.Stratifier.toHapi():
     org.hl7.fhir.r4.model.Measure.MeasureGroupStratifierComponent {
     val hapiValue = org.hl7.fhir.r4.model.Measure.MeasureGroupStratifierComponent()
@@ -307,6 +320,7 @@ public object MeasureConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Measure.Group.Stratifier.Component.toHapi():
     org.hl7.fhir.r4.model.Measure.MeasureGroupStratifierComponentComponent {
     val hapiValue = org.hl7.fhir.r4.model.Measure.MeasureGroupStratifierComponentComponent()
@@ -319,6 +333,7 @@ public object MeasureConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Measure.SupplementalData.toHapi():
     org.hl7.fhir.r4.model.Measure.MeasureSupplementalDataComponent {
     val hapiValue = org.hl7.fhir.r4.model.Measure.MeasureSupplementalDataComponent()

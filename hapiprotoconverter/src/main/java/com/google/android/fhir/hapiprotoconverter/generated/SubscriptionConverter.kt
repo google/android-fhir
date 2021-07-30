@@ -38,8 +38,10 @@ import com.google.fhir.r4.core.Subscription
 import com.google.fhir.r4.core.Subscription.Channel
 import com.google.fhir.r4.core.SubscriptionChannelTypeCode
 import com.google.fhir.r4.core.SubscriptionStatusCode
+import kotlin.jvm.JvmStatic
 
 public object SubscriptionConverter {
+  @JvmStatic
   public fun Subscription.toHapi(): org.hl7.fhir.r4.model.Subscription {
     val hapiValue = org.hl7.fhir.r4.model.Subscription()
     hapiValue.id = id.value
@@ -62,6 +64,7 @@ public object SubscriptionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Subscription.toProto(): Subscription {
     val protoValue =
       Subscription.newBuilder()
@@ -88,6 +91,7 @@ public object SubscriptionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Subscription.SubscriptionChannelComponent.toProto():
     Subscription.Channel {
     val protoValue =
@@ -111,6 +115,7 @@ public object SubscriptionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun Subscription.Channel.toHapi():
     org.hl7.fhir.r4.model.Subscription.SubscriptionChannelComponent {
     val hapiValue = org.hl7.fhir.r4.model.Subscription.SubscriptionChannelComponent()

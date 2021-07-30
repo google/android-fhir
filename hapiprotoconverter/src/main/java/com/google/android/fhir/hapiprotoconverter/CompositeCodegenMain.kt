@@ -24,7 +24,8 @@ import com.squareup.kotlinpoet.ClassName
 import java.io.File
 
 fun main() {
-  File("C:\\Users\\Aditya\\Desktop\\fhir-spec\\site").listFiles()!!
+  // TODO change this
+  File("hapiprotoconverter\\sampledata\\").listFiles()!!
     .filter {
       it.name.startsWith("valueset-") &&
         !it.name.startsWith("valueset-extensions-") &&
@@ -40,25 +41,22 @@ fun main() {
         println(it.name)
       }
     }
-
+  // TODO move this to a different folder?
   File("hapiprotoconverter\\sampledata\\").listFiles()!!
-    .filter { it.name.endsWith(".profile.json") && !it.name.endsWith("-genetics.profile.json") }
+    .filter { it.name.endsWith(".profile.json") }
     .forEach {
       val def =
         JsonFormat.getParser().merge(it.inputStream().reader(), StructureDefinition.newBuilder())
       CompositeCodegen.profileUrlMap[def.url.value] = def.build()
     }
-  CompositeCodegen.profileUrlMap.values // .filter { it.name.value == "Timing"}
-    .forEach { def ->
+  CompositeCodegen.profileUrlMap.values.forEach { def ->
     if ((def.kind.value == StructureDefinitionKindCode.Value.COMPLEX_TYPE ||
         def.kind.value == StructureDefinitionKindCode.Value.RESOURCE) && !def.abstract.value
-    // &&
-    // def.status.value == PublicationStatusCode.Value.ACTIVE
     ) {
       try {
-        Class.forName(ClassName(hapiPackage, def.id.value.capitalize()).reflectionName())
+        Class.forName(ClassName(hapiPackage, def.id.value.capitalizeFirst()).reflectionName())
 
-        Class.forName(ClassName(protoPackage, def.id.value.capitalize()).reflectionName())
+        Class.forName(ClassName(protoPackage, def.id.value.capitalizeFirst()).reflectionName())
         CompositeCodegen.generate(def, File("hapiprotoconverter\\src\\main\\java"))
       } catch (e: Exception) {
         // throw e

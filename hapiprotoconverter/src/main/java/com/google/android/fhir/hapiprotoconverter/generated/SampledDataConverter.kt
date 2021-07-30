@@ -28,9 +28,11 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHa
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
 import com.google.fhir.r4.core.SampledData
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.SimpleQuantity
 
 public object SampledDataConverter {
+  @JvmStatic
   public fun SampledData.toHapi(): org.hl7.fhir.r4.model.SampledData {
     val hapiValue = org.hl7.fhir.r4.model.SampledData()
     hapiValue.id = id.value
@@ -45,6 +47,7 @@ public object SampledDataConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.SampledData.toProto(): SampledData {
     val protoValue =
       SampledData.newBuilder()

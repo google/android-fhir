@@ -47,8 +47,10 @@ import com.google.fhir.r4.core.ImagingStudy
 import com.google.fhir.r4.core.ImagingStudy.Series
 import com.google.fhir.r4.core.ImagingStudyStatusCode
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object ImagingStudyConverter {
+  @JvmStatic
   public fun ImagingStudy.toHapi(): org.hl7.fhir.r4.model.ImagingStudy {
     val hapiValue = org.hl7.fhir.r4.model.ImagingStudy()
     hapiValue.id = id.value
@@ -84,6 +86,7 @@ public object ImagingStudyConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.ImagingStudy.toProto(): ImagingStudy {
     val protoValue =
       ImagingStudy.newBuilder()
@@ -123,6 +126,7 @@ public object ImagingStudyConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesComponent.toProto():
     ImagingStudy.Series {
     val protoValue =
@@ -146,6 +150,7 @@ public object ImagingStudyConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesPerformerComponent.toProto():
     ImagingStudy.Series.Performer {
     val protoValue =
@@ -159,6 +164,7 @@ public object ImagingStudyConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesInstanceComponent.toProto():
     ImagingStudy.Series.Instance {
     val protoValue =
@@ -174,6 +180,7 @@ public object ImagingStudyConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun ImagingStudy.Series.toHapi():
     org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesComponent {
     val hapiValue = org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesComponent()
@@ -195,6 +202,7 @@ public object ImagingStudyConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ImagingStudy.Series.Performer.toHapi():
     org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesPerformerComponent {
     val hapiValue = org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesPerformerComponent()
@@ -206,6 +214,7 @@ public object ImagingStudyConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ImagingStudy.Series.Instance.toHapi():
     org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesInstanceComponent {
     val hapiValue = org.hl7.fhir.r4.model.ImagingStudy.ImagingStudySeriesInstanceComponent()

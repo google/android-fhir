@@ -49,8 +49,10 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.ParticipantRequiredCode
 import com.google.fhir.r4.core.ParticipationStatusCode
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object AppointmentConverter {
+  @JvmStatic
   public fun Appointment.toHapi(): org.hl7.fhir.r4.model.Appointment {
     val hapiValue = org.hl7.fhir.r4.model.Appointment()
     hapiValue.id = id.value
@@ -88,6 +90,7 @@ public object AppointmentConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Appointment.toProto(): Appointment {
     val protoValue =
       Appointment.newBuilder()
@@ -129,6 +132,7 @@ public object AppointmentConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Appointment.AppointmentParticipantComponent.toProto():
     Appointment.Participant {
     val protoValue =
@@ -159,6 +163,7 @@ public object AppointmentConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun Appointment.Participant.toHapi():
     org.hl7.fhir.r4.model.Appointment.AppointmentParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.Appointment.AppointmentParticipantComponent()

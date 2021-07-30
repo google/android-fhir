@@ -55,11 +55,13 @@ import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 public object AllergyIntoleranceConverter {
+  @JvmStatic
   private fun AllergyIntolerance.OnsetX.allergyIntoleranceOnsetToHapi(): Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
       return (this.getDateTime()).toHapi()
@@ -79,6 +81,7 @@ public object AllergyIntoleranceConverter {
     throw IllegalArgumentException("Invalid Type for AllergyIntolerance.onset[x]")
   }
 
+  @JvmStatic
   private fun Type.allergyIntoleranceOnsetToProto(): AllergyIntolerance.OnsetX {
     val protoValue = AllergyIntolerance.OnsetX.newBuilder()
     if (this is DateTimeType) {
@@ -99,6 +102,7 @@ public object AllergyIntoleranceConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun AllergyIntolerance.toHapi(): org.hl7.fhir.r4.model.AllergyIntolerance {
     val hapiValue = org.hl7.fhir.r4.model.AllergyIntolerance()
     hapiValue.id = id.value
@@ -140,6 +144,7 @@ public object AllergyIntoleranceConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.AllergyIntolerance.toProto(): AllergyIntolerance {
     val protoValue =
       AllergyIntolerance.newBuilder()
@@ -195,6 +200,7 @@ public object AllergyIntoleranceConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceReactionComponent.toProto():
     AllergyIntolerance.Reaction {
     val protoValue =
@@ -221,6 +227,7 @@ public object AllergyIntoleranceConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun AllergyIntolerance.Reaction.toHapi():
     org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceReactionComponent {
     val hapiValue = org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceReactionComponent()

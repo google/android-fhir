@@ -37,8 +37,10 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.SubstanceProtein
+import kotlin.jvm.JvmStatic
 
 public object SubstanceProteinConverter {
+  @JvmStatic
   public fun SubstanceProtein.toHapi(): org.hl7.fhir.r4.model.SubstanceProtein {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceProtein()
     hapiValue.id = id.value
@@ -54,6 +56,7 @@ public object SubstanceProteinConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.SubstanceProtein.toProto(): SubstanceProtein {
     val protoValue =
       SubstanceProtein.newBuilder()
@@ -71,6 +74,7 @@ public object SubstanceProteinConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceProtein.SubstanceProteinSubunitComponent.toProto():
     SubstanceProtein.Subunit {
     val protoValue =
@@ -90,6 +94,7 @@ public object SubstanceProteinConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun SubstanceProtein.Subunit.toHapi():
     org.hl7.fhir.r4.model.SubstanceProtein.SubstanceProteinSubunitComponent {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceProtein.SubstanceProteinSubunitComponent()

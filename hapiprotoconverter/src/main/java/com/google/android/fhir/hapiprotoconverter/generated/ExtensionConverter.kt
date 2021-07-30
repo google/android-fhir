@@ -165,6 +165,7 @@ import com.google.fhir.r4.core.Url
 import com.google.fhir.r4.core.UsageContext
 import com.google.fhir.r4.core.Uuid
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Base64BinaryType
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CanonicalType
@@ -187,6 +188,7 @@ import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.model.UuidType
 
 public object ExtensionConverter {
+  @JvmStatic
   private fun Extension.ValueX.extensionValueToHapi(): Type {
     if (this.getBase64Binary() != Base64Binary.newBuilder().defaultInstanceForType) {
       return (this.getBase64Binary()).toHapi()
@@ -338,6 +340,7 @@ public object ExtensionConverter {
     throw IllegalArgumentException("Invalid Type for Extension.value[x]")
   }
 
+  @JvmStatic
   private fun Type.extensionValueToProto(): Extension.ValueX {
     val protoValue = Extension.ValueX.newBuilder()
     if (this is Base64BinaryType) {
@@ -490,6 +493,7 @@ public object ExtensionConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun Extension.toHapi(): org.hl7.fhir.r4.model.Extension {
     val hapiValue = org.hl7.fhir.r4.model.Extension()
     hapiValue.id = id.value
@@ -498,6 +502,7 @@ public object ExtensionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Extension.toProto(): Extension {
     val protoValue =
       Extension.newBuilder()

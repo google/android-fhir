@@ -55,11 +55,13 @@ import com.google.fhir.r4.core.Specimen.Processing
 import com.google.fhir.r4.core.SpecimenStatusCode
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.SimpleQuantity
 import org.hl7.fhir.r4.model.Type
 
 public object SpecimenConverter {
+  @JvmStatic
   private fun Specimen.Collection.CollectedX.specimenCollectionCollectedToHapi(): Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
       return (this.getDateTime()).toHapi()
@@ -70,6 +72,7 @@ public object SpecimenConverter {
     throw IllegalArgumentException("Invalid Type for Specimen.collection.collected[x]")
   }
 
+  @JvmStatic
   private fun Type.specimenCollectionCollectedToProto(): Specimen.Collection.CollectedX {
     val protoValue = Specimen.Collection.CollectedX.newBuilder()
     if (this is DateTimeType) {
@@ -81,6 +84,7 @@ public object SpecimenConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Specimen.Collection.FastingStatusX.specimenCollectionFastingStatusToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
@@ -91,6 +95,7 @@ public object SpecimenConverter {
     throw IllegalArgumentException("Invalid Type for Specimen.collection.fastingStatus[x]")
   }
 
+  @JvmStatic
   private fun Type.specimenCollectionFastingStatusToProto(): Specimen.Collection.FastingStatusX {
     val protoValue = Specimen.Collection.FastingStatusX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -102,6 +107,7 @@ public object SpecimenConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Specimen.Processing.TimeX.specimenProcessingTimeToHapi(): Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
       return (this.getDateTime()).toHapi()
@@ -112,6 +118,7 @@ public object SpecimenConverter {
     throw IllegalArgumentException("Invalid Type for Specimen.processing.time[x]")
   }
 
+  @JvmStatic
   private fun Type.specimenProcessingTimeToProto(): Specimen.Processing.TimeX {
     val protoValue = Specimen.Processing.TimeX.newBuilder()
     if (this is DateTimeType) {
@@ -123,6 +130,7 @@ public object SpecimenConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Specimen.Container.AdditiveX.specimenContainerAdditiveToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
@@ -133,6 +141,7 @@ public object SpecimenConverter {
     throw IllegalArgumentException("Invalid Type for Specimen.container.additive[x]")
   }
 
+  @JvmStatic
   private fun Type.specimenContainerAdditiveToProto(): Specimen.Container.AdditiveX {
     val protoValue = Specimen.Container.AdditiveX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -144,6 +153,7 @@ public object SpecimenConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun Specimen.toHapi(): org.hl7.fhir.r4.model.Specimen {
     val hapiValue = org.hl7.fhir.r4.model.Specimen()
     hapiValue.id = id.value
@@ -170,6 +180,7 @@ public object SpecimenConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Specimen.toProto(): Specimen {
     val protoValue =
       Specimen.newBuilder()
@@ -202,6 +213,7 @@ public object SpecimenConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Specimen.SpecimenCollectionComponent.toProto():
     Specimen.Collection {
     val protoValue =
@@ -220,6 +232,7 @@ public object SpecimenConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Specimen.SpecimenProcessingComponent.toProto():
     Specimen.Processing {
     val protoValue =
@@ -235,6 +248,7 @@ public object SpecimenConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Specimen.SpecimenContainerComponent.toProto():
     Specimen.Container {
     val protoValue =
@@ -252,6 +266,7 @@ public object SpecimenConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun Specimen.Collection.toHapi():
     org.hl7.fhir.r4.model.Specimen.SpecimenCollectionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Specimen.SpecimenCollectionComponent()
@@ -268,6 +283,7 @@ public object SpecimenConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Specimen.Processing.toHapi():
     org.hl7.fhir.r4.model.Specimen.SpecimenProcessingComponent {
     val hapiValue = org.hl7.fhir.r4.model.Specimen.SpecimenProcessingComponent()
@@ -281,6 +297,7 @@ public object SpecimenConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Specimen.Container.toHapi():
     org.hl7.fhir.r4.model.Specimen.SpecimenContainerComponent {
     val hapiValue = org.hl7.fhir.r4.model.Specimen.SpecimenContainerComponent()

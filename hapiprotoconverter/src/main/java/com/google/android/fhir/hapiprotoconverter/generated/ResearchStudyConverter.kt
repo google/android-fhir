@@ -46,8 +46,10 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.ResearchStudy
 import com.google.fhir.r4.core.ResearchStudyStatusCode
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object ResearchStudyConverter {
+  @JvmStatic
   public fun ResearchStudy.toHapi(): org.hl7.fhir.r4.model.ResearchStudy {
     val hapiValue = org.hl7.fhir.r4.model.ResearchStudy()
     hapiValue.id = id.value
@@ -87,6 +89,7 @@ public object ResearchStudyConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.ResearchStudy.toProto(): ResearchStudy {
     val protoValue =
       ResearchStudy.newBuilder()
@@ -130,6 +133,7 @@ public object ResearchStudyConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyArmComponent.toProto():
     ResearchStudy.Arm {
     val protoValue =
@@ -144,6 +148,7 @@ public object ResearchStudyConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyObjectiveComponent.toProto():
     ResearchStudy.Objective {
     val protoValue =
@@ -157,6 +162,7 @@ public object ResearchStudyConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun ResearchStudy.Arm.toHapi():
     org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyArmComponent {
     val hapiValue = org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyArmComponent()
@@ -169,6 +175,7 @@ public object ResearchStudyConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ResearchStudy.Objective.toHapi():
     org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyObjectiveComponent {
     val hapiValue = org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyObjectiveComponent()

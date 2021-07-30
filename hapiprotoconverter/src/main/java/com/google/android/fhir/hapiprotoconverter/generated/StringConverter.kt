@@ -17,10 +17,12 @@
 package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.StringType
 
 public object StringConverter {
   /** returns the proto String equivalent of the hapi StringType */
+  @JvmStatic
   public fun StringType.toProto(): String {
     val protoValue = String.newBuilder()
     if (value != null) protoValue.setValue(value)
@@ -28,6 +30,7 @@ public object StringConverter {
   }
 
   /** returns the hapi StringType equivalent of the proto String */
+  @JvmStatic
   public fun String.toHapi(): StringType {
     val hapiValue = StringType()
     hapiValue.value = value

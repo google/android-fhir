@@ -55,9 +55,11 @@ import com.google.fhir.r4.core.InsurancePlan.Plan.SpecificCost
 import com.google.fhir.r4.core.InsurancePlan.Plan.SpecificCost.PlanBenefit
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 public object InsurancePlanConverter {
+  @JvmStatic
   public fun InsurancePlan.toHapi(): org.hl7.fhir.r4.model.InsurancePlan {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan()
     hapiValue.id = id.value
@@ -83,6 +85,7 @@ public object InsurancePlanConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.InsurancePlan.toProto(): InsurancePlan {
     val protoValue =
       InsurancePlan.newBuilder()
@@ -116,6 +119,7 @@ public object InsurancePlanConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanContactComponent.toProto():
     InsurancePlan.Contact {
     val protoValue =
@@ -131,6 +135,7 @@ public object InsurancePlanConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanCoverageComponent.toProto():
     InsurancePlan.Coverage {
     val protoValue =
@@ -145,6 +150,7 @@ public object InsurancePlanConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.InsurancePlan.CoverageBenefitComponent.toProto():
     InsurancePlan.Coverage.CoverageBenefit {
     val protoValue =
@@ -159,6 +165,7 @@ public object InsurancePlanConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.InsurancePlan.CoverageBenefitLimitComponent.toProto():
     InsurancePlan.Coverage.CoverageBenefit.Limit {
     val protoValue =
@@ -172,6 +179,7 @@ public object InsurancePlanConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanComponent.toProto():
     InsurancePlan.Plan {
     val protoValue =
@@ -189,6 +197,7 @@ public object InsurancePlanConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanGeneralCostComponent.toProto():
     InsurancePlan.Plan.GeneralCost {
     val protoValue =
@@ -204,6 +213,7 @@ public object InsurancePlanConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanSpecificCostComponent.toProto():
     InsurancePlan.Plan.SpecificCost {
     val protoValue =
@@ -217,6 +227,7 @@ public object InsurancePlanConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.InsurancePlan.PlanBenefitComponent.toProto():
     InsurancePlan.Plan.SpecificCost.PlanBenefit {
     val protoValue =
@@ -230,6 +241,7 @@ public object InsurancePlanConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.InsurancePlan.PlanBenefitCostComponent.toProto():
     InsurancePlan.Plan.SpecificCost.PlanBenefit.Cost {
     val protoValue =
@@ -245,6 +257,7 @@ public object InsurancePlanConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun InsurancePlan.Contact.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanContactComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanContactComponent()
@@ -258,6 +271,7 @@ public object InsurancePlanConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun InsurancePlan.Coverage.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanCoverageComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanCoverageComponent()
@@ -270,6 +284,7 @@ public object InsurancePlanConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun InsurancePlan.Coverage.CoverageBenefit.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.CoverageBenefitComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.CoverageBenefitComponent()
@@ -282,6 +297,7 @@ public object InsurancePlanConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun InsurancePlan.Coverage.CoverageBenefit.Limit.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.CoverageBenefitLimitComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.CoverageBenefitLimitComponent()
@@ -293,6 +309,7 @@ public object InsurancePlanConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun InsurancePlan.Plan.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanComponent()
@@ -308,6 +325,7 @@ public object InsurancePlanConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun InsurancePlan.Plan.GeneralCost.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanGeneralCostComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanGeneralCostComponent()
@@ -321,6 +339,7 @@ public object InsurancePlanConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun InsurancePlan.Plan.SpecificCost.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanSpecificCostComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.InsurancePlanPlanSpecificCostComponent()
@@ -332,6 +351,7 @@ public object InsurancePlanConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun InsurancePlan.Plan.SpecificCost.PlanBenefit.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.PlanBenefitComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.PlanBenefitComponent()
@@ -343,6 +363,7 @@ public object InsurancePlanConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun InsurancePlan.Plan.SpecificCost.PlanBenefit.Cost.toHapi():
     org.hl7.fhir.r4.model.InsurancePlan.PlanBenefitCostComponent {
     val hapiValue = org.hl7.fhir.r4.model.InsurancePlan.PlanBenefitCostComponent()

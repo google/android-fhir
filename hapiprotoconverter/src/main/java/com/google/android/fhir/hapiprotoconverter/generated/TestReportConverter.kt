@@ -50,8 +50,10 @@ import com.google.fhir.r4.core.TestReportActionResultCode
 import com.google.fhir.r4.core.TestReportParticipantTypeCode
 import com.google.fhir.r4.core.TestReportResultCode
 import com.google.fhir.r4.core.TestReportStatusCode
+import kotlin.jvm.JvmStatic
 
 public object TestReportConverter {
+  @JvmStatic
   public fun TestReport.toHapi(): org.hl7.fhir.r4.model.TestReport {
     val hapiValue = org.hl7.fhir.r4.model.TestReport()
     hapiValue.id = id.value
@@ -79,6 +81,7 @@ public object TestReportConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.TestReport.toProto(): TestReport {
     val protoValue =
       TestReport.newBuilder()
@@ -116,6 +119,7 @@ public object TestReportConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.TestReportParticipantComponent.toProto():
     TestReport.Participant {
     val protoValue =
@@ -138,6 +142,7 @@ public object TestReportConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.TestReportSetupComponent.toProto():
     TestReport.Setup {
     val protoValue =
@@ -150,6 +155,7 @@ public object TestReportConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.SetupActionComponent.toProto():
     TestReport.Setup.SetupAction {
     val protoValue =
@@ -163,6 +169,7 @@ public object TestReportConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.SetupActionOperationComponent.toProto():
     TestReport.Setup.SetupAction.Operation {
     val protoValue =
@@ -185,6 +192,7 @@ public object TestReportConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.SetupActionAssertComponent.toProto():
     TestReport.Setup.SetupAction.Assert {
     val protoValue =
@@ -207,6 +215,7 @@ public object TestReportConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.TestReportTestComponent.toProto(): TestReport.Test {
     val protoValue =
       TestReport.Test.newBuilder()
@@ -220,6 +229,7 @@ public object TestReportConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.TestActionComponent.toProto():
     TestReport.Test.TestAction {
     val protoValue =
@@ -231,6 +241,7 @@ public object TestReportConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.TestReportTeardownComponent.toProto():
     TestReport.Teardown {
     val protoValue =
@@ -243,6 +254,7 @@ public object TestReportConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.TeardownActionComponent.toProto():
     TestReport.Teardown.TeardownAction {
     val protoValue =
@@ -254,6 +266,7 @@ public object TestReportConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun TestReport.Participant.toHapi():
     org.hl7.fhir.r4.model.TestReport.TestReportParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TestReportParticipantComponent()
@@ -270,6 +283,7 @@ public object TestReportConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun TestReport.Setup.toHapi(): org.hl7.fhir.r4.model.TestReport.TestReportSetupComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TestReportSetupComponent()
     hapiValue.id = id.value
@@ -279,6 +293,7 @@ public object TestReportConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun TestReport.Setup.SetupAction.toHapi():
     org.hl7.fhir.r4.model.TestReport.SetupActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.SetupActionComponent()
@@ -290,6 +305,7 @@ public object TestReportConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun TestReport.Setup.SetupAction.Operation.toHapi():
     org.hl7.fhir.r4.model.TestReport.SetupActionOperationComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.SetupActionOperationComponent()
@@ -306,6 +322,7 @@ public object TestReportConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun TestReport.Setup.SetupAction.Assert.toHapi():
     org.hl7.fhir.r4.model.TestReport.SetupActionAssertComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.SetupActionAssertComponent()
@@ -322,6 +339,7 @@ public object TestReportConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun TestReport.Test.toHapi(): org.hl7.fhir.r4.model.TestReport.TestReportTestComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TestReportTestComponent()
     hapiValue.id = id.value
@@ -333,6 +351,7 @@ public object TestReportConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun TestReport.Test.TestAction.toHapi():
     org.hl7.fhir.r4.model.TestReport.TestActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TestActionComponent()
@@ -342,6 +361,7 @@ public object TestReportConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun TestReport.Teardown.toHapi():
     org.hl7.fhir.r4.model.TestReport.TestReportTeardownComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TestReportTeardownComponent()
@@ -352,6 +372,7 @@ public object TestReportConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun TestReport.Teardown.TeardownAction.toHapi():
     org.hl7.fhir.r4.model.TestReport.TeardownActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TeardownActionComponent()

@@ -39,9 +39,11 @@ import com.google.fhir.r4.core.MedicinalProductIndication.OtherTherapy
 import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
 public object MedicinalProductIndicationConverter {
+  @JvmStatic
   private fun MedicinalProductIndication.OtherTherapy.MedicationX.medicinalProductIndicationOtherTherapyMedicationToHapi():
     Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
@@ -55,6 +57,7 @@ public object MedicinalProductIndicationConverter {
     )
   }
 
+  @JvmStatic
   private fun Type.medicinalProductIndicationOtherTherapyMedicationToProto():
     MedicinalProductIndication.OtherTherapy.MedicationX {
     val protoValue = MedicinalProductIndication.OtherTherapy.MedicationX.newBuilder()
@@ -67,6 +70,7 @@ public object MedicinalProductIndicationConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun MedicinalProductIndication.toHapi(): org.hl7.fhir.r4.model.MedicinalProductIndication {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductIndication()
     hapiValue.id = id.value
@@ -87,6 +91,7 @@ public object MedicinalProductIndicationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.MedicinalProductIndication.toProto():
     MedicinalProductIndication {
     val protoValue =
@@ -110,6 +115,7 @@ public object MedicinalProductIndicationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductIndication.MedicinalProductIndicationOtherTherapyComponent.toProto():
     MedicinalProductIndication.OtherTherapy {
     val protoValue =
@@ -123,6 +129,7 @@ public object MedicinalProductIndicationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun MedicinalProductIndication.OtherTherapy.toHapi():
     org.hl7.fhir.r4.model.MedicinalProductIndication.MedicinalProductIndicationOtherTherapyComponent {
     val hapiValue =

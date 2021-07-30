@@ -55,9 +55,11 @@ import com.google.fhir.r4.core.RequestStatusCode
 import com.google.fhir.r4.core.SimpleQuantity
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Type
 
 public object NutritionOrderConverter {
+  @JvmStatic
   private fun NutritionOrder.EnteralFormula.Administration.RateX.nutritionOrderEnteralFormulaAdministrationRateToHapi():
     Type {
     if (this.getQuantity() != SimpleQuantity.newBuilder().defaultInstanceForType) {
@@ -71,6 +73,7 @@ public object NutritionOrderConverter {
     )
   }
 
+  @JvmStatic
   private fun Type.nutritionOrderEnteralFormulaAdministrationRateToProto():
     NutritionOrder.EnteralFormula.Administration.RateX {
     val protoValue = NutritionOrder.EnteralFormula.Administration.RateX.newBuilder()
@@ -83,6 +86,7 @@ public object NutritionOrderConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun NutritionOrder.toHapi(): org.hl7.fhir.r4.model.NutritionOrder {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder()
     hapiValue.id = id.value
@@ -119,6 +123,7 @@ public object NutritionOrderConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.NutritionOrder.toProto(): NutritionOrder {
     val protoValue =
       NutritionOrder.newBuilder()
@@ -161,6 +166,7 @@ public object NutritionOrderConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietComponent.toProto():
     NutritionOrder.OralDiet {
     val protoValue =
@@ -178,6 +184,7 @@ public object NutritionOrderConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietNutrientComponent.toProto():
     NutritionOrder.OralDiet.Nutrient {
     val protoValue =
@@ -191,6 +198,7 @@ public object NutritionOrderConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietTextureComponent.toProto():
     NutritionOrder.OralDiet.Texture {
     val protoValue =
@@ -204,6 +212,7 @@ public object NutritionOrderConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderSupplementComponent.toProto():
     NutritionOrder.Supplement {
     val protoValue =
@@ -220,6 +229,7 @@ public object NutritionOrderConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderEnteralFormulaComponent.toProto():
     NutritionOrder.EnteralFormula {
     val protoValue =
@@ -242,6 +252,7 @@ public object NutritionOrderConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderEnteralFormulaAdministrationComponent.toProto():
     NutritionOrder.EnteralFormula.Administration {
     val protoValue =
@@ -256,6 +267,7 @@ public object NutritionOrderConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun NutritionOrder.OralDiet.toHapi():
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietComponent {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietComponent()
@@ -271,6 +283,7 @@ public object NutritionOrderConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun NutritionOrder.OralDiet.Nutrient.toHapi():
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietNutrientComponent {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietNutrientComponent()
@@ -282,6 +295,7 @@ public object NutritionOrderConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun NutritionOrder.OralDiet.Texture.toHapi():
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietTextureComponent {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietTextureComponent()
@@ -293,6 +307,7 @@ public object NutritionOrderConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun NutritionOrder.Supplement.toHapi():
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderSupplementComponent {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderSupplementComponent()
@@ -307,6 +322,7 @@ public object NutritionOrderConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun NutritionOrder.EnteralFormula.toHapi():
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderEnteralFormulaComponent {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderEnteralFormulaComponent()
@@ -325,6 +341,7 @@ public object NutritionOrderConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun NutritionOrder.EnteralFormula.Administration.toHapi():
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderEnteralFormulaAdministrationComponent {
     val hapiValue =

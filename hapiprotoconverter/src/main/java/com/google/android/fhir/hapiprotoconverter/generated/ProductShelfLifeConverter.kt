@@ -26,8 +26,10 @@ import com.google.android.fhir.hapiprotoconverter.generated.QuantityConverter.to
 import com.google.android.fhir.hapiprotoconverter.generated.QuantityConverter.toProto
 import com.google.fhir.r4.core.ProductShelfLife
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object ProductShelfLifeConverter {
+  @JvmStatic
   public fun ProductShelfLife.toHapi(): org.hl7.fhir.r4.model.ProductShelfLife {
     val hapiValue = org.hl7.fhir.r4.model.ProductShelfLife()
     hapiValue.id = id.value
@@ -40,6 +42,7 @@ public object ProductShelfLifeConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.ProductShelfLife.toProto(): ProductShelfLife {
     val protoValue =
       ProductShelfLife.newBuilder()

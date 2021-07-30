@@ -42,8 +42,10 @@ import com.google.fhir.r4.core.CareTeam
 import com.google.fhir.r4.core.CareTeamStatusCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object CareTeamConverter {
+  @JvmStatic
   public fun CareTeam.toHapi(): org.hl7.fhir.r4.model.CareTeam {
     val hapiValue = org.hl7.fhir.r4.model.CareTeam()
     hapiValue.id = id.value
@@ -70,6 +72,7 @@ public object CareTeamConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.CareTeam.toProto(): CareTeam {
     val protoValue =
       CareTeam.newBuilder()
@@ -102,6 +105,7 @@ public object CareTeamConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.CareTeam.CareTeamParticipantComponent.toProto():
     CareTeam.Participant {
     val protoValue =
@@ -117,6 +121,7 @@ public object CareTeamConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun CareTeam.Participant.toHapi():
     org.hl7.fhir.r4.model.CareTeam.CareTeamParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.CareTeam.CareTeamParticipantComponent()

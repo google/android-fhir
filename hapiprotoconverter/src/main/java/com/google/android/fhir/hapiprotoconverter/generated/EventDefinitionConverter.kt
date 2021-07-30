@@ -56,10 +56,12 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.Reference
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Type
 
 public object EventDefinitionConverter {
+  @JvmStatic
   private fun EventDefinition.SubjectX.eventDefinitionSubjectToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
@@ -70,6 +72,7 @@ public object EventDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for EventDefinition.subject[x]")
   }
 
+  @JvmStatic
   private fun Type.eventDefinitionSubjectToProto(): EventDefinition.SubjectX {
     val protoValue = EventDefinition.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -81,6 +84,7 @@ public object EventDefinitionConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun EventDefinition.toHapi(): org.hl7.fhir.r4.model.EventDefinition {
     val hapiValue = org.hl7.fhir.r4.model.EventDefinition()
     hapiValue.id = id.value
@@ -120,6 +124,7 @@ public object EventDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.EventDefinition.toProto(): EventDefinition {
     val protoValue =
       EventDefinition.newBuilder()

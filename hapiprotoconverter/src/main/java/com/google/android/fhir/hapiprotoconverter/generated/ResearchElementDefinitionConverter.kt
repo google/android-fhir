@@ -76,12 +76,14 @@ import com.google.fhir.r4.core.ResearchElementTypeCode
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Timing
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Type
 
 public object ResearchElementDefinitionConverter {
+  @JvmStatic
   private fun ResearchElementDefinition.SubjectX.researchElementDefinitionSubjectToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
@@ -92,6 +94,7 @@ public object ResearchElementDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for ResearchElementDefinition.subject[x]")
   }
 
+  @JvmStatic
   private fun Type.researchElementDefinitionSubjectToProto(): ResearchElementDefinition.SubjectX {
     val protoValue = ResearchElementDefinition.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -103,6 +106,7 @@ public object ResearchElementDefinitionConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun ResearchElementDefinition.Characteristic.DefinitionX.researchElementDefinitionCharacteristicDefinitionToHapi():
     Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
@@ -122,6 +126,7 @@ public object ResearchElementDefinitionConverter {
     )
   }
 
+  @JvmStatic
   private fun Type.researchElementDefinitionCharacteristicDefinitionToProto():
     ResearchElementDefinition.Characteristic.DefinitionX {
     val protoValue = ResearchElementDefinition.Characteristic.DefinitionX.newBuilder()
@@ -140,6 +145,7 @@ public object ResearchElementDefinitionConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun ResearchElementDefinition.Characteristic.StudyEffectiveX.researchElementDefinitionCharacteristicStudyEffectiveToHapi():
     Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
@@ -159,6 +165,7 @@ public object ResearchElementDefinitionConverter {
     )
   }
 
+  @JvmStatic
   private fun Type.researchElementDefinitionCharacteristicStudyEffectiveToProto():
     ResearchElementDefinition.Characteristic.StudyEffectiveX {
     val protoValue = ResearchElementDefinition.Characteristic.StudyEffectiveX.newBuilder()
@@ -177,6 +184,7 @@ public object ResearchElementDefinitionConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun ResearchElementDefinition.Characteristic.ParticipantEffectiveX.researchElementDefinitionCharacteristicParticipantEffectiveToHapi():
     Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
@@ -196,6 +204,7 @@ public object ResearchElementDefinitionConverter {
     )
   }
 
+  @JvmStatic
   private fun Type.researchElementDefinitionCharacteristicParticipantEffectiveToProto():
     ResearchElementDefinition.Characteristic.ParticipantEffectiveX {
     val protoValue = ResearchElementDefinition.Characteristic.ParticipantEffectiveX.newBuilder()
@@ -214,6 +223,7 @@ public object ResearchElementDefinitionConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun ResearchElementDefinition.toHapi(): org.hl7.fhir.r4.model.ResearchElementDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ResearchElementDefinition()
     hapiValue.id = id.value
@@ -266,6 +276,7 @@ public object ResearchElementDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.ResearchElementDefinition.toProto(): ResearchElementDefinition {
     val protoValue =
       ResearchElementDefinition.newBuilder()
@@ -332,6 +343,7 @@ public object ResearchElementDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ResearchElementDefinition.ResearchElementDefinitionCharacteristicComponent.toProto():
     ResearchElementDefinition.Characteristic {
     val protoValue =
@@ -375,6 +387,7 @@ public object ResearchElementDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun ResearchElementDefinition.Characteristic.toHapi():
     org.hl7.fhir.r4.model.ResearchElementDefinition.ResearchElementDefinitionCharacteristicComponent {
     val hapiValue =

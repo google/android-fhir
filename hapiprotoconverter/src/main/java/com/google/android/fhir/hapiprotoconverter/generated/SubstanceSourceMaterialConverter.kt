@@ -34,8 +34,10 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.SubstanceSourceMaterial
 import com.google.fhir.r4.core.SubstanceSourceMaterial.Organism
+import kotlin.jvm.JvmStatic
 
 public object SubstanceSourceMaterialConverter {
+  @JvmStatic
   public fun SubstanceSourceMaterial.toHapi(): org.hl7.fhir.r4.model.SubstanceSourceMaterial {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceSourceMaterial()
     hapiValue.id = id.value
@@ -60,6 +62,7 @@ public object SubstanceSourceMaterialConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.toProto(): SubstanceSourceMaterial {
     val protoValue =
       SubstanceSourceMaterial.newBuilder()
@@ -86,6 +89,7 @@ public object SubstanceSourceMaterialConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialFractionDescriptionComponent.toProto():
     SubstanceSourceMaterial.FractionDescription {
     val protoValue =
@@ -99,6 +103,7 @@ public object SubstanceSourceMaterialConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismComponent.toProto():
     SubstanceSourceMaterial.Organism {
     val protoValue =
@@ -118,6 +123,7 @@ public object SubstanceSourceMaterialConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismAuthorComponent.toProto():
     SubstanceSourceMaterial.Organism.Author {
     val protoValue =
@@ -131,6 +137,7 @@ public object SubstanceSourceMaterialConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismHybridComponent.toProto():
     SubstanceSourceMaterial.Organism.Hybrid {
     val protoValue =
@@ -147,6 +154,7 @@ public object SubstanceSourceMaterialConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismOrganismGeneralComponent.toProto():
     SubstanceSourceMaterial.Organism.OrganismGeneral {
     val protoValue =
@@ -162,6 +170,7 @@ public object SubstanceSourceMaterialConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialPartDescriptionComponent.toProto():
     SubstanceSourceMaterial.PartDescription {
     val protoValue =
@@ -175,6 +184,7 @@ public object SubstanceSourceMaterialConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun SubstanceSourceMaterial.FractionDescription.toHapi():
     org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialFractionDescriptionComponent {
     val hapiValue =
@@ -188,6 +198,7 @@ public object SubstanceSourceMaterialConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceSourceMaterial.Organism.toHapi():
     org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismComponent {
     val hapiValue =
@@ -206,6 +217,7 @@ public object SubstanceSourceMaterialConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceSourceMaterial.Organism.Author.toHapi():
     org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismAuthorComponent {
     val hapiValue =
@@ -218,6 +230,7 @@ public object SubstanceSourceMaterialConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceSourceMaterial.Organism.Hybrid.toHapi():
     org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismHybridComponent {
     val hapiValue =
@@ -233,6 +246,7 @@ public object SubstanceSourceMaterialConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceSourceMaterial.Organism.OrganismGeneral.toHapi():
     org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismOrganismGeneralComponent {
     val hapiValue =
@@ -248,6 +262,7 @@ public object SubstanceSourceMaterialConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun SubstanceSourceMaterial.PartDescription.toHapi():
     org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialPartDescriptionComponent {
     val hapiValue =

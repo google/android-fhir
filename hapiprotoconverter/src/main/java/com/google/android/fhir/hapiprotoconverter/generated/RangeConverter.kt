@@ -22,9 +22,11 @@ import com.google.android.fhir.hapiprotoconverter.generated.SimpleQuantityConver
 import com.google.android.fhir.hapiprotoconverter.generated.SimpleQuantityConverter.toProto
 import com.google.fhir.r4.core.Range
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.SimpleQuantity
 
 public object RangeConverter {
+  @JvmStatic
   public fun Range.toHapi(): org.hl7.fhir.r4.model.Range {
     val hapiValue = org.hl7.fhir.r4.model.Range()
     hapiValue.id = id.value
@@ -34,6 +36,7 @@ public object RangeConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Range.toProto(): Range {
     val protoValue =
       Range.newBuilder()

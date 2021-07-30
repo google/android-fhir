@@ -43,10 +43,12 @@ import com.google.fhir.r4.core.Ratio
 import com.google.fhir.r4.core.SimpleQuantity
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Type
 
 public object DosageConverter {
+  @JvmStatic
   private fun Dosage.AsNeededX.dosageAsNeededToHapi(): Type {
     if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
       return (this.getBoolean()).toHapi()
@@ -57,6 +59,7 @@ public object DosageConverter {
     throw IllegalArgumentException("Invalid Type for Dosage.asNeeded[x]")
   }
 
+  @JvmStatic
   private fun Type.dosageAsNeededToProto(): Dosage.AsNeededX {
     val protoValue = Dosage.AsNeededX.newBuilder()
     if (this is BooleanType) {
@@ -68,6 +71,7 @@ public object DosageConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Dosage.DoseAndRate.DoseX.dosageDoseAndRateDoseToHapi(): Type {
     if (this.getRange() != Range.newBuilder().defaultInstanceForType) {
       return (this.getRange()).toHapi()
@@ -78,6 +82,7 @@ public object DosageConverter {
     throw IllegalArgumentException("Invalid Type for Dosage.doseAndRate.dose[x]")
   }
 
+  @JvmStatic
   private fun Type.dosageDoseAndRateDoseToProto(): Dosage.DoseAndRate.DoseX {
     val protoValue = Dosage.DoseAndRate.DoseX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Range) {
@@ -89,6 +94,7 @@ public object DosageConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Dosage.DoseAndRate.RateX.dosageDoseAndRateRateToHapi(): Type {
     if (this.getRatio() != Ratio.newBuilder().defaultInstanceForType) {
       return (this.getRatio()).toHapi()
@@ -102,6 +108,7 @@ public object DosageConverter {
     throw IllegalArgumentException("Invalid Type for Dosage.doseAndRate.rate[x]")
   }
 
+  @JvmStatic
   private fun Type.dosageDoseAndRateRateToProto(): Dosage.DoseAndRate.RateX {
     val protoValue = Dosage.DoseAndRate.RateX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Ratio) {
@@ -116,6 +123,7 @@ public object DosageConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun Dosage.toHapi(): org.hl7.fhir.r4.model.Dosage {
     val hapiValue = org.hl7.fhir.r4.model.Dosage()
     hapiValue.id = id.value
@@ -137,6 +145,7 @@ public object DosageConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Dosage.toProto(): Dosage {
     val protoValue =
       Dosage.newBuilder()
@@ -164,6 +173,7 @@ public object DosageConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent.toProto():
     Dosage.DoseAndRate {
     val protoValue =
@@ -177,6 +187,7 @@ public object DosageConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun Dosage.DoseAndRate.toHapi(): org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent {
     val hapiValue = org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent()
     hapiValue.id = id.value

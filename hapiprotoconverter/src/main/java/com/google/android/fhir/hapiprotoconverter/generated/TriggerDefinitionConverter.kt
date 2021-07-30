@@ -40,11 +40,13 @@ import com.google.fhir.r4.core.Timing
 import com.google.fhir.r4.core.TriggerDefinition
 import com.google.fhir.r4.core.TriggerTypeCode
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Type
 
 public object TriggerDefinitionConverter {
+  @JvmStatic
   private fun TriggerDefinition.TimingX.triggerDefinitionTimingToHapi(): Type {
     if (this.getTiming() != Timing.newBuilder().defaultInstanceForType) {
       return (this.getTiming()).toHapi()
@@ -61,6 +63,7 @@ public object TriggerDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for TriggerDefinition.timing[x]")
   }
 
+  @JvmStatic
   private fun Type.triggerDefinitionTimingToProto(): TriggerDefinition.TimingX {
     val protoValue = TriggerDefinition.TimingX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Timing) {
@@ -78,6 +81,7 @@ public object TriggerDefinitionConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun TriggerDefinition.toHapi(): org.hl7.fhir.r4.model.TriggerDefinition {
     val hapiValue = org.hl7.fhir.r4.model.TriggerDefinition()
     hapiValue.id = id.value
@@ -92,6 +96,7 @@ public object TriggerDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.TriggerDefinition.toProto(): TriggerDefinition {
     val protoValue =
       TriggerDefinition.newBuilder()

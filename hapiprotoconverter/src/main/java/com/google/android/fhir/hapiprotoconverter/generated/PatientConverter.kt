@@ -59,6 +59,7 @@ import com.google.fhir.r4.core.Patient.Contact
 import com.google.fhir.r4.core.Patient.Link
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Enumerations
@@ -66,6 +67,7 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Type
 
 public object PatientConverter {
+  @JvmStatic
   private fun Patient.DeceasedX.patientDeceasedToHapi(): Type {
     if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
       return (this.getBoolean()).toHapi()
@@ -76,6 +78,7 @@ public object PatientConverter {
     throw IllegalArgumentException("Invalid Type for Patient.deceased[x]")
   }
 
+  @JvmStatic
   private fun Type.patientDeceasedToProto(): Patient.DeceasedX {
     val protoValue = Patient.DeceasedX.newBuilder()
     if (this is BooleanType) {
@@ -87,6 +90,7 @@ public object PatientConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun Patient.MultipleBirthX.patientMultipleBirthToHapi(): Type {
     if (this.getBoolean() != Boolean.newBuilder().defaultInstanceForType) {
       return (this.getBoolean()).toHapi()
@@ -97,6 +101,7 @@ public object PatientConverter {
     throw IllegalArgumentException("Invalid Type for Patient.multipleBirth[x]")
   }
 
+  @JvmStatic
   private fun Type.patientMultipleBirthToProto(): Patient.MultipleBirthX {
     val protoValue = Patient.MultipleBirthX.newBuilder()
     if (this is BooleanType) {
@@ -108,6 +113,7 @@ public object PatientConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun Patient.toHapi(): org.hl7.fhir.r4.model.Patient {
     val hapiValue = org.hl7.fhir.r4.model.Patient()
     hapiValue.id = id.value
@@ -137,6 +143,7 @@ public object PatientConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Patient.toProto(): Patient {
     val protoValue =
       Patient.newBuilder()
@@ -174,6 +181,7 @@ public object PatientConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Patient.ContactComponent.toProto(): Patient.Contact {
     val protoValue =
       Patient.Contact.newBuilder()
@@ -199,6 +207,7 @@ public object PatientConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Patient.PatientCommunicationComponent.toProto():
     Patient.Communication {
     val protoValue =
@@ -212,6 +221,7 @@ public object PatientConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Patient.PatientLinkComponent.toProto(): Patient.Link {
     val protoValue =
       Patient.Link.newBuilder()
@@ -228,6 +238,7 @@ public object PatientConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun Patient.Contact.toHapi(): org.hl7.fhir.r4.model.Patient.ContactComponent {
     val hapiValue = org.hl7.fhir.r4.model.Patient.ContactComponent()
     hapiValue.id = id.value
@@ -245,6 +256,7 @@ public object PatientConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Patient.Communication.toHapi():
     org.hl7.fhir.r4.model.Patient.PatientCommunicationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Patient.PatientCommunicationComponent()
@@ -256,6 +268,7 @@ public object PatientConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun Patient.Link.toHapi(): org.hl7.fhir.r4.model.Patient.PatientLinkComponent {
     val hapiValue = org.hl7.fhir.r4.model.Patient.PatientLinkComponent()
     hapiValue.id = id.value

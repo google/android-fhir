@@ -28,8 +28,10 @@ import com.google.fhir.r4.core.ContactPoint
 import com.google.fhir.r4.core.ContactPointSystemCode
 import com.google.fhir.r4.core.ContactPointUseCode
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object ContactPointConverter {
+  @JvmStatic
   public fun ContactPoint.toHapi(): org.hl7.fhir.r4.model.ContactPoint {
     val hapiValue = org.hl7.fhir.r4.model.ContactPoint()
     hapiValue.id = id.value
@@ -48,6 +50,7 @@ public object ContactPointConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.ContactPoint.toProto(): ContactPoint {
     val protoValue =
       ContactPoint.newBuilder()

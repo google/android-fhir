@@ -60,10 +60,12 @@ import com.google.fhir.r4.core.Library
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.Reference
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Type
 
 public object LibraryConverter {
+  @JvmStatic
   private fun Library.SubjectX.librarySubjectToHapi(): Type {
     if (this.getCodeableConcept() != CodeableConcept.newBuilder().defaultInstanceForType) {
       return (this.getCodeableConcept()).toHapi()
@@ -74,6 +76,7 @@ public object LibraryConverter {
     throw IllegalArgumentException("Invalid Type for Library.subject[x]")
   }
 
+  @JvmStatic
   private fun Type.librarySubjectToProto(): Library.SubjectX {
     val protoValue = Library.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
@@ -85,6 +88,7 @@ public object LibraryConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun Library.toHapi(): org.hl7.fhir.r4.model.Library {
     val hapiValue = org.hl7.fhir.r4.model.Library()
     hapiValue.id = id.value
@@ -127,6 +131,7 @@ public object LibraryConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Library.toProto(): Library {
     val protoValue =
       Library.newBuilder()

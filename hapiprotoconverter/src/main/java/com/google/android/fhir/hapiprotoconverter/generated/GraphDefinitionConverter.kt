@@ -52,9 +52,11 @@ import com.google.fhir.r4.core.GraphDefinition.Link.Target.Compartment
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 public object GraphDefinitionConverter {
+  @JvmStatic
   public fun GraphDefinition.toHapi(): org.hl7.fhir.r4.model.GraphDefinition {
     val hapiValue = org.hl7.fhir.r4.model.GraphDefinition()
     hapiValue.id = id.value
@@ -80,6 +82,7 @@ public object GraphDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.GraphDefinition.toProto(): GraphDefinition {
     val protoValue =
       GraphDefinition.newBuilder()
@@ -113,6 +116,7 @@ public object GraphDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkComponent.toProto():
     GraphDefinition.Link {
     val protoValue =
@@ -130,6 +134,7 @@ public object GraphDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkTargetComponent.toProto():
     GraphDefinition.Link.Target {
     val protoValue =
@@ -144,6 +149,7 @@ public object GraphDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkTargetCompartmentComponent.toProto():
     GraphDefinition.Link.Target.Compartment {
     val protoValue =
@@ -178,6 +184,7 @@ public object GraphDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun GraphDefinition.Link.toHapi():
     org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkComponent {
     val hapiValue = org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkComponent()
@@ -193,6 +200,7 @@ public object GraphDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun GraphDefinition.Link.Target.toHapi():
     org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkTargetComponent {
     val hapiValue = org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkTargetComponent()
@@ -205,6 +213,7 @@ public object GraphDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun GraphDefinition.Link.Target.Compartment.toHapi():
     org.hl7.fhir.r4.model.GraphDefinition.GraphDefinitionLinkTargetCompartmentComponent {
     val hapiValue =

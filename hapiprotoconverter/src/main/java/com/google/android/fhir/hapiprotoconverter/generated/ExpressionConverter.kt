@@ -26,8 +26,10 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.fhir.r4.core.Expression
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object ExpressionConverter {
+  @JvmStatic
   public fun Expression.toHapi(): org.hl7.fhir.r4.model.Expression {
     val hapiValue = org.hl7.fhir.r4.model.Expression()
     hapiValue.id = id.value
@@ -38,6 +40,7 @@ public object ExpressionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Expression.toProto(): Expression {
     val protoValue =
       Expression.newBuilder()

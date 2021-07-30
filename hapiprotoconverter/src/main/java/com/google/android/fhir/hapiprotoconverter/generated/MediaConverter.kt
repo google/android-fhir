@@ -52,10 +52,12 @@ import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.Media
 import com.google.fhir.r4.core.Period
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Type
 
 public object MediaConverter {
+  @JvmStatic
   private fun Media.CreatedX.mediaCreatedToHapi(): Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
       return (this.getDateTime()).toHapi()
@@ -66,6 +68,7 @@ public object MediaConverter {
     throw IllegalArgumentException("Invalid Type for Media.created[x]")
   }
 
+  @JvmStatic
   private fun Type.mediaCreatedToProto(): Media.CreatedX {
     val protoValue = Media.CreatedX.newBuilder()
     if (this is DateTimeType) {
@@ -77,6 +80,7 @@ public object MediaConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun Media.toHapi(): org.hl7.fhir.r4.model.Media {
     val hapiValue = org.hl7.fhir.r4.model.Media()
     hapiValue.id = id.value
@@ -112,6 +116,7 @@ public object MediaConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Media.toProto(): Media {
     val protoValue =
       Media.newBuilder()

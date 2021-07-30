@@ -53,11 +53,13 @@ import com.google.fhir.r4.core.RequestPriorityCode
 import com.google.fhir.r4.core.RequestStatusCode
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 public object CommunicationRequestConverter {
+  @JvmStatic
   private fun CommunicationRequest.Payload.ContentX.communicationRequestPayloadContentToHapi():
     Type {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
@@ -72,6 +74,7 @@ public object CommunicationRequestConverter {
     throw IllegalArgumentException("Invalid Type for CommunicationRequest.payload.content[x]")
   }
 
+  @JvmStatic
   private fun Type.communicationRequestPayloadContentToProto():
     CommunicationRequest.Payload.ContentX {
     val protoValue = CommunicationRequest.Payload.ContentX.newBuilder()
@@ -87,6 +90,7 @@ public object CommunicationRequestConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun CommunicationRequest.OccurrenceX.communicationRequestOccurrenceToHapi(): Type {
     if (this.getDateTime() != DateTime.newBuilder().defaultInstanceForType) {
       return (this.getDateTime()).toHapi()
@@ -97,6 +101,7 @@ public object CommunicationRequestConverter {
     throw IllegalArgumentException("Invalid Type for CommunicationRequest.occurrence[x]")
   }
 
+  @JvmStatic
   private fun Type.communicationRequestOccurrenceToProto(): CommunicationRequest.OccurrenceX {
     val protoValue = CommunicationRequest.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
@@ -108,6 +113,7 @@ public object CommunicationRequestConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun CommunicationRequest.toHapi(): org.hl7.fhir.r4.model.CommunicationRequest {
     val hapiValue = org.hl7.fhir.r4.model.CommunicationRequest()
     hapiValue.id = id.value
@@ -149,6 +155,7 @@ public object CommunicationRequestConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.CommunicationRequest.toProto(): CommunicationRequest {
     val protoValue =
       CommunicationRequest.newBuilder()
@@ -196,6 +203,7 @@ public object CommunicationRequestConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.CommunicationRequest.CommunicationRequestPayloadComponent.toProto():
     CommunicationRequest.Payload {
     val protoValue =
@@ -208,6 +216,7 @@ public object CommunicationRequestConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun CommunicationRequest.Payload.toHapi():
     org.hl7.fhir.r4.model.CommunicationRequest.CommunicationRequestPayloadComponent {
     val hapiValue =

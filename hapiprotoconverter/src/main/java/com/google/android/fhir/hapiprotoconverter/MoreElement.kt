@@ -179,7 +179,7 @@ internal fun ElementDefinition.getProtoMethodName(): String {
     .capitalizeFirst()
 }
 
-/** get proto  field name */
+/** get proto field name */
 internal fun ElementDefinition.getProtoFieldName(isRepeated: Boolean = false): String {
   return ((if (getElementMethodName().lowerCaseFirst() in listOf("class", "assert", "for"))
         "${getElementMethodName()}Value"

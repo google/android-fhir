@@ -57,12 +57,14 @@ import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Uri
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
 public object ConceptMapConverter {
+  @JvmStatic
   private fun ConceptMap.SourceX.conceptMapSourceToHapi(): Type {
     if (this.getUri() != Uri.newBuilder().defaultInstanceForType) {
       return (this.getUri()).toHapi()
@@ -73,6 +75,7 @@ public object ConceptMapConverter {
     throw IllegalArgumentException("Invalid Type for ConceptMap.source[x]")
   }
 
+  @JvmStatic
   private fun Type.conceptMapSourceToProto(): ConceptMap.SourceX {
     val protoValue = ConceptMap.SourceX.newBuilder()
     if (this is UriType) {
@@ -84,6 +87,7 @@ public object ConceptMapConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   private fun ConceptMap.TargetX.conceptMapTargetToHapi(): Type {
     if (this.getUri() != Uri.newBuilder().defaultInstanceForType) {
       return (this.getUri()).toHapi()
@@ -94,6 +98,7 @@ public object ConceptMapConverter {
     throw IllegalArgumentException("Invalid Type for ConceptMap.target[x]")
   }
 
+  @JvmStatic
   private fun Type.conceptMapTargetToProto(): ConceptMap.TargetX {
     val protoValue = ConceptMap.TargetX.newBuilder()
     if (this is UriType) {
@@ -105,6 +110,7 @@ public object ConceptMapConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun ConceptMap.toHapi(): org.hl7.fhir.r4.model.ConceptMap {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap()
     hapiValue.id = id.value
@@ -134,6 +140,7 @@ public object ConceptMapConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.ConceptMap.toProto(): ConceptMap {
     val protoValue =
       ConceptMap.newBuilder()
@@ -171,6 +178,7 @@ public object ConceptMapConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupComponent.toProto():
     ConceptMap.Group {
     val protoValue =
@@ -188,6 +196,7 @@ public object ConceptMapConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ConceptMap.SourceElementComponent.toProto():
     ConceptMap.Group.SourceElement {
     val protoValue =
@@ -202,6 +211,7 @@ public object ConceptMapConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ConceptMap.TargetElementComponent.toProto():
     ConceptMap.Group.SourceElement.TargetElement {
     val protoValue =
@@ -226,6 +236,7 @@ public object ConceptMapConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ConceptMap.OtherElementComponent.toProto():
     ConceptMap.Group.SourceElement.TargetElement.OtherElement {
     val protoValue =
@@ -241,6 +252,7 @@ public object ConceptMapConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupUnmappedComponent.toProto():
     ConceptMap.Group.Unmapped {
     val protoValue =
@@ -264,6 +276,7 @@ public object ConceptMapConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun ConceptMap.Group.toHapi(): org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupComponent()
     hapiValue.id = id.value
@@ -278,6 +291,7 @@ public object ConceptMapConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ConceptMap.Group.SourceElement.toHapi():
     org.hl7.fhir.r4.model.ConceptMap.SourceElementComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.SourceElementComponent()
@@ -290,6 +304,7 @@ public object ConceptMapConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ConceptMap.Group.SourceElement.TargetElement.toHapi():
     org.hl7.fhir.r4.model.ConceptMap.TargetElementComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.TargetElementComponent()
@@ -306,6 +321,7 @@ public object ConceptMapConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ConceptMap.Group.SourceElement.TargetElement.OtherElement.toHapi():
     org.hl7.fhir.r4.model.ConceptMap.OtherElementComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.OtherElementComponent()
@@ -319,6 +335,7 @@ public object ConceptMapConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun ConceptMap.Group.Unmapped.toHapi():
     org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupUnmappedComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupUnmappedComponent()

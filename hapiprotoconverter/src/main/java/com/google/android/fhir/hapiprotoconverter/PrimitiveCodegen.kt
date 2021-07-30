@@ -77,6 +77,7 @@ object PrimitiveCodegen {
     // Function that will convert Hapi to proto
     val toProtoBuilder =
       FunSpec.builder("toProto")
+        .addAnnotation(JvmStatic::class)
         .receiver(hapiClass)
         .returns(protoClass)
         .addStatement("val protoValue = %T.newBuilder()", protoClass)
@@ -85,6 +86,7 @@ object PrimitiveCodegen {
     // Function that will convert proto to hapi
     val toHapiBuilder =
       FunSpec.builder("toHapi")
+        .addAnnotation(JvmStatic::class)
         .receiver(protoClass)
         .returns(hapiClass)
         .addStatement("val hapiValue = %T()", hapiClass)
@@ -115,6 +117,7 @@ object PrimitiveCodegen {
         // private func to convert hapi precision to proto precision
         val precisionToProtoFunc =
           FunSpec.builder("toProtoPrecision")
+            .addAnnotation(JvmStatic::class)
             .addModifiers(KModifier.PRIVATE)
             .receiver(TemporalPrecisionEnum::class)
             .returns(ClassName(protoPackage, protoName, "Precision"))
@@ -124,6 +127,7 @@ object PrimitiveCodegen {
         // private func to convert proto precision to hapi precision
         val precisionToHapiFunc =
           FunSpec.builder("toHapiPrecision")
+            .addAnnotation(JvmStatic::class)
             .addModifiers(KModifier.PRIVATE)
             .receiver(ClassName(protoPackage, protoName, "Precision"))
             .returns(TemporalPrecisionEnum::class)
@@ -173,6 +177,7 @@ object PrimitiveCodegen {
         // private func to get precision
         val precisionToProtoFunc =
           FunSpec.builder("getTimePrecision")
+            .addAnnotation(JvmStatic::class)
             .addModifiers(KModifier.PRIVATE)
             .addParameter("timeString", String::class)
             .returns(Integer.TYPE)

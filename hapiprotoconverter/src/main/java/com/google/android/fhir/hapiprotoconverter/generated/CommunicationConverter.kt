@@ -49,10 +49,12 @@ import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.RequestPriorityCode
 import com.google.fhir.r4.core.String
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
 public object CommunicationConverter {
+  @JvmStatic
   private fun Communication.Payload.ContentX.communicationPayloadContentToHapi(): Type {
     if (this.getStringValue() != String.newBuilder().defaultInstanceForType) {
       return (this.getStringValue()).toHapi()
@@ -66,6 +68,7 @@ public object CommunicationConverter {
     throw IllegalArgumentException("Invalid Type for Communication.payload.content[x]")
   }
 
+  @JvmStatic
   private fun Type.communicationPayloadContentToProto(): Communication.Payload.ContentX {
     val protoValue = Communication.Payload.ContentX.newBuilder()
     if (this is StringType) {
@@ -80,6 +83,7 @@ public object CommunicationConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun Communication.toHapi(): org.hl7.fhir.r4.model.Communication {
     val hapiValue = org.hl7.fhir.r4.model.Communication()
     hapiValue.id = id.value
@@ -122,6 +126,7 @@ public object CommunicationConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.Communication.toProto(): Communication {
     val protoValue =
       Communication.newBuilder()
@@ -170,6 +175,7 @@ public object CommunicationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.Communication.CommunicationPayloadComponent.toProto():
     Communication.Payload {
     val protoValue =
@@ -182,6 +188,7 @@ public object CommunicationConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun Communication.Payload.toHapi():
     org.hl7.fhir.r4.model.Communication.CommunicationPayloadComponent {
     val hapiValue = org.hl7.fhir.r4.model.Communication.CommunicationPayloadComponent()

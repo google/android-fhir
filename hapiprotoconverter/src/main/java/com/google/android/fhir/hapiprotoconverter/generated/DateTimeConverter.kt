@@ -21,10 +21,12 @@ import com.google.fhir.r4.core.DateTime
 import java.time.Instant
 import java.util.Date
 import java.util.TimeZone
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.DateTimeType
 
 public object DateTimeConverter {
   /** returns the proto DateTime equivalent of the hapi DateTimeType */
+  @JvmStatic
   public fun DateTimeType.toProto(): DateTime {
     val protoValue = DateTime.newBuilder()
     if (timeZone.id != null) protoValue.setTimezone(timeZone.id)
@@ -34,6 +36,7 @@ public object DateTimeConverter {
   }
 
   /** returns the hapi DateTimeType equivalent of the proto DateTime */
+  @JvmStatic
   public fun DateTime.toHapi(): DateTimeType {
     val hapiValue = DateTimeType()
     hapiValue.timeZone = TimeZone.getTimeZone(timezone)
@@ -43,6 +46,7 @@ public object DateTimeConverter {
   }
 
   /** converts the hapi temporal precision to DateTime.Precision */
+  @JvmStatic
   private fun TemporalPrecisionEnum.toProtoPrecision(): DateTime.Precision =
     when (this) {
       TemporalPrecisionEnum.YEAR -> DateTime.Precision.YEAR
@@ -54,6 +58,7 @@ public object DateTimeConverter {
     }
 
   /** converts the DateTime.Precision to hapi Temporal Precision */
+  @JvmStatic
   private fun DateTime.Precision.toHapiPrecision(): TemporalPrecisionEnum =
     when (this) {
       DateTime.Precision.YEAR -> TemporalPrecisionEnum.YEAR

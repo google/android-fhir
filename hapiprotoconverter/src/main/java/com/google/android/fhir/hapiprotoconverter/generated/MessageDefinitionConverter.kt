@@ -55,11 +55,13 @@ import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Uri
 import java.lang.IllegalArgumentException
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
 public object MessageDefinitionConverter {
+  @JvmStatic
   private fun MessageDefinition.EventX.messageDefinitionEventToHapi(): Type {
     if (this.getCoding() != Coding.newBuilder().defaultInstanceForType) {
       return (this.getCoding()).toHapi()
@@ -70,6 +72,7 @@ public object MessageDefinitionConverter {
     throw IllegalArgumentException("Invalid Type for MessageDefinition.event[x]")
   }
 
+  @JvmStatic
   private fun Type.messageDefinitionEventToProto(): MessageDefinition.EventX {
     val protoValue = MessageDefinition.EventX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Coding) {
@@ -81,6 +84,7 @@ public object MessageDefinitionConverter {
     return protoValue.build()
   }
 
+  @JvmStatic
   public fun MessageDefinition.toHapi(): org.hl7.fhir.r4.model.MessageDefinition {
     val hapiValue = org.hl7.fhir.r4.model.MessageDefinition()
     hapiValue.id = id.value
@@ -124,6 +128,7 @@ public object MessageDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.MessageDefinition.toProto(): MessageDefinition {
     val protoValue =
       MessageDefinition.newBuilder()
@@ -183,6 +188,7 @@ public object MessageDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionFocusComponent.toProto():
     MessageDefinition.Focus {
     val protoValue =
@@ -197,6 +203,7 @@ public object MessageDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionAllowedResponseComponent.toProto():
     MessageDefinition.AllowedResponse {
     val protoValue =
@@ -210,6 +217,7 @@ public object MessageDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun MessageDefinition.Focus.toHapi():
     org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionFocusComponent {
     val hapiValue = org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionFocusComponent()
@@ -222,6 +230,7 @@ public object MessageDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun MessageDefinition.AllowedResponse.toHapi():
     org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionAllowedResponseComponent {
     val hapiValue =

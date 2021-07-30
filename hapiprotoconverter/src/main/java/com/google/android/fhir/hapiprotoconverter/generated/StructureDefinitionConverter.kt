@@ -57,9 +57,11 @@ import com.google.fhir.r4.core.StructureDefinition
 import com.google.fhir.r4.core.StructureDefinition.Context
 import com.google.fhir.r4.core.StructureDefinitionKindCode
 import com.google.fhir.r4.core.TypeDerivationRuleCode
+import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
 
 public object StructureDefinitionConverter {
+  @JvmStatic
   public fun StructureDefinition.toHapi(): org.hl7.fhir.r4.model.StructureDefinition {
     val hapiValue = org.hl7.fhir.r4.model.StructureDefinition()
     hapiValue.id = id.value
@@ -108,6 +110,7 @@ public object StructureDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.StructureDefinition.toProto(): StructureDefinition {
     val protoValue =
       StructureDefinition.newBuilder()
@@ -176,6 +179,7 @@ public object StructureDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionMappingComponent.toProto():
     StructureDefinition.Mapping {
     val protoValue =
@@ -191,6 +195,7 @@ public object StructureDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionContextComponent.toProto():
     StructureDefinition.Context {
     val protoValue =
@@ -210,6 +215,7 @@ public object StructureDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionSnapshotComponent.toProto():
     StructureDefinition.Snapshot {
     val protoValue =
@@ -222,6 +228,7 @@ public object StructureDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionDifferentialComponent.toProto():
     StructureDefinition.Differential {
     val protoValue =
@@ -234,6 +241,7 @@ public object StructureDefinitionConverter {
     return protoValue
   }
 
+  @JvmStatic
   private fun StructureDefinition.Mapping.toHapi():
     org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionMappingComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionMappingComponent()
@@ -247,6 +255,7 @@ public object StructureDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun StructureDefinition.Context.toHapi():
     org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionContextComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionContextComponent()
@@ -262,6 +271,7 @@ public object StructureDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun StructureDefinition.Snapshot.toHapi():
     org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionSnapshotComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionSnapshotComponent()
@@ -272,6 +282,7 @@ public object StructureDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   private fun StructureDefinition.Differential.toHapi():
     org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionDifferentialComponent {
     val hapiValue =

@@ -29,8 +29,10 @@ import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toPr
 import com.google.fhir.r4.core.OperationParameterUseCode
 import com.google.fhir.r4.core.ParameterDefinition
 import com.google.fhir.r4.core.String
+import kotlin.jvm.JvmStatic
 
 public object ParameterDefinitionConverter {
+  @JvmStatic
   public fun ParameterDefinition.toHapi(): org.hl7.fhir.r4.model.ParameterDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ParameterDefinition()
     hapiValue.id = id.value
@@ -48,6 +50,7 @@ public object ParameterDefinitionConverter {
     return hapiValue
   }
 
+  @JvmStatic
   public fun org.hl7.fhir.r4.model.ParameterDefinition.toProto(): ParameterDefinition {
     val protoValue =
       ParameterDefinition.newBuilder()
