@@ -87,5 +87,8 @@
         <item
             name="datePickerHeaderTextAppearance"
         >@style/TextAppearance.MaterialComponents.Subtitle2</item>
+        <item
+            name="dateTimePickerHeaderTextAppearance"
+        >@style/TextAppearance.MaterialComponents.Subtitle2</item>
     </style>
 </resources>

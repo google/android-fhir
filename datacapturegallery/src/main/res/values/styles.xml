@@ -61,6 +61,9 @@
         <item
             name="datePickerHeaderTextAppearance"
         >@style/TextAppearance.MyQuestionnaire.DatePickerHeader</item>
+        <item
+            name="dateTimePickerHeaderTextAppearance"
+        >@style/TextAppearance.MyQuestionnaire.DateTimePickerHeader</item>
     </style>
 
     <style
@@ -180,6 +183,13 @@
 
     <style
         name="TextAppearance.MyQuestionnaire.DatePickerHeader"
+        parent="TextAppearance.MaterialComponents.Subtitle2"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style
+        name="TextAppearance.MyQuestionnaire.DateTimePickerHeader"
         parent="TextAppearance.MaterialComponents.Subtitle2"
     >
         <item name="android:textColor">?attr/colorOnSurface</item>
