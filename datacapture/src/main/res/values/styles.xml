@@ -81,5 +81,8 @@
         <item
             name="chipStyle"
         >@style/Widget.MaterialComponents.Chip.Entry</item>
+        <item
+            name="displayHeaderTextAppearance"
+        >@style/TextAppearance.AppCompat.Small</item>
     </style>
 </resources>

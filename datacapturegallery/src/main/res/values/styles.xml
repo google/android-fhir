@@ -55,6 +55,9 @@
             name="autoCompleteHeaderTextAppearance"
         >@style/TextAppearance.MyQuestionnaire.AutoCompleteHeader</item>
         <item name="chipStyle">@style/Widget.MyQuestionnaire.Chip</item>
+        <item
+            name="displayHeaderTextAppearance"
+        >@style/TextAppearance.MyQuestionnaire.DisplayHeader</item>
     </style>
 
     <style
@@ -163,5 +166,12 @@
         <item name="chipStrokeWidth">0dp</item>
         <item name="chipStrokeColor">?attr/colorOnSurface</item>
         <item name="android:textAppearance">?attr/textAppearanceBody2</item>
+    </style>
+
+    <style
+        name="TextAppearance.MyQuestionnaire.DisplayHeader"
+        parent="TextAppearance.AppCompat.Small"
+    >
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 </resources>
