@@ -84,5 +84,8 @@
         <item
             name="displayHeaderTextAppearance"
         >@style/TextAppearance.AppCompat.Small</item>
+        <item
+            name="datePickerHeaderTextAppearance"
+        >@style/TextAppearance.MaterialComponents.Subtitle2</item>
     </style>
 </resources>
