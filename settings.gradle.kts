@@ -1,5 +1,3 @@
-include(":cqlreference")
-
 include(":datacapture")
 
 include(":datacapturegallery")

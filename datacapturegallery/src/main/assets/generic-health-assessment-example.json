@@ -1,0 +1,195 @@
+{
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire|2.7"
+    ]
+  },
+  "status": "draft",
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "type": "choice",
+      "code": [],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "radio-button",
+                "display": "Radio Button"
+              }
+            ],
+            "text": "Radio Button"
+          }
+        }
+      ],
+      "required": true,
+      "linkId": "1",
+      "text": "Please select your gender",
+      "prefix": "Q1:",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "male",
+            "display": "Male",
+            "system": "http://hl7.org/fhir/gender-identity"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "female",
+            "display": "Female",
+            "system": "http://hl7.org/fhir/gender-identity"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "other",
+            "display": "Other",
+            "system": "http://hl7.org/fhir/gender-identity"
+          }
+        }
+      ]
+    },
+    {
+      "type": "integer",
+      "code": [],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
+          "valueCoding": {
+            "display": "a"
+          }
+        }
+      ],
+      "required": true,
+      "linkId": "2",
+      "text": "Please enter your age",
+      "prefix": "Q2:"
+    },
+    {
+      "type": "choice",
+      "code": [],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "drop-down",
+                "display": "Drop down"
+              }
+            ],
+            "text": "Drop down"
+          }
+        }
+      ],
+      "required": true,
+      "linkId": "3",
+      "text": "Please select your nationality",
+      "prefix": "Q3:",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "south-africa",
+            "display": "South Africa"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "zimbabwe",
+            "display": "Zimbabwe"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "mozambique",
+            "display": "Mozambique"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "malawi",
+            "display": "Malawi"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "other",
+            "display": "Other"
+          }
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "code": [],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "autocomplete",
+                "display": "Auto-complete"
+              }
+            ],
+            "text": "Auto-complete"
+          }
+        }
+      ],
+      "required": true,
+      "linkId": "4",
+      "text": "Do you have any existing conditions",
+      "prefix": "Q4:",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "asthma",
+            "display": "Asthma"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "copd",
+            "display": "Chronic Lung Disease"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "depression",
+            "display": "Depression"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "t2dm",
+            "display": "Diabetes"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "hypertension",
+            "display": "Hypertension"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "hypertension",
+            "display": "High Blood Pressure"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "hypercholesterolaemia",
+            "display": "High Cholesterol"
+          }
+        }
+      ]
+    }
+  ]
+}

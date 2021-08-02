@@ -21,7 +21,7 @@ import androidx.room.Room
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.db.ResourceNotFoundInDbException
+import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.LocalChangeUtils
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
@@ -61,15 +61,15 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
   private val syncedResourceDao = db.syncedResourceDao()
   private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 
-  override suspend fun <R : Resource> insert(vararg resources: R) {
+  override suspend fun <R : Resource> insert(vararg resource: R) {
     db.withTransaction {
-      resourceDao.insertAll(resources.toList())
-      localChangeDao.addInsertAll(resources.toList())
+      resourceDao.insertAll(resource.toList())
+      localChangeDao.addInsertAll(resource.toList())
     }
   }
 
-  override suspend fun <R : Resource> insertRemote(vararg resources: R) {
-    resourceDao.insertAll(resources.toList())
+  override suspend fun <R : Resource> insertRemote(vararg resource: R) {
+    resourceDao.insertAll(resource.toList())
   }
 
   override suspend fun <R : Resource> update(resource: R) {
@@ -85,7 +85,7 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
     return resourceDao.getResource(resourceId = id, resourceType = type)?.let {
       iParser.parseResource(clazz, it)
     }
-      ?: throw ResourceNotFoundInDbException(type.name, id)
+      ?: throw ResourceNotFoundException(type.name, id)
   }
 
   override suspend fun lastUpdate(resourceType: ResourceType): String? {
@@ -111,9 +111,10 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
   }
 
   override suspend fun <R : Resource> search(query: SearchQuery): List<R> =
-    resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).map {
-      iParser.parseResource(it) as R
-    }
+    resourceDao
+      .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+      .map { iParser.parseResource(it) as R }
+      .distinctBy { it.id }
 
   override suspend fun count(query: SearchQuery): Long =
     resourceDao.countResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))

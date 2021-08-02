@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.validation
 
+import android.content.Context
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -23,6 +24,7 @@ internal object QuestionnaireResponseItemValidator {
 
   private val validators =
     mutableListOf(
+      RequiredConstraintValidator,
       MaxValueConstraintValidator,
       MinValueConstraintValidator,
       PrimitiveTypeAnswerMaxLengthValidator,
@@ -33,14 +35,12 @@ internal object QuestionnaireResponseItemValidator {
   /** Validates [questionnaireResponseItem] contains valid answer(s) to [questionnaireItem]. */
   fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    context: Context
   ): ValidationResult {
-    if (questionnaireResponseItem.answer.isEmpty()) {
-      return ValidationResult(true, listOf())
-    }
     val validationResults = mutableListOf<ConstraintValidator.ConstraintValidationResult>()
     validators.forEach {
-      validationResults.add(it.validate(questionnaireItem, questionnaireResponseItem))
+      validationResults.add(it.validate(questionnaireItem, questionnaireResponseItem, context))
     }
     return ValidationResult(
       validationResults.all { it.isValid },

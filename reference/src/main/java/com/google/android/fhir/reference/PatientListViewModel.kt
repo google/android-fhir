@@ -84,12 +84,15 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   /** The Patient's details for display purposes. */
   data class PatientItem(
     val id: String,
+    val resourceId: String,
     val name: String,
     val gender: String,
     val dob: String,
-    val html: String,
     val phone: String,
-    val resourceId: String
+    val city: String,
+    val country: String,
+    val isActive: Boolean,
+    val html: String,
   ) {
     override fun toString(): String = name
   }
@@ -108,6 +111,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     private val application: Application,
     private val fhirEngine: FhirEngine
   ) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
       if (modelClass.isAssignableFrom(PatientListViewModel::class.java)) {
         return PatientListViewModel(application, fhirEngine) as T
@@ -118,21 +122,27 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
 }
 
 internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientItem {
-  val name = name[0].nameAsSingleString
-
   // Show nothing if no values available for gender and date of birth.
+  val patientId = if (hasIdElement()) idElement.idPart else ""
+  val name = if (hasName()) name[0].nameAsSingleString else ""
   val gender = if (hasGenderElement()) genderElement.valueAsString else ""
   val dob = if (hasBirthDateElement()) birthDateElement.valueAsString else ""
+  val phone = if (hasTelecom()) telecom[0].value else ""
+  val city = if (hasAddress()) address[0].city else ""
+  val country = if (hasAddress()) address[0].country else ""
+  val isActive = active
   val html: String = if (hasText()) text.div.valueAsString else ""
-  val phone: String = if (hasTelecom()) telecom[0].value else ""
 
   return PatientListViewModel.PatientItem(
-    position.toString(),
-    name,
-    gender,
-    dob,
-    html,
-    phone,
-    idElement.idPart
+    id = position.toString(),
+    resourceId = patientId,
+    name = name,
+    gender = gender,
+    dob = dob,
+    phone = phone,
+    city = city,
+    country = country,
+    isActive = isActive,
+    html = html
   )
 }

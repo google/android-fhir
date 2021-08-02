@@ -75,6 +75,7 @@ internal object QuestionnaireItemDropDownViewHolderFactory :
                   .setValue(
                     questionnaireItemViewItem.questionnaireItem.answerOption[position].valueCoding
                   )
+              questionnaireItemViewItem.questionnaireResponseItemChangedCallback()
             }
           }
       }

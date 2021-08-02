@@ -86,6 +86,7 @@ class PatientDetailsViewModelFactory(
   private val fhirEngine: FhirEngine,
   private val patientId: String
 ) : ViewModelProvider.Factory {
+  @Suppress("UNCHECKED_CAST")
   override fun <T : ViewModel?> create(modelClass: Class<T>): T {
     require(modelClass.isAssignableFrom(PatientDetailsViewModel::class.java)) {
       "Unknown ViewModel class"
