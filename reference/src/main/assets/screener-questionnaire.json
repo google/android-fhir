@@ -137,7 +137,6 @@
           "type": "choice",
           "linkId": "2.1.0",
           "required": true,
-          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.category",
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -182,7 +181,6 @@
           "type": "choice",
           "linkId": "2.2.0",
           "required": true,
-          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.category",
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
@@ -218,7 +216,6 @@
           "type": "choice",
           "linkId": "2.3.0",
           "required": true,
-          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.category",
           "extension": [
             {
               "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
