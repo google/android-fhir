@@ -18,6 +18,8 @@ package com.google.android.fhir.reference
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -53,7 +55,7 @@ class PatientDetailsFragment : Fragment() {
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? {
+  ): View {
     _binding = PatientDetailBinding.inflate(inflater, container, false)
     return binding.root
   }
@@ -107,19 +109,23 @@ class PatientDetailsFragment : Fragment() {
       )
   }
 
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    inflater.inflate(R.menu.details_options_menu, menu)
+  }
+
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       android.R.id.home -> {
         NavHostFragment.findNavController(this).navigateUp()
         true
       }
+      R.id.menu_patient_edit -> {
+        findNavController()
+          .navigate(PatientDetailsFragmentDirections.navigateToEditPatient(args.patientId))
+        true
+      }
       else -> super.onOptionsItemSelected(item)
     }
-  }
-
-  companion object {
-    /** The fragment argument representing the patient item ID that this fragment represents. */
-    const val ARG_ITEM_ID = "patient_item_id"
   }
 
   override fun onDestroyView() {

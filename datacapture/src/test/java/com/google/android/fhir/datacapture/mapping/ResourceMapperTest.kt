@@ -24,9 +24,11 @@ import com.google.android.fhir.datacapture.utilities.NpmPackageProvider
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
 import java.util.Date
+import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
@@ -461,12 +463,14 @@ class ResourceMapperTest {
       iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
         QuestionnaireResponse
 
-    val patient =
-      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse)
-        .entry
-        .first()
-        .resource as
-        Patient
+    val patient: Patient
+
+    runBlocking {
+      patient =
+        ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
+          .resource as
+          Patient
+    }
 
     assertThat(patient.birthDate).isEqualTo("2021-01-01".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isTrue()
@@ -706,13 +710,14 @@ class ResourceMapperTest {
       iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
         QuestionnaireResponse
 
-    val patient =
-      ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse)
-        .entry
-        .first()
-        .resource as
-        Patient
+    val patient: Patient
 
+    runBlocking {
+      patient =
+        ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse).entry[0]
+          .resource as
+          Patient
+    }
     assertThat(patient.birthDate).isEqualTo("2016-02-11".toDateFromFormatYyyyMmDd())
     assertThat(patient.active).isFalse()
     assertThat(patient.telecom.get(0).value).isNull()
@@ -919,10 +924,12 @@ class ResourceMapperTest {
 
     val uriTestQuestionnaire =
       iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson) as
-        org.hl7.fhir.r4.model.Questionnaire
+        Questionnaire
 
     val patient = createPatientResource()
-    val response: QuestionnaireResponse = ResourceMapper.populate(uriTestQuestionnaire, patient)
+    val response: QuestionnaireResponse
+    runBlocking { response = ResourceMapper.populate(uriTestQuestionnaire, patient) }
+
     val responseItem = response.item[0]
     assertThat(((responseItem.item[0].item[0].answer[0]).value as StringType).valueAsString)
       .isEqualTo("Salman")
@@ -1194,10 +1201,14 @@ class ResourceMapperTest {
         }
       """.trimIndent()
 
-    val contextR4 =
-      SimpleWorkerContext.fromPackage(
-        NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
-      )
+    val contextR4: SimpleWorkerContext
+
+    runBlocking {
+      contextR4 =
+        SimpleWorkerContext.fromPackage(
+          NpmPackageProvider.loadNpmPackage(ApplicationProvider.getApplicationContext())
+        )
+    }
     contextR4.isCanRunWithoutTerminology = true
     val structureMapUtilities = StructureMapUtilities(contextR4)
     val map: StructureMap =
@@ -1240,15 +1251,17 @@ class ResourceMapperTest {
       iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson) as
         QuestionnaireResponse
 
-    val bundle =
-      ResourceMapper.extract(
-        uriTestQuestionnaire,
-        uriTestQuestionnaireResponse,
-        fun(fullUrl: String): StructureMap? {
-          return map
-        },
-        ApplicationProvider.getApplicationContext()
-      )
+    val bundle: Bundle
+
+    runBlocking {
+      bundle =
+        ResourceMapper.extract(
+          uriTestQuestionnaire,
+          uriTestQuestionnaireResponse,
+          { map },
+          ApplicationProvider.getApplicationContext()
+        )
+    }
 
     val patient = bundle.entry.get(0).resource as Patient
     assertThat(patient.birthDate).isEqualTo("2016-02-11".toDateFromFormatYyyyMmDd())
