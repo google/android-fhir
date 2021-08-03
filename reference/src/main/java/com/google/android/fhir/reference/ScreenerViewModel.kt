@@ -58,30 +58,21 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
     viewModelScope.launch {
       val bundle = ResourceMapper.extract(questionnaireResource, questionnaireResponse)
       val reference = Reference("Patient/$patientId")
-      val index = ScreenerQuestionnaireIndex()
-      saveObservation(bundle, reference, index.observation)
-      saveCondition(bundle, reference, index.condition)
-      saveEncounter(bundle, reference, index.encounter)
+      saveResources(bundle, reference)
       isResourcesSaved.value = true
     }
   }
 
-  private suspend fun saveObservation(bundle: Bundle, reference: Reference, index: Int) {
-    val observation = bundle.entry[index].resource as Observation
-    observation.subject = reference
-    saveResourceToDatabase(observation)
-  }
-
-  private suspend fun saveCondition(bundle: Bundle, reference: Reference, index: Int) {
-    val condition = bundle.entry[index].resource as Condition
-    condition.subject = reference
-    saveResourceToDatabase(condition)
-  }
-
-  private suspend fun saveEncounter(bundle: Bundle, reference: Reference, index: Int) {
-    val encounter = bundle.entry[index].resource as Encounter
-    encounter.subject = reference
-    saveResourceToDatabase(encounter)
+  private suspend fun saveResources(bundle: Bundle, reference: Reference) {
+    bundle.entry.forEach {
+      val resource = it.resource
+      when (resource) {
+        is Observation -> resource.subject = reference
+        is Condition -> resource.subject = reference
+        is Encounter -> resource.subject = reference
+      }
+      saveResourceToDatabase(resource)
+    }
   }
 
   private suspend fun saveResourceToDatabase(resource: Resource) {
@@ -105,12 +96,5 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
 
   private fun generateUuid(): String {
     return UUID.randomUUID().toString()
-  }
-
-  // TODO refactor resource index while accessing resources from bundle.
-  class ScreenerQuestionnaireIndex {
-    val observation: Int = 0
-    val condition: Int = 2
-    val encounter: Int = 6
   }
 }

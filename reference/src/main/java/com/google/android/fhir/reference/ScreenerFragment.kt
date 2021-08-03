@@ -96,7 +96,7 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
       questionnaireFragment.getQuestionnaireResponse(),
       args.patientId
     )
-    Toast.makeText(context, "questionnaire response is received.", Toast.LENGTH_SHORT).show()
+    Toast.makeText(context, getString(R.string.response_received), Toast.LENGTH_SHORT).show()
   }
 
   private fun showCancelScreenerQuestionnaireAlertDialog() {
@@ -124,10 +124,12 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
   private fun observeResourcesSaveAction() {
     viewModel.isResourcesSaved.observe(viewLifecycleOwner) {
       if (!it) {
-        Toast.makeText(requireContext(), "Inputs are missing.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), getString(R.string.inputs_missing), Toast.LENGTH_SHORT)
+          .show()
         return@observe
       }
-      Toast.makeText(requireContext(), "Resources are saved.", Toast.LENGTH_SHORT).show()
+      Toast.makeText(requireContext(), getString(R.string.resources_saved), Toast.LENGTH_SHORT)
+        .show()
       NavHostFragment.findNavController(this).navigateUp()
     }
   }

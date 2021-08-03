@@ -104,7 +104,7 @@ class PatientDetailsFragment : Fragment() {
     findNavController()
       .navigate(
         PatientDetailsFragmentDirections.actionPatientDetailsToScreenEncounterFragment(
-          patientDetailsViewModel.patientId
+          args.patientId
         )
       )
   }
