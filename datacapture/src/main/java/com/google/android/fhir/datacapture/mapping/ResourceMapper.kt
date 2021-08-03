@@ -22,6 +22,7 @@ import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
 import com.google.android.fhir.datacapture.utilities.SimpleWorkerContextProvider
+import com.google.android.fhir.datacapture.utilities.toCoding
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -35,6 +36,7 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IdType
@@ -68,6 +70,11 @@ import org.hl7.fhir.r4.utils.StructureMapUtilities
  * WARNING: This is not production-ready.
  */
 object ResourceMapper {
+
+  private val fhirPathEngine: FHIRPathEngine =
+    with(FhirContext.forR4()) {
+      FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this)))
+    }
 
   /**
    * Extract a FHIR resource from the [questionnaire] and [questionnaireResponse].
@@ -170,16 +177,17 @@ object ResourceMapper {
     question: Questionnaire.QuestionnaireItemComponent,
     resource: Resource
   ) {
-    val context = FhirContext.forR4()
-    val fhirPathEngine =
-      FHIRPathEngine(HapiWorkerContext(context, DefaultProfileValidationSupport(context)))
     if (question.type == Questionnaire.QuestionnaireItemType.GROUP) {
       populateInitialValues(question.item, resource)
     } else {
       question.fetchExpression?.let { exp ->
-        val answerExtracted = fhirPathEngine.evaluate(resource, exp.expression)[0] as Type
-        question.initial =
-          mutableListOf(Questionnaire.QuestionnaireItemInitialComponent().setValue(answerExtracted))
+        val answerExtracted = fhirPathEngine.evaluate(resource, exp.expression)
+        answerExtracted.firstOrNull()?.let { answer ->
+          question.initial =
+            mutableListOf(
+              Questionnaire.QuestionnaireItemInitialComponent().setValue(answer.asExpectedType())
+            )
+        }
       }
     }
   }
@@ -469,5 +477,19 @@ private fun Class<*>.getFieldOrNull(name: String): Field? {
     getDeclaredField(name)
   } catch (ex: NoSuchFieldException) {
     return null
+  }
+}
+
+/**
+ * Returns the [Base] object as a [Type] as expected by
+ * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue]. Also,
+ * [Questionnaire.QuestionnaireItemAnswerOptionComponent.setValue] only takes a certain [Type]
+ * objects and throws exception otherwise. This extension function takes care of the conversion
+ * based on the input and expected [Type].
+ */
+private fun Base.asExpectedType(): Type {
+  return when (this) {
+    is Enumeration<*> -> toCoding()
+    else -> this as Type
   }
 }
