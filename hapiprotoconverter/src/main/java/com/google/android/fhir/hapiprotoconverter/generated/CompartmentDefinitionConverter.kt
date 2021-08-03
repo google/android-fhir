@@ -18,6 +18,8 @@ package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toProto
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toHapi
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.ContactDetailConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.ContactDetailConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.DateTimeConverter.toHapi
@@ -37,9 +39,11 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toProto
 import com.google.fhir.r4.core.CompartmentDefinition
+import com.google.fhir.r4.core.CompartmentDefinition.Resource
 import com.google.fhir.r4.core.CompartmentTypeCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PublicationStatusCode
+import com.google.fhir.r4.core.ResourceTypeCode
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
@@ -51,6 +55,7 @@ public object CompartmentDefinitionConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setText(text.toHapi())
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
@@ -82,6 +87,7 @@ public object CompartmentDefinitionConverter {
         .setId(Id.newBuilder().setValue(id))
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
+        .setLanguage(languageElement.toProto())
         .setText(text.toProto())
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
@@ -123,6 +129,11 @@ public object CompartmentDefinitionConverter {
         .setId(String.newBuilder().setValue(id))
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setCode(
+          CompartmentDefinition.Resource.CodeType.newBuilder()
+            .setValue(ResourceTypeCode.Value.valueOf(code))
+            .build()
+        )
         .addAllParam(param.map { it.toProto() })
         .setDocumentation(documentationElement.toProto())
         .build()
@@ -137,6 +148,7 @@ public object CompartmentDefinitionConverter {
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setCode(code.value.name)
     hapiValue.setParam(paramList.map { it.toHapi() })
     hapiValue.setDocumentationElement(documentation.toHapi())
     return hapiValue

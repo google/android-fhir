@@ -22,6 +22,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toH
 import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CanonicalConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.CanonicalConverter.toProto
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toHapi
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CodingConverter.toHapi
@@ -79,6 +81,7 @@ import com.google.fhir.r4.core.Questionnaire.Item.Initial
 import com.google.fhir.r4.core.QuestionnaireItemOperatorCode
 import com.google.fhir.r4.core.QuestionnaireItemTypeCode
 import com.google.fhir.r4.core.Reference
+import com.google.fhir.r4.core.ResourceTypeCode
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Time
 import com.google.fhir.r4.core.Uri
@@ -307,6 +310,7 @@ public object QuestionnaireConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setText(text.toHapi())
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
@@ -318,6 +322,7 @@ public object QuestionnaireConverter {
     hapiValue.setDerivedFrom(derivedFromList.map { it.toHapi() })
     hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_", "")))
     hapiValue.setExperimentalElement(experimental.toHapi())
+    subjectTypeList.forEach { hapiValue.addSubjectType(it.value.name) }
     hapiValue.setDateElement(date.toHapi())
     hapiValue.setPublisherElement(publisher.toHapi())
     hapiValue.setContact(contactList.map { it.toHapi() })
@@ -341,6 +346,7 @@ public object QuestionnaireConverter {
         .setId(Id.newBuilder().setValue(id))
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
+        .setLanguage(languageElement.toProto())
         .setText(text.toProto())
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
@@ -358,6 +364,13 @@ public object QuestionnaireConverter {
             .build()
         )
         .setExperimental(experimentalElement.toProto())
+        .addAllSubjectType(
+          subjectType.map {
+            Questionnaire.SubjectTypeCode.newBuilder()
+              .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString))
+              .build()
+          }
+        )
         .setDate(dateElement.toProto())
         .setPublisher(publisherElement.toProto())
         .addAllContact(contact.map { it.toProto() })

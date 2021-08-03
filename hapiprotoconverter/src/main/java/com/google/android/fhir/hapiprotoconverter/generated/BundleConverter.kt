@@ -16,6 +16,8 @@
 
 package com.google.android.fhir.hapiprotoconverter.generated
 
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toHapi
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.DecimalConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.DecimalConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.ExtensionConverter.toHapi
@@ -52,6 +54,7 @@ public object BundleConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setIdentifier(identifier.toHapi())
     hapiValue.setType(
       org.hl7.fhir.r4.model.Bundle.BundleType.valueOf(type.value.name.replace("_", ""))
@@ -71,6 +74,7 @@ public object BundleConverter {
         .setId(Id.newBuilder().setValue(id))
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
+        .setLanguage(languageElement.toProto())
         .setIdentifier(identifier.toProto())
         .setType(
           Bundle.TypeCode.newBuilder()

@@ -52,15 +52,19 @@ import com.google.fhir.r4.core.Boolean
 import com.google.fhir.r4.core.Canonical
 import com.google.fhir.r4.core.FHIRVersionCode
 import com.google.fhir.r4.core.GuidePageGenerationCode
+import com.google.fhir.r4.core.GuideParameterCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.ImplementationGuide
 import com.google.fhir.r4.core.ImplementationGuide.Definition
 import com.google.fhir.r4.core.ImplementationGuide.Definition.Page
+import com.google.fhir.r4.core.ImplementationGuide.Definition.Parameter
 import com.google.fhir.r4.core.ImplementationGuide.Definition.Resource
+import com.google.fhir.r4.core.ImplementationGuide.Global
 import com.google.fhir.r4.core.ImplementationGuide.Manifest
 import com.google.fhir.r4.core.ImplementationGuide.Manifest.ManifestResource
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.Reference
+import com.google.fhir.r4.core.ResourceTypeCode
 import com.google.fhir.r4.core.SPDXLicenseCode
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Url
@@ -158,6 +162,7 @@ public object ImplementationGuideConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setText(text.toHapi())
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
@@ -180,7 +185,7 @@ public object ImplementationGuideConverter {
         license.value.name.replace("_", "")
       )
     )
-    fhirVersionList.map {
+    fhirVersionList.forEach {
       hapiValue.addFhirVersion(Enumerations.FHIRVersion.valueOf(it.value.name.replace("_", "")))
     }
     hapiValue.setDependsOn(dependsOnList.map { it.toHapi() })
@@ -197,6 +202,7 @@ public object ImplementationGuideConverter {
         .setId(Id.newBuilder().setValue(id))
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
+        .setLanguage(languageElement.toProto())
         .setText(text.toProto())
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
@@ -267,6 +273,11 @@ public object ImplementationGuideConverter {
         .setId(String.newBuilder().setValue(id))
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setType(
+          ImplementationGuide.Global.TypeCode.newBuilder()
+            .setValue(ResourceTypeCode.Value.valueOf(type))
+            .build()
+        )
         .setProfile(profileElement.toProto())
         .build()
     return protoValue
@@ -360,6 +371,11 @@ public object ImplementationGuideConverter {
         .setId(String.newBuilder().setValue(id))
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setCode(
+          ImplementationGuide.Definition.Parameter.CodeType.newBuilder()
+            .setValue(GuideParameterCode.Value.valueOf(code))
+            .build()
+        )
         .setValue(valueElement.toProto())
         .build()
     return protoValue
@@ -448,6 +464,7 @@ public object ImplementationGuideConverter {
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setType(type.value.name)
     hapiValue.setProfileElement(profile.toHapi())
     return hapiValue
   }
@@ -490,7 +507,7 @@ public object ImplementationGuideConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setReference(reference.toHapi())
-    fhirVersionList.map {
+    fhirVersionList.forEach {
       hapiValue.addFhirVersion(Enumerations.FHIRVersion.valueOf(it.value.name.replace("_", "")))
     }
     hapiValue.setNameElement(name.toHapi())
@@ -526,6 +543,7 @@ public object ImplementationGuideConverter {
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setCode(code.value.name)
     hapiValue.setValueElement(value.toHapi())
     return hapiValue
   }

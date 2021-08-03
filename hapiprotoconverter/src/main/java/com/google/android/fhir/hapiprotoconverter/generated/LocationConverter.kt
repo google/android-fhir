@@ -20,6 +20,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.AddressConverter.toH
 import com.google.android.fhir.hapiprotoconverter.generated.AddressConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toProto
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toHapi
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CodingConverter.toHapi
@@ -60,6 +62,7 @@ public object LocationConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setText(text.toHapi())
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
@@ -94,6 +97,7 @@ public object LocationConverter {
         .setId(Id.newBuilder().setValue(id))
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
+        .setLanguage(languageElement.toProto())
         .setText(text.toProto())
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
@@ -186,7 +190,7 @@ public object LocationConverter {
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    daysOfWeekList.map {
+    daysOfWeekList.forEach {
       hapiValue.addDaysOfWeek(
         org.hl7.fhir.r4.model.Location.DaysOfWeek.valueOf(it.value.name.replace("_", ""))
       )

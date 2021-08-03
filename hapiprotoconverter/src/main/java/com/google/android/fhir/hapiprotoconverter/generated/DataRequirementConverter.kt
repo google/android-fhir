@@ -42,6 +42,7 @@ import com.google.fhir.r4.core.DataRequirement.DateFilter
 import com.google.fhir.r4.core.DataRequirement.Sort
 import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Duration
+import com.google.fhir.r4.core.FHIRAllTypesValueSet
 import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.Reference
 import com.google.fhir.r4.core.SortDirectionCode
@@ -109,6 +110,7 @@ public object DataRequirementConverter {
     val hapiValue = org.hl7.fhir.r4.model.DataRequirement()
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
+    hapiValue.setType(type.value.name)
     hapiValue.setProfile(profileList.map { it.toHapi() })
     hapiValue.setSubject(subject.dataRequirementSubjectToHapi())
     hapiValue.setMustSupport(mustSupportList.map { it.toHapi() })
@@ -125,6 +127,11 @@ public object DataRequirementConverter {
       DataRequirement.newBuilder()
         .setId(String.newBuilder().setValue(id))
         .addAllExtension(extension.map { it.toProto() })
+        .setType(
+          DataRequirement.TypeCode.newBuilder()
+            .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
+            .build()
+        )
         .addAllProfile(profile.map { it.toProto() })
         .setSubject(subject.dataRequirementSubjectToProto())
         .addAllMustSupport(mustSupport.map { it.toProto() })

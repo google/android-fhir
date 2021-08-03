@@ -20,6 +20,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toH
 import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CanonicalConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.CanonicalConverter.toProto
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toHapi
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CodingConverter.toHapi
@@ -53,6 +55,7 @@ import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverte
 import com.google.fhir.r4.core.AssertionDirectionTypeCode
 import com.google.fhir.r4.core.AssertionOperatorTypeCode
 import com.google.fhir.r4.core.AssertionResponseTypesCode
+import com.google.fhir.r4.core.FHIRDefinedTypeValueSet
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.String
@@ -75,6 +78,7 @@ public object TestScriptConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setText(text.toHapi())
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
@@ -112,6 +116,7 @@ public object TestScriptConverter {
         .setId(Id.newBuilder().setValue(id))
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
+        .setLanguage(languageElement.toProto())
         .setText(text.toProto())
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
@@ -295,6 +300,11 @@ public object TestScriptConverter {
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
         .setType(type.toProto())
+        .setResource(
+          TestScript.Setup.SetupAction.Operation.ResourceCode.newBuilder()
+            .setValue(FHIRDefinedTypeValueSet.Value.valueOf(resource))
+            .build()
+        )
         .setLabel(labelElement.toProto())
         .setDescription(descriptionElement.toProto())
         .setAccept(
@@ -393,6 +403,11 @@ public object TestScriptConverter {
             .build()
         )
         .setRequestUrl(requestURLElement.toProto())
+        .setResource(
+          TestScript.Setup.SetupAction.Assert.ResourceCode.newBuilder()
+            .setValue(FHIRDefinedTypeValueSet.Value.valueOf(resource))
+            .build()
+        )
         .setResponse(
           TestScript.Setup.SetupAction.Assert.ResponseCode.newBuilder()
             .setValue(
@@ -588,6 +603,7 @@ public object TestScriptConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setType(type.toHapi())
+    hapiValue.setResource(resource.value.name)
     hapiValue.setLabelElement(label.toHapi())
     hapiValue.setDescriptionElement(description.toHapi())
     hapiValue.setAccept(accept.value)
@@ -656,6 +672,7 @@ public object TestScriptConverter {
       )
     )
     hapiValue.setRequestURLElement(requestUrl.toHapi())
+    hapiValue.setResource(resource.value.name)
     hapiValue.setResponse(
       org.hl7.fhir.r4.model.TestScript.AssertionResponseTypes.valueOf(
         response.value.name.replace("_", "")

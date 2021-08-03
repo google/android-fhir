@@ -44,6 +44,7 @@ import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverte
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toProto
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PublicationStatusCode
+import com.google.fhir.r4.core.ResourceTypeCode
 import com.google.fhir.r4.core.SearchComparatorCode
 import com.google.fhir.r4.core.SearchModifierCode
 import com.google.fhir.r4.core.SearchParamTypeCode
@@ -60,6 +61,7 @@ public object SearchParameterConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setText(text.toHapi())
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
@@ -77,6 +79,7 @@ public object SearchParameterConverter {
     hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
     hapiValue.setPurposeElement(purpose.toHapi())
     hapiValue.setCodeElement(code.toHapi())
+    baseList.forEach { hapiValue.addBase(it.value.name) }
     hapiValue.setType(Enumerations.SearchParamType.valueOf(type.value.name.replace("_", "")))
     hapiValue.setExpressionElement(expression.toHapi())
     hapiValue.setXpathElement(xpath.toHapi())
@@ -85,16 +88,17 @@ public object SearchParameterConverter {
         xpathUsage.value.name.replace("_", "")
       )
     )
+    targetList.forEach { hapiValue.addTarget(it.value.name) }
     hapiValue.setMultipleOrElement(multipleOr.toHapi())
     hapiValue.setMultipleAndElement(multipleAnd.toHapi())
-    comparatorList.map {
+    comparatorList.forEach {
       hapiValue.addComparator(
         org.hl7.fhir.r4.model.SearchParameter.SearchComparator.valueOf(
           it.value.name.replace("_", "")
         )
       )
     }
-    modifierList.map {
+    modifierList.forEach {
       hapiValue.addModifier(
         org.hl7.fhir.r4.model.SearchParameter.SearchModifierCode.valueOf(
           it.value.name.replace("_", "")
@@ -113,6 +117,7 @@ public object SearchParameterConverter {
         .setId(Id.newBuilder().setValue(id))
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
+        .setLanguage(languageElement.toProto())
         .setText(text.toProto())
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
@@ -136,6 +141,13 @@ public object SearchParameterConverter {
         .addAllJurisdiction(jurisdiction.map { it.toProto() })
         .setPurpose(purposeElement.toProto())
         .setCode(codeElement.toProto())
+        .addAllBase(
+          base.map {
+            SearchParameter.BaseCode.newBuilder()
+              .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString))
+              .build()
+          }
+        )
         .setType(
           SearchParameter.TypeCode.newBuilder()
             .setValue(
@@ -151,6 +163,13 @@ public object SearchParameterConverter {
               XPathUsageTypeCode.Value.valueOf(xpathUsage.toCode().replace("-", "_").toUpperCase())
             )
             .build()
+        )
+        .addAllTarget(
+          target.map {
+            SearchParameter.TargetCode.newBuilder()
+              .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString))
+              .build()
+          }
         )
         .setMultipleOr(multipleOrElement.toProto())
         .setMultipleAnd(multipleAndElement.toProto())

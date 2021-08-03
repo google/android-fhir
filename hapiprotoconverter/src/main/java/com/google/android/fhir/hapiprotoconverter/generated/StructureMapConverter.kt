@@ -570,6 +570,7 @@ public object StructureMapConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setText(text.toHapi())
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
@@ -601,6 +602,7 @@ public object StructureMapConverter {
         .setId(Id.newBuilder().setValue(id))
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
+        .setLanguage(languageElement.toProto())
         .setText(text.toProto())
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
@@ -934,7 +936,7 @@ public object StructureMapConverter {
     )
     hapiValue.setElementElement(element.toHapi())
     hapiValue.setVariableElement(variable.toHapi())
-    listModeList.map {
+    listModeList.forEach {
       hapiValue.addListMode(
         org.hl7.fhir.r4.model.StructureMap.StructureMapTargetListMode.valueOf(
           it.value.name.replace("_", "")

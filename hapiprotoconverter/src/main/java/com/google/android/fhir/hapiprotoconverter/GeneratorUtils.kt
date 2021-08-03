@@ -52,11 +52,6 @@ internal val ignoreValueSet =
   listOf(
     "http://hl7.org/fhir/ValueSet/languages",
     "http://hl7.org/fhir/ValueSet/expression-language",
-    "http://hl7.org/fhir/ValueSet/all-types|4.0.1",
-    "http://hl7.org/fhir/ValueSet/guide-parameter-code|4.0.1",
-    "http://hl7.org/fhir/ValueSet/resource-types|4.0.1",
-    "http://hl7.org/fhir/ValueSet/defined-types|4.0.1",
-    "http://hl7.org/fhir/ValueSet/medication-statement-status|4.0.1"
   )
 
 // proto package that contains the structures

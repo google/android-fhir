@@ -20,6 +20,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toH
 import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CanonicalConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.CanonicalConverter.toProto
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toHapi
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.ContactDetailConverter.toHapi
@@ -50,6 +52,7 @@ import com.google.fhir.r4.core.ExampleScenario.Process.Step
 import com.google.fhir.r4.core.ExampleScenarioActorTypeCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PublicationStatusCode
+import com.google.fhir.r4.core.ResourceTypeCode
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
@@ -61,6 +64,7 @@ public object ExampleScenarioConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setText(text.toHapi())
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
@@ -91,6 +95,7 @@ public object ExampleScenarioConverter {
         .setId(Id.newBuilder().setValue(id))
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
+        .setLanguage(languageElement.toProto())
         .setText(text.toProto())
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
@@ -154,6 +159,11 @@ public object ExampleScenarioConverter {
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
         .setResourceId(resourceIdElement.toProto())
+        .setResourceType(
+          ExampleScenario.Instance.ResourceTypeCode.newBuilder()
+            .setValue(ResourceTypeCode.Value.valueOf(resourceType))
+            .build()
+        )
         .setName(nameElement.toProto())
         .setDescription(descriptionElement.toProto())
         .addAllVersion(version.map { it.toProto() })
@@ -282,6 +292,7 @@ public object ExampleScenarioConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setResourceIdElement(resourceId.toHapi())
+    hapiValue.setResourceType(resourceType.value.name)
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setDescriptionElement(description.toHapi())
     hapiValue.setVersion(versionList.map { it.toHapi() })

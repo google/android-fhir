@@ -504,6 +504,7 @@ public object ParametersConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setParameter(parameterList.map { it.toHapi() })
     return hapiValue
   }
@@ -515,6 +516,7 @@ public object ParametersConverter {
         .setId(Id.newBuilder().setValue(id))
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
+        .setLanguage(languageElement.toProto())
         .addAllParameter(parameter.map { it.toProto() })
         .build()
     return protoValue

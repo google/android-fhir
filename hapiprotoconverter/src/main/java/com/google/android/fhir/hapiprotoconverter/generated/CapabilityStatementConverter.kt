@@ -20,6 +20,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toH
 import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CanonicalConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.CanonicalConverter.toProto
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toHapi
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CodingConverter.toHapi
@@ -66,6 +68,7 @@ import com.google.fhir.r4.core.FHIRVersionCode
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PublicationStatusCode
 import com.google.fhir.r4.core.ReferenceHandlingPolicyCode
+import com.google.fhir.r4.core.ResourceTypeCode
 import com.google.fhir.r4.core.ResourceVersionPolicyCode
 import com.google.fhir.r4.core.RestfulCapabilityModeCode
 import com.google.fhir.r4.core.SearchParamTypeCode
@@ -82,6 +85,7 @@ public object CapabilityStatementConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setText(text.toHapi())
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
@@ -127,6 +131,7 @@ public object CapabilityStatementConverter {
         .setId(Id.newBuilder().setValue(id))
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
+        .setLanguage(languageElement.toProto())
         .setText(text.toProto())
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
@@ -263,6 +268,11 @@ public object CapabilityStatementConverter {
         .setId(String.newBuilder().setValue(id))
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setType(
+          CapabilityStatement.Rest.Resource.TypeCode.newBuilder()
+            .setValue(ResourceTypeCode.Value.valueOf(type))
+            .build()
+        )
         .setProfile(profileElement.toProto())
         .addAllSupportedProfile(supportedProfile.map { it.toProto() })
         .setDocumentation(documentationElement.toProto())
@@ -536,6 +546,7 @@ public object CapabilityStatementConverter {
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setType(type.value.name)
     hapiValue.setProfileElement(profile.toHapi())
     hapiValue.setSupportedProfile(supportedProfileList.map { it.toHapi() })
     hapiValue.setDocumentationElement(documentation.toHapi())
@@ -559,7 +570,7 @@ public object CapabilityStatementConverter {
         conditionalDelete.value.name.replace("_", "")
       )
     )
-    referencePolicyList.map {
+    referencePolicyList.forEach {
       hapiValue.addReferencePolicy(
         org.hl7.fhir.r4.model.CapabilityStatement.ReferenceHandlingPolicy.valueOf(
           it.value.name.replace("_", "")

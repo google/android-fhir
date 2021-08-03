@@ -16,6 +16,8 @@
 
 package com.google.android.fhir.hapiprotoconverter.generated
 
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toHapi
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.ExtensionConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.ExtensionConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.IdConverter.toHapi
@@ -36,6 +38,7 @@ public object ExpressionConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setDescriptionElement(description.toHapi())
     hapiValue.setNameElement(name.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setReferenceElement(reference.toHapi())
     return hapiValue
   }
@@ -48,6 +51,7 @@ public object ExpressionConverter {
         .addAllExtension(extension.map { it.toProto() })
         .setDescription(descriptionElement.toProto())
         .setName(nameElement.toProto())
+        .setLanguage(languageElement.toProto())
         .setReference(referenceElement.toProto())
         .build()
     return protoValue

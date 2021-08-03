@@ -1562,7 +1562,7 @@ public object ElementDefinitionConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setPathElement(path.toHapi())
-    representationList.map {
+    representationList.forEach {
       hapiValue.addRepresentation(
         org.hl7.fhir.r4.model.ElementDefinition.PropertyRepresentation.valueOf(
           it.value.name.replace("_", "")
@@ -1873,7 +1873,7 @@ public object ElementDefinitionConverter {
     hapiValue.setCodeElement(code.toHapi())
     hapiValue.setProfile(profileList.map { it.toHapi() })
     hapiValue.setTargetProfile(targetProfileList.map { it.toHapi() })
-    aggregationList.map {
+    aggregationList.forEach {
       hapiValue.addAggregation(
         org.hl7.fhir.r4.model.ElementDefinition.AggregationMode.valueOf(
           it.value.name.replace("_", "")

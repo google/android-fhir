@@ -45,6 +45,7 @@ import com.google.android.fhir.hapiprotoconverter.generated.UriConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverter.toProto
 import com.google.fhir.r4.core.BindingStrengthCode
+import com.google.fhir.r4.core.FHIRAllTypesValueSet
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.OperationDefinition
 import com.google.fhir.r4.core.OperationDefinition.Parameter
@@ -52,6 +53,7 @@ import com.google.fhir.r4.core.OperationDefinition.Parameter.Binding
 import com.google.fhir.r4.core.OperationKindCode
 import com.google.fhir.r4.core.OperationParameterUseCode
 import com.google.fhir.r4.core.PublicationStatusCode
+import com.google.fhir.r4.core.ResourceTypeCode
 import com.google.fhir.r4.core.SearchParamTypeCode
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
@@ -64,6 +66,7 @@ public object OperationDefinitionConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setText(text.toHapi())
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
@@ -89,6 +92,7 @@ public object OperationDefinitionConverter {
     hapiValue.setCodeElement(code.toHapi())
     hapiValue.setCommentElement(comment.toHapi())
     hapiValue.setBaseElement(base.toHapi())
+    resourceList.forEach { hapiValue.addResource(it.value.name) }
     hapiValue.setSystemElement(system.toHapi())
     hapiValue.setTypeElement(type.toHapi())
     hapiValue.setInstanceElement(instance.toHapi())
@@ -106,6 +110,7 @@ public object OperationDefinitionConverter {
         .setId(Id.newBuilder().setValue(id))
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
+        .setLanguage(languageElement.toProto())
         .setText(text.toProto())
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
@@ -139,6 +144,13 @@ public object OperationDefinitionConverter {
         .setCode(codeElement.toProto())
         .setComment(commentElement.toProto())
         .setBase(baseElement.toProto())
+        .addAllResource(
+          resource.map {
+            OperationDefinition.ResourceCode.newBuilder()
+              .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString))
+              .build()
+          }
+        )
         .setSystem(systemElement.toProto())
         .setType(typeElement.toProto())
         .setInstance(instanceElement.toProto())
@@ -169,6 +181,11 @@ public object OperationDefinitionConverter {
         .setMin(minElement.toProto())
         .setMax(maxElement.toProto())
         .setDocumentation(documentationElement.toProto())
+        .setType(
+          OperationDefinition.Parameter.TypeCode.newBuilder()
+            .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
+            .build()
+        )
         .addAllTargetProfile(targetProfile.map { it.toProto() })
         .setSearchType(
           OperationDefinition.Parameter.SearchTypeCode.newBuilder()
@@ -248,6 +265,7 @@ public object OperationDefinitionConverter {
     hapiValue.setMinElement(min.toHapi())
     hapiValue.setMaxElement(max.toHapi())
     hapiValue.setDocumentationElement(documentation.toHapi())
+    hapiValue.setType(type.value.name)
     hapiValue.setTargetProfile(targetProfileList.map { it.toHapi() })
     hapiValue.setSearchType(
       Enumerations.SearchParamType.valueOf(searchType.value.name.replace("_", ""))

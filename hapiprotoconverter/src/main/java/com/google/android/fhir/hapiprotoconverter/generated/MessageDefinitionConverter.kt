@@ -20,6 +20,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toH
 import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CanonicalConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.CanonicalConverter.toProto
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toHapi
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CodingConverter.toHapi
@@ -49,9 +51,11 @@ import com.google.android.fhir.hapiprotoconverter.generated.UsageContextConverte
 import com.google.fhir.r4.core.Coding
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.MessageDefinition
+import com.google.fhir.r4.core.MessageDefinition.Focus
 import com.google.fhir.r4.core.MessageSignificanceCategoryCode
 import com.google.fhir.r4.core.MessageheaderResponseRequestCode
 import com.google.fhir.r4.core.PublicationStatusCode
+import com.google.fhir.r4.core.ResourceTypeCode
 import com.google.fhir.r4.core.String
 import com.google.fhir.r4.core.Uri
 import java.lang.IllegalArgumentException
@@ -90,6 +94,7 @@ public object MessageDefinitionConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setText(text.toHapi())
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
@@ -135,6 +140,7 @@ public object MessageDefinitionConverter {
         .setId(Id.newBuilder().setValue(id))
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
+        .setLanguage(languageElement.toProto())
         .setText(text.toProto())
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
@@ -196,6 +202,11 @@ public object MessageDefinitionConverter {
         .setId(String.newBuilder().setValue(id))
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setCode(
+          MessageDefinition.Focus.CodeType.newBuilder()
+            .setValue(ResourceTypeCode.Value.valueOf(code))
+            .build()
+        )
         .setProfile(profileElement.toProto())
         .setMin(minElement.toProto())
         .setMax(maxElement.toProto())
@@ -224,6 +235,7 @@ public object MessageDefinitionConverter {
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setCode(code.value.name)
     hapiValue.setProfileElement(profile.toHapi())
     hapiValue.setMinElement(min.toHapi())
     hapiValue.setMaxElement(max.toHapi())

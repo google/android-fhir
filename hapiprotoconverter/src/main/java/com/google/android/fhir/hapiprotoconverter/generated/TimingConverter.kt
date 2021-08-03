@@ -180,13 +180,13 @@ public object TimingConverter {
     hapiValue.setPeriodUnit(
       org.hl7.fhir.r4.model.Timing.UnitsOfTime.valueOf(periodUnit.value.name.replace("_", ""))
     )
-    dayOfWeekList.map {
+    dayOfWeekList.forEach {
       hapiValue.addDayOfWeek(
         org.hl7.fhir.r4.model.Timing.DayOfWeek.valueOf(it.value.name.replace("_", ""))
       )
     }
     hapiValue.setTimeOfDay(timeOfDayList.map { it.toHapi() })
-    whenList.map {
+    whenList.forEach {
       hapiValue.addWhen(
         org.hl7.fhir.r4.model.Timing.EventTiming.valueOf(it.value.name.replace("_", ""))
       )

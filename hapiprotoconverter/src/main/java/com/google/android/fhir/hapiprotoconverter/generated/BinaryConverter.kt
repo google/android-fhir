@@ -18,6 +18,8 @@ package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.Base64BinaryConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.Base64BinaryConverter.toProto
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toHapi
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.MetaConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.MetaConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.ReferenceConverter.toHapi
@@ -35,6 +37,7 @@ public object BinaryConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setContentType(contentType.value)
     hapiValue.setSecurityContext(securityContext.toHapi())
     hapiValue.setDataElement(data.toHapi())
@@ -48,6 +51,7 @@ public object BinaryConverter {
         .setId(Id.newBuilder().setValue(id))
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
+        .setLanguage(languageElement.toProto())
         .setContentType(Binary.ContentTypeCode.newBuilder().setValue(contentType).build())
         .setSecurityContext(securityContext.toProto())
         .setData(dataElement.toProto())

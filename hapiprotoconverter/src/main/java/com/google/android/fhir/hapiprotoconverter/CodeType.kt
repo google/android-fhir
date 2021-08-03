@@ -21,6 +21,14 @@ import com.google.fhir.r4.core.String
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 
+private val hapiStringProtoCodeType =
+  listOf(
+    "http://hl7.org/fhir/ValueSet/defined-types|4.0.1",
+    "http://hl7.org/fhir/ValueSet/all-types|4.0.1",
+    "http://hl7.org/fhir/ValueSet/guide-parameter-code|4.0.1",
+    "http://hl7.org/fhir/ValueSet/resource-types|4.0.1"
+  )
+
 private val specialValueSet =
   listOf(
     "http://hl7.org/fhir/ValueSet/mimetypes|4.0.1",
@@ -37,16 +45,13 @@ internal fun handleCodeType(
   protoName: kotlin.String,
   backboneElementMap: MutableMap<kotlin.String, CompositeCodegen.BackBoneElementData>
 ) {
-
   val isSingle = element.max.value == "1"
   val isCommon =
     element.binding.extensionList.any { it.url.value == uriCommon && it.value.boolean.value }
-
-  if (!specialValueSet.contains(element.binding.valueSet.value)) {
+  if (hapiStringProtoCodeType.contains(element.binding.valueSet.value)) {
     if (isSingle) {
-      // if enum isSingle
       protoBuilder.addStatement(
-        "$singleMethodTemplate(%T.newBuilder().setValue(%T.valueOf(%L.toCode().replace(\"-\", \"_\").toUpperCase())).build())",
+        "$singleMethodTemplate(%T.newBuilder().setValue(%T.valueOf(%L)).build())",
         element.getProtoMethodName(),
         // Using this just to make sure codes are present in hapi and fhir protos TODO change to
         element.getProtoCodeClass(
@@ -58,15 +63,13 @@ internal fun handleCodeType(
         element.getHapiFieldName()
       )
       hapiBuilder.addStatement(
-        "hapiValue$singleMethodTemplate(%T.valueOf(%L.value.name.replace(\"_\",\"\")))",
+        "hapiValue$singleMethodTemplate(%L.value.name)",
         element.getHapiMethodName(),
-        element.getHapiCodeClass(isCommon),
         element.getProtoFieldName()
       )
     } else {
-      // handle case when enum is repeated
       protoBuilder.addStatement(
-        "$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.value.toCode().replace(\"-\", \"_\").toUpperCase())).build()})",
+        "$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.valueAsString)).build()})",
         element.getProtoMethodName(),
         element.getHapiFieldName(),
         element.getProtoCodeClass(
@@ -76,15 +79,12 @@ internal fun handleCodeType(
         Class.forName(getEnumNameFromElement(element).reflectionName())
       )
       hapiBuilder.addStatement(
-        "%L.map{hapiValue.add%L(%T.valueOf(it.value.name.replace(\"_\",\"\")))}",
+        "%L.forEach{hapiValue.add%L(it.value.name)}",
         element.getProtoFieldName(isRepeated = true),
         element.getHapiMethodName(),
-        element.getHapiCodeClass(isCommon)
       )
     }
-  }
-  // Element is in special valueSet
-  else {
+  } else if (specialValueSet.contains(element.binding.valueSet.value)) {
     if (isSingle) {
       protoBuilder.addStatement(
         "$singleMethodTemplate(%T.newBuilder().setValue(%L).build())",
@@ -119,7 +119,48 @@ internal fun handleCodeType(
         element.getHapiMethodName()
       )
     }
+  } else {
+    if (isSingle) {
+      // if enum isSingle
+      protoBuilder.addStatement(
+        "$singleMethodTemplate(%T.newBuilder().setValue(%T.valueOf(%L.toCode().replace(\"-\", \"_\").toUpperCase())).build())",
+        element.getProtoMethodName(),
+        // Using this just to make sure codes are present in hapi and fhir protos TODO change to
+        element.getProtoCodeClass(
+          protoName,
+          backboneElementMap[element.path.value.substringBeforeLast(".")]
+        ),
+        // KotlinPoet.ClassName
+        Class.forName(getEnumNameFromElement(element).reflectionName()),
+        element.getHapiFieldName()
+      )
+      hapiBuilder.addStatement(
+        "hapiValue$singleMethodTemplate(%T.valueOf(%L.value.name.replace(\"_\",\"\")))",
+        element.getHapiMethodName(),
+        element.getHapiCodeClass(isCommon),
+        element.getProtoFieldName()
+      )
+    } else {
+      // handle case when enum is repeated
+      protoBuilder.addStatement(
+        "$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.value.toCode().replace(\"-\", \"_\").toUpperCase())).build()})",
+        element.getProtoMethodName(),
+        element.getHapiFieldName(),
+        element.getProtoCodeClass(
+          protoName,
+          backboneElementMap[element.path.value.substringBeforeLast(".")]
+        ),
+        Class.forName(getEnumNameFromElement(element).reflectionName())
+      )
+      hapiBuilder.addStatement(
+        "%L.forEach{hapiValue.add%L(%T.valueOf(it.value.name.replace(\"_\",\"\")))}",
+        element.getProtoFieldName(isRepeated = true),
+        element.getHapiMethodName(),
+        element.getHapiCodeClass(isCommon)
+      )
+    }
   }
+  // Element is in special valueSet
 }
 
 private fun getEnumNameFromElement(element: ElementDefinition): ClassName {

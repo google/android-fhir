@@ -18,6 +18,8 @@ package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.AnnotationConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.AnnotationConverter.toProto
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toHapi
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.DateTimeConverter.toHapi
@@ -42,6 +44,7 @@ import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.MedicationStatement
+import com.google.fhir.r4.core.MedicationStatusCode
 import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.Reference
 import java.lang.IllegalArgumentException
@@ -102,12 +105,18 @@ public object MedicationStatementConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setText(text.toHapi())
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
     hapiValue.setPartOf(partOfList.map { it.toHapi() })
+    hapiValue.setStatus(
+      org.hl7.fhir.r4.model.MedicationStatement.MedicationStatementStatus.valueOf(
+        status.value.name.replace("_", "")
+      )
+    )
     hapiValue.setStatusReason(statusReasonList.map { it.toHapi() })
     hapiValue.setCategory(category.toHapi())
     hapiValue.setMedication(medication.medicationStatementMedicationToHapi())
@@ -131,12 +140,20 @@ public object MedicationStatementConverter {
         .setId(Id.newBuilder().setValue(id))
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
+        .setLanguage(languageElement.toProto())
         .setText(text.toProto())
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
         .addAllIdentifier(identifier.map { it.toProto() })
         .addAllBasedOn(basedOn.map { it.toProto() })
         .addAllPartOf(partOf.map { it.toProto() })
+        .setStatus(
+          MedicationStatement.StatusCode.newBuilder()
+            .setValue(
+              MedicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+            )
+            .build()
+        )
         .addAllStatusReason(statusReason.map { it.toProto() })
         .setCategory(category.toProto())
         .setMedication(medication.medicationStatementMedicationToProto())

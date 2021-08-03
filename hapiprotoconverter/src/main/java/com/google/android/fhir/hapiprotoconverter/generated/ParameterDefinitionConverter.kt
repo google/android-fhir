@@ -26,6 +26,7 @@ import com.google.android.fhir.hapiprotoconverter.generated.IntegerConverter.toH
 import com.google.android.fhir.hapiprotoconverter.generated.IntegerConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.StringConverter.toProto
+import com.google.fhir.r4.core.FHIRAllTypesValueSet
 import com.google.fhir.r4.core.OperationParameterUseCode
 import com.google.fhir.r4.core.ParameterDefinition
 import com.google.fhir.r4.core.String
@@ -46,6 +47,7 @@ public object ParameterDefinitionConverter {
     hapiValue.setMinElement(min.toHapi())
     hapiValue.setMaxElement(max.toHapi())
     hapiValue.setDocumentationElement(documentation.toHapi())
+    hapiValue.setType(type.value.name)
     hapiValue.setProfileElement(profile.toHapi())
     return hapiValue
   }
@@ -67,6 +69,11 @@ public object ParameterDefinitionConverter {
         .setMin(minElement.toProto())
         .setMax(maxElement.toProto())
         .setDocumentation(documentationElement.toProto())
+        .setType(
+          ParameterDefinition.TypeCode.newBuilder()
+            .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
+            .build()
+        )
         .setProfile(profileElement.toProto())
         .build()
     return protoValue

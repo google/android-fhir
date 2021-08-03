@@ -20,6 +20,8 @@ import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toH
 import com.google.android.fhir.hapiprotoconverter.generated.BooleanConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CanonicalConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.CanonicalConverter.toProto
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toHapi
+import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.CodeableConceptConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.ContactDetailConverter.toHapi
@@ -51,6 +53,7 @@ import com.google.fhir.r4.core.GraphDefinition.Link.Target
 import com.google.fhir.r4.core.GraphDefinition.Link.Target.Compartment
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.PublicationStatusCode
+import com.google.fhir.r4.core.ResourceTypeCode
 import com.google.fhir.r4.core.String
 import kotlin.jvm.JvmStatic
 import org.hl7.fhir.r4.model.Enumerations
@@ -62,6 +65,7 @@ public object GraphDefinitionConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setText(text.toHapi())
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
@@ -77,6 +81,7 @@ public object GraphDefinitionConverter {
     hapiValue.setUseContext(useContextList.map { it.toHapi() })
     hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
     hapiValue.setPurposeElement(purpose.toHapi())
+    hapiValue.setStart(start.value.name)
     hapiValue.setProfileElement(profile.toHapi())
     hapiValue.setLink(linkList.map { it.toHapi() })
     return hapiValue
@@ -89,6 +94,7 @@ public object GraphDefinitionConverter {
         .setId(Id.newBuilder().setValue(id))
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
+        .setLanguage(languageElement.toProto())
         .setText(text.toProto())
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
@@ -110,6 +116,11 @@ public object GraphDefinitionConverter {
         .addAllUseContext(useContext.map { it.toProto() })
         .addAllJurisdiction(jurisdiction.map { it.toProto() })
         .setPurpose(purposeElement.toProto())
+        .setStart(
+          GraphDefinition.StartCode.newBuilder()
+            .setValue(ResourceTypeCode.Value.valueOf(start))
+            .build()
+        )
         .setProfile(profileElement.toProto())
         .addAllLink(link.map { it.toProto() })
         .build()
@@ -142,6 +153,11 @@ public object GraphDefinitionConverter {
         .setId(String.newBuilder().setValue(id))
         .addAllExtension(extension.map { it.toProto() })
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
+        .setType(
+          GraphDefinition.Link.Target.TypeCode.newBuilder()
+            .setValue(ResourceTypeCode.Value.valueOf(type))
+            .build()
+        )
         .setParams(paramsElement.toProto())
         .setProfile(profileElement.toProto())
         .addAllCompartment(compartment.map { it.toProto() })
@@ -207,6 +223,7 @@ public object GraphDefinitionConverter {
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    hapiValue.setType(type.value.name)
     hapiValue.setParamsElement(params.toHapi())
     hapiValue.setProfileElement(profile.toHapi())
     hapiValue.setCompartment(compartmentList.map { it.toHapi() })

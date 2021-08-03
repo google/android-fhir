@@ -187,7 +187,8 @@ object CompositeCodegen {
       }
       // check if it is an enum
       else if (element.typeList.single().normalizeType() == "Code" &&
-          element.binding != ElementDefinition.ElementDefinitionBinding.getDefaultInstance()
+          element.binding != ElementDefinition.ElementDefinitionBinding.getDefaultInstance() &&
+          !ignoreValueSet.contains(element.binding.valueSet.value)
       ) {
         if (ignoreValueSet.contains(element.binding.valueSet.value)) {
           continue
