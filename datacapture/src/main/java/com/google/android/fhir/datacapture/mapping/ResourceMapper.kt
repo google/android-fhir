@@ -89,10 +89,10 @@ object ResourceMapper {
    * @return [Bundle] containing the extracted [Resource]s or empty Bundle if the extraction fails.
    * An exception might also be thrown in a few cases
    */
-  fun extract(
+  suspend fun extract(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    structureMapProvider: ((String) -> StructureMap?)? = null,
+    structureMapProvider: (suspend (String) -> StructureMap?)? = null,
     context: Context? = null
   ): Bundle {
     return if (questionnaire.targetStructureMap == null)
@@ -108,7 +108,7 @@ object ResourceMapper {
    * extracted resource. If the process completely fails, an error is thrown or a [Bundle]
    * containing empty [Resource] is returned
    */
-  private fun extractByDefinitions(
+  private suspend fun extractByDefinitions(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse
   ): Bundle {
@@ -138,10 +138,10 @@ object ResourceMapper {
    * [Bundle], failure to this an exception will be thrown. If a [StructureMapProvider] is not
    * passed, an empty [Bundle] object is returned
    */
-  private fun extractByStructureMap(
+  private suspend fun extractByStructureMap(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    structureMapProvider: ((String) -> StructureMap?)?,
+    structureMapProvider: (suspend (String) -> StructureMap?)?,
     context: Context?
   ): Bundle {
     if (structureMapProvider == null || context == null) return Bundle()
@@ -159,21 +159,21 @@ object ResourceMapper {
    * Returns a `QuestionnaireResponse` to the [questionnaire] that is pre-filled from the [resource]
    * See http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population.
    */
-  fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
+  suspend fun populate(questionnaire: Questionnaire, resource: Resource): QuestionnaireResponse {
     populateInitialValues(questionnaire.item, resource)
     return QuestionnaireResponse().apply {
       item = questionnaire.item.map { it.createQuestionnaireResponseItem() }
     }
   }
 
-  private fun populateInitialValues(
+  private suspend fun populateInitialValues(
     questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
     resource: Resource
   ) {
     questionnaireItems.forEach { populateInitialValue(it, resource) }
   }
 
-  private fun populateInitialValue(
+  private suspend fun populateInitialValue(
     question: Questionnaire.QuestionnaireItemComponent,
     resource: Resource
   ) {
@@ -203,7 +203,7 @@ object ResourceMapper {
    * Extracts answer values from [questionnaireResponseItemList] and updates the fields defined in
    * the corresponding questions in [questionnaireItemList]. This method handles nested fields.
    */
-  private fun Base.extractFields(
+  private suspend fun Base.extractFields(
     bundle: Bundle,
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
@@ -224,7 +224,7 @@ object ResourceMapper {
    * Extracts the answer value from [questionnaireResponseItem] and updates the field defined in
    * [questionnaireItem]. This method handles nested fields.
    */
-  private fun Base.extractField(
+  private suspend fun Base.extractField(
     bundle: Bundle,
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
