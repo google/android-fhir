@@ -258,7 +258,7 @@ object ResourceMapper {
 
     val definitionField = questionnaireItem.getDefinitionField ?: return
     if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
-      if (questionnaireItem.isChoiceType(choiceTypeFieldIndex = 1)) {
+      if (questionnaireItem.isChoiceElement(choiceTypeFieldIndex = 1)) {
         val value: Base =
           (Class.forName(
                 "org.hl7.fhir.r4.model.${questionnaireItem.itemContextNameToExpressionMap.values.first()}"
@@ -460,7 +460,7 @@ private val Questionnaire.QuestionnaireItemComponent.getDefinitionField: Field?
     if (path.size < 2) return null
     val resourceClass: Class<*> = Class.forName("org.hl7.fhir.r4.model.${path[0]}")
     val definitionField: Field = getFieldOrNull(resourceClass, 1) ?: return null
-    if (isChoiceType(choiceTypeFieldIndex = 1) && path.size > 2) {
+    if (isChoiceElement(choiceTypeFieldIndex = 1) && path.size > 2) {
       return getNestedFieldOfChoiceType()
     }
     return path.drop(2).fold(definitionField) { field: Field?, nestedFieldName: String ->
@@ -470,12 +470,12 @@ private val Questionnaire.QuestionnaireItemComponent.getDefinitionField: Field?
 
 /**
  * Returns nested declared field of choice data type field if present in definition. e.g returns
- * "value" field for definition #Observation.quantityValue.value
+ * "value" field for definition #Observation.valueQuantity.value
  */
 private fun Questionnaire.QuestionnaireItemComponent.getNestedFieldOfChoiceType(): Field? {
   val path = definitionPath ?: return null
-  if (path.size < 3 || !path[1].startsWith(CHOICE_DATA_TYPE_CONSTANT_NAME)) return null
-  val typeChoice = path[1].substringAfter(CHOICE_DATA_TYPE_CONSTANT_NAME)
+  if (path.size < 3 || !path[1].startsWith(CHOICE_ELEMENT_CONSTANT_NAME)) return null
+  val typeChoice = path[1].substringAfter(CHOICE_ELEMENT_CONSTANT_NAME)
   val resourceClass: Class<*> = Class.forName("org.hl7.fhir.r4.model.$typeChoice")
   return resourceClass.getFieldOrNull(path[2])
 }
@@ -484,19 +484,22 @@ private fun Questionnaire.QuestionnaireItemComponent.getNestedFieldOfChoiceType(
  * Returns true if choice data type of declared field present at given choiceTypeFieldIndex in
  * definition.
  *
- * e.g #Observation.quantityValue.value field quantityValue is choice of data type and
+ * Choice of data types (https://www.hl7.org/fhir/formats.html#choice) are in the form of value[x]
+ * valueQuantity, valueCodeableConcept, valueSampledData, valueString etc.
+ *
+ * e.g #Observation.valueQuantity.value field quantityValue is choice of data type and
  * choiceTypeFieldIndex is 1.
  *
  * @param choiceTypeFieldIndex index of field present in definition
  */
-private fun Questionnaire.QuestionnaireItemComponent.isChoiceType(
+private fun Questionnaire.QuestionnaireItemComponent.isChoiceElement(
   choiceTypeFieldIndex: Int
 ): Boolean {
   val path = definitionPath ?: return false
   if (path.size <= choiceTypeFieldIndex) {
     return false
   }
-  if (path[choiceTypeFieldIndex].startsWith(CHOICE_DATA_TYPE_CONSTANT_NAME)) {
+  if (path[choiceTypeFieldIndex].startsWith(CHOICE_ELEMENT_CONSTANT_NAME)) {
     return true
   }
   return false
@@ -506,7 +509,7 @@ private fun Questionnaire.QuestionnaireItemComponent.isChoiceType(
  * Retrieves details about the target field defined in
  * [org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent.definition].
  *
- * e.g #Observation.quantityValue.value field index is 1 for quantityValue.
+ * e.g #Observation.valueQuantity.value field index is 1 for valueQuantity.
  *
  * @param resourceClass which has declared field
  * @param fieldIndex index of field present in definition
@@ -516,10 +519,11 @@ private fun Questionnaire.QuestionnaireItemComponent.getFieldOrNull(
   fieldIndex: Int
 ): Field? {
   val path = definitionPath ?: return null
-  if (isChoiceType(fieldIndex)) {
-    return resourceClass.getFieldOrNull(CHOICE_DATA_TYPE_CONSTANT_NAME)
+  return if (isChoiceElement(fieldIndex)) {
+    resourceClass.getFieldOrNull(CHOICE_ELEMENT_CONSTANT_NAME)
+  } else {
+    return resourceClass.getFieldOrNull(path[fieldIndex])
   }
-  return resourceClass.getFieldOrNull(path[fieldIndex])
 }
 
 /**
@@ -533,7 +537,7 @@ private const val ITEM_CONTEXT_EXTENSION_URL: String =
 private const val ITEM_INITIAL_EXPRESSION_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
 
-private const val CHOICE_DATA_TYPE_CONSTANT_NAME = "value"
+private const val CHOICE_ELEMENT_CONSTANT_NAME = "value"
 
 private val Field.isList: Boolean
   get() = isParameterized && type == List::class.java
