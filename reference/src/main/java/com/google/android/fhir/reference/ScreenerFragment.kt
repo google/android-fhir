@@ -96,7 +96,6 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
       questionnaireFragment.getQuestionnaireResponse(),
       args.patientId
     )
-    Toast.makeText(context, getString(R.string.response_received), Toast.LENGTH_SHORT).show()
   }
 
   private fun showCancelScreenerQuestionnaireAlertDialog() {
