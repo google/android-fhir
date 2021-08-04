@@ -34,9 +34,7 @@ class DatastoreUtil(private val context: Context) {
   private val lastSyncTimestampKey by lazy { stringPreferencesKey("LAST_SYNC_TIMESTAMP") }
 
   fun readLastSyncTimestamp(): OffsetDateTime? {
-    var millis: String?
-
-    millis = runBlocking { context.dataStore.data.first()[lastSyncTimestampKey] } ?: return null
+    val millis = runBlocking { context.dataStore.data.first()[lastSyncTimestampKey] } ?: return null
 
     return OffsetDateTime.parse(millis)
   }

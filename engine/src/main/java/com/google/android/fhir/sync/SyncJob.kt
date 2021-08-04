@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync
 
 import androidx.work.WorkInfo
+import com.google.android.fhir.FhirEngine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
@@ -24,9 +25,15 @@ interface SyncJob {
   fun <W : FhirSyncWorker> poll(
     periodicSyncConfiguration: PeriodicSyncConfiguration,
     clazz: Class<W>
-  ): Flow<WorkInfo>
+  ): Flow<State>
 
-  suspend fun run(subscribeTo: MutableSharedFlow<State>?): Result
+  suspend fun run(
+    fhirEngine: FhirEngine,
+    dataSource: DataSource,
+    resourceSyncParams: ResourceSyncParams,
+    subscribeTo: MutableSharedFlow<State>?
+  ): Result
+
   fun workInfoFlow(): Flow<WorkInfo>
   fun stateFlow(): Flow<State>
 }

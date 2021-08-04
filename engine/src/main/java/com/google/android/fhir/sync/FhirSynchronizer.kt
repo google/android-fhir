@@ -31,15 +31,13 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
-  val timestamp: OffsetDateTime = OffsetDateTime.now()
+  val timestamp: String = OffsetDateTime.now().toString()
 
   object Success : Result()
   data class Error(val exceptions: List<ResourceSyncException>) : Result()
 }
 
 sealed class State {
-  data class Nothing(val lastSyncTimestamp: OffsetDateTime?) : State()
-
   object Started : State()
 
   data class InProgress(val resourceType: ResourceType?) : State()
@@ -65,15 +63,12 @@ internal class FhirSynchronizer(
     return flow != null
   }
 
-  suspend fun subscribe(flow: MutableSharedFlow<State>) {
+  fun subscribe(flow: MutableSharedFlow<State>) {
     if (isSubscribed()) {
       throw IllegalStateException("Already subscribed to a flow")
     }
 
     this.flow = flow
-
-    val lastSyncTimestamp = datastoreUtil.readLastSyncTimestamp()
-    emit(State.Nothing(lastSyncTimestamp))
   }
 
   private suspend fun emit(state: State) {
@@ -81,7 +76,7 @@ internal class FhirSynchronizer(
   }
 
   private suspend fun emitResult(result: Result): Result {
-    datastoreUtil.writeLastSyncTimestamp(result.timestamp)
+    datastoreUtil.writeLastSyncTimestamp(OffsetDateTime.parse(result.timestamp))
 
     when (result) {
       is Result.Success -> emit(State.Finished(result))

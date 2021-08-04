@@ -23,6 +23,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import androidx.work.hasKeyWithValueOfType
 import com.google.android.fhir.FhirEngine
 import com.google.gson.Gson
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,22 +33,20 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.mapNotNull
 
-class SyncJobImpl(
-  private val context: Context,
-  private val fhirEngine: FhirEngine,
-  private val dataSource: DataSource,
-  private val resourceSyncParams: ResourceSyncParams
-) : SyncJob {
+class SyncJobImpl(private val context: Context) : SyncJob {
   private val TAG = javaClass.name
   private val syncWorkType = SyncWorkType.DOWNLOAD_UPLOAD
+  private val gson = Gson()
 
   /** Periodically sync the data with given configuration for given worker class */
   @ExperimentalCoroutinesApi
   override fun <W : FhirSyncWorker> poll(
     periodicSyncConfiguration: PeriodicSyncConfiguration,
     clazz: Class<W>
-  ): Flow<WorkInfo> {
-    Log.i(TAG, "Initiating polling")
+  ): Flow<State> {
+    val workerUniqueName = syncWorkType.workerName
+
+    Log.i(TAG, "Configuring polling for $workerUniqueName")
 
     val periodicWorkRequest =
       PeriodicWorkRequest.Builder(
@@ -58,14 +57,13 @@ class SyncJobImpl(
         .setConstraints(periodicSyncConfiguration.syncConstraints)
         .build()
 
-    val workerUniqueName = syncWorkType.workerName
     val workManager = WorkManager.getInstance(context)
 
-    val flow = workInfoFlow()
+    val flow = stateFlow()
 
     workManager.enqueueUniquePeriodicWork(
       workerUniqueName,
-      ExistingPeriodicWorkPolicy.KEEP,
+      ExistingPeriodicWorkPolicy.REPLACE,
       periodicWorkRequest
     )
 
@@ -81,16 +79,15 @@ class SyncJobImpl(
       .getWorkInfosForUniqueWorkLiveData(syncWorkType.workerName)
       .asFlow()
       .flatMapConcat { it.asFlow() }
-      .mapNotNull { it }
   }
 
   private fun convertToState(workInfo: WorkInfo): State? {
-    return workInfo
-      .takeIf { it.state != WorkInfo.State.ENQUEUED && it.progress.keyValueMap.isNotEmpty() }
+    return workInfo.progress
+      .takeIf { it.keyValueMap.isNotEmpty() && it.hasKeyWithValueOfType<String>("StateType") }
       ?.let {
-        val state = workInfo.progress.getString("StateType")!!
-        val stateData = workInfo.progress.getString("State")!!
-        Gson().fromJson(stateData, Class.forName(state)) as State
+        val state = it.getString("StateType")!!
+        val stateData = it.getString("State")
+        gson.fromJson(stateData, Class.forName(state)) as State
       }
   }
 
@@ -98,7 +95,12 @@ class SyncJobImpl(
    * Run fhir synchronizer immediately with default sync params configured on initialization and
    * subscribe to given flow
    */
-  override suspend fun run(subscribeTo: MutableSharedFlow<State>?): Result {
+  override suspend fun run(
+    fhirEngine: FhirEngine,
+    dataSource: DataSource,
+    resourceSyncParams: ResourceSyncParams,
+    subscribeTo: MutableSharedFlow<State>?
+  ): Result {
     val fhirSynchronizer = FhirSynchronizer(context, fhirEngine, dataSource, resourceSyncParams)
 
     if (subscribeTo != null) fhirSynchronizer.subscribe(subscribeTo)

@@ -63,6 +63,7 @@ class SyncJobTest {
 
   private lateinit var workManager: WorkManager
   private lateinit var fhirEngine: FhirEngine
+  private lateinit var resourceSyncParam: Map<ResourceType, Map<String, String>>
 
   private val database = mock<Database>()
   private val dataSource = mock<DataSource>()
@@ -75,9 +76,9 @@ class SyncJobTest {
   fun setup() {
     fhirEngine = FhirEngineImpl(database, context)
 
-    val resourceSyncParam = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
+    resourceSyncParam = mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
 
-    syncJob = Sync.basicSyncJob(context, fhirEngine, dataSource, resourceSyncParam)
+    syncJob = Sync.basicSyncJob(context)
 
     val config =
       Configuration.Builder()
@@ -111,32 +112,28 @@ class SyncJobTest {
     workManager
       .enqueueUniquePeriodicWork(
         SyncWorkType.DOWNLOAD_UPLOAD.workerName,
-        ExistingPeriodicWorkPolicy.KEEP,
+        ExistingPeriodicWorkPolicy.REPLACE,
         worker
       )
       .result
       .get()
 
-    Thread.sleep(5000) // how to avoid it ???
+    Thread.sleep(2000)
 
-    assertThat(workInfoList).hasSize(7)
     assertThat(workInfoList.map { it.state })
-      .containsExactly(
+      .containsAtLeast(
         WorkInfo.State.ENQUEUED, // waiting for turn
         WorkInfo.State.RUNNING, // worker launched
-        WorkInfo.State.RUNNING, // progress emitted State.Nothing
-        WorkInfo.State.RUNNING, // progress emitted State.Started
-        WorkInfo.State.RUNNING, // progress emitted State.InProgress
+        WorkInfo.State.RUNNING, // progresses emitted Started, InProgress..
         WorkInfo.State.RUNNING, // progress emitted State.Success
         WorkInfo.State.ENQUEUED // waiting again for next turn
       )
       .inOrder()
 
-    // States are Nothing, Started, InProgress .... , Finished (Success)
-    assertThat(stateList[0]).isInstanceOf(State.Nothing::class.java)
-    assertThat(stateList[1]).isInstanceOf(State.Started::class.java)
-    assertThat(stateList[2]).isInstanceOf(State.InProgress::class.java)
-    assertThat(stateList[3]).isInstanceOf(State.Finished::class.java)
+    // States are  Started, InProgress .... , Finished (Success)
+    assertThat(stateList.map { it::class.java })
+      .containsAtLeast(State.InProgress::class.java, State.Finished::class.java)
+      .inOrder()
 
     job1.cancel()
     job2.cancel()
@@ -152,20 +149,21 @@ class SyncJobTest {
     val flow = MutableSharedFlow<State>()
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(flow)
+    syncJob.run(fhirEngine, dataSource, resourceSyncParam, flow)
 
     // State transition for successful job as below
-    // Nothing, Started, InProgress, Finished (Success)
-    assertThat(res[0]).isInstanceOf(State.Nothing::class.java)
-    assertThat(res[1]).isInstanceOf(State.Started::class.java)
-    assertThat(res[2]).isInstanceOf(State.InProgress::class.java)
-    assertThat(res[3]).isInstanceOf(State.Finished::class.java)
+    // Started, InProgress, Finished (Success)
+    assertThat(res.map { it::class.java })
+      .containsExactly(
+        State.Started::class.java,
+        State.InProgress::class.java,
+        State.Finished::class.java
+      )
+      .inOrder()
 
-    val success = (res[3] as State.Finished).result
+    val success = (res[2] as State.Finished).result
 
-    assertThat(success.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
-
-    assertThat(res).hasSize(4)
+    assertThat(success.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp().toString())
 
     job.cancel()
   }
@@ -181,23 +179,25 @@ class SyncJobTest {
 
     val job = launch { flow.collect { res.add(it) } }
 
-    syncJob.run(flow)
+    syncJob.run(fhirEngine, dataSource, resourceSyncParam, flow)
 
     // State transition for failed job as below
-    // Nothing, Started, InProgress, Glitch, Failed (Error)
-    assertThat(res[0]).isInstanceOf(State.Nothing::class.java)
-    assertThat(res[1]).isInstanceOf(State.Started::class.java)
-    assertThat(res[2]).isInstanceOf(State.InProgress::class.java)
-    assertThat(res[3]).isInstanceOf(State.Glitch::class.java)
-    assertThat(res[4]).isInstanceOf(State.Failed::class.java)
+    // Started, InProgress, Glitch, Failed (Error)
+    assertThat(res.map { it::class.java })
+      .containsExactly(
+        State.Started::class.java,
+        State.InProgress::class.java,
+        State.Glitch::class.java,
+        State.Failed::class.java
+      )
+      .inOrder()
 
-    val error = (res[4] as State.Failed).result
+    val error = (res[3] as State.Failed).result
 
-    assertThat(error.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
+    assertThat(error.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp().toString())
 
     assertThat(error.exceptions[0].exception)
       .isInstanceOf(java.lang.IllegalStateException::class.java)
-    assertThat(res).hasSize(5)
 
     job.cancel()
   }

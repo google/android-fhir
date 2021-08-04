@@ -28,13 +28,8 @@ import androidx.work.WorkManager
 import com.google.android.fhir.FhirEngine
 
 object Sync {
-  fun basicSyncJob(
-    context: Context,
-    fhirEngine: FhirEngine,
-    dataSource: DataSource,
-    resourceSyncParams: ResourceSyncParams
-  ): SyncJob {
-    return SyncJobImpl(context, fhirEngine, dataSource, resourceSyncParams)
+  fun basicSyncJob(context: Context): SyncJob {
+    return SyncJobImpl(context)
   }
 
   /**
