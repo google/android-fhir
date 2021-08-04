@@ -19,6 +19,9 @@ package com.google.android.fhir.search
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.ConverterException
+import com.google.android.fhir.UcumValue
+import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.epochDay
 import java.math.BigDecimal
@@ -254,7 +257,7 @@ private fun getConditionParamPair(
     ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
     ParamPrefixEnum.NOT_EQUAL ->
       ConditionParam(
-        "index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?",
+        "(index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?)",
         start,
         end,
         start,
@@ -305,7 +308,7 @@ private fun getConditionParamPair(
     ParamPrefixEnum.NOT_EQUAL -> {
       val precision = value.getRange()
       ConditionParam(
-        "index_value < ? OR index_value >= ?",
+        "(index_value < ? OR index_value >= ?)",
         (value - precision).toDouble(),
         (value + precision).toDouble()
       )
@@ -339,18 +342,30 @@ private fun getConditionParamPair(
   val systemCondition =
     if (system != null) {
       argList.add(system)
-      "AND index_system = ? "
+      "AND index_system = ?"
     } else ""
   val codeCondition =
     if (unit != null) {
-      if (system == "http://unitsofmeasure.org") {
-        // TODO find canonical matches here
-      }
       argList.add(unit)
-      "AND index_unit = ? "
+      "index_unit = ? AND "
     } else ""
   argList.addAll(valueCondition.params)
-  return ConditionParam("$systemCondition${codeCondition}AND ${valueCondition.condition}", argList)
+  val canonicalCondition =
+    if (system == "http://unitsofmeasure.org" && unit != null) {
+      try {
+        val ucumUnit = UnitConverter.getCanonicalUnits(UcumValue(unit, value))
+        val canonicalConditionParam = getConditionParamPair(prefix, ucumUnit.value)
+        argList.add(ucumUnit.units)
+        argList.addAll(canonicalConditionParam.params)
+        " OR (index_canonicalUnit =? AND ${canonicalConditionParam.condition.replace("index_value","index_canonicalValue")})"
+      } catch (exception: ConverterException) {
+        ""
+      }
+    } else ""
+  return ConditionParam(
+    "$systemCondition AND ((${codeCondition}${valueCondition.condition})$canonicalCondition)",
+    argList
+  )
 }
 
 /**

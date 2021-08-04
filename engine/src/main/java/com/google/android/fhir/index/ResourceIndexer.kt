@@ -19,6 +19,9 @@ package com.google.android.fhir.index
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
+import com.google.android.fhir.ConverterException
+import com.google.android.fhir.UcumValue
+import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.epochDay
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.DateTimeIndex
@@ -259,17 +262,32 @@ internal object ResourceIndexer {
           searchParam.path,
           FHIR_CURRENCY_CODE_SYSTEM,
           money.currency,
-          money.value
+          money.value,
+          null,
+          null
         )
       }
       "Quantity" -> {
         val quantity = value as Quantity
+        var canonicalUnit: String? = null
+        var canonicalValue: BigDecimal? = null
+        if (quantity.system == "http://unitsofmeasure.org") {
+          try {
+            val ucumUnit = UnitConverter.getCanonicalUnits(UcumValue(quantity.unit, quantity.value))
+            canonicalUnit = ucumUnit.units
+            canonicalValue = ucumUnit.value
+          } catch (exception: ConverterException) {
+            // TODO handle this
+          }
+        }
         QuantityIndex(
           searchParam.name,
           searchParam.path,
           quantity.system ?: "",
           quantity.unit ?: "",
-          quantity.value
+          quantity.value,
+          canonicalUnit,
+          canonicalValue
         )
       }
       else -> null

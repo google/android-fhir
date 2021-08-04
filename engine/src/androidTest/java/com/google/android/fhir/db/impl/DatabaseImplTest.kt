@@ -1689,6 +1689,35 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun search_quantity_canonical() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.403")
+            system = "http://unitsofmeasure.org"
+            unit = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.EQUAL
+              value = BigDecimal("5403")
+              system = "http://unitsofmeasure.org"
+              unit = "mg"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
+  }
+
+  @Test
   fun search_nameGivenDuplicate_deduplicatePatient() = runBlocking {
     var patient: Patient =
       testingUtils.readFromFile(Patient::class.java, "/patient_name_given_duplicate.json")

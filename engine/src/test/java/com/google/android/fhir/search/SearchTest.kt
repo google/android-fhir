@@ -880,7 +880,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateTimeIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?
+        WHERE resourceType = ? AND index_name = ? AND (index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?)
         )
         """.trimIndent()
       )
@@ -1231,7 +1231,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value < ? OR index_value >= ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value < ? OR index_value >= ?)
         )
         """.trimIndent()
       )
@@ -1530,7 +1530,6 @@ class SearchTest {
         .apply {
           filter(Observation.VALUE_QUANTITY) {
             prefix = ParamPrefixEnum.EQUAL
-            system = "http://unitsofmeasure.org"
             unit = "g"
             value = BigDecimal("5.403")
           }
@@ -1545,7 +1544,7 @@ class SearchTest {
     AND a.resourceId IN (
     SELECT resourceId FROM QuantityIndexEntity
     WHERE resourceType= ? AND index_name = ?
-    AND index_system = ? AND index_unit = ? AND index_value >= ? AND index_value < ?
+    AND ((index_unit = ? AND index_value >= ? AND index_value < ?))
     )
         """.trimIndent()
       )
@@ -1555,7 +1554,6 @@ class SearchTest {
           ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
-          "http://unitsofmeasure.org",
           "g",
           BigDecimal("5.4025").toDouble(),
           BigDecimal("5.4035").toDouble()
@@ -1570,7 +1568,6 @@ class SearchTest {
         .apply {
           filter(Observation.VALUE_QUANTITY) {
             prefix = ParamPrefixEnum.LESSTHAN
-            system = "http://unitsofmeasure.org"
             unit = "g"
             value = BigDecimal("5.403")
           }
@@ -1585,7 +1582,7 @@ class SearchTest {
     AND a.resourceId IN (
     SELECT resourceId FROM QuantityIndexEntity
     WHERE resourceType= ? AND index_name = ?
-    AND index_system = ? AND index_unit = ? AND index_value < ?
+    AND ((index_unit = ? AND index_value < ?))
     )
         """.trimIndent()
       )
@@ -1595,7 +1592,6 @@ class SearchTest {
           ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
-          "http://unitsofmeasure.org",
           "g",
           BigDecimal("5.403").toDouble()
         )
@@ -1622,7 +1618,7 @@ class SearchTest {
     AND a.resourceId IN (
     SELECT resourceId FROM QuantityIndexEntity
     WHERE resourceType= ? AND index_name = ?
-    AND index_system = ? AND index_value <= ?
+    AND index_system = ? AND ((index_value <= ?))
     )
         """.trimIndent()
       )
@@ -1659,7 +1655,7 @@ class SearchTest {
     AND a.resourceId IN (
     SELECT resourceId FROM QuantityIndexEntity
     WHERE resourceType= ? AND index_name = ?
-    AND index_system = ? AND index_value > ?
+    AND index_system = ? AND ((index_value > ?))
     )
         """.trimIndent()
       )
@@ -1695,7 +1691,7 @@ class SearchTest {
     AND a.resourceId IN (
     SELECT resourceId FROM QuantityIndexEntity
     WHERE resourceType= ? AND index_name = ?
-    AND index_value >= ?
+    AND ((index_value >= ?))
     )
         """.trimIndent()
       )
@@ -1730,7 +1726,7 @@ class SearchTest {
     AND a.resourceId IN (
     SELECT resourceId FROM QuantityIndexEntity
     WHERE resourceType= ? AND index_name = ?
-    AND index_value < ? OR index_value >= ?
+    AND (((index_value < ? OR index_value >= ?)))
     )
         """.trimIndent()
       )
@@ -1766,7 +1762,7 @@ class SearchTest {
     AND a.resourceId IN (
     SELECT resourceId FROM QuantityIndexEntity
     WHERE resourceType= ? AND index_name = ?
-    AND index_value > ?
+    AND ((index_value > ?))
     )
         """.trimIndent()
       )
@@ -1801,7 +1797,7 @@ class SearchTest {
     AND a.resourceId IN (
     SELECT resourceId FROM QuantityIndexEntity
     WHERE resourceType= ? AND index_name = ?
-    AND index_value < ?
+    AND ((index_value < ?))
     )
         """.trimIndent()
       )
@@ -1812,6 +1808,49 @@ class SearchTest {
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           BigDecimal("5.403").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_canonical_match() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.EQUAL
+            value = BigDecimal("5403")
+            system = "http://unitsofmeasure.org"
+            unit = "mg"
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+    SELECT a.serializedResource
+    FROM ResourceEntity a
+    WHERE a.resourceType = ?
+    AND a.resourceId IN (
+    SELECT resourceId FROM QuantityIndexEntity
+    WHERE resourceType= ? AND index_name = ?
+    AND index_system = ? AND ((index_unit = ? AND index_value >= ? AND index_value < ?) OR (index_canonicalUnit =? AND index_canonicalValue >= ? AND index_canonicalValue < ?))
+    )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          "http://unitsofmeasure.org",
+          "mg",
+          BigDecimal("5402.5").toDouble(),
+          BigDecimal("5403.5").toDouble(),
+          "g",
+          BigDecimal("5.4025").toDouble(),
+          BigDecimal("5.4035").toDouble()
         )
       )
   }
