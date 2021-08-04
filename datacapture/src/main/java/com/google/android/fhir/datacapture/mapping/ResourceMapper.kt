@@ -50,6 +50,7 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.Type
+import org.hl7.fhir.r4.model.UriType
 import org.hl7.fhir.r4.model.UrlType
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
@@ -372,6 +373,13 @@ private fun generateAnswerWithCorrectType(answer: Base, fieldType: Field): Base 
     CodeType::class.java -> {
       if (answer is Coding) {
         return CodeType(answer.code)
+      } else if (answer is StringType) {
+        return CodeType(answer.value)
+      }
+    }
+    UriType::class.java -> {
+      if (answer is StringType) {
+        return UriType(answer.value)
       }
     }
   }
