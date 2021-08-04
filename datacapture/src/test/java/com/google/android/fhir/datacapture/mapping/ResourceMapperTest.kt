@@ -22,6 +22,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.utilities.NpmPackageProvider
 import com.google.common.truth.Truth.assertThat
+import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Date
 import kotlinx.coroutines.runBlocking
@@ -33,6 +34,7 @@ import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -1268,6 +1270,199 @@ class ResourceMapperTest {
     assertThat(patient.active).isFalse()
     assertThat(patient.name.first().given.first().toString()).isEqualTo("John")
     assertThat(patient.name.first().family).isEqualTo("Doe")
+  }
+
+  @Test
+  fun extract_choiceType_updateObservationFields() {
+    @Language("JSON")
+    val questionnaire =
+      """{
+  "title": "Screener",
+  "status": "active",
+  "version": "0.0.1",
+  "publisher": "Fred Hersch (fredhersch@google.com)",
+  "resourceType": "Questionnaire",
+  "subjectType": [
+    "Encounter"
+  ],
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+      "valueExpression": {
+        "language": "application/x-fhir-query",
+        "expression": "Encounter",
+        "name": "encounter"
+      }
+    }
+  ],
+  "item": [
+    {
+      "text": "Temperature",
+      "type": "group",
+      "linkId": "5.0.0",
+      "code": [
+        {
+          "code": "8310-5",
+          "display": "Temperature",
+          "system": "http://loinc.org"
+        }
+      ],
+      "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Observation",
+            "name": "temperature"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "page",
+                "display": "Page"
+              }
+            ],
+            "text": "Page"
+          }
+        }
+      ],
+      "item": [
+        {
+          "text": "Add instructions for capturing temperature",
+          "type": "display",
+          "linkId": "5.0.1"
+        },
+        {
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Quantity",
+                "name": "quantity"
+              }
+            }
+          ],
+          "item": [
+            {
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.value",
+              "text": "Record temperature",
+              "type": "decimal",
+              "linkId": "5.1.0",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                  "valueDecimal": 35.0
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                  "valueDecimal": 45.0
+                }
+              ]
+            },
+            {
+              "text": "Unit",
+              "type": "choice",
+              "linkId": "5.2.0",
+              "required": true,
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueQuantity.code",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "drop-down",
+                        "display": "Drop down"
+                      }
+                    ],
+                    "text": "Drop down"
+                  }
+                }
+              ],
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "F",
+                    "display": "F"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "code": "C",
+                    "display": "C"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+      """.trimIndent()
+    @Language("JSON")
+    val response =
+      """
+        {
+  "resourceType": "QuestionnaireResponse",
+  "item": [
+    {
+      "linkId": "5.0.0",
+      "item": [
+        {
+          "linkId": "5.0.1"
+        },
+        {
+          "item": [
+            {
+              "linkId": "5.1.0",
+              "answer": [
+                {
+                  "valueDecimal": 36
+                }
+              ]
+            },
+            {
+              "linkId": "5.2.0",
+              "answer": [
+                {
+                  "valueCoding": {
+                    "code": "F",
+                    "display": "F"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+      """.trimIndent()
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
+    val temperatureQuestionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
+    val temperatureQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, response) as QuestionnaireResponse
+    val bundle: Bundle
+    runBlocking {
+      bundle = ResourceMapper.extract(temperatureQuestionnaire, temperatureQuestionnaireResponse)
+    }
+    val observation = bundle.entry[0].resource as Observation
+
+    assertThat(observation.valueQuantity.value).isEqualTo(BigDecimal(36))
+    assertThat(observation.valueQuantity.code).isEqualTo("F")
   }
 
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)
