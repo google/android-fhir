@@ -83,6 +83,8 @@ dependencies {
 
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.fragmentKtx)
+  implementation(Dependencies.apacheCommonsCompress)
+  implementation(Dependencies.apacheCommonsIo)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")

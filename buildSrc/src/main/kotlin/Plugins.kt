@@ -32,6 +32,7 @@ object Plugins {
     "org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.Versions.Kotlin.stdlib}"
   const val navSafeArgsGradlePlugin =
     "androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.Versions.Androidx.navigation}"
+  const val coveragePlugin = "com.vanniktech.android.junit.jacoco"
 
   object Versions {
     const val androidGradlePlugin = "4.2.2"
