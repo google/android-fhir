@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.JsonPatch
 import com.github.fge.jsonpatch.diff.JsonDiff
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
-import java.lang.IllegalArgumentException
 import org.hl7.fhir.r4.model.Resource
 import org.json.JSONArray
 import org.json.JSONObject
@@ -91,12 +90,10 @@ internal object LocalChangeUtils {
   /** Calculates the JSON patch between two [Resource] s. */
   internal fun diff(parser: IParser, source: Resource, target: Resource): JSONArray {
     val objectMapper = ObjectMapper()
-    val jsonDiff =
-      JsonDiff.asJson(
+    return getFilteredJSONArray(JsonDiff.asJson(
         objectMapper.readValue(parser.encodeResourceToString(source), JsonNode::class.java),
         objectMapper.readValue(parser.encodeResourceToString(target), JsonNode::class.java)
-      )
-    return JSONArray(jsonDiff.toString())
+      ))
   }
 
   /**
@@ -110,6 +107,29 @@ internal object LocalChangeUtils {
       .associateBy { it.optString("op") to it.optString("path") }
       .toMutableMap()
   }
+
+  /**
+   * This function returns the json diff as a json array of operation objects. We remove the "/meta" and
+   * "/text" paths as they cause path not found issue when we update the resource. They are usually
+   * present in the downloaded resource object but are missing in the edited object as these aren't
+   * supposed to be edited. Thus, the Json diff creates a DELETE- OP for "/meta" and "/text" and
+   * causes the issue with server update.
+   *
+   * An unfiltered JSON Array for family name update looks like ```[{"op":"remove","path":"/meta"},
+   * {"op":"remove","path":"/text"}, {"op":"replace","path":"/name/0/family","value":"Nucleus"}]```
+   *
+   * A filtered JSON Array for family name update looks like
+   * ```[{"op":"replace","path":"/name/0/family","value":"Nucleus"}]```
+   */
+  private fun getFilteredJSONArray(jsonDiff: JsonNode) =
+    with(JSONArray(jsonDiff.toString())) {
+      val ignorePaths = setOf("/meta", "/text")
+      return@with JSONArray(
+        (0 until length()).map { optJSONObject(it) }.filterNot {
+          ignorePaths.contains(it.optString("path"))
+        }
+      )
+    }
 }
 
 data class LocalChangeToken(val ids: List<Long>)
