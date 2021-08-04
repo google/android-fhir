@@ -522,7 +522,7 @@ private fun Questionnaire.QuestionnaireItemComponent.getFieldOrNull(
   return if (isChoiceElement(fieldIndex)) {
     resourceClass.getFieldOrNull(CHOICE_ELEMENT_CONSTANT_NAME)
   } else {
-    return resourceClass.getFieldOrNull(path[fieldIndex])
+    resourceClass.getFieldOrNull(path[fieldIndex])
   }
 }
 
