@@ -65,7 +65,8 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
         dateFilter.map { it.query(type) } +
         dateTimeFilter.map { it.query(type) } +
         tokenFilters.map { it.query(type) } +
-        numberFilter.map { it.query(type) })
+        numberFilter.map { it.query(type) } +
+        quantityFilters.map { it.query(type) })
       .intersect()
   if (filterQuery != null) {
     filterStatement =
@@ -176,6 +177,18 @@ fun TokenFilter.query(type: ResourceType): SearchQuery {
     AND IFNULL(index_system,'') = ? 
     """,
     listOfNotNull(type.name, parameter!!.paramName, code, uri ?: "")
+  )
+}
+
+fun QuantityFilter.query(type: ResourceType): SearchQuery {
+  val conditionParamPair = getConditionParamPair(prefix, value!!, system, unit)
+  return SearchQuery(
+    """
+      SELECT resourceId FROM QuantityIndexEntity
+      WHERE resourceType= ? AND index_name = ? 
+      ${conditionParamPair.condition}
+    """.trimIndent(),
+    listOfNotNull<Any>(type.name, parameter.paramName) + conditionParamPair.params
   )
 }
 
@@ -313,6 +326,31 @@ private fun getConditionParamPair(
       )
     }
   }
+}
+
+private fun getConditionParamPair(
+  prefix: ParamPrefixEnum?,
+  value: BigDecimal,
+  system: String?,
+  unit: String?
+): ConditionParam<Any> {
+  val valueCondition = getConditionParamPair(prefix, value)
+  val argList = mutableListOf<Any>()
+  val systemCondition =
+    if (system != null) {
+      argList.add(system)
+      "AND index_system = ? "
+    } else ""
+  val codeCondition =
+    if (unit != null) {
+      if (system == "http://unitsofmeasure.org") {
+        // TODO find canonical matches here
+      }
+      argList.add(unit)
+      "AND index_unit = ? "
+    } else ""
+  argList.addAll(valueCondition.params)
+  return ConditionParam("$systemCondition${codeCondition}AND ${valueCondition.condition}", argList)
 }
 
 /**
