@@ -102,7 +102,11 @@ class PatientDetailsFragment : Fragment() {
 
   private fun onAddScreenerClick() {
     findNavController()
-      .navigate(PatientDetailsFragmentDirections.actionPatientDetailsToScreenEncounterFragment())
+      .navigate(
+        PatientDetailsFragmentDirections.actionPatientDetailsToScreenEncounterFragment(
+          args.patientId
+        )
+      )
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
