@@ -20,6 +20,8 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.mapping.ShadowNpmPackageProvider
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,16 +40,24 @@ class SimpleWorkerContextProviderTest {
 
   @Test
   fun `loadSimpleWorkerContext() should cache SimpleWorkerContext`() {
-    val generatedSimpleWorkerContext =
-      SimpleWorkerContextProvider.loadSimpleWorkerContext(
-        ApplicationProvider.getApplicationContext()
-      )
+    val expectedSimpleWorkerContext: SimpleWorkerContext
 
-    assertThat(generatedSimpleWorkerContext)
-      .isEqualTo(
+    runBlocking {
+      expectedSimpleWorkerContext =
         SimpleWorkerContextProvider.loadSimpleWorkerContext(
           ApplicationProvider.getApplicationContext()
         )
-      )
+    }
+
+    val actualSimpleWorkerContext: SimpleWorkerContext
+
+    runBlocking {
+      actualSimpleWorkerContext =
+        SimpleWorkerContextProvider.loadSimpleWorkerContext(
+          ApplicationProvider.getApplicationContext()
+        )
+    }
+
+    assertThat(expectedSimpleWorkerContext).isEqualTo(actualSimpleWorkerContext)
   }
 }
