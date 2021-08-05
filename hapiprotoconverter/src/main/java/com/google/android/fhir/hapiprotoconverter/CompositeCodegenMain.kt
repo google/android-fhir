@@ -50,7 +50,7 @@ fun main() {
       CompositeCodegen.profileUrlMap[def.url.value] = def.build()
     }
   CompositeCodegen.profileUrlMap.values
-    //    .filter { it.name.value == "Expression" }
+    //    .filter { it.name.value == "MedicationStatement" }
     .forEach { def ->
     if ((def.kind.value == StructureDefinitionKindCode.Value.COMPLEX_TYPE ||
         def.kind.value == StructureDefinitionKindCode.Value.RESOURCE) && !def.abstract.value
@@ -61,7 +61,7 @@ fun main() {
         Class.forName(ClassName(protoPackage, def.id.value.capitalizeFirst()).reflectionName())
         CompositeCodegen.generate(def, File("hapiprotoconverter\\src\\main\\java"))
       } catch (e: Exception) {
-        //        throw e
+        //                throw e
         if (e is ClassNotFoundException) {
           println("${def.id.value} Class not found")
         } else {

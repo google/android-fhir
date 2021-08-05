@@ -26,9 +26,21 @@ private val hapiStringProtoCodeType =
     "http://hl7.org/fhir/ValueSet/defined-types|4.0.1",
     "http://hl7.org/fhir/ValueSet/all-types|4.0.1",
     "http://hl7.org/fhir/ValueSet/guide-parameter-code|4.0.1",
-    "http://hl7.org/fhir/ValueSet/resource-types|4.0.1"
   )
 
+// Map of valueSet url that are renamed in Fhir protos
+private val CODE_SYSTEM_RENAMES =
+  mapOf(
+    "http://hl7.org/fhir/secondary-finding" to "ObservationSecondaryFindingCode",
+    "http://terminology.hl7.org/CodeSystem/composition-altcode-kind" to
+      "CompositionAlternativeCodeKindCode",
+    "http://hl7.org/fhir/contract-security-classification" to
+      "ContractResourceSecurityClassificationCode",
+    "http://hl7.org/fhir/device-definition-status" to "FHIRDeviceDefinitionStatusCode",
+    "http://hl7.org/fhir/ValueSet/medication-statement-status" to "MedicationStatementStatusCodes"
+  )
+
+private val resourceCode = "http://hl7.org/fhir/ValueSet/resource-types|4.0.1"
 private val specialValueSet =
   listOf(
     "http://hl7.org/fhir/ValueSet/mimetypes|4.0.1",
@@ -48,7 +60,9 @@ internal fun handleCodeType(
   val isSingle = element.max.value == "1"
   val isCommon =
     element.binding.extensionList.any { it.url.value == uriCommon && it.value.boolean.value }
-  if (hapiStringProtoCodeType.contains(element.binding.valueSet.value)) {
+  if (hapiStringProtoCodeType.contains(element.binding.valueSet.value) ||
+      (element.binding.valueSet.value == resourceCode && isCommon)
+  ) {
     if (isSingle) {
       protoBuilder.addStatement(
         "$singleMethodTemplate(%T.newBuilder().setValue(%T.valueOf(%L)).build())",
@@ -164,6 +178,15 @@ internal fun handleCodeType(
 }
 
 private fun getEnumNameFromElement(element: ElementDefinition): ClassName {
+  // TODO handle code system renames
+
+  if (element.binding.valueSet.value.split("|").first() in CODE_SYSTEM_RENAMES.keys) {
+    return ClassName(
+      protoPackage,
+      CODE_SYSTEM_RENAMES[element.binding.valueSet.value.split("|").first()]!!,
+      "Value"
+    )
+  }
   if (element.hasBinding() && element.binding.hasValueSet()) {
 
     val elementEntry =

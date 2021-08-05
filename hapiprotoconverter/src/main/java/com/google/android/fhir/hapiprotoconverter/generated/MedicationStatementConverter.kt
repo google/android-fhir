@@ -44,7 +44,7 @@ import com.google.fhir.r4.core.CodeableConcept
 import com.google.fhir.r4.core.DateTime
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.MedicationStatement
-import com.google.fhir.r4.core.MedicationStatusCode
+import com.google.fhir.r4.core.MedicationStatementStatusCodes
 import com.google.fhir.r4.core.Period
 import com.google.fhir.r4.core.Reference
 import java.lang.IllegalArgumentException
@@ -150,7 +150,9 @@ public object MedicationStatementConverter {
         .setStatus(
           MedicationStatement.StatusCode.newBuilder()
             .setValue(
-              MedicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              MedicationStatementStatusCodes.Value.valueOf(
+                status.toCode().replace("-", "_").toUpperCase()
+              )
             )
             .build()
         )

@@ -20,18 +20,6 @@ import com.google.fhir.r4.core.ElementDefinition
 import com.google.fhir.r4.core.Extension
 import com.squareup.kotlinpoet.ClassName
 
-// Map of valueSet url that are renamed in Fhir protos
-private val CODE_SYSTEM_RENAMES =
-  mapOf(
-    "http://hl7.org/fhir/secondary-finding" to "ObservationSecondaryFindingCode",
-    "http://terminology.hl7.org/CodeSystem/composition-altcode-kind" to
-      "CompositionAlternativeCodeKindCode",
-    "http://hl7.org/fhir/contract-security-classification" to
-      "ContractResourceSecurityClassificationCode",
-    "http://hl7.org/fhir/device-definition-status" to "FHIRDeviceDefinitionStatusCode",
-    "http://hl7.org/fhir/CodeSystem/medication-statement-status" to "MedicationStatementStatusCodes"
-  )
-
 // will be used in backbone elements
 private const val explicitTypeName =
   "http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name"
@@ -121,8 +109,6 @@ internal fun ElementDefinition.getProtoCodeClass(
     )
     .nestedClass(
       when {
-        binding.valueSet.value in CODE_SYSTEM_RENAMES.keys ->
-          CODE_SYSTEM_RENAMES[binding.valueSet.value]!!
         getElementName().lowerCaseFirst() == "code" -> "CodeType"
         else ->
           getElementName().capitalizeFirst() +
@@ -139,7 +125,11 @@ private val commonEnumClass = ClassName(hapiPackage, "Enumerations")
 internal fun ElementDefinition.getHapiCodeClass(isCommon: Boolean): ClassName {
   return (if (isCommon) commonEnumClass
     else ClassName(hapiPackage, base.path.value.split(".").first().capitalizeFirst()))
-    .nestedClass(binding.extensionList[0].value.stringValue.value.capitalizeFirst())
+    .nestedClass(
+      binding.extensionList[0].value.stringValue.value.capitalizeFirst().split("-").joinToString(
+        ""
+      ) { it.capitalizeFirst() }
+    )
 }
 
 /** @returns the ClassName for choiceProto hapi */

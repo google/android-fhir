@@ -161,7 +161,9 @@ public object ExampleScenarioConverter {
         .setResourceId(resourceIdElement.toProto())
         .setResourceType(
           ExampleScenario.Instance.ResourceTypeCode.newBuilder()
-            .setValue(ResourceTypeCode.Value.valueOf(resourceType))
+            .setValue(
+              ResourceTypeCode.Value.valueOf(resourceType.toCode().replace("-", "_").toUpperCase())
+            )
             .build()
         )
         .setName(nameElement.toProto())
@@ -292,7 +294,11 @@ public object ExampleScenarioConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setResourceIdElement(resourceId.toHapi())
-    hapiValue.setResourceType(resourceType.value.name)
+    hapiValue.setResourceType(
+      org.hl7.fhir.r4.model.ExampleScenario.FHIRResourceType.valueOf(
+        resourceType.value.name.replace("_", "")
+      )
+    )
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setDescriptionElement(description.toHapi())
     hapiValue.setVersion(versionList.map { it.toHapi() })
