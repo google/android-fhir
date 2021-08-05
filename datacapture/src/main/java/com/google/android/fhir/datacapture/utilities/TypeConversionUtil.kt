@@ -23,21 +23,21 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.UriType
 
 /** Converts StringType to toUriType. */
-fun StringType.toUriType(): UriType {
+internal fun StringType.toUriType(): UriType {
   return UriType(value)
 }
 
 /** Converts StringType to CodeType. */
-fun StringType.toCodeType(): CodeType {
+internal fun StringType.toCodeType(): CodeType {
   return CodeType(value)
 }
 
 /** Converts StringType to IdType. */
-fun StringType.toIdType(): IdType {
+internal fun StringType.toIdType(): IdType {
   return IdType(value)
 }
 
 /** Converts Coding to CodeType. */
-fun Coding.toCodeType(): CodeType {
+internal fun Coding.toCodeType(): CodeType {
   return CodeType(code)
 }

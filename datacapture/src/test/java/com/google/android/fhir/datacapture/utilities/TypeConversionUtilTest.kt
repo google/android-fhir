@@ -17,8 +17,11 @@
 package com.google.android.fhir.datacapture.utilities
 
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.UriType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -29,24 +32,24 @@ class TypeConversionUtilTest {
   @Test
   fun stringType_toUriType() {
     val uri = StringType("fakeUri").toUriType()
-    assertThat(uri.value.toString()).isEqualTo("fakeUri")
+    assertThat(uri.equalsDeep(UriType("fakeUri"))).isTrue()
   }
 
   @Test
   fun stringType_toCodeType() {
     val code = StringType("fakeCode").toCodeType()
-    assertThat(code.value.toString()).isEqualTo("fakeCode")
+    assertThat(code.equalsDeep(CodeType("fakeCode"))).isTrue()
   }
 
   @Test
   fun stringType_toIdType() {
     val id = StringType("fakeId").toIdType()
-    assertThat(id.value.toString()).isEqualTo("fakeId")
+    assertThat(id.equalsDeep(IdType("fakeId"))).isTrue()
   }
 
   @Test
   fun coding_toCodeType() {
     val code = Coding("fakeSystem", "fakeCode", "fakeDisplay").toCodeType()
-    assertThat(code.code).isEqualTo("fakeCode")
+    assertThat(code.equalsDeep(CodeType("fakeCode"))).isTrue()
   }
 }
