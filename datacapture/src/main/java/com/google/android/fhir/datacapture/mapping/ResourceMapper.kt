@@ -22,7 +22,10 @@ import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.datacapture.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.targetStructureMap
 import com.google.android.fhir.datacapture.utilities.SimpleWorkerContextProvider
+import com.google.android.fhir.datacapture.utilities.toCodeType
 import com.google.android.fhir.datacapture.utilities.toCoding
+import com.google.android.fhir.datacapture.utilities.toIdType
+import com.google.android.fhir.datacapture.utilities.toUriType
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -367,23 +370,22 @@ private fun generateAnswerWithCorrectType(answer: Base, fieldType: Field): Base 
     }
     IdType::class.java -> {
       if (answer is StringType) {
-        return IdType(answer.value)
+        return answer.toIdType()
       }
     }
     CodeType::class.java -> {
       if (answer is Coding) {
-        return CodeType(answer.code)
+        return answer.toCodeType()
       } else if (answer is StringType) {
-        return CodeType(answer.value)
+        return answer.toCodeType()
       }
     }
     UriType::class.java -> {
       if (answer is StringType) {
-        return UriType(answer.value)
+        return answer.toUriType()
       }
     }
   }
-
   return answer
 }
 

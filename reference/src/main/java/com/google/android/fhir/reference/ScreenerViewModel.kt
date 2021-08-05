@@ -77,7 +77,6 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
       }
       saveResourceToDatabase(resource)
     }
-    isResourcesSaved.value = true
   }
 
   private fun isRequiredFieldMissing(bundle: Bundle): Boolean {
