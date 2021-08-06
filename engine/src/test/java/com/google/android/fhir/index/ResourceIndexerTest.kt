@@ -562,8 +562,8 @@ class ResourceIndexerTest {
           FHIR_CURRENCY_SYSTEM,
           currency,
           value,
-          null,
-          null
+          "",
+          BigDecimal.ZERO
         )
       )
   }
@@ -587,8 +587,8 @@ class ResourceIndexerTest {
           "",
           "",
           BigDecimal.valueOf(value),
-          null,
-          null
+          "",
+          BigDecimal.ZERO
         )
       )
   }
@@ -733,8 +733,8 @@ class ResourceIndexerTest {
           FHIR_CURRENCY_SYSTEM,
           testInvoice.totalGross.currency,
           testInvoice.totalGross.value,
-          null,
-          null
+          "",
+          BigDecimal.ZERO
         ),
         QuantityIndex(
           "totalnet",
@@ -742,8 +742,8 @@ class ResourceIndexerTest {
           FHIR_CURRENCY_SYSTEM,
           testInvoice.totalNet.currency,
           testInvoice.totalNet.value,
-          null,
-          null
+          "",
+          BigDecimal.ZERO
         )
       )
 

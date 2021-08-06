@@ -29,6 +29,6 @@ internal data class QuantityIndex(
   val system: String,
   val unit: String,
   val value: BigDecimal,
-  val canonicalUnit: String?,
-  val canonicalValue: BigDecimal?
+  val canonicalUnit: String,
+  val canonicalValue: BigDecimal
 )

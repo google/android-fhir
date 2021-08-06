@@ -18,23 +18,34 @@ package com.google.android.fhir
 
 import java.math.BigDecimal
 import java.math.MathContext
+import kotlin.jvm.Throws
 import org.fhir.ucum.Decimal
 import org.fhir.ucum.Pair
 import org.fhir.ucum.UcumEssenceService
 import org.fhir.ucum.UcumException
 
 internal object UnitConverter {
-  private val ucumService =
+  private val ucumService by lazy {
     UcumEssenceService(this::class.java.getResourceAsStream("/ucum-essence.xml"))
+  }
 
+  /**
+   * returns the canonical form of a Ucum Value.
+   *
+   * For example a value of 1000 mm will return 1 m.
+   */
+  @Throws(ConverterException::class)
   internal fun getCanonicalUnits(value: UcumValue): UcumValue {
-    val pair = ucumService.getCanonicalForm(Pair(Decimal(value.value.toPlainString()), value.units))
+
     try {
+      val pair =
+        ucumService.getCanonicalForm(Pair(Decimal(value.value.toPlainString()), value.units))
       return UcumValue(
         pair.code,
         pair.value.asDecimal().toBigDecimal(MathContext(value.value.precision()))
       )
     } catch (exception: UcumException) {
+      exception.printStackTrace()
       throw ConverterException()
     }
   }

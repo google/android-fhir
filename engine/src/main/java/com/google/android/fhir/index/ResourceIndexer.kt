@@ -33,6 +33,7 @@ import com.google.android.fhir.index.entities.StringIndex
 import com.google.android.fhir.index.entities.TokenIndex
 import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Address
@@ -263,15 +264,15 @@ internal object ResourceIndexer {
           FHIR_CURRENCY_CODE_SYSTEM,
           money.currency,
           money.value,
-          null,
-          null
+          "",
+          BigDecimal.ZERO
         )
       }
       "Quantity" -> {
         val quantity = value as Quantity
-        var canonicalUnit: String? = null
-        var canonicalValue: BigDecimal? = null
-        if (quantity.system == "http://unitsofmeasure.org") {
+        var canonicalUnit = ""
+        var canonicalValue = BigDecimal.ZERO
+        if (quantity.system == ucumUrl) {
           try {
             val ucumUnit = UnitConverter.getCanonicalUnits(UcumValue(quantity.unit, quantity.value))
             canonicalUnit = ucumUnit.units
