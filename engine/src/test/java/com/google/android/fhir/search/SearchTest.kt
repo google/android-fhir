@@ -1538,14 +1538,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-    SELECT a.serializedResource
-    FROM ResourceEntity a
-    WHERE a.resourceType = ?
-    AND a.resourceId IN (
-    SELECT resourceId FROM QuantityIndexEntity
-    WHERE resourceType= ? AND index_name = ?
-    AND index_unit = ? AND index_value >= ? AND index_value < ?
-    )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_unit = ? AND index_value >= ? AND index_value < ?
+        )
         """.trimIndent()
       )
     assertThat(query.args)
@@ -1576,14 +1576,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-    SELECT a.serializedResource
-    FROM ResourceEntity a
-    WHERE a.resourceType = ?
-    AND a.resourceId IN (
-    SELECT resourceId FROM QuantityIndexEntity
-    WHERE resourceType= ? AND index_name = ?
-    AND index_unit = ? AND index_value < ?
-    )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_unit = ? AND index_value < ?
+        )
         """.trimIndent()
       )
     assertThat(query.args)
@@ -1612,14 +1612,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-    SELECT a.serializedResource
-    FROM ResourceEntity a
-    WHERE a.resourceType = ?
-    AND a.resourceId IN (
-    SELECT resourceId FROM QuantityIndexEntity
-    WHERE resourceType= ? AND index_name = ?
-    AND index_system = ? AND index_value <= ?
-    )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_system = ? AND index_value <= ?
+        )
         """.trimIndent()
       )
     assertThat(query.args)
@@ -1685,14 +1685,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-    SELECT a.serializedResource
-    FROM ResourceEntity a
-    WHERE a.resourceType = ?
-    AND a.resourceId IN (
-    SELECT resourceId FROM QuantityIndexEntity
-    WHERE resourceType= ? AND index_name = ?
-    AND index_value >= ?
-    )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_value >= ?
+        )
         """.trimIndent()
       )
     assertThat(query.args)
@@ -1720,14 +1720,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-    SELECT a.serializedResource
-    FROM ResourceEntity a
-    WHERE a.resourceType = ?
-    AND a.resourceId IN (
-    SELECT resourceId FROM QuantityIndexEntity
-    WHERE resourceType= ? AND index_name = ?
-    AND (index_value < ? OR index_value >= ?)
-    )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND (index_value < ? OR index_value >= ?)
+        )
         """.trimIndent()
       )
     assertThat(query.args)
@@ -1756,14 +1756,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-    SELECT a.serializedResource
-    FROM ResourceEntity a
-    WHERE a.resourceType = ?
-    AND a.resourceId IN (
-    SELECT resourceId FROM QuantityIndexEntity
-    WHERE resourceType= ? AND index_name = ?
-    AND index_value > ?
-    )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_value > ?
+        )
         """.trimIndent()
       )
     assertThat(query.args)
@@ -1791,14 +1791,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-    SELECT a.serializedResource
-    FROM ResourceEntity a
-    WHERE a.resourceType = ?
-    AND a.resourceId IN (
-    SELECT resourceId FROM QuantityIndexEntity
-    WHERE resourceType= ? AND index_name = ?
-    AND index_value < ?
-    )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_value < ?
+        )
         """.trimIndent()
       )
     assertThat(query.args)
@@ -1828,14 +1828,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-    SELECT a.serializedResource
-    FROM ResourceEntity a
-    WHERE a.resourceType = ?
-    AND a.resourceId IN (
-    SELECT resourceId FROM QuantityIndexEntity
-    WHERE resourceType= ? AND index_name = ?
-    AND index_system = ? AND (index_unit = ? AND index_value >= ? AND index_value < ? OR index_canonicalUnit = ? AND index_canonicalValue >= ? AND index_canonicalValue < ?)
-    )
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_system = ? AND (index_unit = ? AND index_value >= ? AND index_value < ? OR index_canonicalUnit = ? AND index_canonicalValue >= ? AND index_canonicalValue < ?)
+        )
         """.trimIndent()
       )
     assertThat(query.args)
