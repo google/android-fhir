@@ -46,11 +46,11 @@ internal object UnitConverter {
       )
     } catch (exception: UcumException) {
       exception.printStackTrace()
-      throw ConverterException()
+      throw ConverterException(exception)
     }
   }
 }
 
-internal class ConverterException : Exception()
+internal class ConverterException(cause: Throwable) : Exception(cause)
 
 internal data class UcumValue(val units: String, val value: BigDecimal)
