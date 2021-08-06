@@ -57,25 +57,41 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   fun saveScreenerEncounter(questionnaireResponse: QuestionnaireResponse, patientId: String) {
     viewModelScope.launch {
       val bundle = ResourceMapper.extract(questionnaireResource, questionnaireResponse)
-      val reference = Reference("Patient/$patientId")
+      val subjectReference = Reference("Patient/$patientId")
       if (isRequiredFieldMissing(bundle)) {
         isResourcesSaved.value = false
         return@launch
       }
-      saveResources(bundle, reference)
+      saveResources(bundle, subjectReference)
       isResourcesSaved.value = true
     }
   }
 
-  private suspend fun saveResources(bundle: Bundle, reference: Reference) {
+  private suspend fun saveResources(bundle: Bundle, subjectReference: Reference) {
+    val encounterId = generateUuid()
+    val encounterReference = Reference("Encounter/$encounterId")
     bundle.entry.forEach {
-      val resource = it.resource
-      when (resource) {
-        is Observation -> resource.subject = reference
-        is Condition -> resource.subject = reference
-        is Encounter -> resource.subject = reference
+      when (val resource = it.resource) {
+        is Observation -> {
+          if (resource.hasCode()) {
+            resource.id = generateUuid()
+            resource.subject = subjectReference
+            resource.encounter = encounterReference
+            saveResourceToDatabase(resource)
+          }
+        }
+        is Condition -> {
+          resource.id = generateUuid()
+          resource.subject = subjectReference
+          resource.encounter = encounterReference
+          saveResourceToDatabase(resource)
+        }
+        is Encounter -> {
+          resource.subject = subjectReference
+          resource.id = encounterId
+          saveResourceToDatabase(resource)
+        }
       }
-      saveResourceToDatabase(resource)
     }
   }
 
@@ -95,7 +111,6 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   }
 
   private suspend fun saveResourceToDatabase(resource: Resource) {
-    resource.id = generateUuid()
     fhirEngine.save(resource)
   }
 
