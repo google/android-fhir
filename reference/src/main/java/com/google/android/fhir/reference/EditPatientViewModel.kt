@@ -71,7 +71,9 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
    */
   fun updatePatient(questionnaireResponse: QuestionnaireResponse) {
     viewModelScope.launch {
-      val patient = ResourceMapper.extract(questionnaireResource, questionnaireResponse) as Patient
+      val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
+      if (entry.resource !is Patient) return@launch
+      val patient = entry.resource as Patient
       if (patient.hasName() &&
           patient.name[0].hasGiven() &&
           patient.name[0].hasFamily() &&
