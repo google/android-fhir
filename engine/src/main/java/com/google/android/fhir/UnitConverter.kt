@@ -30,7 +30,7 @@ internal object UnitConverter {
   }
 
   /**
-   * returns the canonical form of a Ucum Value.
+   * Returns the canonical form of a Ucum Value.
    *
    * For example a value of 1000 mm will return 1 m.
    */

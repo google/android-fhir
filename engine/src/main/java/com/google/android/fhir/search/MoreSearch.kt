@@ -353,12 +353,12 @@ private fun getConditionParamPair(
   // system condition will be preceded by a value condition so if exists append an AND here
   if (system != null) {
     argList.add(system)
-    condition.append("index_system = ?").append(" AND ")
+    condition.append("index_system = ? AND ")
   }
   // if the unit condition will be preceded by a value condition so if exists append an AND here
   if (unit != null) {
     argList.add(unit)
-    nonCanonicalCondition.append("index_unit = ?").append(" AND ")
+    nonCanonicalCondition.append("index_unit = ? AND ")
   }
 
   // add value condition
@@ -372,8 +372,7 @@ private fun getConditionParamPair(
       argList.add(ucumUnit.units)
       argList.addAll(canonicalConditionParam.params)
       canonicalCondition
-        .append("index_canonicalUnit = ?")
-        .append(" AND ")
+        .append("index_canonicalUnit = ? AND ")
         .append(canonicalConditionParam.condition.replace("index_value", "index_canonicalValue"))
     } catch (exception: ConverterException) {
       exception.printStackTrace()
@@ -382,12 +381,7 @@ private fun getConditionParamPair(
 
   // Add OR only when canonical match is possible
   if (canonicalCondition.isNotEmpty()) {
-    condition
-      .append("(")
-      .append(nonCanonicalCondition)
-      .append(" OR ")
-      .append(canonicalCondition)
-      .append(")")
+    condition.append("($nonCanonicalCondition OR $canonicalCondition)")
   } else {
     condition.append(nonCanonicalCondition)
   }
