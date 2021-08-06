@@ -58,6 +58,10 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
     viewModelScope.launch {
       val bundle = ResourceMapper.extract(questionnaireResource, questionnaireResponse)
       val reference = Reference("Patient/$patientId")
+      if (isRequiredFieldMissing(bundle)) {
+        isResourcesSaved.value = false
+        return@launch
+      }
       saveResources(bundle, reference)
       isResourcesSaved.value = true
     }
@@ -73,6 +77,21 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
       }
       saveResourceToDatabase(resource)
     }
+  }
+
+  private fun isRequiredFieldMissing(bundle: Bundle): Boolean {
+    bundle.entry.forEach {
+      val resource = it.resource
+      when (resource) {
+        is Observation -> {
+          if (resource.hasValueQuantity() && !resource.valueQuantity.hasValueElement()) {
+            return true
+          }
+        }
+      // TODO check other resources inputs
+      }
+    }
+    return false
   }
 
   private suspend fun saveResourceToDatabase(resource: Resource) {
