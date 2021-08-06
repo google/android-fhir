@@ -16,8 +16,10 @@
 
 package com.google.android.fhir.hapiprotoconverter
 
+import com.google.fhir.r4.core.Composition
 import com.google.fhir.r4.core.ElementDefinition
 import com.google.fhir.r4.core.String
+import com.google.fhir.r4.core.V3ConfidentialityClassificationValueSet
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 
@@ -40,7 +42,7 @@ private val CODE_SYSTEM_RENAMES =
     "http://hl7.org/fhir/ValueSet/medication-statement-status" to "MedicationStatementStatusCodes"
   )
 
-private val resourceCode = "http://hl7.org/fhir/ValueSet/resource-types|4.0.1"
+private const val resourceCode = "http://hl7.org/fhir/ValueSet/resource-types|4.0.1"
 private val specialValueSet =
   listOf(
     "http://hl7.org/fhir/ValueSet/mimetypes|4.0.1",
@@ -55,11 +57,12 @@ internal fun handleCodeType(
   hapiBuilder: FunSpec.Builder,
   protoBuilder: FunSpec.Builder,
   protoName: kotlin.String,
-  backboneElementMap: MutableMap<kotlin.String, CompositeCodegen.BackBoneElementData>
+  backboneElementMap: MutableMap<kotlin.String, BackBoneElementData>
 ) {
   val isSingle = element.max.value == "1"
   val isCommon =
     element.binding.extensionList.any { it.url.value == uriCommon && it.value.boolean.value }
+
   if (hapiStringProtoCodeType.contains(element.binding.valueSet.value) ||
       (element.binding.valueSet.value == resourceCode && isCommon)
   ) {
@@ -73,7 +76,7 @@ internal fun handleCodeType(
           backboneElementMap[element.path.value.substringBeforeLast(".")]
         ),
         // KotlinPoet.ClassName
-        Class.forName(getEnumNameFromElement(element).reflectionName()),
+        getProtoEnumNameFromElement(element),
         element.getHapiFieldName()
       )
       hapiBuilder.addStatement(
@@ -90,7 +93,7 @@ internal fun handleCodeType(
           protoName,
           backboneElementMap[element.path.value.substringBeforeLast(".")]
         ),
-        Class.forName(getEnumNameFromElement(element).reflectionName())
+        getProtoEnumNameFromElement(element)
       )
       hapiBuilder.addStatement(
         "%L.forEach{hapiValue.add%L(it.value.name)}",
@@ -145,7 +148,7 @@ internal fun handleCodeType(
           backboneElementMap[element.path.value.substringBeforeLast(".")]
         ),
         // KotlinPoet.ClassName
-        Class.forName(getEnumNameFromElement(element).reflectionName()),
+        getProtoEnumNameFromElement(element),
         element.getHapiFieldName()
       )
       hapiBuilder.addStatement(
@@ -164,7 +167,7 @@ internal fun handleCodeType(
           protoName,
           backboneElementMap[element.path.value.substringBeforeLast(".")]
         ),
-        Class.forName(getEnumNameFromElement(element).reflectionName())
+        getProtoEnumNameFromElement(element)
       )
       hapiBuilder.addStatement(
         "%L.forEach{hapiValue.add%L(%T.valueOf(it.value.name.replace(\"_\",\"\")))}",
@@ -177,9 +180,13 @@ internal fun handleCodeType(
   // Element is in special valueSet
 }
 
-private fun getEnumNameFromElement(element: ElementDefinition): ClassName {
-  // TODO handle code system renames
+private fun getProtoEnumNameFromElement(element: ElementDefinition): ClassName {
 
+  Composition.newBuilder()
+    .setConfidentiality(
+      Composition.ConfidentialityCode.newBuilder()
+        .setValue(V3ConfidentialityClassificationValueSet.Value.INVALID_UNINITIALIZED)
+    )
   if (element.binding.valueSet.value.split("|").first() in CODE_SYSTEM_RENAMES.keys) {
     return ClassName(
       protoPackage,
@@ -237,7 +244,7 @@ private fun getValueSetName(name: String): kotlin.String {
       .value
       .split("-")
       .joinToString("") { it.capitalizeFirst() }
-      .replace("[^A-Za-z0-9]", "")
+      .replace("[^A-Za-z0-9]".toRegex(), "")
       .capitalizeFirst()
   if (filteredName.endsWith("ValueSets", ignoreCase = true)) {
     return filteredName.substring(0, filteredName.length - 1)

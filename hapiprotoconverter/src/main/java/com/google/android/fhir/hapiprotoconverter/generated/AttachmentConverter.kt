@@ -18,8 +18,6 @@ package com.google.android.fhir.hapiprotoconverter.generated
 
 import com.google.android.fhir.hapiprotoconverter.generated.Base64BinaryConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.Base64BinaryConverter.toProto
-import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toHapi
-import com.google.android.fhir.hapiprotoconverter.generated.CodeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.DateTimeConverter.toHapi
 import com.google.android.fhir.hapiprotoconverter.generated.DateTimeConverter.toProto
 import com.google.android.fhir.hapiprotoconverter.generated.ExtensionConverter.toHapi
@@ -41,7 +39,6 @@ public object AttachmentConverter {
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setContentType(contentType.value)
-    hapiValue.setLanguageElement(language.toHapi())
     hapiValue.setDataElement(data.toHapi())
     hapiValue.setUrlElement(url.toHapi())
     hapiValue.setSizeElement(size.toHapi())
@@ -58,7 +55,6 @@ public object AttachmentConverter {
         .setId(String.newBuilder().setValue(id))
         .addAllExtension(extension.map { it.toProto() })
         .setContentType(Attachment.ContentTypeCode.newBuilder().setValue(contentType).build())
-        .setLanguage(languageElement.toProto())
         .setData(dataElement.toProto())
         .setUrl(urlElement.toProto())
         .setSize(sizeElement.toProto())

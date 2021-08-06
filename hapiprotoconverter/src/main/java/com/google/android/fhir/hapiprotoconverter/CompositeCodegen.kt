@@ -72,7 +72,7 @@ object CompositeCodegen {
         .returns(hapiClass)
         .addStatement("val hapiValue = %T()", hapiClass)
 
-    // inner function to get protoBuilder from the name of the element ( used to get backbone
+    // inner function to get protoBuilder from the name of the element (used to get backbone
     // builder or base)
     fun getToProtoBuilder(element: ElementDefinition): FunSpec.Builder {
       if (backboneElementMap.containsKey(element.path.value.substringBeforeLast("."))) {
@@ -102,8 +102,11 @@ object CompositeCodegen {
       }
 
       // TODO handle this
-      if (element.typeList.all { it.normalizeType() == "Resource" || it.normalizeType() == "Xhtml" }
-      ) {
+      if (element.typeList.all { it.normalizeType() == "Resource" }) {
+        continue
+      }
+
+      if (element.typeList.all { it.normalizeType() == "Xhtml" }) {
         continue
       }
 
@@ -187,8 +190,7 @@ object CompositeCodegen {
       }
       // check if it is an enum
       else if (element.typeList.single().normalizeType() == "Code" &&
-          element.binding != ElementDefinition.ElementDefinitionBinding.getDefaultInstance() &&
-          !ignoreValueSet.contains(element.binding.valueSet.value)
+          element.binding != ElementDefinition.ElementDefinitionBinding.getDefaultInstance()
       ) {
         if (ignoreValueSet.contains(element.binding.valueSet.value)) {
           continue
@@ -222,29 +224,35 @@ object CompositeCodegen {
     functionsList.forEach { complexConverter.addFunction(it) }
     fileBuilder.addType(complexConverter.build()).build().writeTo(outLocation!!)
   }
+}
 
-  internal fun getHapiProtoConverterFuncPair(
-    funcName: kotlin.String,
-    protoClass: ClassName,
-    hapiClass: ClassName
-  ): Pair<FunSpec.Builder, FunSpec.Builder> {
+data class BackBoneElementData(
+  val protoBuilder: FunSpec.Builder,
+  val protoName: kotlin.String,
+  val hapiBuilder: FunSpec.Builder,
+  val hapiName: kotlin.String
+)
 
-    return FunSpec.builder("${funcName}ToProto".lowerCaseFirst())
-      .addAnnotation(JvmStatic::class)
-      .receiver(hapiClass)
-      .returns(protoClass)
-      .addModifiers(KModifier.PRIVATE) to
+data class HapiProtoFunPair(val protoBuilder: FunSpec.Builder, val hapiBuilder: FunSpec.Builder)
+
+internal fun getHapiProtoConverterFuncPair(
+  funcName: kotlin.String,
+  protoClass: ClassName,
+  hapiClass: ClassName
+): HapiProtoFunPair {
+
+  return HapiProtoFunPair(
+    protoBuilder =
+      FunSpec.builder("${funcName}ToProto".lowerCaseFirst())
+        .addAnnotation(JvmStatic::class)
+        .receiver(hapiClass)
+        .returns(protoClass)
+        .addModifiers(KModifier.PRIVATE),
+    hapiBuilder =
       FunSpec.builder("${funcName}ToHapi".lowerCaseFirst())
         .addAnnotation(JvmStatic::class)
         .receiver(protoClass)
         .returns(hapiClass)
         .addModifiers(KModifier.PRIVATE)
-  }
-
-  data class BackBoneElementData(
-    val protoBuilder: FunSpec.Builder,
-    val protoName: kotlin.String,
-    val hapiBuilder: FunSpec.Builder,
-    val hapiName: kotlin.String
   )
 }

@@ -23,10 +23,10 @@ internal fun handleBackBoneElementTypes(
   element: ElementDefinition,
   hapiBuilder: FunSpec.Builder,
   protoBuilder: FunSpec.Builder,
-  backboneElementMap: MutableMap<String, CompositeCodegen.BackBoneElementData>
+  backboneElementMap: MutableMap<String, BackBoneElementData>
 ) {
   val (toProtoBuilder, toHapiBuilder) =
-    CompositeCodegen.getHapiProtoConverterFuncPair(
+    getHapiProtoConverterFuncPair(
       "",
       element.getBackBoneProtoClass(
         backboneElementMap[element.path.value.substringBeforeLast(".")]
@@ -67,7 +67,7 @@ internal fun handleBackBoneElementTypes(
   }
 
   backboneElementMap[element.path.value] =
-    CompositeCodegen.BackBoneElementData(
+    BackBoneElementData(
       toProtoBuilder.addStatement(
         "val protoValue = %T.newBuilder()",
         element.getBackBoneProtoClass(

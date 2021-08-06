@@ -49,9 +49,7 @@ fun main() {
         JsonFormat.getParser().merge(it.inputStream().reader(), StructureDefinition.newBuilder())
       CompositeCodegen.profileUrlMap[def.url.value] = def.build()
     }
-  CompositeCodegen.profileUrlMap.values
-    //    .filter { it.name.value == "MedicationStatement" }
-    .forEach { def ->
+  CompositeCodegen.profileUrlMap.values.forEach { def ->
     if ((def.kind.value == StructureDefinitionKindCode.Value.COMPLEX_TYPE ||
         def.kind.value == StructureDefinitionKindCode.Value.RESOURCE) && !def.abstract.value
     ) {
@@ -61,7 +59,6 @@ fun main() {
         Class.forName(ClassName(protoPackage, def.id.value.capitalizeFirst()).reflectionName())
         CompositeCodegen.generate(def, File("hapiprotoconverter\\src\\main\\java"))
       } catch (e: Exception) {
-        //                throw e
         if (e is ClassNotFoundException) {
           println("${def.id.value} Class not found")
         } else {
@@ -71,15 +68,6 @@ fun main() {
     }
   }
 }
-
-// Types that don't or rather work aren't generated
-// Attachment - mimeType
-// ElementDefinition - mimeType
-// Expression - ExpressionLanguage
-// Signature - mimeType
-// TODO handle conversion simpleQuantity to Quantity
-
-
 
 // profiles that cannot be generated ( apart from -genetics.json profilesi )
 // Profile for Catalog

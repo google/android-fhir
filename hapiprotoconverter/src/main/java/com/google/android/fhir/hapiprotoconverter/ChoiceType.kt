@@ -35,10 +35,10 @@ internal fun handleChoiceType(
   hapiBuilder: FunSpec.Builder,
   protoBuilder: FunSpec.Builder,
   fileBuilder: FileSpec.Builder,
-  backboneElementMap: MutableMap<String, CompositeCodegen.BackBoneElementData>
+  backboneElementMap: MutableMap<String, BackBoneElementData>
 ): List<FunSpec> {
   val (elementToProtoBuilder, elementToHapiBuilder) =
-    CompositeCodegen.getHapiProtoConverterFuncPair(
+    getHapiProtoConverterFuncPair(
       element
         .path
         .value

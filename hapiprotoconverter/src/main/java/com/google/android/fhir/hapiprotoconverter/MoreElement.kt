@@ -64,9 +64,7 @@ internal fun ElementDefinition.getHapiFieldName(isPrimitive: Boolean = false): S
 }
 
 /** get ClassName for BackBone protoClass */
-internal fun ElementDefinition.getBackBoneProtoClass(
-  data: CompositeCodegen.BackBoneElementData?
-): ClassName {
+internal fun ElementDefinition.getBackBoneProtoClass(data: BackBoneElementData?): ClassName {
   return ClassName(
       protoPackage,
       data?.protoName
@@ -79,9 +77,7 @@ internal fun ElementDefinition.getBackBoneProtoClass(
 }
 
 /** get ClassName for BackBone hapiClass */
-internal fun ElementDefinition.getBackBoneHapiClass(
-  data: CompositeCodegen.BackBoneElementData?
-): ClassName {
+internal fun ElementDefinition.getBackBoneHapiClass(data: BackBoneElementData?): ClassName {
   return ClassName(hapiPackage, base.path.value.split(".").first().capitalizeFirst())
     .nestedClass(
       if (hasExtension(explicitTypeName)) {
@@ -98,7 +94,7 @@ internal fun ElementDefinition.getBackBoneHapiClass(
 /** get ClassName for Code protoClass */
 internal fun ElementDefinition.getProtoCodeClass(
   outerDataTypeName: String,
-  data: CompositeCodegen.BackBoneElementData?
+  data: BackBoneElementData?
 ): ClassName {
   return ClassName(
       protoPackage,
@@ -133,9 +129,7 @@ internal fun ElementDefinition.getHapiCodeClass(isCommon: Boolean): ClassName {
 }
 
 /** @returns the ClassName for choiceProto hapi */
-internal fun ElementDefinition.getChoiceTypeProtoClass(
-  data: CompositeCodegen.BackBoneElementData?
-): ClassName {
+internal fun ElementDefinition.getChoiceTypeProtoClass(data: BackBoneElementData?): ClassName {
   return ClassName(
     protoPackage,
     if (data != null)
