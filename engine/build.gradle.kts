@@ -104,6 +104,7 @@ configurations {
 
 dependencies {
   implementation("androidx.sqlite:sqlite-ktx:2.1.0")
+  implementation("org.fhir:ucum:1.0.3")
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
