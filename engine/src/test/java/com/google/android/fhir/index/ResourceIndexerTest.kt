@@ -556,7 +556,15 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.quantityIndices)
       .contains(
-        QuantityIndex("totalnet", "Invoice.totalNet", FHIR_CURRENCY_SYSTEM, currency, value)
+        QuantityIndex(
+          "totalnet",
+          "Invoice.totalNet",
+          FHIR_CURRENCY_SYSTEM,
+          currency,
+          value,
+          "",
+          BigDecimal.ZERO
+        )
       )
   }
 
@@ -573,7 +581,43 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.quantityIndices)
       .contains(
-        QuantityIndex("quantity", "Substance.instance.quantity", "", "", BigDecimal.valueOf(value))
+        QuantityIndex(
+          "quantity",
+          "Substance.instance.quantity",
+          "",
+          "",
+          BigDecimal.valueOf(value),
+          "",
+          BigDecimal.ZERO
+        )
+      )
+  }
+
+  @Test
+  fun index_quantity_quantity_canonical() {
+    val value = (100).toLong()
+    val substance =
+      Substance().apply {
+        id = "non-null-ID"
+        instance.add(
+          Substance.SubstanceInstanceComponent()
+            .setQuantity(Quantity(value).setSystem("http://unitsofmeasure.org").setUnit("mg"))
+        )
+      }
+
+    val resourceIndices = ResourceIndexer.index(substance)
+
+    assertThat(resourceIndices.quantityIndices)
+      .contains(
+        QuantityIndex(
+          "quantity",
+          "Substance.instance.quantity",
+          "http://unitsofmeasure.org",
+          "mg",
+          BigDecimal.valueOf(value),
+          "g",
+          BigDecimal("0.100")
+        )
       )
   }
 
@@ -688,14 +732,18 @@ class ResourceIndexerTest {
           "Invoice.totalGross",
           FHIR_CURRENCY_SYSTEM,
           testInvoice.totalGross.currency,
-          testInvoice.totalGross.value
+          testInvoice.totalGross.value,
+          "",
+          BigDecimal.ZERO
         ),
         QuantityIndex(
           "totalnet",
           "Invoice.totalNet",
           FHIR_CURRENCY_SYSTEM,
           testInvoice.totalNet.currency,
-          testInvoice.totalNet.value
+          testInvoice.totalNet.value,
+          "",
+          BigDecimal.ZERO
         )
       )
 

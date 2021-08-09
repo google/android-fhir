@@ -19,6 +19,9 @@ package com.google.android.fhir.index
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
+import com.google.android.fhir.ConverterException
+import com.google.android.fhir.UcumValue
+import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.epochDay
 import com.google.android.fhir.index.entities.DateIndex
 import com.google.android.fhir.index.entities.DateTimeIndex
@@ -30,6 +33,7 @@ import com.google.android.fhir.index.entities.StringIndex
 import com.google.android.fhir.index.entities.TokenIndex
 import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Address
@@ -259,17 +263,32 @@ internal object ResourceIndexer {
           searchParam.path,
           FHIR_CURRENCY_CODE_SYSTEM,
           money.currency,
-          money.value
+          money.value,
+          "",
+          BigDecimal.ZERO
         )
       }
       "Quantity" -> {
         val quantity = value as Quantity
+        var canonicalUnit = ""
+        var canonicalValue = BigDecimal.ZERO
+        if (quantity.system == ucumUrl) {
+          try {
+            val ucumUnit = UnitConverter.getCanonicalUnits(UcumValue(quantity.unit, quantity.value))
+            canonicalUnit = ucumUnit.units
+            canonicalValue = ucumUnit.value
+          } catch (exception: ConverterException) {
+            // TODO handle this
+          }
+        }
         QuantityIndex(
           searchParam.name,
           searchParam.path,
           quantity.system ?: "",
           quantity.unit ?: "",
-          quantity.value
+          quantity.value,
+          canonicalUnit,
+          canonicalValue
         )
       }
       else -> null
