@@ -547,7 +547,7 @@ class SearchTest {
   @Test
   fun search_date_approximate() {
     mockkStatic(::getCurrentDate)
-    every { getCurrentDate() } returns Date(1628516301000)
+    every { getCurrentDate() } returns Date(mockEpochTimeStamp)
     val query =
       Search(ResourceType.Patient)
         .apply { filter(Patient.BIRTHDATE, DateType("2013-03-14"), ParamPrefixEnum.APPROXIMATE) }
@@ -840,7 +840,7 @@ class SearchTest {
   @Test
   fun search_dateTime_approximate() {
     mockkStatic(::getCurrentDate)
-    every { getCurrentDate() } returns Date(1628516301000)
+    every { getCurrentDate() } returns Date(mockEpochTimeStamp)
     val query =
       Search(ResourceType.Patient)
         .apply {
@@ -1596,5 +1596,8 @@ class SearchTest {
           BigDecimal("110.00").toDouble()
         )
       )
+  }
+  private companion object {
+    const val mockEpochTimeStamp = 1628516301000
   }
 }

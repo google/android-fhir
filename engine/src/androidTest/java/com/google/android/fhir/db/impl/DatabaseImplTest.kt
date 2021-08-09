@@ -974,7 +974,7 @@ class DatabaseImplTest {
   @Test
   fun search_dateTime_Approximate() = runBlocking {
     mockkStatic(::getCurrentDate)
-    every { getCurrentDate() } returns Date(1628516301000)
+    every { getCurrentDate() } returns Date(mockEpochTimeStamp)
     val patient =
       Patient().apply {
         id = "1"
@@ -995,7 +995,7 @@ class DatabaseImplTest {
   @Test
   fun search_date_Approximate() = runBlocking {
     mockkStatic(::getCurrentDate)
-    every { getCurrentDate() } returns Date(1628516301000)
+    every { getCurrentDate() } returns Date(mockEpochTimeStamp)
     val patient =
       Patient().apply {
         id = "1"
@@ -1345,6 +1345,7 @@ class DatabaseImplTest {
   }
 
   private companion object {
+    const val mockEpochTimeStamp = 1628516301000
     const val TEST_PATIENT_1_ID = "test_patient_1"
     val TEST_PATIENT_1 = Patient()
 
