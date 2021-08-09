@@ -75,9 +75,11 @@ class PatientListFragment : Fragment() {
     val recyclerView: RecyclerView = binding.patientListContainer.patientList
     val adapter = PatientItemRecyclerViewAdapter(this::onPatientItemClicked)
     recyclerView.adapter = adapter
-    recyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
-      setDrawable( ColorDrawable(Color.LTGRAY))
-    })
+    recyclerView.addItemDecoration(
+      DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
+        setDrawable(ColorDrawable(Color.LTGRAY))
+      }
+    )
 
     patientListViewModel.liveSearchedPatients.observe(
       viewLifecycleOwner,

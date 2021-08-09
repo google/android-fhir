@@ -45,5 +45,9 @@
   <string name="inputs_missing">Inputs are missing.</string>
   <string name="resources_saved">Resources are saved.</string>
   <string name="response_received">questionnaire response is received.</string>
-  <string name="html_text">Current status: <font color="#ddd">UNKNOWN</font></string>
+  <string name="html_text">Current status: <font
+            color="#ddd"
+        >UNKNOWN</font></string>
+  <string name="header_observation">Observations</string>
+  <string name="header_conditions">Conditions</string>
 </resources>

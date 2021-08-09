@@ -1,30 +1,34 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#10156125"
-    android:orientation="vertical">
+    android:orientation="vertical"
+>
 
     <TextView
         android:id="@+id/title"
         style="@style/AppTheme.PatientDetails.headline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mary Odhiambo" />
+        android:text="Mary Odhiambo"
+    />
 
     <TextView
         android:id="@+id/status"
         style="@style/AppTheme.PatientDetails.body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-         android:text="@string/html_text"/>
+        android:text="@string/html_text"
+    />
     <TextView
         android:id="@+id/last_contact"
         style="@style/AppTheme.PatientDetails.body2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Last Contacted: none" />
+        android:text="Last Contacted: none"
+    />
 
     <com.google.android.material.button.MaterialButton
         android:paddingLeft="2dp"
@@ -35,5 +39,6 @@
         android:text="Complete Survey"
         android:id="@+id/screener"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+    />
 </LinearLayout>

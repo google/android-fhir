@@ -71,7 +71,12 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
     bundle.entry.forEach {
       val resource = it.resource
       when (resource) {
-        is Observation -> resource.subject = reference
+        is Observation -> {
+          // Lets not save an observation that was in the questionnaire but was left un answered. If
+          // there is a default value, code/value won't be null.
+          if (!resource.hasCode() || !resource.hasValue()) return@forEach
+          resource.subject = reference
+        }
         is Condition -> resource.subject = reference
         is Encounter -> resource.subject = reference
       }

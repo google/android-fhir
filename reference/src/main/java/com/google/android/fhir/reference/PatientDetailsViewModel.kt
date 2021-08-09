@@ -24,6 +24,7 @@ import androidx.lifecycle.liveData
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.search
 import java.util.concurrent.TimeUnit
+import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 
@@ -39,6 +40,7 @@ class PatientDetailsViewModel(
 
   val livePatientData = liveData { emit(getPatient()) }
   val livePatientObservation = liveData { emit(getPatientObservations()) }
+  val livePatientCondition = liveData { emit(getPatientConditions()) }
 
   private suspend fun getPatient(): PatientListViewModel.PatientItem {
     val patient = fhirEngine.load(Patient::class.java, patientId)
@@ -56,13 +58,24 @@ class PatientDetailsViewModel(
     return observations
   }
 
+  private suspend fun getPatientConditions(): List<PatientListViewModel.ConditionItem> {
+    Thread.sleep(TimeUnit.MILLISECONDS.toMillis(200))
+    val observations: MutableList<PatientListViewModel.ConditionItem> = mutableListOf()
+    fhirEngine
+      .search<Condition> { filter(Condition.SUBJECT) { value = "Patient/$patientId" } }
+      .take(MAX_RESOURCE_COUNT)
+      .mapIndexed { index, fhirPatient -> createConditionItem(index + 1, fhirPatient) }
+      .let { observations.addAll(it) }
+    return observations
+  }
+
   /** Creates ObservationItem objects with displayable values from the Fhir Observation objects. */
   private fun createObservationItem(
     position: Int,
     observation: Observation
   ): PatientListViewModel.ObservationItem {
     // val observation: Observation = getObservationDetails(position)
-    val observationCode = observation.code.text
+    val observationCode = observation.code.text ?: observation.code.codingFirstRep.display
 
     // Show nothing if no values available for datetime and value quantity.
     val dateTimeStr =
@@ -71,7 +84,10 @@ class PatientDetailsViewModel(
     val value =
       if (observation.hasValueQuantity()) observation.valueQuantity.value.toString()
       else "No ValueQuantity"
-    val valueUnit = if (observation.hasValueQuantity()) observation.valueQuantity.unit else ""
+    val valueUnit =
+      if (observation.hasValueQuantity())
+        observation.valueQuantity.unit ?: observation.valueQuantity.code
+      else ""
     val valueStr = "$value $valueUnit"
 
     return PatientListViewModel.ObservationItem(
@@ -79,6 +95,30 @@ class PatientDetailsViewModel(
       observationCode,
       dateTimeStr,
       valueStr
+    )
+  }
+
+  /** Creates ObservationItem objects with displayable values from the Fhir Observation objects. */
+  private fun createConditionItem(
+    position: Int,
+    observation: Condition
+  ): PatientListViewModel.ConditionItem {
+    // val observation: Observation = getObservationDetails(position)
+    val observationCode = observation.code.text ?: observation.code.codingFirstRep.display
+
+    // Show nothing if no values available for datetime and value quantity.
+    val dateTimeStr =
+      if (observation.hasOnsetDateTimeType()) observation.onsetDateTimeType.asStringValue()
+      else "No effective DateTime"
+    val value =
+      if (observation.hasVerificationStatus()) observation.verificationStatus.codingFirstRep.code
+      else "No ValueQuantity"
+
+    return PatientListViewModel.ConditionItem(
+      position.toString(),
+      observationCode,
+      dateTimeStr,
+      value
     )
   }
 }

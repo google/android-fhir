@@ -21,7 +21,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.Order
@@ -39,7 +38,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   AndroidViewModel(application) {
 
   val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
-//  val patientCount = liveData { emit(count()) }
+  //  val patientCount = liveData { emit(count()) }
   val patientCount = MutableLiveData<Int>()
   init {
     fetchAndPost { getSearchResults() }
@@ -102,6 +101,15 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
 
   /** The Observation's details for display purposes. */
   data class ObservationItem(
+    val id: String,
+    val code: String,
+    val effective: String,
+    val value: String
+  ) {
+    override fun toString(): String = code
+  }
+
+  data class ConditionItem(
     val id: String,
     val code: String,
     val effective: String,

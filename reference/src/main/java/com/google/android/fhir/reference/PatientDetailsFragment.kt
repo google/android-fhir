@@ -28,7 +28,6 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
-import androidx.core.view.marginLeft
 import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -41,6 +40,7 @@ import com.google.android.fhir.reference.databinding.PatientDetailsHeaderBinding
 import com.google.android.fhir.reference.databinding.PatientListItemViewBinding
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textview.MaterialTextView
+import java.util.Locale
 
 /**
  * A fragment representing a single Patient detail screen. This fragment is contained in a
@@ -73,60 +73,107 @@ class PatientDetailsFragment : Fragment() {
     fhirEngine = FhirApplication.fhirEngine(requireContext())
     patientDetailsViewModel =
       ViewModelProvider(
-        this,
-        PatientDetailsViewModelFactory(requireActivity().application, fhirEngine, args.patientId)
-      )
+          this,
+          PatientDetailsViewModelFactory(requireActivity().application, fhirEngine, args.patientId)
+        )
         .get(PatientDetailsViewModel::class.java)
     patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) { setupPatientData(it) }
     patientDetailsViewModel.livePatientObservation.observe(viewLifecycleOwner) {
-      val observations  = it.map { Model(it.code, it.value) }
-      if (observations.isNotEmpty()) {
-        val container : LinearLayoutCompat = binding.container
-        container.addView(MaterialTextView(container.context).apply {
-          text = "Observations"
-          setPadding(30, 0, 0, 0)
-        })
-        val detailsCard = MaterialCardView(ContextThemeWrapper(container.context, R.style.CardView)).apply {
-          addView(LinearLayout(this.context).apply {
-            orientation = LinearLayout.VERTICAL
-            observations.forEach {
-              addView(ChildItemViewHolder(PatientListItemViewBinding.inflate(LayoutInflater.from(this.context), this, false)).apply { bindTo(it)}.itemView)
-              addView(lineView(this))
-            }
-          })
-        }
-        container.addView(detailsCard)
-        val param  = detailsCard.layoutParams as ViewGroup.MarginLayoutParams
-        param.setMargins(30)
-      }
+      val observations = it.map { observation -> Model(observation.code, observation.value) }
+      renderCard(resources.getText(R.string.header_observation), observations)
+    }
+
+    patientDetailsViewModel.livePatientCondition.observe(viewLifecycleOwner) {
+      val observations = it.map { observation -> Model(observation.code, observation.value) }
+      renderCard(resources.getText(R.string.header_conditions), observations)
     }
   }
 
+  private fun renderCard(header: CharSequence, observations: List<Model>) {
+    if (observations.isNotEmpty()) {
+      val container: LinearLayoutCompat = binding.container
+      container.addView(
+        MaterialTextView(container.context).apply {
+          text = header
+          setPadding(30, 0, 0, 0)
+        }
+      )
+      val detailsCard =
+        MaterialCardView(ContextThemeWrapper(container.context, R.style.CardView)).apply {
+          addView(
+            LinearLayout(this.context).apply {
+              orientation = LinearLayout.VERTICAL
+              observations.forEach {
+                addView(
+                  ChildItemViewHolder(
+                      PatientListItemViewBinding.inflate(
+                        LayoutInflater.from(this.context),
+                        this,
+                        false
+                      )
+                    )
+                    .apply { bindTo(it) }
+                    .itemView
+                )
+                addView(lineView(this))
+              }
+            }
+          )
+        }
+      container.addView(detailsCard)
+      val param = detailsCard.layoutParams as ViewGroup.MarginLayoutParams
+      param.setMargins(30)
+    }
+  }
   private fun setupPatientData(patientItem: PatientListViewModel.PatientItem?) {
     patientItem?.let { patient ->
-      val container : LinearLayoutCompat = binding.container
-      val detailsCard = MaterialCardView(ContextThemeWrapper(container.context, R.style.CardView)).apply {
-        addView(LinearLayout(this.context).apply {
-          orientation = LinearLayout.VERTICAL
-          addView(HeaderItemViewHolder(PatientDetailsHeaderBinding.inflate(LayoutInflater.from(this.context), this, false)).apply {
-            binding.screener.setOnClickListener { onAddScreenerClick() }
-            bindTo(Model("Name", patient.name, type = 1))
-          }.itemView)
-          addView(lineView(this))
-          listOf(
-            Model("Mobile Number", patient.phone),
-            Model("ID Number", patient.resourceId),
-            Model("Address", "${patient.city}, ${patient.country} "),
-            Model("Date of Birth", patient.dob),
-            Model("Gender", patient.gender.capitalize()),
-          ).forEach {
-            addView(ChildItemViewHolder(PatientListItemViewBinding.inflate(LayoutInflater.from(this.context), this, false)).apply { bindTo(it)}.itemView)
-            addView(lineView(this))
-          }
-        })
-      }
+      val container: LinearLayoutCompat = binding.container
+      val detailsCard =
+        MaterialCardView(ContextThemeWrapper(container.context, R.style.CardView)).apply {
+          addView(
+            LinearLayout(this.context).apply {
+              orientation = LinearLayout.VERTICAL
+              addView(
+                HeaderItemViewHolder(
+                    PatientDetailsHeaderBinding.inflate(
+                      LayoutInflater.from(this.context),
+                      this,
+                      false
+                    )
+                  )
+                  .apply {
+                    binding.screener.setOnClickListener { onAddScreenerClick() }
+                    bindTo(Model("Name", patient.name, type = 1))
+                  }
+                  .itemView
+              )
+              addView(lineView(this))
+              listOf(
+                Model("Mobile Number", patient.phone),
+                Model("ID Number", patient.resourceId),
+                Model("Address", "${patient.city}, ${patient.country} "),
+                Model("Date of Birth", patient.dob),
+                Model("Gender", patient.gender.capitalize(Locale.ROOT)),
+              )
+                .forEach {
+                  addView(
+                    ChildItemViewHolder(
+                        PatientListItemViewBinding.inflate(
+                          LayoutInflater.from(this.context),
+                          this,
+                          false
+                        )
+                      )
+                      .apply { bindTo(it) }
+                      .itemView
+                  )
+                  addView(lineView(this))
+                }
+            }
+          )
+        }
       container.addView(detailsCard)
-      val param  = detailsCard.layoutParams as ViewGroup.MarginLayoutParams
+      val param = detailsCard.layoutParams as ViewGroup.MarginLayoutParams
       param.setMargins(30)
       (requireActivity() as AppCompatActivity).supportActionBar?.apply {
         title = "Patient Card"
@@ -135,7 +182,7 @@ class PatientDetailsFragment : Fragment() {
     }
   }
 
-  private fun lineView(container: ViewGroup) : View {
+  private fun lineView(container: ViewGroup): View {
     return View(container.context).apply {
       setBackgroundColor(Color.LTGRAY)
       minimumWidth = ViewGroup.LayoutParams.MATCH_PARENT
