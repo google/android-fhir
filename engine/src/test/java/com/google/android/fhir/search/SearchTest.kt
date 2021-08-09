@@ -1930,8 +1930,8 @@ class SearchTest {
         )
       )
   }
-  
-   private companion object {
+
+  private companion object {
     const val mockEpochTimeStamp = 1628516301000
-   }
+  }
 }

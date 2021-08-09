@@ -220,9 +220,7 @@ private fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Con
   val end = value.rangeEpochDays.last
   return when (prefix) {
     ParamPrefixEnum.APPROXIMATE -> {
-      val currentDateTime = DateType()
-      currentDateTime.value = getCurrentDate()
-      currentDateTime.precision = value.precision
+      val currentDateTime = DateType(getCurrentDate(), value.precision)
       val diffStart =
         (value.rangeEpochDays.first -
             0.1 * (value.rangeEpochDays.first - currentDateTime.rangeEpochDays.first).absoluteValue)
@@ -275,9 +273,7 @@ private fun getConditionParamPair(
   val end = value.rangeEpochMillis.last
   return when (prefix) {
     ParamPrefixEnum.APPROXIMATE -> {
-      val currentDateTime = DateTimeType()
-      currentDateTime.value = getCurrentDate()
-      currentDateTime.precision = value.precision
+      val currentDateTime = DateTimeType(getCurrentDate(), value.precision)
       val diffStart =
         (value.rangeEpochMillis.first -
             0.1 *
