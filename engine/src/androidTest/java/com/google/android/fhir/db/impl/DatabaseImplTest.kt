@@ -22,6 +22,7 @@ import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirServices
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.getCurrentDate
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.resource.TestingUtils
 import com.google.android.fhir.search.Order
@@ -30,10 +31,15 @@ import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth.assertThat
+import io.mockk.every
+import io.mockk.mockkStatic
 import java.math.BigDecimal
+import java.util.Date
+import kotlin.collections.ArrayList
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
@@ -963,6 +969,46 @@ class DatabaseImplTest {
       )
 
     assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_dateTime_Approximate() = runBlocking {
+    mockkStatic(::getCurrentDate)
+    every { getCurrentDate() } returns Date(1628516301000)
+    val patient =
+      Patient().apply {
+        id = "1"
+        deceased = DateTimeType("2013-03-16T10:00:00-05:30")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.APPROXIMATE)
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
+  }
+
+  @Test
+  fun search_date_Approximate() = runBlocking {
+    mockkStatic(::getCurrentDate)
+    every { getCurrentDate() } returns Date(1628516301000)
+    val patient =
+      Patient().apply {
+        id = "1"
+        birthDateElement = DateType("2013-03-16")
+      }
+    database.insert(patient)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply { filter(Patient.BIRTHDATE, DateType("2013-03-14"), ParamPrefixEnum.APPROXIMATE) }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Patient/1")
   }
 
   @Test

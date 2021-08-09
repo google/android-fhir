@@ -21,7 +21,10 @@ import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.epochDay
+import com.google.android.fhir.getCurrentDate
 import java.math.BigDecimal
+import kotlin.math.absoluteValue
+import kotlin.math.roundToLong
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Resource
@@ -199,7 +202,27 @@ private fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Con
   val start = value.rangeEpochDays.first
   val end = value.rangeEpochDays.last
   return when (prefix) {
-    ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
+    ParamPrefixEnum.APPROXIMATE -> {
+      val currentDateTime = DateType()
+      currentDateTime.value = getCurrentDate()
+      currentDateTime.precision = value.precision
+      val diffStart =
+        (value.rangeEpochDays.first -
+            0.1 * (value.rangeEpochDays.first - currentDateTime.rangeEpochDays.first).absoluteValue)
+          .roundToLong()
+      val diffEnd =
+        (value.rangeEpochDays.last +
+            0.1 * (value.rangeEpochDays.last - currentDateTime.rangeEpochDays.last).absoluteValue)
+          .roundToLong()
+
+      ConditionParam(
+        "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
+        diffStart,
+        diffEnd,
+        diffStart,
+        diffEnd
+      )
+    }
     // see https://github.com/google/android-fhir/issues/568
     // https://www.hl7.org/fhir/search.html#prefix
     ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
@@ -234,7 +257,29 @@ private fun getConditionParamPair(
   val start = value.rangeEpochMillis.first
   val end = value.rangeEpochMillis.last
   return when (prefix) {
-    ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
+    ParamPrefixEnum.APPROXIMATE -> {
+      val currentDateTime = DateTimeType()
+      currentDateTime.value = getCurrentDate()
+      currentDateTime.precision = value.precision
+      val diffStart =
+        (value.rangeEpochMillis.first -
+            0.1 *
+              (value.rangeEpochMillis.first - currentDateTime.rangeEpochMillis.first).absoluteValue)
+          .roundToLong()
+      val diffEnd =
+        (value.rangeEpochMillis.last +
+            0.1 *
+              (value.rangeEpochMillis.last - currentDateTime.rangeEpochMillis.last).absoluteValue)
+          .roundToLong()
+
+      ConditionParam(
+        "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
+        diffStart,
+        diffEnd,
+        diffStart,
+        diffEnd
+      )
+    }
     // see https://github.com/google/android-fhir/issues/568
     // https://www.hl7.org/fhir/search.html#prefix
     ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)

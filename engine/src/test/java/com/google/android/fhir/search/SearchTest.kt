@@ -19,8 +19,12 @@ package com.google.android.fhir.search
 import android.os.Build
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.epochDay
+import com.google.android.fhir.getCurrentDate
 import com.google.common.truth.Truth.assertThat
+import io.mockk.every
+import io.mockk.mockkStatic
 import java.math.BigDecimal
+import java.util.Date
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -541,6 +545,41 @@ class SearchTest {
   }
 
   @Test
+  fun search_date_approximate() {
+    mockkStatic(::getCurrentDate)
+    every { getCurrentDate() } returns Date(1628516301000)
+    val query =
+      Search(ResourceType.Patient)
+        .apply { filter(Patient.BIRTHDATE, DateType("2013-03-14"), ParamPrefixEnum.APPROXIMATE) }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM DateIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.BIRTHDATE.paramName,
+          15471.toLong(),
+          16085.toLong(),
+          15471.toLong(),
+          16085.toLong()
+        )
+      )
+  }
+
+  @Test
   fun search_date_starts_after() {
     val query =
       Search(ResourceType.Patient)
@@ -794,6 +833,43 @@ class SearchTest {
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateType("2013-03-14").value.epochDay
+        )
+      )
+  }
+
+  @Test
+  fun search_dateTime_approximate() {
+    mockkStatic(::getCurrentDate)
+    every { getCurrentDate() } returns Date(1628516301000)
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(Patient.BIRTHDATE, DateTimeType("2013-03-14"), ParamPrefixEnum.APPROXIMATE)
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM DateTimeIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.BIRTHDATE.paramName,
+          1336667709900,
+          1389817490099,
+          1336667709900,
+          1389817490099
         )
       )
   }
