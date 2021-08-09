@@ -132,6 +132,6 @@ dependencies {
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
-  testImplementation("io.mockk:mockk:1.12.0")
-  androidTestImplementation("io.mockk:mockk-android:1.12.0")
+  testImplementation(Dependencies.mockk)
+  androidTestImplementation(Dependencies.mockkAndroid)
 }
