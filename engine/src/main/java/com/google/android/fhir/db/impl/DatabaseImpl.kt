@@ -61,15 +61,15 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, data
   private val syncedResourceDao = db.syncedResourceDao()
   private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
 
-  override suspend fun <R : Resource> insert(vararg resources: R) {
+  override suspend fun <R : Resource> insert(vararg resource: R) {
     db.withTransaction {
-      resourceDao.insertAll(resources.toList())
-      localChangeDao.addInsertAll(resources.toList())
+      resourceDao.insertAll(resource.toList())
+      localChangeDao.addInsertAll(resource.toList())
     }
   }
 
-  override suspend fun <R : Resource> insertRemote(vararg resources: R) {
-    resourceDao.insertAll(resources.toList())
+  override suspend fun <R : Resource> insertRemote(vararg resource: R) {
+    resourceDao.insertAll(resource.toList())
   }
 
   override suspend fun <R : Resource> update(resource: R) {

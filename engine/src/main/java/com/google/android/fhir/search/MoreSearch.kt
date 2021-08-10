@@ -21,8 +21,10 @@ import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.db.Database
+import com.google.android.fhir.epochDay
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -68,6 +70,7 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
     (stringFilters.map { it.query(type) } +
         referenceFilters.map { it.query(type) } +
         dateFilter.map { it.query(type) } +
+        dateTimeFilter.map { it.query(type) } +
         tokenFilters.map { it.query(type) } +
         numberFilter.map { it.query(type) })
       .intersect()
@@ -109,7 +112,6 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
 }
 
 fun StringFilter.query(type: ResourceType): SearchQuery {
-
   val condition =
     when (modifier) {
       StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
@@ -162,6 +164,17 @@ fun DateFilter.query(type: ResourceType): SearchQuery {
   )
 }
 
+fun DateTimeFilter.query(type: ResourceType): SearchQuery {
+  val conditionParamPair = getConditionParamPair(prefix, value!!)
+  return SearchQuery(
+    """
+    SELECT resourceId FROM DateTimeIndexEntity 
+    WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
+    """,
+    listOf(type.name, parameter.paramName) + conditionParamPair.params
+  )
+}
+
 fun TokenFilter.query(type: ResourceType): SearchQuery {
   return SearchQuery(
     """
@@ -189,17 +202,15 @@ val Order?.sqlString: String
       null -> ""
     }
 
-private fun getConditionParamPair(
-  prefix: ParamPrefixEnum,
-  value: DateTimeType
-): ConditionParam<Long> {
-  val (start, end) = value.rangeEpochMillis
+private fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): ConditionParam<Long> {
+  val start = value.rangeEpochDays.first
+  val end = value.rangeEpochDays.last
   return when (prefix) {
     ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
     // see https://github.com/google/android-fhir/issues/568
     // https://www.hl7.org/fhir/search.html#prefix
-    ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from >= ?", end + 1)
-    ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("? >= index_to", start)
+    ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
+    ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
     ParamPrefixEnum.NOT_EQUAL ->
       ConditionParam(
         "index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?",
@@ -216,10 +227,45 @@ private fun getConditionParamPair(
         start,
         end
       )
-    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to >= ?", end + 1)
-    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_from >= ?", start)
-    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_from <= ?", start)
-    ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ConditionParam("index_to <= ?", end + 1)
+    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to > ?", end)
+    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_to >= ?", start)
+    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_from < ?", start)
+    ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ConditionParam("index_from <= ?", end)
+  }
+}
+
+private fun getConditionParamPair(
+  prefix: ParamPrefixEnum,
+  value: DateTimeType
+): ConditionParam<Long> {
+  val start = value.rangeEpochMillis.first
+  val end = value.rangeEpochMillis.last
+  return when (prefix) {
+    ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
+    // see https://github.com/google/android-fhir/issues/568
+    // https://www.hl7.org/fhir/search.html#prefix
+    ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
+    ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
+    ParamPrefixEnum.NOT_EQUAL ->
+      ConditionParam(
+        "index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?",
+        start,
+        end,
+        start,
+        end
+      )
+    ParamPrefixEnum.EQUAL ->
+      ConditionParam(
+        "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
+        start,
+        end,
+        start,
+        end
+      )
+    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to > ?", end)
+    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_to >= ?", start)
+    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_from < ?", start)
+    ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ConditionParam("index_from <= ?", end)
   }
 }
 
@@ -294,6 +340,11 @@ private fun BigDecimal.getRange(): BigDecimal {
   }
 }
 
+private val DateType.rangeEpochDays: LongRange
+  get() {
+    return LongRange(value.epochDay, precision.add(value, 1).epochDay - 1)
+  }
+
 /**
  * The range of the range of the Date's epoch Timestamp. The value is related to the precision of
  * the DateTimeType
@@ -303,7 +354,7 @@ private fun BigDecimal.getRange(): BigDecimal {
  * of 2001-01-02)
  */
 private val DateTimeType.rangeEpochMillis
-  get() = value.time to precision.add(value, 1).time - 1
+  get() = LongRange(value.time, precision.add(value, 1).time - 1)
 
 private data class ConditionParam<T>(val condition: String, val params: List<T>) {
   constructor(condition: String, vararg params: T) : this(condition, params.asList())

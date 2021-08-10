@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
       this,
       PeriodicSyncConfiguration(
         syncConstraints = Constraints.Builder().build(),
-        repeat = RepeatInterval(interval = 1, timeUnit = TimeUnit.MINUTES)
+        repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
       )
     )
   }

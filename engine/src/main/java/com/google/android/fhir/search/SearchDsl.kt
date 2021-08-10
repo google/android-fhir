@@ -29,6 +29,7 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.UriType
@@ -37,6 +38,7 @@ import org.hl7.fhir.r4.model.UriType
 data class Search(val type: ResourceType, var count: Int? = null, var from: Int? = null) {
   internal val stringFilters = mutableListOf<StringFilter>()
   internal val dateFilter = mutableListOf<DateFilter>()
+  internal val dateTimeFilter = mutableListOf<DateTimeFilter>()
   internal val numberFilter = mutableListOf<NumberFilter>()
   internal val referenceFilters = mutableListOf<ReferenceFilter>()
   internal val tokenFilters = mutableListOf<TokenFilter>()
@@ -55,10 +57,20 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
     referenceFilters.add(filter)
   }
 
-  fun filter(dateParameter: DateClientParam, init: DateFilter.() -> Unit) {
-    val filter = DateFilter(dateParameter)
-    filter.init()
-    dateFilter.add(filter)
+  fun filter(
+    dateParameter: DateClientParam,
+    date: DateType,
+    prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
+  ) {
+    dateFilter.add(DateFilter(dateParameter, prefix, date))
+  }
+
+  fun filter(
+    dateParameter: DateClientParam,
+    dateTime: DateTimeType,
+    prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL
+  ) {
+    dateTimeFilter.add(DateTimeFilter(dateParameter, prefix, dateTime))
   }
 
   fun filter(filter: TokenClientParam, coding: Coding) =
@@ -122,6 +134,13 @@ data class StringFilter(
 
 @SearchDslMarker
 data class DateFilter(
+  val parameter: DateClientParam,
+  var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
+  var value: DateType? = null
+)
+
+@SearchDslMarker
+data class DateTimeFilter(
   val parameter: DateClientParam,
   var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
   var value: DateTimeType? = null

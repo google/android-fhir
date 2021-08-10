@@ -77,23 +77,28 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.truth)
 
-  api(Dependencies.hapiFhirStructuresR4)
+  api(Dependencies.HapiFhir.structuresR4)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.fragmentKtx)
+  implementation(Dependencies.apacheCommonsCompress)
+  implementation(Dependencies.apacheCommonsIo)
+  implementation(Dependencies.HapiFhir.validation) {
+    exclude(module = "commons-logging")
+    exclude(module = "httpclient")
+  }
   implementation(Dependencies.Kotlin.androidxCoreKtx)
   implementation(Dependencies.Kotlin.kotlinTestJunit)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
   implementation(Dependencies.flexBox)
-  implementation(Dependencies.caffeine)
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
-  testImplementation(Dependencies.mockitoKotlin)
 }

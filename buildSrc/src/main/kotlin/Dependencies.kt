@@ -31,6 +31,11 @@ object Dependencies {
     const val cqlEngineFhir = "org.opencds.cqf:cql-engine-fhir:${Versions.Cql.cqlEngine}"
   }
 
+  object HapiFhir {
+    const val structuresR4 = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhir}"
+    const val validation = "ca.uhn.hapi.fhir:hapi-fhir-validation:${Versions.hapiFhir}"
+  }
+
   object Kotlin {
     const val androidxCoreKtx = "androidx.core:core-ktx:${Versions.Kotlin.androidxCoreKtx}"
     const val kotlinCoroutinesAndroid =
@@ -67,11 +72,8 @@ object Dependencies {
     const val runtime = "androidx.room:room-runtime:${Versions.Androidx.room}"
   }
 
-  const val caffeine = "com.github.ben-manes.caffeine:caffeine:${Versions.caffeine}"
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val guava = "com.google.guava:guava:${Versions.guava}"
-  const val hapiFhirStructuresR4 =
-    "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhirStructuresR4}"
   const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.httpInterceptor}"
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
   const val material = "com.google.android.material:material:${Versions.material}"
@@ -83,6 +85,8 @@ object Dependencies {
     const val extJunitKtx = "androidx.test.ext:junit-ktx:${Versions.AndroidxTest.extJunit}"
     const val rules = "androidx.test:rules:${Versions.AndroidxTest.rules}"
     const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
+    const val workTestingRuntimeKtx =
+      "androidx.work:work-testing:${Versions.Androidx.workRuntimeKtx}"
   }
 
   object Espresso {
@@ -90,6 +94,9 @@ object Dependencies {
   }
 
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
+  const val apacheCommonsCompress =
+    "org.apache.commons:commons-compress:${Versions.apacheCommonsCompress}"
+  const val apacheCommonsIo = "commons-io:commons-io:${Versions.apacheCommonsIo}"
   const val junit = "junit:junit:${Versions.junit}"
   const val mockitoKotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mockitoKotlin}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
@@ -119,10 +126,11 @@ object Dependencies {
       const val stdlib = "1.4.31"
     }
 
-    const val caffeine = "2.9.0"
+    const val apacheCommonsCompress = "1.20"
+    const val apacheCommonsIo = "2.10.0"
     const val desugarJdkLibs = "1.0.9"
     const val guava = "28.2-android"
-    const val hapiFhirStructuresR4 = "5.4.0"
+    const val hapiFhir = "5.4.0"
     const val httpInterceptor = "4.0.0"
     const val jsonToolsPatch = "1.13"
     const val material = "1.3.0"
@@ -141,5 +149,6 @@ object Dependencies {
     const val junit = "4.13"
     const val mockitoKotlin = "3.2.0"
     const val robolectric = "4.5.1"
+    const val coverage = "0.16.0"
   }
 }
