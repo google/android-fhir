@@ -59,7 +59,7 @@ object NpmPackageProvider {
    *
    * The whole process can take 1-2 minutes on a clean installation.
    */
-  fun loadNpmPackage(context: Context): NpmPackage {
+  suspend fun loadNpmPackage(context: Context): NpmPackage {
     setupNpmPackage(context)
 
     if (!this::npmPackage.isInitialized) {
@@ -76,7 +76,7 @@ object NpmPackageProvider {
    *
    * @Throws NpmPackageInitializationError
    */
-  private fun setupNpmPackage(context: Context) {
+  private suspend fun setupNpmPackage(context: Context) {
     val outDir = getLocalFhirCorePackageDirectory(context)
 
     if (File(outDir + "/package/package.json").exists()) {

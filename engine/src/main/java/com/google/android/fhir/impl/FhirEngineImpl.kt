@@ -81,10 +81,9 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   override suspend fun syncUpload(
     upload: (suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>)
   ) {
-    var localChanges = database.getAllLocalChanges()
-    while (localChanges.isNotEmpty()) {
+    val localChanges = database.getAllLocalChanges()
+    if (localChanges.isNotEmpty()) {
       upload(localChanges).forEach { database.deleteUpdates(it) }
-      localChanges = database.getAllLocalChanges()
     }
   }
 }
