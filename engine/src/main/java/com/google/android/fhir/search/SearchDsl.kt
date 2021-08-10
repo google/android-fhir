@@ -131,9 +131,9 @@ data class Search(val type: ResourceType, var count: Int? = null, var from: Int?
 
   /**
    * Provides limited support for the reverse chaining on [Search]
-   * [https://www.hl7.org/fhir/search.html#has] Typical example would be `Search all Patient that have
-   * Condition - Diabetes` Condition.subject is set to a reference to the Patient when Condition
-   * object is created. So, the search code will look like:
+   * [https://www.hl7.org/fhir/search.html#has] Typical example would be `Search all Patient that
+   * have Condition - Diabetes` Condition.subject is set to a reference to the Patient when
+   * Condition object is created. So, the search code will look like:
    * ```
    *     FhirEngine.search<Patient> {
    *        has<Condition>(Condition.SUBJECT) {

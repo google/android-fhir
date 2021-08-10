@@ -34,6 +34,7 @@ import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.CarePlan
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Condition
@@ -1742,7 +1743,7 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun search_nested_patient_with_diabetes() = runBlocking {
+  fun search_patient_has_diabetes() = runBlocking {
     database.insert(TEST_PATIENT_1)
     database.insert(TEST_PATIENT_2)
     val condition =
@@ -1766,7 +1767,7 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun search_nested_patient_who_have_taken_influenza_vaccine_in_India() = runBlocking {
+  fun search_patient_has_taken_influenza_vaccine_in_India() = runBlocking {
     val patient =
       Patient().apply {
         gender = Enumerations.AdministrativeGender.MALE
@@ -1775,7 +1776,7 @@ class DatabaseImplTest {
       }
     val immunization =
       Immunization().apply {
-        this.patient = Reference("Patient/${patient.id}")
+        this.patient = Reference("Patient/${patient.logicalId}")
         vaccineCode =
           CodeableConcept(
             Coding(
@@ -1816,6 +1817,45 @@ class DatabaseImplTest {
           .getQuery()
       )
     assertThat(result).hasSize(1)
+  }
+
+  @Test
+  fun search_patient_return_single_patient_who_has_diabetic_careplan() = runBlocking {
+    val patient =
+      Patient().apply {
+        gender = Enumerations.AdministrativeGender.MALE
+        id = "100"
+      }
+    // This careplan has 2 patient references. One as subject and other as a performer.
+    // The search should only find the subject Patient.
+    val carePlan =
+      CarePlan().apply {
+        subject = Reference("Patient/${patient.logicalId}")
+        activityFirstRep.detail.performer.add(Reference("Patient/${TEST_PATIENT_1.logicalId}"))
+        category =
+          listOf(
+            CodeableConcept(
+              Coding("http://snomed.info/sct", "698360004", "Diabetes self management plan")
+            )
+          )
+      }
+    database.insert(patient, TEST_PATIENT_1, carePlan)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            has<CarePlan>(CarePlan.SUBJECT) {
+              filter(
+                CarePlan.CATEGORY,
+                Coding("http://snomed.info/sct", "698360004", "Diabetes self management plan")
+              )
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).hasSize(1)
+
+    assertThat(result[0].logicalId).isEqualTo("100")
   }
 
   private companion object {
