@@ -32,6 +32,7 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextMultiL
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextQuantityViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemEditTextSingleLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.QuestionnaireItemMultiSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
@@ -83,6 +84,8 @@ internal class QuestionnaireItemAdapter(
           QuestionnaireItemCheckBoxGroupViewHolderFactory
         QuestionnaireItemViewHolderType.AUTO_COMPLETE ->
           QuestionnaireItemAutoCompleteViewHolderFactory
+        QuestionnaireItemViewHolderType.MULTI_SELECT ->
+          QuestionnaireItemMultiSelectViewHolderFactory
       }
     return viewHolderFactory.create(parent)
   }
@@ -131,23 +134,22 @@ internal class QuestionnaireItemAdapter(
 
   private fun getChoiceViewHolderType(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent
-  ): QuestionnaireItemViewHolderType {
-    if (questionnaireItem.itemControl == ITEM_CONTROL_AUTO_COMPLETE) {
-      return QuestionnaireItemViewHolderType.AUTO_COMPLETE
-    } else if (questionnaireItem.itemControl == ITEM_CONTROL_CHECK_BOX || questionnaireItem.repeats
-    ) {
-      return QuestionnaireItemViewHolderType.CHECK_BOX_GROUP
-    } else if (questionnaireItem.itemControl == ITEM_CONTROL_DROP_DOWN) {
-      return QuestionnaireItemViewHolderType.DROP_DOWN
-    } else if (questionnaireItem.itemControl == ITEM_CONTROL_RADIO_BUTTON) {
-      return QuestionnaireItemViewHolderType.RADIO_GROUP
-    } else if (questionnaireItem.answerOption.size >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN
-    ) {
-      return QuestionnaireItemViewHolderType.DROP_DOWN
-    } else {
-      return QuestionnaireItemViewHolderType.RADIO_GROUP
+  ): QuestionnaireItemViewHolderType =
+    when {
+      questionnaireItem.itemControl == ITEM_CONTROL_AUTO_COMPLETE ->
+        QuestionnaireItemViewHolderType.AUTO_COMPLETE
+      questionnaireItem.itemControl == ITEM_CONTROL_CHECK_BOX || questionnaireItem.repeats ->
+        QuestionnaireItemViewHolderType.CHECK_BOX_GROUP
+      questionnaireItem.itemControl == ITEM_CONTROL_DROP_DOWN ->
+        QuestionnaireItemViewHolderType.DROP_DOWN
+      questionnaireItem.itemControl == ITEM_CONTROL_RADIO_BUTTON ->
+        QuestionnaireItemViewHolderType.RADIO_GROUP
+      questionnaireItem.itemControl == ITEM_CONTROL_MULTI_SELECT ->
+        QuestionnaireItemViewHolderType.MULTI_SELECT
+      questionnaireItem.answerOption.size >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN ->
+        QuestionnaireItemViewHolderType.DROP_DOWN
+      else -> QuestionnaireItemViewHolderType.RADIO_GROUP
     }
-  }
 
   internal companion object {
     // Choice questions are rendered as radio group if number of options less than this constant

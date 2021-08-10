@@ -27,6 +27,7 @@ internal const val ITEM_CONTROL_AUTO_COMPLETE = "autocomplete"
 internal const val ITEM_CONTROL_CHECK_BOX = "check-box"
 internal const val ITEM_CONTROL_DROP_DOWN = "drop-down"
 internal const val ITEM_CONTROL_RADIO_BUTTON = "radio-button"
+internal const val ITEM_CONTROL_MULTI_SELECT = "multi-select"
 
 internal const val EXTENSION_ITEM_CONTROL_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl"
@@ -46,6 +47,7 @@ internal val Questionnaire.QuestionnaireItemComponent.itemControl: String?
       ITEM_CONTROL_CHECK_BOX,
       ITEM_CONTROL_DROP_DOWN,
       ITEM_CONTROL_RADIO_BUTTON,
+      ITEM_CONTROL_MULTI_SELECT,
     )
       .firstOrNull { it == code }
   }
