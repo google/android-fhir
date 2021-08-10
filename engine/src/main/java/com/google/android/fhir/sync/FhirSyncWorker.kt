@@ -23,9 +23,11 @@ import androidx.work.Data
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.Result.Error
 import com.google.android.fhir.sync.Result.Success
-import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import java.time.OffsetDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -42,7 +44,10 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   abstract fun getDataSource(): DataSource
   abstract fun getSyncData(): ResourceSyncParams
 
-  private val gson = Gson()
+  private val gson =
+    GsonBuilder()
+      .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeTypeAdapter().nullSafe())
+      .create()
   private var fhirSynchronizer: FhirSynchronizer =
     FhirSynchronizer(appContext, getFhirEngine(), getDataSource(), getSyncData())
 

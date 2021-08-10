@@ -25,7 +25,9 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
 import com.google.android.fhir.FhirEngine
-import com.google.gson.Gson
+import com.google.android.fhir.OffsetDateTimeTypeAdapter
+import com.google.gson.GsonBuilder
+import java.time.OffsetDateTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -36,7 +38,10 @@ import kotlinx.coroutines.flow.mapNotNull
 class SyncJobImpl(private val context: Context) : SyncJob {
   private val TAG = javaClass.name
   private val syncWorkType = SyncWorkType.DOWNLOAD_UPLOAD
-  private val gson = Gson()
+  private val gson =
+    GsonBuilder()
+      .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeTypeAdapter().nullSafe())
+      .create()
 
   /** Periodically sync the data with given configuration for given worker class */
   @ExperimentalCoroutinesApi

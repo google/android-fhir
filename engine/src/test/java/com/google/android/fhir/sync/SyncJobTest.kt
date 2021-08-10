@@ -118,13 +118,14 @@ class SyncJobTest {
       .result
       .get()
 
-    Thread.sleep(2000)
+    Thread.sleep(5000)
 
     assertThat(workInfoList.map { it.state })
-      .containsAtLeast(
+      .containsExactly(
         WorkInfo.State.ENQUEUED, // waiting for turn
         WorkInfo.State.RUNNING, // worker launched
         WorkInfo.State.RUNNING, // progresses emitted Started, InProgress..
+        WorkInfo.State.RUNNING,
         WorkInfo.State.RUNNING, // progress emitted State.Success
         WorkInfo.State.ENQUEUED // waiting again for next turn
       )
@@ -132,7 +133,11 @@ class SyncJobTest {
 
     // States are  Started, InProgress .... , Finished (Success)
     assertThat(stateList.map { it::class.java })
-      .containsAtLeast(State.InProgress::class.java, State.Finished::class.java)
+      .containsExactly(
+        State.Started::class.java,
+        State.InProgress::class.java,
+        State.Finished::class.java
+      )
       .inOrder()
 
     job1.cancel()
@@ -163,7 +168,7 @@ class SyncJobTest {
 
     val success = (res[2] as State.Finished).result
 
-    assertThat(success.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp().toString())
+    assertThat(success.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
 
     job.cancel()
   }
@@ -194,7 +199,7 @@ class SyncJobTest {
 
     val error = (res[3] as State.Failed).result
 
-    assertThat(error.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp().toString())
+    assertThat(error.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
 
     assertThat(error.exceptions[0].exception)
       .isInstanceOf(java.lang.IllegalStateException::class.java)

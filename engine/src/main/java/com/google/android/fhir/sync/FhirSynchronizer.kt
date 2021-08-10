@@ -31,7 +31,7 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 sealed class Result {
-  val timestamp: String = OffsetDateTime.now().toString()
+  val timestamp: OffsetDateTime = OffsetDateTime.now()
 
   object Success : Result()
   data class Error(val exceptions: List<ResourceSyncException>) : Result()
@@ -76,7 +76,7 @@ internal class FhirSynchronizer(
   }
 
   private suspend fun emitResult(result: Result): Result {
-    datastoreUtil.writeLastSyncTimestamp(OffsetDateTime.parse(result.timestamp))
+    datastoreUtil.writeLastSyncTimestamp(result.timestamp)
 
     when (result) {
       is Result.Success -> emit(State.Finished(result))
