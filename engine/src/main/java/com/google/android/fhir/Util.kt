@@ -56,3 +56,6 @@ fun Resource.isUploadSuccess(): Boolean {
   return outcome.issue.isNotEmpty() &&
     outcome.issue.all { it.severity.equals(OperationOutcome.IssueSeverity.INFORMATION) }
 }
+
+/** Url for the UCUM system of measures. */
+const val ucumUrl = "http://unitsofmeasure.org"
