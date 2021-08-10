@@ -25,6 +25,7 @@ import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
@@ -1851,6 +1852,130 @@ class SearchTest {
           "g",
           BigDecimal("5.4025").toDouble(),
           BigDecimal("5.4035").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_nested_patient_with_diabetes() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          has<Condition>(Condition.SUBJECT) {
+            filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+          }
+        }
+        .getQuery()
+    print(query.query)
+
+    assertThat(query.query)
+      .isEqualTo(
+        """ 
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT substr(c.index_value, LENGTH('Patient/')+1)
+        FROM ReferenceIndexEntity c
+        WHERE c.resourceType = ? AND c.index_name = ?
+        AND c.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND IFNULL(index_system,'') = ?
+        )
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Condition.name,
+          Condition.SUBJECT.paramName,
+          ResourceType.Condition.name,
+          Condition.CODE.paramName,
+          "44054006",
+          "http://snomed.info/sct"
+        )
+      )
+  }
+
+  @Test
+  fun search_nested_patient_who_have_taken_influenza_vaccine_in_India() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          has<Immunization>(Immunization.PATIENT) {
+            filter(
+              Immunization.VACCINE_CODE,
+              Coding(
+                "http://hl7.org/fhir/sid/cvx",
+                "140",
+                "Influenza, seasonal, injectable, preservative free"
+              )
+            )
+            //      Follow Immunization.ImmunizationStatus
+            filter(
+              Immunization.STATUS,
+              Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")
+            )
+          }
+
+          filter(Patient.ADDRESS_COUNTRY) {
+            modifier = StringFilterModifier.MATCHES_EXACTLY
+            value = "IN"
+          }
+        }
+        .getQuery()
+
+    print(query.query)
+    print(query.args)
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        )
+        AND a.resourceId IN (
+        SELECT substr(c.index_value, 9)
+        FROM ReferenceIndexEntity c
+        WHERE c.resourceType = ? AND c.index_name = ?
+        AND c.resourceId IN (
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND IFNULL(index_system,'') = ?
+        INTERSECT
+        SELECT resourceId FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        AND IFNULL(index_system,'') = ?
+        )
+        )
+        """.trimIndent()
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          ResourceType.Patient.name,
+          ResourceType.Patient.name,
+          Patient.ADDRESS_COUNTRY.paramName,
+          "IN",
+          ResourceType.Immunization.name,
+          Immunization.PATIENT.paramName,
+          ResourceType.Immunization.name,
+          Immunization.VACCINE_CODE.paramName,
+          "140",
+          "http://hl7.org/fhir/sid/cvx",
+          ResourceType.Immunization.name,
+          Immunization.STATUS.paramName,
+          "completed",
+          "http://hl7.org/fhir/event-status"
         )
       )
   }

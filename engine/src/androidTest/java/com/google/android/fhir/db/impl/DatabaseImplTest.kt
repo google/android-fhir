@@ -32,15 +32,21 @@ import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
@@ -1733,6 +1739,83 @@ class DatabaseImplTest {
           .getQuery()
       )
     assertThat(result.filter { it.id == patient.id }).hasSize(1)
+  }
+
+  @Test
+  fun search_nested_patient_with_diabetes() = runBlocking {
+    database.insert(TEST_PATIENT_1)
+    database.insert(TEST_PATIENT_2)
+    val condition =
+      Condition().apply {
+        subject = Reference("Patient/$TEST_PATIENT_1_ID")
+        code = CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+      }
+    database.insert(condition)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            has<Condition>(Condition.SUBJECT) {
+              filter(Condition.CODE, Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+            }
+          }
+          .getQuery()
+      )
+
+    assertThat(result).hasSize(1)
+  }
+
+  @Test
+  fun search_nested_patient_who_have_taken_influenza_vaccine_in_India() = runBlocking {
+    val patient =
+      Patient().apply {
+        gender = Enumerations.AdministrativeGender.MALE
+        id = "100"
+        addAddress(Address().apply { country = "IN" })
+      }
+    val immunization =
+      Immunization().apply {
+        this.patient = Reference("Patient/${patient.id}")
+        vaccineCode =
+          CodeableConcept(
+            Coding(
+              "http://hl7.org/fhir/sid/cvx",
+              "140",
+              "Influenza, seasonal, injectable, preservative free"
+            )
+          )
+        status = Immunization.ImmunizationStatus.COMPLETED
+      }
+    database.insert(patient, TEST_PATIENT_1, immunization)
+    val result =
+      database.search<Patient>(
+        Search(ResourceType.Patient)
+          .apply {
+            has<Immunization>(Immunization.PATIENT) {
+              filter(
+                Immunization.VACCINE_CODE,
+                Coding(
+                  "http://hl7.org/fhir/sid/cvx",
+                  "140",
+                  "Influenza, seasonal, injectable, preservative free"
+                )
+              )
+
+              // Follow Immunization.ImmunizationStatus
+              filter(
+                Immunization.STATUS,
+                Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")
+              )
+            }
+
+            filter(Patient.ADDRESS_COUNTRY) {
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+              value = "IN"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).hasSize(1)
   }
 
   private companion object {
