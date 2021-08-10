@@ -40,6 +40,7 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Device
+import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.InstantType
@@ -543,6 +544,36 @@ class ResourceIndexerTest {
   }
 
   @Test
+  fun index_gender() {
+    val patient =
+      Patient().apply {
+        id = "someID"
+        gender = Enumerations.AdministrativeGender.UNKNOWN
+      }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.tokenIndices)
+      .contains(
+        TokenIndex(
+          "gender",
+          "Patient.gender",
+          "http://hl7.org/fhir/administrative-gender",
+          "unknown"
+        )
+      )
+  }
+
+  @Test
+  fun index_gender_null() {
+    val patient = Patient().apply { id = "someID" }
+
+    val resourceIndices = ResourceIndexer.index(patient)
+
+    assertThat(resourceIndices.tokenIndices.any { it.name == "gender" }).isFalse()
+  }
+
+  @Test
   fun index_quantity_money() {
     val currency = "EU"
     val value = BigDecimal.valueOf(300)
@@ -762,7 +793,8 @@ class ResourceIndexerTest {
           "Invoice.participant.role",
           testInvoice.participantFirstRep.role.codingFirstRep.system,
           testInvoice.participantFirstRep.role.codingFirstRep.code
-        )
+        ),
+        TokenIndex("status", "Invoice.status", "http://hl7.org/fhir/invoice-status", "issued")
       )
 
     assertThat(resourceIndices.uriIndices).isEmpty()
@@ -812,7 +844,16 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.numberIndices).isEmpty()
 
-    assertThat(resourceIndices.tokenIndices).isEmpty()
+    assertThat(resourceIndices.tokenIndices)
+      .containsExactly(
+        TokenIndex("subject-type", "Questionnaire.subjectType", "", "Patient"),
+        TokenIndex(
+          "status",
+          "Questionnaire.status",
+          "http://hl7.org/fhir/publication-status",
+          "draft"
+        )
+      )
 
     assertThat(resourceIndices.dateTimeIndices)
       .containsExactly(
@@ -878,6 +919,18 @@ class ResourceIndexerTest {
           "Patient.communication.language",
           testPatient.communicationFirstRep.language.codingFirstRep.system,
           testPatient.communicationFirstRep.language.codingFirstRep.code
+        ),
+        TokenIndex(
+          "gender",
+          "Patient.gender",
+          testPatient.gender.system,
+          testPatient.gender.toCode()
+        ),
+        TokenIndex(
+          "address-use",
+          "Patient.address.use",
+          testPatient.addressFirstRep.use.system,
+          testPatient.addressFirstRep.use.toCode()
         )
       )
 
@@ -940,6 +993,12 @@ class ResourceIndexerTest {
           "Location.type",
           testLocation.typeFirstRep.codingFirstRep.system,
           testLocation.typeFirstRep.codingFirstRep.code
+        ),
+        TokenIndex(
+          "status",
+          "Location.status",
+          testLocation.status.system,
+          testLocation.status.toCode()
         )
       )
 
