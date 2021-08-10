@@ -43,6 +43,7 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.ICoding
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
@@ -245,6 +246,10 @@ internal object ResourceIndexer {
         codeableConcept.coding.filter { it.code != null && it.code!!.isNotEmpty() }.map {
           TokenIndex(searchParam.name, searchParam.path, it.system ?: "", it.code)
         }
+      }
+      "code" -> {
+        val coding = value as ICoding
+        listOf(TokenIndex(searchParam.name, searchParam.path, coding.system ?: "", coding.code))
       }
       else -> listOf()
     }
