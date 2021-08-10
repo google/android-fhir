@@ -22,16 +22,7 @@
       "text": "Symptoms",
       "linkId": "1.0.0",
       "type": "group",
-      "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
       "extension": [
-        {
-          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-          "valueExpression": {
-            "language": "application/x-fhir-query",
-            "expression": "Observation",
-            "name": "symptoms"
-          }
-        },
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
           "valueCodeableConcept": {
@@ -49,55 +40,198 @@
       "item": [
         {
           "text": "In the past two weeks have you experienced ANY of these symptoms?",
-          "type": "choice",
-          "code": [],
-          "linkId": "1.1.0",
-          "required": true,
-          "repeats": true,
-          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.category",
+          "type": "display",
+          "linkId": "1.1.0"
+        },
+        {
+          "linkId": "1.2.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
           "extension": [
             {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-              "valueCodeableConcept": {
-                "coding": [
-                  {
-                    "system": "http://hl7.org/fhir/questionnaire-item-control",
-                    "code": "drop-down",
-                    "display": "Drop down"
-                  }
-                ],
-                "text": "Drop down"
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Observation",
+                "name": "fever"
               }
             }
           ],
-          "answerOption": [
+          "item": [
             {
-              "valueCoding": {
-                "code": "386661006",
-                "display": "Fever",
-                "system": "http://snomed.info/sct"
-              }
-            },
+              "type": "choice",
+              "linkId": "1.2.1",
+              "required": true,
+              "repeats": true,
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "drop-down",
+                        "display": "Drop down"
+                      }
+                    ],
+                    "text": "Drop down"
+                  }
+                }
+              ],
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "386661006",
+                    "display": "Fever",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "1.3.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
+          "extension": [
             {
-              "valueCoding": {
-                "code": "13645005",
-                "display": "Shortness of breath",
-                "system": "http://snomed.info/sct"
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Observation",
+                "name": "breathShortness"
               }
-            },
+            }
+          ],
+          "item": [
             {
-              "valueCoding": {
-                "code": "49727002",
-                "display": "Cough",
-                "system": "http://snomed.info/sct"
-              }
-            },
+              "type": "choice",
+              "linkId": "1.3.1",
+              "required": true,
+              "repeats": true,
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "drop-down",
+                        "display": "Drop down"
+                      }
+                    ],
+                    "text": "Drop down"
+                  }
+                }
+              ],
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "13645005",
+                    "display": "Shortness of breath",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "1.4.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
+          "extension": [
             {
-              "valueCoding": {
-                "code": "44169009",
-                "display": "Loss of smell",
-                "system": "http://snomed.info/sct"
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Observation",
+                "name": "cough"
               }
+            }
+          ],
+          "item": [
+            {
+              "type": "choice",
+              "linkId": "1.4.1",
+              "required": true,
+              "repeats": true,
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "drop-down",
+                        "display": "Drop down"
+                      }
+                    ],
+                    "text": "Drop down"
+                  }
+                }
+              ],
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "49727002",
+                    "display": "Cough",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "1.5.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Observation",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Observation",
+                "name": "lossOfSmell"
+              }
+            }
+          ],
+          "item": [
+            {
+              "type": "choice",
+              "linkId": "1.5.1",
+              "required": true,
+              "repeats": true,
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "drop-down",
+                        "display": "Drop down"
+                      }
+                    ],
+                    "text": "Drop down"
+                  }
+                }
+              ],
+              "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.code",
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "44169009",
+                    "display": "Loss of smell",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
             }
           ]
         }

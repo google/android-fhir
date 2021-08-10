@@ -68,3 +68,6 @@ class OffsetDateTimeTypeAdapter : TypeAdapter<OffsetDateTime>() {
 
   override fun read(input: JsonReader): OffsetDateTime = OffsetDateTime.parse(input.nextString())
 }
+
+/** Url for the UCUM system of measures. */
+const val ucumUrl = "http://unitsofmeasure.org"
