@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.db.impl
 
+import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
@@ -975,42 +976,48 @@ class DatabaseImplTest {
 
   @Test
   fun search_dateTime_Approximate() = runBlocking {
-    mockkStatic(::getCurrentDate)
-    every { getCurrentDate() } returns Date(mockEpochTimeStamp)
-    val patient =
-      Patient().apply {
-        id = "1"
-        deceased = DateTimeType("2013-03-16T10:00:00-05:30")
-      }
-    database.insert(patient)
-    val result =
-      database.search<Patient>(
-        Search(ResourceType.Patient)
-          .apply {
-            filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.APPROXIMATE)
-          }
-          .getQuery()
-      )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      mockkStatic(::getCurrentDate)
+      every { getCurrentDate() } returns Date(mockEpochTimeStamp)
+      val patient =
+        Patient().apply {
+          id = "1"
+          deceased = DateTimeType("2013-03-16T10:00:00-05:30")
+        }
+      database.insert(patient)
+      val result =
+        database.search<Patient>(
+          Search(ResourceType.Patient)
+            .apply {
+              filter(Patient.DEATH_DATE, DateTimeType("2013-03-14"), ParamPrefixEnum.APPROXIMATE)
+            }
+            .getQuery()
+        )
+      assertThat(result.single().id).isEqualTo("Patient/1")
+    }
   }
 
   @Test
   fun search_date_Approximate() = runBlocking {
-    mockkStatic(::getCurrentDate)
-    every { getCurrentDate() } returns Date(mockEpochTimeStamp)
-    val patient =
-      Patient().apply {
-        id = "1"
-        birthDateElement = DateType("2013-03-16")
-      }
-    database.insert(patient)
-    val result =
-      database.search<Patient>(
-        Search(ResourceType.Patient)
-          .apply { filter(Patient.BIRTHDATE, DateType("2013-03-14"), ParamPrefixEnum.APPROXIMATE) }
-          .getQuery()
-      )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      mockkStatic(::getCurrentDate)
+      every { getCurrentDate() } returns Date(mockEpochTimeStamp)
+      val patient =
+        Patient().apply {
+          id = "1"
+          birthDateElement = DateType("2013-03-16")
+        }
+      database.insert(patient)
+      val result =
+        database.search<Patient>(
+          Search(ResourceType.Patient)
+            .apply {
+              filter(Patient.BIRTHDATE, DateType("2013-03-14"), ParamPrefixEnum.APPROXIMATE)
+            }
+            .getQuery()
+        )
+      assertThat(result.single().id).isEqualTo("Patient/1")
+    }
   }
 
   @Test
