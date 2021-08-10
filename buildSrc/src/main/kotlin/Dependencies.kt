@@ -18,6 +18,7 @@ object Dependencies {
 
   object Androidx {
     const val activity = "androidx.activity:activity:${Versions.Androidx.activity}"
+    const val activityKtx = "androidx.activity:activity-ktx:${Versions.Androidx.activity}"
     const val appCompat = "androidx.appcompat:appcompat:${Versions.Androidx.appCompat}"
     const val constraintLayout =
       "androidx.constraintlayout:constraintlayout:${Versions.Androidx.constraintLayout}"

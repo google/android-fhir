@@ -26,6 +26,7 @@ object Plugins {
     const val kotlin = "kotlin"
     const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
     const val spotless = "com.diffplug.spotless"
+    const val parcelize = "kotlin-parcelize"
   }
 
   // classpath plugins

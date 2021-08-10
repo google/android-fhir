@@ -36,6 +36,8 @@ import com.google.android.fhir.datacapture.views.QuestionnaireItemGroupViewHolde
 import com.google.android.fhir.datacapture.views.QuestionnaireItemRadioGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireItemViewItem
+import com.google.android.fhir.datacapture.views.barcode.QuestionnaireItemBarCodeReaderViewHolderFactory
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
 internal class QuestionnaireItemAdapter(
@@ -69,7 +71,7 @@ internal class QuestionnaireItemAdapter(
         QuestionnaireItemViewHolderType.EDIT_TEXT_SINGLE_LINE ->
           QuestionnaireItemEditTextSingleLineViewHolderFactory
         QuestionnaireItemViewHolderType.EDIT_TEXT_MULTI_LINE ->
-          QuestionnaireItemEditTextMultiLineViewHolderFactory
+          QuestionnaireItemBarCodeReaderViewHolderFactory
         QuestionnaireItemViewHolderType.EDIT_TEXT_INTEGER ->
           QuestionnaireItemEditTextIntegerViewHolderFactory
         QuestionnaireItemViewHolderType.EDIT_TEXT_DECIMAL ->
