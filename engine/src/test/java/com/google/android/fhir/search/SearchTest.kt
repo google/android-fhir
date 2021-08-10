@@ -30,6 +30,7 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.Immunization
+import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
@@ -879,7 +880,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM DateTimeIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?
+        WHERE resourceType = ? AND index_name = ? AND (index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?)
         )
         """.trimIndent()
       )
@@ -1230,7 +1231,7 @@ class SearchTest {
         WHERE a.resourceType = ?
         AND a.resourceId IN (
         SELECT resourceId FROM NumberIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value < ? OR index_value >= ?
+        WHERE resourceType = ? AND index_name = ? AND (index_value < ? OR index_value >= ?)
         )
         """.trimIndent()
       )
@@ -1518,6 +1519,338 @@ class SearchTest {
           RiskAssessment.PROBABILITY.paramName,
           BigDecimal("90.00").toDouble(),
           BigDecimal("110.00").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_equals() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.EQUAL
+            unit = "g"
+            value = BigDecimal("5.403")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_unit = ? AND index_value >= ? AND index_value < ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          "g",
+          BigDecimal("5.4025").toDouble(),
+          BigDecimal("5.4035").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_less() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.LESSTHAN
+            unit = "g"
+            value = BigDecimal("5.403")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_unit = ? AND index_value < ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          "g",
+          BigDecimal("5.403").toDouble()
+        )
+      )
+  }
+  @Test
+  fun search_quantity_less_or_equal() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+            system = "http://unitsofmeasure.org"
+            value = BigDecimal("5.403")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_system = ? AND index_value <= ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          "http://unitsofmeasure.org",
+          BigDecimal("5.403").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_greater() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.GREATERTHAN
+            system = "http://unitsofmeasure.org"
+            value = BigDecimal("5.403")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_system = ? AND index_value > ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          "http://unitsofmeasure.org",
+          BigDecimal("5.403").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_greater_equal() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+            value = BigDecimal("5.403")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_value >= ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          BigDecimal("5.403").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_not_equal() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.NOT_EQUAL
+            value = BigDecimal("5.403")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND (index_value < ? OR index_value >= ?)
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          BigDecimal("5.4025").toDouble(),
+          BigDecimal("5.4035").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_starts_after() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.STARTS_AFTER
+            value = BigDecimal("5.403")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_value > ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          BigDecimal("5.403").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_ends_before() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.ENDS_BEFORE
+            value = BigDecimal("5.403")
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_value < ?
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          BigDecimal("5.403").toDouble()
+        )
+      )
+  }
+
+  @Test
+  fun search_quantity_canonical_match() {
+    val query =
+      Search(ResourceType.Observation)
+        .apply {
+          filter(Observation.VALUE_QUANTITY) {
+            prefix = ParamPrefixEnum.EQUAL
+            value = BigDecimal("5403")
+            system = "http://unitsofmeasure.org"
+            unit = "mg"
+          }
+        }
+        .getQuery()
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceId IN (
+        SELECT resourceId FROM QuantityIndexEntity
+        WHERE resourceType= ? AND index_name = ?
+        AND index_system = ? AND (index_unit = ? AND index_value >= ? AND index_value < ? OR index_canonicalUnit = ? AND index_canonicalValue >= ? AND index_canonicalValue < ?)
+        )
+        """.trimIndent()
+      )
+    assertThat(query.args)
+      .isEqualTo(
+        listOfNotNull(
+          ResourceType.Observation.name,
+          ResourceType.Observation.name,
+          Observation.VALUE_QUANTITY.paramName,
+          "http://unitsofmeasure.org",
+          "mg",
+          BigDecimal("5402.5").toDouble(),
+          BigDecimal("5403.5").toDouble(),
+          "g",
+          BigDecimal("5.4025").toDouble(),
+          BigDecimal("5.4035").toDouble()
         )
       )
   }

@@ -19,8 +19,12 @@ package com.google.android.fhir.search
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.ConverterException
+import com.google.android.fhir.UcumValue
+import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.epochDay
+import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
@@ -65,7 +69,8 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
         dateFilter.map { it.query(type) } +
         dateTimeFilter.map { it.query(type) } +
         tokenFilters.map { it.query(type) } +
-        numberFilter.map { it.query(type) })
+        numberFilter.map { it.query(type) } +
+        quantityFilters.map { it.query(type) })
       .intersect()
   if (filterQuery != null) {
     filterStatement =
@@ -179,6 +184,18 @@ fun TokenFilter.query(type: ResourceType): SearchQuery {
   )
 }
 
+fun QuantityFilter.query(type: ResourceType): SearchQuery {
+  val conditionParamPair = getConditionParamPair(prefix, value!!, system, unit)
+  return SearchQuery(
+    """
+      SELECT resourceId FROM QuantityIndexEntity
+      WHERE resourceType= ? AND index_name = ? 
+      AND ${conditionParamPair.condition}
+    """.trimIndent(),
+    listOfNotNull<Any>(type.name, parameter.paramName) + conditionParamPair.params
+  )
+}
+
 fun List<SearchQuery>.intersect(): SearchQuery? {
   return if (isEmpty()) {
     null
@@ -241,7 +258,7 @@ private fun getConditionParamPair(
     ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
     ParamPrefixEnum.NOT_EQUAL ->
       ConditionParam(
-        "index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?",
+        "(index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?)",
         start,
         end,
         start,
@@ -292,7 +309,7 @@ private fun getConditionParamPair(
     ParamPrefixEnum.NOT_EQUAL -> {
       val precision = value.getRange()
       ConditionParam(
-        "index_value < ? OR index_value >= ?",
+        "(index_value < ? OR index_value >= ?)",
         (value - precision).toDouble(),
         (value + precision).toDouble()
       )
@@ -313,6 +330,62 @@ private fun getConditionParamPair(
       )
     }
   }
+}
+
+/**
+ * Returns the condition and list of params required in Quantity.query see
+ * https://www.hl7.org/fhir/search.html#quantity.
+ */
+private fun getConditionParamPair(
+  prefix: ParamPrefixEnum?,
+  value: BigDecimal,
+  system: String?,
+  unit: String?
+): ConditionParam<Any> {
+  // value cannot be null -> the value condition will always be present
+  val valueConditionParam = getConditionParamPair(prefix, value)
+  val argList = mutableListOf<Any>()
+
+  val condition = StringBuilder()
+  val canonicalCondition = StringBuilder()
+  val nonCanonicalCondition = StringBuilder()
+
+  // system condition will be preceded by a value condition so if exists append an AND here
+  if (system != null) {
+    argList.add(system)
+    condition.append("index_system = ? AND ")
+  }
+  // if the unit condition will be preceded by a value condition so if exists append an AND here
+  if (unit != null) {
+    argList.add(unit)
+    nonCanonicalCondition.append("index_unit = ? AND ")
+  }
+
+  // add value condition
+  nonCanonicalCondition.append(valueConditionParam.condition)
+  argList.addAll(valueConditionParam.params)
+
+  if (system == ucumUrl && unit != null) {
+    try {
+      val ucumUnit = UnitConverter.getCanonicalUnits(UcumValue(unit, value))
+      val canonicalConditionParam = getConditionParamPair(prefix, ucumUnit.value)
+      argList.add(ucumUnit.units)
+      argList.addAll(canonicalConditionParam.params)
+      canonicalCondition
+        .append("index_canonicalUnit = ? AND ")
+        .append(canonicalConditionParam.condition.replace("index_value", "index_canonicalValue"))
+    } catch (exception: ConverterException) {
+      exception.printStackTrace()
+    }
+  }
+
+  // Add OR only when canonical match is possible
+  if (canonicalCondition.isNotEmpty()) {
+    condition.append("($nonCanonicalCondition OR $canonicalCondition)")
+  } else {
+    condition.append(nonCanonicalCondition)
+  }
+  return ConditionParam(condition.toString(), argList)
 }
 
 /**
