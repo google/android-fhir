@@ -17,6 +17,7 @@
 package com.google.android.fhir.search
 
 import android.os.Build
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.epochDay
 import com.google.android.fhir.getCurrentDate
@@ -25,6 +26,8 @@ import io.mockk.every
 import io.mockk.mockkStatic
 import java.math.BigDecimal
 import java.util.Date
+import kotlin.math.absoluteValue
+import kotlin.math.roundToLong
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -547,11 +550,13 @@ class SearchTest {
 
   @Test
   fun search_date_approximate() {
+    val mockDateType = DateType(Date(mockEpochTimeStamp),TemporalPrecisionEnum.DAY)
+    val value = DateType("2013-03-14")
     mockkStatic(::getCurrentDate)
-    every { getCurrentDate() } returns Date(mockEpochTimeStamp)
+    every { getCurrentDate() } returns mockDateType.value
     val query =
       Search(ResourceType.Patient)
-        .apply { filter(Patient.BIRTHDATE, DateType("2013-03-14"), ParamPrefixEnum.APPROXIMATE) }
+        .apply { filter(Patient.BIRTHDATE, value, ParamPrefixEnum.APPROXIMATE) }
         .getQuery()
 
     assertThat(query.query)
@@ -566,16 +571,25 @@ class SearchTest {
         )
         """.trimIndent()
       )
+
+    val diffStart =
+      (value.rangeEpochDays.first -
+          0.1 * (value.rangeEpochDays.first - mockDateType.rangeEpochDays.first).absoluteValue)
+        .roundToLong()
+    val diffEnd =
+      (value.rangeEpochDays.last +
+          0.1 * (value.rangeEpochDays.last - mockDateType.rangeEpochDays.last).absoluteValue)
+        .roundToLong()
     assertThat(query.args)
       .isEqualTo(
         listOf(
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
-          15471.toLong(),
-          16085.toLong(),
-          15471.toLong(),
-          16085.toLong()
+          diffStart,
+          diffEnd,
+          diffStart,
+          diffEnd
         )
       )
   }
@@ -840,13 +854,14 @@ class SearchTest {
 
   @Test
   fun search_dateTime_approximate() {
+    val mockDateTimeType = DateTimeType(Date(mockEpochTimeStamp),TemporalPrecisionEnum.DAY)
+    val value = DateTimeType("2013-03-14")
     mockkStatic(::getCurrentDate)
-    every { getCurrentDate() } returns Date(mockEpochTimeStamp)
+    every { getCurrentDate() } returns mockDateTimeType.value
+
     val query =
       Search(ResourceType.Patient)
-        .apply {
-          filter(Patient.BIRTHDATE, DateTimeType("2013-03-14"), ParamPrefixEnum.APPROXIMATE)
-        }
+        .apply { filter(Patient.BIRTHDATE, value, ParamPrefixEnum.APPROXIMATE) }
         .getQuery()
 
     assertThat(query.query)
@@ -861,16 +876,28 @@ class SearchTest {
         )
         """.trimIndent()
       )
+
+    val diffStart =
+      (value.rangeEpochMillis.first -
+              0.1 *
+              (value.rangeEpochMillis.first - mockDateTimeType.rangeEpochMillis.first).absoluteValue)
+        .roundToLong()
+    val diffEnd =
+      (value.rangeEpochMillis.last +
+              0.1 *
+              (value.rangeEpochMillis.last - mockDateTimeType.rangeEpochMillis.last).absoluteValue)
+        .roundToLong()
+
     assertThat(query.args)
       .isEqualTo(
         listOf(
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
-          1336667709900,
-          1389817490099,
-          1336667709900,
-          1389817490099
+          diffStart,
+          diffEnd,
+          diffStart,
+          diffEnd
         )
       )
   }

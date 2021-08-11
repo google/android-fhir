@@ -447,7 +447,7 @@ private fun BigDecimal.getRange(): BigDecimal {
   }
 }
 
-private val DateType.rangeEpochDays: LongRange
+internal val DateType.rangeEpochDays: LongRange
   get() {
     return LongRange(value.epochDay, precision.add(value, 1).epochDay - 1)
   }
@@ -460,7 +460,7 @@ private val DateType.rangeEpochDays: LongRange
  * 978307200 (epoch timestamp of 2001-01-01) and 978393599 ( which is one second less than the epoch
  * of 2001-01-02)
  */
-private val DateTimeType.rangeEpochMillis
+internal val DateTimeType.rangeEpochMillis
   get() = LongRange(value.time, precision.add(value, 1).time - 1)
 
 private data class ConditionParam<T>(val condition: String, val params: List<T>) {
