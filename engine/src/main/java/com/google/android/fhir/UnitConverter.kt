@@ -35,11 +35,10 @@ internal object UnitConverter {
    * For example a value of 1000 mm will return 1 m.
    */
   @Throws(ConverterException::class)
-  internal fun getCanonicalUnits(value: UcumValue): UcumValue {
-
+  internal fun getCanonicalForm(value: UcumValue): UcumValue {
     try {
       val pair =
-        ucumService.getCanonicalForm(Pair(Decimal(value.value.toPlainString()), value.units))
+        ucumService.getCanonicalForm(Pair(Decimal(value.value.toPlainString()), value.code))
       return UcumValue(
         pair.code,
         pair.value.asDecimal().toBigDecimal(MathContext(value.value.precision()))
@@ -53,4 +52,4 @@ internal object UnitConverter {
 
 internal class ConverterException(cause: Throwable) : Exception(cause)
 
-internal data class UcumValue(val units: String, val value: BigDecimal)
+internal data class UcumValue(val code: String, val value: BigDecimal)

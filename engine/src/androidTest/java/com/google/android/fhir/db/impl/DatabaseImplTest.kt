@@ -1291,7 +1291,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.403")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code =  "g"
           }
       }
     database.insert(observation)
@@ -1303,7 +1303,7 @@ class DatabaseImplTest {
               prefix = ParamPrefixEnum.EQUAL
               value = BigDecimal("5.403")
               system = "http://unitsofmeasure.org"
-              unit = "g"
+              unit =  "g"
             }
           }
           .getQuery()
@@ -1320,7 +1320,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.403")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code =  "g"
           }
       }
     database.insert(observation)
@@ -1332,7 +1332,7 @@ class DatabaseImplTest {
               prefix = ParamPrefixEnum.NOT_EQUAL
               value = BigDecimal("5.403")
               system = "http://unitsofmeasure.org"
-              unit = "g"
+              unit =  "g"
             }
           }
           .getQuery()
@@ -1349,7 +1349,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.3")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code =  "g"
           }
       }
     database.insert(observation)
@@ -1361,7 +1361,7 @@ class DatabaseImplTest {
               prefix = ParamPrefixEnum.LESSTHAN
               value = BigDecimal("5.403")
               system = "http://unitsofmeasure.org"
-              unit = "g"
+              unit =  "g"
             }
           }
           .getQuery()
@@ -1378,7 +1378,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.4035")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code =  "g"
           }
       }
     database.insert(observation)
@@ -1390,7 +1390,7 @@ class DatabaseImplTest {
               prefix = ParamPrefixEnum.LESSTHAN
               value = BigDecimal("5.403")
               system = "http://unitsofmeasure.org"
-              unit = "g"
+              unit =  "g"
             }
           }
           .getQuery()
@@ -1407,7 +1407,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.5")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code =  "g"
           }
       }
     database.insert(observation)
@@ -1419,7 +1419,7 @@ class DatabaseImplTest {
               prefix = ParamPrefixEnum.GREATERTHAN
               value = BigDecimal("5.403")
               system = "http://unitsofmeasure.org"
-              unit = "g"
+              unit =  "g"
             }
           }
           .getQuery()
@@ -1436,7 +1436,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.3")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code =  "g"
           }
       }
     database.insert(observation)
@@ -1448,7 +1448,7 @@ class DatabaseImplTest {
               prefix = ParamPrefixEnum.GREATERTHAN
               value = BigDecimal("5.403")
               system = "http://unitsofmeasure.org"
-              unit = "g"
+              unit =  "g"
             }
           }
           .getQuery()
@@ -1465,7 +1465,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.3")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code =  "g"
           }
       }
     database.insert(observation)
@@ -1477,7 +1477,7 @@ class DatabaseImplTest {
               prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
               value = BigDecimal("5.403")
               system = "http://unitsofmeasure.org"
-              unit = "g"
+              unit =  "g"
             }
           }
           .getQuery()
@@ -1494,7 +1494,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.5")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code =  "g"
           }
       }
     database.insert(observation)
@@ -1506,7 +1506,7 @@ class DatabaseImplTest {
               prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
               value = BigDecimal("5.403")
               system = "http://unitsofmeasure.org"
-              unit = "g"
+              unit =  "g"
             }
           }
           .getQuery()
@@ -1523,7 +1523,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.5")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code =  "g"
           }
       }
     database.insert(observation)
@@ -1535,7 +1535,7 @@ class DatabaseImplTest {
               prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
               value = BigDecimal("5.403")
               system = "http://unitsofmeasure.org"
-              unit = "g"
+              unit =  "g"
             }
           }
           .getQuery()
@@ -1552,7 +1552,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.3")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code =  "g"
           }
       }
     database.insert(observation)
@@ -1564,7 +1564,7 @@ class DatabaseImplTest {
               prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
               value = BigDecimal("5.403")
               system = "http://unitsofmeasure.org"
-              unit = "g"
+              unit =  "g"
             }
           }
           .getQuery()
@@ -1581,7 +1581,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.5")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code =  "g"
           }
       }
     database.insert(observation)
@@ -1593,7 +1593,7 @@ class DatabaseImplTest {
               prefix = ParamPrefixEnum.STARTS_AFTER
               value = BigDecimal("5.403")
               system = "http://unitsofmeasure.org"
-              unit = "g"
+              unit =  "g"
             }
           }
           .getQuery()
@@ -1610,7 +1610,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.3")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code =  "g"
           }
       }
     database.insert(observation)
@@ -1622,7 +1622,7 @@ class DatabaseImplTest {
               prefix = ParamPrefixEnum.STARTS_AFTER
               value = BigDecimal("5.403")
               system = "http://unitsofmeasure.org"
-              unit = "g"
+              unit =  "g"
             }
           }
           .getQuery()
@@ -1639,7 +1639,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.3")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code =  "g"
           }
       }
     database.insert(observation)
@@ -1651,7 +1651,7 @@ class DatabaseImplTest {
               prefix = ParamPrefixEnum.ENDS_BEFORE
               value = BigDecimal("5.403")
               system = "http://unitsofmeasure.org"
-              unit = "g"
+              unit =  "g"
             }
           }
           .getQuery()
@@ -1668,7 +1668,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.5")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code =  "g"
           }
       }
     database.insert(observation)
@@ -1680,7 +1680,7 @@ class DatabaseImplTest {
               prefix = ParamPrefixEnum.ENDS_BEFORE
               value = BigDecimal("5.403")
               system = "http://unitsofmeasure.org"
-              unit = "g"
+              unit =  "g"
             }
           }
           .getQuery()
@@ -1697,7 +1697,7 @@ class DatabaseImplTest {
           Quantity().apply {
             value = BigDecimal("5.403")
             system = "http://unitsofmeasure.org"
-            unit = "g"
+            code =  "g"
           }
       }
     database.insert(observation)
@@ -1709,7 +1709,7 @@ class DatabaseImplTest {
               prefix = ParamPrefixEnum.EQUAL
               value = BigDecimal("5403")
               system = "http://unitsofmeasure.org"
-              unit = "mg"
+              unit =  "mg"
             }
           }
           .getQuery()
