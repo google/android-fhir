@@ -26,34 +26,34 @@ import com.google.android.fhir.datacapture.views.barcode.mlkit.md.barcodedetecti
 
 /** Presents a list of field info in the detected barcode. */
 internal class BarcodeFieldAdapter(private val barcodeFieldList: List<BarcodeField>) :
-    RecyclerView.Adapter<BarcodeFieldViewHolder>() {
+  RecyclerView.Adapter<BarcodeFieldViewHolder>() {
 
-    internal class BarcodeFieldViewHolder private constructor(view: View) :
-        RecyclerView.ViewHolder(view) {
+  internal class BarcodeFieldViewHolder private constructor(view: View) :
+    RecyclerView.ViewHolder(view) {
 
-        private val labelView: TextView = view.findViewById(R.id.barcode_field_label)
-        private val valueView: TextView = view.findViewById(R.id.barcode_field_value)
+    private val labelView: TextView = view.findViewById(R.id.barcode_field_label)
+    private val valueView: TextView = view.findViewById(R.id.barcode_field_value)
 
-        fun bindBarcodeField(barcodeField: BarcodeField) {
-            labelView.text = barcodeField.label
-            valueView.text = barcodeField.value
-        }
-
-        companion object {
-
-            fun create(parent: ViewGroup): BarcodeFieldViewHolder {
-                val view =
-                    LayoutInflater.from(parent.context).inflate(R.layout.barcode_field, parent, false)
-                return BarcodeFieldViewHolder(view)
-            }
-        }
+    fun bindBarcodeField(barcodeField: BarcodeField) {
+      labelView.text = barcodeField.label
+      valueView.text = barcodeField.value
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BarcodeFieldViewHolder =
-        BarcodeFieldViewHolder.create(parent)
+    companion object {
 
-    override fun onBindViewHolder(holder: BarcodeFieldViewHolder, position: Int) =
-        holder.bindBarcodeField(barcodeFieldList[position])
+      fun create(parent: ViewGroup): BarcodeFieldViewHolder {
+        val view =
+          LayoutInflater.from(parent.context).inflate(R.layout.barcode_field, parent, false)
+        return BarcodeFieldViewHolder(view)
+      }
+    }
+  }
 
-    override fun getItemCount(): Int = barcodeFieldList.size
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BarcodeFieldViewHolder =
+    BarcodeFieldViewHolder.create(parent)
+
+  override fun onBindViewHolder(holder: BarcodeFieldViewHolder, position: Int) =
+    holder.bindBarcodeField(barcodeFieldList[position])
+
+  override fun getItemCount(): Int = barcodeFieldList.size
 }

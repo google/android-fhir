@@ -30,117 +30,117 @@ import java.io.IOException
 /** Preview the camera image in the screen. */
 class CameraSourcePreview(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
 
-    private val surfaceView: SurfaceView =
-        SurfaceView(context).apply {
-            holder.addCallback(SurfaceCallback())
-            addView(this)
-        }
-    private var graphicOverlay: GraphicOverlay? = null
-    private var startRequested = false
-    private var surfaceAvailable = false
-    private var cameraSource: CameraSource? = null
-    private var cameraPreviewSize: Size? = null
-
-    override fun onFinishInflate() {
-        super.onFinishInflate()
-        graphicOverlay = findViewById(R.id.camera_preview_graphic_overlay)
+  private val surfaceView: SurfaceView =
+    SurfaceView(context).apply {
+      holder.addCallback(SurfaceCallback())
+      addView(this)
     }
+  private var graphicOverlay: GraphicOverlay? = null
+  private var startRequested = false
+  private var surfaceAvailable = false
+  private var cameraSource: CameraSource? = null
+  private var cameraPreviewSize: Size? = null
 
-    @Throws(IOException::class)
-    fun start(cameraSource: CameraSource) {
-        this.cameraSource = cameraSource
-        startRequested = true
-        startIfReady()
+  override fun onFinishInflate() {
+    super.onFinishInflate()
+    graphicOverlay = findViewById(R.id.camera_preview_graphic_overlay)
+  }
+
+  @Throws(IOException::class)
+  fun start(cameraSource: CameraSource) {
+    this.cameraSource = cameraSource
+    startRequested = true
+    startIfReady()
+  }
+
+  fun stop() {
+    cameraSource?.let {
+      it.stop()
+      cameraSource = null
+      startRequested = false
     }
+  }
 
-    fun stop() {
-        cameraSource?.let {
-            it.stop()
-            cameraSource = null
-            startRequested = false
-        }
+  @Throws(IOException::class)
+  private fun startIfReady() {
+    if (startRequested && surfaceAvailable) {
+      cameraSource?.start(surfaceView.holder)
+      requestLayout()
+      graphicOverlay?.let { overlay ->
+        cameraSource?.let { overlay.setCameraInfo(it) }
+        overlay.clear()
+      }
+      startRequested = false
     }
+  }
 
-    @Throws(IOException::class)
-    private fun startIfReady() {
-        if (startRequested && surfaceAvailable) {
-            cameraSource?.start(surfaceView.holder)
-            requestLayout()
-            graphicOverlay?.let { overlay ->
-                cameraSource?.let { overlay.setCameraInfo(it) }
-                overlay.clear()
-            }
-            startRequested = false
-        }
-    }
+  override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+    val layoutWidth = right - left
+    val layoutHeight = bottom - top
 
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        val layoutWidth = right - left
-        val layoutHeight = bottom - top
+    cameraSource?.previewSize?.let { cameraPreviewSize = it }
 
-        cameraSource?.previewSize?.let { cameraPreviewSize = it }
-
-        val previewSizeRatio =
-            cameraPreviewSize?.let { size ->
-                if (Utils.isPortraitMode(context)) {
-                    // Camera's natural orientation is landscape, so need to swap width and height.
-                    size.height.toFloat() / size.width
-                } else {
-                    size.width.toFloat() / size.height
-                }
-            }
-                ?: layoutWidth.toFloat() / layoutHeight.toFloat()
-
-        // Match the width of the child view to its parent.
-        val childHeight = (layoutWidth / previewSizeRatio).toInt()
-        if (childHeight <= layoutHeight) {
-            for (i in 0 until childCount) {
-                getChildAt(i).layout(0, 0, layoutWidth, childHeight)
-            }
+    val previewSizeRatio =
+      cameraPreviewSize?.let { size ->
+        if (Utils.isPortraitMode(context)) {
+          // Camera's natural orientation is landscape, so need to swap width and height.
+          size.height.toFloat() / size.width
         } else {
-            // When the child view is too tall to be fitted in its parent: If the child view is
-            // static overlay view container (contains views such as bottom prompt chip), we apply
-            // the size of the parent view to it. Otherwise, we offset the top/bottom position
-            // equally to position it in the center of the parent.
-            val excessLenInHalf = (childHeight - layoutHeight) / 2
-            for (i in 0 until childCount) {
-                val childView = getChildAt(i)
-                when (childView.id) {
-                    R.id.static_overlay_container -> {
-                        childView.layout(0, 0, layoutWidth, layoutHeight)
-                    }
-                    else -> {
-                        childView.layout(0, -excessLenInHalf, layoutWidth, layoutHeight + excessLenInHalf)
-                    }
-                }
-            }
+          size.width.toFloat() / size.height
         }
+      }
+        ?: layoutWidth.toFloat() / layoutHeight.toFloat()
 
-        try {
-            startIfReady()
-        } catch (e: IOException) {
-            Log.e(TAG, "Could not start camera source.", e)
+    // Match the width of the child view to its parent.
+    val childHeight = (layoutWidth / previewSizeRatio).toInt()
+    if (childHeight <= layoutHeight) {
+      for (i in 0 until childCount) {
+        getChildAt(i).layout(0, 0, layoutWidth, childHeight)
+      }
+    } else {
+      // When the child view is too tall to be fitted in its parent: If the child view is
+      // static overlay view container (contains views such as bottom prompt chip), we apply
+      // the size of the parent view to it. Otherwise, we offset the top/bottom position
+      // equally to position it in the center of the parent.
+      val excessLenInHalf = (childHeight - layoutHeight) / 2
+      for (i in 0 until childCount) {
+        val childView = getChildAt(i)
+        when (childView.id) {
+          R.id.static_overlay_container -> {
+            childView.layout(0, 0, layoutWidth, layoutHeight)
+          }
+          else -> {
+            childView.layout(0, -excessLenInHalf, layoutWidth, layoutHeight + excessLenInHalf)
+          }
         }
+      }
     }
 
-    private inner class SurfaceCallback : SurfaceHolder.Callback {
-        override fun surfaceCreated(surface: SurfaceHolder) {
-            surfaceAvailable = true
-            try {
-                startIfReady()
-            } catch (e: IOException) {
-                Log.e(TAG, "Could not start camera source.", e)
-            }
-        }
+    try {
+      startIfReady()
+    } catch (e: IOException) {
+      Log.e(TAG, "Could not start camera source.", e)
+    }
+  }
 
-        override fun surfaceDestroyed(surface: SurfaceHolder) {
-            surfaceAvailable = false
-        }
-
-        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
+  private inner class SurfaceCallback : SurfaceHolder.Callback {
+    override fun surfaceCreated(surface: SurfaceHolder) {
+      surfaceAvailable = true
+      try {
+        startIfReady()
+      } catch (e: IOException) {
+        Log.e(TAG, "Could not start camera source.", e)
+      }
     }
 
-    companion object {
-        private const val TAG = "CameraSourcePreview"
+    override fun surfaceDestroyed(surface: SurfaceHolder) {
+      surfaceAvailable = false
     }
+
+    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
+  }
+
+  companion object {
+    private const val TAG = "CameraSourcePreview"
+  }
 }
