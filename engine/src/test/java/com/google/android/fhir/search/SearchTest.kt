@@ -550,7 +550,7 @@ class SearchTest {
 
   @Test
   fun search_date_approximate() {
-    val mockDateType = DateType(Date(mockEpochTimeStamp),TemporalPrecisionEnum.DAY)
+    val mockDateType = DateType(Date(mockEpochTimeStamp), TemporalPrecisionEnum.DAY)
     val value = DateType("2013-03-14")
     mockkStatic(::getCurrentDate)
     every { getCurrentDate() } returns mockDateType.value
@@ -854,7 +854,7 @@ class SearchTest {
 
   @Test
   fun search_dateTime_approximate() {
-    val mockDateTimeType = DateTimeType(Date(mockEpochTimeStamp),TemporalPrecisionEnum.DAY)
+    val mockDateTimeType = DateTimeType(Date(mockEpochTimeStamp), TemporalPrecisionEnum.DAY)
     val value = DateTimeType("2013-03-14")
     mockkStatic(::getCurrentDate)
     every { getCurrentDate() } returns mockDateTimeType.value
@@ -879,13 +879,13 @@ class SearchTest {
 
     val diffStart =
       (value.rangeEpochMillis.first -
-              0.1 *
-              (value.rangeEpochMillis.first - mockDateTimeType.rangeEpochMillis.first).absoluteValue)
+          0.1 *
+            (value.rangeEpochMillis.first - mockDateTimeType.rangeEpochMillis.first).absoluteValue)
         .roundToLong()
     val diffEnd =
       (value.rangeEpochMillis.last +
-              0.1 *
-              (value.rangeEpochMillis.last - mockDateTimeType.rangeEpochMillis.last).absoluteValue)
+          0.1 *
+            (value.rangeEpochMillis.last - mockDateTimeType.rangeEpochMillis.last).absoluteValue)
         .roundToLong()
 
     assertThat(query.args)
