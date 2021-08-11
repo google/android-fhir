@@ -71,7 +71,7 @@ class FhirSyncWorkerTest {
         )
         .build()
     val result = runBlocking { worker.doWork() }
-    assertThat(result).isEqualTo(ListenableWorker.Result.success())
+    assertThat(result).isInstanceOf(ListenableWorker.Result.success()::class.java)
   }
 
   @Test
@@ -84,7 +84,7 @@ class FhirSyncWorkerTest {
         )
         .build()
     val result = runBlocking { worker.doWork() }
-    assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+    assertThat(result).isInstanceOf(ListenableWorker.Result.failure()::class.java)
   }
 
   @Test
@@ -97,7 +97,7 @@ class FhirSyncWorkerTest {
         )
         .build()
     val result = runBlocking { worker.doWork() }
-    assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+    assertThat(result).isInstanceOf(ListenableWorker.Result.failure()::class.java)
   }
 
   @Test

@@ -29,6 +29,7 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -118,10 +119,19 @@ class TestingUtils constructor(private val iParser: IParser) {
 
     override suspend fun syncUpload(
       upload: suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>
-    ) {}
+    ) {
+      upload(listOf())
+    }
 
-    override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {}
-
+    override suspend fun syncDownload(download: suspend (SyncDownloadContext) -> List<Resource>) {
+      download(
+        object : SyncDownloadContext {
+          override suspend fun getLatestTimestampFor(type: ResourceType): String {
+            return "123456788"
+          }
+        }
+      )
+    }
     override suspend fun count(search: Search): Long {
       return 0
     }
