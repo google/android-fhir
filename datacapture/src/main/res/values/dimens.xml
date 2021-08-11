@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!--
+<?xml version="1.0" encoding="utf-8" ?><!--
  Copyright 2021 Google LLC
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,14 +57,10 @@
     <dimen name="object_reticle_inner_ring_stroke_radius">14dp</dimen>
     <dimen name="object_reticle_inner_ring_stroke_width">2dp</dimen>
     <dimen name="object_selection_distance_threshold">24dp</dimen>
-    <dimen
-        name="object_dot_radius"
-        >@dimen/object_reticle_inner_ring_stroke_radius</dimen>
+    <dimen name="object_dot_radius">@dimen/object_reticle_inner_ring_stroke_radius</dimen>
     <dimen name="object_thumbnail_height">120dp</dimen>
     <dimen name="object_thumbnail_margin">24dp</dimen>
-    <dimen
-        name="object_thumbnail_stroke_width"
-        >@dimen/bounding_box_confirmed_stroke_width</dimen>
+    <dimen name="object_thumbnail_stroke_width">@dimen/bounding_box_confirmed_stroke_width</dimen>
     <dimen name="preview_card_carousel_padding_top">16dp</dimen>
     <dimen name="preview_card_carousel_padding_bottom">8dp</dimen>
     <dimen name="preview_card_carousel_height">120dp</dimen>
