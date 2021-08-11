@@ -358,8 +358,8 @@ private fun getConditionParamPair(
   // if the unit condition will be preceded by a value condition so if exists append an AND here
   if (unit != null) {
     argList.add(unit)
-    if (condition.isNotEmpty()){
-    nonCanonicalCondition.append("index_code = ? AND ")
+    if (condition.isNotEmpty()) {
+      nonCanonicalCondition.append("index_code = ? AND ")
     } else {
       nonCanonicalCondition.append("(index_code = ? OR index_unit = ?) AND ")
       argList.add(unit)

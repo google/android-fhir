@@ -292,7 +292,7 @@ internal object ResourceIndexer {
           searchParam.path,
           quantity.system ?: "",
           quantity.unit ?: "",
-          quantity.code?: "",
+          quantity.code ?: "",
           quantity.value,
           canonicalCode,
           canonicalValue
