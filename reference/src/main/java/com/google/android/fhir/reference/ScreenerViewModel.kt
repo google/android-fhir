@@ -89,10 +89,12 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
           }
         }
         is Condition -> {
-          resource.id = generateUuid()
-          resource.subject = subjectReference
-          resource.encounter = encounterReference
-          saveResourceToDatabase(resource)
+          if (resource.hasCode()) {
+            resource.id = generateUuid()
+            resource.subject = subjectReference
+            resource.encounter = encounterReference
+            saveResourceToDatabase(resource)
+          }
         }
         is Encounter -> {
           resource.subject = subjectReference
