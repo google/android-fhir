@@ -24,9 +24,11 @@ import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
+import java.math.BigDecimal
 import java.util.UUID
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Observation
@@ -34,6 +36,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.RiskAssessment
 
 const val TAG = "ScreenerViewModel"
 
@@ -42,12 +45,12 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   AndroidViewModel(application) {
   val questionnaire: String
     get() = getQuestionnaireJson()
+  val isResourcesSaved = MutableLiveData<Boolean>()
 
   private val questionnaireResource: Questionnaire
     get() = FhirContext.forR4().newJsonParser().parseResource(questionnaire) as Questionnaire
   private var questionnaireJson: String? = null
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
-  val isResourcesSaved = MutableLiveData<Boolean>()
 
   /**
    * Saves screener encounter questionnaire response into the application database.
@@ -58,17 +61,22 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
     viewModelScope.launch {
       val bundle = ResourceMapper.extract(questionnaireResource, questionnaireResponse)
       val subjectReference = Reference("Patient/$patientId")
+      val encounterId = generateUuid()
       if (isRequiredFieldMissing(bundle)) {
         isResourcesSaved.value = false
         return@launch
       }
-      saveResources(bundle, subjectReference)
+      saveResources(bundle, subjectReference, encounterId)
+      generateRiskAssessmentResource(bundle, subjectReference, encounterId)
       isResourcesSaved.value = true
     }
   }
 
-  private suspend fun saveResources(bundle: Bundle, subjectReference: Reference) {
-    val encounterId = generateUuid()
+  private suspend fun saveResources(
+    bundle: Bundle,
+    subjectReference: Reference,
+    encounterId: String
+  ) {
     val encounterReference = Reference("Encounter/$encounterId")
     bundle.entry.forEach {
       when (val resource = it.resource) {
@@ -130,5 +138,130 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
 
   private fun generateUuid(): String {
     return UUID.randomUUID().toString()
+  }
+
+  private suspend fun generateRiskAssessmentResource(
+    bundle: Bundle,
+    subjectReference: Reference,
+    encounterId: String
+  ) {
+    val spO2 = getSpO2(bundle)
+    spO2?.let {
+      val isSymptomPresent = isSymptomPresent(bundle)
+      val isComorbidityPresent = isComorbidityPresent(bundle)
+      val codeableConcept = getQualitativeRisk(isSymptomPresent, isComorbidityPresent, it)
+      codeableConcept?.let {
+        val riskAssessment =
+          RiskAssessment().apply {
+            id = generateUuid()
+            addPrediction().apply { qualitativeRisk = codeableConcept }
+            subject = subjectReference
+            encounter = Reference("Encounter/$encounterId")
+          }
+        saveResourceToDatabase(riskAssessment)
+      }
+    }
+  }
+
+  private fun getQualitativeRisk(
+    isSymptomPresent: Boolean,
+    isComorbidityPresent: Boolean,
+    spO2: BigDecimal
+  ): CodeableConcept? {
+    val codeableConcept = CodeableConcept()
+    val coding = codeableConcept.addCoding()
+    coding.system = "http://terminology.hl7.org/CodeSystem/risk-probability"
+    if (spO2 < BigDecimal(90)) {
+      coding.code = "high"
+      coding.display = "High likelihood"
+    } else if (spO2 >= BigDecimal(90) && spO2 < BigDecimal(94)) {
+      coding.code = "moderate"
+      coding.display = "Moderate likelihood"
+    } else if (isSymptomPresent) {
+      coding.code = "moderate"
+      coding.display = "Moderate likelihood"
+    } else if (spO2 >= BigDecimal(94) && isComorbidityPresent) {
+      coding.code = "moderate"
+      coding.display = "Moderate likelihood"
+    } else if (spO2 >= BigDecimal(94) && !isComorbidityPresent) {
+      coding.code = "low"
+      coding.display = "low likelihood"
+    } else {
+      return null
+    }
+    return codeableConcept
+  }
+
+  private fun getSpO2(bundle: Bundle): BigDecimal? {
+    return bundle
+      .entry
+      .asSequence()
+      .filter { it.resource is Observation }
+      .map { it.resource as Observation }
+      .filter { it.hasCode() && it.code.hasCoding() && it.code.coding.first().code.equals(SPO2) }
+      .map { it.valueQuantity.value }
+      .firstOrNull()
+  }
+
+  private fun isSymptomPresent(bundle: Bundle): Boolean {
+    val count =
+      bundle
+        .entry
+        .filter { it.resource is Observation }
+        .map { it.resource as Observation }
+        .filter { it.hasCode() && it.code.hasCoding() }
+        .flatMap { it.code.coding }
+        .map { it.code }
+        .filter { isSymptomPresent(it) }
+        .count()
+    return count > 0
+  }
+
+  private fun isSymptomPresent(symptom: String): Boolean {
+    return symptom == FEVER ||
+      symptom == SHORTNESS_BREATH ||
+      symptom == COUGH ||
+      symptom == LOSS_OF_SMELL
+  }
+
+  private fun isComorbidityPresent(bundle: Bundle): Boolean {
+    val count =
+      bundle
+        .entry
+        .filter { it.resource is Condition }
+        .map { it.resource as Condition }
+        .filter { it.hasCode() && it.code.hasCoding() }
+        .flatMap { it.code.coding }
+        .map { it.code }
+        .filter { isComorbidityPresent(it) }
+        .count()
+    return count > 0
+  }
+
+  private fun isComorbidityPresent(comorbidity: String): Boolean {
+    return comorbidity == ASTHMA ||
+      comorbidity == LUNG_DISEASE ||
+      comorbidity == DEPRESSION ||
+      comorbidity == DIABETES ||
+      comorbidity == HYPER_TENSION ||
+      comorbidity == HEART_DISEASE ||
+      comorbidity == HIGH_BLOOD_LIPIDS
+  }
+
+  private companion object {
+    const val ASTHMA = "161527007"
+    const val LUNG_DISEASE = "13645005"
+    const val DEPRESSION = "35489007"
+    const val DIABETES = "161445009"
+    const val HYPER_TENSION = "161501007"
+    const val HEART_DISEASE = "56265001"
+    const val HIGH_BLOOD_LIPIDS = "161450003"
+
+    const val FEVER = "386661006"
+    const val SHORTNESS_BREATH = "13645005"
+    const val COUGH = "49727002"
+    const val LOSS_OF_SMELL = "44169009"
+
+    const val SPO2 = "59408-5"
   }
 }
