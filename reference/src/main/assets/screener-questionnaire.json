@@ -386,16 +386,7 @@
       "text": "Medical History",
       "type": "group",
       "linkId": "3.0.0",
-      "definition": "http://hl7.org/fhir/StructureDefinition/Condition",
       "extension": [
-        {
-          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
-          "valueExpression": {
-            "language": "application/x-fhir-query",
-            "expression": "Condition",
-            "name": "medicalHistory"
-          }
-        },
         {
           "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
           "valueCodeableConcept": {
@@ -412,77 +403,343 @@
       ],
       "item": [
         {
-          "type": "choice",
-          "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Condition.category",
+          "linkId": "3.1.0",
+          "type": "display",
+          "text": "Do you have any existing conditions"
+        },
+        {
+          "linkId": "3.2.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Condition",
           "extension": [
             {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-              "valueCodeableConcept": {
-                "coding": [
-                  {
-                    "system": "http://hl7.org/fhir/questionnaire-item-control",
-                    "code": "drop-down",
-                    "display": "Drop down"
-                  }
-                ],
-                "text": "Drop down"
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Condition",
+                "name": "asthma"
               }
             }
           ],
-          "required": true,
-          "repeats": true,
-          "linkId": "3.1.0",
-          "text": "Do you have any existing conditions",
-          "code": [],
-          "answerOption": [
+          "item": [
             {
-              "valueCoding": {
-                "code": "161527007",
-                "display": "Asthma",
-                "system": "http://snomed.info/sct"
-              }
-            },
+              "linkId": "3.2.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.code",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "drop-down",
+                        "display": "Drop down"
+                      }
+                    ],
+                    "text": "Drop down"
+                  }
+                }
+              ],
+              "required": true,
+              "repeats": true,
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "161527007",
+                    "display": "Asthma",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "3.3.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Condition",
+          "extension": [
             {
-              "valueCoding": {
-                "code": "13645005",
-                "display": "Chronic Lung Disease",
-                "system": "http://snomed.info/sct"
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Condition",
+                "name": "chronicLung"
               }
-            },
+            }
+          ],
+          "item": [
             {
-              "valueCoding": {
-                "code": "35489007",
-                "display": "Depression",
-                "system" : "http://snomed.info/sct"
-              }
-            },
+              "linkId": "3.3.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.code",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "drop-down",
+                        "display": "Drop down"
+                      }
+                    ],
+                    "text": "Drop down"
+                  }
+                }
+              ],
+              "required": true,
+              "repeats": true,
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "13645005",
+                    "display": "Chronic Lung Disease",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "3.4.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Condition",
+          "extension": [
             {
-              "valueCoding": {
-                "code": "161445009",
-                "display": "Diabetes",
-                "system" : "http://snomed.info/sct"
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Condition",
+                "name": "depression"
               }
-            },
+            }
+          ],
+          "item": [
             {
-              "valueCoding": {
-                "code": "161501007",
-                "display": "Hypertension",
-                "system" : "http://snomed.info/sct"
-              }
-            },
+              "linkId": "3.4.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.code",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "drop-down",
+                        "display": "Drop down"
+                      }
+                    ],
+                    "text": "Drop down"
+                  }
+                }
+              ],
+              "required": true,
+              "repeats": true,
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "35489007",
+                    "display": "Depression",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "3.5.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Condition",
+          "extension": [
             {
-              "valueCoding": {
-                "code": "56265001",
-                "display": "Heart disease",
-                "system" : "http://snomed.info/sct"
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Condition",
+                "name": "diabetes"
               }
-            },
+            }
+          ],
+          "item": [
             {
-              "valueCoding": {
-                "code": "161450003",
-                "display": "High blood lipids",
-                "system" : "http://snomed.info/sct"
+              "linkId": "3.5.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.code",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "drop-down",
+                        "display": "Drop down"
+                      }
+                    ],
+                    "text": "Drop down"
+                  }
+                }
+              ],
+              "required": true,
+              "repeats": true,
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "161445009",
+                    "display": "Diabetes",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "3.6.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Condition",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Condition",
+                "name": "asthma"
               }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "3.6.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.code",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "drop-down",
+                        "display": "Drop down"
+                      }
+                    ],
+                    "text": "Drop down"
+                  }
+                }
+              ],
+              "required": true,
+              "repeats": true,
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "161501007",
+                    "display": "Hypertension",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "3.7.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Condition",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Condition",
+                "name": "heartDisease"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "3.7.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.code",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "drop-down",
+                        "display": "Drop down"
+                      }
+                    ],
+                    "text": "Drop down"
+                  }
+                }
+              ],
+              "required": true,
+              "repeats": true,
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "56265001",
+                    "display": "Heart disease",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "3.8.0",
+          "type": "group",
+          "definition": "http://hl7.org/fhir/StructureDefinition/Condition",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+              "valueExpression": {
+                "language": "application/x-fhir-query",
+                "expression": "Condition",
+                "name": "bloodLipids"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "3.8.1",
+              "type": "choice",
+              "definition": "http://hl7.org/fhir/StructureDefinition/Condition#Condition.code",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "drop-down",
+                        "display": "Drop down"
+                      }
+                    ],
+                    "text": "Drop down"
+                  }
+                }
+              ],
+              "required": true,
+              "repeats": true,
+              "answerOption": [
+                {
+                  "valueCoding": {
+                    "code": "161450003",
+                    "display": "High blood lipids",
+                    "system": "http://snomed.info/sct"
+                  }
+                }
+              ]
             }
           ]
         }
