@@ -76,18 +76,27 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
   /** Tracks modifications in order to update the UI. */
   private val modificationCount = MutableStateFlow(0)
 
-  /** Callback function to update the UI. */
+  /**
+   * Callback function to update the UI which takes the linkId of the question whose answer(s) has
+   * been changed.
+   */
   private val questionnaireResponseItemChangedCallback: (String) -> Unit = { linkId ->
-    linkIdToQuestionnaireItemMap[linkId]?.let {
-      if (it.hasNestedItemsWithinAnswers) {
-        linkIdToQuestionnaireResponseItemMap[linkId]!!.addNestedItemsToAnswer(it)
+    linkIdToQuestionnaireItemMap[linkId]?.let { questionnaireItem ->
+      if (questionnaireItem.hasNestedItemsWithinAnswers) {
+        linkIdToQuestionnaireResponseItemMap[linkId]?.let { questionnaireResponseItem ->
+          questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
+          questionnaireResponseItem.answer.singleOrNull()?.item?.forEach {
+            nestedQuestionnaireResponseItem ->
+            linkIdToQuestionnaireResponseItemMap[nestedQuestionnaireResponseItem.linkId] =
+              nestedQuestionnaireResponseItem
+          }
+        }
       }
     }
     modificationCount.value += 1
   }
 
-  private val pageFlow =
-    MutableStateFlow<QuestionnairePagination?>(questionnaire.getInitialPagination())
+  private val pageFlow = MutableStateFlow(questionnaire.getInitialPagination())
 
   internal fun goToPreviousPage() {
     pageFlow.value = pageFlow.value!!.previousPage()
@@ -123,13 +132,18 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
   private fun createLinkIdToQuestionnaireResponseItemMap(
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
-  ): Map<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+  ): MutableMap<String, QuestionnaireResponse.QuestionnaireResponseItemComponent> {
     val linkIdToQuestionnaireResponseItemMap =
       questionnaireResponseItemList.map { it.linkId to it }.toMap().toMutableMap()
     for (item in questionnaireResponseItemList) {
       linkIdToQuestionnaireResponseItemMap.putAll(
         createLinkIdToQuestionnaireResponseItemMap(item.item)
       )
+      item.answer.forEach {
+        linkIdToQuestionnaireResponseItemMap.putAll(
+          createLinkIdToQuestionnaireResponseItemMap(it.item)
+        )
+      }
     }
     return linkIdToQuestionnaireResponseItemMap
   }
@@ -212,7 +226,7 @@ internal class QuestionnaireViewModel(state: SavedStateHandle) : ViewModel() {
 
 /**
  * Traverse (DFS) through the list of questionnaire items and the list of questionnaire response
- * items and check if the linkid of the matching pairs of questionnaire item and questionnaire
+ * items and check if the linkId of the matching pairs of questionnaire item and questionnaire
  * response item are equal. The traverse is carried out in the two lists in tandem. The two lists
  * should be structurally identical.
  */
@@ -236,10 +250,11 @@ private fun validateQuestionnaireResponseItems(
     if (questionnaireItem.type.equals(Questionnaire.QuestionnaireItemType.GROUP)) {
       validateQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
     } else {
-      validateQuestionnaireResponseItems(
-        questionnaireItem.item,
-        questionnaireResponseItem.answer.first().item
-      )
+      if (questionnaireResponseItem.answer.isNotEmpty())
+        validateQuestionnaireResponseItems(
+          questionnaireItem.item,
+          questionnaireResponseItem.answer.first().item
+        )
     }
   }
   if (questionnaireItemListIterator.hasNext() xor questionnaireResponseItemListIterator.hasNext()) {

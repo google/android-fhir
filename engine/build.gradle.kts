@@ -64,6 +64,7 @@ android {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
     }
+    getByName("debug") { isTestCoverageEnabled = true }
   }
 
   compileOptions {
@@ -102,6 +103,7 @@ configurations {
 
 dependencies {
   implementation("androidx.sqlite:sqlite-ktx:2.1.0")
+  implementation("org.fhir:ucum:1.0.3")
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
@@ -122,11 +124,18 @@ dependencies {
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.guava)
   implementation(Dependencies.jsonToolsPatch)
+  implementation(Dependencies.Lifecycle.liveDataKtx)
+  implementation(Dependencies.Androidx.datastorePref)
 
   kapt(Dependencies.Room.compiler)
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
+  testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  testImplementation(Dependencies.AndroidxTest.archCore)
+  testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
