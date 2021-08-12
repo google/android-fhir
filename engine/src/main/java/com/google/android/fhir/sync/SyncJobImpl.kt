@@ -24,6 +24,7 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
+import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.gson.GsonBuilder
@@ -77,6 +78,10 @@ class SyncJobImpl(private val context: Context) : SyncJob {
 
   override fun stateFlow(): Flow<State> {
     return workInfoFlow().mapNotNull { convertToState(it) }
+  }
+
+  override fun lastSyncTimestamp(): OffsetDateTime? {
+    return DatastoreUtil(context).readLastSyncTimestamp()
   }
 
   override fun workInfoFlow(): Flow<WorkInfo> {
