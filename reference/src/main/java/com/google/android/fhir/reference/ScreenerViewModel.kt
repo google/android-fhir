@@ -53,17 +53,6 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
     get() = FhirContext.forR4().newJsonParser().parseResource(questionnaire) as Questionnaire
   private var questionnaireJson: String? = null
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
-  private val comorbidities: Set<String> =
-    setOf(
-      ASTHMA,
-      LUNG_DISEASE,
-      DEPRESSION,
-      DIABETES,
-      HYPER_TENSION,
-      HEART_DISEASE,
-      HIGH_BLOOD_LIPIDS
-    )
-  private val symptoms: Set<String> = setOf(FEVER, SHORTNESS_BREATH, COUGH, LOSS_OF_SMELL)
 
   /**
    * Saves screener encounter questionnaire response into the application database.
@@ -267,5 +256,17 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
     const val LOSS_OF_SMELL = "44169009"
 
     const val SPO2 = "59408-5"
+
+    private val comorbidities: Set<String> =
+      setOf(
+        ASTHMA,
+        LUNG_DISEASE,
+        DEPRESSION,
+        DIABETES,
+        HYPER_TENSION,
+        HEART_DISEASE,
+        HIGH_BLOOD_LIPIDS
+      )
+    private val symptoms: Set<String> = setOf(FEVER, SHORTNESS_BREATH, COUGH, LOSS_OF_SMELL)
   }
 }
