@@ -16,22 +16,15 @@
 -->
 <resources>
     <attr name="groupHeaderTextAppearance" format="reference" />
-    <attr name="checkBoxGroupHeaderTextAppearance" format="reference" />
+    <attr name="headerTextAppearance" format="reference" />
     <attr name="checkBoxStyle" format="reference" />
-    <attr name="radioGroupHeaderTextAppearance" format="reference" />
     <attr name="radioButtonStyle" format="reference" />
-    <attr name="dropDownHeaderTextAppearance" format="reference" />
     <attr name="dropDownTextAppearance" format="reference" />
     <attr name="dropDownSelectedTextAppearance" format="reference" />
     <attr name="dropDownStyle" format="reference" />
-    <attr name="editTextHeaderTextAppearance" format="reference" />
     <attr name="editTextInputTextAppearance" format="reference" />
     <attr name="editTextLayoutStyle" format="reference" />
-    <attr name="autoCompleteHeaderTextAppearance" format="reference" />
     <attr name="chipStyle" format="reference" />
-    <attr name="displayHeaderTextAppearance" format="reference" />
-    <attr name="datePickerHeaderTextAppearance" format="reference" />
-    <attr name="dateTimePickerHeaderTextAppearance" format="reference" />
 
     <declare-styleable name="QuestionnaireTheme">
         <!-- The ID of the theme to be applied to the questionnaire. The referenced theme must

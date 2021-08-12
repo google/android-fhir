@@ -37,7 +37,7 @@
         />
 
         <TextView
-            style="?attr/editTextHeaderTextAppearance"
+            style="?attr/headerTextAppearance"
             android:id="@+id/question"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

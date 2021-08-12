@@ -42,21 +42,15 @@
         >@style/TextAppearance.MaterialComponents.Headline6
         </item>
         <item
-            name="checkBoxGroupHeaderTextAppearance"
+            name="headerTextAppearance"
         >@style/TextAppearance.MaterialComponents.Subtitle2</item>
         <item
             name="checkBoxStyle"
         >@style/Widget.AppCompat.CompoundButton.CheckBox
         </item>
         <item
-            name="radioGroupHeaderTextAppearance"
-        >@style/TextAppearance.MaterialComponents.Subtitle2</item>
-        <item
             name="radioButtonStyle"
         >@style/Widget.AppCompat.CompoundButton.RadioButton</item>
-        <item
-            name="dropDownHeaderTextAppearance"
-        >@style/TextAppearance.MaterialComponents.Subtitle2</item>
         <item
             name="dropDownTextAppearance"
         >@style/TextAppearance.MaterialComponents.Subtitle1</item>
@@ -67,28 +61,13 @@
             name="dropDownStyle"
         >@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu</item>
         <item
-            name="editTextHeaderTextAppearance"
-        >@style/TextAppearance.MaterialComponents.Subtitle2</item>
-        <item
             name="editTextInputTextAppearance"
         >@style/TextAppearance.MaterialComponents.Subtitle1</item>
         <item
             name="editTextLayoutStyle"
         >@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
         <item
-            name="autoCompleteHeaderTextAppearance"
-        >@style/TextAppearance.MaterialComponents.Subtitle2</item>
-        <item
             name="chipStyle"
         >@style/Widget.MaterialComponents.Chip.Entry</item>
-        <item
-            name="displayHeaderTextAppearance"
-        >@style/TextAppearance.AppCompat.Small</item>
-        <item
-            name="datePickerHeaderTextAppearance"
-        >@style/TextAppearance.MaterialComponents.Subtitle2</item>
-        <item
-            name="dateTimePickerHeaderTextAppearance"
-        >@style/TextAppearance.MaterialComponents.Subtitle2</item>
     </style>
 </resources>

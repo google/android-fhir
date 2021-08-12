@@ -23,18 +23,12 @@
         >@style/TextAppearance.MyQuestionnaire.GroupHeader
         </item>
         <item
-            name="checkBoxGroupHeaderTextAppearance"
-        >@style/TextAppearance.MyQuestionnaire.CheckBoxGroupHeader</item>
+            name="headerTextAppearance"
+        >@style/TextAppearance.MyQuestionnaire.Header</item>
         <item name="checkBoxStyle">@style/Widget.MyQuestionnaire.CheckBox</item>
-        <item
-            name="radioGroupHeaderTextAppearance"
-        >@style/TextAppearance.MyQuestionnaire.RadioGroupHeader</item>
         <item
             name="radioButtonStyle"
         >@style/Widget.MyQuestionnaire.RadioButton</item>
-        <item
-            name="dropDownHeaderTextAppearance"
-        >@style/TextAppearance.MyQuestionnaire.DropDownHeader</item>
         <item
             name="dropDownTextAppearance"
         >@style/TextAppearance.MyQuestionnaire.DropDown</item>
@@ -43,27 +37,12 @@
         >@style/TextAppearance.MyQuestionnaire.DropDownSelected</item>
         <item name="dropDownStyle">@style/Widget.MyQuestionnaire.DropDown</item>
         <item
-            name="editTextHeaderTextAppearance"
-        >@style/TextAppearance.MyQuestionnaire.EditTextHeader</item>
-        <item
             name="editTextInputTextAppearance"
         >@style/TextAppearance.MyQuestionnaire.EditTextInput</item>
         <item
             name="editTextLayoutStyle"
         >@style/Widget.MyQuestionnaire.EditText</item>
-        <item
-            name="autoCompleteHeaderTextAppearance"
-        >@style/TextAppearance.MyQuestionnaire.AutoCompleteHeader</item>
         <item name="chipStyle">@style/Widget.MyQuestionnaire.Chip</item>
-        <item
-            name="displayHeaderTextAppearance"
-        >@style/TextAppearance.MyQuestionnaire.DisplayHeader</item>
-        <item
-            name="datePickerHeaderTextAppearance"
-        >@style/TextAppearance.MyQuestionnaire.DatePickerHeader</item>
-        <item
-            name="dateTimePickerHeaderTextAppearance"
-        >@style/TextAppearance.MyQuestionnaire.DateTimePickerHeader</item>
     </style>
 
     <style
@@ -74,7 +53,7 @@
     </style>
 
     <style
-        name="TextAppearance.MyQuestionnaire.CheckBoxGroupHeader"
+        name="TextAppearance.MyQuestionnaire.Header"
         parent="TextAppearance.MaterialComponents.Subtitle2"
     >
         <item name="android:textColor">?attr/colorOnSurface</item>
@@ -92,13 +71,6 @@
     </style>
 
     <style
-        name="TextAppearance.MyQuestionnaire.RadioGroupHeader"
-        parent="TextAppearance.MaterialComponents.Subtitle2"
-    >
-        <item name="android:textColor">?attr/colorOnSurface</item>
-    </style>
-
-    <style
         name="Widget.MyQuestionnaire.RadioButton"
         parent="Widget.AppCompat.CompoundButton.RadioButton"
     >
@@ -107,13 +79,6 @@
         <item
             name="android:textAppearance"
         >@style/TextAppearance.AppCompat</item>
-    </style>
-
-    <style
-        name="TextAppearance.MyQuestionnaire.DropDownHeader"
-        parent="TextAppearance.MaterialComponents.Subtitle2"
-    >
-        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
     <style
@@ -136,13 +101,6 @@
     />
 
     <style
-        name="TextAppearance.MyQuestionnaire.EditTextHeader"
-        parent="TextAppearance.MaterialComponents.Subtitle2"
-    >
-        <item name="android:textColor">?attr/colorOnSurface</item>
-    </style>
-
-    <style
         name="Widget.MyQuestionnaire.EditText"
         parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox"
     />
@@ -150,13 +108,6 @@
     <style
         name="TextAppearance.MyQuestionnaire.EditTextInput"
         parent="TextAppearance.MaterialComponents.Subtitle1"
-    >
-        <item name="android:textColor">?attr/colorOnSurface</item>
-    </style>
-
-    <style
-        name="TextAppearance.MyQuestionnaire.AutoCompleteHeader"
-        parent="TextAppearance.MaterialComponents.Subtitle2"
     >
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
@@ -172,26 +123,5 @@
         <item name="chipStrokeWidth">0dp</item>
         <item name="chipStrokeColor">?attr/colorOnSurface</item>
         <item name="android:textAppearance">?attr/textAppearanceBody2</item>
-    </style>
-
-    <style
-        name="TextAppearance.MyQuestionnaire.DisplayHeader"
-        parent="TextAppearance.AppCompat.Small"
-    >
-        <item name="android:textColor">?attr/colorOnSurface</item>
-    </style>
-
-    <style
-        name="TextAppearance.MyQuestionnaire.DatePickerHeader"
-        parent="TextAppearance.MaterialComponents.Subtitle2"
-    >
-        <item name="android:textColor">?attr/colorOnSurface</item>
-    </style>
-
-    <style
-        name="TextAppearance.MyQuestionnaire.DateTimePickerHeader"
-        parent="TextAppearance.MaterialComponents.Subtitle2"
-    >
-        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 </resources>

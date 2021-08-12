@@ -34,7 +34,7 @@
         />
 
         <TextView
-            style="?attr/dropDownHeaderTextAppearance"
+            style="?attr/headerTextAppearance"
             android:id="@+id/dropdown_question_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -45,7 +45,7 @@
             />
 
             <TextView
-                style="?attr/dateTimePickerHeaderTextAppearance"
+                style="?attr/headerTextAppearance"
                 android:id="@+id/date_question"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -87,7 +87,7 @@
     >
 
         <TextView
-            style="?attr/dateTimePickerHeaderTextAppearance"
+            style="?attr/headerTextAppearance"
             android:id="@+id/time_question"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
