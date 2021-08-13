@@ -45,7 +45,9 @@
         android:label="Screen Encounter"
         android:name="com.google.android.fhir.reference.ScreenerFragment"
         tools:layout="@layout/screener_encounter_fragment"
-    />
+    >
+    <argument android:name="patient_id" app:argType="string" />
+  </fragment>
   <fragment
         android:id="@+id/addPatientFragment"
         android:label="@string/add_patient"
