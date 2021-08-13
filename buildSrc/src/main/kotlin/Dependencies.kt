@@ -24,6 +24,8 @@ object Dependencies {
     const val fragmentKtx = "androidx.fragment:fragment-ktx:${Versions.Androidx.fragmentKtx}"
     const val recyclerView = "androidx.recyclerview:recyclerview:${Versions.Androidx.recyclerView}"
     const val workRuntimeKtx = "androidx.work:work-runtime-ktx:${Versions.Androidx.workRuntimeKtx}"
+    const val datastorePref =
+      "androidx.datastore:datastore-preferences:${Versions.Androidx.datastorePref}"
   }
 
   object FhirProto {
@@ -46,6 +48,8 @@ object Dependencies {
     const val kotlinCoroutinesCore =
       "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.Kotlin.kotlinCoroutinesCore}"
     const val kotlinTestJunit = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.Kotlin.stdlib}"
+    const val kotlinCoroutinesTest =
+      "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.kotlinCoroutinesCore}"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.Kotlin.stdlib}"
   }
 
@@ -77,7 +81,8 @@ object Dependencies {
 
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val guava = "com.google.guava:guava:${Versions.guava}"
-  const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.httpInterceptor}"
+  const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.http}"
+  const val http = "com.squareup.okhttp3:okhttp:${Versions.http}"
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
   const val material = "com.google.android.material:material:${Versions.material}"
 
@@ -90,6 +95,7 @@ object Dependencies {
     const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
     const val workTestingRuntimeKtx =
       "androidx.work:work-testing:${Versions.Androidx.workRuntimeKtx}"
+    const val archCore = "androidx.arch.core:core-testing:${Versions.AndroidxTest.archCore}"
   }
 
   object Espresso {
@@ -117,6 +123,7 @@ object Dependencies {
       const val recyclerView = "1.1.0"
       const val room = "2.3.0"
       const val workRuntimeKtx = "2.5.0"
+      const val datastorePref = "1.0.0-rc02"
     }
     object FhirProto {
       const val fhirProto = "0.6.1"
@@ -136,7 +143,7 @@ object Dependencies {
     const val desugarJdkLibs = "1.0.9"
     const val guava = "28.2-android"
     const val hapiFhir = "5.4.0"
-    const val httpInterceptor = "4.0.0"
+    const val http = "4.9.1"
     const val jsonToolsPatch = "1.13"
     const val material = "1.3.0"
     const val retrofit = "2.7.2"
@@ -145,6 +152,7 @@ object Dependencies {
 
     object AndroidxTest {
       const val core = "1.2.0"
+      const val archCore = "2.1.0"
       const val extJunit = "1.1.2"
       const val rules = "1.1.0"
       const val runner = "1.1.0"

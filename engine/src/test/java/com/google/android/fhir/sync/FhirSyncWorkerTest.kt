@@ -23,16 +23,9 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.SyncDownloadContext
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.search.Search
+import com.google.android.fhir.resource.TestingUtils
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Observation
-import org.hl7.fhir.r4.model.OperationOutcome
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
 import org.junit.Test
@@ -46,133 +39,17 @@ class FhirSyncWorkerTest {
   private lateinit var context: Context
   class PassingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
     FhirSyncWorker(appContext, workerParams) {
-    private var engine: FhirEngine =
-      object : FhirEngine {
-        override suspend fun <R : Resource> save(vararg resource: R) {}
 
-        override suspend fun <R : Resource> update(resource: R) {}
-
-        override suspend fun <R : Resource> load(clazz: Class<R>, id: String): R {
-          return clazz.newInstance()
-        }
-
-        override suspend fun <R : Resource> remove(clazz: Class<R>, id: String) {}
-
-        override suspend fun <R : Resource> search(search: Search): List<R> {
-          return emptyList()
-        }
-
-        override suspend fun syncUpload(
-          upload: suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>
-        ) {}
-
-        override suspend fun syncDownload(
-          download: suspend (SyncDownloadContext) -> List<Resource>
-        ) {}
-
-        override suspend fun count(search: Search): Long {
-          return 0
-        }
-      }
-    private var source: DataSource =
-      object : DataSource {
-        override suspend fun loadData(path: String): Bundle {
-          return Bundle()
-        }
-
-        override suspend fun insert(
-          resourceType: String,
-          resourceId: String,
-          payload: String
-        ): Resource {
-          return Observation()
-        }
-
-        override suspend fun update(
-          resourceType: String,
-          resourceId: String,
-          payload: String
-        ): OperationOutcome {
-          return OperationOutcome()
-        }
-
-        override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
-          return OperationOutcome()
-        }
-      }
-    override fun getFhirEngine(): FhirEngine = engine
-    override fun getDataSource(): DataSource = source
+    override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
+    override fun getDataSource(): DataSource = TestingUtils.TestDataSourceImpl
     override fun getSyncData(): ResourceSyncParams = mapOf()
   }
 
   class FailingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
     FhirSyncWorker(appContext, workerParams) {
-    private var engine =
-      object : FhirEngine {
-        override suspend fun <R : Resource> save(vararg resource: R) {}
 
-        override suspend fun <R : Resource> update(resource: R) {}
-
-        override suspend fun <R : Resource> load(clazz: Class<R>, id: String): R {
-          return clazz.newInstance()
-        }
-
-        override suspend fun <R : Resource> remove(clazz: Class<R>, id: String) {}
-
-        override suspend fun <R : Resource> search(search: Search): List<R> {
-          return emptyList()
-        }
-
-        override suspend fun syncUpload(
-          upload: suspend (List<SquashedLocalChange>) -> List<LocalChangeToken>
-        ) {
-          upload(listOf())
-        }
-
-        override suspend fun syncDownload(
-          download: suspend (SyncDownloadContext) -> List<Resource>
-        ) {
-          download(
-            object : SyncDownloadContext {
-              override suspend fun getLatestTimestampFor(type: ResourceType): String {
-                return "123456788"
-              }
-            }
-          )
-        }
-
-        override suspend fun count(search: Search): Long {
-          return 0
-        }
-      }
-    private var source =
-      object : DataSource {
-        override suspend fun loadData(path: String): Bundle {
-          throw Exception("Loading failed...")
-        }
-
-        override suspend fun insert(
-          resourceType: String,
-          resourceId: String,
-          payload: String
-        ): Resource {
-          throw Exception("Insertion failed...")
-        }
-
-        override suspend fun update(
-          resourceType: String,
-          resourceId: String,
-          payload: String
-        ): OperationOutcome {
-          throw Exception("Updating failed...")
-        }
-
-        override suspend fun delete(resourceType: String, resourceId: String): OperationOutcome {
-          throw Exception("Deleting failed...")
-        }
-      }
-    override fun getFhirEngine(): FhirEngine = engine
-    override fun getDataSource(): DataSource = source
+    override fun getFhirEngine(): FhirEngine = TestingUtils.TestFhirEngineImpl
+    override fun getDataSource(): DataSource = TestingUtils.TestCorruptDatasource
     override fun getSyncData(): ResourceSyncParams =
       mapOf(ResourceType.Patient to mapOf("address-city" to "NAIROBI"))
   }
@@ -194,7 +71,7 @@ class FhirSyncWorkerTest {
         )
         .build()
     val result = runBlocking { worker.doWork() }
-    assertThat(result).isEqualTo(ListenableWorker.Result.success())
+    assertThat(result).isInstanceOf(ListenableWorker.Result.success()::class.java)
   }
 
   @Test
@@ -207,7 +84,7 @@ class FhirSyncWorkerTest {
         )
         .build()
     val result = runBlocking { worker.doWork() }
-    assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+    assertThat(result).isInstanceOf(ListenableWorker.Result.failure()::class.java)
   }
 
   @Test
@@ -220,7 +97,7 @@ class FhirSyncWorkerTest {
         )
         .build()
     val result = runBlocking { worker.doWork() }
-    assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+    assertThat(result).isInstanceOf(ListenableWorker.Result.failure()::class.java)
   }
 
   @Test
