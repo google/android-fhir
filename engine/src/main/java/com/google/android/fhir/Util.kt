@@ -71,7 +71,11 @@ class OffsetDateTimeTypeAdapter : TypeAdapter<OffsetDateTime>() {
   override fun read(input: JsonReader): OffsetDateTime = OffsetDateTime.parse(input.nextString())
 }
 
-class StateExclusionStrategy : ExclusionStrategy {
+/**
+ * Exclusion strategy for [Gson] that handles field exclusions for [State] returned by
+ * FhirSynchronizer. It should skip serializing the exceptions to avoid WorkManager WorkData limit
+ */
+internal class StateExclusionStrategy : ExclusionStrategy {
   override fun shouldSkipField(field: FieldAttributes): Boolean {
     return if (field.name.equals("exceptions")) {
       return true

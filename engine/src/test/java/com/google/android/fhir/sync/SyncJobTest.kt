@@ -138,7 +138,7 @@ class SyncJobTest {
 
   @Test
   fun `should poll accurately with given delay with exceptions`() = runBlockingTest {
-    val worker = PeriodicWorkRequestBuilder<TestCorruptSyncWorker>(15, TimeUnit.MINUTES).build()
+    val worker = PeriodicWorkRequestBuilder<TestFailingSyncWorker>(15, TimeUnit.MINUTES).build()
 
     // get flows return by work manager wrapper
     val workInfoFlow = syncJob.workInfoFlow()
