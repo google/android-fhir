@@ -1,6 +1,21 @@
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
+  id(Plugins.BuildPlugins.mavenPublish)
+}
+
+afterEvaluate {
+  publishing {
+    publications {
+      register("release", MavenPublication::class) {
+        from(components["release"])
+        artifactId = "converter"
+        groupId = "com.google.android.fhir"
+        version = "0.1.0-alpha01"
+
+      }
+    }
+  }
 }
 
 android {
