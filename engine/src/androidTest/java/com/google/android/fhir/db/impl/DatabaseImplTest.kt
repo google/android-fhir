@@ -37,8 +37,10 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
@@ -1278,6 +1280,441 @@ class DatabaseImplTest {
           .getQuery()
       )
     assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_quantity_equal() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.403")
+            system = "http://unitsofmeasure.org"
+            unit = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.EQUAL
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
+  }
+
+  @Test
+  fun search_quantity_not_equal() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.403")
+            system = "http://unitsofmeasure.org"
+            unit = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.NOT_EQUAL
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_quantity_less() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.3")
+            system = "http://unitsofmeasure.org"
+            unit = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.LESSTHAN
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
+  }
+
+  @Test
+  fun search_quantity_less_no_match() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.4035")
+            system = "http://unitsofmeasure.org"
+            unit = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.LESSTHAN
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_quantity_greater() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.5")
+            system = "http://unitsofmeasure.org"
+            unit = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.GREATERTHAN
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
+  }
+
+  @Test
+  fun search_quantity_greater_no_match() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.3")
+            system = "http://unitsofmeasure.org"
+            unit = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.GREATERTHAN
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_quantity_less_or_equal() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.3")
+            system = "http://unitsofmeasure.org"
+            unit = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
+  }
+
+  @Test
+  fun search_quantity_less_or_equal_no_match() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.5")
+            system = "http://unitsofmeasure.org"
+            unit = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_quantity_greater_or_equal() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.5")
+            system = "http://unitsofmeasure.org"
+            unit = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
+  }
+
+  @Test
+  fun search_quantity_greater_or_equal_no_match() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.3")
+            system = "http://unitsofmeasure.org"
+            unit = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_quantity_starts_after() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.5")
+            system = "http://unitsofmeasure.org"
+            unit = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.STARTS_AFTER
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
+  }
+
+  @Test
+  fun search_quantity_starts_after_no_match() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.3")
+            system = "http://unitsofmeasure.org"
+            unit = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.STARTS_AFTER
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_quantity_ends_before() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.3")
+            system = "http://unitsofmeasure.org"
+            unit = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
+  }
+
+  @Test
+  fun search_quantity_ends_before_no_match() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.5")
+            system = "http://unitsofmeasure.org"
+            unit = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.ENDS_BEFORE
+              value = BigDecimal("5.403")
+              system = "http://unitsofmeasure.org"
+              unit = "g"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun search_quantity_canonical() = runBlocking {
+    val observation =
+      Observation().apply {
+        id = "1"
+        value =
+          Quantity().apply {
+            value = BigDecimal("5.403")
+            system = "http://unitsofmeasure.org"
+            unit = "g"
+          }
+      }
+    database.insert(observation)
+    val result =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(Observation.VALUE_QUANTITY) {
+              prefix = ParamPrefixEnum.EQUAL
+              value = BigDecimal("5403")
+              system = "http://unitsofmeasure.org"
+              unit = "mg"
+            }
+          }
+          .getQuery()
+      )
+    assertThat(result.single().id).isEqualTo("Observation/1")
   }
 
   @Test

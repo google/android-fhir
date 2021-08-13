@@ -17,6 +17,10 @@
 package com.google.android.fhir
 
 import android.annotation.SuppressLint
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
+import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
@@ -56,3 +60,14 @@ fun Resource.isUploadSuccess(): Boolean {
   return outcome.issue.isNotEmpty() &&
     outcome.issue.all { it.severity.equals(OperationOutcome.IssueSeverity.INFORMATION) }
 }
+
+class OffsetDateTimeTypeAdapter : TypeAdapter<OffsetDateTime>() {
+  override fun write(out: JsonWriter, value: OffsetDateTime) {
+    out.value(DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(value))
+  }
+
+  override fun read(input: JsonReader): OffsetDateTime = OffsetDateTime.parse(input.nextString())
+}
+
+/** Url for the UCUM system of measures. */
+const val ucumUrl = "http://unitsofmeasure.org"
