@@ -74,20 +74,10 @@ class PatientDetailsFragment : Fragment() {
         .get(PatientDetailsViewModel::class.java)
     patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) { setupPatientData(it) }
     patientDetailsViewModel.livePatientObservation.observe(viewLifecycleOwner) {
-      val observations =
-        it.map { observation -> PatientProperty(observation.code, observation.value) }
-      binding.patientObservations.header.text = resources.getText(R.string.header_observation)
-      renderCard(binding.patientObservations.propertiesContainer, observations)
-      binding.patientObservations.container.visibility =
-        if (observations.isEmpty()) View.GONE else View.VISIBLE
+      setupObservationsData(it)
     }
-
     patientDetailsViewModel.livePatientCondition.observe(viewLifecycleOwner) {
-      val conditions = it.map { condition -> PatientProperty(condition.code, condition.value) }
-      binding.patientConditions.header.text = resources.getText(R.string.header_conditions)
-      renderCard(binding.patientConditions.propertiesContainer, conditions)
-      binding.patientConditions.container.visibility =
-        if (conditions.isEmpty()) View.GONE else View.VISIBLE
+      setupConditionData(it)
     }
 
     (requireActivity() as AppCompatActivity).supportActionBar?.apply {
@@ -98,17 +88,25 @@ class PatientDetailsFragment : Fragment() {
 
   private fun renderCard(container: LinearLayout, properties: List<PatientProperty>) {
     if (properties.isEmpty()) return
+    container.apply { properties.forEach { addPropertyView(it) } }
+  }
 
-    container.apply {
-      properties.forEach {
-        addView(
-          PatientListItemViewBinding.inflate(LayoutInflater.from(this.context), this, false)
-            .apply { bind(it) }
-            .root
-        )
-        addView(lineView(this))
-      }
-    }
+  private fun setupObservationsData(observationItems: List<PatientListViewModel.ObservationItem>) {
+    val observations =
+      observationItems.map { observation -> PatientProperty(observation.code, observation.value) }
+    binding.patientObservations.header.text = resources.getText(R.string.header_observation)
+    renderCard(binding.patientObservations.propertiesContainer, observations)
+    binding.patientObservations.container.visibility =
+      if (observations.isEmpty()) View.GONE else View.VISIBLE
+  }
+
+  private fun setupConditionData(conditionItems: List<PatientListViewModel.ConditionItem>) {
+    val conditions =
+      conditionItems.map { condition -> PatientProperty(condition.code, condition.value) }
+    binding.patientConditions.header.text = resources.getText(R.string.header_conditions)
+    renderCard(binding.patientConditions.propertiesContainer, conditions)
+    binding.patientConditions.container.visibility =
+      if (conditions.isEmpty()) View.GONE else View.VISIBLE
   }
 
   private fun setupPatientData(patientItem: PatientListViewModel.PatientItem?) {
@@ -116,15 +114,7 @@ class PatientDetailsFragment : Fragment() {
       val patientDetailsCard = binding.patientDetailsCard
       patientDetailsCard.header.visibility = View.GONE
       patientDetailsCard.propertiesContainer.apply {
-        addView(
-          PatientDetailsHeaderBinding.inflate(LayoutInflater.from(this.context), this, false)
-            .apply {
-              screener.setOnClickListener { onAddScreenerClick() }
-              title.text = patient.name
-            }
-            .root
-        )
-        addView(lineView(this))
+        addHeader(patient)
         listOf(
           PatientProperty("Mobile Number", patient.phone),
           PatientProperty("ID Number", patient.resourceId),
@@ -132,21 +122,35 @@ class PatientDetailsFragment : Fragment() {
           PatientProperty("Date of Birth", patient.dob),
           PatientProperty("Gender", patient.gender.capitalize(Locale.ROOT)),
         )
-          .forEach {
-            addView(
-              PatientListItemViewBinding.inflate(LayoutInflater.from(this.context), this, false)
-                .apply { bind(it) }
-                .root
-            )
-            addView(lineView(this))
-          }
+          .forEach { addPropertyView(it) }
       }
     }
   }
 
-  fun PatientListItemViewBinding.bind(model: PatientProperty) {
-    name.text = model.header
-    age.text = model.value
+  private fun ViewGroup.addHeader(patient: PatientListViewModel.PatientItem) {
+    addView(
+      PatientDetailsHeaderBinding.inflate(LayoutInflater.from(this.context), this, false)
+        .apply {
+          screener.setOnClickListener { onAddScreenerClick() }
+          title.text = patient.name
+        }
+        .root
+    )
+    addView(lineView(this))
+  }
+
+  private fun ViewGroup.addPropertyView(patientProperty: PatientProperty) {
+    addView(
+      PatientListItemViewBinding.inflate(LayoutInflater.from(this.context), this, false)
+        .apply { bind(patientProperty) }
+        .root
+    )
+    addView(lineView(this))
+  }
+
+  private fun PatientListItemViewBinding.bind(patientProperty: PatientProperty) {
+    name.text = patientProperty.header
+    age.text = patientProperty.value
     status.visibility = View.GONE
     id.visibility = View.GONE
   }
