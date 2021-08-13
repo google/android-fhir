@@ -137,51 +137,6 @@ class SyncJobTest {
   }
 
   @Test
-  fun `should poll accurately with given delay with exceptions`() = runBlockingTest {
-    val worker = PeriodicWorkRequestBuilder<TestFailingSyncWorker>(15, TimeUnit.MINUTES).build()
-
-    // get flows return by work manager wrapper
-    val workInfoFlow = syncJob.workInfoFlow()
-    val stateFlow = syncJob.stateFlow()
-
-    val workInfoList = mutableListOf<WorkInfo>()
-    val stateList = mutableListOf<State>()
-
-    // convert flows to list to assert later
-    val job1 = launch { workInfoFlow.toList(workInfoList) }
-    val job2 = launch { stateFlow.toList(stateList) }
-
-    workManager
-      .enqueueUniquePeriodicWork(
-        SyncWorkType.DOWNLOAD_UPLOAD.workerName,
-        ExistingPeriodicWorkPolicy.REPLACE,
-        worker
-      )
-      .result
-      .get()
-
-    Thread.sleep(5000)
-
-    assertThat(workInfoList.map { it.state })
-      .containsAtLeast(
-        WorkInfo.State.ENQUEUED, // waiting for turn
-        WorkInfo.State.RUNNING, // worker launched
-        WorkInfo.State.RUNNING, // progresses emitted Started, InProgress..State.Success
-        WorkInfo.State.ENQUEUED // waiting again for next turn
-      )
-      .inOrder()
-
-    // States are  Started, InProgress .... , Finished (Error)
-    assertThat(stateList.map { it::class.java }).contains(State.Failed::class.java)
-
-    val error = (stateList[stateList.size - 1] as State.Failed).result
-    assertThat(error.timestamp).isEqualTo(datastoreUtil.readLastSyncTimestamp())
-
-    job1.cancel()
-    job2.cancel()
-  }
-
-  @Test
   fun `should run synchronizer and emit states accurately in sequence`() = runBlockingTest {
     whenever(database.getAllLocalChanges()).thenReturn(listOf())
     whenever(dataSource.loadData(any())).thenReturn(Bundle())
