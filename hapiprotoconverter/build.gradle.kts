@@ -12,7 +12,22 @@ afterEvaluate {
         artifactId = "converter"
         groupId = "com.google.android.fhir"
         version = "0.1.0-alpha01"
+        artifact(
+          tasks.create<Jar>("androidSourcesJar") {
+            archiveClassifier.set("sources")
+            from(android.sourceSets.getByName("main").java.srcDirs)
+          }
+        )
 
+        pom {
+          name.set("Android FHIR Engine Library")
+          licenses {
+            license {
+              name.set("The Apache License, Version 2.0")
+              url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+          }
+        }
       }
     }
   }
