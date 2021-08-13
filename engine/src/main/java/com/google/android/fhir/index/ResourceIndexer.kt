@@ -19,7 +19,12 @@ package com.google.android.fhir.index
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import ca.uhn.fhir.model.api.annotation.SearchParamDefinition
+import com.google.android.fhir.ConverterException
+import com.google.android.fhir.UcumValue
+import com.google.android.fhir.UnitConverter
+import com.google.android.fhir.epochDay
 import com.google.android.fhir.index.entities.DateIndex
+import com.google.android.fhir.index.entities.DateTimeIndex
 import com.google.android.fhir.index.entities.NumberIndex
 import com.google.android.fhir.index.entities.PositionIndex
 import com.google.android.fhir.index.entities.QuantityIndex
@@ -28,6 +33,7 @@ import com.google.android.fhir.index.entities.StringIndex
 import com.google.android.fhir.index.entities.TokenIndex
 import com.google.android.fhir.index.entities.UriIndex
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Address
@@ -37,6 +43,7 @@ import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.ICoding
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
@@ -78,7 +85,11 @@ internal object ResourceIndexer {
           SearchParamType.NUMBER ->
             numberIndex(searchParam, value)?.also { indexBuilder.addNumberIndex(it) }
           SearchParamType.DATE ->
-            dateIndex(searchParam, value)?.also { indexBuilder.addDateIndex(it) }
+            if (value.fhirType() == "date") {
+              dateIndex(searchParam, value)?.also { indexBuilder.addDateIndex(it) }
+            } else {
+              dateTimeIndex(searchParam, value)?.also { indexBuilder.addDateTimeIndex(it) }
+            }
           SearchParamType.STRING ->
             stringIndex(searchParam, value)?.also { indexBuilder.addStringIndex(it) }
           SearchParamType.TOKEN ->
@@ -89,15 +100,16 @@ internal object ResourceIndexer {
             quantityIndex(searchParam, value)?.also { indexBuilder.addQuantityIndex(it) }
           SearchParamType.URI -> uriIndex(searchParam, value)?.also { indexBuilder.addUriIndex(it) }
           SearchParamType.SPECIAL -> specialIndex(value)?.also { indexBuilder.addPositionIndex(it) }
-        // TODO: Handle composite type https://github.com/google/android-fhir/issues/292.
+          // TODO: Handle composite type https://github.com/google/android-fhir/issues/292.
+          else -> Unit
         }
       }
 
     // Add 'lastUpdated' index to all resources.
     if (resource.meta.hasLastUpdated()) {
       val lastUpdatedElement = resource.meta.lastUpdatedElement
-      indexBuilder.addDateIndex(
-        DateIndex(
+      indexBuilder.addDateTimeIndex(
+        DateTimeIndex(
           name = "_lastUpdated",
           path = arrayOf(resource.fhirType(), "meta", "lastUpdated").joinToString(separator = "."),
           from = lastUpdatedElement.value.time,
@@ -117,20 +129,21 @@ internal object ResourceIndexer {
       else -> null
     }
 
-  private fun dateIndex(searchParam: SearchParamDefinition, value: Base): DateIndex? =
+  private fun dateIndex(searchParam: SearchParamDefinition, value: Base): DateIndex {
+    val date = value as DateType
+    return DateIndex(
+      searchParam.name,
+      searchParam.path,
+      date.value.epochDay,
+      date.precision.add(date.value, 1).epochDay - 1
+    )
+  }
+
+  private fun dateTimeIndex(searchParam: SearchParamDefinition, value: Base): DateTimeIndex? =
     when (value.fhirType()) {
-      "date" -> {
-        val date = value as DateType
-        DateIndex(
-          searchParam.name,
-          searchParam.path,
-          date.value.time,
-          date.precision.add(date.value, 1).time - 1
-        )
-      }
       "dateTime" -> {
         val dateTime = value as DateTimeType
-        DateIndex(
+        DateTimeIndex(
           searchParam.name,
           searchParam.path,
           dateTime.value.time,
@@ -140,11 +153,11 @@ internal object ResourceIndexer {
       // No need to add precision because an instant is meant to have zero width
       "instant" -> {
         val instant = value as InstantType
-        DateIndex(searchParam.name, searchParam.path, instant.value.time, instant.value.time)
+        DateTimeIndex(searchParam.name, searchParam.path, instant.value.time, instant.value.time)
       }
       "Period" -> {
         val period = value as Period
-        DateIndex(
+        DateTimeIndex(
           searchParam.name,
           searchParam.path,
           if (period.hasStart()) period.start.time else 0,
@@ -154,7 +167,7 @@ internal object ResourceIndexer {
       }
       "Timing" -> {
         val timing = value as Timing
-        DateIndex(
+        DateTimeIndex(
           searchParam.name,
           searchParam.path,
           timing.event.minOf { it.value.time },
@@ -234,6 +247,10 @@ internal object ResourceIndexer {
           TokenIndex(searchParam.name, searchParam.path, it.system ?: "", it.code)
         }
       }
+      "code" -> {
+        val coding = value as ICoding
+        listOf(TokenIndex(searchParam.name, searchParam.path, coding.system ?: "", coding.code))
+      }
       else -> listOf()
     }
 
@@ -251,17 +268,32 @@ internal object ResourceIndexer {
           searchParam.path,
           FHIR_CURRENCY_CODE_SYSTEM,
           money.currency,
-          money.value
+          money.value,
+          "",
+          BigDecimal.ZERO
         )
       }
       "Quantity" -> {
         val quantity = value as Quantity
+        var canonicalUnit = ""
+        var canonicalValue = BigDecimal.ZERO
+        if (quantity.system == ucumUrl) {
+          try {
+            val ucumUnit = UnitConverter.getCanonicalUnits(UcumValue(quantity.unit, quantity.value))
+            canonicalUnit = ucumUnit.units
+            canonicalValue = ucumUnit.value
+          } catch (exception: ConverterException) {
+            // TODO handle this
+          }
+        }
         QuantityIndex(
           searchParam.name,
           searchParam.path,
           quantity.system ?: "",
           quantity.unit ?: "",
-          quantity.value
+          quantity.value,
+          canonicalUnit,
+          canonicalValue
         )
       }
       else -> null

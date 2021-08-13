@@ -23,6 +23,7 @@ import com.google.android.fhir.db.impl.dao.LocalChangeDao
 import com.google.android.fhir.db.impl.dao.ResourceDao
 import com.google.android.fhir.db.impl.dao.SyncedResourceDao
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
+import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.NumberIndexEntity
 import com.google.android.fhir.db.impl.entities.PositionIndexEntity
@@ -44,6 +45,7 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
       QuantityIndexEntity::class,
       UriIndexEntity::class,
       DateIndexEntity::class,
+      DateTimeIndexEntity::class,
       NumberIndexEntity::class,
       SyncedResourceEntity::class,
       LocalChangeEntity::class,

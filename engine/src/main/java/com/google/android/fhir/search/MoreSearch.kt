@@ -19,9 +19,15 @@ package com.google.android.fhir.search
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.ConverterException
+import com.google.android.fhir.UcumValue
+import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
+import com.google.android.fhir.epochDay
+import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -61,8 +67,10 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
     (stringFilters.map { it.query(type) } +
         referenceFilters.map { it.query(type) } +
         dateFilter.map { it.query(type) } +
+        dateTimeFilter.map { it.query(type) } +
         tokenFilters.map { it.query(type) } +
-        numberFilter.map { it.query(type) })
+        numberFilter.map { it.query(type) } +
+        quantityFilters.map { it.query(type) })
       .intersect()
   if (filterQuery != null) {
     filterStatement =
@@ -102,7 +110,6 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
 }
 
 fun StringFilter.query(type: ResourceType): SearchQuery {
-
   val condition =
     when (modifier) {
       StringFilterModifier.STARTS_WITH -> "LIKE ? || '%' COLLATE NOCASE"
@@ -155,6 +162,17 @@ fun DateFilter.query(type: ResourceType): SearchQuery {
   )
 }
 
+fun DateTimeFilter.query(type: ResourceType): SearchQuery {
+  val conditionParamPair = getConditionParamPair(prefix, value!!)
+  return SearchQuery(
+    """
+    SELECT resourceId FROM DateTimeIndexEntity 
+    WHERE resourceType = ? AND index_name = ? AND ${conditionParamPair.condition}
+    """,
+    listOf(type.name, parameter.paramName) + conditionParamPair.params
+  )
+}
+
 fun TokenFilter.query(type: ResourceType): SearchQuery {
   return SearchQuery(
     """
@@ -163,6 +181,18 @@ fun TokenFilter.query(type: ResourceType): SearchQuery {
     AND IFNULL(index_system,'') = ? 
     """,
     listOfNotNull(type.name, parameter!!.paramName, code, uri ?: "")
+  )
+}
+
+fun QuantityFilter.query(type: ResourceType): SearchQuery {
+  val conditionParamPair = getConditionParamPair(prefix, value!!, system, unit)
+  return SearchQuery(
+    """
+      SELECT resourceId FROM QuantityIndexEntity
+      WHERE resourceType= ? AND index_name = ? 
+      AND ${conditionParamPair.condition}
+    """.trimIndent(),
+    listOfNotNull<Any>(type.name, parameter.paramName) + conditionParamPair.params
   )
 }
 
@@ -182,17 +212,15 @@ val Order?.sqlString: String
       null -> ""
     }
 
-private fun getConditionParamPair(
-  prefix: ParamPrefixEnum,
-  value: DateTimeType
-): ConditionParam<Long> {
-  val (start, end) = value.rangeEpochMillis
+private fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): ConditionParam<Long> {
+  val start = value.rangeEpochDays.first
+  val end = value.rangeEpochDays.last
   return when (prefix) {
     ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
     // see https://github.com/google/android-fhir/issues/568
     // https://www.hl7.org/fhir/search.html#prefix
-    ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from >= ?", end + 1)
-    ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("? >= index_to", start)
+    ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
+    ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
     ParamPrefixEnum.NOT_EQUAL ->
       ConditionParam(
         "index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?",
@@ -209,10 +237,45 @@ private fun getConditionParamPair(
         start,
         end
       )
-    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to >= ?", end + 1)
-    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_from >= ?", start)
-    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_from <= ?", start)
-    ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ConditionParam("index_to <= ?", end + 1)
+    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to > ?", end)
+    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_to >= ?", start)
+    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_from < ?", start)
+    ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ConditionParam("index_from <= ?", end)
+  }
+}
+
+private fun getConditionParamPair(
+  prefix: ParamPrefixEnum,
+  value: DateTimeType
+): ConditionParam<Long> {
+  val start = value.rangeEpochMillis.first
+  val end = value.rangeEpochMillis.last
+  return when (prefix) {
+    ParamPrefixEnum.APPROXIMATE -> TODO("Not Implemented")
+    // see https://github.com/google/android-fhir/issues/568
+    // https://www.hl7.org/fhir/search.html#prefix
+    ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
+    ParamPrefixEnum.ENDS_BEFORE -> ConditionParam("index_to < ?", start)
+    ParamPrefixEnum.NOT_EQUAL ->
+      ConditionParam(
+        "(index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?)",
+        start,
+        end,
+        start,
+        end
+      )
+    ParamPrefixEnum.EQUAL ->
+      ConditionParam(
+        "index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?",
+        start,
+        end,
+        start,
+        end
+      )
+    ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to > ?", end)
+    ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_to >= ?", start)
+    ParamPrefixEnum.LESSTHAN -> ConditionParam("index_from < ?", start)
+    ParamPrefixEnum.LESSTHAN_OR_EQUALS -> ConditionParam("index_from <= ?", end)
   }
 }
 
@@ -246,7 +309,7 @@ private fun getConditionParamPair(
     ParamPrefixEnum.NOT_EQUAL -> {
       val precision = value.getRange()
       ConditionParam(
-        "index_value < ? OR index_value >= ?",
+        "(index_value < ? OR index_value >= ?)",
         (value - precision).toDouble(),
         (value + precision).toDouble()
       )
@@ -270,6 +333,62 @@ private fun getConditionParamPair(
 }
 
 /**
+ * Returns the condition and list of params required in Quantity.query see
+ * https://www.hl7.org/fhir/search.html#quantity.
+ */
+private fun getConditionParamPair(
+  prefix: ParamPrefixEnum?,
+  value: BigDecimal,
+  system: String?,
+  unit: String?
+): ConditionParam<Any> {
+  // value cannot be null -> the value condition will always be present
+  val valueConditionParam = getConditionParamPair(prefix, value)
+  val argList = mutableListOf<Any>()
+
+  val condition = StringBuilder()
+  val canonicalCondition = StringBuilder()
+  val nonCanonicalCondition = StringBuilder()
+
+  // system condition will be preceded by a value condition so if exists append an AND here
+  if (system != null) {
+    argList.add(system)
+    condition.append("index_system = ? AND ")
+  }
+  // if the unit condition will be preceded by a value condition so if exists append an AND here
+  if (unit != null) {
+    argList.add(unit)
+    nonCanonicalCondition.append("index_unit = ? AND ")
+  }
+
+  // add value condition
+  nonCanonicalCondition.append(valueConditionParam.condition)
+  argList.addAll(valueConditionParam.params)
+
+  if (system == ucumUrl && unit != null) {
+    try {
+      val ucumUnit = UnitConverter.getCanonicalUnits(UcumValue(unit, value))
+      val canonicalConditionParam = getConditionParamPair(prefix, ucumUnit.value)
+      argList.add(ucumUnit.units)
+      argList.addAll(canonicalConditionParam.params)
+      canonicalCondition
+        .append("index_canonicalUnit = ? AND ")
+        .append(canonicalConditionParam.condition.replace("index_value", "index_canonicalValue"))
+    } catch (exception: ConverterException) {
+      exception.printStackTrace()
+    }
+  }
+
+  // Add OR only when canonical match is possible
+  if (canonicalCondition.isNotEmpty()) {
+    condition.append("($nonCanonicalCondition OR $canonicalCondition)")
+  } else {
+    condition.append(nonCanonicalCondition)
+  }
+  return ConditionParam(condition.toString(), argList)
+}
+
+/**
  * Returns the range in which the value should lie for it to be considered a match (@see
  * NumberFilter.query). The value is directly related to the scale of the BigDecimal.
  *
@@ -287,6 +406,11 @@ private fun BigDecimal.getRange(): BigDecimal {
   }
 }
 
+private val DateType.rangeEpochDays: LongRange
+  get() {
+    return LongRange(value.epochDay, precision.add(value, 1).epochDay - 1)
+  }
+
 /**
  * The range of the range of the Date's epoch Timestamp. The value is related to the precision of
  * the DateTimeType
@@ -296,7 +420,7 @@ private fun BigDecimal.getRange(): BigDecimal {
  * of 2001-01-02)
  */
 private val DateTimeType.rangeEpochMillis
-  get() = value.time to precision.add(value, 1).time - 1
+  get() = LongRange(value.time, precision.add(value, 1).time - 1)
 
 private data class ConditionParam<T>(val condition: String, val params: List<T>) {
   constructor(condition: String, vararg params: T) : this(condition, params.asList())

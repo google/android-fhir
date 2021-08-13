@@ -12,7 +12,7 @@ afterEvaluate {
         from(components["release"])
         artifactId = "engine"
         groupId = "com.google.android.fhir"
-        version = "0.1.0-alpha02"
+        version = "0.1.0-alpha03"
         // Also publish source code for developers' convenience
         artifact(
           tasks.create<Jar>("androidSourcesJar") {
@@ -39,8 +39,6 @@ android {
   defaultConfig {
     minSdkVersion(Sdk.minSdk)
     targetSdkVersion(Sdk.targetSdk)
-    versionCode = 1
-    versionName = "1.0"
     testInstrumentationRunner(Dependencies.androidJunitRunner)
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments(mapOf("package" to "com.google.android.fhir"))
@@ -66,6 +64,7 @@ android {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
     }
+    getByName("debug") { isTestCoverageEnabled = true }
   }
 
   compileOptions {
@@ -103,21 +102,26 @@ configurations {
 }
 
 dependencies {
+  implementation("androidx.sqlite:sqlite-ktx:2.1.0")
+  implementation("org.fhir:ucum:1.0.3")
   androidTestImplementation(Dependencies.AndroidxTest.core)
-  androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
+  androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
 
-  api(Dependencies.hapiFhirStructuresR4) { exclude(module = "junit") }
+  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
+  implementation(Dependencies.Androidx.workRuntimeKtx)
+  implementation(Dependencies.HapiFhir.validation) {
+    exclude(module = "commons-logging")
+    exclude(module = "httpclient")
+  }
+  implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.Room.ktx)
-  implementation(Dependencies.Androidx.workRuntimeKtx)
-  implementation(Dependencies.Kotlin.stdlib)
-  implementation(Dependencies.caffeine)
   implementation(Dependencies.guava)
   implementation(Dependencies.jsonToolsPatch)
 
@@ -127,4 +131,5 @@ dependencies {
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
 }
