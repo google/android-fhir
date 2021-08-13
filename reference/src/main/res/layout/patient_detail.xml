@@ -27,5 +27,17 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
     >
+        <include
+            layout="@layout/patient_details_card_view"
+            android:id="@+id/patient_details_card"
+        />
+        <include
+            layout="@layout/patient_details_card_view"
+            android:id="@+id/patient_observations"
+        />
+        <include
+            layout="@layout/patient_details_card_view"
+            android:id="@+id/patient_conditions"
+        />
     </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.core.widget.NestedScrollView>

@@ -34,16 +34,21 @@ class PatientItemViewHolder(private val binding: PatientListItemViewBinding) :
     patientItem: PatientListViewModel.PatientItem,
     onItemClicked: (PatientListViewModel.PatientItem) -> Unit
   ) {
-    //    this.idView.text = patientItem.id
     this.nameView.text = patientItem.name
-    this.ageView.text =
-      "${Period.between(
-        LocalDate.parse(patientItem.dob),
-        LocalDate.now()
-      ).years.let { return@let if (it > 0) it else 1 }} years old"
-    this.idView.text =
-      "Id: #---${patientItem.resourceId.substring(patientItem.resourceId.length - 3)}"
+    this.ageView.text = "${getAge(patientItem)} years old"
+    // The new ui just shows shortened id with just last 3 characters.
+    this.idView.text = "Id: #---${getTruncatedId(patientItem)}"
 
     this.itemView.setOnClickListener { onItemClicked(patientItem) }
+  }
+
+  private fun getAge(patientItem: PatientListViewModel.PatientItem): Int {
+    return Period.between(LocalDate.parse(patientItem.dob), LocalDate.now()).years.let {
+      return@let if (it > 0) it else 1
+    }
+  }
+
+  private fun getTruncatedId(patientItem: PatientListViewModel.PatientItem): String {
+    return patientItem.resourceId.substring(patientItem.resourceId.length - 3)
   }
 }

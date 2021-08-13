@@ -38,7 +38,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   AndroidViewModel(application) {
 
   val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
-  //  val patientCount = liveData { emit(count()) }
   val patientCount = MutableLiveData<Int>()
   init {
     fetchAndPost { getSearchResults() }
@@ -52,15 +51,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     viewModelScope.launch {
       liveSearchedPatients.value = search()
       patientCount.value = liveSearchedPatients.value!!.size
-    }
-  }
-
-  private suspend fun count(): Long {
-    return fhirEngine.count<Patient> {
-      filter(Patient.ADDRESS_CITY) {
-        modifier = StringFilterModifier.MATCHES_EXACTLY
-        value = "NAIROBI"
-      }
     }
   }
 

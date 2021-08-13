@@ -6,13 +6,6 @@
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
 >
-
-
-<!--  <LinearLayout-->
-<!--      android:orientation="vertical"-->
-<!--      android:id="@+id/patient_details"-->
-<!--      android:layout_width="match_parent"-->
-<!--      android:layout_height="wrap_content"/>-->
   <com.google.android.material.card.MaterialCardView
         android:layout_margin="10dp"
         style="@style/Base.CardView"

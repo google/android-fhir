@@ -18,7 +18,6 @@ package com.google.android.fhir.reference
 
 import android.graphics.Color
 import android.os.Bundle
-import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -27,8 +26,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.LinearLayoutCompat
-import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
@@ -38,8 +35,6 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.reference.databinding.PatientDetailBinding
 import com.google.android.fhir.reference.databinding.PatientDetailsHeaderBinding
 import com.google.android.fhir.reference.databinding.PatientListItemViewBinding
-import com.google.android.material.card.MaterialCardView
-import com.google.android.material.textview.MaterialTextView
 import java.util.Locale
 
 /**
@@ -79,107 +74,81 @@ class PatientDetailsFragment : Fragment() {
         .get(PatientDetailsViewModel::class.java)
     patientDetailsViewModel.livePatientData.observe(viewLifecycleOwner) { setupPatientData(it) }
     patientDetailsViewModel.livePatientObservation.observe(viewLifecycleOwner) {
-      val observations = it.map { observation -> Model(observation.code, observation.value) }
-      renderCard(resources.getText(R.string.header_observation), observations)
+      val observations =
+        it.map { observation -> PatientProperty(observation.code, observation.value) }
+      binding.patientObservations.header.text = resources.getText(R.string.header_observation)
+      renderCard(binding.patientObservations.propertiesContainer, observations)
+      binding.patientObservations.container.visibility =
+        if (observations.isEmpty()) View.GONE else View.VISIBLE
     }
 
     patientDetailsViewModel.livePatientCondition.observe(viewLifecycleOwner) {
-      val observations = it.map { observation -> Model(observation.code, observation.value) }
-      renderCard(resources.getText(R.string.header_conditions), observations)
+      val conditions = it.map { condition -> PatientProperty(condition.code, condition.value) }
+      binding.patientConditions.header.text = resources.getText(R.string.header_conditions)
+      renderCard(binding.patientConditions.propertiesContainer, conditions)
+      binding.patientConditions.container.visibility =
+        if (conditions.isEmpty()) View.GONE else View.VISIBLE
+    }
+
+    (requireActivity() as AppCompatActivity).supportActionBar?.apply {
+      title = "Patient Card"
+      setDisplayHomeAsUpEnabled(true)
     }
   }
 
-  private fun renderCard(header: CharSequence, observations: List<Model>) {
-    if (observations.isNotEmpty()) {
-      val container: LinearLayoutCompat = binding.container
-      container.addView(
-        MaterialTextView(container.context).apply {
-          text = header
-          setPadding(30, 0, 0, 0)
-        }
-      )
-      val detailsCard =
-        MaterialCardView(ContextThemeWrapper(container.context, R.style.CardView)).apply {
-          addView(
-            LinearLayout(this.context).apply {
-              orientation = LinearLayout.VERTICAL
-              observations.forEach {
-                addView(
-                  ChildItemViewHolder(
-                      PatientListItemViewBinding.inflate(
-                        LayoutInflater.from(this.context),
-                        this,
-                        false
-                      )
-                    )
-                    .apply { bindTo(it) }
-                    .itemView
-                )
-                addView(lineView(this))
-              }
-            }
-          )
-        }
-      container.addView(detailsCard)
-      val param = detailsCard.layoutParams as ViewGroup.MarginLayoutParams
-      param.setMargins(30)
-    }
-  }
-  private fun setupPatientData(patientItem: PatientListViewModel.PatientItem?) {
-    patientItem?.let { patient ->
-      val container: LinearLayoutCompat = binding.container
-      val detailsCard =
-        MaterialCardView(ContextThemeWrapper(container.context, R.style.CardView)).apply {
-          addView(
-            LinearLayout(this.context).apply {
-              orientation = LinearLayout.VERTICAL
-              addView(
-                HeaderItemViewHolder(
-                    PatientDetailsHeaderBinding.inflate(
-                      LayoutInflater.from(this.context),
-                      this,
-                      false
-                    )
-                  )
-                  .apply {
-                    binding.screener.setOnClickListener { onAddScreenerClick() }
-                    bindTo(Model("Name", patient.name, type = 1))
-                  }
-                  .itemView
-              )
-              addView(lineView(this))
-              listOf(
-                Model("Mobile Number", patient.phone),
-                Model("ID Number", patient.resourceId),
-                Model("Address", "${patient.city}, ${patient.country} "),
-                Model("Date of Birth", patient.dob),
-                Model("Gender", patient.gender.capitalize(Locale.ROOT)),
-              )
-                .forEach {
-                  addView(
-                    ChildItemViewHolder(
-                        PatientListItemViewBinding.inflate(
-                          LayoutInflater.from(this.context),
-                          this,
-                          false
-                        )
-                      )
-                      .apply { bindTo(it) }
-                      .itemView
-                  )
-                  addView(lineView(this))
-                }
-            }
-          )
-        }
-      container.addView(detailsCard)
-      val param = detailsCard.layoutParams as ViewGroup.MarginLayoutParams
-      param.setMargins(30)
-      (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-        title = "Patient Card"
-        setDisplayHomeAsUpEnabled(true)
+  private fun renderCard(container: LinearLayout, properties: List<PatientProperty>) {
+    if (properties.isEmpty()) return
+
+    container.apply {
+      properties.forEach {
+        addView(
+          PatientListItemViewBinding.inflate(LayoutInflater.from(this.context), this, false)
+            .apply { bind(it) }
+            .root
+        )
+        addView(lineView(this))
       }
     }
+  }
+
+  private fun setupPatientData(patientItem: PatientListViewModel.PatientItem?) {
+    patientItem?.let { patient ->
+      val patientDetailsCard = binding.patientDetailsCard
+      patientDetailsCard.header.visibility = View.GONE
+      patientDetailsCard.propertiesContainer.apply {
+        addView(
+          PatientDetailsHeaderBinding.inflate(LayoutInflater.from(this.context), this, false)
+            .apply {
+              screener.setOnClickListener { onAddScreenerClick() }
+              title.text = patient.name
+            }
+            .root
+        )
+        addView(lineView(this))
+        listOf(
+          PatientProperty("Mobile Number", patient.phone),
+          PatientProperty("ID Number", patient.resourceId),
+          PatientProperty("Address", "${patient.city}, ${patient.country} "),
+          PatientProperty("Date of Birth", patient.dob),
+          PatientProperty("Gender", patient.gender.capitalize(Locale.ROOT)),
+        )
+          .forEach {
+            addView(
+              PatientListItemViewBinding.inflate(LayoutInflater.from(this.context), this, false)
+                .apply { bind(it) }
+                .root
+            )
+            addView(lineView(this))
+          }
+      }
+    }
+  }
+
+  fun PatientListItemViewBinding.bind(model: PatientProperty) {
+    name.text = model.header
+    age.text = model.value
+    status.visibility = View.GONE
+    id.visibility = View.GONE
   }
 
   private fun lineView(container: ViewGroup): View {
@@ -222,4 +191,10 @@ class PatientDetailsFragment : Fragment() {
     super.onDestroyView()
     _binding = null
   }
+
+  /** Model to store the properties displayed on the patient details page. */
+  data class PatientProperty(
+    val header: String,
+    val value: String,
+  )
 }
