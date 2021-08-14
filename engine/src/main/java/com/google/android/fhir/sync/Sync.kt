@@ -28,17 +28,22 @@ import androidx.work.WorkManager
 import com.google.android.fhir.FhirEngine
 
 object Sync {
+  fun basicSyncJob(context: Context): SyncJob {
+    return SyncJobImpl(context)
+  }
+
   /**
    * Does a one time sync based on [ResourceSyncParams]. Returns a [Result] that tells caller
    * whether process was Success or Failure. In case of failure, caller needs to take care of the
    * retry
    */
   suspend fun oneTimeSync(
+    context: Context,
     fhirEngine: FhirEngine,
     dataSource: DataSource,
     resourceSyncParams: ResourceSyncParams
   ): Result {
-    return FhirSynchronizer(fhirEngine, dataSource, resourceSyncParams).synchronize()
+    return FhirSynchronizer(context, fhirEngine, dataSource, resourceSyncParams).synchronize()
   }
 
   /**
@@ -119,6 +124,7 @@ object Sync {
 
 /** Defines different types of synchronisation workers: download and upload */
 enum class SyncWorkType(val workerName: String) {
+  DOWNLOAD_UPLOAD("fhir-engine-download-upload-worker"),
   DOWNLOAD("download"),
   UPLOAD("upload")
 }
