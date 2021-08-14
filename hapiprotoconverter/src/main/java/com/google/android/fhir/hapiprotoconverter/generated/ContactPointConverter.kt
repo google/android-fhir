@@ -38,12 +38,28 @@ public object ContactPointConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setSystem(
       org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem.valueOf(
-        system.value.name.replace("_", "")
+        system
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setValueElement(value.toHapi())
     hapiValue.setUse(
-      org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.valueOf(use.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.valueOf(
+        use
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setRankElement(rank.toHapi())
     hapiValue.setPeriod(period.toHapi())
@@ -59,7 +75,13 @@ public object ContactPointConverter {
         .setSystem(
           ContactPoint.SystemCode.newBuilder()
             .setValue(
-              ContactPointSystemCode.Value.valueOf(system.toCode().replace("-", "_").toUpperCase())
+              ContactPointSystemCode.Value.valueOf(
+                system
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -67,7 +89,13 @@ public object ContactPointConverter {
         .setUse(
           ContactPoint.UseCode.newBuilder()
             .setValue(
-              ContactPointUseCode.Value.valueOf(use.toCode().replace("-", "_").toUpperCase())
+              ContactPointUseCode.Value.valueOf(
+                use
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

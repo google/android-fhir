@@ -90,7 +90,18 @@ public object CapabilityStatementConverter {
     hapiValue.setVersionElement(version.toHapi())
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setTitleElement(title.toHapi())
-    hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_", "")))
+    hapiValue.setStatus(
+      Enumerations.PublicationStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
     hapiValue.setPublisherElement(publisher.toHapi())
@@ -102,7 +113,14 @@ public object CapabilityStatementConverter {
     hapiValue.setCopyrightElement(copyright.toHapi())
     hapiValue.setKind(
       org.hl7.fhir.r4.model.CapabilityStatement.CapabilityStatementKind.valueOf(
-        kind.value.name.replace("_", "")
+        kind
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setInstantiates(instantiatesList.map { it.toHapi() })
@@ -110,10 +128,33 @@ public object CapabilityStatementConverter {
     hapiValue.setSoftware(software.toHapi())
     hapiValue.setImplementation(implementation.toHapi())
     hapiValue.setFhirVersion(
-      Enumerations.FHIRVersion.valueOf(fhirVersion.value.name.replace("_", ""))
+      Enumerations.FHIRVersion.valueOf(
+        fhirVersion
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
-    formatList.map { hapiValue.addFormat(it.value) }
-    patchFormatList.map { hapiValue.addPatchFormat(it.value) }
+    formatList.map {
+      hapiValue.addFormat(
+        it.value.apply {
+          if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+          else this
+        }
+      )
+    }
+    patchFormatList.map {
+      hapiValue.addPatchFormat(
+        it.value.apply {
+          if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+          else this
+        }
+      )
+    }
     hapiValue.setImplementationGuide(implementationGuideList.map { it.toHapi() })
     hapiValue.setRest(restList.map { it.toHapi() })
     hapiValue.setMessaging(messagingList.map { it.toHapi() })
@@ -138,7 +179,13 @@ public object CapabilityStatementConverter {
         .setStatus(
           CapabilityStatement.StatusCode.newBuilder()
             .setValue(
-              PublicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              PublicationStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -155,7 +202,11 @@ public object CapabilityStatementConverter {
           CapabilityStatement.KindCode.newBuilder()
             .setValue(
               CapabilityStatementKindCode.Value.valueOf(
-                kind.toCode().replace("-", "_").toUpperCase()
+                kind
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -167,16 +218,32 @@ public object CapabilityStatementConverter {
         .setFhirVersion(
           CapabilityStatement.FhirVersionCode.newBuilder()
             .setValue(
-              FHIRVersionCode.Value.valueOf(fhirVersion.toCode().replace("-", "_").toUpperCase())
+              FHIRVersionCode.Value.valueOf(
+                fhirVersion
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
         .addAllFormat(
-          format.map { CapabilityStatement.FormatCode.newBuilder().setValue(it.value).build() }
+          format.map {
+            CapabilityStatement.FormatCode.newBuilder()
+              .setValue(
+                it.value.apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+              )
+              .build()
+          }
         )
         .addAllPatchFormat(
           patchFormat.map {
-            CapabilityStatement.PatchFormatCode.newBuilder().setValue(it.value).build()
+            CapabilityStatement.PatchFormatCode.newBuilder()
+              .setValue(
+                it.value.apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+              )
+              .build()
           }
         )
         .addAllImplementationGuide(implementationGuide.map { it.toProto() })
@@ -228,7 +295,13 @@ public object CapabilityStatementConverter {
         .setMode(
           CapabilityStatement.Rest.ModeCode.newBuilder()
             .setValue(
-              RestfulCapabilityModeCode.Value.valueOf(mode.toCode().replace("-", "_").toUpperCase())
+              RestfulCapabilityModeCode.Value.valueOf(
+                mode
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -277,7 +350,11 @@ public object CapabilityStatementConverter {
           CapabilityStatement.Rest.Resource.VersioningCode.newBuilder()
             .setValue(
               ResourceVersionPolicyCode.Value.valueOf(
-                versioning.toCode().replace("-", "_").toUpperCase()
+                versioning
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -289,7 +366,11 @@ public object CapabilityStatementConverter {
           CapabilityStatement.Rest.Resource.ConditionalReadCode.newBuilder()
             .setValue(
               ConditionalReadStatusCode.Value.valueOf(
-                conditionalRead.toCode().replace("-", "_").toUpperCase()
+                conditionalRead
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -299,7 +380,11 @@ public object CapabilityStatementConverter {
           CapabilityStatement.Rest.Resource.ConditionalDeleteCode.newBuilder()
             .setValue(
               ConditionalDeleteStatusCode.Value.valueOf(
-                conditionalDelete.toCode().replace("-", "_").toUpperCase()
+                conditionalDelete
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -309,7 +394,11 @@ public object CapabilityStatementConverter {
             CapabilityStatement.Rest.Resource.ReferencePolicyCode.newBuilder()
               .setValue(
                 ReferenceHandlingPolicyCode.Value.valueOf(
-                  it.value.toCode().replace("-", "_").toUpperCase()
+                  it.value
+                    .toCode()
+                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                    .replace("-", "_")
+                    .toUpperCase()
                 )
               )
               .build()
@@ -335,7 +424,11 @@ public object CapabilityStatementConverter {
           CapabilityStatement.Rest.Resource.ResourceInteraction.CodeType.newBuilder()
             .setValue(
               TypeRestfulInteractionValueSet.Value.valueOf(
-                code.toCode().replace("-", "_").toUpperCase()
+                code
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -358,7 +451,13 @@ public object CapabilityStatementConverter {
         .setType(
           CapabilityStatement.Rest.Resource.SearchParam.TypeCode.newBuilder()
             .setValue(
-              SearchParamTypeCode.Value.valueOf(type.toCode().replace("-", "_").toUpperCase())
+              SearchParamTypeCode.Value.valueOf(
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -394,7 +493,11 @@ public object CapabilityStatementConverter {
           CapabilityStatement.Rest.SystemInteraction.CodeType.newBuilder()
             .setValue(
               SystemRestfulInteractionValueSet.Value.valueOf(
-                code.toCode().replace("-", "_").toUpperCase()
+                code
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -445,7 +548,13 @@ public object CapabilityStatementConverter {
         .setMode(
           CapabilityStatement.Messaging.SupportedMessage.ModeCode.newBuilder()
             .setValue(
-              EventCapabilityModeCode.Value.valueOf(mode.toCode().replace("-", "_").toUpperCase())
+              EventCapabilityModeCode.Value.valueOf(
+                mode
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -464,7 +573,15 @@ public object CapabilityStatementConverter {
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
         .setMode(
           CapabilityStatement.Document.ModeCode.newBuilder()
-            .setValue(DocumentModeCode.Value.valueOf(mode.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              DocumentModeCode.Value.valueOf(
+                mode
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .setDocumentation(documentationElement.toProto())
@@ -509,7 +626,14 @@ public object CapabilityStatementConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setMode(
       org.hl7.fhir.r4.model.CapabilityStatement.RestfulCapabilityMode.valueOf(
-        mode.value.name.replace("_", "")
+        mode
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setDocumentationElement(documentation.toHapi())
@@ -549,7 +673,14 @@ public object CapabilityStatementConverter {
     hapiValue.setInteraction(interactionList.map { it.toHapi() })
     hapiValue.setVersioning(
       org.hl7.fhir.r4.model.CapabilityStatement.ResourceVersionPolicy.valueOf(
-        versioning.value.name.replace("_", "")
+        versioning
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setReadHistoryElement(readHistory.toHapi())
@@ -557,19 +688,39 @@ public object CapabilityStatementConverter {
     hapiValue.setConditionalCreateElement(conditionalCreate.toHapi())
     hapiValue.setConditionalRead(
       org.hl7.fhir.r4.model.CapabilityStatement.ConditionalReadStatus.valueOf(
-        conditionalRead.value.name.replace("_", "")
+        conditionalRead
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setConditionalUpdateElement(conditionalUpdate.toHapi())
     hapiValue.setConditionalDelete(
       org.hl7.fhir.r4.model.CapabilityStatement.ConditionalDeleteStatus.valueOf(
-        conditionalDelete.value.name.replace("_", "")
+        conditionalDelete
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     referencePolicyList.forEach {
       hapiValue.addReferencePolicy(
         org.hl7.fhir.r4.model.CapabilityStatement.ReferenceHandlingPolicy.valueOf(
-          it.value.name.replace("_", "")
+          it.value
+            .name
+            .apply {
+              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+              else this
+            }
+            .replace("_", "")
         )
       )
     }
@@ -589,7 +740,14 @@ public object CapabilityStatementConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setCode(
       org.hl7.fhir.r4.model.CapabilityStatement.TypeRestfulInteraction.valueOf(
-        code.value.name.replace("_", "")
+        code
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setDocumentationElement(documentation.toHapi())
@@ -607,7 +765,18 @@ public object CapabilityStatementConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setDefinitionElement(definition.toHapi())
-    hapiValue.setType(Enumerations.SearchParamType.valueOf(type.value.name.replace("_", "")))
+    hapiValue.setType(
+      Enumerations.SearchParamType.valueOf(
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setDocumentationElement(documentation.toHapi())
     return hapiValue
   }
@@ -635,7 +804,14 @@ public object CapabilityStatementConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setCode(
       org.hl7.fhir.r4.model.CapabilityStatement.SystemRestfulInteraction.valueOf(
-        code.value.name.replace("_", "")
+        code
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setDocumentationElement(documentation.toHapi())
@@ -681,7 +857,14 @@ public object CapabilityStatementConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setMode(
       org.hl7.fhir.r4.model.CapabilityStatement.EventCapabilityMode.valueOf(
-        mode.value.name.replace("_", "")
+        mode
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setDefinitionElement(definition.toHapi())
@@ -697,7 +880,14 @@ public object CapabilityStatementConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setMode(
       org.hl7.fhir.r4.model.CapabilityStatement.DocumentMode.valueOf(
-        mode.value.name.replace("_", "")
+        mode
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setDocumentationElement(documentation.toHapi())

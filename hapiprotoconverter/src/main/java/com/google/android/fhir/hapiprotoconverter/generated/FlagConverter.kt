@@ -49,7 +49,16 @@ public object FlagConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Flag.FlagStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Flag.FlagStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setCategory(categoryList.map { it.toHapi() })
     hapiValue.setCode(code.toHapi())
@@ -73,7 +82,15 @@ public object FlagConverter {
         .addAllIdentifier(identifier.map { it.toProto() })
         .setStatus(
           Flag.StatusCode.newBuilder()
-            .setValue(FlagStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              FlagStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .addAllCategory(category.map { it.toProto() })

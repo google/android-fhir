@@ -73,10 +73,28 @@ public object OperationDefinitionConverter {
     hapiValue.setVersionElement(version.toHapi())
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setTitleElement(title.toHapi())
-    hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_", "")))
+    hapiValue.setStatus(
+      Enumerations.PublicationStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setKind(
       org.hl7.fhir.r4.model.OperationDefinition.OperationKind.valueOf(
-        kind.value.name.replace("_", "")
+        kind
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setExperimentalElement(experimental.toHapi())
@@ -91,7 +109,14 @@ public object OperationDefinitionConverter {
     hapiValue.setCodeElement(code.toHapi())
     hapiValue.setCommentElement(comment.toHapi())
     hapiValue.setBaseElement(base.toHapi())
-    resourceList.forEach { hapiValue.addResource(it.value.name) }
+    resourceList.forEach {
+      hapiValue.addResource(
+        it.value.name.apply {
+          if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+          else this
+        }
+      )
+    }
     hapiValue.setSystemElement(system.toHapi())
     hapiValue.setTypeElement(type.toHapi())
     hapiValue.setInstanceElement(instance.toHapi())
@@ -119,14 +144,26 @@ public object OperationDefinitionConverter {
         .setStatus(
           OperationDefinition.StatusCode.newBuilder()
             .setValue(
-              PublicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              PublicationStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
         .setKind(
           OperationDefinition.KindCode.newBuilder()
             .setValue(
-              OperationKindCode.Value.valueOf(kind.toCode().replace("-", "_").toUpperCase())
+              OperationKindCode.Value.valueOf(
+                kind
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -145,7 +182,13 @@ public object OperationDefinitionConverter {
         .addAllResource(
           resource.map {
             OperationDefinition.ResourceCode.newBuilder()
-              .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString))
+              .setValue(
+                ResourceTypeCode.Value.valueOf(
+                  it.valueAsString.apply {
+                    if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this
+                  }
+                )
+              )
               .build()
           }
         )
@@ -172,7 +215,13 @@ public object OperationDefinitionConverter {
         .setUse(
           OperationDefinition.Parameter.UseCode.newBuilder()
             .setValue(
-              OperationParameterUseCode.Value.valueOf(use.toCode().replace("-", "_").toUpperCase())
+              OperationParameterUseCode.Value.valueOf(
+                use
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -188,7 +237,13 @@ public object OperationDefinitionConverter {
         .setSearchType(
           OperationDefinition.Parameter.SearchTypeCode.newBuilder()
             .setValue(
-              SearchParamTypeCode.Value.valueOf(searchType.toCode().replace("-", "_").toUpperCase())
+              SearchParamTypeCode.Value.valueOf(
+                searchType
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -209,7 +264,13 @@ public object OperationDefinitionConverter {
         .setStrength(
           OperationDefinition.Parameter.Binding.StrengthCode.newBuilder()
             .setValue(
-              BindingStrengthCode.Value.valueOf(strength.toCode().replace("-", "_").toUpperCase())
+              BindingStrengthCode.Value.valueOf(
+                strength
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -257,7 +318,14 @@ public object OperationDefinitionConverter {
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setUse(
       org.hl7.fhir.r4.model.OperationDefinition.OperationParameterUse.valueOf(
-        use.value.name.replace("_", "")
+        use
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setMinElement(min.toHapi())
@@ -266,7 +334,16 @@ public object OperationDefinitionConverter {
     hapiValue.setType(type.value.name)
     hapiValue.setTargetProfile(targetProfileList.map { it.toHapi() })
     hapiValue.setSearchType(
-      Enumerations.SearchParamType.valueOf(searchType.value.name.replace("_", ""))
+      Enumerations.SearchParamType.valueOf(
+        searchType
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setBinding(binding.toHapi())
     hapiValue.setReferencedFrom(referencedFromList.map { it.toHapi() })
@@ -282,7 +359,16 @@ public object OperationDefinitionConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setStrength(
-      Enumerations.BindingStrength.valueOf(strength.value.name.replace("_", ""))
+      Enumerations.BindingStrength.valueOf(
+        strength
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setValueSetElement(valueSet.toHapi())
     return hapiValue

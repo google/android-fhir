@@ -191,7 +191,18 @@ public object EvidenceVariableConverter {
     hapiValue.setTitleElement(title.toHapi())
     hapiValue.setShortTitleElement(shortTitle.toHapi())
     hapiValue.setSubtitleElement(subtitle.toHapi())
-    hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_", "")))
+    hapiValue.setStatus(
+      Enumerations.PublicationStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setDateElement(date.toHapi())
     hapiValue.setPublisherElement(publisher.toHapi())
     hapiValue.setContact(contactList.map { it.toHapi() })
@@ -211,7 +222,14 @@ public object EvidenceVariableConverter {
     hapiValue.setRelatedArtifact(relatedArtifactList.map { it.toHapi() })
     hapiValue.setType(
       org.hl7.fhir.r4.model.EvidenceVariable.EvidenceVariableType.valueOf(
-        type.value.name.replace("_", "")
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCharacteristic(characteristicList.map { it.toHapi() })
@@ -238,7 +256,13 @@ public object EvidenceVariableConverter {
         .setStatus(
           EvidenceVariable.StatusCode.newBuilder()
             .setValue(
-              PublicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              PublicationStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -262,7 +286,13 @@ public object EvidenceVariableConverter {
         .setType(
           EvidenceVariable.TypeCode.newBuilder()
             .setValue(
-              EvidenceVariableTypeCode.Value.valueOf(type.toCode().replace("-", "_").toUpperCase())
+              EvidenceVariableTypeCode.Value.valueOf(
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -290,7 +320,13 @@ public object EvidenceVariableConverter {
         .setGroupMeasure(
           EvidenceVariable.Characteristic.GroupMeasureCode.newBuilder()
             .setValue(
-              GroupMeasureCode.Value.valueOf(groupMeasure.toCode().replace("-", "_").toUpperCase())
+              GroupMeasureCode.Value.valueOf(
+                groupMeasure
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -315,7 +351,14 @@ public object EvidenceVariableConverter {
     hapiValue.setTimeFromStart(timeFromStart.toHapi())
     hapiValue.setGroupMeasure(
       org.hl7.fhir.r4.model.EvidenceVariable.GroupMeasure.valueOf(
-        groupMeasure.value.name.replace("_", "")
+        groupMeasure
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     return hapiValue

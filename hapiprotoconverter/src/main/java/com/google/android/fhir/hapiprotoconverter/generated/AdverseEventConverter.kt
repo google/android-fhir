@@ -54,7 +54,14 @@ public object AdverseEventConverter {
     hapiValue.setIdentifier(identifier.toHapi())
     hapiValue.setActuality(
       org.hl7.fhir.r4.model.AdverseEvent.AdverseEventActuality.valueOf(
-        actuality.value.name.replace("_", "")
+        actuality
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCategory(categoryList.map { it.toHapi() })
@@ -93,7 +100,11 @@ public object AdverseEventConverter {
           AdverseEvent.ActualityCode.newBuilder()
             .setValue(
               AdverseEventActualityCode.Value.valueOf(
-                actuality.toCode().replace("-", "_").toUpperCase()
+                actuality
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()

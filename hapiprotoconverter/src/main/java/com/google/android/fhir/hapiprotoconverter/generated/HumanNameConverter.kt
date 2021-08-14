@@ -34,7 +34,16 @@ public object HumanNameConverter {
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setUse(
-      org.hl7.fhir.r4.model.HumanName.NameUse.valueOf(use.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.HumanName.NameUse.valueOf(
+        use
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setTextElement(text.toHapi())
     hapiValue.setFamilyElement(family.toHapi())
@@ -53,7 +62,15 @@ public object HumanNameConverter {
         .addAllExtension(extension.map { it.toProto() })
         .setUse(
           HumanName.UseCode.newBuilder()
-            .setValue(NameUseCode.Value.valueOf(use.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              NameUseCode.Value.valueOf(
+                use
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .setText(textElement.toProto())

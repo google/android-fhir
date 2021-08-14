@@ -825,15 +825,42 @@ public object TaskConverter {
     hapiValue.setGroupIdentifier(groupIdentifier.toHapi())
     hapiValue.setPartOf(partOfList.map { it.toHapi() })
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Task.TaskStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Task.TaskStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setStatusReason(statusReason.toHapi())
     hapiValue.setBusinessStatus(businessStatus.toHapi())
     hapiValue.setIntent(
-      org.hl7.fhir.r4.model.Task.TaskIntent.valueOf(intent.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Task.TaskIntent.valueOf(
+        intent
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setPriority(
-      org.hl7.fhir.r4.model.Task.TaskPriority.valueOf(priority.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Task.TaskPriority.valueOf(
+        priority
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setCode(code.toHapi())
     hapiValue.setDescriptionElement(description.toHapi())
@@ -876,7 +903,15 @@ public object TaskConverter {
         .addAllPartOf(partOf.map { it.toProto() })
         .setStatus(
           Task.StatusCode.newBuilder()
-            .setValue(TaskStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              TaskStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .setStatusReason(statusReason.toProto())
@@ -884,14 +919,26 @@ public object TaskConverter {
         .setIntent(
           Task.IntentCode.newBuilder()
             .setValue(
-              TaskIntentValueSet.Value.valueOf(intent.toCode().replace("-", "_").toUpperCase())
+              TaskIntentValueSet.Value.valueOf(
+                intent
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
         .setPriority(
           Task.PriorityCode.newBuilder()
             .setValue(
-              RequestPriorityCode.Value.valueOf(priority.toCode().replace("-", "_").toUpperCase())
+              RequestPriorityCode.Value.valueOf(
+                priority
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

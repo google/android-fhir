@@ -35,10 +35,28 @@ public object AddressConverter {
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setUse(
-      org.hl7.fhir.r4.model.Address.AddressUse.valueOf(use.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Address.AddressUse.valueOf(
+        use
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setType(
-      org.hl7.fhir.r4.model.Address.AddressType.valueOf(type.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Address.AddressType.valueOf(
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setTextElement(text.toHapi())
     hapiValue.setLine(lineList.map { it.toHapi() })
@@ -59,12 +77,28 @@ public object AddressConverter {
         .addAllExtension(extension.map { it.toProto() })
         .setUse(
           Address.UseCode.newBuilder()
-            .setValue(AddressUseCode.Value.valueOf(use.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              AddressUseCode.Value.valueOf(
+                use
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .setType(
           Address.TypeCode.newBuilder()
-            .setValue(AddressTypeCode.Value.valueOf(type.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              AddressTypeCode.Value.valueOf(
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .setText(textElement.toProto())

@@ -58,7 +58,16 @@ public object SlotConverter {
     hapiValue.setAppointmentType(appointmentType.toHapi())
     hapiValue.setSchedule(schedule.toHapi())
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Slot.SlotStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Slot.SlotStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setStartElement(start.toHapi())
     hapiValue.setEndElement(end.toHapi())
@@ -85,7 +94,15 @@ public object SlotConverter {
         .setSchedule(schedule.toProto())
         .setStatus(
           Slot.StatusCode.newBuilder()
-            .setValue(SlotStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              SlotStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .setStart(startElement.toProto())

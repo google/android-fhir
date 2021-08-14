@@ -68,7 +68,18 @@ public object SearchParameterConverter {
     hapiValue.setVersionElement(version.toHapi())
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setDerivedFromElement(derivedFrom.toHapi())
-    hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_", "")))
+    hapiValue.setStatus(
+      Enumerations.PublicationStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
     hapiValue.setPublisherElement(publisher.toHapi())
@@ -78,29 +89,73 @@ public object SearchParameterConverter {
     hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
     hapiValue.setPurposeElement(purpose.toHapi())
     hapiValue.setCodeElement(code.toHapi())
-    baseList.forEach { hapiValue.addBase(it.value.name) }
-    hapiValue.setType(Enumerations.SearchParamType.valueOf(type.value.name.replace("_", "")))
+    baseList.forEach {
+      hapiValue.addBase(
+        it.value.name.apply {
+          if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+          else this
+        }
+      )
+    }
+    hapiValue.setType(
+      Enumerations.SearchParamType.valueOf(
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setExpressionElement(expression.toHapi())
     hapiValue.setXpathElement(xpath.toHapi())
     hapiValue.setXpathUsage(
       org.hl7.fhir.r4.model.SearchParameter.XPathUsageType.valueOf(
-        xpathUsage.value.name.replace("_", "")
+        xpathUsage
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
-    targetList.forEach { hapiValue.addTarget(it.value.name) }
+    targetList.forEach {
+      hapiValue.addTarget(
+        it.value.name.apply {
+          if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+          else this
+        }
+      )
+    }
     hapiValue.setMultipleOrElement(multipleOr.toHapi())
     hapiValue.setMultipleAndElement(multipleAnd.toHapi())
     comparatorList.forEach {
       hapiValue.addComparator(
         org.hl7.fhir.r4.model.SearchParameter.SearchComparator.valueOf(
-          it.value.name.replace("_", "")
+          it.value
+            .name
+            .apply {
+              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+              else this
+            }
+            .replace("_", "")
         )
       )
     }
     modifierList.forEach {
       hapiValue.addModifier(
         org.hl7.fhir.r4.model.SearchParameter.SearchModifierCode.valueOf(
-          it.value.name.replace("_", "")
+          it.value
+            .name
+            .apply {
+              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+              else this
+            }
+            .replace("_", "")
         )
       )
     }
@@ -126,7 +181,13 @@ public object SearchParameterConverter {
         .setStatus(
           SearchParameter.StatusCode.newBuilder()
             .setValue(
-              PublicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              PublicationStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -142,14 +203,26 @@ public object SearchParameterConverter {
         .addAllBase(
           base.map {
             SearchParameter.BaseCode.newBuilder()
-              .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString))
+              .setValue(
+                ResourceTypeCode.Value.valueOf(
+                  it.valueAsString.apply {
+                    if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this
+                  }
+                )
+              )
               .build()
           }
         )
         .setType(
           SearchParameter.TypeCode.newBuilder()
             .setValue(
-              SearchParamTypeCode.Value.valueOf(type.toCode().replace("-", "_").toUpperCase())
+              SearchParamTypeCode.Value.valueOf(
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -158,14 +231,26 @@ public object SearchParameterConverter {
         .setXpathUsage(
           SearchParameter.XpathUsageCode.newBuilder()
             .setValue(
-              XPathUsageTypeCode.Value.valueOf(xpathUsage.toCode().replace("-", "_").toUpperCase())
+              XPathUsageTypeCode.Value.valueOf(
+                xpathUsage
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
         .addAllTarget(
           target.map {
             SearchParameter.TargetCode.newBuilder()
-              .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString))
+              .setValue(
+                ResourceTypeCode.Value.valueOf(
+                  it.valueAsString.apply {
+                    if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this
+                  }
+                )
+              )
               .build()
           }
         )
@@ -176,7 +261,11 @@ public object SearchParameterConverter {
             SearchParameter.ComparatorCode.newBuilder()
               .setValue(
                 SearchComparatorCode.Value.valueOf(
-                  it.value.toCode().replace("-", "_").toUpperCase()
+                  it.value
+                    .toCode()
+                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                    .replace("-", "_")
+                    .toUpperCase()
                 )
               )
               .build()
@@ -186,7 +275,13 @@ public object SearchParameterConverter {
           modifier.map {
             SearchParameter.ModifierCode.newBuilder()
               .setValue(
-                SearchModifierCode.Value.valueOf(it.value.toCode().replace("-", "_").toUpperCase())
+                SearchModifierCode.Value.valueOf(
+                  it.value
+                    .toCode()
+                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                    .replace("-", "_")
+                    .toUpperCase()
+                )
               )
               .build()
           }

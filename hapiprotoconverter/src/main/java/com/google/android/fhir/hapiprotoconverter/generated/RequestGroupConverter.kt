@@ -170,14 +170,39 @@ public object RequestGroupConverter {
     hapiValue.setReplaces(replacesList.map { it.toHapi() })
     hapiValue.setGroupIdentifier(groupIdentifier.toHapi())
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.RequestGroup.RequestStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.RequestGroup.RequestStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setIntent(
-      org.hl7.fhir.r4.model.RequestGroup.RequestIntent.valueOf(intent.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.RequestGroup.RequestIntent.valueOf(
+        intent
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setPriority(
       org.hl7.fhir.r4.model.RequestGroup.RequestPriority.valueOf(
-        priority.value.name.replace("_", "")
+        priority
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCode(code.toHapi())
@@ -211,21 +236,39 @@ public object RequestGroupConverter {
         .setStatus(
           RequestGroup.StatusCode.newBuilder()
             .setValue(
-              RequestStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              RequestStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
         .setIntent(
           RequestGroup.IntentCode.newBuilder()
             .setValue(
-              RequestIntentCode.Value.valueOf(intent.toCode().replace("-", "_").toUpperCase())
+              RequestIntentCode.Value.valueOf(
+                intent
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
         .setPriority(
           RequestGroup.PriorityCode.newBuilder()
             .setValue(
-              RequestPriorityCode.Value.valueOf(priority.toCode().replace("-", "_").toUpperCase())
+              RequestPriorityCode.Value.valueOf(
+                priority
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -257,7 +300,13 @@ public object RequestGroupConverter {
         .setPriority(
           RequestGroup.Action.PriorityCode.newBuilder()
             .setValue(
-              RequestPriorityCode.Value.valueOf(priority.toCode().replace("-", "_").toUpperCase())
+              RequestPriorityCode.Value.valueOf(
+                priority
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -272,7 +321,11 @@ public object RequestGroupConverter {
           RequestGroup.Action.GroupingBehaviorCode.newBuilder()
             .setValue(
               ActionGroupingBehaviorCode.Value.valueOf(
-                groupingBehavior.toCode().replace("-", "_").toUpperCase()
+                groupingBehavior
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -281,7 +334,11 @@ public object RequestGroupConverter {
           RequestGroup.Action.SelectionBehaviorCode.newBuilder()
             .setValue(
               ActionSelectionBehaviorCode.Value.valueOf(
-                selectionBehavior.toCode().replace("-", "_").toUpperCase()
+                selectionBehavior
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -290,7 +347,11 @@ public object RequestGroupConverter {
           RequestGroup.Action.RequiredBehaviorCode.newBuilder()
             .setValue(
               ActionRequiredBehaviorCode.Value.valueOf(
-                requiredBehavior.toCode().replace("-", "_").toUpperCase()
+                requiredBehavior
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -299,7 +360,11 @@ public object RequestGroupConverter {
           RequestGroup.Action.PrecheckBehaviorCode.newBuilder()
             .setValue(
               ActionPrecheckBehaviorCode.Value.valueOf(
-                precheckBehavior.toCode().replace("-", "_").toUpperCase()
+                precheckBehavior
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -308,7 +373,11 @@ public object RequestGroupConverter {
           RequestGroup.Action.CardinalityBehaviorCode.newBuilder()
             .setValue(
               ActionCardinalityBehaviorCode.Value.valueOf(
-                cardinalityBehavior.toCode().replace("-", "_").toUpperCase()
+                cardinalityBehavior
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -329,7 +398,13 @@ public object RequestGroupConverter {
         .setKind(
           RequestGroup.Action.Condition.KindCode.newBuilder()
             .setValue(
-              ActionConditionKindCode.Value.valueOf(kind.toCode().replace("-", "_").toUpperCase())
+              ActionConditionKindCode.Value.valueOf(
+                kind
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -351,7 +426,11 @@ public object RequestGroupConverter {
           RequestGroup.Action.RelatedAction.RelationshipCode.newBuilder()
             .setValue(
               ActionRelationshipTypeCode.Value.valueOf(
-                relationship.toCode().replace("-", "_").toUpperCase()
+                relationship
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -374,7 +453,14 @@ public object RequestGroupConverter {
     hapiValue.setTextEquivalentElement(textEquivalent.toHapi())
     hapiValue.setPriority(
       org.hl7.fhir.r4.model.RequestGroup.RequestPriority.valueOf(
-        priority.value.name.replace("_", "")
+        priority
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCode(codeList.map { it.toHapi() })
@@ -386,27 +472,62 @@ public object RequestGroupConverter {
     hapiValue.setType(type.toHapi())
     hapiValue.setGroupingBehavior(
       org.hl7.fhir.r4.model.RequestGroup.ActionGroupingBehavior.valueOf(
-        groupingBehavior.value.name.replace("_", "")
+        groupingBehavior
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setSelectionBehavior(
       org.hl7.fhir.r4.model.RequestGroup.ActionSelectionBehavior.valueOf(
-        selectionBehavior.value.name.replace("_", "")
+        selectionBehavior
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setRequiredBehavior(
       org.hl7.fhir.r4.model.RequestGroup.ActionRequiredBehavior.valueOf(
-        requiredBehavior.value.name.replace("_", "")
+        requiredBehavior
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setPrecheckBehavior(
       org.hl7.fhir.r4.model.RequestGroup.ActionPrecheckBehavior.valueOf(
-        precheckBehavior.value.name.replace("_", "")
+        precheckBehavior
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCardinalityBehavior(
       org.hl7.fhir.r4.model.RequestGroup.ActionCardinalityBehavior.valueOf(
-        cardinalityBehavior.value.name.replace("_", "")
+        cardinalityBehavior
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setResource(resource.toHapi())
@@ -422,7 +543,14 @@ public object RequestGroupConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setKind(
       org.hl7.fhir.r4.model.RequestGroup.ActionConditionKind.valueOf(
-        kind.value.name.replace("_", "")
+        kind
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setExpression(expression.toHapi())
@@ -439,7 +567,14 @@ public object RequestGroupConverter {
     hapiValue.setActionIdElement(actionId.toHapi())
     hapiValue.setRelationship(
       org.hl7.fhir.r4.model.RequestGroup.ActionRelationshipType.valueOf(
-        relationship.value.name.replace("_", "")
+        relationship
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setOffset(offset.requestGroupActionRelatedActionOffsetToHapi())

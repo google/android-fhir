@@ -16,10 +16,8 @@
 
 package com.google.android.fhir.hapiprotoconverter
 
-import com.google.fhir.r4.core.Composition
 import com.google.fhir.r4.core.ElementDefinition
 import com.google.fhir.r4.core.String
-import com.google.fhir.r4.core.V3ConfidentialityClassificationValueSet
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 
@@ -29,7 +27,10 @@ private val hapiStringProtoCodeType =
     "http://hl7.org/fhir/ValueSet/all-types|4.0.1",
     "http://hl7.org/fhir/ValueSet/guide-parameter-code|4.0.1",
   )
-
+private const val toHapiCheck =
+  "apply { if(equals(\"INVALID_UNINITIALIZED\",true) || equals(\"UNRECOGNIZED\",true)) \"NULL\" else this }"
+private const val toProtoCheck =
+  "apply { if(equals(\"NULL\",true)) \"INVALID_UNINITIALIZED\" else this }"
 // Map of valueSet url that are renamed in Fhir protos
 private val CODE_SYSTEM_RENAMES =
   mapOf(
@@ -52,6 +53,7 @@ private val specialValueSet =
 private const val uriCommon =
   "http://hl7.org/fhir/StructureDefinition/elementdefinition-isCommonBinding"
 
+// TODO Possible alternative -> MAP all code Types instead of relying on the valueOf method
 internal fun handleCodeType(
   element: ElementDefinition,
   hapiBuilder: FunSpec.Builder,
@@ -86,7 +88,7 @@ internal fun handleCodeType(
       )
     } else {
       protoBuilder.addStatement(
-        "$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.valueAsString)).build()})",
+        "$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.valueAsString.$toProtoCheck)).build()})",
         element.getProtoMethodName(),
         element.getHapiFieldName(),
         element.getProtoCodeClass(
@@ -96,7 +98,7 @@ internal fun handleCodeType(
         getProtoEnumNameFromElement(element)
       )
       hapiBuilder.addStatement(
-        "%L.forEach{hapiValue.add%L(it.value.name)}",
+        "%L.forEach{hapiValue.add%L(it.value.name.$toHapiCheck)}",
         element.getProtoFieldName(isRepeated = true),
         element.getHapiMethodName(),
       )
@@ -104,7 +106,7 @@ internal fun handleCodeType(
   } else if (specialValueSet.contains(element.binding.valueSet.value)) {
     if (isSingle) {
       protoBuilder.addStatement(
-        "$singleMethodTemplate(%T.newBuilder().setValue(%L).build())",
+        "$singleMethodTemplate(%T.newBuilder().setValue(%L.$toProtoCheck).build())",
         element.getProtoMethodName(),
         // Using this just to make sure codes are present in hapi and fhir protos TODO change to
         element.getProtoCodeClass(
@@ -115,13 +117,13 @@ internal fun handleCodeType(
         element.getHapiFieldName()
       )
       hapiBuilder.addStatement(
-        "hapiValue$singleMethodTemplate(%L.value)",
+        "hapiValue$singleMethodTemplate(%L.value.$toHapiCheck)",
         element.getHapiMethodName(),
         element.getProtoFieldName()
       )
     } else {
       protoBuilder.addStatement(
-        "$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(it.value).build()})",
+        "$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(it.value.$toProtoCheck).build()})",
         element.getProtoMethodName(),
         element.getHapiFieldName(),
         element.getProtoCodeClass(
@@ -131,7 +133,7 @@ internal fun handleCodeType(
       )
 
       hapiBuilder.addStatement(
-        "%L.map{hapiValue.add%L(it.value)}",
+        "%L.map{hapiValue.add%L(it.value.$toHapiCheck)}",
         element.getProtoFieldName(isRepeated = true),
         element.getHapiMethodName()
       )
@@ -140,7 +142,7 @@ internal fun handleCodeType(
     if (isSingle) {
       // if enum isSingle
       protoBuilder.addStatement(
-        "$singleMethodTemplate(%T.newBuilder().setValue(%T.valueOf(%L.toCode().replace(\"-\", \"_\").toUpperCase())).build())",
+        "$singleMethodTemplate(%T.newBuilder().setValue(%T.valueOf(%L.toCode().$toProtoCheck.replace(\"-\", \"_\").toUpperCase())).build())",
         element.getProtoMethodName(),
         // Using this just to make sure codes are present in hapi and fhir protos TODO change to
         element.getProtoCodeClass(
@@ -152,7 +154,7 @@ internal fun handleCodeType(
         element.getHapiFieldName()
       )
       hapiBuilder.addStatement(
-        "hapiValue$singleMethodTemplate(%T.valueOf(%L.value.name.replace(\"_\",\"\")))",
+        "hapiValue$singleMethodTemplate(%T.valueOf(%L.value.name.$toHapiCheck.replace(\"_\",\"\")))",
         element.getHapiMethodName(),
         element.getHapiCodeClass(isCommon),
         element.getProtoFieldName()
@@ -160,7 +162,7 @@ internal fun handleCodeType(
     } else {
       // handle case when enum is repeated
       protoBuilder.addStatement(
-        "$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.value.toCode().replace(\"-\", \"_\").toUpperCase())).build()})",
+        "$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.value.toCode().$toProtoCheck.replace(\"-\", \"_\").toUpperCase())).build()})",
         element.getProtoMethodName(),
         element.getHapiFieldName(),
         element.getProtoCodeClass(
@@ -170,7 +172,7 @@ internal fun handleCodeType(
         getProtoEnumNameFromElement(element)
       )
       hapiBuilder.addStatement(
-        "%L.forEach{hapiValue.add%L(%T.valueOf(it.value.name.replace(\"_\",\"\")))}",
+        "%L.forEach{hapiValue.add%L(%T.valueOf(it.value.name.$toHapiCheck.replace(\"_\",\"\")))}",
         element.getProtoFieldName(isRepeated = true),
         element.getHapiMethodName(),
         element.getHapiCodeClass(isCommon)
@@ -182,11 +184,6 @@ internal fun handleCodeType(
 
 private fun getProtoEnumNameFromElement(element: ElementDefinition): ClassName {
 
-  Composition.newBuilder()
-    .setConfidentiality(
-      Composition.ConfidentialityCode.newBuilder()
-        .setValue(V3ConfidentialityClassificationValueSet.Value.INVALID_UNINITIALIZED)
-    )
   if (element.binding.valueSet.value.split("|").first() in CODE_SYSTEM_RENAMES.keys) {
     return ClassName(
       protoPackage,

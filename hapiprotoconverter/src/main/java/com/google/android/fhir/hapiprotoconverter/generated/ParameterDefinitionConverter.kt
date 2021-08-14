@@ -41,7 +41,14 @@ public object ParameterDefinitionConverter {
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setUse(
       org.hl7.fhir.r4.model.ParameterDefinition.ParameterUse.valueOf(
-        use.value.name.replace("_", "")
+        use
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setMinElement(min.toHapi())
@@ -62,7 +69,13 @@ public object ParameterDefinitionConverter {
         .setUse(
           ParameterDefinition.UseCode.newBuilder()
             .setValue(
-              OperationParameterUseCode.Value.valueOf(use.toCode().replace("-", "_").toUpperCase())
+              OperationParameterUseCode.Value.valueOf(
+                use
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

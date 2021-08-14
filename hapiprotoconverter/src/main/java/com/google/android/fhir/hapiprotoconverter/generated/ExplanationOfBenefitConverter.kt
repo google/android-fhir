@@ -420,13 +420,29 @@ public object ExplanationOfBenefitConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.ExplanationOfBenefit.ExplanationOfBenefitStatus.valueOf(
-        status.value.name.replace("_", "")
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setType(type.toHapi())
     hapiValue.setSubType(subType.toHapi())
     hapiValue.setUse(
-      org.hl7.fhir.r4.model.ExplanationOfBenefit.Use.valueOf(use.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.ExplanationOfBenefit.Use.valueOf(
+        use
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setPatient(patient.toHapi())
     hapiValue.setBillablePeriod(billablePeriod.toHapi())
@@ -447,7 +463,14 @@ public object ExplanationOfBenefitConverter {
     hapiValue.setClaimResponse(claimResponse.toHapi())
     hapiValue.setOutcome(
       org.hl7.fhir.r4.model.ExplanationOfBenefit.RemittanceOutcome.valueOf(
-        outcome.value.name.replace("_", "")
+        outcome
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setDispositionElement(disposition.toHapi())
@@ -487,7 +510,11 @@ public object ExplanationOfBenefitConverter {
           ExplanationOfBenefit.StatusCode.newBuilder()
             .setValue(
               ExplanationOfBenefitStatusCode.Value.valueOf(
-                status.toCode().replace("-", "_").toUpperCase()
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -496,7 +523,15 @@ public object ExplanationOfBenefitConverter {
         .setSubType(subType.toProto())
         .setUse(
           ExplanationOfBenefit.UseCode.newBuilder()
-            .setValue(UseCode.Value.valueOf(use.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              UseCode.Value.valueOf(
+                use
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .setPatient(patient.toProto())
@@ -519,7 +554,13 @@ public object ExplanationOfBenefitConverter {
         .setOutcome(
           ExplanationOfBenefit.OutcomeCode.newBuilder()
             .setValue(
-              ClaimProcessingCode.Value.valueOf(outcome.toCode().replace("-", "_").toUpperCase())
+              ClaimProcessingCode.Value.valueOf(
+                outcome
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -885,7 +926,15 @@ public object ExplanationOfBenefitConverter {
         .setNumber(numberElement.toProto())
         .setType(
           ExplanationOfBenefit.Note.TypeCode.newBuilder()
-            .setValue(NoteTypeCode.Value.valueOf(type.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              NoteTypeCode.Value.valueOf(
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .setText(textElement.toProto())
@@ -1231,7 +1280,18 @@ public object ExplanationOfBenefitConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setNumberElement(number.toHapi())
-    hapiValue.setType(Enumerations.NoteType.valueOf(type.value.name.replace("_", "")))
+    hapiValue.setType(
+      Enumerations.NoteType.valueOf(
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setTextElement(text.toHapi())
     hapiValue.setLanguage(language.toHapi())
     return hapiValue

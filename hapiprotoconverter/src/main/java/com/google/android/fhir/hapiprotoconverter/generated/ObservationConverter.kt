@@ -290,7 +290,14 @@ public object ObservationConverter {
     hapiValue.setPartOf(partOfList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Observation.ObservationStatus.valueOf(
-        status.value.name.replace("_", "")
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCategory(categoryList.map { it.toHapi() })
@@ -332,7 +339,13 @@ public object ObservationConverter {
         .setStatus(
           Observation.StatusCode.newBuilder()
             .setValue(
-              ObservationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              ObservationStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

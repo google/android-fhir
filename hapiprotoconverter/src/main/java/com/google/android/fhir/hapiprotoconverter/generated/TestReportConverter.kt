@@ -65,11 +65,29 @@ public object TestReportConverter {
     hapiValue.setIdentifier(identifier.toHapi())
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.TestReport.TestReportStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.TestReport.TestReportStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setTestScript(testScript.toHapi())
     hapiValue.setResult(
-      org.hl7.fhir.r4.model.TestReport.TestReportResult.valueOf(result.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.TestReport.TestReportResult.valueOf(
+        result
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setScoreElement(score.toHapi())
     hapiValue.setTesterElement(tester.toHapi())
@@ -96,7 +114,13 @@ public object TestReportConverter {
         .setStatus(
           TestReport.StatusCode.newBuilder()
             .setValue(
-              TestReportStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              TestReportStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -104,7 +128,13 @@ public object TestReportConverter {
         .setResult(
           TestReport.ResultCode.newBuilder()
             .setValue(
-              TestReportResultCode.Value.valueOf(result.toCode().replace("-", "_").toUpperCase())
+              TestReportResultCode.Value.valueOf(
+                result
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -131,7 +161,11 @@ public object TestReportConverter {
           TestReport.Participant.TypeCode.newBuilder()
             .setValue(
               TestReportParticipantTypeCode.Value.valueOf(
-                type.toCode().replace("-", "_").toUpperCase()
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -181,7 +215,11 @@ public object TestReportConverter {
           TestReport.Setup.SetupAction.Operation.ResultCode.newBuilder()
             .setValue(
               TestReportActionResultCode.Value.valueOf(
-                result.toCode().replace("-", "_").toUpperCase()
+                result
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -204,7 +242,11 @@ public object TestReportConverter {
           TestReport.Setup.SetupAction.Assert.ResultCode.newBuilder()
             .setValue(
               TestReportActionResultCode.Value.valueOf(
-                result.toCode().replace("-", "_").toUpperCase()
+                result
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -275,7 +317,14 @@ public object TestReportConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setType(
       org.hl7.fhir.r4.model.TestReport.TestReportParticipantType.valueOf(
-        type.value.name.replace("_", "")
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setUriElement(uri.toHapi())
@@ -314,7 +363,14 @@ public object TestReportConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setResult(
       org.hl7.fhir.r4.model.TestReport.TestReportActionResult.valueOf(
-        result.value.name.replace("_", "")
+        result
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setMessageElement(message.toHapi())
@@ -331,7 +387,14 @@ public object TestReportConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setResult(
       org.hl7.fhir.r4.model.TestReport.TestReportActionResult.valueOf(
-        result.value.name.replace("_", "")
+        result
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setMessageElement(message.toHapi())

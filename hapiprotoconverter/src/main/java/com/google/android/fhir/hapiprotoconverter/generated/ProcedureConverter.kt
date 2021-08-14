@@ -115,7 +115,16 @@ public object ProcedureConverter {
     hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
     hapiValue.setPartOf(partOfList.map { it.toHapi() })
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Procedure.ProcedureStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Procedure.ProcedureStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setStatusReason(statusReason.toHapi())
     hapiValue.setCategory(category.toHapi())
@@ -160,7 +169,13 @@ public object ProcedureConverter {
         .setStatus(
           Procedure.StatusCode.newBuilder()
             .setValue(
-              EventStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              EventStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

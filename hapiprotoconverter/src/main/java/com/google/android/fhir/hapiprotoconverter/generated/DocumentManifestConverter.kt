@@ -54,7 +54,16 @@ public object DocumentManifestConverter {
     hapiValue.setMasterIdentifier(masterIdentifier.toHapi())
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
-      Enumerations.DocumentReferenceStatus.valueOf(status.value.name.replace("_", ""))
+      Enumerations.DocumentReferenceStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setType(type.toHapi())
     hapiValue.setSubject(subject.toHapi())
@@ -84,7 +93,11 @@ public object DocumentManifestConverter {
           DocumentManifest.StatusCode.newBuilder()
             .setValue(
               DocumentReferenceStatusCode.Value.valueOf(
-                status.toCode().replace("-", "_").toUpperCase()
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()

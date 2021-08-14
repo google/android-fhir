@@ -398,7 +398,16 @@ public object ContractConverter {
     hapiValue.setUrlElement(url.toHapi())
     hapiValue.setVersionElement(version.toHapi())
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Contract.ContractStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Contract.ContractStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setLegalState(legalState.toHapi())
     hapiValue.setInstantiatesCanonical(instantiatesCanonical.toHapi())
@@ -449,7 +458,11 @@ public object ContractConverter {
           Contract.StatusCode.newBuilder()
             .setValue(
               ContractResourceStatusCode.Value.valueOf(
-                status.toCode().replace("-", "_").toUpperCase()
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -503,7 +516,11 @@ public object ContractConverter {
           Contract.ContentDefinition.PublicationStatusCode.newBuilder()
             .setValue(
               ContractResourcePublicationStatusCode.Value.valueOf(
-                publicationStatus.toCode().replace("-", "_").toUpperCase()
+                publicationStatus
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -779,7 +796,14 @@ public object ContractConverter {
     hapiValue.setPublicationDateElement(publicationDate.toHapi())
     hapiValue.setPublicationStatus(
       org.hl7.fhir.r4.model.Contract.ContractPublicationStatus.valueOf(
-        publicationStatus.value.name.replace("_", "")
+        publicationStatus
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCopyrightElement(copyright.toHapi())

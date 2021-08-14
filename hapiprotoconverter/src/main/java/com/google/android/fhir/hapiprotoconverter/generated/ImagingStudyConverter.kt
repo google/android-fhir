@@ -62,7 +62,14 @@ public object ImagingStudyConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.ImagingStudy.ImagingStudyStatus.valueOf(
-        status.value.name.replace("_", "")
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setModality(modalityList.map { it.toHapi() })
@@ -100,7 +107,13 @@ public object ImagingStudyConverter {
         .setStatus(
           ImagingStudy.StatusCode.newBuilder()
             .setValue(
-              ImagingStudyStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              ImagingStudyStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

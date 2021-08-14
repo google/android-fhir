@@ -181,7 +181,14 @@ public object GoalConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setLifecycleStatus(
       org.hl7.fhir.r4.model.Goal.GoalLifecycleStatus.valueOf(
-        lifecycleStatus.value.name.replace("_", "")
+        lifecycleStatus
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setAchievementStatus(achievementStatus.toHapi())
@@ -216,7 +223,11 @@ public object GoalConverter {
           Goal.LifecycleStatusCode.newBuilder()
             .setValue(
               GoalLifecycleStatusCode.Value.valueOf(
-                lifecycleStatus.toCode().replace("-", "_").toUpperCase()
+                lifecycleStatus
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()

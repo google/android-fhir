@@ -66,7 +66,13 @@ public object ObservationDefinitionConverter {
     permittedDataTypeList.forEach {
       hapiValue.addPermittedDataType(
         org.hl7.fhir.r4.model.ObservationDefinition.ObservationDataType.valueOf(
-          it.value.name.replace("_", "")
+          it.value
+            .name
+            .apply {
+              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+              else this
+            }
+            .replace("_", "")
         )
       )
     }
@@ -100,7 +106,11 @@ public object ObservationDefinitionConverter {
             ObservationDefinition.PermittedDataTypeCode.newBuilder()
               .setValue(
                 ObservationDataTypeCode.Value.valueOf(
-                  it.value.toCode().replace("-", "_").toUpperCase()
+                  it.value
+                    .toCode()
+                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                    .replace("-", "_")
+                    .toUpperCase()
                 )
               )
               .build()
@@ -147,7 +157,11 @@ public object ObservationDefinitionConverter {
           ObservationDefinition.QualifiedInterval.CategoryCode.newBuilder()
             .setValue(
               ObservationRangeCategoryCode.Value.valueOf(
-                category.toCode().replace("-", "_").toUpperCase()
+                category
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -159,7 +173,11 @@ public object ObservationDefinitionConverter {
           ObservationDefinition.QualifiedInterval.GenderCode.newBuilder()
             .setValue(
               AdministrativeGenderCode.Value.valueOf(
-                gender.toCode().replace("-", "_").toUpperCase()
+                gender
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -197,14 +215,30 @@ public object ObservationDefinitionConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setCategory(
       org.hl7.fhir.r4.model.ObservationDefinition.ObservationRangeCategory.valueOf(
-        category.value.name.replace("_", "")
+        category
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setRange(range.toHapi())
     hapiValue.setContext(context.toHapi())
     hapiValue.setAppliesTo(appliesToList.map { it.toHapi() })
     hapiValue.setGender(
-      Enumerations.AdministrativeGender.valueOf(gender.value.name.replace("_", ""))
+      Enumerations.AdministrativeGender.valueOf(
+        gender
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setAge(age.toHapi())
     hapiValue.setGestationalAge(gestationalAge.toHapi())

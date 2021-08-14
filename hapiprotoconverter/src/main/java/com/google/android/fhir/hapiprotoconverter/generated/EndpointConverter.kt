@@ -57,7 +57,16 @@ public object EndpointConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Endpoint.EndpointStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Endpoint.EndpointStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setConnectionType(connectionType.toHapi())
     hapiValue.setNameElement(name.toHapi())
@@ -65,7 +74,14 @@ public object EndpointConverter {
     hapiValue.setContact(contactList.map { it.toHapi() })
     hapiValue.setPeriod(period.toHapi())
     hapiValue.setPayloadType(payloadTypeList.map { it.toHapi() })
-    payloadMimeTypeList.map { hapiValue.addPayloadMimeType(it.value) }
+    payloadMimeTypeList.map {
+      hapiValue.addPayloadMimeType(
+        it.value.apply {
+          if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+          else this
+        }
+      )
+    }
     hapiValue.setAddressElement(address.toHapi())
     hapiValue.setHeader(headerList.map { it.toHapi() })
     return hapiValue
@@ -85,7 +101,13 @@ public object EndpointConverter {
         .setStatus(
           Endpoint.StatusCode.newBuilder()
             .setValue(
-              EndpointStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              EndpointStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -97,7 +119,11 @@ public object EndpointConverter {
         .addAllPayloadType(payloadType.map { it.toProto() })
         .addAllPayloadMimeType(
           payloadMimeType.map {
-            Endpoint.PayloadMimeTypeCode.newBuilder().setValue(it.value).build()
+            Endpoint.PayloadMimeTypeCode.newBuilder()
+              .setValue(
+                it.value.apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+              )
+              .build()
           }
         )
         .setAddress(addressElement.toProto())

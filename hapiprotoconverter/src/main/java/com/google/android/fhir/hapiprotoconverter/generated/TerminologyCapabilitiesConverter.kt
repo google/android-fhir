@@ -70,7 +70,18 @@ public object TerminologyCapabilitiesConverter {
     hapiValue.setVersionElement(version.toHapi())
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setTitleElement(title.toHapi())
-    hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_", "")))
+    hapiValue.setStatus(
+      Enumerations.PublicationStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
     hapiValue.setPublisherElement(publisher.toHapi())
@@ -82,7 +93,14 @@ public object TerminologyCapabilitiesConverter {
     hapiValue.setCopyrightElement(copyright.toHapi())
     hapiValue.setKind(
       org.hl7.fhir.r4.model.TerminologyCapabilities.CapabilityStatementKind.valueOf(
-        kind.value.name.replace("_", "")
+        kind
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setSoftware(software.toHapi())
@@ -92,7 +110,14 @@ public object TerminologyCapabilitiesConverter {
     hapiValue.setExpansion(expansion.toHapi())
     hapiValue.setCodeSearch(
       org.hl7.fhir.r4.model.TerminologyCapabilities.CodeSearchSupport.valueOf(
-        codeSearch.value.name.replace("_", "")
+        codeSearch
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setValidateCode(validateCode.toHapi())
@@ -118,7 +143,13 @@ public object TerminologyCapabilitiesConverter {
         .setStatus(
           TerminologyCapabilities.StatusCode.newBuilder()
             .setValue(
-              PublicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              PublicationStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -135,7 +166,11 @@ public object TerminologyCapabilitiesConverter {
           TerminologyCapabilities.KindCode.newBuilder()
             .setValue(
               CapabilityStatementKindCode.Value.valueOf(
-                kind.toCode().replace("-", "_").toUpperCase()
+                kind
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -149,7 +184,11 @@ public object TerminologyCapabilitiesConverter {
           TerminologyCapabilities.CodeSearchCode.newBuilder()
             .setValue(
               CodeSearchSupportCode.Value.valueOf(
-                codeSearch.toCode().replace("-", "_").toUpperCase()
+                codeSearch
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()

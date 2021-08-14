@@ -66,7 +66,14 @@ public object VisionPrescriptionConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.VisionPrescription.VisionStatus.valueOf(
-        status.value.name.replace("_", "")
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCreatedElement(created.toHapi())
@@ -93,7 +100,11 @@ public object VisionPrescriptionConverter {
           VisionPrescription.StatusCode.newBuilder()
             .setValue(
               FinancialResourceStatusCode.Value.valueOf(
-                status.toCode().replace("-", "_").toUpperCase()
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -119,7 +130,15 @@ public object VisionPrescriptionConverter {
         .setProduct(product.toProto())
         .setEye(
           VisionPrescription.LensSpecification.EyeCode.newBuilder()
-            .setValue(VisionEyesCode.Value.valueOf(eye.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              VisionEyesCode.Value.valueOf(
+                eye
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .setSphere(sphereElement.toProto())
@@ -149,7 +168,15 @@ public object VisionPrescriptionConverter {
         .setAmount(amountElement.toProto())
         .setBase(
           VisionPrescription.LensSpecification.Prism.BaseCode.newBuilder()
-            .setValue(VisionBaseCode.Value.valueOf(base.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              VisionBaseCode.Value.valueOf(
+                base
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .build()
@@ -166,7 +193,16 @@ public object VisionPrescriptionConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setProduct(product.toHapi())
     hapiValue.setEye(
-      org.hl7.fhir.r4.model.VisionPrescription.VisionEyes.valueOf(eye.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.VisionPrescription.VisionEyes.valueOf(
+        eye
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setSphereElement(sphere.toHapi())
     hapiValue.setCylinderElement(cylinder.toHapi())
@@ -192,7 +228,16 @@ public object VisionPrescriptionConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setAmountElement(amount.toHapi())
     hapiValue.setBase(
-      org.hl7.fhir.r4.model.VisionPrescription.VisionBase.valueOf(base.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.VisionPrescription.VisionBase.valueOf(
+        base
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     return hapiValue
   }

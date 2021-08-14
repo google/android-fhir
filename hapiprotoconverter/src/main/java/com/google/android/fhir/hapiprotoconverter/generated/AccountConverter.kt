@@ -56,7 +56,16 @@ public object AccountConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Account.AccountStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Account.AccountStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setType(type.toHapi())
     hapiValue.setNameElement(name.toHapi())
@@ -84,7 +93,13 @@ public object AccountConverter {
         .setStatus(
           Account.StatusCode.newBuilder()
             .setValue(
-              AccountStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              AccountStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

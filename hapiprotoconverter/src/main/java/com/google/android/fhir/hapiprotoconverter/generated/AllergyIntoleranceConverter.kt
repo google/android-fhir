@@ -116,19 +116,39 @@ public object AllergyIntoleranceConverter {
     hapiValue.setVerificationStatus(verificationStatus.toHapi())
     hapiValue.setType(
       org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceType.valueOf(
-        type.value.name.replace("_", "")
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     categoryList.forEach {
       hapiValue.addCategory(
         org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory.valueOf(
-          it.value.name.replace("_", "")
+          it.value
+            .name
+            .apply {
+              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+              else this
+            }
+            .replace("_", "")
         )
       )
     }
     hapiValue.setCriticality(
       org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCriticality.valueOf(
-        criticality.value.name.replace("_", "")
+        criticality
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCode(code.toHapi())
@@ -161,7 +181,11 @@ public object AllergyIntoleranceConverter {
           AllergyIntolerance.TypeCode.newBuilder()
             .setValue(
               AllergyIntoleranceTypeCode.Value.valueOf(
-                type.toCode().replace("-", "_").toUpperCase()
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -171,7 +195,11 @@ public object AllergyIntoleranceConverter {
             AllergyIntolerance.CategoryCode.newBuilder()
               .setValue(
                 AllergyIntoleranceCategoryCode.Value.valueOf(
-                  it.value.toCode().replace("-", "_").toUpperCase()
+                  it.value
+                    .toCode()
+                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                    .replace("-", "_")
+                    .toUpperCase()
                 )
               )
               .build()
@@ -181,7 +209,11 @@ public object AllergyIntoleranceConverter {
           AllergyIntolerance.CriticalityCode.newBuilder()
             .setValue(
               AllergyIntoleranceCriticalityCode.Value.valueOf(
-                criticality.toCode().replace("-", "_").toUpperCase()
+                criticality
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -216,7 +248,11 @@ public object AllergyIntoleranceConverter {
           AllergyIntolerance.Reaction.SeverityCode.newBuilder()
             .setValue(
               AllergyIntoleranceSeverityCode.Value.valueOf(
-                severity.toCode().replace("-", "_").toUpperCase()
+                severity
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -240,7 +276,14 @@ public object AllergyIntoleranceConverter {
     hapiValue.setOnsetElement(onset.toHapi())
     hapiValue.setSeverity(
       org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceSeverity.valueOf(
-        severity.value.name.replace("_", "")
+        severity
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setExposureRoute(exposureRoute.toHapi())

@@ -89,7 +89,16 @@ public object ConsentConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Consent.ConsentState.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Consent.ConsentState.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setScope(scope.toHapi())
     hapiValue.setCategory(categoryList.map { it.toHapi() })
@@ -119,7 +128,13 @@ public object ConsentConverter {
         .setStatus(
           Consent.StatusCode.newBuilder()
             .setValue(
-              ConsentStateCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              ConsentStateCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -176,7 +191,13 @@ public object ConsentConverter {
         .setType(
           Consent.Provision.TypeCode.newBuilder()
             .setValue(
-              ConsentProvisionTypeCode.Value.valueOf(type.toCode().replace("-", "_").toUpperCase())
+              ConsentProvisionTypeCode.Value.valueOf(
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -218,7 +239,13 @@ public object ConsentConverter {
         .setMeaning(
           Consent.Provision.ProvisionData.MeaningCode.newBuilder()
             .setValue(
-              ConsentDataMeaningCode.Value.valueOf(meaning.toCode().replace("-", "_").toUpperCase())
+              ConsentDataMeaningCode.Value.valueOf(
+                meaning
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -258,7 +285,16 @@ public object ConsentConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setType(
-      org.hl7.fhir.r4.model.Consent.ConsentProvisionType.valueOf(type.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Consent.ConsentProvisionType.valueOf(
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setPeriod(period.toHapi())
     hapiValue.setActor(actorList.map { it.toHapi() })
@@ -292,7 +328,16 @@ public object ConsentConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setMeaning(
-      org.hl7.fhir.r4.model.Consent.ConsentDataMeaning.valueOf(meaning.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Consent.ConsentDataMeaning.valueOf(
+        meaning
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setReference(reference.toHapi())
     return hapiValue

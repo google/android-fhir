@@ -61,7 +61,18 @@ public object CatalogEntryConverter {
     hapiValue.setReferencedItem(referencedItem.toHapi())
     hapiValue.setAdditionalIdentifier(additionalIdentifierList.map { it.toHapi() })
     hapiValue.setClassification(classificationList.map { it.toHapi() })
-    hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_", "")))
+    hapiValue.setStatus(
+      Enumerations.PublicationStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setValidityPeriod(validityPeriod.toHapi())
     hapiValue.setValidToElement(validTo.toHapi())
     hapiValue.setLastUpdatedElement(lastUpdated.toHapi())
@@ -90,7 +101,13 @@ public object CatalogEntryConverter {
         .setStatus(
           CatalogEntry.StatusCode.newBuilder()
             .setValue(
-              PublicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              PublicationStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -116,7 +133,11 @@ public object CatalogEntryConverter {
           CatalogEntry.RelatedEntry.RelationtypeCode.newBuilder()
             .setValue(
               CatalogEntryRelationTypeCode.Value.valueOf(
-                relationtype.toCode().replace("-", "_").toUpperCase()
+                relationtype
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -135,7 +156,14 @@ public object CatalogEntryConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setRelationtype(
       org.hl7.fhir.r4.model.CatalogEntry.CatalogEntryRelationType.valueOf(
-        relationtype.value.name.replace("_", "")
+        relationtype
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setItem(item.toHapi())

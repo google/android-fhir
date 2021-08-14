@@ -151,7 +151,18 @@ public object CodeSystemConverter {
     hapiValue.setVersionElement(version.toHapi())
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setTitleElement(title.toHapi())
-    hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_", "")))
+    hapiValue.setStatus(
+      Enumerations.PublicationStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
     hapiValue.setPublisherElement(publisher.toHapi())
@@ -165,14 +176,28 @@ public object CodeSystemConverter {
     hapiValue.setValueSetElement(valueSet.toHapi())
     hapiValue.setHierarchyMeaning(
       org.hl7.fhir.r4.model.CodeSystem.CodeSystemHierarchyMeaning.valueOf(
-        hierarchyMeaning.value.name.replace("_", "")
+        hierarchyMeaning
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCompositionalElement(compositional.toHapi())
     hapiValue.setVersionNeededElement(versionNeeded.toHapi())
     hapiValue.setContent(
       org.hl7.fhir.r4.model.CodeSystem.CodeSystemContentMode.valueOf(
-        content.value.name.replace("_", "")
+        content
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setSupplementsElement(supplements.toHapi())
@@ -201,7 +226,13 @@ public object CodeSystemConverter {
         .setStatus(
           CodeSystem.StatusCode.newBuilder()
             .setValue(
-              PublicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              PublicationStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -220,7 +251,11 @@ public object CodeSystemConverter {
           CodeSystem.HierarchyMeaningCode.newBuilder()
             .setValue(
               CodeSystemHierarchyMeaningCode.Value.valueOf(
-                hierarchyMeaning.toCode().replace("-", "_").toUpperCase()
+                hierarchyMeaning
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -231,7 +266,11 @@ public object CodeSystemConverter {
           CodeSystem.ContentCode.newBuilder()
             .setValue(
               CodeSystemContentModeCode.Value.valueOf(
-                content.toCode().replace("-", "_").toUpperCase()
+                content
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -259,7 +298,13 @@ public object CodeSystemConverter {
           operator.map {
             CodeSystem.Filter.OperatorCode.newBuilder()
               .setValue(
-                FilterOperatorCode.Value.valueOf(it.value.toCode().replace("-", "_").toUpperCase())
+                FilterOperatorCode.Value.valueOf(
+                  it.value
+                    .toCode()
+                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                    .replace("-", "_")
+                    .toUpperCase()
+                )
               )
               .build()
           }
@@ -281,7 +326,15 @@ public object CodeSystemConverter {
         .setDescription(descriptionElement.toProto())
         .setType(
           CodeSystem.Property.TypeCode.newBuilder()
-            .setValue(PropertyTypeCode.Value.valueOf(type.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              PropertyTypeCode.Value.valueOf(
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .build()
@@ -344,7 +397,15 @@ public object CodeSystemConverter {
     hapiValue.setDescriptionElement(description.toHapi())
     operatorList.forEach {
       hapiValue.addOperator(
-        org.hl7.fhir.r4.model.CodeSystem.FilterOperator.valueOf(it.value.name.replace("_", ""))
+        org.hl7.fhir.r4.model.CodeSystem.FilterOperator.valueOf(
+          it.value
+            .name
+            .apply {
+              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+              else this
+            }
+            .replace("_", "")
+        )
       )
     }
     hapiValue.setValueElement(value.toHapi())
@@ -361,7 +422,16 @@ public object CodeSystemConverter {
     hapiValue.setUriElement(uri.toHapi())
     hapiValue.setDescriptionElement(description.toHapi())
     hapiValue.setType(
-      org.hl7.fhir.r4.model.CodeSystem.PropertyType.valueOf(type.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.CodeSystem.PropertyType.valueOf(
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     return hapiValue
   }

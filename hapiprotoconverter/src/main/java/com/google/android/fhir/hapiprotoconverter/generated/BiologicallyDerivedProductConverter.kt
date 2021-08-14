@@ -149,13 +149,27 @@ public object BiologicallyDerivedProductConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setProductCategory(
       org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductCategory.valueOf(
-        productCategory.value.name.replace("_", "")
+        productCategory
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setProductCode(productCode.toHapi())
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductStatus.valueOf(
-        status.value.name.replace("_", "")
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setRequest(requestList.map { it.toHapi() })
@@ -184,7 +198,11 @@ public object BiologicallyDerivedProductConverter {
           BiologicallyDerivedProduct.ProductCategoryCode.newBuilder()
             .setValue(
               BiologicallyDerivedProductCategoryCode.Value.valueOf(
-                productCategory.toCode().replace("-", "_").toUpperCase()
+                productCategory
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -194,7 +212,11 @@ public object BiologicallyDerivedProductConverter {
           BiologicallyDerivedProduct.StatusCode.newBuilder()
             .setValue(
               BiologicallyDerivedProductStatusCode.Value.valueOf(
-                status.toCode().replace("-", "_").toUpperCase()
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -269,7 +291,11 @@ public object BiologicallyDerivedProductConverter {
           BiologicallyDerivedProduct.Storage.ScaleCode.newBuilder()
             .setValue(
               BiologicallyDerivedProductStorageScaleCode.Value.valueOf(
-                scale.toCode().replace("-", "_").toUpperCase()
+                scale
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -336,7 +362,16 @@ public object BiologicallyDerivedProductConverter {
     hapiValue.setTemperatureElement(temperature.toHapi())
     hapiValue.setScale(
       org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductStorageScale
-        .valueOf(scale.value.name.replace("_", ""))
+        .valueOf(
+          scale
+            .value
+            .name
+            .apply {
+              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+              else this
+            }
+            .replace("_", "")
+        )
     )
     hapiValue.setDuration(duration.toHapi())
     return hapiValue

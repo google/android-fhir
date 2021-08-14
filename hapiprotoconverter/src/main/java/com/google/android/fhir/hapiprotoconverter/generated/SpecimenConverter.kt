@@ -165,7 +165,16 @@ public object SpecimenConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setAccessionIdentifier(accessionIdentifier.toHapi())
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Specimen.SpecimenStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Specimen.SpecimenStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setType(type.toHapi())
     hapiValue.setSubject(subject.toHapi())
@@ -195,7 +204,13 @@ public object SpecimenConverter {
         .setStatus(
           Specimen.StatusCode.newBuilder()
             .setValue(
-              SpecimenStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              SpecimenStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

@@ -169,7 +169,18 @@ public object ImplementationGuideConverter {
     hapiValue.setVersionElement(version.toHapi())
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setTitleElement(title.toHapi())
-    hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_", "")))
+    hapiValue.setStatus(
+      Enumerations.PublicationStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
     hapiValue.setPublisherElement(publisher.toHapi())
@@ -181,11 +192,28 @@ public object ImplementationGuideConverter {
     hapiValue.setPackageIdElement(packageId.toHapi())
     hapiValue.setLicense(
       org.hl7.fhir.r4.model.ImplementationGuide.SPDXLicense.valueOf(
-        license.value.name.replace("_", "")
+        license
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     fhirVersionList.forEach {
-      hapiValue.addFhirVersion(Enumerations.FHIRVersion.valueOf(it.value.name.replace("_", "")))
+      hapiValue.addFhirVersion(
+        Enumerations.FHIRVersion.valueOf(
+          it.value
+            .name
+            .apply {
+              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+              else this
+            }
+            .replace("_", "")
+        )
+      )
     }
     hapiValue.setDependsOn(dependsOnList.map { it.toHapi() })
     hapiValue.setGlobal(globalList.map { it.toHapi() })
@@ -211,7 +239,13 @@ public object ImplementationGuideConverter {
         .setStatus(
           ImplementationGuide.StatusCode.newBuilder()
             .setValue(
-              PublicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              PublicationStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -227,7 +261,13 @@ public object ImplementationGuideConverter {
         .setLicense(
           ImplementationGuide.LicenseCode.newBuilder()
             .setValue(
-              SPDXLicenseCode.Value.valueOf(license.toCode().replace("-", "_").toUpperCase())
+              SPDXLicenseCode.Value.valueOf(
+                license
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -235,7 +275,13 @@ public object ImplementationGuideConverter {
           fhirVersion.map {
             ImplementationGuide.FhirVersionCode.newBuilder()
               .setValue(
-                FHIRVersionCode.Value.valueOf(it.value.toCode().replace("-", "_").toUpperCase())
+                FHIRVersionCode.Value.valueOf(
+                  it.value
+                    .toCode()
+                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                    .replace("-", "_")
+                    .toUpperCase()
+                )
               )
               .build()
           }
@@ -325,7 +371,13 @@ public object ImplementationGuideConverter {
           fhirVersion.map {
             ImplementationGuide.Definition.Resource.FhirVersionCode.newBuilder()
               .setValue(
-                FHIRVersionCode.Value.valueOf(it.value.toCode().replace("-", "_").toUpperCase())
+                FHIRVersionCode.Value.valueOf(
+                  it.value
+                    .toCode()
+                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                    .replace("-", "_")
+                    .toUpperCase()
+                )
               )
               .build()
           }
@@ -352,7 +404,11 @@ public object ImplementationGuideConverter {
           ImplementationGuide.Definition.Page.GenerationCode.newBuilder()
             .setValue(
               GuidePageGenerationCode.Value.valueOf(
-                generation.toCode().replace("-", "_").toUpperCase()
+                generation
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -506,7 +562,17 @@ public object ImplementationGuideConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setReference(reference.toHapi())
     fhirVersionList.forEach {
-      hapiValue.addFhirVersion(Enumerations.FHIRVersion.valueOf(it.value.name.replace("_", "")))
+      hapiValue.addFhirVersion(
+        Enumerations.FHIRVersion.valueOf(
+          it.value
+            .name
+            .apply {
+              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+              else this
+            }
+            .replace("_", "")
+        )
+      )
     }
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setDescriptionElement(description.toHapi())
@@ -527,7 +593,14 @@ public object ImplementationGuideConverter {
     hapiValue.setTitleElement(title.toHapi())
     hapiValue.setGeneration(
       org.hl7.fhir.r4.model.ImplementationGuide.GuidePageGeneration.valueOf(
-        generation.value.name.replace("_", "")
+        generation
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     return hapiValue

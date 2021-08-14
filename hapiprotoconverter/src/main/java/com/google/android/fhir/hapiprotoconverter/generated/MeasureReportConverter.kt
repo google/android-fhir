@@ -63,12 +63,26 @@ public object MeasureReportConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.valueOf(
-        status.value.name.replace("_", "")
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setType(
       org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.valueOf(
-        type.value.name.replace("_", "")
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setMeasureElement(measure.toHapi())
@@ -96,14 +110,26 @@ public object MeasureReportConverter {
         .setStatus(
           MeasureReport.StatusCode.newBuilder()
             .setValue(
-              MeasureReportStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              MeasureReportStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
         .setType(
           MeasureReport.TypeCode.newBuilder()
             .setValue(
-              MeasureReportTypeCode.Value.valueOf(type.toCode().replace("-", "_").toUpperCase())
+              MeasureReportTypeCode.Value.valueOf(
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

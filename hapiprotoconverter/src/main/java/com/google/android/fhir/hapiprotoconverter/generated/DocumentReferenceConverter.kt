@@ -63,11 +63,27 @@ public object DocumentReferenceConverter {
     hapiValue.setMasterIdentifier(masterIdentifier.toHapi())
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
-      Enumerations.DocumentReferenceStatus.valueOf(status.value.name.replace("_", ""))
+      Enumerations.DocumentReferenceStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setDocStatus(
       org.hl7.fhir.r4.model.DocumentReference.ReferredDocumentStatus.valueOf(
-        docStatus.value.name.replace("_", "")
+        docStatus
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setType(type.toHapi())
@@ -101,7 +117,11 @@ public object DocumentReferenceConverter {
           DocumentReference.StatusCode.newBuilder()
             .setValue(
               DocumentReferenceStatusCode.Value.valueOf(
-                status.toCode().replace("-", "_").toUpperCase()
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -110,7 +130,11 @@ public object DocumentReferenceConverter {
           DocumentReference.DocStatusCode.newBuilder()
             .setValue(
               CompositionStatusCode.Value.valueOf(
-                docStatus.toCode().replace("-", "_").toUpperCase()
+                docStatus
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -143,7 +167,11 @@ public object DocumentReferenceConverter {
           DocumentReference.RelatesTo.CodeType.newBuilder()
             .setValue(
               DocumentRelationshipTypeCode.Value.valueOf(
-                code.toCode().replace("-", "_").toUpperCase()
+                code
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -195,7 +223,14 @@ public object DocumentReferenceConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setCode(
       org.hl7.fhir.r4.model.DocumentReference.DocumentRelationshipType.valueOf(
-        code.value.name.replace("_", "")
+        code
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setTarget(target.toHapi())

@@ -168,18 +168,39 @@ public object ServiceRequestConverter {
     hapiValue.setRequisition(requisition.toHapi())
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus.valueOf(
-        status.value.name.replace("_", "")
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setIntent(
       org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestIntent.valueOf(
-        intent.value.name.replace("_", "")
+        intent
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCategory(categoryList.map { it.toHapi() })
     hapiValue.setPriority(
       org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestPriority.valueOf(
-        priority.value.name.replace("_", "")
+        priority
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setDoNotPerformElement(doNotPerform.toHapi())
@@ -227,14 +248,26 @@ public object ServiceRequestConverter {
         .setStatus(
           ServiceRequest.StatusCode.newBuilder()
             .setValue(
-              RequestStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              RequestStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
         .setIntent(
           ServiceRequest.IntentCode.newBuilder()
             .setValue(
-              RequestIntentCode.Value.valueOf(intent.toCode().replace("-", "_").toUpperCase())
+              RequestIntentCode.Value.valueOf(
+                intent
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -242,7 +275,13 @@ public object ServiceRequestConverter {
         .setPriority(
           ServiceRequest.PriorityCode.newBuilder()
             .setValue(
-              RequestPriorityCode.Value.valueOf(priority.toCode().replace("-", "_").toUpperCase())
+              RequestPriorityCode.Value.valueOf(
+                priority
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

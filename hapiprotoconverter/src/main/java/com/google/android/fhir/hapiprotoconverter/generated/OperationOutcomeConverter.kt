@@ -76,13 +76,27 @@ public object OperationOutcomeConverter {
         .setSeverity(
           OperationOutcome.Issue.SeverityCode.newBuilder()
             .setValue(
-              IssueSeverityCode.Value.valueOf(severity.toCode().replace("-", "_").toUpperCase())
+              IssueSeverityCode.Value.valueOf(
+                severity
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
         .setCode(
           OperationOutcome.Issue.CodeType.newBuilder()
-            .setValue(IssueTypeCode.Value.valueOf(code.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              IssueTypeCode.Value.valueOf(
+                code
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .setDetails(details.toProto())
@@ -102,11 +116,27 @@ public object OperationOutcomeConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setSeverity(
       org.hl7.fhir.r4.model.OperationOutcome.IssueSeverity.valueOf(
-        severity.value.name.replace("_", "")
+        severity
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCode(
-      org.hl7.fhir.r4.model.OperationOutcome.IssueType.valueOf(code.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.OperationOutcome.IssueType.valueOf(
+        code
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setDetails(details.toHapi())
     hapiValue.setDiagnosticsElement(diagnostics.toHapi())

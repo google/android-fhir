@@ -58,7 +58,16 @@ public object VerificationResultConverter {
     hapiValue.setTargetLocation(targetLocationList.map { it.toHapi() })
     hapiValue.setNeed(need.toHapi())
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.VerificationResult.Status.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.VerificationResult.Status.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setStatusDateElement(statusDate.toHapi())
     hapiValue.setValidationType(validationType.toHapi())
@@ -88,7 +97,15 @@ public object VerificationResultConverter {
         .setNeed(need.toProto())
         .setStatus(
           VerificationResult.StatusCode.newBuilder()
-            .setValue(StatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              StatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .setStatusDate(statusDateElement.toProto())

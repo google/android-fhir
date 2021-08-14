@@ -57,7 +57,14 @@ public object AppointmentResponseConverter {
     hapiValue.setActor(actor.toHapi())
     hapiValue.setParticipantStatus(
       org.hl7.fhir.r4.model.AppointmentResponse.ParticipantStatus.valueOf(
-        participantStatus.value.name.replace("_", "")
+        participantStatus
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCommentElement(comment.toHapi())
@@ -84,7 +91,11 @@ public object AppointmentResponseConverter {
           AppointmentResponse.ParticipantStatusCode.newBuilder()
             .setValue(
               ParticipationStatusCode.Value.valueOf(
-                participantStatus.toCode().replace("-", "_").toUpperCase()
+                participantStatus
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()

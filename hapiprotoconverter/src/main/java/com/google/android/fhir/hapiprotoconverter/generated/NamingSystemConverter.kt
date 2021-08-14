@@ -61,9 +61,29 @@ public object NamingSystemConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setNameElement(name.toHapi())
-    hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_", "")))
+    hapiValue.setStatus(
+      Enumerations.PublicationStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setKind(
-      org.hl7.fhir.r4.model.NamingSystem.NamingSystemType.valueOf(kind.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.NamingSystem.NamingSystemType.valueOf(
+        kind
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setDateElement(date.toHapi())
     hapiValue.setPublisherElement(publisher.toHapi())
@@ -92,14 +112,26 @@ public object NamingSystemConverter {
         .setStatus(
           NamingSystem.StatusCode.newBuilder()
             .setValue(
-              PublicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              PublicationStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
         .setKind(
           NamingSystem.KindCode.newBuilder()
             .setValue(
-              NamingSystemTypeCode.Value.valueOf(kind.toCode().replace("-", "_").toUpperCase())
+              NamingSystemTypeCode.Value.valueOf(
+                kind
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -129,7 +161,11 @@ public object NamingSystemConverter {
           NamingSystem.UniqueId.TypeCode.newBuilder()
             .setValue(
               NamingSystemIdentifierTypeCode.Value.valueOf(
-                type.toCode().replace("-", "_").toUpperCase()
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -151,7 +187,14 @@ public object NamingSystemConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setType(
       org.hl7.fhir.r4.model.NamingSystem.NamingSystemIdentifierType.valueOf(
-        type.value.name.replace("_", "")
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setValueElement(value.toHapi())

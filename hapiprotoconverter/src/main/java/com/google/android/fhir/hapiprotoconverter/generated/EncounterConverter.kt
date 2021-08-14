@@ -59,7 +59,16 @@ public object EncounterConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setStatusHistory(statusHistoryList.map { it.toHapi() })
     hapiValue.setClass_(classValue.toHapi())
@@ -99,7 +108,13 @@ public object EncounterConverter {
         .setStatus(
           Encounter.StatusCode.newBuilder()
             .setValue(
-              EncounterStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              EncounterStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -139,7 +154,13 @@ public object EncounterConverter {
         .setStatus(
           Encounter.StatusHistory.StatusCode.newBuilder()
             .setValue(
-              EncounterStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              EncounterStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -225,7 +246,11 @@ public object EncounterConverter {
           Encounter.Location.StatusCode.newBuilder()
             .setValue(
               EncounterLocationStatusCode.Value.valueOf(
-                status.toCode().replace("-", "_").toUpperCase()
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -244,7 +269,16 @@ public object EncounterConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setPeriod(period.toHapi())
     return hapiValue
@@ -316,7 +350,14 @@ public object EncounterConverter {
     hapiValue.setLocation(location.toHapi())
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Encounter.EncounterLocationStatus.valueOf(
-        status.value.name.replace("_", "")
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setPhysicalType(physicalType.toHapi())

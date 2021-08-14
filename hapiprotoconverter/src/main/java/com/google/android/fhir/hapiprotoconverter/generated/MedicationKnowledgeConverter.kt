@@ -197,7 +197,14 @@ public object MedicationKnowledgeConverter {
     hapiValue.setCode(code.toHapi())
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeStatus.valueOf(
-        status.value.name.replace("_", "")
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setManufacturer(manufacturer.toHapi())
@@ -238,7 +245,11 @@ public object MedicationKnowledgeConverter {
           MedicationKnowledge.StatusCode.newBuilder()
             .setValue(
               MedicationKnowledgeStatusCode.Value.valueOf(
-                status.toCode().replace("-", "_").toUpperCase()
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()

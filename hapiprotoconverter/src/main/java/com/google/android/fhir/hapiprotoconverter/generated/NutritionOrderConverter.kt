@@ -101,12 +101,26 @@ public object NutritionOrderConverter {
     hapiValue.setInstantiates(instantiatesList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderStatus.valueOf(
-        status.value.name.replace("_", "")
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setIntent(
       org.hl7.fhir.r4.model.NutritionOrder.NutritiionOrderIntent.valueOf(
-        intent.value.name.replace("_", "")
+        intent
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setPatient(patient.toHapi())
@@ -140,14 +154,26 @@ public object NutritionOrderConverter {
         .setStatus(
           NutritionOrder.StatusCode.newBuilder()
             .setValue(
-              RequestStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              RequestStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
         .setIntent(
           NutritionOrder.IntentCode.newBuilder()
             .setValue(
-              RequestIntentCode.Value.valueOf(intent.toCode().replace("-", "_").toUpperCase())
+              RequestIntentCode.Value.valueOf(
+                intent
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

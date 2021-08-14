@@ -88,7 +88,16 @@ public object CoverageConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Coverage.CoverageStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Coverage.CoverageStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setType(type.toHapi())
     hapiValue.setPolicyHolder(policyHolder.toHapi())
@@ -123,7 +132,11 @@ public object CoverageConverter {
           Coverage.StatusCode.newBuilder()
             .setValue(
               FinancialResourceStatusCode.Value.valueOf(
-                status.toCode().replace("-", "_").toUpperCase()
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()

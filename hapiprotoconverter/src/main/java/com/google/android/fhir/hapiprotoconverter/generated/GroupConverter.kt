@@ -111,7 +111,16 @@ public object GroupConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setActiveElement(active.toHapi())
     hapiValue.setType(
-      org.hl7.fhir.r4.model.Group.GroupType.valueOf(type.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Group.GroupType.valueOf(
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setActualElement(actual.toHapi())
     hapiValue.setCode(code.toHapi())
@@ -137,7 +146,15 @@ public object GroupConverter {
         .setActive(activeElement.toProto())
         .setType(
           Group.TypeCode.newBuilder()
-            .setValue(GroupTypeCode.Value.valueOf(type.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              GroupTypeCode.Value.valueOf(
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .setActual(actualElement.toProto())

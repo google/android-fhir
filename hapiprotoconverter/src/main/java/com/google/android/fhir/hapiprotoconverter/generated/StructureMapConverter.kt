@@ -578,7 +578,18 @@ public object StructureMapConverter {
     hapiValue.setVersionElement(version.toHapi())
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setTitleElement(title.toHapi())
-    hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_", "")))
+    hapiValue.setStatus(
+      Enumerations.PublicationStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
     hapiValue.setPublisherElement(publisher.toHapi())
@@ -612,7 +623,13 @@ public object StructureMapConverter {
         .setStatus(
           StructureMap.StatusCode.newBuilder()
             .setValue(
-              PublicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              PublicationStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -644,7 +661,13 @@ public object StructureMapConverter {
         .setMode(
           StructureMap.Structure.ModeCode.newBuilder()
             .setValue(
-              StructureMapModelModeCode.Value.valueOf(mode.toCode().replace("-", "_").toUpperCase())
+              StructureMapModelModeCode.Value.valueOf(
+                mode
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -668,7 +691,11 @@ public object StructureMapConverter {
           StructureMap.Group.TypeModeCode.newBuilder()
             .setValue(
               StructureMapGroupTypeModeCode.Value.valueOf(
-                typeMode.toCode().replace("-", "_").toUpperCase()
+                typeMode
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -693,7 +720,13 @@ public object StructureMapConverter {
         .setMode(
           StructureMap.Group.Input.ModeCode.newBuilder()
             .setValue(
-              StructureMapInputModeCode.Value.valueOf(mode.toCode().replace("-", "_").toUpperCase())
+              StructureMapInputModeCode.Value.valueOf(
+                mode
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -737,7 +770,11 @@ public object StructureMapConverter {
           StructureMap.Group.Rule.Source.ListModeCode.newBuilder()
             .setValue(
               StructureMapSourceListModeCode.Value.valueOf(
-                listMode.toCode().replace("-", "_").toUpperCase()
+                listMode
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -763,7 +800,11 @@ public object StructureMapConverter {
           StructureMap.Group.Rule.Target.ContextTypeCode.newBuilder()
             .setValue(
               StructureMapContextTypeCode.Value.valueOf(
-                contextType.toCode().replace("-", "_").toUpperCase()
+                contextType
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -775,7 +816,11 @@ public object StructureMapConverter {
             StructureMap.Group.Rule.Target.ListModeCode.newBuilder()
               .setValue(
                 StructureMapTargetListModeCode.Value.valueOf(
-                  it.value.toCode().replace("-", "_").toUpperCase()
+                  it.value
+                    .toCode()
+                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                    .replace("-", "_")
+                    .toUpperCase()
                 )
               )
               .build()
@@ -786,7 +831,11 @@ public object StructureMapConverter {
           StructureMap.Group.Rule.Target.TransformCode.newBuilder()
             .setValue(
               StructureMapTransformCode.Value.valueOf(
-                transform.toCode().replace("-", "_").toUpperCase()
+                transform
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -833,7 +882,14 @@ public object StructureMapConverter {
     hapiValue.setUrlElement(url.toHapi())
     hapiValue.setMode(
       org.hl7.fhir.r4.model.StructureMap.StructureMapModelMode.valueOf(
-        mode.value.name.replace("_", "")
+        mode
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setAliasElement(alias.toHapi())
@@ -852,7 +908,14 @@ public object StructureMapConverter {
     hapiValue.setExtendsElement(extends.toHapi())
     hapiValue.setTypeMode(
       org.hl7.fhir.r4.model.StructureMap.StructureMapGroupTypeMode.valueOf(
-        typeMode.value.name.replace("_", "")
+        typeMode
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setDocumentationElement(documentation.toHapi())
@@ -872,7 +935,14 @@ public object StructureMapConverter {
     hapiValue.setTypeElement(type.toHapi())
     hapiValue.setMode(
       org.hl7.fhir.r4.model.StructureMap.StructureMapInputMode.valueOf(
-        mode.value.name.replace("_", "")
+        mode
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setDocumentationElement(documentation.toHapi())
@@ -909,7 +979,14 @@ public object StructureMapConverter {
     hapiValue.setElementElement(element.toHapi())
     hapiValue.setListMode(
       org.hl7.fhir.r4.model.StructureMap.StructureMapSourceListMode.valueOf(
-        listMode.value.name.replace("_", "")
+        listMode
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setVariableElement(variable.toHapi())
@@ -929,7 +1006,14 @@ public object StructureMapConverter {
     hapiValue.setContextElement(context.toHapi())
     hapiValue.setContextType(
       org.hl7.fhir.r4.model.StructureMap.StructureMapContextType.valueOf(
-        contextType.value.name.replace("_", "")
+        contextType
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setElementElement(element.toHapi())
@@ -937,14 +1021,27 @@ public object StructureMapConverter {
     listModeList.forEach {
       hapiValue.addListMode(
         org.hl7.fhir.r4.model.StructureMap.StructureMapTargetListMode.valueOf(
-          it.value.name.replace("_", "")
+          it.value
+            .name
+            .apply {
+              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+              else this
+            }
+            .replace("_", "")
         )
       )
     }
     hapiValue.setListRuleIdElement(listRuleId.toHapi())
     hapiValue.setTransform(
       org.hl7.fhir.r4.model.StructureMap.StructureMapTransform.valueOf(
-        transform.value.name.replace("_", "")
+        transform
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setParameter(parameterList.map { it.toHapi() })

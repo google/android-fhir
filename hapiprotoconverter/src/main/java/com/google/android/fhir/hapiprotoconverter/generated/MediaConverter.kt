@@ -93,7 +93,16 @@ public object MediaConverter {
     hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
     hapiValue.setPartOf(partOfList.map { it.toHapi() })
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Media.MediaStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Media.MediaStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setType(type.toHapi())
     hapiValue.setModality(modality.toHapi())
@@ -132,7 +141,13 @@ public object MediaConverter {
         .setStatus(
           Media.StatusCode.newBuilder()
             .setValue(
-              EventStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              EventStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

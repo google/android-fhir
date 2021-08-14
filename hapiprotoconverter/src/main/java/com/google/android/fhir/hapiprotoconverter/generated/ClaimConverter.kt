@@ -278,11 +278,31 @@ public object ClaimConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Claim.ClaimStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Claim.ClaimStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setType(type.toHapi())
     hapiValue.setSubType(subType.toHapi())
-    hapiValue.setUse(org.hl7.fhir.r4.model.Claim.Use.valueOf(use.value.name.replace("_", "")))
+    hapiValue.setUse(
+      org.hl7.fhir.r4.model.Claim.Use.valueOf(
+        use
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setPatient(patient.toHapi())
     hapiValue.setBillablePeriod(billablePeriod.toHapi())
     hapiValue.setCreatedElement(created.toHapi())
@@ -323,7 +343,11 @@ public object ClaimConverter {
           Claim.StatusCode.newBuilder()
             .setValue(
               FinancialResourceStatusCode.Value.valueOf(
-                status.toCode().replace("-", "_").toUpperCase()
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -332,7 +356,15 @@ public object ClaimConverter {
         .setSubType(subType.toProto())
         .setUse(
           Claim.UseCode.newBuilder()
-            .setValue(UseCode.Value.valueOf(use.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              UseCode.Value.valueOf(
+                use
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .setPatient(patient.toProto())

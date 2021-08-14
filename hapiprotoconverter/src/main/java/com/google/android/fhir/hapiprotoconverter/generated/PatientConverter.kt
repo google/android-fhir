@@ -127,7 +127,16 @@ public object PatientConverter {
     hapiValue.setName(nameList.map { it.toHapi() })
     hapiValue.setTelecom(telecomList.map { it.toHapi() })
     hapiValue.setGender(
-      Enumerations.AdministrativeGender.valueOf(gender.value.name.replace("_", ""))
+      Enumerations.AdministrativeGender.valueOf(
+        gender
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setBirthDateElement(birthDate.toHapi())
     hapiValue.setDeceased(deceased.patientDeceasedToHapi())
@@ -161,7 +170,11 @@ public object PatientConverter {
           Patient.GenderCode.newBuilder()
             .setValue(
               AdministrativeGenderCode.Value.valueOf(
-                gender.toCode().replace("-", "_").toUpperCase()
+                gender
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -196,7 +209,11 @@ public object PatientConverter {
           Patient.Contact.GenderCode.newBuilder()
             .setValue(
               AdministrativeGenderCode.Value.valueOf(
-                gender.toCode().replace("-", "_").toUpperCase()
+                gender
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -231,7 +248,15 @@ public object PatientConverter {
         .setOther(other.toProto())
         .setType(
           Patient.Link.TypeCode.newBuilder()
-            .setValue(LinkTypeCode.Value.valueOf(type.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              LinkTypeCode.Value.valueOf(
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .build()
@@ -249,7 +274,16 @@ public object PatientConverter {
     hapiValue.setTelecom(telecomList.map { it.toHapi() })
     hapiValue.setAddress(address.toHapi())
     hapiValue.setGender(
-      Enumerations.AdministrativeGender.valueOf(gender.value.name.replace("_", ""))
+      Enumerations.AdministrativeGender.valueOf(
+        gender
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setOrganization(organization.toHapi())
     hapiValue.setPeriod(period.toHapi())
@@ -276,7 +310,16 @@ public object PatientConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setOther(other.toHapi())
     hapiValue.setType(
-      org.hl7.fhir.r4.model.Patient.LinkType.valueOf(type.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Patient.LinkType.valueOf(
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     return hapiValue
   }

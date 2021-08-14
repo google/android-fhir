@@ -170,13 +170,26 @@ public object CoverageEligibilityResponseConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.CoverageEligibilityResponse.EligibilityResponseStatus.valueOf(
-        status.value.name.replace("_", "")
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     purposeList.forEach {
       hapiValue.addPurpose(
         org.hl7.fhir.r4.model.CoverageEligibilityResponse.EligibilityResponsePurpose.valueOf(
-          it.value.name.replace("_", "")
+          it.value
+            .name
+            .apply {
+              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+              else this
+            }
+            .replace("_", "")
         )
       )
     }
@@ -186,7 +199,16 @@ public object CoverageEligibilityResponseConverter {
     hapiValue.setRequestor(requestor.toHapi())
     hapiValue.setRequest(request.toHapi())
     hapiValue.setOutcome(
-      Enumerations.RemittanceOutcome.valueOf(outcome.value.name.replace("_", ""))
+      Enumerations.RemittanceOutcome.valueOf(
+        outcome
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setDispositionElement(disposition.toHapi())
     hapiValue.setInsurer(insurer.toHapi())
@@ -213,7 +235,11 @@ public object CoverageEligibilityResponseConverter {
           CoverageEligibilityResponse.StatusCode.newBuilder()
             .setValue(
               FinancialResourceStatusCode.Value.valueOf(
-                status.toCode().replace("-", "_").toUpperCase()
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -223,7 +249,11 @@ public object CoverageEligibilityResponseConverter {
             CoverageEligibilityResponse.PurposeCode.newBuilder()
               .setValue(
                 EligibilityResponsePurposeCode.Value.valueOf(
-                  it.value.toCode().replace("-", "_").toUpperCase()
+                  it.value
+                    .toCode()
+                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                    .replace("-", "_")
+                    .toUpperCase()
                 )
               )
               .build()
@@ -237,7 +267,13 @@ public object CoverageEligibilityResponseConverter {
         .setOutcome(
           CoverageEligibilityResponse.OutcomeCode.newBuilder()
             .setValue(
-              ClaimProcessingCode.Value.valueOf(outcome.toCode().replace("-", "_").toUpperCase())
+              ClaimProcessingCode.Value.valueOf(
+                outcome
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

@@ -40,7 +40,16 @@ public object IdentifierConverter {
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setUse(
-      org.hl7.fhir.r4.model.Identifier.IdentifierUse.valueOf(use.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Identifier.IdentifierUse.valueOf(
+        use
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setType(type.toHapi())
     hapiValue.setSystemElement(system.toHapi())
@@ -58,7 +67,15 @@ public object IdentifierConverter {
         .addAllExtension(extension.map { it.toProto() })
         .setUse(
           Identifier.UseCode.newBuilder()
-            .setValue(IdentifierUseCode.Value.valueOf(use.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              IdentifierUseCode.Value.valueOf(
+                use
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .setType(type.toProto())

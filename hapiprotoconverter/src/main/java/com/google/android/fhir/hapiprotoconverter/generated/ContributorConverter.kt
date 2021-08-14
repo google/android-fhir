@@ -34,7 +34,16 @@ public object ContributorConverter {
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setType(
-      org.hl7.fhir.r4.model.Contributor.ContributorType.valueOf(type.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Contributor.ContributorType.valueOf(
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setContact(contactList.map { it.toHapi() })
@@ -50,7 +59,13 @@ public object ContributorConverter {
         .setType(
           Contributor.TypeCode.newBuilder()
             .setValue(
-              ContributorTypeCode.Value.valueOf(type.toCode().replace("-", "_").toUpperCase())
+              ContributorTypeCode.Value.valueOf(
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

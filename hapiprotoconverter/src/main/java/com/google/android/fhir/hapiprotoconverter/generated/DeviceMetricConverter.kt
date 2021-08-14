@@ -62,17 +62,38 @@ public object DeviceMetricConverter {
     hapiValue.setParent(parent.toHapi())
     hapiValue.setOperationalStatus(
       org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricOperationalStatus.valueOf(
-        operationalStatus.value.name.replace("_", "")
+        operationalStatus
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setColor(
       org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricColor.valueOf(
-        color.value.name.replace("_", "")
+        color
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCategory(
       org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCategory.valueOf(
-        category.value.name.replace("_", "")
+        category
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setMeasurementPeriod(measurementPeriod.toHapi())
@@ -99,7 +120,11 @@ public object DeviceMetricConverter {
           DeviceMetric.OperationalStatusCode.newBuilder()
             .setValue(
               DeviceMetricOperationalStatusCode.Value.valueOf(
-                operationalStatus.toCode().replace("-", "_").toUpperCase()
+                operationalStatus
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -107,7 +132,13 @@ public object DeviceMetricConverter {
         .setColor(
           DeviceMetric.ColorCode.newBuilder()
             .setValue(
-              DeviceMetricColorCode.Value.valueOf(color.toCode().replace("-", "_").toUpperCase())
+              DeviceMetricColorCode.Value.valueOf(
+                color
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -115,7 +146,11 @@ public object DeviceMetricConverter {
           DeviceMetric.CategoryCode.newBuilder()
             .setValue(
               DeviceMetricCategoryCode.Value.valueOf(
-                category.toCode().replace("-", "_").toUpperCase()
+                category
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -138,7 +173,11 @@ public object DeviceMetricConverter {
           DeviceMetric.Calibration.TypeCode.newBuilder()
             .setValue(
               DeviceMetricCalibrationTypeCode.Value.valueOf(
-                type.toCode().replace("-", "_").toUpperCase()
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -147,7 +186,11 @@ public object DeviceMetricConverter {
           DeviceMetric.Calibration.StateCode.newBuilder()
             .setValue(
               DeviceMetricCalibrationStateCode.Value.valueOf(
-                state.toCode().replace("-", "_").toUpperCase()
+                state
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -166,12 +209,26 @@ public object DeviceMetricConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setType(
       org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCalibrationType.valueOf(
-        type.value.name.replace("_", "")
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setState(
       org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCalibrationState.valueOf(
-        state.value.name.replace("_", "")
+        state
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setTimeElement(time.toHapi())

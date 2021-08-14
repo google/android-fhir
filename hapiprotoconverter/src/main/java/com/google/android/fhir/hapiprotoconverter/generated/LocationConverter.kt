@@ -65,14 +65,32 @@ public object LocationConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Location.LocationStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Location.LocationStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setOperationalStatus(operationalStatus.toHapi())
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setAlias(aliasList.map { it.toHapi() })
     hapiValue.setDescriptionElement(description.toHapi())
     hapiValue.setMode(
-      org.hl7.fhir.r4.model.Location.LocationMode.valueOf(mode.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Location.LocationMode.valueOf(
+        mode
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setType(typeList.map { it.toHapi() })
     hapiValue.setTelecom(telecomList.map { it.toHapi() })
@@ -101,7 +119,13 @@ public object LocationConverter {
         .setStatus(
           Location.StatusCode.newBuilder()
             .setValue(
-              LocationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              LocationStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -111,7 +135,15 @@ public object LocationConverter {
         .setDescription(descriptionElement.toProto())
         .setMode(
           Location.ModeCode.newBuilder()
-            .setValue(LocationModeCode.Value.valueOf(mode.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              LocationModeCode.Value.valueOf(
+                mode
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .addAllType(type.map { it.toProto() })
@@ -155,7 +187,13 @@ public object LocationConverter {
           daysOfWeek.map {
             Location.HoursOfOperation.DaysOfWeekCode.newBuilder()
               .setValue(
-                DaysOfWeekCode.Value.valueOf(it.value.toCode().replace("-", "_").toUpperCase())
+                DaysOfWeekCode.Value.valueOf(
+                  it.value
+                    .toCode()
+                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                    .replace("-", "_")
+                    .toUpperCase()
+                )
               )
               .build()
           }
@@ -188,7 +226,15 @@ public object LocationConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     daysOfWeekList.forEach {
       hapiValue.addDaysOfWeek(
-        org.hl7.fhir.r4.model.Location.DaysOfWeek.valueOf(it.value.name.replace("_", ""))
+        org.hl7.fhir.r4.model.Location.DaysOfWeek.valueOf(
+          it.value
+            .name
+            .apply {
+              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+              else this
+            }
+            .replace("_", "")
+        )
       )
     }
     hapiValue.setAllDayElement(allDay.toHapi())

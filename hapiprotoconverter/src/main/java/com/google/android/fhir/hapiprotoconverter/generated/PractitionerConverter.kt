@@ -67,7 +67,16 @@ public object PractitionerConverter {
     hapiValue.setTelecom(telecomList.map { it.toHapi() })
     hapiValue.setAddress(addressList.map { it.toHapi() })
     hapiValue.setGender(
-      Enumerations.AdministrativeGender.valueOf(gender.value.name.replace("_", ""))
+      Enumerations.AdministrativeGender.valueOf(
+        gender
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setBirthDateElement(birthDate.toHapi())
     hapiValue.setPhoto(photoList.map { it.toHapi() })
@@ -95,7 +104,11 @@ public object PractitionerConverter {
           Practitioner.GenderCode.newBuilder()
             .setValue(
               AdministrativeGenderCode.Value.valueOf(
-                gender.toCode().replace("-", "_").toUpperCase()
+                gender
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()

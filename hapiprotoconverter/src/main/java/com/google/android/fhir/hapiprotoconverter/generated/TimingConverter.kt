@@ -120,7 +120,11 @@ public object TimingConverter {
           Timing.Repeat.DurationUnitCode.newBuilder()
             .setValue(
               UnitsOfTimeValueSet.Value.valueOf(
-                durationUnit.toCode().replace("-", "_").toUpperCase()
+                durationUnit
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -132,7 +136,13 @@ public object TimingConverter {
         .setPeriodUnit(
           Timing.Repeat.PeriodUnitCode.newBuilder()
             .setValue(
-              UnitsOfTimeValueSet.Value.valueOf(periodUnit.toCode().replace("-", "_").toUpperCase())
+              UnitsOfTimeValueSet.Value.valueOf(
+                periodUnit
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -140,7 +150,13 @@ public object TimingConverter {
           dayOfWeek.map {
             Timing.Repeat.DayOfWeekCode.newBuilder()
               .setValue(
-                DaysOfWeekCode.Value.valueOf(it.value.toCode().replace("-", "_").toUpperCase())
+                DaysOfWeekCode.Value.valueOf(
+                  it.value
+                    .toCode()
+                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                    .replace("-", "_")
+                    .toUpperCase()
+                )
               )
               .build()
           }
@@ -150,7 +166,13 @@ public object TimingConverter {
           `when`.map {
             Timing.Repeat.WhenCode.newBuilder()
               .setValue(
-                EventTimingValueSet.Value.valueOf(it.value.toCode().replace("-", "_").toUpperCase())
+                EventTimingValueSet.Value.valueOf(
+                  it.value
+                    .toCode()
+                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                    .replace("-", "_")
+                    .toUpperCase()
+                )
               )
               .build()
           }
@@ -171,24 +193,58 @@ public object TimingConverter {
     hapiValue.setDurationElement(duration.toHapi())
     hapiValue.setDurationMaxElement(durationMax.toHapi())
     hapiValue.setDurationUnit(
-      org.hl7.fhir.r4.model.Timing.UnitsOfTime.valueOf(durationUnit.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Timing.UnitsOfTime.valueOf(
+        durationUnit
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setFrequencyElement(frequency.toHapi())
     hapiValue.setFrequencyMaxElement(frequencyMax.toHapi())
     hapiValue.setPeriodElement(period.toHapi())
     hapiValue.setPeriodMaxElement(periodMax.toHapi())
     hapiValue.setPeriodUnit(
-      org.hl7.fhir.r4.model.Timing.UnitsOfTime.valueOf(periodUnit.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Timing.UnitsOfTime.valueOf(
+        periodUnit
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     dayOfWeekList.forEach {
       hapiValue.addDayOfWeek(
-        org.hl7.fhir.r4.model.Timing.DayOfWeek.valueOf(it.value.name.replace("_", ""))
+        org.hl7.fhir.r4.model.Timing.DayOfWeek.valueOf(
+          it.value
+            .name
+            .apply {
+              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+              else this
+            }
+            .replace("_", "")
+        )
       )
     }
     hapiValue.setTimeOfDay(timeOfDayList.map { it.toHapi() })
     whenList.forEach {
       hapiValue.addWhen(
-        org.hl7.fhir.r4.model.Timing.EventTiming.valueOf(it.value.name.replace("_", ""))
+        org.hl7.fhir.r4.model.Timing.EventTiming.valueOf(
+          it.value
+            .name
+            .apply {
+              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+              else this
+            }
+            .replace("_", "")
+        )
       )
     }
     hapiValue.setOffsetElement(offset.toHapi())

@@ -88,7 +88,14 @@ public object DiagnosticReportConverter {
     hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus.valueOf(
-        status.value.name.replace("_", "")
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCategory(categoryList.map { it.toHapi() })
@@ -125,7 +132,11 @@ public object DiagnosticReportConverter {
           DiagnosticReport.StatusCode.newBuilder()
             .setValue(
               DiagnosticReportStatusCode.Value.valueOf(
-                status.toCode().replace("-", "_").toUpperCase()
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()

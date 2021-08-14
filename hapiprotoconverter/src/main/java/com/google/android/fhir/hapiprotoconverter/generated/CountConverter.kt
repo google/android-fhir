@@ -40,7 +40,16 @@ public object CountConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setValueElement(value.toHapi())
     hapiValue.setComparator(
-      Quantity.QuantityComparator.valueOf(comparator.value.name.replace("_", ""))
+      Quantity.QuantityComparator.valueOf(
+        comparator
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setUnitElement(unit.toHapi())
     hapiValue.setSystemElement(system.toHapi())
@@ -59,7 +68,11 @@ public object CountConverter {
           Count.ComparatorCode.newBuilder()
             .setValue(
               QuantityComparatorCode.Value.valueOf(
-                comparator.toCode().replace("-", "_").toUpperCase()
+                comparator
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()

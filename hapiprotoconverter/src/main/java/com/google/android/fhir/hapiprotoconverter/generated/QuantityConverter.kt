@@ -40,7 +40,14 @@ public object QuantityConverter {
     hapiValue.setValueElement(value.toHapi())
     hapiValue.setComparator(
       org.hl7.fhir.r4.model.Quantity.QuantityComparator.valueOf(
-        comparator.value.name.replace("_", "")
+        comparator
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setUnitElement(unit.toHapi())
@@ -60,7 +67,11 @@ public object QuantityConverter {
           Quantity.ComparatorCode.newBuilder()
             .setValue(
               QuantityComparatorCode.Value.valueOf(
-                comparator.toCode().replace("-", "_").toUpperCase()
+                comparator
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()

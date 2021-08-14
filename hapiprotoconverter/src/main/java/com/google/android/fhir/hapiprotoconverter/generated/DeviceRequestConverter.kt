@@ -172,15 +172,38 @@ public object DeviceRequestConverter {
     hapiValue.setGroupIdentifier(groupIdentifier.toHapi())
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.DeviceRequest.DeviceRequestStatus.valueOf(
-        status.value.name.replace("_", "")
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setIntent(
-      org.hl7.fhir.r4.model.DeviceRequest.RequestIntent.valueOf(intent.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.DeviceRequest.RequestIntent.valueOf(
+        intent
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setPriority(
       org.hl7.fhir.r4.model.DeviceRequest.RequestPriority.valueOf(
-        priority.value.name.replace("_", "")
+        priority
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCode(code.deviceRequestCodeToHapi())
@@ -220,21 +243,39 @@ public object DeviceRequestConverter {
         .setStatus(
           DeviceRequest.StatusCode.newBuilder()
             .setValue(
-              RequestStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              RequestStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
         .setIntent(
           DeviceRequest.IntentCode.newBuilder()
             .setValue(
-              RequestIntentCode.Value.valueOf(intent.toCode().replace("-", "_").toUpperCase())
+              RequestIntentCode.Value.valueOf(
+                intent
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
         .setPriority(
           DeviceRequest.PriorityCode.newBuilder()
             .setValue(
-              RequestPriorityCode.Value.valueOf(priority.toCode().replace("-", "_").toUpperCase())
+              RequestPriorityCode.Value.valueOf(
+                priority
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

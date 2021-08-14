@@ -40,8 +40,16 @@ public object SignatureConverter {
     hapiValue.setWhenElement(`when`.toHapi())
     hapiValue.setWho(who.toHapi())
     hapiValue.setOnBehalfOf(onBehalfOf.toHapi())
-    hapiValue.setTargetFormat(targetFormat.value)
-    hapiValue.setSigFormat(sigFormat.value)
+    hapiValue.setTargetFormat(
+      targetFormat.value.apply {
+        if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL" else this
+      }
+    )
+    hapiValue.setSigFormat(
+      sigFormat.value.apply {
+        if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL" else this
+      }
+    )
     hapiValue.setDataElement(data.toHapi())
     return hapiValue
   }
@@ -56,8 +64,20 @@ public object SignatureConverter {
         .setWhen(whenElement.toProto())
         .setWho(who.toProto())
         .setOnBehalfOf(onBehalfOf.toProto())
-        .setTargetFormat(Signature.TargetFormatCode.newBuilder().setValue(targetFormat).build())
-        .setSigFormat(Signature.SigFormatCode.newBuilder().setValue(sigFormat).build())
+        .setTargetFormat(
+          Signature.TargetFormatCode.newBuilder()
+            .setValue(
+              targetFormat.apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+            )
+            .build()
+        )
+        .setSigFormat(
+          Signature.SigFormatCode.newBuilder()
+            .setValue(
+              sigFormat.apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+            )
+            .build()
+        )
         .setData(dataElement.toProto())
         .build()
     return protoValue

@@ -99,7 +99,18 @@ public object EventDefinitionConverter {
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setTitleElement(title.toHapi())
     hapiValue.setSubtitleElement(subtitle.toHapi())
-    hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_", "")))
+    hapiValue.setStatus(
+      Enumerations.PublicationStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setSubject(subject.eventDefinitionSubjectToHapi())
     hapiValue.setDateElement(date.toHapi())
@@ -143,7 +154,13 @@ public object EventDefinitionConverter {
         .setStatus(
           EventDefinition.StatusCode.newBuilder()
             .setValue(
-              PublicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              PublicationStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

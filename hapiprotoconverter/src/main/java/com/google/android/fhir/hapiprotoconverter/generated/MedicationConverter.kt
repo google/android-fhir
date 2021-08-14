@@ -85,7 +85,16 @@ public object MedicationConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setCode(code.toHapi())
     hapiValue.setStatus(
-      org.hl7.fhir.r4.model.Medication.MedicationStatus.valueOf(status.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Medication.MedicationStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setManufacturer(manufacturer.toHapi())
     hapiValue.setForm(form.toHapi())
@@ -110,7 +119,13 @@ public object MedicationConverter {
         .setStatus(
           Medication.StatusCode.newBuilder()
             .setValue(
-              MedicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              MedicationStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

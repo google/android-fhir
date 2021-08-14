@@ -93,13 +93,29 @@ public object AuditEventConverter {
     hapiValue.setType(type.toHapi())
     hapiValue.setSubtype(subtypeList.map { it.toHapi() })
     hapiValue.setAction(
-      org.hl7.fhir.r4.model.AuditEvent.AuditEventAction.valueOf(action.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.AuditEvent.AuditEventAction.valueOf(
+        action
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setPeriod(period.toHapi())
     hapiValue.setRecordedElement(recorded.toHapi())
     hapiValue.setOutcome(
       org.hl7.fhir.r4.model.AuditEvent.AuditEventOutcome.valueOf(
-        outcome.value.name.replace("_", "")
+        outcome
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setOutcomeDescElement(outcomeDesc.toHapi())
@@ -125,7 +141,13 @@ public object AuditEventConverter {
         .setAction(
           AuditEvent.ActionCode.newBuilder()
             .setValue(
-              AuditEventActionCode.Value.valueOf(action.toCode().replace("-", "_").toUpperCase())
+              AuditEventActionCode.Value.valueOf(
+                action
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -134,7 +156,13 @@ public object AuditEventConverter {
         .setOutcome(
           AuditEvent.OutcomeCode.newBuilder()
             .setValue(
-              AuditEventOutcomeCode.Value.valueOf(outcome.toCode().replace("-", "_").toUpperCase())
+              AuditEventOutcomeCode.Value.valueOf(
+                outcome
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -183,7 +211,11 @@ public object AuditEventConverter {
           AuditEvent.Agent.Network.TypeCode.newBuilder()
             .setValue(
               AuditEventAgentNetworkTypeCode.Value.valueOf(
-                type.toCode().replace("-", "_").toUpperCase()
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -272,7 +304,14 @@ public object AuditEventConverter {
     hapiValue.setAddressElement(address.toHapi())
     hapiValue.setType(
       org.hl7.fhir.r4.model.AuditEvent.AuditEventAgentNetworkType.valueOf(
-        type.value.name.replace("_", "")
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     return hapiValue

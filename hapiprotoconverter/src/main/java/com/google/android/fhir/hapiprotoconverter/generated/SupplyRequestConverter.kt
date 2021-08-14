@@ -162,13 +162,27 @@ public object SupplyRequestConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestStatus.valueOf(
-        status.value.name.replace("_", "")
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setCategory(category.toHapi())
     hapiValue.setPriority(
       org.hl7.fhir.r4.model.SupplyRequest.RequestPriority.valueOf(
-        priority.value.name.replace("_", "")
+        priority
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setItem(item.supplyRequestItemToHapi())
@@ -199,7 +213,13 @@ public object SupplyRequestConverter {
         .setStatus(
           SupplyRequest.StatusCode.newBuilder()
             .setValue(
-              SupplyRequestStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              SupplyRequestStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -207,7 +227,13 @@ public object SupplyRequestConverter {
         .setPriority(
           SupplyRequest.PriorityCode.newBuilder()
             .setValue(
-              RequestPriorityCode.Value.valueOf(priority.toCode().replace("-", "_").toUpperCase())
+              RequestPriorityCode.Value.valueOf(
+                priority
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

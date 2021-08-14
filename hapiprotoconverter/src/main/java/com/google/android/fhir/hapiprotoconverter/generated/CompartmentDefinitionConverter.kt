@@ -59,7 +59,18 @@ public object CompartmentDefinitionConverter {
     hapiValue.setUrlElement(url.toHapi())
     hapiValue.setVersionElement(version.toHapi())
     hapiValue.setNameElement(name.toHapi())
-    hapiValue.setStatus(Enumerations.PublicationStatus.valueOf(status.value.name.replace("_", "")))
+    hapiValue.setStatus(
+      Enumerations.PublicationStatus.valueOf(
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
     hapiValue.setPublisherElement(publisher.toHapi())
@@ -69,7 +80,14 @@ public object CompartmentDefinitionConverter {
     hapiValue.setPurposeElement(purpose.toHapi())
     hapiValue.setCode(
       org.hl7.fhir.r4.model.CompartmentDefinition.CompartmentType.valueOf(
-        code.value.name.replace("_", "")
+        code
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setSearchElement(search.toHapi())
@@ -93,7 +111,13 @@ public object CompartmentDefinitionConverter {
         .setStatus(
           CompartmentDefinition.StatusCode.newBuilder()
             .setValue(
-              PublicationStatusCode.Value.valueOf(status.toCode().replace("-", "_").toUpperCase())
+              PublicationStatusCode.Value.valueOf(
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -107,7 +131,13 @@ public object CompartmentDefinitionConverter {
         .setCode(
           CompartmentDefinition.CodeType.newBuilder()
             .setValue(
-              CompartmentTypeCode.Value.valueOf(code.toCode().replace("-", "_").toUpperCase())
+              CompartmentTypeCode.Value.valueOf(
+                code
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )

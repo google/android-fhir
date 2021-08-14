@@ -63,7 +63,14 @@ public object PaymentReconciliationConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.PaymentReconciliation.PaymentReconciliationStatus.valueOf(
-        status.value.name.replace("_", "")
+        status
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
       )
     )
     hapiValue.setPeriod(period.toHapi())
@@ -72,7 +79,16 @@ public object PaymentReconciliationConverter {
     hapiValue.setRequest(request.toHapi())
     hapiValue.setRequestor(requestor.toHapi())
     hapiValue.setOutcome(
-      Enumerations.RemittanceOutcome.valueOf(outcome.value.name.replace("_", ""))
+      Enumerations.RemittanceOutcome.valueOf(
+        outcome
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setDispositionElement(disposition.toHapi())
     hapiValue.setPaymentDateElement(paymentDate.toHapi())
@@ -99,7 +115,11 @@ public object PaymentReconciliationConverter {
           PaymentReconciliation.StatusCode.newBuilder()
             .setValue(
               FinancialResourceStatusCode.Value.valueOf(
-                status.toCode().replace("-", "_").toUpperCase()
+                status
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
               )
             )
             .build()
@@ -112,7 +132,13 @@ public object PaymentReconciliationConverter {
         .setOutcome(
           PaymentReconciliation.OutcomeCode.newBuilder()
             .setValue(
-              ClaimProcessingCode.Value.valueOf(outcome.toCode().replace("-", "_").toUpperCase())
+              ClaimProcessingCode.Value.valueOf(
+                outcome
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
             )
             .build()
         )
@@ -159,7 +185,15 @@ public object PaymentReconciliationConverter {
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
         .setType(
           PaymentReconciliation.Notes.TypeCode.newBuilder()
-            .setValue(NoteTypeCode.Value.valueOf(type.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              NoteTypeCode.Value.valueOf(
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .setText(textElement.toProto())
@@ -194,7 +228,18 @@ public object PaymentReconciliationConverter {
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setType(Enumerations.NoteType.valueOf(type.value.name.replace("_", "")))
+    hapiValue.setType(
+      Enumerations.NoteType.valueOf(
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
+    )
     hapiValue.setTextElement(text.toHapi())
     return hapiValue
   }

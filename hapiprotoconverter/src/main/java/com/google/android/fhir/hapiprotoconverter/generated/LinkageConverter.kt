@@ -77,7 +77,15 @@ public object LinkageConverter {
         .addAllModifierExtension(modifierExtension.map { it.toProto() })
         .setType(
           Linkage.Item.TypeCode.newBuilder()
-            .setValue(LinkageTypeCode.Value.valueOf(type.toCode().replace("-", "_").toUpperCase()))
+            .setValue(
+              LinkageTypeCode.Value.valueOf(
+                type
+                  .toCode()
+                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .replace("-", "_")
+                  .toUpperCase()
+              )
+            )
             .build()
         )
         .setResource(resource.toProto())
@@ -92,7 +100,16 @@ public object LinkageConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setType(
-      org.hl7.fhir.r4.model.Linkage.LinkageType.valueOf(type.value.name.replace("_", ""))
+      org.hl7.fhir.r4.model.Linkage.LinkageType.valueOf(
+        type
+          .value
+          .name
+          .apply {
+            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
+            else this
+          }
+          .replace("_", "")
+      )
     )
     hapiValue.setResource(resource.toHapi())
     return hapiValue
