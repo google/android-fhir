@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.hapiprotoconverter
 
-import android.annotation.SuppressLint
 import com.google.common.truth.Truth
 import com.google.fhir.r4.core.Id
 import com.google.fhir.r4.core.StructureDefinition
@@ -44,7 +43,7 @@ object PrimitiveTestCodegen {
   private const val TIME_LIKE_TEST_TEMPLATE =
     "%1T.assertThat(proto.toHapi().precision).isEquivalentAccordingToCompareTo(hapi.precision)\n%1T.assertThat(proto.toHapi().timeZone.id).isEqualTo(hapi.timeZone.id)\n"
 
-  @SuppressLint("DefaultLocale")
+  @Suppress("DefaultLocale")
   fun generate(def: StructureDefinition, outLocation: File? = null) {
     require(def.kind.value == StructureDefinitionKindCode.Value.PRIMITIVE_TYPE) {
       "structure definition needs to be of type primitive"

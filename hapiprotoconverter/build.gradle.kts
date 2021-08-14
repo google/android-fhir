@@ -1,26 +1,20 @@
 plugins {
-  id(Plugins.BuildPlugins.androidLib)
-  id(Plugins.BuildPlugins.kotlinAndroid)
   id(Plugins.BuildPlugins.mavenPublish)
+  id("java-library")
+  id("kotlin")
 }
 
 afterEvaluate {
   publishing {
     publications {
       register("release", MavenPublication::class) {
-        from(components["release"])
+        from(components["kotlin"])
         artifactId = "converter"
         groupId = "com.google.android.fhir"
         version = "0.1.0-alpha01"
-        artifact(
-          tasks.create<Jar>("androidSourcesJar") {
-            archiveClassifier.set("sources")
-            from(android.sourceSets.getByName("main").java.srcDirs)
-          }
-        )
 
         pom {
-          name.set("Android FHIR Engine Library")
+          name.set("Android FHIR Hapi Proto Converter Library")
           licenses {
             license {
               name.set("The Apache License, Version 2.0")
@@ -33,49 +27,14 @@ afterEvaluate {
   }
 }
 
-android {
-  compileSdkVersion(Sdk.compileSdk)
-  defaultConfig {
-    minSdkVersion(Sdk.minSdk)
-    targetSdkVersion(Sdk.targetSdk)
-    versionCode = 1
-    versionName = "1.0"
-    testInstrumentationRunner(Dependencies.androidJunitRunner)
-    // need to specify this to prevent junit runner from going deep into our dependencies
-    testInstrumentationRunnerArguments(mapOf("package" to "com.google.android.fhir"))
-    // Required when setting minSdkVersion to 20 or lower
-    // See https://developer.android.com/studio/write/java8-support
-    multiDexEnabled = true
-  }
-
-  buildTypes {
-    getByName("release") {
-      isMinifyEnabled = false
-      proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-    }
-  }
-  compileOptions {
-    // Flag to enable support for the new language APIs
-    // See https = //developer.android.com/studio/write/java8-support
-    isCoreLibraryDesugaringEnabled = true
-    // Sets Java compatibility to Java 8
-    // See https = //developer.android.com/studio/write/java8-support
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-  }
-  kotlinOptions { jvmTarget = JavaVersion.VERSION_1_8.toString() }
+java {
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 dependencies {
-  androidTestImplementation(Dependencies.AndroidxTest.core)
-  androidTestImplementation(Dependencies.junit)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
-  androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.truth)
-
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
   implementation(Dependencies.FhirProto.fhirProtobufs)
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.kotlinPoet)
   testImplementation(Dependencies.AndroidxTest.core)

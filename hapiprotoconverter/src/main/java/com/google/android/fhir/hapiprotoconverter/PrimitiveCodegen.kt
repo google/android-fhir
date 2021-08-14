@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.hapiprotoconverter
 
-import android.annotation.SuppressLint
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import com.google.fhir.r4.core.StructureDefinition
 import com.google.fhir.r4.core.StructureDefinitionKindCode
@@ -50,7 +49,7 @@ object PrimitiveCodegen {
       ImmutableList.of("SECOND", "MILLISECOND")
     )
 
-  @SuppressLint("DefaultLocale")
+  @Suppress("DefaultLocale")
   fun generate(def: StructureDefinition, outLocation: File) {
     // ensure that the definition is of PRIMITIVE_TYPE
     require(def.kind.value == StructureDefinitionKindCode.Value.PRIMITIVE_TYPE) {
