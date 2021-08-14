@@ -70,16 +70,7 @@ public object GraphDefinitionConverter {
     hapiValue.setVersionElement(version.toHapi())
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
@@ -112,11 +103,7 @@ public object GraphDefinitionConverter {
           GraphDefinition.StatusCode.newBuilder()
             .setValue(
               PublicationStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -190,11 +177,7 @@ public object GraphDefinitionConverter {
           GraphDefinition.Link.Target.Compartment.UseCode.newBuilder()
             .setValue(
               GraphCompartmentUseCode.Value.valueOf(
-                use
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -203,11 +186,7 @@ public object GraphDefinitionConverter {
           GraphDefinition.Link.Target.Compartment.CodeType.newBuilder()
             .setValue(
               CompartmentTypeCode.Value.valueOf(
-                code
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -216,11 +195,7 @@ public object GraphDefinitionConverter {
           GraphDefinition.Link.Target.Compartment.RuleCode.newBuilder()
             .setValue(
               GraphCompartmentRuleCode.Value.valueOf(
-                rule
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                rule.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -271,38 +246,17 @@ public object GraphDefinitionConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setUse(
       org.hl7.fhir.r4.model.GraphDefinition.GraphCompartmentUse.valueOf(
-        use
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        use.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setCode(
       org.hl7.fhir.r4.model.GraphDefinition.CompartmentCode.valueOf(
-        code
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        code.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setRule(
       org.hl7.fhir.r4.model.GraphDefinition.GraphCompartmentRule.valueOf(
-        rule
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        rule.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setExpressionElement(expression.toHapi())

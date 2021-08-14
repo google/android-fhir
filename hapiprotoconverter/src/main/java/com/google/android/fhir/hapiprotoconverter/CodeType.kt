@@ -27,10 +27,8 @@ private val hapiStringProtoCodeType =
     "http://hl7.org/fhir/ValueSet/all-types|4.0.1",
     "http://hl7.org/fhir/ValueSet/guide-parameter-code|4.0.1",
   )
-private const val toHapiCheck =
-  "apply { if(equals(\"INVALID_UNINITIALIZED\",true) || equals(\"UNRECOGNIZED\",true)) \"NULL\" else this }"
-private const val toProtoCheck =
-  "apply { if(equals(\"NULL\",true)) \"INVALID_UNINITIALIZED\" else this }"
+private const val toHapiCheck = "hapiCodeCheck()"
+private const val toProtoCheck = "protoCodeCheck()"
 // Map of valueSet url that are renamed in Fhir protos
 private val CODE_SYSTEM_RENAMES =
   mapOf(

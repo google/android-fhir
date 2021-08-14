@@ -170,11 +170,7 @@ public object MessageHeaderConverter {
           MessageHeader.Response.CodeType.newBuilder()
             .setValue(
               ResponseTypeCode.Value.valueOf(
-                code
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -223,14 +219,7 @@ public object MessageHeaderConverter {
     hapiValue.setIdentifierElement(identifier.toHapi())
     hapiValue.setCode(
       org.hl7.fhir.r4.model.MessageHeader.ResponseType.valueOf(
-        code
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        code.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setDetails(details.toHapi())

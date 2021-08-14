@@ -60,16 +60,7 @@ public object CompartmentDefinitionConverter {
     hapiValue.setVersionElement(version.toHapi())
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
@@ -80,14 +71,7 @@ public object CompartmentDefinitionConverter {
     hapiValue.setPurposeElement(purpose.toHapi())
     hapiValue.setCode(
       org.hl7.fhir.r4.model.CompartmentDefinition.CompartmentType.valueOf(
-        code
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        code.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setSearchElement(search.toHapi())
@@ -112,11 +96,7 @@ public object CompartmentDefinitionConverter {
           CompartmentDefinition.StatusCode.newBuilder()
             .setValue(
               PublicationStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -132,11 +112,7 @@ public object CompartmentDefinitionConverter {
           CompartmentDefinition.CodeType.newBuilder()
             .setValue(
               CompartmentTypeCode.Value.valueOf(
-                code
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()

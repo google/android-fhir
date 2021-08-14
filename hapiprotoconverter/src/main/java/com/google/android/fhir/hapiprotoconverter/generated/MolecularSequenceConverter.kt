@@ -67,14 +67,7 @@ public object MolecularSequenceConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setType(
       org.hl7.fhir.r4.model.MolecularSequence.SequenceType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setCoordinateSystemElement(coordinateSystem.toHapi())
@@ -109,11 +102,7 @@ public object MolecularSequenceConverter {
           MolecularSequence.TypeCode.newBuilder()
             .setValue(
               SequenceTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -150,11 +139,7 @@ public object MolecularSequenceConverter {
           MolecularSequence.ReferenceSeq.OrientationCode.newBuilder()
             .setValue(
               OrientationTypeCode.Value.valueOf(
-                orientation
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                orientation.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -166,11 +151,7 @@ public object MolecularSequenceConverter {
           MolecularSequence.ReferenceSeq.StrandCode.newBuilder()
             .setValue(
               StrandTypeCode.Value.valueOf(
-                strand
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                strand.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -211,11 +192,7 @@ public object MolecularSequenceConverter {
           MolecularSequence.Quality.TypeCode.newBuilder()
             .setValue(
               QualityTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -269,11 +246,7 @@ public object MolecularSequenceConverter {
           MolecularSequence.Repository.TypeCode.newBuilder()
             .setValue(
               RepositoryTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -343,14 +316,7 @@ public object MolecularSequenceConverter {
     hapiValue.setGenomeBuildElement(genomeBuild.toHapi())
     hapiValue.setOrientation(
       org.hl7.fhir.r4.model.MolecularSequence.OrientationType.valueOf(
-        orientation
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        orientation.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setReferenceSeqId(referenceSeqId.toHapi())
@@ -358,14 +324,7 @@ public object MolecularSequenceConverter {
     hapiValue.setReferenceSeqStringElement(referenceSeqString.toHapi())
     hapiValue.setStrand(
       org.hl7.fhir.r4.model.MolecularSequence.StrandType.valueOf(
-        strand
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        strand.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setWindowStartElement(windowStart.toHapi())
@@ -398,14 +357,7 @@ public object MolecularSequenceConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setType(
       org.hl7.fhir.r4.model.MolecularSequence.QualityType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setStandardSequence(standardSequence.toHapi())
@@ -451,14 +403,7 @@ public object MolecularSequenceConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setType(
       org.hl7.fhir.r4.model.MolecularSequence.RepositoryType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setUrlElement(url.toHapi())

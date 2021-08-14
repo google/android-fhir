@@ -40,16 +40,7 @@ public object DurationConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setValueElement(value.toHapi())
     hapiValue.setComparator(
-      Quantity.QuantityComparator.valueOf(
-        comparator
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Quantity.QuantityComparator.valueOf(comparator.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setUnitElement(unit.toHapi())
     hapiValue.setSystemElement(system.toHapi())
@@ -68,11 +59,7 @@ public object DurationConverter {
           Duration.ComparatorCode.newBuilder()
             .setValue(
               QuantityComparatorCode.Value.valueOf(
-                comparator
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                comparator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()

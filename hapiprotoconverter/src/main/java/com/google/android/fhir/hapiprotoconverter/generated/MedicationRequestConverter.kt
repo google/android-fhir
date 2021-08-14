@@ -149,40 +149,19 @@ public object MedicationRequestConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setStatusReason(statusReason.toHapi())
     hapiValue.setIntent(
       org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestIntent.valueOf(
-        intent
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        intent.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setCategory(categoryList.map { it.toHapi() })
     hapiValue.setPriority(
       org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestPriority.valueOf(
-        priority
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        priority.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setDoNotPerformElement(doNotPerform.toHapi())
@@ -229,11 +208,7 @@ public object MedicationRequestConverter {
           MedicationRequest.StatusCode.newBuilder()
             .setValue(
               MedicationrequestStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -243,11 +218,7 @@ public object MedicationRequestConverter {
           MedicationRequest.IntentCode.newBuilder()
             .setValue(
               MedicationRequestIntentCode.Value.valueOf(
-                intent
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -257,11 +228,7 @@ public object MedicationRequestConverter {
           MedicationRequest.PriorityCode.newBuilder()
             .setValue(
               RequestPriorityCode.Value.valueOf(
-                priority
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()

@@ -70,16 +70,7 @@ public object ExampleScenarioConverter {
     hapiValue.setVersionElement(version.toHapi())
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
@@ -114,11 +105,7 @@ public object ExampleScenarioConverter {
           ExampleScenario.StatusCode.newBuilder()
             .setValue(
               PublicationStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -152,11 +139,7 @@ public object ExampleScenarioConverter {
           ExampleScenario.Actor.TypeCode.newBuilder()
             .setValue(
               ExampleScenarioActorTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -180,11 +163,7 @@ public object ExampleScenarioConverter {
           ExampleScenario.Instance.ResourceTypeCode.newBuilder()
             .setValue(
               ResourceTypeCode.Value.valueOf(
-                resourceType
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                resourceType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -301,14 +280,7 @@ public object ExampleScenarioConverter {
     hapiValue.setActorIdElement(actorId.toHapi())
     hapiValue.setType(
       org.hl7.fhir.r4.model.ExampleScenario.ExampleScenarioActorType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setNameElement(name.toHapi())
@@ -326,14 +298,7 @@ public object ExampleScenarioConverter {
     hapiValue.setResourceIdElement(resourceId.toHapi())
     hapiValue.setResourceType(
       org.hl7.fhir.r4.model.ExampleScenario.FHIRResourceType.valueOf(
-        resourceType
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        resourceType.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setNameElement(name.toHapi())

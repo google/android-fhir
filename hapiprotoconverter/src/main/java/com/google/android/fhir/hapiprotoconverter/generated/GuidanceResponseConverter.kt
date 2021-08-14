@@ -94,14 +94,7 @@ public object GuidanceResponseConverter {
     hapiValue.setModule(module.guidanceResponseModuleToHapi())
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.GuidanceResponse.GuidanceResponseStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setSubject(subject.toHapi())
@@ -135,11 +128,7 @@ public object GuidanceResponseConverter {
           GuidanceResponse.StatusCode.newBuilder()
             .setValue(
               GuidanceResponseStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()

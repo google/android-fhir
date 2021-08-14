@@ -111,14 +111,7 @@ public object MedicationStatementConverter {
     hapiValue.setPartOf(partOfList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.MedicationStatement.MedicationStatementStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setStatusReason(statusReasonList.map { it.toHapi() })
@@ -154,11 +147,7 @@ public object MedicationStatementConverter {
           MedicationStatement.StatusCode.newBuilder()
             .setValue(
               MedicationStatementStatusCodes.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()

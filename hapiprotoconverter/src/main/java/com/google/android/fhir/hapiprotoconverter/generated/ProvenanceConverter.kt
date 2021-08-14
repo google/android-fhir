@@ -146,11 +146,7 @@ public object ProvenanceConverter {
           Provenance.Entity.RoleCode.newBuilder()
             .setValue(
               ProvenanceEntityRoleCode.Value.valueOf(
-                role
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                role.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -182,14 +178,7 @@ public object ProvenanceConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setRole(
       org.hl7.fhir.r4.model.Provenance.ProvenanceEntityRole.valueOf(
-        role
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        role.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setWhat(what.toHapi())

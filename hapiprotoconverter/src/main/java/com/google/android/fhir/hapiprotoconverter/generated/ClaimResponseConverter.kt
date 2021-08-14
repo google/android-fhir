@@ -141,28 +141,14 @@ public object ClaimResponseConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.ClaimResponse.ClaimResponseStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setType(type.toHapi())
     hapiValue.setSubType(subType.toHapi())
     hapiValue.setUse(
       org.hl7.fhir.r4.model.ClaimResponse.Use.valueOf(
-        use
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        use.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setPatient(patient.toHapi())
@@ -172,14 +158,7 @@ public object ClaimResponseConverter {
     hapiValue.setRequest(request.toHapi())
     hapiValue.setOutcome(
       org.hl7.fhir.r4.model.ClaimResponse.RemittanceOutcome.valueOf(
-        outcome
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        outcome.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setDispositionElement(disposition.toHapi())
@@ -215,11 +194,7 @@ public object ClaimResponseConverter {
           ClaimResponse.StatusCode.newBuilder()
             .setValue(
               FinancialResourceStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -229,13 +204,7 @@ public object ClaimResponseConverter {
         .setUse(
           ClaimResponse.UseCode.newBuilder()
             .setValue(
-              UseCode.Value.valueOf(
-                use
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
-              )
+              UseCode.Value.valueOf(use.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
             )
             .build()
         )
@@ -248,11 +217,7 @@ public object ClaimResponseConverter {
           ClaimResponse.OutcomeCode.newBuilder()
             .setValue(
               ClaimProcessingCode.Value.valueOf(
-                outcome
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -447,11 +412,7 @@ public object ClaimResponseConverter {
           ClaimResponse.Note.TypeCode.newBuilder()
             .setValue(
               NoteTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -641,16 +602,7 @@ public object ClaimResponseConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setNumberElement(number.toHapi())
     hapiValue.setType(
-      Enumerations.NoteType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.NoteType.valueOf(type.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setTextElement(text.toHapi())
     hapiValue.setLanguage(language.toHapi())

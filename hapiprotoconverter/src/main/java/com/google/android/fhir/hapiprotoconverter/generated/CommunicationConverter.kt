@@ -100,28 +100,14 @@ public object CommunicationConverter {
     hapiValue.setInResponseTo(inResponseToList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Communication.CommunicationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setStatusReason(statusReason.toHapi())
     hapiValue.setCategory(categoryList.map { it.toHapi() })
     hapiValue.setPriority(
       org.hl7.fhir.r4.model.Communication.CommunicationPriority.valueOf(
-        priority
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        priority.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setMedium(mediumList.map { it.toHapi() })
@@ -160,11 +146,7 @@ public object CommunicationConverter {
           Communication.StatusCode.newBuilder()
             .setValue(
               EventStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -175,11 +157,7 @@ public object CommunicationConverter {
           Communication.PriorityCode.newBuilder()
             .setValue(
               RequestPriorityCode.Value.valueOf(
-                priority
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()

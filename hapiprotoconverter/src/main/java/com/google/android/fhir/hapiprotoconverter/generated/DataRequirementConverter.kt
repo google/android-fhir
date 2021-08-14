@@ -184,11 +184,7 @@ public object DataRequirementConverter {
           DataRequirement.Sort.DirectionCode.newBuilder()
             .setValue(
               SortDirectionCode.Value.valueOf(
-                direction
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                direction.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -231,14 +227,7 @@ public object DataRequirementConverter {
     hapiValue.setPathElement(path.toHapi())
     hapiValue.setDirection(
       org.hl7.fhir.r4.model.DataRequirement.SortDirection.valueOf(
-        direction
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        direction.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     return hapiValue

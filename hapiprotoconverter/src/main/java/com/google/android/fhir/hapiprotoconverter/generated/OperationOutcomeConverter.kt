@@ -77,11 +77,7 @@ public object OperationOutcomeConverter {
           OperationOutcome.Issue.SeverityCode.newBuilder()
             .setValue(
               IssueSeverityCode.Value.valueOf(
-                severity
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                severity.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -90,11 +86,7 @@ public object OperationOutcomeConverter {
           OperationOutcome.Issue.CodeType.newBuilder()
             .setValue(
               IssueTypeCode.Value.valueOf(
-                code
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -116,26 +108,12 @@ public object OperationOutcomeConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setSeverity(
       org.hl7.fhir.r4.model.OperationOutcome.IssueSeverity.valueOf(
-        severity
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        severity.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setCode(
       org.hl7.fhir.r4.model.OperationOutcome.IssueType.valueOf(
-        code
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        code.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setDetails(details.toHapi())

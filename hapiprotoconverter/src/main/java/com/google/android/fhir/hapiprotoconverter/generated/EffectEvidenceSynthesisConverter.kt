@@ -79,16 +79,7 @@ public object EffectEvidenceSynthesisConverter {
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setTitleElement(title.toHapi())
     hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setDateElement(date.toHapi())
     hapiValue.setPublisherElement(publisher.toHapi())
@@ -139,11 +130,7 @@ public object EffectEvidenceSynthesisConverter {
           EffectEvidenceSynthesis.StatusCode.newBuilder()
             .setValue(
               PublicationStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -207,11 +194,7 @@ public object EffectEvidenceSynthesisConverter {
           EffectEvidenceSynthesis.ResultsByExposure.ExposureStateCode.newBuilder()
             .setValue(
               ExposureStateCode.Value.valueOf(
-                exposureState
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                exposureState.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -312,14 +295,7 @@ public object EffectEvidenceSynthesisConverter {
     hapiValue.setDescriptionElement(description.toHapi())
     hapiValue.setExposureState(
       org.hl7.fhir.r4.model.EffectEvidenceSynthesis.ExposureState.valueOf(
-        exposureState
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        exposureState.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setVariantState(variantState.toHapi())

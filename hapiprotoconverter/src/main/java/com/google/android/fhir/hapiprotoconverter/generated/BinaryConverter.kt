@@ -35,11 +35,7 @@ public object BinaryConverter {
     hapiValue.id = id.value
     hapiValue.setMeta(meta.toHapi())
     hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setContentType(
-      contentType.value.apply {
-        if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL" else this
-      }
-    )
+    hapiValue.setContentType(contentType.value.hapiCodeCheck())
     hapiValue.setSecurityContext(securityContext.toHapi())
     hapiValue.setDataElement(data.toHapi())
     return hapiValue
@@ -53,11 +49,7 @@ public object BinaryConverter {
         .setMeta(meta.toProto())
         .setImplicitRules(implicitRulesElement.toProto())
         .setContentType(
-          Binary.ContentTypeCode.newBuilder()
-            .setValue(
-              contentType.apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-            )
-            .build()
+          Binary.ContentTypeCode.newBuilder().setValue(contentType.protoCodeCheck()).build()
         )
         .setSecurityContext(securityContext.toProto())
         .setData(dataElement.toProto())

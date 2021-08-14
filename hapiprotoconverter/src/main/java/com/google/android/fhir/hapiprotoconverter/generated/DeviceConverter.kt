@@ -67,14 +67,7 @@ public object DeviceConverter {
     hapiValue.setUdiCarrier(udiCarrierList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Device.FHIRDeviceStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setStatusReason(statusReasonList.map { it.toHapi() })
@@ -119,11 +112,7 @@ public object DeviceConverter {
           Device.StatusCode.newBuilder()
             .setValue(
               FHIRDeviceStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -170,11 +159,7 @@ public object DeviceConverter {
           Device.UdiCarrier.EntryTypeCode.newBuilder()
             .setValue(
               UDIEntryTypeCode.Value.valueOf(
-                entryType
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                entryType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -195,11 +180,7 @@ public object DeviceConverter {
           Device.DeviceName.TypeCode.newBuilder()
             .setValue(
               DeviceNameTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -263,14 +244,7 @@ public object DeviceConverter {
     hapiValue.setCarrierHRFElement(carrierHrf.toHapi())
     hapiValue.setEntryType(
       org.hl7.fhir.r4.model.Device.UDIEntryType.valueOf(
-        entryType
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        entryType.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     return hapiValue
@@ -285,14 +259,7 @@ public object DeviceConverter {
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setType(
       org.hl7.fhir.r4.model.Device.DeviceNameType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     return hapiValue

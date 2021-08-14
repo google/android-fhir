@@ -198,16 +198,7 @@ public object ActivityDefinitionConverter {
     hapiValue.setTitleElement(title.toHapi())
     hapiValue.setSubtitleElement(subtitle.toHapi())
     hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setSubject(subject.activityDefinitionSubjectToHapi())
@@ -232,40 +223,19 @@ public object ActivityDefinitionConverter {
     hapiValue.setLibrary(libraryList.map { it.toHapi() })
     hapiValue.setKind(
       org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionKind.valueOf(
-        kind
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        kind.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setProfileElement(profile.toHapi())
     hapiValue.setCode(code.toHapi())
     hapiValue.setIntent(
       org.hl7.fhir.r4.model.ActivityDefinition.RequestIntent.valueOf(
-        intent
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        intent.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setPriority(
       org.hl7.fhir.r4.model.ActivityDefinition.RequestPriority.valueOf(
-        priority
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        priority.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setDoNotPerformElement(doNotPerform.toHapi())
@@ -304,11 +274,7 @@ public object ActivityDefinitionConverter {
           ActivityDefinition.StatusCode.newBuilder()
             .setValue(
               PublicationStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -338,11 +304,7 @@ public object ActivityDefinitionConverter {
           ActivityDefinition.KindCode.newBuilder()
             .setValue(
               RequestResourceTypeCode.Value.valueOf(
-                kind
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -353,11 +315,7 @@ public object ActivityDefinitionConverter {
           ActivityDefinition.IntentCode.newBuilder()
             .setValue(
               RequestIntentCode.Value.valueOf(
-                intent
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -366,11 +324,7 @@ public object ActivityDefinitionConverter {
           ActivityDefinition.PriorityCode.newBuilder()
             .setValue(
               RequestPriorityCode.Value.valueOf(
-                priority
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -404,11 +358,7 @@ public object ActivityDefinitionConverter {
           ActivityDefinition.Participant.TypeCode.newBuilder()
             .setValue(
               ActionParticipantTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -442,14 +392,7 @@ public object ActivityDefinitionConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setType(
       org.hl7.fhir.r4.model.ActivityDefinition.ActivityParticipantType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setRole(role.toHapi())

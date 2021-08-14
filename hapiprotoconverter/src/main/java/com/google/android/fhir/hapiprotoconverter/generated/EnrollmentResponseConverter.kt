@@ -52,28 +52,12 @@ public object EnrollmentResponseConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.EnrollmentResponse.EnrollmentResponseStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setRequest(request.toHapi())
     hapiValue.setOutcome(
-      Enumerations.RemittanceOutcome.valueOf(
-        outcome
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.RemittanceOutcome.valueOf(outcome.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setDispositionElement(disposition.toHapi())
     hapiValue.setCreatedElement(created.toHapi())
@@ -97,11 +81,7 @@ public object EnrollmentResponseConverter {
           EnrollmentResponse.StatusCode.newBuilder()
             .setValue(
               FinancialResourceStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -111,11 +91,7 @@ public object EnrollmentResponseConverter {
           EnrollmentResponse.OutcomeCode.newBuilder()
             .setValue(
               ClaimProcessingCode.Value.valueOf(
-                outcome
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()

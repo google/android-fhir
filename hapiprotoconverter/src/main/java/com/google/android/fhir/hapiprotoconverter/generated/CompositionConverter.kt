@@ -89,14 +89,7 @@ public object CompositionConverter {
     hapiValue.setIdentifier(identifier.toHapi())
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Composition.CompositionStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setType(type.toHapi())
@@ -108,14 +101,7 @@ public object CompositionConverter {
     hapiValue.setTitleElement(title.toHapi())
     hapiValue.setConfidentiality(
       org.hl7.fhir.r4.model.Composition.DocumentConfidentiality.valueOf(
-        confidentiality
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        confidentiality.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setAttester(attesterList.map { it.toHapi() })
@@ -141,11 +127,7 @@ public object CompositionConverter {
           Composition.StatusCode.newBuilder()
             .setValue(
               CompositionStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -161,11 +143,7 @@ public object CompositionConverter {
           Composition.ConfidentialityCode.newBuilder()
             .setValue(
               V3ConfidentialityClassificationValueSet.Value.valueOf(
-                confidentiality
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                confidentiality.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -191,11 +169,7 @@ public object CompositionConverter {
           Composition.Attester.ModeCode.newBuilder()
             .setValue(
               CompositionAttestationModeCode.Value.valueOf(
-                mode
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -218,11 +192,7 @@ public object CompositionConverter {
           Composition.RelatesTo.CodeType.newBuilder()
             .setValue(
               DocumentRelationshipTypeCode.Value.valueOf(
-                code
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -263,11 +233,7 @@ public object CompositionConverter {
           Composition.Section.ModeCode.newBuilder()
             .setValue(
               ListModeCode.Value.valueOf(
-                mode
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -288,14 +254,7 @@ public object CompositionConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setMode(
       org.hl7.fhir.r4.model.Composition.CompositionAttestationMode.valueOf(
-        mode
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        mode.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setTimeElement(time.toHapi())
@@ -312,14 +271,7 @@ public object CompositionConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setCode(
       org.hl7.fhir.r4.model.Composition.DocumentRelationshipType.valueOf(
-        code
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        code.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setTarget(target.compositionRelatesToTargetToHapi())
@@ -352,14 +304,7 @@ public object CompositionConverter {
     hapiValue.setText(text.toHapi())
     hapiValue.setMode(
       org.hl7.fhir.r4.model.Composition.SectionMode.valueOf(
-        mode
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        mode.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setOrderedBy(orderedBy.toHapi())

@@ -125,16 +125,7 @@ public object ConceptMapConverter {
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setTitleElement(title.toHapi())
     hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
@@ -170,11 +161,7 @@ public object ConceptMapConverter {
           ConceptMap.StatusCode.newBuilder()
             .setValue(
               PublicationStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -242,11 +229,7 @@ public object ConceptMapConverter {
           ConceptMap.Group.SourceElement.TargetElement.EquivalenceCode.newBuilder()
             .setValue(
               ConceptMapEquivalenceCode.Value.valueOf(
-                equivalence
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                equivalence.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -285,11 +268,7 @@ public object ConceptMapConverter {
           ConceptMap.Group.Unmapped.ModeCode.newBuilder()
             .setValue(
               ConceptMapGroupUnmappedModeCode.Value.valueOf(
-                mode
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -340,14 +319,7 @@ public object ConceptMapConverter {
     hapiValue.setDisplayElement(display.toHapi())
     hapiValue.setEquivalence(
       Enumerations.ConceptMapEquivalence.valueOf(
-        equivalence
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        equivalence.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setCommentElement(comment.toHapi())
@@ -378,14 +350,7 @@ public object ConceptMapConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setMode(
       org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupUnmappedMode.valueOf(
-        mode
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        mode.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setCodeElement(code.toHapi())

@@ -41,14 +41,7 @@ public object RelatedArtifactConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setType(
       org.hl7.fhir.r4.model.RelatedArtifact.RelatedArtifactType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setLabelElement(label.toHapi())
@@ -70,11 +63,7 @@ public object RelatedArtifactConverter {
           RelatedArtifact.TypeCode.newBuilder()
             .setValue(
               RelatedArtifactTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()

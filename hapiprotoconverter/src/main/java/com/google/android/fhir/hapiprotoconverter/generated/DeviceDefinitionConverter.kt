@@ -177,11 +177,7 @@ public object DeviceDefinitionConverter {
           DeviceDefinition.DeviceName.TypeCode.newBuilder()
             .setValue(
               DeviceNameTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -272,14 +268,7 @@ public object DeviceDefinitionConverter {
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setType(
       org.hl7.fhir.r4.model.DeviceDefinition.DeviceNameType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     return hapiValue

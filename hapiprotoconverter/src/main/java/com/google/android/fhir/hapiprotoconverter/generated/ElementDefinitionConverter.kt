@@ -1565,13 +1565,7 @@ public object ElementDefinitionConverter {
     representationList.forEach {
       hapiValue.addRepresentation(
         org.hl7.fhir.r4.model.ElementDefinition.PropertyRepresentation.valueOf(
-          it.value
-            .name
-            .apply {
-              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-              else this
-            }
-            .replace("_", "")
+          it.value.name.hapiCodeCheck().replace("_", "")
         )
       )
     }
@@ -1623,11 +1617,7 @@ public object ElementDefinitionConverter {
             ElementDefinition.RepresentationCode.newBuilder()
               .setValue(
                 PropertyRepresentationCode.Value.valueOf(
-                  it.value
-                    .toCode()
-                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                    .replace("-", "_")
-                    .toUpperCase()
+                  it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
                 )
               )
               .build()
@@ -1683,11 +1673,7 @@ public object ElementDefinitionConverter {
           ElementDefinition.Slicing.RulesCode.newBuilder()
             .setValue(
               SlicingRulesCode.Value.valueOf(
-                rules
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                rules.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -1707,11 +1693,7 @@ public object ElementDefinitionConverter {
           ElementDefinition.Slicing.Discriminator.TypeCode.newBuilder()
             .setValue(
               DiscriminatorTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -1750,11 +1732,7 @@ public object ElementDefinitionConverter {
             ElementDefinition.TypeRef.AggregationCode.newBuilder()
               .setValue(
                 AggregationModeCode.Value.valueOf(
-                  it.value
-                    .toCode()
-                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                    .replace("-", "_")
-                    .toUpperCase()
+                  it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
                 )
               )
               .build()
@@ -1764,11 +1742,7 @@ public object ElementDefinitionConverter {
           ElementDefinition.TypeRef.VersioningCode.newBuilder()
             .setValue(
               ReferenceVersionRulesCode.Value.valueOf(
-                versioning
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                versioning.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -1803,11 +1777,7 @@ public object ElementDefinitionConverter {
           ElementDefinition.Constraint.SeverityCode.newBuilder()
             .setValue(
               ConstraintSeverityCode.Value.valueOf(
-                severity
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                severity.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -1831,11 +1801,7 @@ public object ElementDefinitionConverter {
           ElementDefinition.ElementDefinitionBinding.StrengthCode.newBuilder()
             .setValue(
               BindingStrengthCode.Value.valueOf(
-                strength
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                strength.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -1856,9 +1822,7 @@ public object ElementDefinitionConverter {
         .setIdentity(identityElement.toProto())
         .setLanguage(
           ElementDefinition.Mapping.LanguageCode.newBuilder()
-            .setValue(
-              language.apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-            )
+            .setValue(language.protoCodeCheck())
             .build()
         )
         .setMap(mapElement.toProto())
@@ -1878,14 +1842,7 @@ public object ElementDefinitionConverter {
     hapiValue.setOrderedElement(ordered.toHapi())
     hapiValue.setRules(
       org.hl7.fhir.r4.model.ElementDefinition.SlicingRules.valueOf(
-        rules
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        rules.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     return hapiValue
@@ -1900,14 +1857,7 @@ public object ElementDefinitionConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setType(
       org.hl7.fhir.r4.model.ElementDefinition.DiscriminatorType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setPathElement(path.toHapi())
@@ -1938,26 +1888,13 @@ public object ElementDefinitionConverter {
     aggregationList.forEach {
       hapiValue.addAggregation(
         org.hl7.fhir.r4.model.ElementDefinition.AggregationMode.valueOf(
-          it.value
-            .name
-            .apply {
-              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-              else this
-            }
-            .replace("_", "")
+          it.value.name.hapiCodeCheck().replace("_", "")
         )
       )
     }
     hapiValue.setVersioning(
       org.hl7.fhir.r4.model.ElementDefinition.ReferenceVersionRules.valueOf(
-        versioning
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        versioning.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     return hapiValue
@@ -1984,14 +1921,7 @@ public object ElementDefinitionConverter {
     hapiValue.setRequirementsElement(requirements.toHapi())
     hapiValue.setSeverity(
       org.hl7.fhir.r4.model.ElementDefinition.ConstraintSeverity.valueOf(
-        severity
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        severity.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setHumanElement(human.toHapi())
@@ -2008,16 +1938,7 @@ public object ElementDefinitionConverter {
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setStrength(
-      Enumerations.BindingStrength.valueOf(
-        strength
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.BindingStrength.valueOf(strength.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setDescriptionElement(description.toHapi())
     hapiValue.setValueSetElement(valueSet.toHapi())
@@ -2031,11 +1952,7 @@ public object ElementDefinitionConverter {
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setIdentityElement(identity.toHapi())
-    hapiValue.setLanguage(
-      language.value.apply {
-        if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL" else this
-      }
-    )
+    hapiValue.setLanguage(language.value.hapiCodeCheck())
     hapiValue.setMapElement(map.toHapi())
     hapiValue.setCommentElement(comment.toHapi())
     return hapiValue

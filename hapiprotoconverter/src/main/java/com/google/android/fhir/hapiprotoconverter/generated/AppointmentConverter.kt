@@ -64,14 +64,7 @@ public object AppointmentConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Appointment.AppointmentStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setCancelationReason(cancelationReason.toHapi())
@@ -112,11 +105,7 @@ public object AppointmentConverter {
           Appointment.StatusCode.newBuilder()
             .setValue(
               AppointmentStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -159,11 +148,7 @@ public object AppointmentConverter {
           Appointment.Participant.RequiredCode.newBuilder()
             .setValue(
               ParticipantRequiredCode.Value.valueOf(
-                required
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                required.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -172,11 +157,7 @@ public object AppointmentConverter {
           Appointment.Participant.StatusCode.newBuilder()
             .setValue(
               ParticipationStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -197,26 +178,12 @@ public object AppointmentConverter {
     hapiValue.setActor(actor.toHapi())
     hapiValue.setRequired(
       org.hl7.fhir.r4.model.Appointment.ParticipantRequired.valueOf(
-        required
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        required.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Appointment.ParticipationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setPeriod(period.toHapi())

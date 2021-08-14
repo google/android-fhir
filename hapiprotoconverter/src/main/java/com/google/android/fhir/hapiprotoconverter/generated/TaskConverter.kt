@@ -826,40 +826,19 @@ public object TaskConverter {
     hapiValue.setPartOf(partOfList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Task.TaskStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setStatusReason(statusReason.toHapi())
     hapiValue.setBusinessStatus(businessStatus.toHapi())
     hapiValue.setIntent(
       org.hl7.fhir.r4.model.Task.TaskIntent.valueOf(
-        intent
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        intent.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setPriority(
       org.hl7.fhir.r4.model.Task.TaskPriority.valueOf(
-        priority
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        priority.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setCode(code.toHapi())
@@ -905,11 +884,7 @@ public object TaskConverter {
           Task.StatusCode.newBuilder()
             .setValue(
               TaskStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -920,11 +895,7 @@ public object TaskConverter {
           Task.IntentCode.newBuilder()
             .setValue(
               TaskIntentValueSet.Value.valueOf(
-                intent
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -933,11 +904,7 @@ public object TaskConverter {
           Task.PriorityCode.newBuilder()
             .setValue(
               RequestPriorityCode.Value.valueOf(
-                priority
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()

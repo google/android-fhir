@@ -101,26 +101,12 @@ public object NutritionOrderConverter {
     hapiValue.setInstantiates(instantiatesList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setIntent(
       org.hl7.fhir.r4.model.NutritionOrder.NutritiionOrderIntent.valueOf(
-        intent
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        intent.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setPatient(patient.toHapi())
@@ -155,11 +141,7 @@ public object NutritionOrderConverter {
           NutritionOrder.StatusCode.newBuilder()
             .setValue(
               RequestStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -168,11 +150,7 @@ public object NutritionOrderConverter {
           NutritionOrder.IntentCode.newBuilder()
             .setValue(
               RequestIntentCode.Value.valueOf(
-                intent
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()

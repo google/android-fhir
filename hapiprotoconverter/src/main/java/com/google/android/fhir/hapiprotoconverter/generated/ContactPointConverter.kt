@@ -38,27 +38,13 @@ public object ContactPointConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setSystem(
       org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem.valueOf(
-        system
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        system.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setValueElement(value.toHapi())
     hapiValue.setUse(
       org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.valueOf(
-        use
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        use.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setRankElement(rank.toHapi())
@@ -76,11 +62,7 @@ public object ContactPointConverter {
           ContactPoint.SystemCode.newBuilder()
             .setValue(
               ContactPointSystemCode.Value.valueOf(
-                system
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                system.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -90,11 +72,7 @@ public object ContactPointConverter {
           ContactPoint.UseCode.newBuilder()
             .setValue(
               ContactPointUseCode.Value.valueOf(
-                use
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()

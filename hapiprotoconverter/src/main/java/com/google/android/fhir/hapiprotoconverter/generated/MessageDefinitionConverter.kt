@@ -102,16 +102,7 @@ public object MessageDefinitionConverter {
     hapiValue.setTitleElement(title.toHapi())
     hapiValue.setReplaces(replacesList.map { it.toHapi() })
     hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
@@ -127,27 +118,13 @@ public object MessageDefinitionConverter {
     hapiValue.setEvent(event.messageDefinitionEventToHapi())
     hapiValue.setCategory(
       org.hl7.fhir.r4.model.MessageDefinition.MessageSignificanceCategory.valueOf(
-        category
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        category.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setFocus(focusList.map { it.toHapi() })
     hapiValue.setResponseRequired(
       org.hl7.fhir.r4.model.MessageDefinition.MessageheaderResponseRequest.valueOf(
-        responseRequired
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        responseRequired.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setAllowedResponse(allowedResponseList.map { it.toHapi() })
@@ -175,11 +152,7 @@ public object MessageDefinitionConverter {
           MessageDefinition.StatusCode.newBuilder()
             .setValue(
               PublicationStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -200,11 +173,7 @@ public object MessageDefinitionConverter {
           MessageDefinition.CategoryCode.newBuilder()
             .setValue(
               MessageSignificanceCategoryCode.Value.valueOf(
-                category
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                category.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -214,11 +183,7 @@ public object MessageDefinitionConverter {
           MessageDefinition.ResponseRequiredCode.newBuilder()
             .setValue(
               MessageheaderResponseRequestCode.Value.valueOf(
-                responseRequired
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                responseRequired.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()

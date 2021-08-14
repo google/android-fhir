@@ -240,16 +240,7 @@ public object ResearchElementDefinitionConverter {
     hapiValue.setShortTitleElement(shortTitle.toHapi())
     hapiValue.setSubtitleElement(subtitle.toHapi())
     hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setSubject(subject.researchElementDefinitionSubjectToHapi())
@@ -275,26 +266,12 @@ public object ResearchElementDefinitionConverter {
     hapiValue.setLibrary(libraryList.map { it.toHapi() })
     hapiValue.setType(
       org.hl7.fhir.r4.model.ResearchElementDefinition.ResearchElementType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setVariableType(
       org.hl7.fhir.r4.model.ResearchElementDefinition.VariableType.valueOf(
-        variableType
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        variableType.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setCharacteristic(characteristicList.map { it.toHapi() })
@@ -322,11 +299,7 @@ public object ResearchElementDefinitionConverter {
           ResearchElementDefinition.StatusCode.newBuilder()
             .setValue(
               PublicationStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -357,11 +330,7 @@ public object ResearchElementDefinitionConverter {
           ResearchElementDefinition.TypeCode.newBuilder()
             .setValue(
               ResearchElementTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -370,11 +339,7 @@ public object ResearchElementDefinitionConverter {
           ResearchElementDefinition.VariableTypeCode.newBuilder()
             .setValue(
               EvidenceVariableTypeCode.Value.valueOf(
-                variableType
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                variableType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -405,11 +370,7 @@ public object ResearchElementDefinitionConverter {
           ResearchElementDefinition.Characteristic.StudyEffectiveGroupMeasureCode.newBuilder()
             .setValue(
               GroupMeasureCode.Value.valueOf(
-                studyEffectiveGroupMeasure
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                studyEffectiveGroupMeasure.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -425,7 +386,7 @@ public object ResearchElementDefinitionConverter {
               GroupMeasureCode.Value.valueOf(
                 participantEffectiveGroupMeasure
                   .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
+                  .protoCodeCheck()
                   .replace("-", "_")
                   .toUpperCase()
               )
@@ -456,14 +417,7 @@ public object ResearchElementDefinitionConverter {
     hapiValue.setStudyEffectiveTimeFromStart(studyEffectiveTimeFromStart.toHapi())
     hapiValue.setStudyEffectiveGroupMeasure(
       org.hl7.fhir.r4.model.ResearchElementDefinition.GroupMeasure.valueOf(
-        studyEffectiveGroupMeasure
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        studyEffectiveGroupMeasure.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setParticipantEffectiveDescriptionElement(participantEffectiveDescription.toHapi())
@@ -473,14 +427,7 @@ public object ResearchElementDefinitionConverter {
     hapiValue.setParticipantEffectiveTimeFromStart(participantEffectiveTimeFromStart.toHapi())
     hapiValue.setParticipantEffectiveGroupMeasure(
       org.hl7.fhir.r4.model.ResearchElementDefinition.GroupMeasure.valueOf(
-        participantEffectiveGroupMeasure
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        participantEffectiveGroupMeasure.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     return hapiValue

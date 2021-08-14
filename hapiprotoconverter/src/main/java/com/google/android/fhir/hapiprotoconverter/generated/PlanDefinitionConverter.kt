@@ -294,16 +294,7 @@ public object PlanDefinitionConverter {
     hapiValue.setSubtitleElement(subtitle.toHapi())
     hapiValue.setType(type.toHapi())
     hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setSubject(subject.planDefinitionSubjectToHapi())
@@ -352,11 +343,7 @@ public object PlanDefinitionConverter {
           PlanDefinition.StatusCode.newBuilder()
             .setValue(
               PublicationStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -438,11 +425,7 @@ public object PlanDefinitionConverter {
           PlanDefinition.Action.PriorityCode.newBuilder()
             .setValue(
               RequestPriorityCode.Value.valueOf(
-                priority
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -464,11 +447,7 @@ public object PlanDefinitionConverter {
           PlanDefinition.Action.GroupingBehaviorCode.newBuilder()
             .setValue(
               ActionGroupingBehaviorCode.Value.valueOf(
-                groupingBehavior
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                groupingBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -477,11 +456,7 @@ public object PlanDefinitionConverter {
           PlanDefinition.Action.SelectionBehaviorCode.newBuilder()
             .setValue(
               ActionSelectionBehaviorCode.Value.valueOf(
-                selectionBehavior
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                selectionBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -490,11 +465,7 @@ public object PlanDefinitionConverter {
           PlanDefinition.Action.RequiredBehaviorCode.newBuilder()
             .setValue(
               ActionRequiredBehaviorCode.Value.valueOf(
-                requiredBehavior
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                requiredBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -503,11 +474,7 @@ public object PlanDefinitionConverter {
           PlanDefinition.Action.PrecheckBehaviorCode.newBuilder()
             .setValue(
               ActionPrecheckBehaviorCode.Value.valueOf(
-                precheckBehavior
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                precheckBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -516,11 +483,7 @@ public object PlanDefinitionConverter {
           PlanDefinition.Action.CardinalityBehaviorCode.newBuilder()
             .setValue(
               ActionCardinalityBehaviorCode.Value.valueOf(
-                cardinalityBehavior
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                cardinalityBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -544,11 +507,7 @@ public object PlanDefinitionConverter {
           PlanDefinition.Action.Condition.KindCode.newBuilder()
             .setValue(
               ActionConditionKindCode.Value.valueOf(
-                kind
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -571,11 +530,7 @@ public object PlanDefinitionConverter {
           PlanDefinition.Action.RelatedAction.RelationshipCode.newBuilder()
             .setValue(
               ActionRelationshipTypeCode.Value.valueOf(
-                relationship
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                relationship.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -597,11 +552,7 @@ public object PlanDefinitionConverter {
           PlanDefinition.Action.Participant.TypeCode.newBuilder()
             .setValue(
               ActionParticipantTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -668,14 +619,7 @@ public object PlanDefinitionConverter {
     hapiValue.setTextEquivalentElement(textEquivalent.toHapi())
     hapiValue.setPriority(
       org.hl7.fhir.r4.model.PlanDefinition.RequestPriority.valueOf(
-        priority
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        priority.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setCode(codeList.map { it.toHapi() })
@@ -693,62 +637,27 @@ public object PlanDefinitionConverter {
     hapiValue.setType(type.toHapi())
     hapiValue.setGroupingBehavior(
       org.hl7.fhir.r4.model.PlanDefinition.ActionGroupingBehavior.valueOf(
-        groupingBehavior
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        groupingBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setSelectionBehavior(
       org.hl7.fhir.r4.model.PlanDefinition.ActionSelectionBehavior.valueOf(
-        selectionBehavior
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        selectionBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setRequiredBehavior(
       org.hl7.fhir.r4.model.PlanDefinition.ActionRequiredBehavior.valueOf(
-        requiredBehavior
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        requiredBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setPrecheckBehavior(
       org.hl7.fhir.r4.model.PlanDefinition.ActionPrecheckBehavior.valueOf(
-        precheckBehavior
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        precheckBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setCardinalityBehavior(
       org.hl7.fhir.r4.model.PlanDefinition.ActionCardinalityBehavior.valueOf(
-        cardinalityBehavior
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        cardinalityBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setDefinition(definition.planDefinitionActionDefinitionToHapi())
@@ -766,14 +675,7 @@ public object PlanDefinitionConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setKind(
       org.hl7.fhir.r4.model.PlanDefinition.ActionConditionKind.valueOf(
-        kind
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        kind.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setExpression(expression.toHapi())
@@ -791,14 +693,7 @@ public object PlanDefinitionConverter {
     hapiValue.setActionIdElement(actionId.toHapi())
     hapiValue.setRelationship(
       org.hl7.fhir.r4.model.PlanDefinition.ActionRelationshipType.valueOf(
-        relationship
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        relationship.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setOffset(offset.planDefinitionActionRelatedActionOffsetToHapi())
@@ -814,14 +709,7 @@ public object PlanDefinitionConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setType(
       org.hl7.fhir.r4.model.PlanDefinition.ActionParticipantType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setRole(role.toHapi())

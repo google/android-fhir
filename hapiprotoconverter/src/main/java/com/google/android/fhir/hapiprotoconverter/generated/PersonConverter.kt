@@ -63,16 +63,7 @@ public object PersonConverter {
     hapiValue.setName(nameList.map { it.toHapi() })
     hapiValue.setTelecom(telecomList.map { it.toHapi() })
     hapiValue.setGender(
-      Enumerations.AdministrativeGender.valueOf(
-        gender
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setBirthDateElement(birthDate.toHapi())
     hapiValue.setAddress(addressList.map { it.toHapi() })
@@ -100,11 +91,7 @@ public object PersonConverter {
           Person.GenderCode.newBuilder()
             .setValue(
               AdministrativeGenderCode.Value.valueOf(
-                gender
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -131,11 +118,7 @@ public object PersonConverter {
           Person.Link.AssuranceCode.newBuilder()
             .setValue(
               IdentityAssuranceLevelCode.Value.valueOf(
-                assurance
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                assurance.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -153,14 +136,7 @@ public object PersonConverter {
     hapiValue.setTarget(target.toHapi())
     hapiValue.setAssurance(
       org.hl7.fhir.r4.model.Person.IdentityAssuranceLevel.valueOf(
-        assurance
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        assurance.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     return hapiValue

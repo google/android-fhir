@@ -38,11 +38,7 @@ public object AttachmentConverter {
     val hapiValue = org.hl7.fhir.r4.model.Attachment()
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setContentType(
-      contentType.value.apply {
-        if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL" else this
-      }
-    )
+    hapiValue.setContentType(contentType.value.hapiCodeCheck())
     hapiValue.setDataElement(data.toHapi())
     hapiValue.setUrlElement(url.toHapi())
     hapiValue.setSizeElement(size.toHapi())
@@ -59,11 +55,7 @@ public object AttachmentConverter {
         .setId(String.newBuilder().setValue(id))
         .addAllExtension(extension.map { it.toProto() })
         .setContentType(
-          Attachment.ContentTypeCode.newBuilder()
-            .setValue(
-              contentType.apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-            )
-            .build()
+          Attachment.ContentTypeCode.newBuilder().setValue(contentType.protoCodeCheck()).build()
         )
         .setData(dataElement.toProto())
         .setUrl(urlElement.toProto())

@@ -36,26 +36,12 @@ public object AddressConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setUse(
       org.hl7.fhir.r4.model.Address.AddressUse.valueOf(
-        use
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        use.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setType(
       org.hl7.fhir.r4.model.Address.AddressType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setTextElement(text.toHapi())
@@ -79,11 +65,7 @@ public object AddressConverter {
           Address.UseCode.newBuilder()
             .setValue(
               AddressUseCode.Value.valueOf(
-                use
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -92,11 +74,7 @@ public object AddressConverter {
           Address.TypeCode.newBuilder()
             .setValue(
               AddressTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()

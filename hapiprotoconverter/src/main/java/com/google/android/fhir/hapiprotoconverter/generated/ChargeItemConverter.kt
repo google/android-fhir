@@ -129,14 +129,7 @@ public object ChargeItemConverter {
     hapiValue.setDefinitionCanonical(definitionCanonicalList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.ChargeItem.ChargeItemStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setPartOf(partOfList.map { it.toHapi() })
@@ -181,11 +174,7 @@ public object ChargeItemConverter {
           ChargeItem.StatusCode.newBuilder()
             .setValue(
               ChargeItemStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()

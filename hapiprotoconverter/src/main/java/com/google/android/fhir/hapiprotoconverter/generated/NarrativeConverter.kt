@@ -31,14 +31,7 @@ public object NarrativeConverter {
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Narrative.NarrativeStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     return hapiValue
@@ -54,11 +47,7 @@ public object NarrativeConverter {
           Narrative.StatusCode.newBuilder()
             .setValue(
               NarrativeStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()

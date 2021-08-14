@@ -71,16 +71,7 @@ public object TerminologyCapabilitiesConverter {
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setTitleElement(title.toHapi())
     hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
@@ -93,14 +84,7 @@ public object TerminologyCapabilitiesConverter {
     hapiValue.setCopyrightElement(copyright.toHapi())
     hapiValue.setKind(
       org.hl7.fhir.r4.model.TerminologyCapabilities.CapabilityStatementKind.valueOf(
-        kind
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        kind.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setSoftware(software.toHapi())
@@ -110,14 +94,7 @@ public object TerminologyCapabilitiesConverter {
     hapiValue.setExpansion(expansion.toHapi())
     hapiValue.setCodeSearch(
       org.hl7.fhir.r4.model.TerminologyCapabilities.CodeSearchSupport.valueOf(
-        codeSearch
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        codeSearch.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setValidateCode(validateCode.toHapi())
@@ -144,11 +121,7 @@ public object TerminologyCapabilitiesConverter {
           TerminologyCapabilities.StatusCode.newBuilder()
             .setValue(
               PublicationStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -166,11 +139,7 @@ public object TerminologyCapabilitiesConverter {
           TerminologyCapabilities.KindCode.newBuilder()
             .setValue(
               CapabilityStatementKindCode.Value.valueOf(
-                kind
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -184,11 +153,7 @@ public object TerminologyCapabilitiesConverter {
           TerminologyCapabilities.CodeSearchCode.newBuilder()
             .setValue(
               CodeSearchSupportCode.Value.valueOf(
-                codeSearch
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                codeSearch.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()

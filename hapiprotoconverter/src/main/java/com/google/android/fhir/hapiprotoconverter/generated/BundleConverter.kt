@@ -55,14 +55,7 @@ public object BundleConverter {
     hapiValue.setIdentifier(identifier.toHapi())
     hapiValue.setType(
       org.hl7.fhir.r4.model.Bundle.BundleType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setTimestampElement(timestamp.toHapi())
@@ -85,11 +78,7 @@ public object BundleConverter {
           Bundle.TypeCode.newBuilder()
             .setValue(
               BundleTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -143,11 +132,7 @@ public object BundleConverter {
           Bundle.Entry.Search.ModeCode.newBuilder()
             .setValue(
               SearchEntryModeCode.Value.valueOf(
-                mode
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -169,11 +154,7 @@ public object BundleConverter {
           Bundle.Entry.Request.MethodCode.newBuilder()
             .setValue(
               HTTPVerbCode.Value.valueOf(
-                method
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                method.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -236,14 +217,7 @@ public object BundleConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setMode(
       org.hl7.fhir.r4.model.Bundle.SearchEntryMode.valueOf(
-        mode
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        mode.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setScoreElement(score.toHapi())
@@ -259,14 +233,7 @@ public object BundleConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setMethod(
       org.hl7.fhir.r4.model.Bundle.HTTPVerb.valueOf(
-        method
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        method.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setUrlElement(url.toHapi())

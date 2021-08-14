@@ -76,16 +76,7 @@ public object StructureDefinitionConverter {
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setTitleElement(title.toHapi())
     hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
@@ -98,28 +89,12 @@ public object StructureDefinitionConverter {
     hapiValue.setCopyrightElement(copyright.toHapi())
     hapiValue.setKeyword(keywordList.map { it.toHapi() })
     hapiValue.setFhirVersion(
-      Enumerations.FHIRVersion.valueOf(
-        fhirVersion
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.FHIRVersion.valueOf(fhirVersion.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setMapping(mappingList.map { it.toHapi() })
     hapiValue.setKind(
       org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionKind.valueOf(
-        kind
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        kind.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setAbstractElement(abstract.toHapi())
@@ -129,14 +104,7 @@ public object StructureDefinitionConverter {
     hapiValue.setBaseDefinitionElement(baseDefinition.toHapi())
     hapiValue.setDerivation(
       org.hl7.fhir.r4.model.StructureDefinition.TypeDerivationRule.valueOf(
-        derivation
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        derivation.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setSnapshot(snapshot.toHapi())
@@ -163,11 +131,7 @@ public object StructureDefinitionConverter {
           StructureDefinition.StatusCode.newBuilder()
             .setValue(
               PublicationStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -186,11 +150,7 @@ public object StructureDefinitionConverter {
           StructureDefinition.FhirVersionCode.newBuilder()
             .setValue(
               FHIRVersionCode.Value.valueOf(
-                fhirVersion
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                fhirVersion.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -200,11 +160,7 @@ public object StructureDefinitionConverter {
           StructureDefinition.KindCode.newBuilder()
             .setValue(
               StructureDefinitionKindCode.Value.valueOf(
-                kind
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -218,11 +174,7 @@ public object StructureDefinitionConverter {
           StructureDefinition.DerivationCode.newBuilder()
             .setValue(
               TypeDerivationRuleCode.Value.valueOf(
-                derivation
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                derivation.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -261,11 +213,7 @@ public object StructureDefinitionConverter {
           StructureDefinition.Context.TypeCode.newBuilder()
             .setValue(
               ExtensionContextTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -324,14 +272,7 @@ public object StructureDefinitionConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setType(
       org.hl7.fhir.r4.model.StructureDefinition.ExtensionContextType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setExpressionElement(expression.toHapi())

@@ -54,14 +54,7 @@ public object EpisodeOfCareConverter {
     hapiValue.setIdentifier(identifierList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setStatusHistory(statusHistoryList.map { it.toHapi() })
@@ -92,11 +85,7 @@ public object EpisodeOfCareConverter {
           EpisodeOfCare.StatusCode.newBuilder()
             .setValue(
               EpisodeOfCareStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -127,11 +116,7 @@ public object EpisodeOfCareConverter {
           EpisodeOfCare.StatusHistory.StatusCode.newBuilder()
             .setValue(
               EpisodeOfCareStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -165,14 +150,7 @@ public object EpisodeOfCareConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setPeriod(period.toHapi())

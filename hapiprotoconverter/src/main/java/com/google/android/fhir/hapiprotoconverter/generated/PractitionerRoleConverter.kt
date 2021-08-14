@@ -115,11 +115,7 @@ public object PractitionerRoleConverter {
             PractitionerRole.AvailableTime.DaysOfWeekCode.newBuilder()
               .setValue(
                 DaysOfWeekCode.Value.valueOf(
-                  it.value
-                    .toCode()
-                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                    .replace("-", "_")
-                    .toUpperCase()
+                  it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
                 )
               )
               .build()
@@ -156,13 +152,7 @@ public object PractitionerRoleConverter {
     daysOfWeekList.forEach {
       hapiValue.addDaysOfWeek(
         org.hl7.fhir.r4.model.PractitionerRole.DaysOfWeek.valueOf(
-          it.value
-            .name
-            .apply {
-              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-              else this
-            }
-            .replace("_", "")
+          it.value.name.hapiCodeCheck().replace("_", "")
         )
       )
     }

@@ -120,11 +120,7 @@ public object TimingConverter {
           Timing.Repeat.DurationUnitCode.newBuilder()
             .setValue(
               UnitsOfTimeValueSet.Value.valueOf(
-                durationUnit
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                durationUnit.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -137,11 +133,7 @@ public object TimingConverter {
           Timing.Repeat.PeriodUnitCode.newBuilder()
             .setValue(
               UnitsOfTimeValueSet.Value.valueOf(
-                periodUnit
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                periodUnit.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -151,11 +143,7 @@ public object TimingConverter {
             Timing.Repeat.DayOfWeekCode.newBuilder()
               .setValue(
                 DaysOfWeekCode.Value.valueOf(
-                  it.value
-                    .toCode()
-                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                    .replace("-", "_")
-                    .toUpperCase()
+                  it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
                 )
               )
               .build()
@@ -167,11 +155,7 @@ public object TimingConverter {
             Timing.Repeat.WhenCode.newBuilder()
               .setValue(
                 EventTimingValueSet.Value.valueOf(
-                  it.value
-                    .toCode()
-                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                    .replace("-", "_")
-                    .toUpperCase()
+                  it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
                 )
               )
               .build()
@@ -194,14 +178,7 @@ public object TimingConverter {
     hapiValue.setDurationMaxElement(durationMax.toHapi())
     hapiValue.setDurationUnit(
       org.hl7.fhir.r4.model.Timing.UnitsOfTime.valueOf(
-        durationUnit
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        durationUnit.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setFrequencyElement(frequency.toHapi())
@@ -210,26 +187,13 @@ public object TimingConverter {
     hapiValue.setPeriodMaxElement(periodMax.toHapi())
     hapiValue.setPeriodUnit(
       org.hl7.fhir.r4.model.Timing.UnitsOfTime.valueOf(
-        periodUnit
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        periodUnit.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     dayOfWeekList.forEach {
       hapiValue.addDayOfWeek(
         org.hl7.fhir.r4.model.Timing.DayOfWeek.valueOf(
-          it.value
-            .name
-            .apply {
-              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-              else this
-            }
-            .replace("_", "")
+          it.value.name.hapiCodeCheck().replace("_", "")
         )
       )
     }
@@ -237,13 +201,7 @@ public object TimingConverter {
     whenList.forEach {
       hapiValue.addWhen(
         org.hl7.fhir.r4.model.Timing.EventTiming.valueOf(
-          it.value
-            .name
-            .apply {
-              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-              else this
-            }
-            .replace("_", "")
+          it.value.name.hapiCodeCheck().replace("_", "")
         )
       )
     }

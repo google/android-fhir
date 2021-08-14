@@ -148,16 +148,7 @@ public object ValueSetConverter {
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setTitleElement(title.toHapi())
     hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
@@ -193,11 +184,7 @@ public object ValueSetConverter {
           ValueSet.StatusCode.newBuilder()
             .setValue(
               PublicationStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -290,10 +277,7 @@ public object ValueSetConverter {
           ValueSet.Compose.ConceptSet.Filter.OpCode.newBuilder()
             .setValue(
               FilterOperatorCode.Value.valueOf(
-                op.toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                op.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -414,13 +398,7 @@ public object ValueSetConverter {
     hapiValue.setPropertyElement(property.toHapi())
     hapiValue.setOp(
       org.hl7.fhir.r4.model.ValueSet.FilterOperator.valueOf(
-        op.value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        op.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setValueElement(value.toHapi())

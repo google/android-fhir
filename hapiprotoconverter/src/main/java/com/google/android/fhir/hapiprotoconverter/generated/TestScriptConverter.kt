@@ -85,16 +85,7 @@ public object TestScriptConverter {
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setTitleElement(title.toHapi())
     hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
@@ -136,11 +127,7 @@ public object TestScriptConverter {
           TestScript.StatusCode.newBuilder()
             .setValue(
               PublicationStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -322,14 +309,12 @@ public object TestScriptConverter {
         .setDescription(descriptionElement.toProto())
         .setAccept(
           TestScript.Setup.SetupAction.Operation.AcceptCode.newBuilder()
-            .setValue(accept.apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this })
+            .setValue(accept.protoCodeCheck())
             .build()
         )
         .setContentType(
           TestScript.Setup.SetupAction.Operation.ContentTypeCode.newBuilder()
-            .setValue(
-              contentType.apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-            )
+            .setValue(contentType.protoCodeCheck())
             .build()
         )
         .setDestination(destinationElement.toProto())
@@ -338,11 +323,7 @@ public object TestScriptConverter {
           TestScript.Setup.SetupAction.Operation.MethodCode.newBuilder()
             .setValue(
               TestScriptRequestMethodCode.Value.valueOf(
-                method
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                method.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -387,11 +368,7 @@ public object TestScriptConverter {
           TestScript.Setup.SetupAction.Assert.DirectionCode.newBuilder()
             .setValue(
               AssertionDirectionTypeCode.Value.valueOf(
-                direction
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                direction.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -401,9 +378,7 @@ public object TestScriptConverter {
         .setCompareToSourcePath(compareToSourcePathElement.toProto())
         .setContentType(
           TestScript.Setup.SetupAction.Assert.ContentTypeCode.newBuilder()
-            .setValue(
-              contentType.apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-            )
+            .setValue(contentType.protoCodeCheck())
             .build()
         )
         .setExpression(expressionElement.toProto())
@@ -414,11 +389,7 @@ public object TestScriptConverter {
           TestScript.Setup.SetupAction.Assert.OperatorCode.newBuilder()
             .setValue(
               AssertionOperatorTypeCode.Value.valueOf(
-                operator
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                operator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -428,11 +399,7 @@ public object TestScriptConverter {
           TestScript.Setup.SetupAction.Assert.RequestMethodCode.newBuilder()
             .setValue(
               TestScriptRequestMethodCode.Value.valueOf(
-                requestMethod
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                requestMethod.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -447,11 +414,7 @@ public object TestScriptConverter {
           TestScript.Setup.SetupAction.Assert.ResponseCode.newBuilder()
             .setValue(
               AssertionResponseTypesCode.Value.valueOf(
-                response
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                response.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -645,28 +608,13 @@ public object TestScriptConverter {
     hapiValue.setResource(resource.value.name)
     hapiValue.setLabelElement(label.toHapi())
     hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setAccept(
-      accept.value.apply {
-        if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL" else this
-      }
-    )
-    hapiValue.setContentType(
-      contentType.value.apply {
-        if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL" else this
-      }
-    )
+    hapiValue.setAccept(accept.value.hapiCodeCheck())
+    hapiValue.setContentType(contentType.value.hapiCodeCheck())
     hapiValue.setDestinationElement(destination.toHapi())
     hapiValue.setEncodeRequestUrlElement(encodeRequestUrl.toHapi())
     hapiValue.setMethod(
       org.hl7.fhir.r4.model.TestScript.TestScriptRequestMethodCode.valueOf(
-        method
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        method.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setOriginElement(origin.toHapi())
@@ -703,65 +651,33 @@ public object TestScriptConverter {
     hapiValue.setDescriptionElement(description.toHapi())
     hapiValue.setDirection(
       org.hl7.fhir.r4.model.TestScript.AssertionDirectionType.valueOf(
-        direction
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        direction.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setCompareToSourceIdElement(compareToSourceId.toHapi())
     hapiValue.setCompareToSourceExpressionElement(compareToSourceExpression.toHapi())
     hapiValue.setCompareToSourcePathElement(compareToSourcePath.toHapi())
-    hapiValue.setContentType(
-      contentType.value.apply {
-        if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL" else this
-      }
-    )
+    hapiValue.setContentType(contentType.value.hapiCodeCheck())
     hapiValue.setExpressionElement(expression.toHapi())
     hapiValue.setHeaderFieldElement(headerField.toHapi())
     hapiValue.setMinimumIdElement(minimumId.toHapi())
     hapiValue.setNavigationLinksElement(navigationLinks.toHapi())
     hapiValue.setOperator(
       org.hl7.fhir.r4.model.TestScript.AssertionOperatorType.valueOf(
-        operator
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        operator.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setPathElement(path.toHapi())
     hapiValue.setRequestMethod(
       org.hl7.fhir.r4.model.TestScript.TestScriptRequestMethodCode.valueOf(
-        requestMethod
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        requestMethod.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setRequestURLElement(requestUrl.toHapi())
     hapiValue.setResource(resource.value.name)
     hapiValue.setResponse(
       org.hl7.fhir.r4.model.TestScript.AssertionResponseTypes.valueOf(
-        response
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        response.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setResponseCodeElement(responseCode.toHapi())

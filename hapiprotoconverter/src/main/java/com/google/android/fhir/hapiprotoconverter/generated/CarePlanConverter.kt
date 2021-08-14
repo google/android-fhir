@@ -135,26 +135,12 @@ public object CarePlanConverter {
     hapiValue.setPartOf(partOfList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.CarePlan.CarePlanStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setIntent(
       org.hl7.fhir.r4.model.CarePlan.CarePlanIntent.valueOf(
-        intent
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        intent.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setCategory(categoryList.map { it.toHapi() })
@@ -195,11 +181,7 @@ public object CarePlanConverter {
           CarePlan.StatusCode.newBuilder()
             .setValue(
               RequestStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -208,11 +190,7 @@ public object CarePlanConverter {
           CarePlan.IntentCode.newBuilder()
             .setValue(
               CarePlanIntentValueSet.Value.valueOf(
-                intent
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -265,11 +243,7 @@ public object CarePlanConverter {
           CarePlan.Activity.Detail.KindCode.newBuilder()
             .setValue(
               CarePlanActivityKindValueSet.Value.valueOf(
-                kind
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -284,11 +258,7 @@ public object CarePlanConverter {
           CarePlan.Activity.Detail.StatusCode.newBuilder()
             .setValue(
               CarePlanActivityStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -329,14 +299,7 @@ public object CarePlanConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setKind(
       org.hl7.fhir.r4.model.CarePlan.CarePlanActivityKind.valueOf(
-        kind
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        kind.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setInstantiatesCanonical(instantiatesCanonicalList.map { it.toHapi() })
@@ -347,14 +310,7 @@ public object CarePlanConverter {
     hapiValue.setGoal(goalList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.CarePlan.CarePlanActivityStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setStatusReason(statusReason.toHapi())

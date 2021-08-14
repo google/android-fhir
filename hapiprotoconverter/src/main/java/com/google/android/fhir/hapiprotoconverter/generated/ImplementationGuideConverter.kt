@@ -170,16 +170,7 @@ public object ImplementationGuideConverter {
     hapiValue.setNameElement(name.toHapi())
     hapiValue.setTitleElement(title.toHapi())
     hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setExperimentalElement(experimental.toHapi())
     hapiValue.setDateElement(date.toHapi())
@@ -192,27 +183,12 @@ public object ImplementationGuideConverter {
     hapiValue.setPackageIdElement(packageId.toHapi())
     hapiValue.setLicense(
       org.hl7.fhir.r4.model.ImplementationGuide.SPDXLicense.valueOf(
-        license
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        license.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     fhirVersionList.forEach {
       hapiValue.addFhirVersion(
-        Enumerations.FHIRVersion.valueOf(
-          it.value
-            .name
-            .apply {
-              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-              else this
-            }
-            .replace("_", "")
-        )
+        Enumerations.FHIRVersion.valueOf(it.value.name.hapiCodeCheck().replace("_", ""))
       )
     }
     hapiValue.setDependsOn(dependsOnList.map { it.toHapi() })
@@ -240,11 +216,7 @@ public object ImplementationGuideConverter {
           ImplementationGuide.StatusCode.newBuilder()
             .setValue(
               PublicationStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -262,11 +234,7 @@ public object ImplementationGuideConverter {
           ImplementationGuide.LicenseCode.newBuilder()
             .setValue(
               SPDXLicenseCode.Value.valueOf(
-                license
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                license.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -276,11 +244,7 @@ public object ImplementationGuideConverter {
             ImplementationGuide.FhirVersionCode.newBuilder()
               .setValue(
                 FHIRVersionCode.Value.valueOf(
-                  it.value
-                    .toCode()
-                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                    .replace("-", "_")
-                    .toUpperCase()
+                  it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
                 )
               )
               .build()
@@ -372,11 +336,7 @@ public object ImplementationGuideConverter {
             ImplementationGuide.Definition.Resource.FhirVersionCode.newBuilder()
               .setValue(
                 FHIRVersionCode.Value.valueOf(
-                  it.value
-                    .toCode()
-                    .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                    .replace("-", "_")
-                    .toUpperCase()
+                  it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
                 )
               )
               .build()
@@ -404,11 +364,7 @@ public object ImplementationGuideConverter {
           ImplementationGuide.Definition.Page.GenerationCode.newBuilder()
             .setValue(
               GuidePageGenerationCode.Value.valueOf(
-                generation
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                generation.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -563,15 +519,7 @@ public object ImplementationGuideConverter {
     hapiValue.setReference(reference.toHapi())
     fhirVersionList.forEach {
       hapiValue.addFhirVersion(
-        Enumerations.FHIRVersion.valueOf(
-          it.value
-            .name
-            .apply {
-              if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-              else this
-            }
-            .replace("_", "")
-        )
+        Enumerations.FHIRVersion.valueOf(it.value.name.hapiCodeCheck().replace("_", ""))
       )
     }
     hapiValue.setNameElement(name.toHapi())
@@ -593,14 +541,7 @@ public object ImplementationGuideConverter {
     hapiValue.setTitleElement(title.toHapi())
     hapiValue.setGeneration(
       org.hl7.fhir.r4.model.ImplementationGuide.GuidePageGeneration.valueOf(
-        generation
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        generation.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     return hapiValue

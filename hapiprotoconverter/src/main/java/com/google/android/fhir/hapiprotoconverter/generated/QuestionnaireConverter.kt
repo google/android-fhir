@@ -318,26 +318,10 @@ public object QuestionnaireConverter {
     hapiValue.setTitleElement(title.toHapi())
     hapiValue.setDerivedFrom(derivedFromList.map { it.toHapi() })
     hapiValue.setStatus(
-      Enumerations.PublicationStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
-      )
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
     hapiValue.setExperimentalElement(experimental.toHapi())
-    subjectTypeList.forEach {
-      hapiValue.addSubjectType(
-        it.value.name.apply {
-          if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-          else this
-        }
-      )
-    }
+    subjectTypeList.forEach { hapiValue.addSubjectType(it.value.name.hapiCodeCheck()) }
     hapiValue.setDateElement(date.toHapi())
     hapiValue.setPublisherElement(publisher.toHapi())
     hapiValue.setContact(contactList.map { it.toHapi() })
@@ -374,11 +358,7 @@ public object QuestionnaireConverter {
           Questionnaire.StatusCode.newBuilder()
             .setValue(
               PublicationStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -387,13 +367,7 @@ public object QuestionnaireConverter {
         .addAllSubjectType(
           subjectType.map {
             Questionnaire.SubjectTypeCode.newBuilder()
-              .setValue(
-                ResourceTypeCode.Value.valueOf(
-                  it.valueAsString.apply {
-                    if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this
-                  }
-                )
-              )
+              .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString.protoCodeCheck()))
               .build()
           }
         )
@@ -431,11 +405,7 @@ public object QuestionnaireConverter {
           Questionnaire.Item.TypeCode.newBuilder()
             .setValue(
               QuestionnaireItemTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -445,11 +415,7 @@ public object QuestionnaireConverter {
           Questionnaire.Item.EnableBehaviorCode.newBuilder()
             .setValue(
               EnableWhenBehaviorCode.Value.valueOf(
-                enableBehavior
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                enableBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -478,11 +444,7 @@ public object QuestionnaireConverter {
           Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
             .setValue(
               QuestionnaireItemOperatorCode.Value.valueOf(
-                operator
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                operator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -533,27 +495,13 @@ public object QuestionnaireConverter {
     hapiValue.setTextElement(text.toHapi())
     hapiValue.setType(
       org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setEnableWhen(enableWhenList.map { it.toHapi() })
     hapiValue.setEnableBehavior(
       org.hl7.fhir.r4.model.Questionnaire.EnableWhenBehavior.valueOf(
-        enableBehavior
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        enableBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setRequiredElement(required.toHapi())
@@ -576,14 +524,7 @@ public object QuestionnaireConverter {
     hapiValue.setQuestionElement(question.toHapi())
     hapiValue.setOperator(
       org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemOperator.valueOf(
-        operator
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        operator.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setAnswer(answer.questionnaireItemEnableWhenAnswerToHapi())

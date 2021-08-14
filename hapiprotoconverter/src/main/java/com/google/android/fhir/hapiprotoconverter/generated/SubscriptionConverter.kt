@@ -52,14 +52,7 @@ public object SubscriptionConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Subscription.SubscriptionStatus.valueOf(
-        status
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setContact(contactList.map { it.toHapi() })
@@ -85,11 +78,7 @@ public object SubscriptionConverter {
           Subscription.StatusCode.newBuilder()
             .setValue(
               SubscriptionStatusCode.Value.valueOf(
-                status
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
@@ -116,20 +105,14 @@ public object SubscriptionConverter {
           Subscription.Channel.TypeCode.newBuilder()
             .setValue(
               SubscriptionChannelTypeCode.Value.valueOf(
-                type
-                  .toCode()
-                  .apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-                  .replace("-", "_")
-                  .toUpperCase()
+                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
               )
             )
             .build()
         )
         .setEndpoint(endpointElement.toProto())
         .setPayload(
-          Subscription.Channel.PayloadCode.newBuilder()
-            .setValue(payload.apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this })
-            .build()
+          Subscription.Channel.PayloadCode.newBuilder().setValue(payload.protoCodeCheck()).build()
         )
         .addAllHeader(header.map { it.toProto() })
         .build()
@@ -145,22 +128,11 @@ public object SubscriptionConverter {
     hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
     hapiValue.setType(
       org.hl7.fhir.r4.model.Subscription.SubscriptionChannelType.valueOf(
-        type
-          .value
-          .name
-          .apply {
-            if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL"
-            else this
-          }
-          .replace("_", "")
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
     hapiValue.setEndpointElement(endpoint.toHapi())
-    hapiValue.setPayload(
-      payload.value.apply {
-        if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL" else this
-      }
-    )
+    hapiValue.setPayload(payload.value.hapiCodeCheck())
     hapiValue.setHeader(headerList.map { it.toHapi() })
     return hapiValue
   }

@@ -31,11 +31,7 @@ public object MoneyConverter {
     hapiValue.id = id.value
     hapiValue.setExtension(extensionList.map { it.toHapi() })
     hapiValue.setValueElement(value.toHapi())
-    hapiValue.setCurrency(
-      currency.value.apply {
-        if (equals("INVALID_UNINITIALIZED", true) || equals("UNRECOGNIZED", true)) "NULL" else this
-      }
-    )
+    hapiValue.setCurrency(currency.value.hapiCodeCheck())
     return hapiValue
   }
 
@@ -46,13 +42,7 @@ public object MoneyConverter {
         .setId(String.newBuilder().setValue(id))
         .addAllExtension(extension.map { it.toProto() })
         .setValue(valueElement.toProto())
-        .setCurrency(
-          Money.CurrencyCode.newBuilder()
-            .setValue(
-              currency.apply { if (equals("NULL", true)) "INVALID_UNINITIALIZED" else this }
-            )
-            .build()
-        )
+        .setCurrency(Money.CurrencyCode.newBuilder().setValue(currency.protoCodeCheck()).build())
         .build()
     return protoValue
   }
