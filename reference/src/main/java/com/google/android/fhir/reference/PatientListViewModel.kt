@@ -25,6 +25,7 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.Order
+import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
@@ -54,12 +55,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   }
 
   private suspend fun count(): Long {
-    return fhirEngine.count<Patient> {
-      filter(Patient.ADDRESS_CITY) {
-        modifier = StringFilterModifier.MATCHES_EXACTLY
-        value = "NAIROBI"
-      }
-    }
+    return fhirEngine.count<Patient> { filterCity(this) }
   }
 
   private suspend fun getSearchResults(nameQuery: String = ""): List<PatientItem> {
@@ -71,10 +67,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
             modifier = StringFilterModifier.CONTAINS
             value = nameQuery
           }
-        filter(Patient.ADDRESS_CITY) {
-          modifier = StringFilterModifier.MATCHES_EXACTLY
-          value = "NAIROBI"
-        }
+        filterCity(this)
         sort(Patient.GIVEN, Order.ASCENDING)
         count = 100
         from = 0
@@ -83,6 +76,13 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
       .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
       .let { patients.addAll(it) }
     return patients
+  }
+
+  private fun filterCity(search: Search) {
+    search.filter(Patient.ADDRESS_CITY) {
+      modifier = StringFilterModifier.MATCHES_EXACTLY
+      value = "NAIROBI"
+    }
   }
 
   /** The Patient's details for display purposes. */
