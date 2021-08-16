@@ -116,7 +116,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
             return true
           }
         }
-        // TODO check other resources inputs
+      // TODO check other resources inputs
       }
     }
     return false
