@@ -37,7 +37,6 @@ dependencies {
   implementation(Dependencies.FhirProto.fhirProtobufs)
   implementation(Dependencies.Kotlin.stdlib)
   runtimeOnly(Dependencies.kotlinPoet)
-  testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.truth)
 }
