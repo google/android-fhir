@@ -36,6 +36,11 @@
   <string name="patient_city">City</string>
   <string name="patient_country">Country</string>
   <string name="patient_is_active">Is Active</string>
+  <string name="patient_property_mobile">Mobile Number</string>
+  <string name="patient_property_id">ID Number</string>
+  <string name="patient_property_address">Address</string>
+  <string name="patient_property_dob">Date of Birth</string>
+  <string name="patient_property_gender">Gender</string>
   <string name="add_patient">Add Patient</string>
   <string name="edit_patient">Edit Patient</string>
   <string name="submit">Submit</string>
@@ -53,4 +58,5 @@
   <string name="message_no_datetime">No effective DateTime</string>
   <string name="message_no_value_quantity">No ValueQuantity</string>
   <string name="complete_survey">Complete Survey</string>
+  <string name="description_status">Status</string>
 </resources>

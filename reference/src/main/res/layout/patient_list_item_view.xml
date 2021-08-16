@@ -26,12 +26,11 @@
         android:id="@+id/status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
         android:layout_marginStart="@dimen/text_margin"
-        android:layout_marginBottom="@dimen/text_margin"
+        android:layout_marginTop="@dimen/status_margin"
         android:gravity="center_vertical"
         android:src="@drawable/ic_baseline_circle"
-        android:contentDescription="Status"
+        android:contentDescription="@string/description_status"
     />
 
     <TextView

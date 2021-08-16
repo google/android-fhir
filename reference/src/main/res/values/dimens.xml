@@ -21,4 +21,5 @@
     <dimen name="large_text_margin">24dp</dimen>
     <dimen name="text_margin">10dp</dimen>
     <dimen name="small_text_margin">2dp</dimen>
+    <dimen name="status_margin">15dp</dimen>
 </resources>

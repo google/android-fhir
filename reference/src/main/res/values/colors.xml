@@ -16,6 +16,7 @@
 -->
 <resources>
     <color name="colorPrimary">#175adf</color>
-    <color name="colorPrimaryDark">#175adf</color>
+    <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#175adf</color>
+    <color name="colorStatusBar">#175adf</color>
 </resources>

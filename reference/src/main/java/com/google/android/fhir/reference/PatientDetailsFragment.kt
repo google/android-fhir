@@ -116,11 +116,17 @@ class PatientDetailsFragment : Fragment() {
       patientDetailsCard.propertiesContainer.apply {
         addHeader(patient)
         listOf(
-          PatientProperty("Mobile Number", patient.phone),
-          PatientProperty("ID Number", patient.resourceId),
-          PatientProperty("Address", "${patient.city}, ${patient.country} "),
-          PatientProperty("Date of Birth", patient.dob),
-          PatientProperty("Gender", patient.gender.capitalize(Locale.ROOT)),
+          PatientProperty(getString(R.string.patient_property_mobile), patient.phone),
+          PatientProperty(getString(R.string.patient_property_id), patient.resourceId),
+          PatientProperty(
+            getString(R.string.patient_property_address),
+            "${patient.city}, ${patient.country} "
+          ),
+          PatientProperty(getString(R.string.patient_property_dob), patient.dob),
+          PatientProperty(
+            getString(R.string.patient_property_gender),
+            patient.gender.capitalize(Locale.ROOT)
+          ),
         )
           .forEach { addPropertyView(it) }
       }
