@@ -51,95 +51,166 @@ public object CompartmentDefinitionConverter {
   public fun CompartmentDefinition.toHapi(): org.hl7.fhir.r4.model.CompartmentDefinition {
     val hapiValue = org.hl7.fhir.r4.model.CompartmentDefinition()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setVersionElement(version.toHapi())
-    hapiValue.setNameElement(name.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
     hapiValue.setStatus(
       Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setExperimentalElement(experimental.toHapi())
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setPublisherElement(publisher.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setUseContext(useContextList.map { it.toHapi() })
-    hapiValue.setPurposeElement(purpose.toHapi())
+    if (hasExperimental()) {
+      hapiValue.setExperimentalElement(experimental.toHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasPublisher()) {
+      hapiValue.setPublisherElement(publisher.toHapi())
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (useContextCount > 0) {
+      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+    }
+    if (hasPurpose()) {
+      hapiValue.setPurposeElement(purpose.toHapi())
+    }
     hapiValue.setCode(
       org.hl7.fhir.r4.model.CompartmentDefinition.CompartmentType.valueOf(
         code.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setSearchElement(search.toHapi())
-    hapiValue.setResource(resourceList.map { it.toHapi() })
+    if (hasSearch()) {
+      hapiValue.setSearchElement(search.toHapi())
+    }
+    if (resourceCount > 0) {
+      hapiValue.setResource(resourceList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.CompartmentDefinition.toProto(): CompartmentDefinition {
-    val protoValue =
-      CompartmentDefinition.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUrl(urlElement.toProto())
-        .setVersion(versionElement.toProto())
-        .setName(nameElement.toProto())
-        .setStatus(
-          CompartmentDefinition.StatusCode.newBuilder()
-            .setValue(
-              PublicationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = CompartmentDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    protoValue.setStatus(
+      CompartmentDefinition.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setExperimental(experimentalElement.toProto())
-        .setDate(dateElement.toProto())
-        .setPublisher(publisherElement.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .addAllUseContext(useContext.map { it.toProto() })
-        .setPurpose(purposeElement.toProto())
-        .setCode(
-          CompartmentDefinition.CodeType.newBuilder()
-            .setValue(
-              CompartmentTypeCode.Value.valueOf(
-                code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setSearch(searchElement.toProto())
-        .addAllResource(resource.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasExperimental()) {
+      protoValue.setExperimental(experimentalElement.toProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasPublisher()) {
+      protoValue.setPublisher(publisherElement.toProto())
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasUseContext()) {
+      protoValue.addAllUseContext(useContext.map { it.toProto() })
+    }
+    if (hasPurpose()) {
+      protoValue.setPurpose(purposeElement.toProto())
+    }
+    protoValue.setCode(
+      CompartmentDefinition.CodeType.newBuilder()
+        .setValue(
+          CompartmentTypeCode.Value.valueOf(
+            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasSearch()) {
+      protoValue.setSearch(searchElement.toProto())
+    }
+    if (hasResource()) {
+      protoValue.addAllResource(resource.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.CompartmentDefinition.CompartmentDefinitionResourceComponent.toProto():
     CompartmentDefinition.Resource {
     val protoValue =
-      CompartmentDefinition.Resource.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(
-          CompartmentDefinition.Resource.CodeType.newBuilder()
-            .setValue(ResourceTypeCode.Value.valueOf(code))
-            .build()
-        )
-        .addAllParam(param.map { it.toProto() })
-        .setDocumentation(documentationElement.toProto())
+      CompartmentDefinition.Resource.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setCode(
+      CompartmentDefinition.Resource.CodeType.newBuilder()
+        .setValue(ResourceTypeCode.Value.valueOf(code))
         .build()
-    return protoValue
+    )
+    if (hasParam()) {
+      protoValue.addAllParam(param.map { it.toProto() })
+    }
+    if (hasDocumentation()) {
+      protoValue.setDocumentation(documentationElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -148,11 +219,19 @@ public object CompartmentDefinitionConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.CompartmentDefinition.CompartmentDefinitionResourceComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setCode(code.value.name)
-    hapiValue.setParam(paramList.map { it.toHapi() })
-    hapiValue.setDocumentationElement(documentation.toHapi())
+    if (paramCount > 0) {
+      hapiValue.setParam(paramList.map { it.toHapi() })
+    }
+    if (hasDocumentation()) {
+      hapiValue.setDocumentationElement(documentation.toHapi())
+    }
     return hapiValue
   }
 }

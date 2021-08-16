@@ -33,29 +33,54 @@ public object MarketingStatusConverter {
   public fun MarketingStatus.toHapi(): org.hl7.fhir.r4.model.MarketingStatus {
     val hapiValue = org.hl7.fhir.r4.model.MarketingStatus()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCountry(country.toHapi())
-    hapiValue.setJurisdiction(jurisdiction.toHapi())
-    hapiValue.setStatus(status.toHapi())
-    hapiValue.setDateRange(dateRange.toHapi())
-    hapiValue.setRestoreDateElement(restoreDate.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCountry()) {
+      hapiValue.setCountry(country.toHapi())
+    }
+    if (hasJurisdiction()) {
+      hapiValue.setJurisdiction(jurisdiction.toHapi())
+    }
+    if (hasStatus()) {
+      hapiValue.setStatus(status.toHapi())
+    }
+    if (hasDateRange()) {
+      hapiValue.setDateRange(dateRange.toHapi())
+    }
+    if (hasRestoreDate()) {
+      hapiValue.setRestoreDateElement(restoreDate.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.MarketingStatus.toProto(): MarketingStatus {
-    val protoValue =
-      MarketingStatus.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCountry(country.toProto())
-        .setJurisdiction(jurisdiction.toProto())
-        .setStatus(status.toProto())
-        .setDateRange(dateRange.toProto())
-        .setRestoreDate(restoreDateElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = MarketingStatus.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCountry()) {
+      protoValue.setCountry(country.toProto())
+    }
+    if (hasJurisdiction()) {
+      protoValue.setJurisdiction(jurisdiction.toProto())
+    }
+    if (hasStatus()) {
+      protoValue.setStatus(status.toProto())
+    }
+    if (hasDateRange()) {
+      protoValue.setDateRange(dateRange.toProto())
+    }
+    if (hasRestoreDate()) {
+      protoValue.setRestoreDate(restoreDateElement.toProto())
+    }
+    return protoValue.build()
   }
 }

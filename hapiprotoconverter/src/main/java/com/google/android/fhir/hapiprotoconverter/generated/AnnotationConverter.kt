@@ -62,23 +62,36 @@ public object AnnotationConverter {
   public fun Annotation.toHapi(): org.hl7.fhir.r4.model.Annotation {
     val hapiValue = org.hl7.fhir.r4.model.Annotation()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setAuthor(author.annotationAuthorToHapi())
-    hapiValue.setTimeElement(time.toHapi())
-    hapiValue.setTextElement(text.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasAuthor()) {
+      hapiValue.setAuthor(author.annotationAuthorToHapi())
+    }
+    if (hasTime()) {
+      hapiValue.setTimeElement(time.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setTextElement(text.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Annotation.toProto(): Annotation {
-    val protoValue =
-      Annotation.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setAuthor(author.annotationAuthorToProto())
-        .setTime(timeElement.toProto())
-        .setText(textElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Annotation.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasAuthor()) {
+      protoValue.setAuthor(author.annotationAuthorToProto())
+    }
+    if (hasTime()) {
+      protoValue.setTime(timeElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(textElement.toProto())
+    }
+    return protoValue.build()
   }
 }

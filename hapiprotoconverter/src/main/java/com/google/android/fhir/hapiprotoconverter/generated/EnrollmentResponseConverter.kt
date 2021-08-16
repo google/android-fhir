@@ -44,63 +44,104 @@ public object EnrollmentResponseConverter {
   public fun EnrollmentResponse.toHapi(): org.hl7.fhir.r4.model.EnrollmentResponse {
     val hapiValue = org.hl7.fhir.r4.model.EnrollmentResponse()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.EnrollmentResponse.EnrollmentResponseStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setRequest(request.toHapi())
+    if (hasRequest()) {
+      hapiValue.setRequest(request.toHapi())
+    }
     hapiValue.setOutcome(
       Enumerations.RemittanceOutcome.valueOf(outcome.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setDispositionElement(disposition.toHapi())
-    hapiValue.setCreatedElement(created.toHapi())
-    hapiValue.setOrganization(organization.toHapi())
-    hapiValue.setRequestProvider(requestProvider.toHapi())
+    if (hasDisposition()) {
+      hapiValue.setDispositionElement(disposition.toHapi())
+    }
+    if (hasCreated()) {
+      hapiValue.setCreatedElement(created.toHapi())
+    }
+    if (hasOrganization()) {
+      hapiValue.setOrganization(organization.toHapi())
+    }
+    if (hasRequestProvider()) {
+      hapiValue.setRequestProvider(requestProvider.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.EnrollmentResponse.toProto(): EnrollmentResponse {
-    val protoValue =
-      EnrollmentResponse.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setStatus(
-          EnrollmentResponse.StatusCode.newBuilder()
-            .setValue(
-              FinancialResourceStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = EnrollmentResponse.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      EnrollmentResponse.StatusCode.newBuilder()
+        .setValue(
+          FinancialResourceStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setRequest(request.toProto())
-        .setOutcome(
-          EnrollmentResponse.OutcomeCode.newBuilder()
-            .setValue(
-              ClaimProcessingCode.Value.valueOf(
-                outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setDisposition(dispositionElement.toProto())
-        .setCreated(createdElement.toProto())
-        .setOrganization(organization.toProto())
-        .setRequestProvider(requestProvider.toProto())
         .build()
-    return protoValue
+    )
+    if (hasRequest()) {
+      protoValue.setRequest(request.toProto())
+    }
+    protoValue.setOutcome(
+      EnrollmentResponse.OutcomeCode.newBuilder()
+        .setValue(
+          ClaimProcessingCode.Value.valueOf(
+            outcome.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasDisposition()) {
+      protoValue.setDisposition(dispositionElement.toProto())
+    }
+    if (hasCreated()) {
+      protoValue.setCreated(createdElement.toProto())
+    }
+    if (hasOrganization()) {
+      protoValue.setOrganization(organization.toProto())
+    }
+    if (hasRequestProvider()) {
+      protoValue.setRequestProvider(requestProvider.toProto())
+    }
+    return protoValue.build()
   }
 }

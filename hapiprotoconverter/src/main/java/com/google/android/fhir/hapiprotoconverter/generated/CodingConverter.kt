@@ -35,27 +35,48 @@ public object CodingConverter {
   public fun Coding.toHapi(): org.hl7.fhir.r4.model.Coding {
     val hapiValue = org.hl7.fhir.r4.model.Coding()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setSystemElement(system.toHapi())
-    hapiValue.setVersionElement(version.toHapi())
-    hapiValue.setCodeElement(code.toHapi())
-    hapiValue.setDisplayElement(display.toHapi())
-    hapiValue.setUserSelectedElement(userSelected.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasSystem()) {
+      hapiValue.setSystemElement(system.toHapi())
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
+    if (hasCode()) {
+      hapiValue.setCodeElement(code.toHapi())
+    }
+    if (hasDisplay()) {
+      hapiValue.setDisplayElement(display.toHapi())
+    }
+    if (hasUserSelected()) {
+      hapiValue.setUserSelectedElement(userSelected.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Coding.toProto(): Coding {
-    val protoValue =
-      Coding.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setSystem(systemElement.toProto())
-        .setVersion(versionElement.toProto())
-        .setCode(codeElement.toProto())
-        .setDisplay(displayElement.toProto())
-        .setUserSelected(userSelectedElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Coding.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasSystem()) {
+      protoValue.setSystem(systemElement.toProto())
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    if (hasCode()) {
+      protoValue.setCode(codeElement.toProto())
+    }
+    if (hasDisplay()) {
+      protoValue.setDisplay(displayElement.toProto())
+    }
+    if (hasUserSelected()) {
+      protoValue.setUserSelected(userSelectedElement.toProto())
+    }
+    return protoValue.build()
   }
 }

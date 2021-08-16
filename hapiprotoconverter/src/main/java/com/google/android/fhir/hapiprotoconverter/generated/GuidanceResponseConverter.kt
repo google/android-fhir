@@ -84,67 +84,140 @@ public object GuidanceResponseConverter {
   public fun GuidanceResponse.toHapi(): org.hl7.fhir.r4.model.GuidanceResponse {
     val hapiValue = org.hl7.fhir.r4.model.GuidanceResponse()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setRequestIdentifier(requestIdentifier.toHapi())
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setModule(module.guidanceResponseModuleToHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasRequestIdentifier()) {
+      hapiValue.setRequestIdentifier(requestIdentifier.toHapi())
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasModule()) {
+      hapiValue.setModule(module.guidanceResponseModuleToHapi())
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.GuidanceResponse.GuidanceResponseStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setSubject(subject.toHapi())
-    hapiValue.setEncounter(encounter.toHapi())
-    hapiValue.setOccurrenceDateTimeElement(occurrenceDateTime.toHapi())
-    hapiValue.setPerformer(performer.toHapi())
-    hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
-    hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
-    hapiValue.setNote(noteList.map { it.toHapi() })
-    hapiValue.setEvaluationMessage(evaluationMessageList.map { it.toHapi() })
-    hapiValue.setOutputParameters(outputParameters.toHapi())
-    hapiValue.setResult(result.toHapi())
-    hapiValue.setDataRequirement(dataRequirementList.map { it.toHapi() })
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.toHapi())
+    }
+    if (hasEncounter()) {
+      hapiValue.setEncounter(encounter.toHapi())
+    }
+    if (hasOccurrenceDateTime()) {
+      hapiValue.setOccurrenceDateTimeElement(occurrenceDateTime.toHapi())
+    }
+    if (hasPerformer()) {
+      hapiValue.setPerformer(performer.toHapi())
+    }
+    if (reasonCodeCount > 0) {
+      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+    }
+    if (reasonReferenceCount > 0) {
+      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+    }
+    if (noteCount > 0) {
+      hapiValue.setNote(noteList.map { it.toHapi() })
+    }
+    if (evaluationMessageCount > 0) {
+      hapiValue.setEvaluationMessage(evaluationMessageList.map { it.toHapi() })
+    }
+    if (hasOutputParameters()) {
+      hapiValue.setOutputParameters(outputParameters.toHapi())
+    }
+    if (hasResult()) {
+      hapiValue.setResult(result.toHapi())
+    }
+    if (dataRequirementCount > 0) {
+      hapiValue.setDataRequirement(dataRequirementList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.GuidanceResponse.toProto(): GuidanceResponse {
-    val protoValue =
-      GuidanceResponse.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setRequestIdentifier(requestIdentifier.toProto())
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setModule(module.guidanceResponseModuleToProto())
-        .setStatus(
-          GuidanceResponse.StatusCode.newBuilder()
-            .setValue(
-              GuidanceResponseStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = GuidanceResponse.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasRequestIdentifier()) {
+      protoValue.setRequestIdentifier(requestIdentifier.toProto())
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasModule()) {
+      protoValue.setModule(module.guidanceResponseModuleToProto())
+    }
+    protoValue.setStatus(
+      GuidanceResponse.StatusCode.newBuilder()
+        .setValue(
+          GuidanceResponseStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setSubject(subject.toProto())
-        .setEncounter(encounter.toProto())
-        .setOccurrenceDateTime(occurrenceDateTimeElement.toProto())
-        .setPerformer(performer.toProto())
-        .addAllReasonCode(reasonCode.map { it.toProto() })
-        .addAllReasonReference(reasonReference.map { it.toProto() })
-        .addAllNote(note.map { it.toProto() })
-        .addAllEvaluationMessage(evaluationMessage.map { it.toProto() })
-        .setOutputParameters(outputParameters.toProto())
-        .setResult(result.toProto())
-        .addAllDataRequirement(dataRequirement.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasSubject()) {
+      protoValue.setSubject(subject.toProto())
+    }
+    if (hasEncounter()) {
+      protoValue.setEncounter(encounter.toProto())
+    }
+    if (hasOccurrenceDateTime()) {
+      protoValue.setOccurrenceDateTime(occurrenceDateTimeElement.toProto())
+    }
+    if (hasPerformer()) {
+      protoValue.setPerformer(performer.toProto())
+    }
+    if (hasReasonCode()) {
+      protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
+    }
+    if (hasReasonReference()) {
+      protoValue.addAllReasonReference(reasonReference.map { it.toProto() })
+    }
+    if (hasNote()) {
+      protoValue.addAllNote(note.map { it.toProto() })
+    }
+    if (hasEvaluationMessage()) {
+      protoValue.addAllEvaluationMessage(evaluationMessage.map { it.toProto() })
+    }
+    if (hasOutputParameters()) {
+      protoValue.setOutputParameters(outputParameters.toProto())
+    }
+    if (hasResult()) {
+      protoValue.setResult(result.toProto())
+    }
+    if (hasDataRequirement()) {
+      protoValue.addAllDataRequirement(dataRequirement.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 }

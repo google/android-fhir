@@ -497,19 +497,24 @@ public object ExtensionConverter {
   public fun Extension.toHapi(): org.hl7.fhir.r4.model.Extension {
     val hapiValue = org.hl7.fhir.r4.model.Extension()
     hapiValue.id = id.value
-    hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setValue(value.extensionValueToHapi())
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.extensionValueToHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Extension.toProto(): Extension {
-    val protoValue =
-      Extension.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .setUrl(urlElement.toProto())
-        .setValue(value.extensionValueToProto())
-        .build()
-    return protoValue
+    val protoValue = Extension.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.extensionValueToProto())
+    }
+    return protoValue.build()
   }
 }

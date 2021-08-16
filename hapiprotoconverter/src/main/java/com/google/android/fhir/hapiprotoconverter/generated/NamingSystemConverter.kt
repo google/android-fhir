@@ -55,12 +55,24 @@ public object NamingSystemConverter {
   public fun NamingSystem.toHapi(): org.hl7.fhir.r4.model.NamingSystem {
     val hapiValue = org.hl7.fhir.r4.model.NamingSystem()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
     hapiValue.setStatus(
       Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
@@ -69,85 +81,143 @@ public object NamingSystemConverter {
         kind.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setPublisherElement(publisher.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setResponsibleElement(responsible.toHapi())
-    hapiValue.setType(type.toHapi())
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setUseContext(useContextList.map { it.toHapi() })
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
-    hapiValue.setUsageElement(usage.toHapi())
-    hapiValue.setUniqueId(uniqueIdList.map { it.toHapi() })
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasPublisher()) {
+      hapiValue.setPublisherElement(publisher.toHapi())
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (hasResponsible()) {
+      hapiValue.setResponsibleElement(responsible.toHapi())
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (useContextCount > 0) {
+      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+    }
+    if (jurisdictionCount > 0) {
+      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    }
+    if (hasUsage()) {
+      hapiValue.setUsageElement(usage.toHapi())
+    }
+    if (uniqueIdCount > 0) {
+      hapiValue.setUniqueId(uniqueIdList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.NamingSystem.toProto(): NamingSystem {
-    val protoValue =
-      NamingSystem.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .setStatus(
-          NamingSystem.StatusCode.newBuilder()
-            .setValue(
-              PublicationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = NamingSystem.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    protoValue.setStatus(
+      NamingSystem.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setKind(
-          NamingSystem.KindCode.newBuilder()
-            .setValue(
-              NamingSystemTypeCode.Value.valueOf(
-                kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setDate(dateElement.toProto())
-        .setPublisher(publisherElement.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setResponsible(responsibleElement.toProto())
-        .setType(type.toProto())
-        .setDescription(descriptionElement.toProto())
-        .addAllUseContext(useContext.map { it.toProto() })
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .setUsage(usageElement.toProto())
-        .addAllUniqueId(uniqueId.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    protoValue.setKind(
+      NamingSystem.KindCode.newBuilder()
+        .setValue(
+          NamingSystemTypeCode.Value.valueOf(
+            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasPublisher()) {
+      protoValue.setPublisher(publisherElement.toProto())
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasResponsible()) {
+      protoValue.setResponsible(responsibleElement.toProto())
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasUseContext()) {
+      protoValue.addAllUseContext(useContext.map { it.toProto() })
+    }
+    if (hasJurisdiction()) {
+      protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
+    }
+    if (hasUsage()) {
+      protoValue.setUsage(usageElement.toProto())
+    }
+    if (hasUniqueId()) {
+      protoValue.addAllUniqueId(uniqueId.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.NamingSystem.NamingSystemUniqueIdComponent.toProto():
     NamingSystem.UniqueId {
-    val protoValue =
-      NamingSystem.UniqueId.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(
-          NamingSystem.UniqueId.TypeCode.newBuilder()
-            .setValue(
-              NamingSystemIdentifierTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = NamingSystem.UniqueId.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setType(
+      NamingSystem.UniqueId.TypeCode.newBuilder()
+        .setValue(
+          NamingSystemIdentifierTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setValue(valueElement.toProto())
-        .setPreferred(preferredElement.toProto())
-        .setComment(commentElement.toProto())
-        .setPeriod(period.toProto())
         .build()
-    return protoValue
+    )
+    if (hasValue()) {
+      protoValue.setValue(valueElement.toProto())
+    }
+    if (hasPreferred()) {
+      protoValue.setPreferred(preferredElement.toProto())
+    }
+    if (hasComment()) {
+      protoValue.setComment(commentElement.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -155,17 +225,29 @@ public object NamingSystemConverter {
     org.hl7.fhir.r4.model.NamingSystem.NamingSystemUniqueIdComponent {
     val hapiValue = org.hl7.fhir.r4.model.NamingSystem.NamingSystemUniqueIdComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setType(
       org.hl7.fhir.r4.model.NamingSystem.NamingSystemIdentifierType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setValueElement(value.toHapi())
-    hapiValue.setPreferredElement(preferred.toHapi())
-    hapiValue.setCommentElement(comment.toHapi())
-    hapiValue.setPeriod(period.toHapi())
+    if (hasValue()) {
+      hapiValue.setValueElement(value.toHapi())
+    }
+    if (hasPreferred()) {
+      hapiValue.setPreferredElement(preferred.toHapi())
+    }
+    if (hasComment()) {
+      hapiValue.setCommentElement(comment.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
     return hapiValue
   }
 }

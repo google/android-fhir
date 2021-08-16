@@ -78,59 +78,140 @@ public object MedicinalProductAuthorizationConverter {
     org.hl7.fhir.r4.model.MedicinalProductAuthorization {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductAuthorization()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setSubject(subject.toHapi())
-    hapiValue.setCountry(countryList.map { it.toHapi() })
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
-    hapiValue.setStatus(status.toHapi())
-    hapiValue.setStatusDateElement(statusDate.toHapi())
-    hapiValue.setRestoreDateElement(restoreDate.toHapi())
-    hapiValue.setValidityPeriod(validityPeriod.toHapi())
-    hapiValue.setDataExclusivityPeriod(dataExclusivityPeriod.toHapi())
-    hapiValue.setDateOfFirstAuthorizationElement(dateOfFirstAuthorization.toHapi())
-    hapiValue.setInternationalBirthDateElement(internationalBirthDate.toHapi())
-    hapiValue.setLegalBasis(legalBasis.toHapi())
-    hapiValue.setJurisdictionalAuthorization(jurisdictionalAuthorizationList.map { it.toHapi() })
-    hapiValue.setHolder(holder.toHapi())
-    hapiValue.setRegulator(regulator.toHapi())
-    hapiValue.setProcedure(procedure.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.toHapi())
+    }
+    if (countryCount > 0) {
+      hapiValue.setCountry(countryList.map { it.toHapi() })
+    }
+    if (jurisdictionCount > 0) {
+      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    }
+    if (hasStatus()) {
+      hapiValue.setStatus(status.toHapi())
+    }
+    if (hasStatusDate()) {
+      hapiValue.setStatusDateElement(statusDate.toHapi())
+    }
+    if (hasRestoreDate()) {
+      hapiValue.setRestoreDateElement(restoreDate.toHapi())
+    }
+    if (hasValidityPeriod()) {
+      hapiValue.setValidityPeriod(validityPeriod.toHapi())
+    }
+    if (hasDataExclusivityPeriod()) {
+      hapiValue.setDataExclusivityPeriod(dataExclusivityPeriod.toHapi())
+    }
+    if (hasDateOfFirstAuthorization()) {
+      hapiValue.setDateOfFirstAuthorizationElement(dateOfFirstAuthorization.toHapi())
+    }
+    if (hasInternationalBirthDate()) {
+      hapiValue.setInternationalBirthDateElement(internationalBirthDate.toHapi())
+    }
+    if (hasLegalBasis()) {
+      hapiValue.setLegalBasis(legalBasis.toHapi())
+    }
+    if (jurisdictionalAuthorizationCount > 0) {
+      hapiValue.setJurisdictionalAuthorization(jurisdictionalAuthorizationList.map { it.toHapi() })
+    }
+    if (hasHolder()) {
+      hapiValue.setHolder(holder.toHapi())
+    }
+    if (hasRegulator()) {
+      hapiValue.setRegulator(regulator.toHapi())
+    }
+    if (hasProcedure()) {
+      hapiValue.setProcedure(procedure.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.MedicinalProductAuthorization.toProto():
     MedicinalProductAuthorization {
-    val protoValue =
-      MedicinalProductAuthorization.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setSubject(subject.toProto())
-        .addAllCountry(country.map { it.toProto() })
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .setStatus(status.toProto())
-        .setStatusDate(statusDateElement.toProto())
-        .setRestoreDate(restoreDateElement.toProto())
-        .setValidityPeriod(validityPeriod.toProto())
-        .setDataExclusivityPeriod(dataExclusivityPeriod.toProto())
-        .setDateOfFirstAuthorization(dateOfFirstAuthorizationElement.toProto())
-        .setInternationalBirthDate(internationalBirthDateElement.toProto())
-        .setLegalBasis(legalBasis.toProto())
-        .addAllJurisdictionalAuthorization(jurisdictionalAuthorization.map { it.toProto() })
-        .setHolder(holder.toProto())
-        .setRegulator(regulator.toProto())
-        .setProcedure(procedure.toProto())
-        .build()
-    return protoValue
+    val protoValue = MedicinalProductAuthorization.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.toProto())
+    }
+    if (hasCountry()) {
+      protoValue.addAllCountry(country.map { it.toProto() })
+    }
+    if (hasJurisdiction()) {
+      protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
+    }
+    if (hasStatus()) {
+      protoValue.setStatus(status.toProto())
+    }
+    if (hasStatusDate()) {
+      protoValue.setStatusDate(statusDateElement.toProto())
+    }
+    if (hasRestoreDate()) {
+      protoValue.setRestoreDate(restoreDateElement.toProto())
+    }
+    if (hasValidityPeriod()) {
+      protoValue.setValidityPeriod(validityPeriod.toProto())
+    }
+    if (hasDataExclusivityPeriod()) {
+      protoValue.setDataExclusivityPeriod(dataExclusivityPeriod.toProto())
+    }
+    if (hasDateOfFirstAuthorization()) {
+      protoValue.setDateOfFirstAuthorization(dateOfFirstAuthorizationElement.toProto())
+    }
+    if (hasInternationalBirthDate()) {
+      protoValue.setInternationalBirthDate(internationalBirthDateElement.toProto())
+    }
+    if (hasLegalBasis()) {
+      protoValue.setLegalBasis(legalBasis.toProto())
+    }
+    if (hasJurisdictionalAuthorization()) {
+      protoValue.addAllJurisdictionalAuthorization(jurisdictionalAuthorization.map { it.toProto() })
+    }
+    if (hasHolder()) {
+      protoValue.setHolder(holder.toProto())
+    }
+    if (hasRegulator()) {
+      protoValue.setRegulator(regulator.toProto())
+    }
+    if (hasProcedure()) {
+      protoValue.setProcedure(procedure.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -139,30 +220,51 @@ public object MedicinalProductAuthorizationConverter {
     val protoValue =
       MedicinalProductAuthorization.JurisdictionalAuthorization.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setCountry(country.toProto())
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .setLegalStatusOfSupply(legalStatusOfSupply.toProto())
-        .setValidityPeriod(validityPeriod.toProto())
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasCountry()) {
+      protoValue.setCountry(country.toProto())
+    }
+    if (hasJurisdiction()) {
+      protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
+    }
+    if (hasLegalStatusOfSupply()) {
+      protoValue.setLegalStatusOfSupply(legalStatusOfSupply.toProto())
+    }
+    if (hasValidityPeriod()) {
+      protoValue.setValidityPeriod(validityPeriod.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductAuthorization.MedicinalProductAuthorizationProcedureComponent.toProto():
     MedicinalProductAuthorization.Procedure {
     val protoValue =
-      MedicinalProductAuthorization.Procedure.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setIdentifier(identifier.toProto())
-        .setType(type.toProto())
-        .setDate(date.medicinalProductAuthorizationProcedureDateToProto())
-        .build()
-    return protoValue
+      MedicinalProductAuthorization.Procedure.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.setIdentifier(identifier.toProto())
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(date.medicinalProductAuthorizationProcedureDateToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -172,13 +274,27 @@ public object MedicinalProductAuthorizationConverter {
       org.hl7.fhir.r4.model.MedicinalProductAuthorization
         .MedicinalProductAuthorizationJurisdictionalAuthorizationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setCountry(country.toHapi())
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
-    hapiValue.setLegalStatusOfSupply(legalStatusOfSupply.toHapi())
-    hapiValue.setValidityPeriod(validityPeriod.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasCountry()) {
+      hapiValue.setCountry(country.toHapi())
+    }
+    if (jurisdictionCount > 0) {
+      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    }
+    if (hasLegalStatusOfSupply()) {
+      hapiValue.setLegalStatusOfSupply(legalStatusOfSupply.toHapi())
+    }
+    if (hasValidityPeriod()) {
+      hapiValue.setValidityPeriod(validityPeriod.toHapi())
+    }
     return hapiValue
   }
 
@@ -189,11 +305,21 @@ public object MedicinalProductAuthorizationConverter {
       org.hl7.fhir.r4.model.MedicinalProductAuthorization
         .MedicinalProductAuthorizationProcedureComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifier.toHapi())
-    hapiValue.setType(type.toHapi())
-    hapiValue.setDate(date.medicinalProductAuthorizationProcedureDateToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasIdentifier()) {
+      hapiValue.setIdentifier(identifier.toHapi())
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDate(date.medicinalProductAuthorizationProcedureDateToHapi())
+    }
     return hapiValue
   }
 }

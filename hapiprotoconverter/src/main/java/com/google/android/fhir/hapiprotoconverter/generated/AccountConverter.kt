@@ -49,97 +49,174 @@ public object AccountConverter {
   public fun Account.toHapi(): org.hl7.fhir.r4.model.Account {
     val hapiValue = org.hl7.fhir.r4.model.Account()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Account.AccountStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setType(type.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setSubject(subjectList.map { it.toHapi() })
-    hapiValue.setServicePeriod(servicePeriod.toHapi())
-    hapiValue.setCoverage(coverageList.map { it.toHapi() })
-    hapiValue.setOwner(owner.toHapi())
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setGuarantor(guarantorList.map { it.toHapi() })
-    hapiValue.setPartOf(partOf.toHapi())
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (subjectCount > 0) {
+      hapiValue.setSubject(subjectList.map { it.toHapi() })
+    }
+    if (hasServicePeriod()) {
+      hapiValue.setServicePeriod(servicePeriod.toHapi())
+    }
+    if (coverageCount > 0) {
+      hapiValue.setCoverage(coverageList.map { it.toHapi() })
+    }
+    if (hasOwner()) {
+      hapiValue.setOwner(owner.toHapi())
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (guarantorCount > 0) {
+      hapiValue.setGuarantor(guarantorList.map { it.toHapi() })
+    }
+    if (hasPartOf()) {
+      hapiValue.setPartOf(partOf.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Account.toProto(): Account {
-    val protoValue =
-      Account.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setStatus(
-          Account.StatusCode.newBuilder()
-            .setValue(
-              AccountStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Account.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      Account.StatusCode.newBuilder()
+        .setValue(
+          AccountStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setType(type.toProto())
-        .setName(nameElement.toProto())
-        .addAllSubject(subject.map { it.toProto() })
-        .setServicePeriod(servicePeriod.toProto())
-        .addAllCoverage(coverage.map { it.toProto() })
-        .setOwner(owner.toProto())
-        .setDescription(descriptionElement.toProto())
-        .addAllGuarantor(guarantor.map { it.toProto() })
-        .setPartOf(partOf.toProto())
         .build()
-    return protoValue
+    )
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasSubject()) {
+      protoValue.addAllSubject(subject.map { it.toProto() })
+    }
+    if (hasServicePeriod()) {
+      protoValue.setServicePeriod(servicePeriod.toProto())
+    }
+    if (hasCoverage()) {
+      protoValue.addAllCoverage(coverage.map { it.toProto() })
+    }
+    if (hasOwner()) {
+      protoValue.setOwner(owner.toProto())
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasGuarantor()) {
+      protoValue.addAllGuarantor(guarantor.map { it.toProto() })
+    }
+    if (hasPartOf()) {
+      protoValue.setPartOf(partOf.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Account.CoverageComponent.toProto(): Account.Coverage {
-    val protoValue =
-      Account.Coverage.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCoverage(coverage.toProto())
-        .setPriority(priorityElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Account.Coverage.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCoverage()) {
+      protoValue.setCoverage(coverage.toProto())
+    }
+    if (hasPriority()) {
+      protoValue.setPriority(priorityElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Account.GuarantorComponent.toProto(): Account.Guarantor {
-    val protoValue =
-      Account.Guarantor.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setParty(party.toProto())
-        .setOnHold(onHoldElement.toProto())
-        .setPeriod(period.toProto())
-        .build()
-    return protoValue
+    val protoValue = Account.Guarantor.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasParty()) {
+      protoValue.setParty(party.toProto())
+    }
+    if (hasOnHold()) {
+      protoValue.setOnHold(onHoldElement.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun Account.Coverage.toHapi(): org.hl7.fhir.r4.model.Account.CoverageComponent {
     val hapiValue = org.hl7.fhir.r4.model.Account.CoverageComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCoverage(coverage.toHapi())
-    hapiValue.setPriorityElement(priority.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCoverage()) {
+      hapiValue.setCoverage(coverage.toHapi())
+    }
+    if (hasPriority()) {
+      hapiValue.setPriorityElement(priority.toHapi())
+    }
     return hapiValue
   }
 
@@ -147,11 +224,21 @@ public object AccountConverter {
   private fun Account.Guarantor.toHapi(): org.hl7.fhir.r4.model.Account.GuarantorComponent {
     val hapiValue = org.hl7.fhir.r4.model.Account.GuarantorComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setParty(party.toHapi())
-    hapiValue.setOnHoldElement(onHold.toHapi())
-    hapiValue.setPeriod(period.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasParty()) {
+      hapiValue.setParty(party.toHapi())
+    }
+    if (hasOnHold()) {
+      hapiValue.setOnHoldElement(onHold.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
     return hapiValue
   }
 }

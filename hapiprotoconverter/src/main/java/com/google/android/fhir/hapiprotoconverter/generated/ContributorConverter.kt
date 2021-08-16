@@ -32,35 +32,44 @@ public object ContributorConverter {
   public fun Contributor.toHapi(): org.hl7.fhir.r4.model.Contributor {
     val hapiValue = org.hl7.fhir.r4.model.Contributor()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
     hapiValue.setType(
       org.hl7.fhir.r4.model.Contributor.ContributorType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Contributor.toProto(): Contributor {
-    val protoValue =
-      Contributor.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setType(
-          Contributor.TypeCode.newBuilder()
-            .setValue(
-              ContributorTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Contributor.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    protoValue.setType(
+      Contributor.TypeCode.newBuilder()
+        .setValue(
+          ContributorTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setName(nameElement.toProto())
-        .addAllContact(contact.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 }

@@ -169,89 +169,159 @@ public object QuestionnaireResponseConverter {
   public fun QuestionnaireResponse.toHapi(): org.hl7.fhir.r4.model.QuestionnaireResponse {
     val hapiValue = org.hl7.fhir.r4.model.QuestionnaireResponse()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifier.toHapi())
-    hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
-    hapiValue.setPartOf(partOfList.map { it.toHapi() })
-    hapiValue.setQuestionnaireElement(questionnaire.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasIdentifier()) {
+      hapiValue.setIdentifier(identifier.toHapi())
+    }
+    if (basedOnCount > 0) {
+      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+    }
+    if (partOfCount > 0) {
+      hapiValue.setPartOf(partOfList.map { it.toHapi() })
+    }
+    if (hasQuestionnaire()) {
+      hapiValue.setQuestionnaireElement(questionnaire.toHapi())
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setSubject(subject.toHapi())
-    hapiValue.setEncounter(encounter.toHapi())
-    hapiValue.setAuthoredElement(authored.toHapi())
-    hapiValue.setAuthor(author.toHapi())
-    hapiValue.setSource(source.toHapi())
-    hapiValue.setItem(itemList.map { it.toHapi() })
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.toHapi())
+    }
+    if (hasEncounter()) {
+      hapiValue.setEncounter(encounter.toHapi())
+    }
+    if (hasAuthored()) {
+      hapiValue.setAuthoredElement(authored.toHapi())
+    }
+    if (hasAuthor()) {
+      hapiValue.setAuthor(author.toHapi())
+    }
+    if (hasSource()) {
+      hapiValue.setSource(source.toHapi())
+    }
+    if (itemCount > 0) {
+      hapiValue.setItem(itemList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.QuestionnaireResponse.toProto(): QuestionnaireResponse {
-    val protoValue =
-      QuestionnaireResponse.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setIdentifier(identifier.toProto())
-        .addAllBasedOn(basedOn.map { it.toProto() })
-        .addAllPartOf(partOf.map { it.toProto() })
-        .setQuestionnaire(questionnaireElement.toProto())
-        .setStatus(
-          QuestionnaireResponse.StatusCode.newBuilder()
-            .setValue(
-              QuestionnaireResponseStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = QuestionnaireResponse.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.setIdentifier(identifier.toProto())
+    }
+    if (hasBasedOn()) {
+      protoValue.addAllBasedOn(basedOn.map { it.toProto() })
+    }
+    if (hasPartOf()) {
+      protoValue.addAllPartOf(partOf.map { it.toProto() })
+    }
+    if (hasQuestionnaire()) {
+      protoValue.setQuestionnaire(questionnaireElement.toProto())
+    }
+    protoValue.setStatus(
+      QuestionnaireResponse.StatusCode.newBuilder()
+        .setValue(
+          QuestionnaireResponseStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setSubject(subject.toProto())
-        .setEncounter(encounter.toProto())
-        .setAuthored(authoredElement.toProto())
-        .setAuthor(author.toProto())
-        .setSource(source.toProto())
-        .addAllItem(item.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasSubject()) {
+      protoValue.setSubject(subject.toProto())
+    }
+    if (hasEncounter()) {
+      protoValue.setEncounter(encounter.toProto())
+    }
+    if (hasAuthored()) {
+      protoValue.setAuthored(authoredElement.toProto())
+    }
+    if (hasAuthor()) {
+      protoValue.setAuthor(author.toProto())
+    }
+    if (hasSource()) {
+      protoValue.setSource(source.toProto())
+    }
+    if (hasItem()) {
+      protoValue.addAllItem(item.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent.toProto():
     QuestionnaireResponse.Item {
-    val protoValue =
-      QuestionnaireResponse.Item.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setLinkId(linkIdElement.toProto())
-        .setDefinition(definitionElement.toProto())
-        .setText(textElement.toProto())
-        .addAllAnswer(answer.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = QuestionnaireResponse.Item.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasLinkId()) {
+      protoValue.setLinkId(linkIdElement.toProto())
+    }
+    if (hasDefinition()) {
+      protoValue.setDefinition(definitionElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(textElement.toProto())
+    }
+    if (hasAnswer()) {
+      protoValue.addAllAnswer(answer.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent.toProto():
     QuestionnaireResponse.Item.Answer {
     val protoValue =
-      QuestionnaireResponse.Item.Answer.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setValue(value.questionnaireResponseItemAnswerValueToProto())
-        .build()
-    return protoValue
+      QuestionnaireResponse.Item.Answer.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.questionnaireResponseItemAnswerValueToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -259,12 +329,24 @@ public object QuestionnaireResponseConverter {
     org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setLinkIdElement(linkId.toHapi())
-    hapiValue.setDefinitionElement(definition.toHapi())
-    hapiValue.setTextElement(text.toHapi())
-    hapiValue.setAnswer(answerList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasLinkId()) {
+      hapiValue.setLinkIdElement(linkId.toHapi())
+    }
+    if (hasDefinition()) {
+      hapiValue.setDefinitionElement(definition.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setTextElement(text.toHapi())
+    }
+    if (answerCount > 0) {
+      hapiValue.setAnswer(answerList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -274,9 +356,15 @@ public object QuestionnaireResponseConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setValue(value.questionnaireResponseItemAnswerValueToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.questionnaireResponseItemAnswerValueToHapi())
+    }
     return hapiValue
   }
 }

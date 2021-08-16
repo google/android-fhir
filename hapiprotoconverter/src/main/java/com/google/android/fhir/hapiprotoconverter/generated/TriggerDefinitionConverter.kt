@@ -85,39 +85,56 @@ public object TriggerDefinitionConverter {
   public fun TriggerDefinition.toHapi(): org.hl7.fhir.r4.model.TriggerDefinition {
     val hapiValue = org.hl7.fhir.r4.model.TriggerDefinition()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
     hapiValue.setType(
       org.hl7.fhir.r4.model.TriggerDefinition.TriggerType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setTiming(timing.triggerDefinitionTimingToHapi())
-    hapiValue.setData(dataList.map { it.toHapi() })
-    hapiValue.setCondition(condition.toHapi())
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasTiming()) {
+      hapiValue.setTiming(timing.triggerDefinitionTimingToHapi())
+    }
+    if (dataCount > 0) {
+      hapiValue.setData(dataList.map { it.toHapi() })
+    }
+    if (hasCondition()) {
+      hapiValue.setCondition(condition.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.TriggerDefinition.toProto(): TriggerDefinition {
-    val protoValue =
-      TriggerDefinition.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setType(
-          TriggerDefinition.TypeCode.newBuilder()
-            .setValue(
-              TriggerTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = TriggerDefinition.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    protoValue.setType(
+      TriggerDefinition.TypeCode.newBuilder()
+        .setValue(
+          TriggerTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setName(nameElement.toProto())
-        .setTiming(timing.triggerDefinitionTimingToProto())
-        .addAllData(data.map { it.toProto() })
-        .setCondition(condition.toProto())
         .build()
-    return protoValue
+    )
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasTiming()) {
+      protoValue.setTiming(timing.triggerDefinitionTimingToProto())
+    }
+    if (hasData()) {
+      protoValue.addAllData(data.map { it.toProto() })
+    }
+    if (hasCondition()) {
+      protoValue.setCondition(condition.toProto())
+    }
+    return protoValue.build()
   }
 }

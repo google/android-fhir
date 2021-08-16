@@ -38,41 +38,62 @@ public object IdentifierConverter {
   public fun Identifier.toHapi(): org.hl7.fhir.r4.model.Identifier {
     val hapiValue = org.hl7.fhir.r4.model.Identifier()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
     hapiValue.setUse(
       org.hl7.fhir.r4.model.Identifier.IdentifierUse.valueOf(
         use.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setType(type.toHapi())
-    hapiValue.setSystemElement(system.toHapi())
-    hapiValue.setValueElement(value.toHapi())
-    hapiValue.setPeriod(period.toHapi())
-    hapiValue.setAssigner(assigner.toHapi())
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasSystem()) {
+      hapiValue.setSystemElement(system.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValueElement(value.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
+    if (hasAssigner()) {
+      hapiValue.setAssigner(assigner.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Identifier.toProto(): Identifier {
-    val protoValue =
-      Identifier.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setUse(
-          Identifier.UseCode.newBuilder()
-            .setValue(
-              IdentifierUseCode.Value.valueOf(
-                use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Identifier.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    protoValue.setUse(
+      Identifier.UseCode.newBuilder()
+        .setValue(
+          IdentifierUseCode.Value.valueOf(
+            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setType(type.toProto())
-        .setSystem(systemElement.toProto())
-        .setValue(valueElement.toProto())
-        .setPeriod(period.toProto())
-        .setAssigner(assigner.toProto())
         .build()
-    return protoValue
+    )
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasSystem()) {
+      protoValue.setSystem(systemElement.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(valueElement.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    if (hasAssigner()) {
+      protoValue.setAssigner(assigner.toProto())
+    }
+    return protoValue.build()
   }
 }

@@ -49,80 +49,154 @@ public object CareTeamConverter {
   public fun CareTeam.toHapi(): org.hl7.fhir.r4.model.CareTeam {
     val hapiValue = org.hl7.fhir.r4.model.CareTeam()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.CareTeam.CareTeamStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setCategory(categoryList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setSubject(subject.toHapi())
-    hapiValue.setEncounter(encounter.toHapi())
-    hapiValue.setPeriod(period.toHapi())
-    hapiValue.setParticipant(participantList.map { it.toHapi() })
-    hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
-    hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
-    hapiValue.setManagingOrganization(managingOrganizationList.map { it.toHapi() })
-    hapiValue.setTelecom(telecomList.map { it.toHapi() })
-    hapiValue.setNote(noteList.map { it.toHapi() })
+    if (categoryCount > 0) {
+      hapiValue.setCategory(categoryList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.toHapi())
+    }
+    if (hasEncounter()) {
+      hapiValue.setEncounter(encounter.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
+    if (participantCount > 0) {
+      hapiValue.setParticipant(participantList.map { it.toHapi() })
+    }
+    if (reasonCodeCount > 0) {
+      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+    }
+    if (reasonReferenceCount > 0) {
+      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+    }
+    if (managingOrganizationCount > 0) {
+      hapiValue.setManagingOrganization(managingOrganizationList.map { it.toHapi() })
+    }
+    if (telecomCount > 0) {
+      hapiValue.setTelecom(telecomList.map { it.toHapi() })
+    }
+    if (noteCount > 0) {
+      hapiValue.setNote(noteList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.CareTeam.toProto(): CareTeam {
-    val protoValue =
-      CareTeam.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setStatus(
-          CareTeam.StatusCode.newBuilder()
-            .setValue(
-              CareTeamStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = CareTeam.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      CareTeam.StatusCode.newBuilder()
+        .setValue(
+          CareTeamStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .addAllCategory(category.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .setSubject(subject.toProto())
-        .setEncounter(encounter.toProto())
-        .setPeriod(period.toProto())
-        .addAllParticipant(participant.map { it.toProto() })
-        .addAllReasonCode(reasonCode.map { it.toProto() })
-        .addAllReasonReference(reasonReference.map { it.toProto() })
-        .addAllManagingOrganization(managingOrganization.map { it.toProto() })
-        .addAllTelecom(telecom.map { it.toProto() })
-        .addAllNote(note.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasCategory()) {
+      protoValue.addAllCategory(category.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.toProto())
+    }
+    if (hasEncounter()) {
+      protoValue.setEncounter(encounter.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    if (hasParticipant()) {
+      protoValue.addAllParticipant(participant.map { it.toProto() })
+    }
+    if (hasReasonCode()) {
+      protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
+    }
+    if (hasReasonReference()) {
+      protoValue.addAllReasonReference(reasonReference.map { it.toProto() })
+    }
+    if (hasManagingOrganization()) {
+      protoValue.addAllManagingOrganization(managingOrganization.map { it.toProto() })
+    }
+    if (hasTelecom()) {
+      protoValue.addAllTelecom(telecom.map { it.toProto() })
+    }
+    if (hasNote()) {
+      protoValue.addAllNote(note.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.CareTeam.CareTeamParticipantComponent.toProto():
     CareTeam.Participant {
-    val protoValue =
-      CareTeam.Participant.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllRole(role.map { it.toProto() })
-        .setMember(member.toProto())
-        .setOnBehalfOf(onBehalfOf.toProto())
-        .setPeriod(period.toProto())
-        .build()
-    return protoValue
+    val protoValue = CareTeam.Participant.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasRole()) {
+      protoValue.addAllRole(role.map { it.toProto() })
+    }
+    if (hasMember()) {
+      protoValue.setMember(member.toProto())
+    }
+    if (hasOnBehalfOf()) {
+      protoValue.setOnBehalfOf(onBehalfOf.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -130,12 +204,24 @@ public object CareTeamConverter {
     org.hl7.fhir.r4.model.CareTeam.CareTeamParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.CareTeam.CareTeamParticipantComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setRole(roleList.map { it.toHapi() })
-    hapiValue.setMember(member.toHapi())
-    hapiValue.setOnBehalfOf(onBehalfOf.toHapi())
-    hapiValue.setPeriod(period.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (roleCount > 0) {
+      hapiValue.setRole(roleList.map { it.toHapi() })
+    }
+    if (hasMember()) {
+      hapiValue.setMember(member.toHapi())
+    }
+    if (hasOnBehalfOf()) {
+      hapiValue.setOnBehalfOf(onBehalfOf.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
     return hapiValue
   }
 }

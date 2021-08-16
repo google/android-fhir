@@ -38,43 +38,68 @@ public object RelatedArtifactConverter {
   public fun RelatedArtifact.toHapi(): org.hl7.fhir.r4.model.RelatedArtifact {
     val hapiValue = org.hl7.fhir.r4.model.RelatedArtifact()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
     hapiValue.setType(
       org.hl7.fhir.r4.model.RelatedArtifact.RelatedArtifactType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setLabelElement(label.toHapi())
-    hapiValue.setDisplayElement(display.toHapi())
-    hapiValue.setCitationElement(citation.toHapi())
-    hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setDocument(document.toHapi())
-    hapiValue.setResourceElement(resource.toHapi())
+    if (hasLabel()) {
+      hapiValue.setLabelElement(label.toHapi())
+    }
+    if (hasDisplay()) {
+      hapiValue.setDisplayElement(display.toHapi())
+    }
+    if (hasCitation()) {
+      hapiValue.setCitationElement(citation.toHapi())
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
+    if (hasDocument()) {
+      hapiValue.setDocument(document.toHapi())
+    }
+    if (hasResource()) {
+      hapiValue.setResourceElement(resource.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.RelatedArtifact.toProto(): RelatedArtifact {
-    val protoValue =
-      RelatedArtifact.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setType(
-          RelatedArtifact.TypeCode.newBuilder()
-            .setValue(
-              RelatedArtifactTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = RelatedArtifact.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    protoValue.setType(
+      RelatedArtifact.TypeCode.newBuilder()
+        .setValue(
+          RelatedArtifactTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setLabel(labelElement.toProto())
-        .setDisplay(displayElement.toProto())
-        .setCitation(citationElement.toProto())
-        .setUrl(urlElement.toProto())
-        .setDocument(document.toProto())
-        .setResource(resourceElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasLabel()) {
+      protoValue.setLabel(labelElement.toProto())
+    }
+    if (hasDisplay()) {
+      protoValue.setDisplay(displayElement.toProto())
+    }
+    if (hasCitation()) {
+      protoValue.setCitation(citationElement.toProto())
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    if (hasDocument()) {
+      protoValue.setDocument(document.toProto())
+    }
+    if (hasResource()) {
+      protoValue.setResource(resourceElement.toProto())
+    }
+    return protoValue.build()
   }
 }

@@ -35,41 +35,90 @@ public object ProdCharacteristicConverter {
   public fun ProdCharacteristic.toHapi(): org.hl7.fhir.r4.model.ProdCharacteristic {
     val hapiValue = org.hl7.fhir.r4.model.ProdCharacteristic()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setHeight(height.toHapi())
-    hapiValue.setWidth(width.toHapi())
-    hapiValue.setDepth(depth.toHapi())
-    hapiValue.setWeight(weight.toHapi())
-    hapiValue.setNominalVolume(nominalVolume.toHapi())
-    hapiValue.setExternalDiameter(externalDiameter.toHapi())
-    hapiValue.setShapeElement(shape.toHapi())
-    hapiValue.setColor(colorList.map { it.toHapi() })
-    hapiValue.setImprint(imprintList.map { it.toHapi() })
-    hapiValue.setImage(imageList.map { it.toHapi() })
-    hapiValue.setScoring(scoring.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasHeight()) {
+      hapiValue.setHeight(height.toHapi())
+    }
+    if (hasWidth()) {
+      hapiValue.setWidth(width.toHapi())
+    }
+    if (hasDepth()) {
+      hapiValue.setDepth(depth.toHapi())
+    }
+    if (hasWeight()) {
+      hapiValue.setWeight(weight.toHapi())
+    }
+    if (hasNominalVolume()) {
+      hapiValue.setNominalVolume(nominalVolume.toHapi())
+    }
+    if (hasExternalDiameter()) {
+      hapiValue.setExternalDiameter(externalDiameter.toHapi())
+    }
+    if (hasShape()) {
+      hapiValue.setShapeElement(shape.toHapi())
+    }
+    if (colorCount > 0) {
+      hapiValue.setColor(colorList.map { it.toHapi() })
+    }
+    if (imprintCount > 0) {
+      hapiValue.setImprint(imprintList.map { it.toHapi() })
+    }
+    if (imageCount > 0) {
+      hapiValue.setImage(imageList.map { it.toHapi() })
+    }
+    if (hasScoring()) {
+      hapiValue.setScoring(scoring.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.ProdCharacteristic.toProto(): ProdCharacteristic {
-    val protoValue =
-      ProdCharacteristic.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setHeight(height.toProto())
-        .setWidth(width.toProto())
-        .setDepth(depth.toProto())
-        .setWeight(weight.toProto())
-        .setNominalVolume(nominalVolume.toProto())
-        .setExternalDiameter(externalDiameter.toProto())
-        .setShape(shapeElement.toProto())
-        .addAllColor(color.map { it.toProto() })
-        .addAllImprint(imprint.map { it.toProto() })
-        .addAllImage(image.map { it.toProto() })
-        .setScoring(scoring.toProto())
-        .build()
-    return protoValue
+    val protoValue = ProdCharacteristic.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasHeight()) {
+      protoValue.setHeight(height.toProto())
+    }
+    if (hasWidth()) {
+      protoValue.setWidth(width.toProto())
+    }
+    if (hasDepth()) {
+      protoValue.setDepth(depth.toProto())
+    }
+    if (hasWeight()) {
+      protoValue.setWeight(weight.toProto())
+    }
+    if (hasNominalVolume()) {
+      protoValue.setNominalVolume(nominalVolume.toProto())
+    }
+    if (hasExternalDiameter()) {
+      protoValue.setExternalDiameter(externalDiameter.toProto())
+    }
+    if (hasShape()) {
+      protoValue.setShape(shapeElement.toProto())
+    }
+    if (hasColor()) {
+      protoValue.addAllColor(color.map { it.toProto() })
+    }
+    if (hasImprint()) {
+      protoValue.addAllImprint(imprint.map { it.toProto() })
+    }
+    if (hasImage()) {
+      protoValue.addAllImage(image.map { it.toProto() })
+    }
+    if (hasScoring()) {
+      protoValue.setScoring(scoring.toProto())
+    }
+    return protoValue.build()
   }
 }

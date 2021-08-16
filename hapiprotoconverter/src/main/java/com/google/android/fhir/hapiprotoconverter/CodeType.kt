@@ -68,7 +68,7 @@ internal fun handleCodeType(
   ) {
     if (isSingle) {
       protoBuilder.addStatement(
-        "$singleMethodTemplate(%T.newBuilder().setValue(%T.valueOf(%L)).build())",
+        "protoValue$singleMethodTemplate(%T.newBuilder().setValue(%T.valueOf(%L)).build())",
         element.getProtoMethodName(),
         // Using this just to make sure codes are present in hapi and fhir protos TODO change to
         element.getProtoCodeClass(
@@ -86,7 +86,7 @@ internal fun handleCodeType(
       )
     } else {
       protoBuilder.addStatement(
-        "$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.valueAsString.$toProtoCheck)).build()})",
+        "protoValue$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.valueAsString.$toProtoCheck)).build()})",
         element.getProtoMethodName(),
         element.getHapiFieldName(),
         element.getProtoCodeClass(
@@ -104,7 +104,7 @@ internal fun handleCodeType(
   } else if (specialValueSet.contains(element.binding.valueSet.value)) {
     if (isSingle) {
       protoBuilder.addStatement(
-        "$singleMethodTemplate(%T.newBuilder().setValue(%L.$toProtoCheck).build())",
+        "protoValue$singleMethodTemplate(%T.newBuilder().setValue(%L.$toProtoCheck).build())",
         element.getProtoMethodName(),
         // Using this just to make sure codes are present in hapi and fhir protos TODO change to
         element.getProtoCodeClass(
@@ -121,7 +121,7 @@ internal fun handleCodeType(
       )
     } else {
       protoBuilder.addStatement(
-        "$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(it.value.$toProtoCheck).build()})",
+        "protoValue$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(it.value.$toProtoCheck).build()})",
         element.getProtoMethodName(),
         element.getHapiFieldName(),
         element.getProtoCodeClass(
@@ -140,7 +140,7 @@ internal fun handleCodeType(
     if (isSingle) {
       // if enum isSingle
       protoBuilder.addStatement(
-        "$singleMethodTemplate(%T.newBuilder().setValue(%T.valueOf(%L.toCode().$toProtoCheck.replace(\"-\", \"_\").toUpperCase())).build())",
+        "protoValue$singleMethodTemplate(%T.newBuilder().setValue(%T.valueOf(%L.toCode().$toProtoCheck.replace(\"-\", \"_\").toUpperCase())).build())",
         element.getProtoMethodName(),
         // Using this just to make sure codes are present in hapi and fhir protos TODO change to
         element.getProtoCodeClass(
@@ -160,7 +160,7 @@ internal fun handleCodeType(
     } else {
       // handle case when enum is repeated
       protoBuilder.addStatement(
-        "$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.value.toCode().$toProtoCheck.replace(\"-\", \"_\").toUpperCase())).build()})",
+        "protoValue$multipleMethodTemplate(%L.map{%T.newBuilder().setValue(%T.valueOf(it.value.toCode().$toProtoCheck.replace(\"-\", \"_\").toUpperCase())).build()})",
         element.getProtoMethodName(),
         element.getHapiFieldName(),
         element.getProtoCodeClass(

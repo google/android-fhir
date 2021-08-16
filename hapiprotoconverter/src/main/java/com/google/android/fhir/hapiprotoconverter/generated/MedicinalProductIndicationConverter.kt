@@ -74,59 +74,118 @@ public object MedicinalProductIndicationConverter {
   public fun MedicinalProductIndication.toHapi(): org.hl7.fhir.r4.model.MedicinalProductIndication {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductIndication()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSubject(subjectList.map { it.toHapi() })
-    hapiValue.setDiseaseSymptomProcedure(diseaseSymptomProcedure.toHapi())
-    hapiValue.setDiseaseStatus(diseaseStatus.toHapi())
-    hapiValue.setComorbidity(comorbidityList.map { it.toHapi() })
-    hapiValue.setIntendedEffect(intendedEffect.toHapi())
-    hapiValue.setDuration(duration.toHapi())
-    hapiValue.setOtherTherapy(otherTherapyList.map { it.toHapi() })
-    hapiValue.setUndesirableEffect(undesirableEffectList.map { it.toHapi() })
-    hapiValue.setPopulation(populationList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (subjectCount > 0) {
+      hapiValue.setSubject(subjectList.map { it.toHapi() })
+    }
+    if (hasDiseaseSymptomProcedure()) {
+      hapiValue.setDiseaseSymptomProcedure(diseaseSymptomProcedure.toHapi())
+    }
+    if (hasDiseaseStatus()) {
+      hapiValue.setDiseaseStatus(diseaseStatus.toHapi())
+    }
+    if (comorbidityCount > 0) {
+      hapiValue.setComorbidity(comorbidityList.map { it.toHapi() })
+    }
+    if (hasIntendedEffect()) {
+      hapiValue.setIntendedEffect(intendedEffect.toHapi())
+    }
+    if (hasDuration()) {
+      hapiValue.setDuration(duration.toHapi())
+    }
+    if (otherTherapyCount > 0) {
+      hapiValue.setOtherTherapy(otherTherapyList.map { it.toHapi() })
+    }
+    if (undesirableEffectCount > 0) {
+      hapiValue.setUndesirableEffect(undesirableEffectList.map { it.toHapi() })
+    }
+    if (populationCount > 0) {
+      hapiValue.setPopulation(populationList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.MedicinalProductIndication.toProto():
     MedicinalProductIndication {
-    val protoValue =
-      MedicinalProductIndication.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllSubject(subject.map { it.toProto() })
-        .setDiseaseSymptomProcedure(diseaseSymptomProcedure.toProto())
-        .setDiseaseStatus(diseaseStatus.toProto())
-        .addAllComorbidity(comorbidity.map { it.toProto() })
-        .setIntendedEffect(intendedEffect.toProto())
-        .setDuration(duration.toProto())
-        .addAllOtherTherapy(otherTherapy.map { it.toProto() })
-        .addAllUndesirableEffect(undesirableEffect.map { it.toProto() })
-        .addAllPopulation(population.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = MedicinalProductIndication.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSubject()) {
+      protoValue.addAllSubject(subject.map { it.toProto() })
+    }
+    if (hasDiseaseSymptomProcedure()) {
+      protoValue.setDiseaseSymptomProcedure(diseaseSymptomProcedure.toProto())
+    }
+    if (hasDiseaseStatus()) {
+      protoValue.setDiseaseStatus(diseaseStatus.toProto())
+    }
+    if (hasComorbidity()) {
+      protoValue.addAllComorbidity(comorbidity.map { it.toProto() })
+    }
+    if (hasIntendedEffect()) {
+      protoValue.setIntendedEffect(intendedEffect.toProto())
+    }
+    if (hasDuration()) {
+      protoValue.setDuration(duration.toProto())
+    }
+    if (hasOtherTherapy()) {
+      protoValue.addAllOtherTherapy(otherTherapy.map { it.toProto() })
+    }
+    if (hasUndesirableEffect()) {
+      protoValue.addAllUndesirableEffect(undesirableEffect.map { it.toProto() })
+    }
+    if (hasPopulation()) {
+      protoValue.addAllPopulation(population.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProductIndication.MedicinalProductIndicationOtherTherapyComponent.toProto():
     MedicinalProductIndication.OtherTherapy {
     val protoValue =
-      MedicinalProductIndication.OtherTherapy.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setTherapyRelationshipType(therapyRelationshipType.toProto())
-        .setMedication(medication.medicinalProductIndicationOtherTherapyMedicationToProto())
-        .build()
-    return protoValue
+      MedicinalProductIndication.OtherTherapy.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasTherapyRelationshipType()) {
+      protoValue.setTherapyRelationshipType(therapyRelationshipType.toProto())
+    }
+    if (hasMedication()) {
+      protoValue.setMedication(medication.medicinalProductIndicationOtherTherapyMedicationToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -136,10 +195,18 @@ public object MedicinalProductIndicationConverter {
       org.hl7.fhir.r4.model.MedicinalProductIndication
         .MedicinalProductIndicationOtherTherapyComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setTherapyRelationshipType(therapyRelationshipType.toHapi())
-    hapiValue.setMedication(medication.medicinalProductIndicationOtherTherapyMedicationToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasTherapyRelationshipType()) {
+      hapiValue.setTherapyRelationshipType(therapyRelationshipType.toHapi())
+    }
+    if (hasMedication()) {
+      hapiValue.setMedication(medication.medicinalProductIndicationOtherTherapyMedicationToHapi())
+    }
     return hapiValue
   }
 }

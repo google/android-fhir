@@ -36,31 +36,60 @@ public object SampledDataConverter {
   public fun SampledData.toHapi(): org.hl7.fhir.r4.model.SampledData {
     val hapiValue = org.hl7.fhir.r4.model.SampledData()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setOrigin(origin.toHapi())
-    hapiValue.setPeriodElement(period.toHapi())
-    hapiValue.setFactorElement(factor.toHapi())
-    hapiValue.setLowerLimitElement(lowerLimit.toHapi())
-    hapiValue.setUpperLimitElement(upperLimit.toHapi())
-    hapiValue.setDimensionsElement(dimensions.toHapi())
-    hapiValue.setDataElement(data.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasOrigin()) {
+      hapiValue.setOrigin(origin.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriodElement(period.toHapi())
+    }
+    if (hasFactor()) {
+      hapiValue.setFactorElement(factor.toHapi())
+    }
+    if (hasLowerLimit()) {
+      hapiValue.setLowerLimitElement(lowerLimit.toHapi())
+    }
+    if (hasUpperLimit()) {
+      hapiValue.setUpperLimitElement(upperLimit.toHapi())
+    }
+    if (hasDimensions()) {
+      hapiValue.setDimensionsElement(dimensions.toHapi())
+    }
+    if (hasData()) {
+      hapiValue.setDataElement(data.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.SampledData.toProto(): SampledData {
-    val protoValue =
-      SampledData.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setOrigin((origin as SimpleQuantity).toProto())
-        .setPeriod(periodElement.toProto())
-        .setFactor(factorElement.toProto())
-        .setLowerLimit(lowerLimitElement.toProto())
-        .setUpperLimit(upperLimitElement.toProto())
-        .setDimensions(dimensionsElement.toProto())
-        .setData(dataElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = SampledData.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasOrigin()) {
+      protoValue.setOrigin((origin as SimpleQuantity).toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(periodElement.toProto())
+    }
+    if (hasFactor()) {
+      protoValue.setFactor(factorElement.toProto())
+    }
+    if (hasLowerLimit()) {
+      protoValue.setLowerLimit(lowerLimitElement.toProto())
+    }
+    if (hasUpperLimit()) {
+      protoValue.setUpperLimit(upperLimitElement.toProto())
+    }
+    if (hasDimensions()) {
+      protoValue.setDimensions(dimensionsElement.toProto())
+    }
+    if (hasData()) {
+      protoValue.setData(dataElement.toProto())
+    }
+    return protoValue.build()
   }
 }

@@ -50,16 +50,36 @@ public object DeviceMetricConverter {
   public fun DeviceMetric.toHapi(): org.hl7.fhir.r4.model.DeviceMetric {
     val hapiValue = org.hl7.fhir.r4.model.DeviceMetric()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
-    hapiValue.setUnit(unit.toHapi())
-    hapiValue.setSource(source.toHapi())
-    hapiValue.setParent(parent.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasUnit()) {
+      hapiValue.setUnit(unit.toHapi())
+    }
+    if (hasSource()) {
+      hapiValue.setSource(source.toHapi())
+    }
+    if (hasParent()) {
+      hapiValue.setParent(parent.toHapi())
+    }
     hapiValue.setOperationalStatus(
       org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricOperationalStatus.valueOf(
         operationalStatus.value.name.hapiCodeCheck().replace("_", "")
@@ -75,88 +95,116 @@ public object DeviceMetricConverter {
         category.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setMeasurementPeriod(measurementPeriod.toHapi())
-    hapiValue.setCalibration(calibrationList.map { it.toHapi() })
+    if (hasMeasurementPeriod()) {
+      hapiValue.setMeasurementPeriod(measurementPeriod.toHapi())
+    }
+    if (calibrationCount > 0) {
+      hapiValue.setCalibration(calibrationList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.DeviceMetric.toProto(): DeviceMetric {
-    val protoValue =
-      DeviceMetric.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setType(type.toProto())
-        .setUnit(unit.toProto())
-        .setSource(source.toProto())
-        .setParent(parent.toProto())
-        .setOperationalStatus(
-          DeviceMetric.OperationalStatusCode.newBuilder()
-            .setValue(
-              DeviceMetricOperationalStatusCode.Value.valueOf(
-                operationalStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = DeviceMetric.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasUnit()) {
+      protoValue.setUnit(unit.toProto())
+    }
+    if (hasSource()) {
+      protoValue.setSource(source.toProto())
+    }
+    if (hasParent()) {
+      protoValue.setParent(parent.toProto())
+    }
+    protoValue.setOperationalStatus(
+      DeviceMetric.OperationalStatusCode.newBuilder()
+        .setValue(
+          DeviceMetricOperationalStatusCode.Value.valueOf(
+            operationalStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setColor(
-          DeviceMetric.ColorCode.newBuilder()
-            .setValue(
-              DeviceMetricColorCode.Value.valueOf(
-                color.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setCategory(
-          DeviceMetric.CategoryCode.newBuilder()
-            .setValue(
-              DeviceMetricCategoryCode.Value.valueOf(
-                category.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setMeasurementPeriod(measurementPeriod.toProto())
-        .addAllCalibration(calibration.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    protoValue.setColor(
+      DeviceMetric.ColorCode.newBuilder()
+        .setValue(
+          DeviceMetricColorCode.Value.valueOf(
+            color.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    protoValue.setCategory(
+      DeviceMetric.CategoryCode.newBuilder()
+        .setValue(
+          DeviceMetricCategoryCode.Value.valueOf(
+            category.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasMeasurementPeriod()) {
+      protoValue.setMeasurementPeriod(measurementPeriod.toProto())
+    }
+    if (hasCalibration()) {
+      protoValue.addAllCalibration(calibration.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCalibrationComponent.toProto():
     DeviceMetric.Calibration {
-    val protoValue =
-      DeviceMetric.Calibration.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(
-          DeviceMetric.Calibration.TypeCode.newBuilder()
-            .setValue(
-              DeviceMetricCalibrationTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = DeviceMetric.Calibration.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setType(
+      DeviceMetric.Calibration.TypeCode.newBuilder()
+        .setValue(
+          DeviceMetricCalibrationTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setState(
-          DeviceMetric.Calibration.StateCode.newBuilder()
-            .setValue(
-              DeviceMetricCalibrationStateCode.Value.valueOf(
-                state.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setTime(timeElement.toProto())
         .build()
-    return protoValue
+    )
+    protoValue.setState(
+      DeviceMetric.Calibration.StateCode.newBuilder()
+        .setValue(
+          DeviceMetricCalibrationStateCode.Value.valueOf(
+            state.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasTime()) {
+      protoValue.setTime(timeElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -164,8 +212,12 @@ public object DeviceMetricConverter {
     org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCalibrationComponent {
     val hapiValue = org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCalibrationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setType(
       org.hl7.fhir.r4.model.DeviceMetric.DeviceMetricCalibrationType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")
@@ -176,7 +228,9 @@ public object DeviceMetricConverter {
         state.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setTimeElement(time.toHapi())
+    if (hasTime()) {
+      hapiValue.setTimeElement(time.toHapi())
+    }
     return hapiValue
   }
 }

@@ -57,221 +57,317 @@ public object TestReportConverter {
   public fun TestReport.toHapi(): org.hl7.fhir.r4.model.TestReport {
     val hapiValue = org.hl7.fhir.r4.model.TestReport()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifier.toHapi())
-    hapiValue.setNameElement(name.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasIdentifier()) {
+      hapiValue.setIdentifier(identifier.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.TestReport.TestReportStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setTestScript(testScript.toHapi())
+    if (hasTestScript()) {
+      hapiValue.setTestScript(testScript.toHapi())
+    }
     hapiValue.setResult(
       org.hl7.fhir.r4.model.TestReport.TestReportResult.valueOf(
         result.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setScoreElement(score.toHapi())
-    hapiValue.setTesterElement(tester.toHapi())
-    hapiValue.setIssuedElement(issued.toHapi())
-    hapiValue.setParticipant(participantList.map { it.toHapi() })
-    hapiValue.setSetup(setup.toHapi())
-    hapiValue.setTest(testList.map { it.toHapi() })
-    hapiValue.setTeardown(teardown.toHapi())
+    if (hasScore()) {
+      hapiValue.setScoreElement(score.toHapi())
+    }
+    if (hasTester()) {
+      hapiValue.setTesterElement(tester.toHapi())
+    }
+    if (hasIssued()) {
+      hapiValue.setIssuedElement(issued.toHapi())
+    }
+    if (participantCount > 0) {
+      hapiValue.setParticipant(participantList.map { it.toHapi() })
+    }
+    if (hasSetup()) {
+      hapiValue.setSetup(setup.toHapi())
+    }
+    if (testCount > 0) {
+      hapiValue.setTest(testList.map { it.toHapi() })
+    }
+    if (hasTeardown()) {
+      hapiValue.setTeardown(teardown.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.TestReport.toProto(): TestReport {
-    val protoValue =
-      TestReport.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setIdentifier(identifier.toProto())
-        .setName(nameElement.toProto())
-        .setStatus(
-          TestReport.StatusCode.newBuilder()
-            .setValue(
-              TestReportStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = TestReport.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.setIdentifier(identifier.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    protoValue.setStatus(
+      TestReport.StatusCode.newBuilder()
+        .setValue(
+          TestReportStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setTestScript(testScript.toProto())
-        .setResult(
-          TestReport.ResultCode.newBuilder()
-            .setValue(
-              TestReportResultCode.Value.valueOf(
-                result.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setScore(scoreElement.toProto())
-        .setTester(testerElement.toProto())
-        .setIssued(issuedElement.toProto())
-        .addAllParticipant(participant.map { it.toProto() })
-        .setSetup(setup.toProto())
-        .addAllTest(test.map { it.toProto() })
-        .setTeardown(teardown.toProto())
         .build()
-    return protoValue
+    )
+    if (hasTestScript()) {
+      protoValue.setTestScript(testScript.toProto())
+    }
+    protoValue.setResult(
+      TestReport.ResultCode.newBuilder()
+        .setValue(
+          TestReportResultCode.Value.valueOf(
+            result.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasScore()) {
+      protoValue.setScore(scoreElement.toProto())
+    }
+    if (hasTester()) {
+      protoValue.setTester(testerElement.toProto())
+    }
+    if (hasIssued()) {
+      protoValue.setIssued(issuedElement.toProto())
+    }
+    if (hasParticipant()) {
+      protoValue.addAllParticipant(participant.map { it.toProto() })
+    }
+    if (hasSetup()) {
+      protoValue.setSetup(setup.toProto())
+    }
+    if (hasTest()) {
+      protoValue.addAllTest(test.map { it.toProto() })
+    }
+    if (hasTeardown()) {
+      protoValue.setTeardown(teardown.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.TestReportParticipantComponent.toProto():
     TestReport.Participant {
-    val protoValue =
-      TestReport.Participant.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(
-          TestReport.Participant.TypeCode.newBuilder()
-            .setValue(
-              TestReportParticipantTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = TestReport.Participant.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setType(
+      TestReport.Participant.TypeCode.newBuilder()
+        .setValue(
+          TestReportParticipantTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setUri(uriElement.toProto())
-        .setDisplay(displayElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasUri()) {
+      protoValue.setUri(uriElement.toProto())
+    }
+    if (hasDisplay()) {
+      protoValue.setDisplay(displayElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.TestReportSetupComponent.toProto():
     TestReport.Setup {
-    val protoValue =
-      TestReport.Setup.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllAction(action.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = TestReport.Setup.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasAction()) {
+      protoValue.addAllAction(action.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.SetupActionComponent.toProto():
     TestReport.Setup.SetupAction {
     val protoValue =
-      TestReport.Setup.SetupAction.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setOperation(operation.toProto())
-        .setAssertValue(assert.toProto())
-        .build()
-    return protoValue
+      TestReport.Setup.SetupAction.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasOperation()) {
+      protoValue.setOperation(operation.toProto())
+    }
+    if (hasAssert()) {
+      protoValue.setAssertValue(assert.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.SetupActionOperationComponent.toProto():
     TestReport.Setup.SetupAction.Operation {
     val protoValue =
-      TestReport.Setup.SetupAction.Operation.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setResult(
-          TestReport.Setup.SetupAction.Operation.ResultCode.newBuilder()
-            .setValue(
-              TestReportActionResultCode.Value.valueOf(
-                result.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      TestReport.Setup.SetupAction.Operation.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setResult(
+      TestReport.Setup.SetupAction.Operation.ResultCode.newBuilder()
+        .setValue(
+          TestReportActionResultCode.Value.valueOf(
+            result.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setMessage(messageElement.toProto())
-        .setDetail(detailElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasMessage()) {
+      protoValue.setMessage(messageElement.toProto())
+    }
+    if (hasDetail()) {
+      protoValue.setDetail(detailElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.SetupActionAssertComponent.toProto():
     TestReport.Setup.SetupAction.Assert {
     val protoValue =
-      TestReport.Setup.SetupAction.Assert.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setResult(
-          TestReport.Setup.SetupAction.Assert.ResultCode.newBuilder()
-            .setValue(
-              TestReportActionResultCode.Value.valueOf(
-                result.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      TestReport.Setup.SetupAction.Assert.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setResult(
+      TestReport.Setup.SetupAction.Assert.ResultCode.newBuilder()
+        .setValue(
+          TestReportActionResultCode.Value.valueOf(
+            result.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setMessage(messageElement.toProto())
-        .setDetail(detailElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasMessage()) {
+      protoValue.setMessage(messageElement.toProto())
+    }
+    if (hasDetail()) {
+      protoValue.setDetail(detailElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.TestReportTestComponent.toProto(): TestReport.Test {
-    val protoValue =
-      TestReport.Test.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .setDescription(descriptionElement.toProto())
-        .addAllAction(action.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = TestReport.Test.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasAction()) {
+      protoValue.addAllAction(action.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.TestActionComponent.toProto():
     TestReport.Test.TestAction {
-    val protoValue =
-      TestReport.Test.TestAction.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = TestReport.Test.TestAction.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.TestReportTeardownComponent.toProto():
     TestReport.Teardown {
-    val protoValue =
-      TestReport.Teardown.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllAction(action.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = TestReport.Teardown.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasAction()) {
+      protoValue.addAllAction(action.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.TestReport.TeardownActionComponent.toProto():
     TestReport.Teardown.TeardownAction {
     val protoValue =
-      TestReport.Teardown.TeardownAction.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .build()
-    return protoValue
+      TestReport.Teardown.TeardownAction.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -279,15 +375,23 @@ public object TestReportConverter {
     org.hl7.fhir.r4.model.TestReport.TestReportParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TestReportParticipantComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setType(
       org.hl7.fhir.r4.model.TestReport.TestReportParticipantType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setUriElement(uri.toHapi())
-    hapiValue.setDisplayElement(display.toHapi())
+    if (hasUri()) {
+      hapiValue.setUriElement(uri.toHapi())
+    }
+    if (hasDisplay()) {
+      hapiValue.setDisplayElement(display.toHapi())
+    }
     return hapiValue
   }
 
@@ -295,9 +399,15 @@ public object TestReportConverter {
   private fun TestReport.Setup.toHapi(): org.hl7.fhir.r4.model.TestReport.TestReportSetupComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TestReportSetupComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setAction(actionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (actionCount > 0) {
+      hapiValue.setAction(actionList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -306,10 +416,18 @@ public object TestReportConverter {
     org.hl7.fhir.r4.model.TestReport.SetupActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.SetupActionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setOperation(operation.toHapi())
-    hapiValue.setAssert(assertValue.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasOperation()) {
+      hapiValue.setOperation(operation.toHapi())
+    }
+    if (hasAssertValue()) {
+      hapiValue.setAssert(assertValue.toHapi())
+    }
     return hapiValue
   }
 
@@ -318,15 +436,23 @@ public object TestReportConverter {
     org.hl7.fhir.r4.model.TestReport.SetupActionOperationComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.SetupActionOperationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setResult(
       org.hl7.fhir.r4.model.TestReport.TestReportActionResult.valueOf(
         result.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setMessageElement(message.toHapi())
-    hapiValue.setDetailElement(detail.toHapi())
+    if (hasMessage()) {
+      hapiValue.setMessageElement(message.toHapi())
+    }
+    if (hasDetail()) {
+      hapiValue.setDetailElement(detail.toHapi())
+    }
     return hapiValue
   }
 
@@ -335,15 +461,23 @@ public object TestReportConverter {
     org.hl7.fhir.r4.model.TestReport.SetupActionAssertComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.SetupActionAssertComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setResult(
       org.hl7.fhir.r4.model.TestReport.TestReportActionResult.valueOf(
         result.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setMessageElement(message.toHapi())
-    hapiValue.setDetailElement(detail.toHapi())
+    if (hasMessage()) {
+      hapiValue.setMessageElement(message.toHapi())
+    }
+    if (hasDetail()) {
+      hapiValue.setDetailElement(detail.toHapi())
+    }
     return hapiValue
   }
 
@@ -351,11 +485,21 @@ public object TestReportConverter {
   private fun TestReport.Test.toHapi(): org.hl7.fhir.r4.model.TestReport.TestReportTestComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TestReportTestComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setAction(actionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (actionCount > 0) {
+      hapiValue.setAction(actionList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -364,8 +508,12 @@ public object TestReportConverter {
     org.hl7.fhir.r4.model.TestReport.TestActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TestActionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -374,9 +522,15 @@ public object TestReportConverter {
     org.hl7.fhir.r4.model.TestReport.TestReportTeardownComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TestReportTeardownComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setAction(actionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (actionCount > 0) {
+      hapiValue.setAction(actionList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -385,8 +539,12 @@ public object TestReportConverter {
     org.hl7.fhir.r4.model.TestReport.TeardownActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.TestReport.TeardownActionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     return hapiValue
   }
 }

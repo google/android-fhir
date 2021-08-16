@@ -173,95 +173,189 @@ public object GoalConverter {
   public fun Goal.toHapi(): org.hl7.fhir.r4.model.Goal {
     val hapiValue = org.hl7.fhir.r4.model.Goal()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
     hapiValue.setLifecycleStatus(
       org.hl7.fhir.r4.model.Goal.GoalLifecycleStatus.valueOf(
         lifecycleStatus.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setAchievementStatus(achievementStatus.toHapi())
-    hapiValue.setCategory(categoryList.map { it.toHapi() })
-    hapiValue.setPriority(priority.toHapi())
-    hapiValue.setDescription(description.toHapi())
-    hapiValue.setSubject(subject.toHapi())
-    hapiValue.setStart(start.goalStartToHapi())
-    hapiValue.setTarget(targetList.map { it.toHapi() })
-    hapiValue.setStatusDateElement(statusDate.toHapi())
-    hapiValue.setStatusReasonElement(statusReason.toHapi())
-    hapiValue.setExpressedBy(expressedBy.toHapi())
-    hapiValue.setAddresses(addressesList.map { it.toHapi() })
-    hapiValue.setNote(noteList.map { it.toHapi() })
-    hapiValue.setOutcomeCode(outcomeCodeList.map { it.toHapi() })
-    hapiValue.setOutcomeReference(outcomeReferenceList.map { it.toHapi() })
+    if (hasAchievementStatus()) {
+      hapiValue.setAchievementStatus(achievementStatus.toHapi())
+    }
+    if (categoryCount > 0) {
+      hapiValue.setCategory(categoryList.map { it.toHapi() })
+    }
+    if (hasPriority()) {
+      hapiValue.setPriority(priority.toHapi())
+    }
+    if (hasDescription()) {
+      hapiValue.setDescription(description.toHapi())
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.toHapi())
+    }
+    if (hasStart()) {
+      hapiValue.setStart(start.goalStartToHapi())
+    }
+    if (targetCount > 0) {
+      hapiValue.setTarget(targetList.map { it.toHapi() })
+    }
+    if (hasStatusDate()) {
+      hapiValue.setStatusDateElement(statusDate.toHapi())
+    }
+    if (hasStatusReason()) {
+      hapiValue.setStatusReasonElement(statusReason.toHapi())
+    }
+    if (hasExpressedBy()) {
+      hapiValue.setExpressedBy(expressedBy.toHapi())
+    }
+    if (addressesCount > 0) {
+      hapiValue.setAddresses(addressesList.map { it.toHapi() })
+    }
+    if (noteCount > 0) {
+      hapiValue.setNote(noteList.map { it.toHapi() })
+    }
+    if (outcomeCodeCount > 0) {
+      hapiValue.setOutcomeCode(outcomeCodeList.map { it.toHapi() })
+    }
+    if (outcomeReferenceCount > 0) {
+      hapiValue.setOutcomeReference(outcomeReferenceList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Goal.toProto(): Goal {
-    val protoValue =
-      Goal.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setLifecycleStatus(
-          Goal.LifecycleStatusCode.newBuilder()
-            .setValue(
-              GoalLifecycleStatusCode.Value.valueOf(
-                lifecycleStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Goal.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    protoValue.setLifecycleStatus(
+      Goal.LifecycleStatusCode.newBuilder()
+        .setValue(
+          GoalLifecycleStatusCode.Value.valueOf(
+            lifecycleStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setAchievementStatus(achievementStatus.toProto())
-        .addAllCategory(category.map { it.toProto() })
-        .setPriority(priority.toProto())
-        .setDescription(description.toProto())
-        .setSubject(subject.toProto())
-        .setStart(start.goalStartToProto())
-        .addAllTarget(target.map { it.toProto() })
-        .setStatusDate(statusDateElement.toProto())
-        .setStatusReason(statusReasonElement.toProto())
-        .setExpressedBy(expressedBy.toProto())
-        .addAllAddresses(addresses.map { it.toProto() })
-        .addAllNote(note.map { it.toProto() })
-        .addAllOutcomeCode(outcomeCode.map { it.toProto() })
-        .addAllOutcomeReference(outcomeReference.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasAchievementStatus()) {
+      protoValue.setAchievementStatus(achievementStatus.toProto())
+    }
+    if (hasCategory()) {
+      protoValue.addAllCategory(category.map { it.toProto() })
+    }
+    if (hasPriority()) {
+      protoValue.setPriority(priority.toProto())
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(description.toProto())
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.toProto())
+    }
+    if (hasStart()) {
+      protoValue.setStart(start.goalStartToProto())
+    }
+    if (hasTarget()) {
+      protoValue.addAllTarget(target.map { it.toProto() })
+    }
+    if (hasStatusDate()) {
+      protoValue.setStatusDate(statusDateElement.toProto())
+    }
+    if (hasStatusReason()) {
+      protoValue.setStatusReason(statusReasonElement.toProto())
+    }
+    if (hasExpressedBy()) {
+      protoValue.setExpressedBy(expressedBy.toProto())
+    }
+    if (hasAddresses()) {
+      protoValue.addAllAddresses(addresses.map { it.toProto() })
+    }
+    if (hasNote()) {
+      protoValue.addAllNote(note.map { it.toProto() })
+    }
+    if (hasOutcomeCode()) {
+      protoValue.addAllOutcomeCode(outcomeCode.map { it.toProto() })
+    }
+    if (hasOutcomeReference()) {
+      protoValue.addAllOutcomeReference(outcomeReference.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Goal.GoalTargetComponent.toProto(): Goal.Target {
-    val protoValue =
-      Goal.Target.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setMeasure(measure.toProto())
-        .setDetail(detail.goalTargetDetailToProto())
-        .setDue(due.goalTargetDueToProto())
-        .build()
-    return protoValue
+    val protoValue = Goal.Target.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasMeasure()) {
+      protoValue.setMeasure(measure.toProto())
+    }
+    if (hasDetail()) {
+      protoValue.setDetail(detail.goalTargetDetailToProto())
+    }
+    if (hasDue()) {
+      protoValue.setDue(due.goalTargetDueToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun Goal.Target.toHapi(): org.hl7.fhir.r4.model.Goal.GoalTargetComponent {
     val hapiValue = org.hl7.fhir.r4.model.Goal.GoalTargetComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setMeasure(measure.toHapi())
-    hapiValue.setDetail(detail.goalTargetDetailToHapi())
-    hapiValue.setDue(due.goalTargetDueToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasMeasure()) {
+      hapiValue.setMeasure(measure.toHapi())
+    }
+    if (hasDetail()) {
+      hapiValue.setDetail(detail.goalTargetDetailToHapi())
+    }
+    if (hasDue()) {
+      hapiValue.setDue(due.goalTargetDueToHapi())
+    }
     return hapiValue
   }
 }

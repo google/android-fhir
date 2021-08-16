@@ -49,8 +49,9 @@ internal fun handleOtherType(
   fileBuilder.addImport(toHapi.enclosingClassName!!, toHapi.simpleName)
 
   if (isSingle) {
+    protoBuilder.beginControlFlow("if (has%L())", element.getHapiMethodName())
     protoBuilder.addStatement(
-      "$singleMethodTemplate(${if (element.typeList.first().profileList.isNotEmpty()) "( %L as %T )" else "%L%L"}.toProto())",
+      "protoValue$singleMethodTemplate(${if (element.typeList.first().profileList.isNotEmpty()) "( %L as %T )" else "%L%L"}.toProto())",
       element.getProtoMethodName(),
       element.getHapiFieldName(
         isPrimitive =
@@ -60,6 +61,8 @@ internal fun handleOtherType(
         ClassName(hapiPackage, element.typeList.first().normalizeType())
       else ""
     )
+    protoBuilder.endControlFlow()
+    hapiBuilder.beginControlFlow("if (has%L())", element.getProtoMethodName())
     hapiBuilder.addStatement(
       "hapiValue$singleMethodTemplate(%L.toHapi())",
       element.getHapiMethodName(
@@ -68,19 +71,25 @@ internal fun handleOtherType(
       ),
       element.getProtoFieldName(),
     )
+    hapiBuilder.endControlFlow()
   } else {
+    protoBuilder.beginControlFlow("if (has%L())", element.getHapiMethodName())
     protoBuilder.addStatement(
-      "$multipleMethodTemplate(%L.map{${if (element.typeList.first().profileList.isNotEmpty()) "( it as %T  )" else "it%L"}.toProto()})",
+      "protoValue$multipleMethodTemplate(%L.map{${if (element.typeList.first().profileList.isNotEmpty()) "( it as %T  )" else "it%L"}.toProto()})",
       element.getProtoMethodName(),
       element.getHapiFieldName(),
       if (element.typeList.first().profileList.isNotEmpty())
         ClassName(hapiPackage, element.typeList.first().normalizeType())
       else ""
     )
+    protoBuilder.endControlFlow()
+
+    hapiBuilder.beginControlFlow("if (%LCount > 0)", element.getProtoFieldName())
     hapiBuilder.addStatement(
       "hapiValue$singleMethodTemplate(%L.map{it.toHapi()})",
       element.getHapiMethodName(),
       element.getProtoFieldName(isRepeated = true)
     )
+    hapiBuilder.endControlFlow()
   }
 }

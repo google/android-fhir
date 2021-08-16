@@ -502,36 +502,50 @@ public object ParametersConverter {
   public fun Parameters.toHapi(): org.hl7.fhir.r4.model.Parameters {
     val hapiValue = org.hl7.fhir.r4.model.Parameters()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setParameter(parameterList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (parameterCount > 0) {
+      hapiValue.setParameter(parameterList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Parameters.toProto(): Parameters {
-    val protoValue =
-      Parameters.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .addAllParameter(parameter.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = Parameters.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasParameter()) {
+      protoValue.addAllParameter(parameter.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Parameters.ParametersParameterComponent.toProto():
     Parameters.Parameter {
-    val protoValue =
-      Parameters.Parameter.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .setValue(value.parametersParameterValueToProto())
-        .build()
-    return protoValue
+    val protoValue = Parameters.Parameter.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.parametersParameterValueToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -539,10 +553,18 @@ public object ParametersConverter {
     org.hl7.fhir.r4.model.Parameters.ParametersParameterComponent {
     val hapiValue = org.hl7.fhir.r4.model.Parameters.ParametersParameterComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setValue(value.parametersParameterValueToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.parametersParameterValueToHapi())
+    }
     return hapiValue
   }
 }

@@ -40,51 +40,92 @@ public object EnrollmentRequestConverter {
   public fun EnrollmentRequest.toHapi(): org.hl7.fhir.r4.model.EnrollmentRequest {
     val hapiValue = org.hl7.fhir.r4.model.EnrollmentRequest()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.EnrollmentRequest.EnrollmentRequestStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setCreatedElement(created.toHapi())
-    hapiValue.setInsurer(insurer.toHapi())
-    hapiValue.setProvider(provider.toHapi())
-    hapiValue.setCandidate(candidate.toHapi())
-    hapiValue.setCoverage(coverage.toHapi())
+    if (hasCreated()) {
+      hapiValue.setCreatedElement(created.toHapi())
+    }
+    if (hasInsurer()) {
+      hapiValue.setInsurer(insurer.toHapi())
+    }
+    if (hasProvider()) {
+      hapiValue.setProvider(provider.toHapi())
+    }
+    if (hasCandidate()) {
+      hapiValue.setCandidate(candidate.toHapi())
+    }
+    if (hasCoverage()) {
+      hapiValue.setCoverage(coverage.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.EnrollmentRequest.toProto(): EnrollmentRequest {
-    val protoValue =
-      EnrollmentRequest.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setStatus(
-          EnrollmentRequest.StatusCode.newBuilder()
-            .setValue(
-              FinancialResourceStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = EnrollmentRequest.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      EnrollmentRequest.StatusCode.newBuilder()
+        .setValue(
+          FinancialResourceStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setCreated(createdElement.toProto())
-        .setInsurer(insurer.toProto())
-        .setProvider(provider.toProto())
-        .setCandidate(candidate.toProto())
-        .setCoverage(coverage.toProto())
         .build()
-    return protoValue
+    )
+    if (hasCreated()) {
+      protoValue.setCreated(createdElement.toProto())
+    }
+    if (hasInsurer()) {
+      protoValue.setInsurer(insurer.toProto())
+    }
+    if (hasProvider()) {
+      protoValue.setProvider(provider.toProto())
+    }
+    if (hasCandidate()) {
+      protoValue.setCandidate(candidate.toProto())
+    }
+    if (hasCoverage()) {
+      protoValue.setCoverage(coverage.toProto())
+    }
+    return protoValue.build()
   }
 }

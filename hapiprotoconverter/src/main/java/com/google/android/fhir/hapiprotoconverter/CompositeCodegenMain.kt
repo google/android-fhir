@@ -62,6 +62,7 @@ fun main() {
         if (e is ClassNotFoundException) {
           println("${def.id.value} Class not found")
         } else {
+          //          throw e
           println(def.name.value)
         }
       }

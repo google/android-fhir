@@ -50,84 +50,152 @@ public object CatalogEntryConverter {
   public fun CatalogEntry.toHapi(): org.hl7.fhir.r4.model.CatalogEntry {
     val hapiValue = org.hl7.fhir.r4.model.CatalogEntry()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
-    hapiValue.setOrderableElement(orderable.toHapi())
-    hapiValue.setReferencedItem(referencedItem.toHapi())
-    hapiValue.setAdditionalIdentifier(additionalIdentifierList.map { it.toHapi() })
-    hapiValue.setClassification(classificationList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasOrderable()) {
+      hapiValue.setOrderableElement(orderable.toHapi())
+    }
+    if (hasReferencedItem()) {
+      hapiValue.setReferencedItem(referencedItem.toHapi())
+    }
+    if (additionalIdentifierCount > 0) {
+      hapiValue.setAdditionalIdentifier(additionalIdentifierList.map { it.toHapi() })
+    }
+    if (classificationCount > 0) {
+      hapiValue.setClassification(classificationList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setValidityPeriod(validityPeriod.toHapi())
-    hapiValue.setValidToElement(validTo.toHapi())
-    hapiValue.setLastUpdatedElement(lastUpdated.toHapi())
-    hapiValue.setAdditionalCharacteristic(additionalCharacteristicList.map { it.toHapi() })
-    hapiValue.setAdditionalClassification(additionalClassificationList.map { it.toHapi() })
-    hapiValue.setRelatedEntry(relatedEntryList.map { it.toHapi() })
+    if (hasValidityPeriod()) {
+      hapiValue.setValidityPeriod(validityPeriod.toHapi())
+    }
+    if (hasValidTo()) {
+      hapiValue.setValidToElement(validTo.toHapi())
+    }
+    if (hasLastUpdated()) {
+      hapiValue.setLastUpdatedElement(lastUpdated.toHapi())
+    }
+    if (additionalCharacteristicCount > 0) {
+      hapiValue.setAdditionalCharacteristic(additionalCharacteristicList.map { it.toHapi() })
+    }
+    if (additionalClassificationCount > 0) {
+      hapiValue.setAdditionalClassification(additionalClassificationList.map { it.toHapi() })
+    }
+    if (relatedEntryCount > 0) {
+      hapiValue.setRelatedEntry(relatedEntryList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.CatalogEntry.toProto(): CatalogEntry {
-    val protoValue =
-      CatalogEntry.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setType(type.toProto())
-        .setOrderable(orderableElement.toProto())
-        .setReferencedItem(referencedItem.toProto())
-        .addAllAdditionalIdentifier(additionalIdentifier.map { it.toProto() })
-        .addAllClassification(classification.map { it.toProto() })
-        .setStatus(
-          CatalogEntry.StatusCode.newBuilder()
-            .setValue(
-              PublicationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = CatalogEntry.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasOrderable()) {
+      protoValue.setOrderable(orderableElement.toProto())
+    }
+    if (hasReferencedItem()) {
+      protoValue.setReferencedItem(referencedItem.toProto())
+    }
+    if (hasAdditionalIdentifier()) {
+      protoValue.addAllAdditionalIdentifier(additionalIdentifier.map { it.toProto() })
+    }
+    if (hasClassification()) {
+      protoValue.addAllClassification(classification.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      CatalogEntry.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setValidityPeriod(validityPeriod.toProto())
-        .setValidTo(validToElement.toProto())
-        .setLastUpdated(lastUpdatedElement.toProto())
-        .addAllAdditionalCharacteristic(additionalCharacteristic.map { it.toProto() })
-        .addAllAdditionalClassification(additionalClassification.map { it.toProto() })
-        .addAllRelatedEntry(relatedEntry.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasValidityPeriod()) {
+      protoValue.setValidityPeriod(validityPeriod.toProto())
+    }
+    if (hasValidTo()) {
+      protoValue.setValidTo(validToElement.toProto())
+    }
+    if (hasLastUpdated()) {
+      protoValue.setLastUpdated(lastUpdatedElement.toProto())
+    }
+    if (hasAdditionalCharacteristic()) {
+      protoValue.addAllAdditionalCharacteristic(additionalCharacteristic.map { it.toProto() })
+    }
+    if (hasAdditionalClassification()) {
+      protoValue.addAllAdditionalClassification(additionalClassification.map { it.toProto() })
+    }
+    if (hasRelatedEntry()) {
+      protoValue.addAllRelatedEntry(relatedEntry.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.CatalogEntry.CatalogEntryRelatedEntryComponent.toProto():
     CatalogEntry.RelatedEntry {
-    val protoValue =
-      CatalogEntry.RelatedEntry.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setRelationtype(
-          CatalogEntry.RelatedEntry.RelationtypeCode.newBuilder()
-            .setValue(
-              CatalogEntryRelationTypeCode.Value.valueOf(
-                relationtype.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = CatalogEntry.RelatedEntry.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setRelationtype(
+      CatalogEntry.RelatedEntry.RelationtypeCode.newBuilder()
+        .setValue(
+          CatalogEntryRelationTypeCode.Value.valueOf(
+            relationtype.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setItem(item.toProto())
         .build()
-    return protoValue
+    )
+    if (hasItem()) {
+      protoValue.setItem(item.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -135,14 +203,20 @@ public object CatalogEntryConverter {
     org.hl7.fhir.r4.model.CatalogEntry.CatalogEntryRelatedEntryComponent {
     val hapiValue = org.hl7.fhir.r4.model.CatalogEntry.CatalogEntryRelatedEntryComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setRelationtype(
       org.hl7.fhir.r4.model.CatalogEntry.CatalogEntryRelationType.valueOf(
         relationtype.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setItem(item.toHapi())
+    if (hasItem()) {
+      hapiValue.setItem(item.toHapi())
+    }
     return hapiValue
   }
 }

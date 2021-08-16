@@ -41,35 +41,72 @@ public object BasicConverter {
   public fun Basic.toHapi(): org.hl7.fhir.r4.model.Basic {
     val hapiValue = org.hl7.fhir.r4.model.Basic()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setSubject(subject.toHapi())
-    hapiValue.setCreatedElement(created.toHapi())
-    hapiValue.setAuthor(author.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.toHapi())
+    }
+    if (hasCreated()) {
+      hapiValue.setCreatedElement(created.toHapi())
+    }
+    if (hasAuthor()) {
+      hapiValue.setAuthor(author.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Basic.toProto(): Basic {
-    val protoValue =
-      Basic.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setCode(code.toProto())
-        .setSubject(subject.toProto())
-        .setCreated(createdElement.toProto())
-        .setAuthor(author.toProto())
-        .build()
-    return protoValue
+    val protoValue = Basic.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.toProto())
+    }
+    if (hasCreated()) {
+      protoValue.setCreated(createdElement.toProto())
+    }
+    if (hasAuthor()) {
+      protoValue.setAuthor(author.toProto())
+    }
+    return protoValue.build()
   }
 }

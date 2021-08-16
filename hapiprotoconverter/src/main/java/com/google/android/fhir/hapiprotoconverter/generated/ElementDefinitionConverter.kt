@@ -1559,9 +1559,15 @@ public object ElementDefinitionConverter {
   public fun ElementDefinition.toHapi(): org.hl7.fhir.r4.model.ElementDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ElementDefinition()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setPathElement(path.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasPath()) {
+      hapiValue.setPathElement(path.toHapi())
+    }
     representationList.forEach {
       hapiValue.addRepresentation(
         org.hl7.fhir.r4.model.ElementDefinition.PropertyRepresentation.valueOf(
@@ -1569,225 +1575,388 @@ public object ElementDefinitionConverter {
         )
       )
     }
-    hapiValue.setSliceNameElement(sliceName.toHapi())
-    hapiValue.setSliceIsConstrainingElement(sliceIsConstraining.toHapi())
-    hapiValue.setLabelElement(label.toHapi())
-    hapiValue.setCode(codeList.map { it.toHapi() })
-    hapiValue.setSlicing(slicing.toHapi())
-    hapiValue.setShortElement(short.toHapi())
-    hapiValue.setDefinitionElement(definition.toHapi())
-    hapiValue.setCommentElement(comment.toHapi())
-    hapiValue.setRequirementsElement(requirements.toHapi())
-    hapiValue.setAlias(aliasList.map { it.toHapi() })
-    hapiValue.setMinElement(min.toHapi())
-    hapiValue.setMaxElement(max.toHapi())
-    hapiValue.setBase(base.toHapi())
-    hapiValue.setContentReferenceElement(contentReference.toHapi())
-    hapiValue.setType(typeList.map { it.toHapi() })
-    hapiValue.setDefaultValue(defaultValue.elementDefinitionDefaultValueToHapi())
-    hapiValue.setMeaningWhenMissingElement(meaningWhenMissing.toHapi())
-    hapiValue.setOrderMeaningElement(orderMeaning.toHapi())
-    hapiValue.setFixed(fixed.elementDefinitionFixedToHapi())
-    hapiValue.setPattern(pattern.elementDefinitionPatternToHapi())
-    hapiValue.setExample(exampleList.map { it.toHapi() })
-    hapiValue.setMinValue(minValue.elementDefinitionMinValueToHapi())
-    hapiValue.setMaxValue(maxValue.elementDefinitionMaxValueToHapi())
-    hapiValue.setMaxLengthElement(maxLength.toHapi())
-    hapiValue.setCondition(conditionList.map { it.toHapi() })
-    hapiValue.setConstraint(constraintList.map { it.toHapi() })
-    hapiValue.setMustSupportElement(mustSupport.toHapi())
-    hapiValue.setIsModifierElement(isModifier.toHapi())
-    hapiValue.setIsModifierReasonElement(isModifierReason.toHapi())
-    hapiValue.setIsSummaryElement(isSummary.toHapi())
-    hapiValue.setBinding(binding.toHapi())
-    hapiValue.setMapping(mappingList.map { it.toHapi() })
+    if (hasSliceName()) {
+      hapiValue.setSliceNameElement(sliceName.toHapi())
+    }
+    if (hasSliceIsConstraining()) {
+      hapiValue.setSliceIsConstrainingElement(sliceIsConstraining.toHapi())
+    }
+    if (hasLabel()) {
+      hapiValue.setLabelElement(label.toHapi())
+    }
+    if (codeCount > 0) {
+      hapiValue.setCode(codeList.map { it.toHapi() })
+    }
+    if (hasSlicing()) {
+      hapiValue.setSlicing(slicing.toHapi())
+    }
+    if (hasShort()) {
+      hapiValue.setShortElement(short.toHapi())
+    }
+    if (hasDefinition()) {
+      hapiValue.setDefinitionElement(definition.toHapi())
+    }
+    if (hasComment()) {
+      hapiValue.setCommentElement(comment.toHapi())
+    }
+    if (hasRequirements()) {
+      hapiValue.setRequirementsElement(requirements.toHapi())
+    }
+    if (aliasCount > 0) {
+      hapiValue.setAlias(aliasList.map { it.toHapi() })
+    }
+    if (hasMin()) {
+      hapiValue.setMinElement(min.toHapi())
+    }
+    if (hasMax()) {
+      hapiValue.setMaxElement(max.toHapi())
+    }
+    if (hasBase()) {
+      hapiValue.setBase(base.toHapi())
+    }
+    if (hasContentReference()) {
+      hapiValue.setContentReferenceElement(contentReference.toHapi())
+    }
+    if (typeCount > 0) {
+      hapiValue.setType(typeList.map { it.toHapi() })
+    }
+    if (hasDefaultValue()) {
+      hapiValue.setDefaultValue(defaultValue.elementDefinitionDefaultValueToHapi())
+    }
+    if (hasMeaningWhenMissing()) {
+      hapiValue.setMeaningWhenMissingElement(meaningWhenMissing.toHapi())
+    }
+    if (hasOrderMeaning()) {
+      hapiValue.setOrderMeaningElement(orderMeaning.toHapi())
+    }
+    if (hasFixed()) {
+      hapiValue.setFixed(fixed.elementDefinitionFixedToHapi())
+    }
+    if (hasPattern()) {
+      hapiValue.setPattern(pattern.elementDefinitionPatternToHapi())
+    }
+    if (exampleCount > 0) {
+      hapiValue.setExample(exampleList.map { it.toHapi() })
+    }
+    if (hasMinValue()) {
+      hapiValue.setMinValue(minValue.elementDefinitionMinValueToHapi())
+    }
+    if (hasMaxValue()) {
+      hapiValue.setMaxValue(maxValue.elementDefinitionMaxValueToHapi())
+    }
+    if (hasMaxLength()) {
+      hapiValue.setMaxLengthElement(maxLength.toHapi())
+    }
+    if (conditionCount > 0) {
+      hapiValue.setCondition(conditionList.map { it.toHapi() })
+    }
+    if (constraintCount > 0) {
+      hapiValue.setConstraint(constraintList.map { it.toHapi() })
+    }
+    if (hasMustSupport()) {
+      hapiValue.setMustSupportElement(mustSupport.toHapi())
+    }
+    if (hasIsModifier()) {
+      hapiValue.setIsModifierElement(isModifier.toHapi())
+    }
+    if (hasIsModifierReason()) {
+      hapiValue.setIsModifierReasonElement(isModifierReason.toHapi())
+    }
+    if (hasIsSummary()) {
+      hapiValue.setIsSummaryElement(isSummary.toHapi())
+    }
+    if (hasBinding()) {
+      hapiValue.setBinding(binding.toHapi())
+    }
+    if (mappingCount > 0) {
+      hapiValue.setMapping(mappingList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.ElementDefinition.toProto(): ElementDefinition {
-    val protoValue =
-      ElementDefinition.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setPath(pathElement.toProto())
-        .addAllRepresentation(
-          representation.map {
-            ElementDefinition.RepresentationCode.newBuilder()
-              .setValue(
-                PropertyRepresentationCode.Value.valueOf(
-                  it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-                )
-              )
-              .build()
-          }
-        )
-        .setSliceName(sliceNameElement.toProto())
-        .setSliceIsConstraining(sliceIsConstrainingElement.toProto())
-        .setLabel(labelElement.toProto())
-        .addAllCode(code.map { it.toProto() })
-        .setSlicing(slicing.toProto())
-        .setShort(shortElement.toProto())
-        .setDefinition(definitionElement.toProto())
-        .setComment(commentElement.toProto())
-        .setRequirements(requirementsElement.toProto())
-        .addAllAlias(alias.map { it.toProto() })
-        .setMin(minElement.toProto())
-        .setMax(maxElement.toProto())
-        .setBase(base.toProto())
-        .setContentReference(contentReferenceElement.toProto())
-        .addAllType(type.map { it.toProto() })
-        .setDefaultValue(defaultValue.elementDefinitionDefaultValueToProto())
-        .setMeaningWhenMissing(meaningWhenMissingElement.toProto())
-        .setOrderMeaning(orderMeaningElement.toProto())
-        .setFixed(fixed.elementDefinitionFixedToProto())
-        .setPattern(pattern.elementDefinitionPatternToProto())
-        .addAllExample(example.map { it.toProto() })
-        .setMinValue(minValue.elementDefinitionMinValueToProto())
-        .setMaxValue(maxValue.elementDefinitionMaxValueToProto())
-        .setMaxLength(maxLengthElement.toProto())
-        .addAllCondition(condition.map { it.toProto() })
-        .addAllConstraint(constraint.map { it.toProto() })
-        .setMustSupport(mustSupportElement.toProto())
-        .setIsModifier(isModifierElement.toProto())
-        .setIsModifierReason(isModifierReasonElement.toProto())
-        .setIsSummary(isSummaryElement.toProto())
-        .setBinding(binding.toProto())
-        .addAllMapping(mapping.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = ElementDefinition.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasPath()) {
+      protoValue.setPath(pathElement.toProto())
+    }
+    protoValue.addAllRepresentation(
+      representation.map {
+        ElementDefinition.RepresentationCode.newBuilder()
+          .setValue(
+            PropertyRepresentationCode.Value.valueOf(
+              it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
+          )
+          .build()
+      }
+    )
+    if (hasSliceName()) {
+      protoValue.setSliceName(sliceNameElement.toProto())
+    }
+    if (hasSliceIsConstraining()) {
+      protoValue.setSliceIsConstraining(sliceIsConstrainingElement.toProto())
+    }
+    if (hasLabel()) {
+      protoValue.setLabel(labelElement.toProto())
+    }
+    if (hasCode()) {
+      protoValue.addAllCode(code.map { it.toProto() })
+    }
+    if (hasSlicing()) {
+      protoValue.setSlicing(slicing.toProto())
+    }
+    if (hasShort()) {
+      protoValue.setShort(shortElement.toProto())
+    }
+    if (hasDefinition()) {
+      protoValue.setDefinition(definitionElement.toProto())
+    }
+    if (hasComment()) {
+      protoValue.setComment(commentElement.toProto())
+    }
+    if (hasRequirements()) {
+      protoValue.setRequirements(requirementsElement.toProto())
+    }
+    if (hasAlias()) {
+      protoValue.addAllAlias(alias.map { it.toProto() })
+    }
+    if (hasMin()) {
+      protoValue.setMin(minElement.toProto())
+    }
+    if (hasMax()) {
+      protoValue.setMax(maxElement.toProto())
+    }
+    if (hasBase()) {
+      protoValue.setBase(base.toProto())
+    }
+    if (hasContentReference()) {
+      protoValue.setContentReference(contentReferenceElement.toProto())
+    }
+    if (hasType()) {
+      protoValue.addAllType(type.map { it.toProto() })
+    }
+    if (hasDefaultValue()) {
+      protoValue.setDefaultValue(defaultValue.elementDefinitionDefaultValueToProto())
+    }
+    if (hasMeaningWhenMissing()) {
+      protoValue.setMeaningWhenMissing(meaningWhenMissingElement.toProto())
+    }
+    if (hasOrderMeaning()) {
+      protoValue.setOrderMeaning(orderMeaningElement.toProto())
+    }
+    if (hasFixed()) {
+      protoValue.setFixed(fixed.elementDefinitionFixedToProto())
+    }
+    if (hasPattern()) {
+      protoValue.setPattern(pattern.elementDefinitionPatternToProto())
+    }
+    if (hasExample()) {
+      protoValue.addAllExample(example.map { it.toProto() })
+    }
+    if (hasMinValue()) {
+      protoValue.setMinValue(minValue.elementDefinitionMinValueToProto())
+    }
+    if (hasMaxValue()) {
+      protoValue.setMaxValue(maxValue.elementDefinitionMaxValueToProto())
+    }
+    if (hasMaxLength()) {
+      protoValue.setMaxLength(maxLengthElement.toProto())
+    }
+    if (hasCondition()) {
+      protoValue.addAllCondition(condition.map { it.toProto() })
+    }
+    if (hasConstraint()) {
+      protoValue.addAllConstraint(constraint.map { it.toProto() })
+    }
+    if (hasMustSupport()) {
+      protoValue.setMustSupport(mustSupportElement.toProto())
+    }
+    if (hasIsModifier()) {
+      protoValue.setIsModifier(isModifierElement.toProto())
+    }
+    if (hasIsModifierReason()) {
+      protoValue.setIsModifierReason(isModifierReasonElement.toProto())
+    }
+    if (hasIsSummary()) {
+      protoValue.setIsSummary(isSummaryElement.toProto())
+    }
+    if (hasBinding()) {
+      protoValue.setBinding(binding.toProto())
+    }
+    if (hasMapping()) {
+      protoValue.addAllMapping(mapping.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionSlicingComponent.toProto():
     ElementDefinition.Slicing {
-    val protoValue =
-      ElementDefinition.Slicing.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllDiscriminator(discriminator.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .setOrdered(orderedElement.toProto())
-        .setRules(
-          ElementDefinition.Slicing.RulesCode.newBuilder()
-            .setValue(
-              SlicingRulesCode.Value.valueOf(
-                rules.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = ElementDefinition.Slicing.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasDiscriminator()) {
+      protoValue.addAllDiscriminator(discriminator.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasOrdered()) {
+      protoValue.setOrdered(orderedElement.toProto())
+    }
+    protoValue.setRules(
+      ElementDefinition.Slicing.RulesCode.newBuilder()
+        .setValue(
+          SlicingRulesCode.Value.valueOf(
+            rules.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
         .build()
-    return protoValue
+    )
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionSlicingDiscriminatorComponent.toProto():
     ElementDefinition.Slicing.Discriminator {
     val protoValue =
-      ElementDefinition.Slicing.Discriminator.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setType(
-          ElementDefinition.Slicing.Discriminator.TypeCode.newBuilder()
-            .setValue(
-              DiscriminatorTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      ElementDefinition.Slicing.Discriminator.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    protoValue.setType(
+      ElementDefinition.Slicing.Discriminator.TypeCode.newBuilder()
+        .setValue(
+          DiscriminatorTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setPath(pathElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasPath()) {
+      protoValue.setPath(pathElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionBaseComponent.toProto():
     ElementDefinition.Base {
-    val protoValue =
-      ElementDefinition.Base.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setPath(pathElement.toProto())
-        .setMin(minElement.toProto())
-        .setMax(maxElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = ElementDefinition.Base.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasPath()) {
+      protoValue.setPath(pathElement.toProto())
+    }
+    if (hasMin()) {
+      protoValue.setMin(minElement.toProto())
+    }
+    if (hasMax()) {
+      protoValue.setMax(maxElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ElementDefinition.TypeRefComponent.toProto():
     ElementDefinition.TypeRef {
-    val protoValue =
-      ElementDefinition.TypeRef.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setCode(codeElement.toProto())
-        .addAllProfile(profile.map { it.toProto() })
-        .addAllTargetProfile(targetProfile.map { it.toProto() })
-        .addAllAggregation(
-          aggregation.map {
-            ElementDefinition.TypeRef.AggregationCode.newBuilder()
-              .setValue(
-                AggregationModeCode.Value.valueOf(
-                  it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-                )
-              )
-              .build()
-          }
-        )
-        .setVersioning(
-          ElementDefinition.TypeRef.VersioningCode.newBuilder()
-            .setValue(
-              ReferenceVersionRulesCode.Value.valueOf(
-                versioning.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    val protoValue = ElementDefinition.TypeRef.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(codeElement.toProto())
+    }
+    if (hasProfile()) {
+      protoValue.addAllProfile(profile.map { it.toProto() })
+    }
+    if (hasTargetProfile()) {
+      protoValue.addAllTargetProfile(targetProfile.map { it.toProto() })
+    }
+    protoValue.addAllAggregation(
+      aggregation.map {
+        ElementDefinition.TypeRef.AggregationCode.newBuilder()
+          .setValue(
+            AggregationModeCode.Value.valueOf(
+              it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
             )
-            .build()
+          )
+          .build()
+      }
+    )
+    protoValue.setVersioning(
+      ElementDefinition.TypeRef.VersioningCode.newBuilder()
+        .setValue(
+          ReferenceVersionRulesCode.Value.valueOf(
+            versioning.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
         .build()
-    return protoValue
+    )
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionExampleComponent.toProto():
     ElementDefinition.Example {
-    val protoValue =
-      ElementDefinition.Example.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setLabel(labelElement.toProto())
-        .setValue(value.elementDefinitionExampleValueToProto())
-        .build()
-    return protoValue
+    val protoValue = ElementDefinition.Example.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasLabel()) {
+      protoValue.setLabel(labelElement.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.elementDefinitionExampleValueToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionConstraintComponent.toProto():
     ElementDefinition.Constraint {
     val protoValue =
-      ElementDefinition.Constraint.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setKey(keyElement.toProto())
-        .setRequirements(requirementsElement.toProto())
-        .setSeverity(
-          ElementDefinition.Constraint.SeverityCode.newBuilder()
-            .setValue(
-              ConstraintSeverityCode.Value.valueOf(
-                severity.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      ElementDefinition.Constraint.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasKey()) {
+      protoValue.setKey(keyElement.toProto())
+    }
+    if (hasRequirements()) {
+      protoValue.setRequirements(requirementsElement.toProto())
+    }
+    protoValue.setSeverity(
+      ElementDefinition.Constraint.SeverityCode.newBuilder()
+        .setValue(
+          ConstraintSeverityCode.Value.valueOf(
+            severity.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setHuman(humanElement.toProto())
-        .setExpression(expressionElement.toProto())
-        .setXpath(xpathElement.toProto())
-        .setSource(sourceElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasHuman()) {
+      protoValue.setHuman(humanElement.toProto())
+    }
+    if (hasExpression()) {
+      protoValue.setExpression(expressionElement.toProto())
+    }
+    if (hasXpath()) {
+      protoValue.setXpath(xpathElement.toProto())
+    }
+    if (hasSource()) {
+      protoValue.setSource(sourceElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -1796,39 +1965,49 @@ public object ElementDefinitionConverter {
     val protoValue =
       ElementDefinition.ElementDefinitionBinding.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setStrength(
-          ElementDefinition.ElementDefinitionBinding.StrengthCode.newBuilder()
-            .setValue(
-              BindingStrengthCode.Value.valueOf(
-                strength.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    protoValue.setStrength(
+      ElementDefinition.ElementDefinitionBinding.StrengthCode.newBuilder()
+        .setValue(
+          BindingStrengthCode.Value.valueOf(
+            strength.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setDescription(descriptionElement.toProto())
-        .setValueSet(valueSetElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasValueSet()) {
+      protoValue.setValueSet(valueSetElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionMappingComponent.toProto():
     ElementDefinition.Mapping {
-    val protoValue =
-      ElementDefinition.Mapping.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setIdentity(identityElement.toProto())
-        .setLanguage(
-          ElementDefinition.Mapping.LanguageCode.newBuilder()
-            .setValue(language.protoCodeCheck())
-            .build()
-        )
-        .setMap(mapElement.toProto())
-        .setComment(commentElement.toProto())
+    val protoValue = ElementDefinition.Mapping.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasIdentity()) {
+      protoValue.setIdentity(identityElement.toProto())
+    }
+    protoValue.setLanguage(
+      ElementDefinition.Mapping.LanguageCode.newBuilder()
+        .setValue(language.protoCodeCheck())
         .build()
-    return protoValue
+    )
+    if (hasMap()) {
+      protoValue.setMap(mapElement.toProto())
+    }
+    if (hasComment()) {
+      protoValue.setComment(commentElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -1836,10 +2015,18 @@ public object ElementDefinitionConverter {
     org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionSlicingComponent {
     val hapiValue = org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionSlicingComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setDiscriminator(discriminatorList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setOrderedElement(ordered.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (discriminatorCount > 0) {
+      hapiValue.setDiscriminator(discriminatorList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (hasOrdered()) {
+      hapiValue.setOrderedElement(ordered.toHapi())
+    }
     hapiValue.setRules(
       org.hl7.fhir.r4.model.ElementDefinition.SlicingRules.valueOf(
         rules.value.name.hapiCodeCheck().replace("_", "")
@@ -1854,13 +2041,17 @@ public object ElementDefinitionConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionSlicingDiscriminatorComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
     hapiValue.setType(
       org.hl7.fhir.r4.model.ElementDefinition.DiscriminatorType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setPathElement(path.toHapi())
+    if (hasPath()) {
+      hapiValue.setPathElement(path.toHapi())
+    }
     return hapiValue
   }
 
@@ -1869,10 +2060,18 @@ public object ElementDefinitionConverter {
     org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionBaseComponent {
     val hapiValue = org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionBaseComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setPathElement(path.toHapi())
-    hapiValue.setMinElement(min.toHapi())
-    hapiValue.setMaxElement(max.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasPath()) {
+      hapiValue.setPathElement(path.toHapi())
+    }
+    if (hasMin()) {
+      hapiValue.setMinElement(min.toHapi())
+    }
+    if (hasMax()) {
+      hapiValue.setMaxElement(max.toHapi())
+    }
     return hapiValue
   }
 
@@ -1881,10 +2080,18 @@ public object ElementDefinitionConverter {
     org.hl7.fhir.r4.model.ElementDefinition.TypeRefComponent {
     val hapiValue = org.hl7.fhir.r4.model.ElementDefinition.TypeRefComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setCodeElement(code.toHapi())
-    hapiValue.setProfile(profileList.map { it.toHapi() })
-    hapiValue.setTargetProfile(targetProfileList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCodeElement(code.toHapi())
+    }
+    if (profileCount > 0) {
+      hapiValue.setProfile(profileList.map { it.toHapi() })
+    }
+    if (targetProfileCount > 0) {
+      hapiValue.setTargetProfile(targetProfileList.map { it.toHapi() })
+    }
     aggregationList.forEach {
       hapiValue.addAggregation(
         org.hl7.fhir.r4.model.ElementDefinition.AggregationMode.valueOf(
@@ -1905,9 +2112,15 @@ public object ElementDefinitionConverter {
     org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionExampleComponent {
     val hapiValue = org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionExampleComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setLabelElement(label.toHapi())
-    hapiValue.setValue(value.elementDefinitionExampleValueToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasLabel()) {
+      hapiValue.setLabelElement(label.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.elementDefinitionExampleValueToHapi())
+    }
     return hapiValue
   }
 
@@ -1916,18 +2129,32 @@ public object ElementDefinitionConverter {
     org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionConstraintComponent {
     val hapiValue = org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionConstraintComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setKeyElement(key.toHapi())
-    hapiValue.setRequirementsElement(requirements.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasKey()) {
+      hapiValue.setKeyElement(key.toHapi())
+    }
+    if (hasRequirements()) {
+      hapiValue.setRequirementsElement(requirements.toHapi())
+    }
     hapiValue.setSeverity(
       org.hl7.fhir.r4.model.ElementDefinition.ConstraintSeverity.valueOf(
         severity.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setHumanElement(human.toHapi())
-    hapiValue.setExpressionElement(expression.toHapi())
-    hapiValue.setXpathElement(xpath.toHapi())
-    hapiValue.setSourceElement(source.toHapi())
+    if (hasHuman()) {
+      hapiValue.setHumanElement(human.toHapi())
+    }
+    if (hasExpression()) {
+      hapiValue.setExpressionElement(expression.toHapi())
+    }
+    if (hasXpath()) {
+      hapiValue.setXpathElement(xpath.toHapi())
+    }
+    if (hasSource()) {
+      hapiValue.setSourceElement(source.toHapi())
+    }
     return hapiValue
   }
 
@@ -1936,12 +2163,18 @@ public object ElementDefinitionConverter {
     org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionBindingComponent {
     val hapiValue = org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionBindingComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
     hapiValue.setStrength(
       Enumerations.BindingStrength.valueOf(strength.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setValueSetElement(valueSet.toHapi())
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (hasValueSet()) {
+      hapiValue.setValueSetElement(valueSet.toHapi())
+    }
     return hapiValue
   }
 
@@ -1950,11 +2183,19 @@ public object ElementDefinitionConverter {
     org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionMappingComponent {
     val hapiValue = org.hl7.fhir.r4.model.ElementDefinition.ElementDefinitionMappingComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setIdentityElement(identity.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasIdentity()) {
+      hapiValue.setIdentityElement(identity.toHapi())
+    }
     hapiValue.setLanguage(language.value.hapiCodeCheck())
-    hapiValue.setMapElement(map.toHapi())
-    hapiValue.setCommentElement(comment.toHapi())
+    if (hasMap()) {
+      hapiValue.setMapElement(map.toHapi())
+    }
+    if (hasComment()) {
+      hapiValue.setCommentElement(comment.toHapi())
+    }
     return hapiValue
   }
 }

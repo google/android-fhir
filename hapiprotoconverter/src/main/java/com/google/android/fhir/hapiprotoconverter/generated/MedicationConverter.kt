@@ -77,83 +77,140 @@ public object MedicationConverter {
   public fun Medication.toHapi(): org.hl7.fhir.r4.model.Medication {
     val hapiValue = org.hl7.fhir.r4.model.Medication()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setCode(code.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Medication.MedicationStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setManufacturer(manufacturer.toHapi())
-    hapiValue.setForm(form.toHapi())
-    hapiValue.setAmount(amount.toHapi())
-    hapiValue.setIngredient(ingredientList.map { it.toHapi() })
-    hapiValue.setBatch(batch.toHapi())
+    if (hasManufacturer()) {
+      hapiValue.setManufacturer(manufacturer.toHapi())
+    }
+    if (hasForm()) {
+      hapiValue.setForm(form.toHapi())
+    }
+    if (hasAmount()) {
+      hapiValue.setAmount(amount.toHapi())
+    }
+    if (ingredientCount > 0) {
+      hapiValue.setIngredient(ingredientList.map { it.toHapi() })
+    }
+    if (hasBatch()) {
+      hapiValue.setBatch(batch.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Medication.toProto(): Medication {
-    val protoValue =
-      Medication.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setCode(code.toProto())
-        .setStatus(
-          Medication.StatusCode.newBuilder()
-            .setValue(
-              MedicationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Medication.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    protoValue.setStatus(
+      Medication.StatusCode.newBuilder()
+        .setValue(
+          MedicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setManufacturer(manufacturer.toProto())
-        .setForm(form.toProto())
-        .setAmount(amount.toProto())
-        .addAllIngredient(ingredient.map { it.toProto() })
-        .setBatch(batch.toProto())
         .build()
-    return protoValue
+    )
+    if (hasManufacturer()) {
+      protoValue.setManufacturer(manufacturer.toProto())
+    }
+    if (hasForm()) {
+      protoValue.setForm(form.toProto())
+    }
+    if (hasAmount()) {
+      protoValue.setAmount(amount.toProto())
+    }
+    if (hasIngredient()) {
+      protoValue.addAllIngredient(ingredient.map { it.toProto() })
+    }
+    if (hasBatch()) {
+      protoValue.setBatch(batch.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Medication.MedicationIngredientComponent.toProto():
     Medication.Ingredient {
-    val protoValue =
-      Medication.Ingredient.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setItem(item.medicationIngredientItemToProto())
-        .setIsActive(isActiveElement.toProto())
-        .setStrength(strength.toProto())
-        .build()
-    return protoValue
+    val protoValue = Medication.Ingredient.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasItem()) {
+      protoValue.setItem(item.medicationIngredientItemToProto())
+    }
+    if (hasIsActive()) {
+      protoValue.setIsActive(isActiveElement.toProto())
+    }
+    if (hasStrength()) {
+      protoValue.setStrength(strength.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Medication.MedicationBatchComponent.toProto():
     Medication.Batch {
-    val protoValue =
-      Medication.Batch.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setLotNumber(lotNumberElement.toProto())
-        .setExpirationDate(expirationDateElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Medication.Batch.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasLotNumber()) {
+      protoValue.setLotNumber(lotNumberElement.toProto())
+    }
+    if (hasExpirationDate()) {
+      protoValue.setExpirationDate(expirationDateElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -161,11 +218,21 @@ public object MedicationConverter {
     org.hl7.fhir.r4.model.Medication.MedicationIngredientComponent {
     val hapiValue = org.hl7.fhir.r4.model.Medication.MedicationIngredientComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setItem(item.medicationIngredientItemToHapi())
-    hapiValue.setIsActiveElement(isActive.toHapi())
-    hapiValue.setStrength(strength.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasItem()) {
+      hapiValue.setItem(item.medicationIngredientItemToHapi())
+    }
+    if (hasIsActive()) {
+      hapiValue.setIsActiveElement(isActive.toHapi())
+    }
+    if (hasStrength()) {
+      hapiValue.setStrength(strength.toHapi())
+    }
     return hapiValue
   }
 
@@ -173,10 +240,18 @@ public object MedicationConverter {
   private fun Medication.Batch.toHapi(): org.hl7.fhir.r4.model.Medication.MedicationBatchComponent {
     val hapiValue = org.hl7.fhir.r4.model.Medication.MedicationBatchComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setLotNumberElement(lotNumber.toHapi())
-    hapiValue.setExpirationDateElement(expirationDate.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasLotNumber()) {
+      hapiValue.setLotNumberElement(lotNumber.toHapi())
+    }
+    if (hasExpirationDate()) {
+      hapiValue.setExpirationDateElement(expirationDate.toHapi())
+    }
     return hapiValue
   }
 }

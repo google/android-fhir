@@ -33,27 +33,52 @@ public object ProductShelfLifeConverter {
   public fun ProductShelfLife.toHapi(): org.hl7.fhir.r4.model.ProductShelfLife {
     val hapiValue = org.hl7.fhir.r4.model.ProductShelfLife()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifier.toHapi())
-    hapiValue.setType(type.toHapi())
-    hapiValue.setPeriod(period.toHapi())
-    hapiValue.setSpecialPrecautionsForStorage(specialPrecautionsForStorageList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasIdentifier()) {
+      hapiValue.setIdentifier(identifier.toHapi())
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
+    if (specialPrecautionsForStorageCount > 0) {
+      hapiValue.setSpecialPrecautionsForStorage(
+        specialPrecautionsForStorageList.map { it.toHapi() }
+      )
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.ProductShelfLife.toProto(): ProductShelfLife {
-    val protoValue =
-      ProductShelfLife.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setIdentifier(identifier.toProto())
-        .setType(type.toProto())
-        .setPeriod(period.toProto())
-        .addAllSpecialPrecautionsForStorage(specialPrecautionsForStorage.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = ProductShelfLife.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.setIdentifier(identifier.toProto())
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    if (hasSpecialPrecautionsForStorage()) {
+      protoValue.addAllSpecialPrecautionsForStorage(
+        specialPrecautionsForStorage.map { it.toProto() }
+      )
+    }
+    return protoValue.build()
   }
 }

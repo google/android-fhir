@@ -306,179 +306,318 @@ public object QuestionnaireConverter {
   public fun Questionnaire.toHapi(): org.hl7.fhir.r4.model.Questionnaire {
     val hapiValue = org.hl7.fhir.r4.model.Questionnaire()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setVersionElement(version.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setTitleElement(title.toHapi())
-    hapiValue.setDerivedFrom(derivedFromList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasTitle()) {
+      hapiValue.setTitleElement(title.toHapi())
+    }
+    if (derivedFromCount > 0) {
+      hapiValue.setDerivedFrom(derivedFromList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setExperimentalElement(experimental.toHapi())
+    if (hasExperimental()) {
+      hapiValue.setExperimentalElement(experimental.toHapi())
+    }
     subjectTypeList.forEach { hapiValue.addSubjectType(it.value.name.hapiCodeCheck()) }
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setPublisherElement(publisher.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setUseContext(useContextList.map { it.toHapi() })
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
-    hapiValue.setPurposeElement(purpose.toHapi())
-    hapiValue.setCopyrightElement(copyright.toHapi())
-    hapiValue.setApprovalDateElement(approvalDate.toHapi())
-    hapiValue.setLastReviewDateElement(lastReviewDate.toHapi())
-    hapiValue.setEffectivePeriod(effectivePeriod.toHapi())
-    hapiValue.setCode(codeList.map { it.toHapi() })
-    hapiValue.setItem(itemList.map { it.toHapi() })
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasPublisher()) {
+      hapiValue.setPublisherElement(publisher.toHapi())
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (useContextCount > 0) {
+      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+    }
+    if (jurisdictionCount > 0) {
+      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    }
+    if (hasPurpose()) {
+      hapiValue.setPurposeElement(purpose.toHapi())
+    }
+    if (hasCopyright()) {
+      hapiValue.setCopyrightElement(copyright.toHapi())
+    }
+    if (hasApprovalDate()) {
+      hapiValue.setApprovalDateElement(approvalDate.toHapi())
+    }
+    if (hasLastReviewDate()) {
+      hapiValue.setLastReviewDateElement(lastReviewDate.toHapi())
+    }
+    if (hasEffectivePeriod()) {
+      hapiValue.setEffectivePeriod(effectivePeriod.toHapi())
+    }
+    if (codeCount > 0) {
+      hapiValue.setCode(codeList.map { it.toHapi() })
+    }
+    if (itemCount > 0) {
+      hapiValue.setItem(itemList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Questionnaire.toProto(): Questionnaire {
-    val protoValue =
-      Questionnaire.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUrl(urlElement.toProto())
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setVersion(versionElement.toProto())
-        .setName(nameElement.toProto())
-        .setTitle(titleElement.toProto())
-        .addAllDerivedFrom(derivedFrom.map { it.toProto() })
-        .setStatus(
-          Questionnaire.StatusCode.newBuilder()
-            .setValue(
-              PublicationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Questionnaire.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasTitle()) {
+      protoValue.setTitle(titleElement.toProto())
+    }
+    if (hasDerivedFrom()) {
+      protoValue.addAllDerivedFrom(derivedFrom.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      Questionnaire.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setExperimental(experimentalElement.toProto())
-        .addAllSubjectType(
-          subjectType.map {
-            Questionnaire.SubjectTypeCode.newBuilder()
-              .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString.protoCodeCheck()))
-              .build()
-          }
-        )
-        .setDate(dateElement.toProto())
-        .setPublisher(publisherElement.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .addAllUseContext(useContext.map { it.toProto() })
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .setPurpose(purposeElement.toProto())
-        .setCopyright(copyrightElement.toProto())
-        .setApprovalDate(approvalDateElement.toProto())
-        .setLastReviewDate(lastReviewDateElement.toProto())
-        .setEffectivePeriod(effectivePeriod.toProto())
-        .addAllCode(code.map { it.toProto() })
-        .addAllItem(item.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasExperimental()) {
+      protoValue.setExperimental(experimentalElement.toProto())
+    }
+    protoValue.addAllSubjectType(
+      subjectType.map {
+        Questionnaire.SubjectTypeCode.newBuilder()
+          .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString.protoCodeCheck()))
+          .build()
+      }
+    )
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasPublisher()) {
+      protoValue.setPublisher(publisherElement.toProto())
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasUseContext()) {
+      protoValue.addAllUseContext(useContext.map { it.toProto() })
+    }
+    if (hasJurisdiction()) {
+      protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
+    }
+    if (hasPurpose()) {
+      protoValue.setPurpose(purposeElement.toProto())
+    }
+    if (hasCopyright()) {
+      protoValue.setCopyright(copyrightElement.toProto())
+    }
+    if (hasApprovalDate()) {
+      protoValue.setApprovalDate(approvalDateElement.toProto())
+    }
+    if (hasLastReviewDate()) {
+      protoValue.setLastReviewDate(lastReviewDateElement.toProto())
+    }
+    if (hasEffectivePeriod()) {
+      protoValue.setEffectivePeriod(effectivePeriod.toProto())
+    }
+    if (hasCode()) {
+      protoValue.addAllCode(code.map { it.toProto() })
+    }
+    if (hasItem()) {
+      protoValue.addAllItem(item.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent.toProto():
     Questionnaire.Item {
-    val protoValue =
-      Questionnaire.Item.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setLinkId(linkIdElement.toProto())
-        .setDefinition(definitionElement.toProto())
-        .addAllCode(code.map { it.toProto() })
-        .setPrefix(prefixElement.toProto())
-        .setText(textElement.toProto())
-        .setType(
-          Questionnaire.Item.TypeCode.newBuilder()
-            .setValue(
-              QuestionnaireItemTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Questionnaire.Item.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasLinkId()) {
+      protoValue.setLinkId(linkIdElement.toProto())
+    }
+    if (hasDefinition()) {
+      protoValue.setDefinition(definitionElement.toProto())
+    }
+    if (hasCode()) {
+      protoValue.addAllCode(code.map { it.toProto() })
+    }
+    if (hasPrefix()) {
+      protoValue.setPrefix(prefixElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(textElement.toProto())
+    }
+    protoValue.setType(
+      Questionnaire.Item.TypeCode.newBuilder()
+        .setValue(
+          QuestionnaireItemTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .addAllEnableWhen(enableWhen.map { it.toProto() })
-        .setEnableBehavior(
-          Questionnaire.Item.EnableBehaviorCode.newBuilder()
-            .setValue(
-              EnableWhenBehaviorCode.Value.valueOf(
-                enableBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setRequired(requiredElement.toProto())
-        .setRepeats(repeatsElement.toProto())
-        .setReadOnly(readOnlyElement.toProto())
-        .setMaxLength(maxLengthElement.toProto())
-        .setAnswerValueSet(answerValueSetElement.toProto())
-        .addAllAnswerOption(answerOption.map { it.toProto() })
-        .addAllInitial(initial.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasEnableWhen()) {
+      protoValue.addAllEnableWhen(enableWhen.map { it.toProto() })
+    }
+    protoValue.setEnableBehavior(
+      Questionnaire.Item.EnableBehaviorCode.newBuilder()
+        .setValue(
+          EnableWhenBehaviorCode.Value.valueOf(
+            enableBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasRequired()) {
+      protoValue.setRequired(requiredElement.toProto())
+    }
+    if (hasRepeats()) {
+      protoValue.setRepeats(repeatsElement.toProto())
+    }
+    if (hasReadOnly()) {
+      protoValue.setReadOnly(readOnlyElement.toProto())
+    }
+    if (hasMaxLength()) {
+      protoValue.setMaxLength(maxLengthElement.toProto())
+    }
+    if (hasAnswerValueSet()) {
+      protoValue.setAnswerValueSet(answerValueSetElement.toProto())
+    }
+    if (hasAnswerOption()) {
+      protoValue.addAllAnswerOption(answerOption.map { it.toProto() })
+    }
+    if (hasInitial()) {
+      protoValue.addAllInitial(initial.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemEnableWhenComponent.toProto():
     Questionnaire.Item.EnableWhen {
     val protoValue =
-      Questionnaire.Item.EnableWhen.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setQuestion(questionElement.toProto())
-        .setOperator(
-          Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
-            .setValue(
-              QuestionnaireItemOperatorCode.Value.valueOf(
-                operator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      Questionnaire.Item.EnableWhen.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasQuestion()) {
+      protoValue.setQuestion(questionElement.toProto())
+    }
+    protoValue.setOperator(
+      Questionnaire.Item.EnableWhen.OperatorCode.newBuilder()
+        .setValue(
+          QuestionnaireItemOperatorCode.Value.valueOf(
+            operator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setAnswer(answer.questionnaireItemEnableWhenAnswerToProto())
         .build()
-    return protoValue
+    )
+    if (hasAnswer()) {
+      protoValue.setAnswer(answer.questionnaireItemEnableWhenAnswerToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemAnswerOptionComponent.toProto():
     Questionnaire.Item.AnswerOption {
     val protoValue =
-      Questionnaire.Item.AnswerOption.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setValue(value.questionnaireItemAnswerOptionValueToProto())
-        .setInitialSelected(initialSelectedElement.toProto())
-        .build()
-    return protoValue
+      Questionnaire.Item.AnswerOption.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.questionnaireItemAnswerOptionValueToProto())
+    }
+    if (hasInitialSelected()) {
+      protoValue.setInitialSelected(initialSelectedElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemInitialComponent.toProto():
     Questionnaire.Item.Initial {
-    val protoValue =
-      Questionnaire.Item.Initial.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setValue(value.questionnaireItemInitialValueToProto())
-        .build()
-    return protoValue
+    val protoValue = Questionnaire.Item.Initial.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.questionnaireItemInitialValueToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -486,31 +625,61 @@ public object QuestionnaireConverter {
     org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setLinkIdElement(linkId.toHapi())
-    hapiValue.setDefinitionElement(definition.toHapi())
-    hapiValue.setCode(codeList.map { it.toHapi() })
-    hapiValue.setPrefixElement(prefix.toHapi())
-    hapiValue.setTextElement(text.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasLinkId()) {
+      hapiValue.setLinkIdElement(linkId.toHapi())
+    }
+    if (hasDefinition()) {
+      hapiValue.setDefinitionElement(definition.toHapi())
+    }
+    if (codeCount > 0) {
+      hapiValue.setCode(codeList.map { it.toHapi() })
+    }
+    if (hasPrefix()) {
+      hapiValue.setPrefixElement(prefix.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setTextElement(text.toHapi())
+    }
     hapiValue.setType(
       org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setEnableWhen(enableWhenList.map { it.toHapi() })
+    if (enableWhenCount > 0) {
+      hapiValue.setEnableWhen(enableWhenList.map { it.toHapi() })
+    }
     hapiValue.setEnableBehavior(
       org.hl7.fhir.r4.model.Questionnaire.EnableWhenBehavior.valueOf(
         enableBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setRequiredElement(required.toHapi())
-    hapiValue.setRepeatsElement(repeats.toHapi())
-    hapiValue.setReadOnlyElement(readOnly.toHapi())
-    hapiValue.setMaxLengthElement(maxLength.toHapi())
-    hapiValue.setAnswerValueSetElement(answerValueSet.toHapi())
-    hapiValue.setAnswerOption(answerOptionList.map { it.toHapi() })
-    hapiValue.setInitial(initialList.map { it.toHapi() })
+    if (hasRequired()) {
+      hapiValue.setRequiredElement(required.toHapi())
+    }
+    if (hasRepeats()) {
+      hapiValue.setRepeatsElement(repeats.toHapi())
+    }
+    if (hasReadOnly()) {
+      hapiValue.setReadOnlyElement(readOnly.toHapi())
+    }
+    if (hasMaxLength()) {
+      hapiValue.setMaxLengthElement(maxLength.toHapi())
+    }
+    if (hasAnswerValueSet()) {
+      hapiValue.setAnswerValueSetElement(answerValueSet.toHapi())
+    }
+    if (answerOptionCount > 0) {
+      hapiValue.setAnswerOption(answerOptionList.map { it.toHapi() })
+    }
+    if (initialCount > 0) {
+      hapiValue.setInitial(initialList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -519,15 +688,23 @@ public object QuestionnaireConverter {
     org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemEnableWhenComponent {
     val hapiValue = org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemEnableWhenComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setQuestionElement(question.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasQuestion()) {
+      hapiValue.setQuestionElement(question.toHapi())
+    }
     hapiValue.setOperator(
       org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemOperator.valueOf(
         operator.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setAnswer(answer.questionnaireItemEnableWhenAnswerToHapi())
+    if (hasAnswer()) {
+      hapiValue.setAnswer(answer.questionnaireItemEnableWhenAnswerToHapi())
+    }
     return hapiValue
   }
 
@@ -536,10 +713,18 @@ public object QuestionnaireConverter {
     org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemAnswerOptionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemAnswerOptionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setValue(value.questionnaireItemAnswerOptionValueToHapi())
-    hapiValue.setInitialSelectedElement(initialSelected.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.questionnaireItemAnswerOptionValueToHapi())
+    }
+    if (hasInitialSelected()) {
+      hapiValue.setInitialSelectedElement(initialSelected.toHapi())
+    }
     return hapiValue
   }
 
@@ -548,9 +733,15 @@ public object QuestionnaireConverter {
     org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemInitialComponent {
     val hapiValue = org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemInitialComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setValue(value.questionnaireItemInitialValueToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.questionnaireItemInitialValueToHapi())
+    }
     return hapiValue
   }
 }

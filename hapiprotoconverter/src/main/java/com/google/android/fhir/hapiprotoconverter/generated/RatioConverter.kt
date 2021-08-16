@@ -29,21 +29,30 @@ public object RatioConverter {
   public fun Ratio.toHapi(): org.hl7.fhir.r4.model.Ratio {
     val hapiValue = org.hl7.fhir.r4.model.Ratio()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setNumerator(numerator.toHapi())
-    hapiValue.setDenominator(denominator.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasNumerator()) {
+      hapiValue.setNumerator(numerator.toHapi())
+    }
+    if (hasDenominator()) {
+      hapiValue.setDenominator(denominator.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Ratio.toProto(): Ratio {
-    val protoValue =
-      Ratio.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setNumerator(numerator.toProto())
-        .setDenominator(denominator.toProto())
-        .build()
-    return protoValue
+    val protoValue = Ratio.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasNumerator()) {
+      protoValue.setNumerator(numerator.toProto())
+    }
+    if (hasDenominator()) {
+      protoValue.setDenominator(denominator.toProto())
+    }
+    return protoValue.build()
   }
 }

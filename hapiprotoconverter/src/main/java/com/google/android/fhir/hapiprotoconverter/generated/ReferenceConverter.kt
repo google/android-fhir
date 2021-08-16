@@ -33,23 +33,36 @@ public object ReferenceConverter {
   public fun Reference.toHapi(): org.hl7.fhir.r4.model.Reference {
     val hapiValue = org.hl7.fhir.r4.model.Reference()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setTypeElement(type.toHapi())
-    hapiValue.setIdentifier(identifier.toHapi())
-    hapiValue.setDisplayElement(display.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setTypeElement(type.toHapi())
+    }
+    if (hasIdentifier()) {
+      hapiValue.setIdentifier(identifier.toHapi())
+    }
+    if (hasDisplay()) {
+      hapiValue.setDisplayElement(display.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Reference.toProto(): Reference {
-    val protoValue =
-      Reference.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setType(typeElement.toProto())
-        .setIdentifier(identifier.toProto())
-        .setDisplay(displayElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Reference.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(typeElement.toProto())
+    }
+    if (hasIdentifier()) {
+      protoValue.setIdentifier(identifier.toProto())
+    }
+    if (hasDisplay()) {
+      protoValue.setDisplay(displayElement.toProto())
+    }
+    return protoValue.build()
   }
 }

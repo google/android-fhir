@@ -40,67 +40,105 @@ public object LinkageConverter {
   public fun Linkage.toHapi(): org.hl7.fhir.r4.model.Linkage {
     val hapiValue = org.hl7.fhir.r4.model.Linkage()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setActiveElement(active.toHapi())
-    hapiValue.setAuthor(author.toHapi())
-    hapiValue.setItem(itemList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasActive()) {
+      hapiValue.setActiveElement(active.toHapi())
+    }
+    if (hasAuthor()) {
+      hapiValue.setAuthor(author.toHapi())
+    }
+    if (itemCount > 0) {
+      hapiValue.setItem(itemList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Linkage.toProto(): Linkage {
-    val protoValue =
-      Linkage.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setActive(activeElement.toProto())
-        .setAuthor(author.toProto())
-        .addAllItem(item.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = Linkage.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasActive()) {
+      protoValue.setActive(activeElement.toProto())
+    }
+    if (hasAuthor()) {
+      protoValue.setAuthor(author.toProto())
+    }
+    if (hasItem()) {
+      protoValue.addAllItem(item.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Linkage.LinkageItemComponent.toProto(): Linkage.Item {
-    val protoValue =
-      Linkage.Item.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(
-          Linkage.Item.TypeCode.newBuilder()
-            .setValue(
-              LinkageTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Linkage.Item.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setType(
+      Linkage.Item.TypeCode.newBuilder()
+        .setValue(
+          LinkageTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setResource(resource.toProto())
         .build()
-    return protoValue
+    )
+    if (hasResource()) {
+      protoValue.setResource(resource.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun Linkage.Item.toHapi(): org.hl7.fhir.r4.model.Linkage.LinkageItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.Linkage.LinkageItemComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setType(
       org.hl7.fhir.r4.model.Linkage.LinkageType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setResource(resource.toHapi())
+    if (hasResource()) {
+      hapiValue.setResource(resource.toHapi())
+    }
     return hapiValue
   }
 }

@@ -103,88 +103,157 @@ public object GroupConverter {
   public fun Group.toHapi(): org.hl7.fhir.r4.model.Group {
     val hapiValue = org.hl7.fhir.r4.model.Group()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setActiveElement(active.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasActive()) {
+      hapiValue.setActiveElement(active.toHapi())
+    }
     hapiValue.setType(
       org.hl7.fhir.r4.model.Group.GroupType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setActualElement(actual.toHapi())
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setQuantityElement(quantity.toHapi())
-    hapiValue.setManagingEntity(managingEntity.toHapi())
-    hapiValue.setCharacteristic(characteristicList.map { it.toHapi() })
-    hapiValue.setMember(memberList.map { it.toHapi() })
+    if (hasActual()) {
+      hapiValue.setActualElement(actual.toHapi())
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasQuantity()) {
+      hapiValue.setQuantityElement(quantity.toHapi())
+    }
+    if (hasManagingEntity()) {
+      hapiValue.setManagingEntity(managingEntity.toHapi())
+    }
+    if (characteristicCount > 0) {
+      hapiValue.setCharacteristic(characteristicList.map { it.toHapi() })
+    }
+    if (memberCount > 0) {
+      hapiValue.setMember(memberList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Group.toProto(): Group {
-    val protoValue =
-      Group.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setActive(activeElement.toProto())
-        .setType(
-          Group.TypeCode.newBuilder()
-            .setValue(
-              GroupTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Group.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasActive()) {
+      protoValue.setActive(activeElement.toProto())
+    }
+    protoValue.setType(
+      Group.TypeCode.newBuilder()
+        .setValue(
+          GroupTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setActual(actualElement.toProto())
-        .setCode(code.toProto())
-        .setName(nameElement.toProto())
-        .setQuantity(quantityElement.toProto())
-        .setManagingEntity(managingEntity.toProto())
-        .addAllCharacteristic(characteristic.map { it.toProto() })
-        .addAllMember(member.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasActual()) {
+      protoValue.setActual(actualElement.toProto())
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasQuantity()) {
+      protoValue.setQuantity(quantityElement.toProto())
+    }
+    if (hasManagingEntity()) {
+      protoValue.setManagingEntity(managingEntity.toProto())
+    }
+    if (hasCharacteristic()) {
+      protoValue.addAllCharacteristic(characteristic.map { it.toProto() })
+    }
+    if (hasMember()) {
+      protoValue.addAllMember(member.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Group.GroupCharacteristicComponent.toProto():
     Group.Characteristic {
-    val protoValue =
-      Group.Characteristic.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(code.toProto())
-        .setValue(value.groupCharacteristicValueToProto())
-        .setExclude(excludeElement.toProto())
-        .setPeriod(period.toProto())
-        .build()
-    return protoValue
+    val protoValue = Group.Characteristic.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.groupCharacteristicValueToProto())
+    }
+    if (hasExclude()) {
+      protoValue.setExclude(excludeElement.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Group.GroupMemberComponent.toProto(): Group.Member {
-    val protoValue =
-      Group.Member.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setEntity(entity.toProto())
-        .setPeriod(period.toProto())
-        .setInactive(inactiveElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Group.Member.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasEntity()) {
+      protoValue.setEntity(entity.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    if (hasInactive()) {
+      protoValue.setInactive(inactiveElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -192,12 +261,24 @@ public object GroupConverter {
     org.hl7.fhir.r4.model.Group.GroupCharacteristicComponent {
     val hapiValue = org.hl7.fhir.r4.model.Group.GroupCharacteristicComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setValue(value.groupCharacteristicValueToHapi())
-    hapiValue.setExcludeElement(exclude.toHapi())
-    hapiValue.setPeriod(period.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.groupCharacteristicValueToHapi())
+    }
+    if (hasExclude()) {
+      hapiValue.setExcludeElement(exclude.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
     return hapiValue
   }
 
@@ -205,11 +286,21 @@ public object GroupConverter {
   private fun Group.Member.toHapi(): org.hl7.fhir.r4.model.Group.GroupMemberComponent {
     val hapiValue = org.hl7.fhir.r4.model.Group.GroupMemberComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setEntity(entity.toHapi())
-    hapiValue.setPeriod(period.toHapi())
-    hapiValue.setInactiveElement(inactive.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasEntity()) {
+      hapiValue.setEntity(entity.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
+    if (hasInactive()) {
+      hapiValue.setInactiveElement(inactive.toHapi())
+    }
     return hapiValue
   }
 }

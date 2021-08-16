@@ -281,299 +281,519 @@ public object PlanDefinitionConverter {
   public fun PlanDefinition.toHapi(): org.hl7.fhir.r4.model.PlanDefinition {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setVersionElement(version.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setTitleElement(title.toHapi())
-    hapiValue.setSubtitleElement(subtitle.toHapi())
-    hapiValue.setType(type.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasTitle()) {
+      hapiValue.setTitleElement(title.toHapi())
+    }
+    if (hasSubtitle()) {
+      hapiValue.setSubtitleElement(subtitle.toHapi())
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
     hapiValue.setStatus(
       Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setExperimentalElement(experimental.toHapi())
-    hapiValue.setSubject(subject.planDefinitionSubjectToHapi())
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setPublisherElement(publisher.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setUseContext(useContextList.map { it.toHapi() })
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
-    hapiValue.setPurposeElement(purpose.toHapi())
-    hapiValue.setUsageElement(usage.toHapi())
-    hapiValue.setCopyrightElement(copyright.toHapi())
-    hapiValue.setApprovalDateElement(approvalDate.toHapi())
-    hapiValue.setLastReviewDateElement(lastReviewDate.toHapi())
-    hapiValue.setEffectivePeriod(effectivePeriod.toHapi())
-    hapiValue.setTopic(topicList.map { it.toHapi() })
-    hapiValue.setAuthor(authorList.map { it.toHapi() })
-    hapiValue.setEditor(editorList.map { it.toHapi() })
-    hapiValue.setReviewer(reviewerList.map { it.toHapi() })
-    hapiValue.setEndorser(endorserList.map { it.toHapi() })
-    hapiValue.setRelatedArtifact(relatedArtifactList.map { it.toHapi() })
-    hapiValue.setLibrary(libraryList.map { it.toHapi() })
-    hapiValue.setGoal(goalList.map { it.toHapi() })
-    hapiValue.setAction(actionList.map { it.toHapi() })
+    if (hasExperimental()) {
+      hapiValue.setExperimentalElement(experimental.toHapi())
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.planDefinitionSubjectToHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasPublisher()) {
+      hapiValue.setPublisherElement(publisher.toHapi())
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (useContextCount > 0) {
+      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+    }
+    if (jurisdictionCount > 0) {
+      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    }
+    if (hasPurpose()) {
+      hapiValue.setPurposeElement(purpose.toHapi())
+    }
+    if (hasUsage()) {
+      hapiValue.setUsageElement(usage.toHapi())
+    }
+    if (hasCopyright()) {
+      hapiValue.setCopyrightElement(copyright.toHapi())
+    }
+    if (hasApprovalDate()) {
+      hapiValue.setApprovalDateElement(approvalDate.toHapi())
+    }
+    if (hasLastReviewDate()) {
+      hapiValue.setLastReviewDateElement(lastReviewDate.toHapi())
+    }
+    if (hasEffectivePeriod()) {
+      hapiValue.setEffectivePeriod(effectivePeriod.toHapi())
+    }
+    if (topicCount > 0) {
+      hapiValue.setTopic(topicList.map { it.toHapi() })
+    }
+    if (authorCount > 0) {
+      hapiValue.setAuthor(authorList.map { it.toHapi() })
+    }
+    if (editorCount > 0) {
+      hapiValue.setEditor(editorList.map { it.toHapi() })
+    }
+    if (reviewerCount > 0) {
+      hapiValue.setReviewer(reviewerList.map { it.toHapi() })
+    }
+    if (endorserCount > 0) {
+      hapiValue.setEndorser(endorserList.map { it.toHapi() })
+    }
+    if (relatedArtifactCount > 0) {
+      hapiValue.setRelatedArtifact(relatedArtifactList.map { it.toHapi() })
+    }
+    if (libraryCount > 0) {
+      hapiValue.setLibrary(libraryList.map { it.toHapi() })
+    }
+    if (goalCount > 0) {
+      hapiValue.setGoal(goalList.map { it.toHapi() })
+    }
+    if (actionCount > 0) {
+      hapiValue.setAction(actionList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.PlanDefinition.toProto(): PlanDefinition {
-    val protoValue =
-      PlanDefinition.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUrl(urlElement.toProto())
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setVersion(versionElement.toProto())
-        .setName(nameElement.toProto())
-        .setTitle(titleElement.toProto())
-        .setSubtitle(subtitleElement.toProto())
-        .setType(type.toProto())
-        .setStatus(
-          PlanDefinition.StatusCode.newBuilder()
-            .setValue(
-              PublicationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = PlanDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasTitle()) {
+      protoValue.setTitle(titleElement.toProto())
+    }
+    if (hasSubtitle()) {
+      protoValue.setSubtitle(subtitleElement.toProto())
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    protoValue.setStatus(
+      PlanDefinition.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setExperimental(experimentalElement.toProto())
-        .setSubject(subject.planDefinitionSubjectToProto())
-        .setDate(dateElement.toProto())
-        .setPublisher(publisherElement.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .addAllUseContext(useContext.map { it.toProto() })
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .setPurpose(purposeElement.toProto())
-        .setUsage(usageElement.toProto())
-        .setCopyright(copyrightElement.toProto())
-        .setApprovalDate(approvalDateElement.toProto())
-        .setLastReviewDate(lastReviewDateElement.toProto())
-        .setEffectivePeriod(effectivePeriod.toProto())
-        .addAllTopic(topic.map { it.toProto() })
-        .addAllAuthor(author.map { it.toProto() })
-        .addAllEditor(editor.map { it.toProto() })
-        .addAllReviewer(reviewer.map { it.toProto() })
-        .addAllEndorser(endorser.map { it.toProto() })
-        .addAllRelatedArtifact(relatedArtifact.map { it.toProto() })
-        .addAllLibrary(library.map { it.toProto() })
-        .addAllGoal(goal.map { it.toProto() })
-        .addAllAction(action.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasExperimental()) {
+      protoValue.setExperimental(experimentalElement.toProto())
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.planDefinitionSubjectToProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasPublisher()) {
+      protoValue.setPublisher(publisherElement.toProto())
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasUseContext()) {
+      protoValue.addAllUseContext(useContext.map { it.toProto() })
+    }
+    if (hasJurisdiction()) {
+      protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
+    }
+    if (hasPurpose()) {
+      protoValue.setPurpose(purposeElement.toProto())
+    }
+    if (hasUsage()) {
+      protoValue.setUsage(usageElement.toProto())
+    }
+    if (hasCopyright()) {
+      protoValue.setCopyright(copyrightElement.toProto())
+    }
+    if (hasApprovalDate()) {
+      protoValue.setApprovalDate(approvalDateElement.toProto())
+    }
+    if (hasLastReviewDate()) {
+      protoValue.setLastReviewDate(lastReviewDateElement.toProto())
+    }
+    if (hasEffectivePeriod()) {
+      protoValue.setEffectivePeriod(effectivePeriod.toProto())
+    }
+    if (hasTopic()) {
+      protoValue.addAllTopic(topic.map { it.toProto() })
+    }
+    if (hasAuthor()) {
+      protoValue.addAllAuthor(author.map { it.toProto() })
+    }
+    if (hasEditor()) {
+      protoValue.addAllEditor(editor.map { it.toProto() })
+    }
+    if (hasReviewer()) {
+      protoValue.addAllReviewer(reviewer.map { it.toProto() })
+    }
+    if (hasEndorser()) {
+      protoValue.addAllEndorser(endorser.map { it.toProto() })
+    }
+    if (hasRelatedArtifact()) {
+      protoValue.addAllRelatedArtifact(relatedArtifact.map { it.toProto() })
+    }
+    if (hasLibrary()) {
+      protoValue.addAllLibrary(library.map { it.toProto() })
+    }
+    if (hasGoal()) {
+      protoValue.addAllGoal(goal.map { it.toProto() })
+    }
+    if (hasAction()) {
+      protoValue.addAllAction(action.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalComponent.toProto():
     PlanDefinition.Goal {
-    val protoValue =
-      PlanDefinition.Goal.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCategory(category.toProto())
-        .setDescription(description.toProto())
-        .setPriority(priority.toProto())
-        .setStart(start.toProto())
-        .addAllAddresses(addresses.map { it.toProto() })
-        .addAllDocumentation(documentation.map { it.toProto() })
-        .addAllTarget(target.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = PlanDefinition.Goal.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCategory()) {
+      protoValue.setCategory(category.toProto())
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(description.toProto())
+    }
+    if (hasPriority()) {
+      protoValue.setPriority(priority.toProto())
+    }
+    if (hasStart()) {
+      protoValue.setStart(start.toProto())
+    }
+    if (hasAddresses()) {
+      protoValue.addAllAddresses(addresses.map { it.toProto() })
+    }
+    if (hasDocumentation()) {
+      protoValue.addAllDocumentation(documentation.map { it.toProto() })
+    }
+    if (hasTarget()) {
+      protoValue.addAllTarget(target.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalTargetComponent.toProto():
     PlanDefinition.Goal.Target {
-    val protoValue =
-      PlanDefinition.Goal.Target.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setMeasure(measure.toProto())
-        .setDetail(detail.planDefinitionGoalTargetDetailToProto())
-        .setDue(due.toProto())
-        .build()
-    return protoValue
+    val protoValue = PlanDefinition.Goal.Target.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasMeasure()) {
+      protoValue.setMeasure(measure.toProto())
+    }
+    if (hasDetail()) {
+      protoValue.setDetail(detail.planDefinitionGoalTargetDetailToProto())
+    }
+    if (hasDue()) {
+      protoValue.setDue(due.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionComponent.toProto():
     PlanDefinition.Action {
-    val protoValue =
-      PlanDefinition.Action.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setPrefix(prefixElement.toProto())
-        .setTitle(titleElement.toProto())
-        .setDescription(descriptionElement.toProto())
-        .setTextEquivalent(textEquivalentElement.toProto())
-        .setPriority(
-          PlanDefinition.Action.PriorityCode.newBuilder()
-            .setValue(
-              RequestPriorityCode.Value.valueOf(
-                priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = PlanDefinition.Action.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasPrefix()) {
+      protoValue.setPrefix(prefixElement.toProto())
+    }
+    if (hasTitle()) {
+      protoValue.setTitle(titleElement.toProto())
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasTextEquivalent()) {
+      protoValue.setTextEquivalent(textEquivalentElement.toProto())
+    }
+    protoValue.setPriority(
+      PlanDefinition.Action.PriorityCode.newBuilder()
+        .setValue(
+          RequestPriorityCode.Value.valueOf(
+            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .addAllCode(code.map { it.toProto() })
-        .addAllReason(reason.map { it.toProto() })
-        .addAllDocumentation(documentation.map { it.toProto() })
-        .addAllGoalId(goalId.map { it.toProto() })
-        .setSubject(subject.planDefinitionActionSubjectToProto())
-        .addAllTrigger(trigger.map { it.toProto() })
-        .addAllCondition(condition.map { it.toProto() })
-        .addAllInput(input.map { it.toProto() })
-        .addAllOutput(output.map { it.toProto() })
-        .addAllRelatedAction(relatedAction.map { it.toProto() })
-        .setTiming(timing.planDefinitionActionTimingToProto())
-        .addAllParticipant(participant.map { it.toProto() })
-        .setType(type.toProto())
-        .setGroupingBehavior(
-          PlanDefinition.Action.GroupingBehaviorCode.newBuilder()
-            .setValue(
-              ActionGroupingBehaviorCode.Value.valueOf(
-                groupingBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setSelectionBehavior(
-          PlanDefinition.Action.SelectionBehaviorCode.newBuilder()
-            .setValue(
-              ActionSelectionBehaviorCode.Value.valueOf(
-                selectionBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setRequiredBehavior(
-          PlanDefinition.Action.RequiredBehaviorCode.newBuilder()
-            .setValue(
-              ActionRequiredBehaviorCode.Value.valueOf(
-                requiredBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setPrecheckBehavior(
-          PlanDefinition.Action.PrecheckBehaviorCode.newBuilder()
-            .setValue(
-              ActionPrecheckBehaviorCode.Value.valueOf(
-                precheckBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setCardinalityBehavior(
-          PlanDefinition.Action.CardinalityBehaviorCode.newBuilder()
-            .setValue(
-              ActionCardinalityBehaviorCode.Value.valueOf(
-                cardinalityBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setDefinition(definition.planDefinitionActionDefinitionToProto())
-        .setTransform(transformElement.toProto())
-        .addAllDynamicValue(dynamicValue.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasCode()) {
+      protoValue.addAllCode(code.map { it.toProto() })
+    }
+    if (hasReason()) {
+      protoValue.addAllReason(reason.map { it.toProto() })
+    }
+    if (hasDocumentation()) {
+      protoValue.addAllDocumentation(documentation.map { it.toProto() })
+    }
+    if (hasGoalId()) {
+      protoValue.addAllGoalId(goalId.map { it.toProto() })
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.planDefinitionActionSubjectToProto())
+    }
+    if (hasTrigger()) {
+      protoValue.addAllTrigger(trigger.map { it.toProto() })
+    }
+    if (hasCondition()) {
+      protoValue.addAllCondition(condition.map { it.toProto() })
+    }
+    if (hasInput()) {
+      protoValue.addAllInput(input.map { it.toProto() })
+    }
+    if (hasOutput()) {
+      protoValue.addAllOutput(output.map { it.toProto() })
+    }
+    if (hasRelatedAction()) {
+      protoValue.addAllRelatedAction(relatedAction.map { it.toProto() })
+    }
+    if (hasTiming()) {
+      protoValue.setTiming(timing.planDefinitionActionTimingToProto())
+    }
+    if (hasParticipant()) {
+      protoValue.addAllParticipant(participant.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    protoValue.setGroupingBehavior(
+      PlanDefinition.Action.GroupingBehaviorCode.newBuilder()
+        .setValue(
+          ActionGroupingBehaviorCode.Value.valueOf(
+            groupingBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    protoValue.setSelectionBehavior(
+      PlanDefinition.Action.SelectionBehaviorCode.newBuilder()
+        .setValue(
+          ActionSelectionBehaviorCode.Value.valueOf(
+            selectionBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    protoValue.setRequiredBehavior(
+      PlanDefinition.Action.RequiredBehaviorCode.newBuilder()
+        .setValue(
+          ActionRequiredBehaviorCode.Value.valueOf(
+            requiredBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    protoValue.setPrecheckBehavior(
+      PlanDefinition.Action.PrecheckBehaviorCode.newBuilder()
+        .setValue(
+          ActionPrecheckBehaviorCode.Value.valueOf(
+            precheckBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    protoValue.setCardinalityBehavior(
+      PlanDefinition.Action.CardinalityBehaviorCode.newBuilder()
+        .setValue(
+          ActionCardinalityBehaviorCode.Value.valueOf(
+            cardinalityBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasDefinition()) {
+      protoValue.setDefinition(definition.planDefinitionActionDefinitionToProto())
+    }
+    if (hasTransform()) {
+      protoValue.setTransform(transformElement.toProto())
+    }
+    if (hasDynamicValue()) {
+      protoValue.addAllDynamicValue(dynamicValue.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionConditionComponent.toProto():
     PlanDefinition.Action.Condition {
     val protoValue =
-      PlanDefinition.Action.Condition.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setKind(
-          PlanDefinition.Action.Condition.KindCode.newBuilder()
-            .setValue(
-              ActionConditionKindCode.Value.valueOf(
-                kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      PlanDefinition.Action.Condition.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setKind(
+      PlanDefinition.Action.Condition.KindCode.newBuilder()
+        .setValue(
+          ActionConditionKindCode.Value.valueOf(
+            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setExpression(expression.toProto())
         .build()
-    return protoValue
+    )
+    if (hasExpression()) {
+      protoValue.setExpression(expression.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionRelatedActionComponent.toProto():
     PlanDefinition.Action.RelatedAction {
     val protoValue =
-      PlanDefinition.Action.RelatedAction.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setActionId(actionIdElement.toProto())
-        .setRelationship(
-          PlanDefinition.Action.RelatedAction.RelationshipCode.newBuilder()
-            .setValue(
-              ActionRelationshipTypeCode.Value.valueOf(
-                relationship.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      PlanDefinition.Action.RelatedAction.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasActionId()) {
+      protoValue.setActionId(actionIdElement.toProto())
+    }
+    protoValue.setRelationship(
+      PlanDefinition.Action.RelatedAction.RelationshipCode.newBuilder()
+        .setValue(
+          ActionRelationshipTypeCode.Value.valueOf(
+            relationship.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setOffset(offset.planDefinitionActionRelatedActionOffsetToProto())
         .build()
-    return protoValue
+    )
+    if (hasOffset()) {
+      protoValue.setOffset(offset.planDefinitionActionRelatedActionOffsetToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionParticipantComponent.toProto():
     PlanDefinition.Action.Participant {
     val protoValue =
-      PlanDefinition.Action.Participant.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(
-          PlanDefinition.Action.Participant.TypeCode.newBuilder()
-            .setValue(
-              ActionParticipantTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      PlanDefinition.Action.Participant.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setType(
+      PlanDefinition.Action.Participant.TypeCode.newBuilder()
+        .setValue(
+          ActionParticipantTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setRole(role.toProto())
         .build()
-    return protoValue
+    )
+    if (hasRole()) {
+      protoValue.setRole(role.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionDynamicValueComponent.toProto():
     PlanDefinition.Action.DynamicValue {
     val protoValue =
-      PlanDefinition.Action.DynamicValue.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setPath(pathElement.toProto())
-        .setExpression(expression.toProto())
-        .build()
-    return protoValue
+      PlanDefinition.Action.DynamicValue.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasPath()) {
+      protoValue.setPath(pathElement.toProto())
+    }
+    if (hasExpression()) {
+      protoValue.setExpression(expression.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -581,15 +801,33 @@ public object PlanDefinitionConverter {
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCategory(category.toHapi())
-    hapiValue.setDescription(description.toHapi())
-    hapiValue.setPriority(priority.toHapi())
-    hapiValue.setStart(start.toHapi())
-    hapiValue.setAddresses(addressesList.map { it.toHapi() })
-    hapiValue.setDocumentation(documentationList.map { it.toHapi() })
-    hapiValue.setTarget(targetList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCategory()) {
+      hapiValue.setCategory(category.toHapi())
+    }
+    if (hasDescription()) {
+      hapiValue.setDescription(description.toHapi())
+    }
+    if (hasPriority()) {
+      hapiValue.setPriority(priority.toHapi())
+    }
+    if (hasStart()) {
+      hapiValue.setStart(start.toHapi())
+    }
+    if (addressesCount > 0) {
+      hapiValue.setAddresses(addressesList.map { it.toHapi() })
+    }
+    if (documentationCount > 0) {
+      hapiValue.setDocumentation(documentationList.map { it.toHapi() })
+    }
+    if (targetCount > 0) {
+      hapiValue.setTarget(targetList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -598,11 +836,21 @@ public object PlanDefinitionConverter {
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalTargetComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalTargetComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setMeasure(measure.toHapi())
-    hapiValue.setDetail(detail.planDefinitionGoalTargetDetailToHapi())
-    hapiValue.setDue(due.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasMeasure()) {
+      hapiValue.setMeasure(measure.toHapi())
+    }
+    if (hasDetail()) {
+      hapiValue.setDetail(detail.planDefinitionGoalTargetDetailToHapi())
+    }
+    if (hasDue()) {
+      hapiValue.setDue(due.toHapi())
+    }
     return hapiValue
   }
 
@@ -611,30 +859,68 @@ public object PlanDefinitionConverter {
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setPrefixElement(prefix.toHapi())
-    hapiValue.setTitleElement(title.toHapi())
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setTextEquivalentElement(textEquivalent.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasPrefix()) {
+      hapiValue.setPrefixElement(prefix.toHapi())
+    }
+    if (hasTitle()) {
+      hapiValue.setTitleElement(title.toHapi())
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (hasTextEquivalent()) {
+      hapiValue.setTextEquivalentElement(textEquivalent.toHapi())
+    }
     hapiValue.setPriority(
       org.hl7.fhir.r4.model.PlanDefinition.RequestPriority.valueOf(
         priority.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setCode(codeList.map { it.toHapi() })
-    hapiValue.setReason(reasonList.map { it.toHapi() })
-    hapiValue.setDocumentation(documentationList.map { it.toHapi() })
-    hapiValue.setGoalId(goalIdList.map { it.toHapi() })
-    hapiValue.setSubject(subject.planDefinitionActionSubjectToHapi())
-    hapiValue.setTrigger(triggerList.map { it.toHapi() })
-    hapiValue.setCondition(conditionList.map { it.toHapi() })
-    hapiValue.setInput(inputList.map { it.toHapi() })
-    hapiValue.setOutput(outputList.map { it.toHapi() })
-    hapiValue.setRelatedAction(relatedActionList.map { it.toHapi() })
-    hapiValue.setTiming(timing.planDefinitionActionTimingToHapi())
-    hapiValue.setParticipant(participantList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
+    if (codeCount > 0) {
+      hapiValue.setCode(codeList.map { it.toHapi() })
+    }
+    if (reasonCount > 0) {
+      hapiValue.setReason(reasonList.map { it.toHapi() })
+    }
+    if (documentationCount > 0) {
+      hapiValue.setDocumentation(documentationList.map { it.toHapi() })
+    }
+    if (goalIdCount > 0) {
+      hapiValue.setGoalId(goalIdList.map { it.toHapi() })
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.planDefinitionActionSubjectToHapi())
+    }
+    if (triggerCount > 0) {
+      hapiValue.setTrigger(triggerList.map { it.toHapi() })
+    }
+    if (conditionCount > 0) {
+      hapiValue.setCondition(conditionList.map { it.toHapi() })
+    }
+    if (inputCount > 0) {
+      hapiValue.setInput(inputList.map { it.toHapi() })
+    }
+    if (outputCount > 0) {
+      hapiValue.setOutput(outputList.map { it.toHapi() })
+    }
+    if (relatedActionCount > 0) {
+      hapiValue.setRelatedAction(relatedActionList.map { it.toHapi() })
+    }
+    if (hasTiming()) {
+      hapiValue.setTiming(timing.planDefinitionActionTimingToHapi())
+    }
+    if (participantCount > 0) {
+      hapiValue.setParticipant(participantList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
     hapiValue.setGroupingBehavior(
       org.hl7.fhir.r4.model.PlanDefinition.ActionGroupingBehavior.valueOf(
         groupingBehavior.value.name.hapiCodeCheck().replace("_", "")
@@ -660,9 +946,15 @@ public object PlanDefinitionConverter {
         cardinalityBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setDefinition(definition.planDefinitionActionDefinitionToHapi())
-    hapiValue.setTransformElement(transform.toHapi())
-    hapiValue.setDynamicValue(dynamicValueList.map { it.toHapi() })
+    if (hasDefinition()) {
+      hapiValue.setDefinition(definition.planDefinitionActionDefinitionToHapi())
+    }
+    if (hasTransform()) {
+      hapiValue.setTransformElement(transform.toHapi())
+    }
+    if (dynamicValueCount > 0) {
+      hapiValue.setDynamicValue(dynamicValueList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -671,14 +963,20 @@ public object PlanDefinitionConverter {
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionConditionComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionConditionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setKind(
       org.hl7.fhir.r4.model.PlanDefinition.ActionConditionKind.valueOf(
         kind.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setExpression(expression.toHapi())
+    if (hasExpression()) {
+      hapiValue.setExpression(expression.toHapi())
+    }
     return hapiValue
   }
 
@@ -688,15 +986,23 @@ public object PlanDefinitionConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionRelatedActionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setActionIdElement(actionId.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasActionId()) {
+      hapiValue.setActionIdElement(actionId.toHapi())
+    }
     hapiValue.setRelationship(
       org.hl7.fhir.r4.model.PlanDefinition.ActionRelationshipType.valueOf(
         relationship.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setOffset(offset.planDefinitionActionRelatedActionOffsetToHapi())
+    if (hasOffset()) {
+      hapiValue.setOffset(offset.planDefinitionActionRelatedActionOffsetToHapi())
+    }
     return hapiValue
   }
 
@@ -705,14 +1011,20 @@ public object PlanDefinitionConverter {
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionParticipantComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setType(
       org.hl7.fhir.r4.model.PlanDefinition.ActionParticipantType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setRole(role.toHapi())
+    if (hasRole()) {
+      hapiValue.setRole(role.toHapi())
+    }
     return hapiValue
   }
 
@@ -721,10 +1033,18 @@ public object PlanDefinitionConverter {
     org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionDynamicValueComponent {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionDynamicValueComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setPathElement(path.toHapi())
-    hapiValue.setExpression(expression.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasPath()) {
+      hapiValue.setPathElement(path.toHapi())
+    }
+    if (hasExpression()) {
+      hapiValue.setExpression(expression.toHapi())
+    }
     return hapiValue
   }
 }

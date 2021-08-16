@@ -81,126 +81,237 @@ public object CoverageConverter {
   public fun Coverage.toHapi(): org.hl7.fhir.r4.model.Coverage {
     val hapiValue = org.hl7.fhir.r4.model.Coverage()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Coverage.CoverageStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setType(type.toHapi())
-    hapiValue.setPolicyHolder(policyHolder.toHapi())
-    hapiValue.setSubscriber(subscriber.toHapi())
-    hapiValue.setSubscriberIdElement(subscriberId.toHapi())
-    hapiValue.setBeneficiary(beneficiary.toHapi())
-    hapiValue.setDependentElement(dependent.toHapi())
-    hapiValue.setRelationship(relationship.toHapi())
-    hapiValue.setPeriod(period.toHapi())
-    hapiValue.setPayor(payorList.map { it.toHapi() })
-    hapiValue.setClass_(classValueList.map { it.toHapi() })
-    hapiValue.setOrderElement(order.toHapi())
-    hapiValue.setNetworkElement(network.toHapi())
-    hapiValue.setCostToBeneficiary(costToBeneficiaryList.map { it.toHapi() })
-    hapiValue.setSubrogationElement(subrogation.toHapi())
-    hapiValue.setContract(contractList.map { it.toHapi() })
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasPolicyHolder()) {
+      hapiValue.setPolicyHolder(policyHolder.toHapi())
+    }
+    if (hasSubscriber()) {
+      hapiValue.setSubscriber(subscriber.toHapi())
+    }
+    if (hasSubscriberId()) {
+      hapiValue.setSubscriberIdElement(subscriberId.toHapi())
+    }
+    if (hasBeneficiary()) {
+      hapiValue.setBeneficiary(beneficiary.toHapi())
+    }
+    if (hasDependent()) {
+      hapiValue.setDependentElement(dependent.toHapi())
+    }
+    if (hasRelationship()) {
+      hapiValue.setRelationship(relationship.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
+    if (payorCount > 0) {
+      hapiValue.setPayor(payorList.map { it.toHapi() })
+    }
+    if (classValueCount > 0) {
+      hapiValue.setClass_(classValueList.map { it.toHapi() })
+    }
+    if (hasOrder()) {
+      hapiValue.setOrderElement(order.toHapi())
+    }
+    if (hasNetwork()) {
+      hapiValue.setNetworkElement(network.toHapi())
+    }
+    if (costToBeneficiaryCount > 0) {
+      hapiValue.setCostToBeneficiary(costToBeneficiaryList.map { it.toHapi() })
+    }
+    if (hasSubrogation()) {
+      hapiValue.setSubrogationElement(subrogation.toHapi())
+    }
+    if (contractCount > 0) {
+      hapiValue.setContract(contractList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Coverage.toProto(): Coverage {
-    val protoValue =
-      Coverage.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setStatus(
-          Coverage.StatusCode.newBuilder()
-            .setValue(
-              FinancialResourceStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Coverage.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      Coverage.StatusCode.newBuilder()
+        .setValue(
+          FinancialResourceStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setType(type.toProto())
-        .setPolicyHolder(policyHolder.toProto())
-        .setSubscriber(subscriber.toProto())
-        .setSubscriberId(subscriberIdElement.toProto())
-        .setBeneficiary(beneficiary.toProto())
-        .setDependent(dependentElement.toProto())
-        .setRelationship(relationship.toProto())
-        .setPeriod(period.toProto())
-        .addAllPayor(payor.map { it.toProto() })
-        .addAllClassValue(class_.map { it.toProto() })
-        .setOrder(orderElement.toProto())
-        .setNetwork(networkElement.toProto())
-        .addAllCostToBeneficiary(costToBeneficiary.map { it.toProto() })
-        .setSubrogation(subrogationElement.toProto())
-        .addAllContract(contract.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasPolicyHolder()) {
+      protoValue.setPolicyHolder(policyHolder.toProto())
+    }
+    if (hasSubscriber()) {
+      protoValue.setSubscriber(subscriber.toProto())
+    }
+    if (hasSubscriberId()) {
+      protoValue.setSubscriberId(subscriberIdElement.toProto())
+    }
+    if (hasBeneficiary()) {
+      protoValue.setBeneficiary(beneficiary.toProto())
+    }
+    if (hasDependent()) {
+      protoValue.setDependent(dependentElement.toProto())
+    }
+    if (hasRelationship()) {
+      protoValue.setRelationship(relationship.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    if (hasPayor()) {
+      protoValue.addAllPayor(payor.map { it.toProto() })
+    }
+    if (hasClass_()) {
+      protoValue.addAllClassValue(class_.map { it.toProto() })
+    }
+    if (hasOrder()) {
+      protoValue.setOrder(orderElement.toProto())
+    }
+    if (hasNetwork()) {
+      protoValue.setNetwork(networkElement.toProto())
+    }
+    if (hasCostToBeneficiary()) {
+      protoValue.addAllCostToBeneficiary(costToBeneficiary.map { it.toProto() })
+    }
+    if (hasSubrogation()) {
+      protoValue.setSubrogation(subrogationElement.toProto())
+    }
+    if (hasContract()) {
+      protoValue.addAllContract(contract.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Coverage.ClassComponent.toProto(): Coverage.Class {
-    val protoValue =
-      Coverage.Class.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(type.toProto())
-        .setValue(valueElement.toProto())
-        .setName(nameElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Coverage.Class.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(valueElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Coverage.CostToBeneficiaryComponent.toProto():
     Coverage.CostToBeneficiary {
-    val protoValue =
-      Coverage.CostToBeneficiary.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(type.toProto())
-        .setValue(value.coverageCostToBeneficiaryValueToProto())
-        .addAllException(exception.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = Coverage.CostToBeneficiary.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.coverageCostToBeneficiaryValueToProto())
+    }
+    if (hasException()) {
+      protoValue.addAllException(exception.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Coverage.ExemptionComponent.toProto():
     Coverage.CostToBeneficiary.Exemption {
     val protoValue =
-      Coverage.CostToBeneficiary.Exemption.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(type.toProto())
-        .setPeriod(period.toProto())
-        .build()
-    return protoValue
+      Coverage.CostToBeneficiary.Exemption.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun Coverage.Class.toHapi(): org.hl7.fhir.r4.model.Coverage.ClassComponent {
     val hapiValue = org.hl7.fhir.r4.model.Coverage.ClassComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
-    hapiValue.setValueElement(value.toHapi())
-    hapiValue.setNameElement(name.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValueElement(value.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
     return hapiValue
   }
 
@@ -209,11 +320,21 @@ public object CoverageConverter {
     org.hl7.fhir.r4.model.Coverage.CostToBeneficiaryComponent {
     val hapiValue = org.hl7.fhir.r4.model.Coverage.CostToBeneficiaryComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
-    hapiValue.setValue(value.coverageCostToBeneficiaryValueToHapi())
-    hapiValue.setException(exceptionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.coverageCostToBeneficiaryValueToHapi())
+    }
+    if (exceptionCount > 0) {
+      hapiValue.setException(exceptionList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -222,10 +343,18 @@ public object CoverageConverter {
     org.hl7.fhir.r4.model.Coverage.ExemptionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Coverage.ExemptionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
-    hapiValue.setPeriod(period.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
     return hapiValue
   }
 }

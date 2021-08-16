@@ -33,27 +33,40 @@ public object BinaryConverter {
   public fun Binary.toHapi(): org.hl7.fhir.r4.model.Binary {
     val hapiValue = org.hl7.fhir.r4.model.Binary()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
     hapiValue.setContentType(contentType.value.hapiCodeCheck())
-    hapiValue.setSecurityContext(securityContext.toHapi())
-    hapiValue.setDataElement(data.toHapi())
+    if (hasSecurityContext()) {
+      hapiValue.setSecurityContext(securityContext.toHapi())
+    }
+    if (hasData()) {
+      hapiValue.setDataElement(data.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Binary.toProto(): Binary {
-    val protoValue =
-      Binary.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setContentType(
-          Binary.ContentTypeCode.newBuilder().setValue(contentType.protoCodeCheck()).build()
-        )
-        .setSecurityContext(securityContext.toProto())
-        .setData(dataElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Binary.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    protoValue.setContentType(
+      Binary.ContentTypeCode.newBuilder().setValue(contentType.protoCodeCheck()).build()
+    )
+    if (hasSecurityContext()) {
+      protoValue.setSecurityContext(securityContext.toProto())
+    }
+    if (hasData()) {
+      protoValue.setData(dataElement.toProto())
+    }
+    return protoValue.build()
   }
 }

@@ -37,37 +37,54 @@ public object AgeConverter {
   public fun Age.toHapi(): org.hl7.fhir.r4.model.Age {
     val hapiValue = org.hl7.fhir.r4.model.Age()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setValueElement(value.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasValue()) {
+      hapiValue.setValueElement(value.toHapi())
+    }
     hapiValue.setComparator(
       Quantity.QuantityComparator.valueOf(comparator.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setUnitElement(unit.toHapi())
-    hapiValue.setSystemElement(system.toHapi())
-    hapiValue.setCodeElement(code.toHapi())
+    if (hasUnit()) {
+      hapiValue.setUnitElement(unit.toHapi())
+    }
+    if (hasSystem()) {
+      hapiValue.setSystemElement(system.toHapi())
+    }
+    if (hasCode()) {
+      hapiValue.setCodeElement(code.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Age.toProto(): Age {
-    val protoValue =
-      Age.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setValue(valueElement.toProto())
-        .setComparator(
-          Age.ComparatorCode.newBuilder()
-            .setValue(
-              QuantityComparatorCode.Value.valueOf(
-                comparator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Age.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasValue()) {
+      protoValue.setValue(valueElement.toProto())
+    }
+    protoValue.setComparator(
+      Age.ComparatorCode.newBuilder()
+        .setValue(
+          QuantityComparatorCode.Value.valueOf(
+            comparator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setUnit(unitElement.toProto())
-        .setSystem(systemElement.toProto())
-        .setCode(codeElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasUnit()) {
+      protoValue.setUnit(unitElement.toProto())
+    }
+    if (hasSystem()) {
+      protoValue.setSystem(systemElement.toProto())
+    }
+    if (hasCode()) {
+      protoValue.setCode(codeElement.toProto())
+    }
+    return protoValue.build()
   }
 }

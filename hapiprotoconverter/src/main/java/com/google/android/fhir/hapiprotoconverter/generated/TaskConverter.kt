@@ -813,24 +813,50 @@ public object TaskConverter {
   public fun Task.toHapi(): org.hl7.fhir.r4.model.Task {
     val hapiValue = org.hl7.fhir.r4.model.Task()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setInstantiatesCanonicalElement(instantiatesCanonical.toHapi())
-    hapiValue.setInstantiatesUriElement(instantiatesUri.toHapi())
-    hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
-    hapiValue.setGroupIdentifier(groupIdentifier.toHapi())
-    hapiValue.setPartOf(partOfList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasInstantiatesCanonical()) {
+      hapiValue.setInstantiatesCanonicalElement(instantiatesCanonical.toHapi())
+    }
+    if (hasInstantiatesUri()) {
+      hapiValue.setInstantiatesUriElement(instantiatesUri.toHapi())
+    }
+    if (basedOnCount > 0) {
+      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+    }
+    if (hasGroupIdentifier()) {
+      hapiValue.setGroupIdentifier(groupIdentifier.toHapi())
+    }
+    if (partOfCount > 0) {
+      hapiValue.setPartOf(partOfList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Task.TaskStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setStatusReason(statusReason.toHapi())
-    hapiValue.setBusinessStatus(businessStatus.toHapi())
+    if (hasStatusReason()) {
+      hapiValue.setStatusReason(statusReason.toHapi())
+    }
+    if (hasBusinessStatus()) {
+      hapiValue.setBusinessStatus(businessStatus.toHapi())
+    }
     hapiValue.setIntent(
       org.hl7.fhir.r4.model.Task.TaskIntent.valueOf(
         intent.value.name.hapiCodeCheck().replace("_", "")
@@ -841,147 +867,277 @@ public object TaskConverter {
         priority.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setFocus(focus.toHapi())
-    hapiValue.setFor(forValue.toHapi())
-    hapiValue.setEncounter(encounter.toHapi())
-    hapiValue.setExecutionPeriod(executionPeriod.toHapi())
-    hapiValue.setAuthoredOnElement(authoredOn.toHapi())
-    hapiValue.setLastModifiedElement(lastModified.toHapi())
-    hapiValue.setRequester(requester.toHapi())
-    hapiValue.setPerformerType(performerTypeList.map { it.toHapi() })
-    hapiValue.setOwner(owner.toHapi())
-    hapiValue.setLocation(location.toHapi())
-    hapiValue.setReasonCode(reasonCode.toHapi())
-    hapiValue.setReasonReference(reasonReference.toHapi())
-    hapiValue.setInsurance(insuranceList.map { it.toHapi() })
-    hapiValue.setNote(noteList.map { it.toHapi() })
-    hapiValue.setRelevantHistory(relevantHistoryList.map { it.toHapi() })
-    hapiValue.setRestriction(restriction.toHapi())
-    hapiValue.setInput(inputList.map { it.toHapi() })
-    hapiValue.setOutput(outputList.map { it.toHapi() })
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (hasFocus()) {
+      hapiValue.setFocus(focus.toHapi())
+    }
+    if (hasForValue()) {
+      hapiValue.setFor(forValue.toHapi())
+    }
+    if (hasEncounter()) {
+      hapiValue.setEncounter(encounter.toHapi())
+    }
+    if (hasExecutionPeriod()) {
+      hapiValue.setExecutionPeriod(executionPeriod.toHapi())
+    }
+    if (hasAuthoredOn()) {
+      hapiValue.setAuthoredOnElement(authoredOn.toHapi())
+    }
+    if (hasLastModified()) {
+      hapiValue.setLastModifiedElement(lastModified.toHapi())
+    }
+    if (hasRequester()) {
+      hapiValue.setRequester(requester.toHapi())
+    }
+    if (performerTypeCount > 0) {
+      hapiValue.setPerformerType(performerTypeList.map { it.toHapi() })
+    }
+    if (hasOwner()) {
+      hapiValue.setOwner(owner.toHapi())
+    }
+    if (hasLocation()) {
+      hapiValue.setLocation(location.toHapi())
+    }
+    if (hasReasonCode()) {
+      hapiValue.setReasonCode(reasonCode.toHapi())
+    }
+    if (hasReasonReference()) {
+      hapiValue.setReasonReference(reasonReference.toHapi())
+    }
+    if (insuranceCount > 0) {
+      hapiValue.setInsurance(insuranceList.map { it.toHapi() })
+    }
+    if (noteCount > 0) {
+      hapiValue.setNote(noteList.map { it.toHapi() })
+    }
+    if (relevantHistoryCount > 0) {
+      hapiValue.setRelevantHistory(relevantHistoryList.map { it.toHapi() })
+    }
+    if (hasRestriction()) {
+      hapiValue.setRestriction(restriction.toHapi())
+    }
+    if (inputCount > 0) {
+      hapiValue.setInput(inputList.map { it.toHapi() })
+    }
+    if (outputCount > 0) {
+      hapiValue.setOutput(outputList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Task.toProto(): Task {
-    val protoValue =
-      Task.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setInstantiatesCanonical(instantiatesCanonicalElement.toProto())
-        .setInstantiatesUri(instantiatesUriElement.toProto())
-        .addAllBasedOn(basedOn.map { it.toProto() })
-        .setGroupIdentifier(groupIdentifier.toProto())
-        .addAllPartOf(partOf.map { it.toProto() })
-        .setStatus(
-          Task.StatusCode.newBuilder()
-            .setValue(
-              TaskStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Task.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasInstantiatesCanonical()) {
+      protoValue.setInstantiatesCanonical(instantiatesCanonicalElement.toProto())
+    }
+    if (hasInstantiatesUri()) {
+      protoValue.setInstantiatesUri(instantiatesUriElement.toProto())
+    }
+    if (hasBasedOn()) {
+      protoValue.addAllBasedOn(basedOn.map { it.toProto() })
+    }
+    if (hasGroupIdentifier()) {
+      protoValue.setGroupIdentifier(groupIdentifier.toProto())
+    }
+    if (hasPartOf()) {
+      protoValue.addAllPartOf(partOf.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      Task.StatusCode.newBuilder()
+        .setValue(
+          TaskStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setStatusReason(statusReason.toProto())
-        .setBusinessStatus(businessStatus.toProto())
-        .setIntent(
-          Task.IntentCode.newBuilder()
-            .setValue(
-              TaskIntentValueSet.Value.valueOf(
-                intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setPriority(
-          Task.PriorityCode.newBuilder()
-            .setValue(
-              RequestPriorityCode.Value.valueOf(
-                priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setCode(code.toProto())
-        .setDescription(descriptionElement.toProto())
-        .setFocus(focus.toProto())
-        .setForValue(`for`.toProto())
-        .setEncounter(encounter.toProto())
-        .setExecutionPeriod(executionPeriod.toProto())
-        .setAuthoredOn(authoredOnElement.toProto())
-        .setLastModified(lastModifiedElement.toProto())
-        .setRequester(requester.toProto())
-        .addAllPerformerType(performerType.map { it.toProto() })
-        .setOwner(owner.toProto())
-        .setLocation(location.toProto())
-        .setReasonCode(reasonCode.toProto())
-        .setReasonReference(reasonReference.toProto())
-        .addAllInsurance(insurance.map { it.toProto() })
-        .addAllNote(note.map { it.toProto() })
-        .addAllRelevantHistory(relevantHistory.map { it.toProto() })
-        .setRestriction(restriction.toProto())
-        .addAllInput(input.map { it.toProto() })
-        .addAllOutput(output.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasStatusReason()) {
+      protoValue.setStatusReason(statusReason.toProto())
+    }
+    if (hasBusinessStatus()) {
+      protoValue.setBusinessStatus(businessStatus.toProto())
+    }
+    protoValue.setIntent(
+      Task.IntentCode.newBuilder()
+        .setValue(
+          TaskIntentValueSet.Value.valueOf(
+            intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    protoValue.setPriority(
+      Task.PriorityCode.newBuilder()
+        .setValue(
+          RequestPriorityCode.Value.valueOf(
+            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasFocus()) {
+      protoValue.setFocus(focus.toProto())
+    }
+    if (hasFor()) {
+      protoValue.setForValue(`for`.toProto())
+    }
+    if (hasEncounter()) {
+      protoValue.setEncounter(encounter.toProto())
+    }
+    if (hasExecutionPeriod()) {
+      protoValue.setExecutionPeriod(executionPeriod.toProto())
+    }
+    if (hasAuthoredOn()) {
+      protoValue.setAuthoredOn(authoredOnElement.toProto())
+    }
+    if (hasLastModified()) {
+      protoValue.setLastModified(lastModifiedElement.toProto())
+    }
+    if (hasRequester()) {
+      protoValue.setRequester(requester.toProto())
+    }
+    if (hasPerformerType()) {
+      protoValue.addAllPerformerType(performerType.map { it.toProto() })
+    }
+    if (hasOwner()) {
+      protoValue.setOwner(owner.toProto())
+    }
+    if (hasLocation()) {
+      protoValue.setLocation(location.toProto())
+    }
+    if (hasReasonCode()) {
+      protoValue.setReasonCode(reasonCode.toProto())
+    }
+    if (hasReasonReference()) {
+      protoValue.setReasonReference(reasonReference.toProto())
+    }
+    if (hasInsurance()) {
+      protoValue.addAllInsurance(insurance.map { it.toProto() })
+    }
+    if (hasNote()) {
+      protoValue.addAllNote(note.map { it.toProto() })
+    }
+    if (hasRelevantHistory()) {
+      protoValue.addAllRelevantHistory(relevantHistory.map { it.toProto() })
+    }
+    if (hasRestriction()) {
+      protoValue.setRestriction(restriction.toProto())
+    }
+    if (hasInput()) {
+      protoValue.addAllInput(input.map { it.toProto() })
+    }
+    if (hasOutput()) {
+      protoValue.addAllOutput(output.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Task.TaskRestrictionComponent.toProto(): Task.Restriction {
-    val protoValue =
-      Task.Restriction.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setRepetitions(repetitionsElement.toProto())
-        .setPeriod(period.toProto())
-        .addAllRecipient(recipient.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = Task.Restriction.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasRepetitions()) {
+      protoValue.setRepetitions(repetitionsElement.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    if (hasRecipient()) {
+      protoValue.addAllRecipient(recipient.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Task.ParameterComponent.toProto(): Task.Parameter {
-    val protoValue =
-      Task.Parameter.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(type.toProto())
-        .setValue(value.taskInputValueToProto())
-        .build()
-    return protoValue
+    val protoValue = Task.Parameter.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.taskInputValueToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Task.TaskOutputComponent.toProto(): Task.Output {
-    val protoValue =
-      Task.Output.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(type.toProto())
-        .setValue(value.taskOutputValueToProto())
-        .build()
-    return protoValue
+    val protoValue = Task.Output.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.taskOutputValueToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun Task.Restriction.toHapi(): org.hl7.fhir.r4.model.Task.TaskRestrictionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Task.TaskRestrictionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setRepetitionsElement(repetitions.toHapi())
-    hapiValue.setPeriod(period.toHapi())
-    hapiValue.setRecipient(recipientList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasRepetitions()) {
+      hapiValue.setRepetitionsElement(repetitions.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
+    if (recipientCount > 0) {
+      hapiValue.setRecipient(recipientList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -989,10 +1145,18 @@ public object TaskConverter {
   private fun Task.Parameter.toHapi(): org.hl7.fhir.r4.model.Task.ParameterComponent {
     val hapiValue = org.hl7.fhir.r4.model.Task.ParameterComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
-    hapiValue.setValue(value.taskInputValueToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.taskInputValueToHapi())
+    }
     return hapiValue
   }
 
@@ -1000,10 +1164,18 @@ public object TaskConverter {
   private fun Task.Output.toHapi(): org.hl7.fhir.r4.model.Task.TaskOutputComponent {
     val hapiValue = org.hl7.fhir.r4.model.Task.TaskOutputComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
-    hapiValue.setValue(value.taskOutputValueToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.taskOutputValueToHapi())
+    }
     return hapiValue
   }
 }

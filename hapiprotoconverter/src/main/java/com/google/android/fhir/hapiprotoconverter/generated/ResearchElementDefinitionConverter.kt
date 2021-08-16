@@ -227,43 +227,111 @@ public object ResearchElementDefinitionConverter {
   public fun ResearchElementDefinition.toHapi(): org.hl7.fhir.r4.model.ResearchElementDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ResearchElementDefinition()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setVersionElement(version.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setTitleElement(title.toHapi())
-    hapiValue.setShortTitleElement(shortTitle.toHapi())
-    hapiValue.setSubtitleElement(subtitle.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasTitle()) {
+      hapiValue.setTitleElement(title.toHapi())
+    }
+    if (hasShortTitle()) {
+      hapiValue.setShortTitleElement(shortTitle.toHapi())
+    }
+    if (hasSubtitle()) {
+      hapiValue.setSubtitleElement(subtitle.toHapi())
+    }
     hapiValue.setStatus(
       Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setExperimentalElement(experimental.toHapi())
-    hapiValue.setSubject(subject.researchElementDefinitionSubjectToHapi())
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setPublisherElement(publisher.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setComment(commentList.map { it.toHapi() })
-    hapiValue.setUseContext(useContextList.map { it.toHapi() })
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
-    hapiValue.setPurposeElement(purpose.toHapi())
-    hapiValue.setUsageElement(usage.toHapi())
-    hapiValue.setCopyrightElement(copyright.toHapi())
-    hapiValue.setApprovalDateElement(approvalDate.toHapi())
-    hapiValue.setLastReviewDateElement(lastReviewDate.toHapi())
-    hapiValue.setEffectivePeriod(effectivePeriod.toHapi())
-    hapiValue.setTopic(topicList.map { it.toHapi() })
-    hapiValue.setAuthor(authorList.map { it.toHapi() })
-    hapiValue.setEditor(editorList.map { it.toHapi() })
-    hapiValue.setReviewer(reviewerList.map { it.toHapi() })
-    hapiValue.setEndorser(endorserList.map { it.toHapi() })
-    hapiValue.setRelatedArtifact(relatedArtifactList.map { it.toHapi() })
-    hapiValue.setLibrary(libraryList.map { it.toHapi() })
+    if (hasExperimental()) {
+      hapiValue.setExperimentalElement(experimental.toHapi())
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.researchElementDefinitionSubjectToHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasPublisher()) {
+      hapiValue.setPublisherElement(publisher.toHapi())
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (commentCount > 0) {
+      hapiValue.setComment(commentList.map { it.toHapi() })
+    }
+    if (useContextCount > 0) {
+      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+    }
+    if (jurisdictionCount > 0) {
+      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    }
+    if (hasPurpose()) {
+      hapiValue.setPurposeElement(purpose.toHapi())
+    }
+    if (hasUsage()) {
+      hapiValue.setUsageElement(usage.toHapi())
+    }
+    if (hasCopyright()) {
+      hapiValue.setCopyrightElement(copyright.toHapi())
+    }
+    if (hasApprovalDate()) {
+      hapiValue.setApprovalDateElement(approvalDate.toHapi())
+    }
+    if (hasLastReviewDate()) {
+      hapiValue.setLastReviewDateElement(lastReviewDate.toHapi())
+    }
+    if (hasEffectivePeriod()) {
+      hapiValue.setEffectivePeriod(effectivePeriod.toHapi())
+    }
+    if (topicCount > 0) {
+      hapiValue.setTopic(topicList.map { it.toHapi() })
+    }
+    if (authorCount > 0) {
+      hapiValue.setAuthor(authorList.map { it.toHapi() })
+    }
+    if (editorCount > 0) {
+      hapiValue.setEditor(editorList.map { it.toHapi() })
+    }
+    if (reviewerCount > 0) {
+      hapiValue.setReviewer(reviewerList.map { it.toHapi() })
+    }
+    if (endorserCount > 0) {
+      hapiValue.setEndorser(endorserList.map { it.toHapi() })
+    }
+    if (relatedArtifactCount > 0) {
+      hapiValue.setRelatedArtifact(relatedArtifactList.map { it.toHapi() })
+    }
+    if (libraryCount > 0) {
+      hapiValue.setLibrary(libraryList.map { it.toHapi() })
+    }
     hapiValue.setType(
       org.hl7.fhir.r4.model.ResearchElementDefinition.ResearchElementType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")
@@ -274,127 +342,222 @@ public object ResearchElementDefinitionConverter {
         variableType.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setCharacteristic(characteristicList.map { it.toHapi() })
+    if (characteristicCount > 0) {
+      hapiValue.setCharacteristic(characteristicList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.ResearchElementDefinition.toProto(): ResearchElementDefinition {
-    val protoValue =
-      ResearchElementDefinition.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUrl(urlElement.toProto())
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setVersion(versionElement.toProto())
-        .setName(nameElement.toProto())
-        .setTitle(titleElement.toProto())
-        .setShortTitle(shortTitleElement.toProto())
-        .setSubtitle(subtitleElement.toProto())
-        .setStatus(
-          ResearchElementDefinition.StatusCode.newBuilder()
-            .setValue(
-              PublicationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = ResearchElementDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasTitle()) {
+      protoValue.setTitle(titleElement.toProto())
+    }
+    if (hasShortTitle()) {
+      protoValue.setShortTitle(shortTitleElement.toProto())
+    }
+    if (hasSubtitle()) {
+      protoValue.setSubtitle(subtitleElement.toProto())
+    }
+    protoValue.setStatus(
+      ResearchElementDefinition.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setExperimental(experimentalElement.toProto())
-        .setSubject(subject.researchElementDefinitionSubjectToProto())
-        .setDate(dateElement.toProto())
-        .setPublisher(publisherElement.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .addAllComment(comment.map { it.toProto() })
-        .addAllUseContext(useContext.map { it.toProto() })
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .setPurpose(purposeElement.toProto())
-        .setUsage(usageElement.toProto())
-        .setCopyright(copyrightElement.toProto())
-        .setApprovalDate(approvalDateElement.toProto())
-        .setLastReviewDate(lastReviewDateElement.toProto())
-        .setEffectivePeriod(effectivePeriod.toProto())
-        .addAllTopic(topic.map { it.toProto() })
-        .addAllAuthor(author.map { it.toProto() })
-        .addAllEditor(editor.map { it.toProto() })
-        .addAllReviewer(reviewer.map { it.toProto() })
-        .addAllEndorser(endorser.map { it.toProto() })
-        .addAllRelatedArtifact(relatedArtifact.map { it.toProto() })
-        .addAllLibrary(library.map { it.toProto() })
-        .setType(
-          ResearchElementDefinition.TypeCode.newBuilder()
-            .setValue(
-              ResearchElementTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setVariableType(
-          ResearchElementDefinition.VariableTypeCode.newBuilder()
-            .setValue(
-              EvidenceVariableTypeCode.Value.valueOf(
-                variableType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .addAllCharacteristic(characteristic.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasExperimental()) {
+      protoValue.setExperimental(experimentalElement.toProto())
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.researchElementDefinitionSubjectToProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasPublisher()) {
+      protoValue.setPublisher(publisherElement.toProto())
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasComment()) {
+      protoValue.addAllComment(comment.map { it.toProto() })
+    }
+    if (hasUseContext()) {
+      protoValue.addAllUseContext(useContext.map { it.toProto() })
+    }
+    if (hasJurisdiction()) {
+      protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
+    }
+    if (hasPurpose()) {
+      protoValue.setPurpose(purposeElement.toProto())
+    }
+    if (hasUsage()) {
+      protoValue.setUsage(usageElement.toProto())
+    }
+    if (hasCopyright()) {
+      protoValue.setCopyright(copyrightElement.toProto())
+    }
+    if (hasApprovalDate()) {
+      protoValue.setApprovalDate(approvalDateElement.toProto())
+    }
+    if (hasLastReviewDate()) {
+      protoValue.setLastReviewDate(lastReviewDateElement.toProto())
+    }
+    if (hasEffectivePeriod()) {
+      protoValue.setEffectivePeriod(effectivePeriod.toProto())
+    }
+    if (hasTopic()) {
+      protoValue.addAllTopic(topic.map { it.toProto() })
+    }
+    if (hasAuthor()) {
+      protoValue.addAllAuthor(author.map { it.toProto() })
+    }
+    if (hasEditor()) {
+      protoValue.addAllEditor(editor.map { it.toProto() })
+    }
+    if (hasReviewer()) {
+      protoValue.addAllReviewer(reviewer.map { it.toProto() })
+    }
+    if (hasEndorser()) {
+      protoValue.addAllEndorser(endorser.map { it.toProto() })
+    }
+    if (hasRelatedArtifact()) {
+      protoValue.addAllRelatedArtifact(relatedArtifact.map { it.toProto() })
+    }
+    if (hasLibrary()) {
+      protoValue.addAllLibrary(library.map { it.toProto() })
+    }
+    protoValue.setType(
+      ResearchElementDefinition.TypeCode.newBuilder()
+        .setValue(
+          ResearchElementTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    protoValue.setVariableType(
+      ResearchElementDefinition.VariableTypeCode.newBuilder()
+        .setValue(
+          EvidenceVariableTypeCode.Value.valueOf(
+            variableType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasCharacteristic()) {
+      protoValue.addAllCharacteristic(characteristic.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ResearchElementDefinition.ResearchElementDefinitionCharacteristicComponent.toProto():
     ResearchElementDefinition.Characteristic {
     val protoValue =
-      ResearchElementDefinition.Characteristic.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setDefinition(definition.researchElementDefinitionCharacteristicDefinitionToProto())
-        .addAllUsageContext(usageContext.map { it.toProto() })
-        .setExclude(excludeElement.toProto())
-        .setUnitOfMeasure(unitOfMeasure.toProto())
-        .setStudyEffectiveDescription(studyEffectiveDescriptionElement.toProto())
-        .setStudyEffective(
-          studyEffective.researchElementDefinitionCharacteristicStudyEffectiveToProto()
-        )
-        .setStudyEffectiveTimeFromStart(studyEffectiveTimeFromStart.toProto())
-        .setStudyEffectiveGroupMeasure(
-          ResearchElementDefinition.Characteristic.StudyEffectiveGroupMeasureCode.newBuilder()
-            .setValue(
-              GroupMeasureCode.Value.valueOf(
-                studyEffectiveGroupMeasure.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setParticipantEffectiveDescription(participantEffectiveDescriptionElement.toProto())
-        .setParticipantEffective(
-          participantEffective.researchElementDefinitionCharacteristicParticipantEffectiveToProto()
-        )
-        .setParticipantEffectiveTimeFromStart(participantEffectiveTimeFromStart.toProto())
-        .setParticipantEffectiveGroupMeasure(
-          ResearchElementDefinition.Characteristic.ParticipantEffectiveGroupMeasureCode.newBuilder()
-            .setValue(
-              GroupMeasureCode.Value.valueOf(
-                participantEffectiveGroupMeasure
-                  .toCode()
-                  .protoCodeCheck()
-                  .replace("-", "_")
-                  .toUpperCase()
-              )
-            )
-            .build()
+      ResearchElementDefinition.Characteristic.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasDefinition()) {
+      protoValue.setDefinition(
+        definition.researchElementDefinitionCharacteristicDefinitionToProto()
+      )
+    }
+    if (hasUsageContext()) {
+      protoValue.addAllUsageContext(usageContext.map { it.toProto() })
+    }
+    if (hasExclude()) {
+      protoValue.setExclude(excludeElement.toProto())
+    }
+    if (hasUnitOfMeasure()) {
+      protoValue.setUnitOfMeasure(unitOfMeasure.toProto())
+    }
+    if (hasStudyEffectiveDescription()) {
+      protoValue.setStudyEffectiveDescription(studyEffectiveDescriptionElement.toProto())
+    }
+    if (hasStudyEffective()) {
+      protoValue.setStudyEffective(
+        studyEffective.researchElementDefinitionCharacteristicStudyEffectiveToProto()
+      )
+    }
+    if (hasStudyEffectiveTimeFromStart()) {
+      protoValue.setStudyEffectiveTimeFromStart(studyEffectiveTimeFromStart.toProto())
+    }
+    protoValue.setStudyEffectiveGroupMeasure(
+      ResearchElementDefinition.Characteristic.StudyEffectiveGroupMeasureCode.newBuilder()
+        .setValue(
+          GroupMeasureCode.Value.valueOf(
+            studyEffectiveGroupMeasure.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
         .build()
-    return protoValue
+    )
+    if (hasParticipantEffectiveDescription()) {
+      protoValue.setParticipantEffectiveDescription(
+        participantEffectiveDescriptionElement.toProto()
+      )
+    }
+    if (hasParticipantEffective()) {
+      protoValue.setParticipantEffective(
+        participantEffective.researchElementDefinitionCharacteristicParticipantEffectiveToProto()
+      )
+    }
+    if (hasParticipantEffectiveTimeFromStart()) {
+      protoValue.setParticipantEffectiveTimeFromStart(participantEffectiveTimeFromStart.toProto())
+    }
+    protoValue.setParticipantEffectiveGroupMeasure(
+      ResearchElementDefinition.Characteristic.ParticipantEffectiveGroupMeasureCode.newBuilder()
+        .setValue(
+          GroupMeasureCode.Value.valueOf(
+            participantEffectiveGroupMeasure
+              .toCode()
+              .protoCodeCheck()
+              .replace("-", "_")
+              .toUpperCase()
+          )
+        )
+        .build()
+    )
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -404,27 +567,51 @@ public object ResearchElementDefinitionConverter {
       org.hl7.fhir.r4.model.ResearchElementDefinition
         .ResearchElementDefinitionCharacteristicComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setDefinition(definition.researchElementDefinitionCharacteristicDefinitionToHapi())
-    hapiValue.setUsageContext(usageContextList.map { it.toHapi() })
-    hapiValue.setExcludeElement(exclude.toHapi())
-    hapiValue.setUnitOfMeasure(unitOfMeasure.toHapi())
-    hapiValue.setStudyEffectiveDescriptionElement(studyEffectiveDescription.toHapi())
-    hapiValue.setStudyEffective(
-      studyEffective.researchElementDefinitionCharacteristicStudyEffectiveToHapi()
-    )
-    hapiValue.setStudyEffectiveTimeFromStart(studyEffectiveTimeFromStart.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasDefinition()) {
+      hapiValue.setDefinition(definition.researchElementDefinitionCharacteristicDefinitionToHapi())
+    }
+    if (usageContextCount > 0) {
+      hapiValue.setUsageContext(usageContextList.map { it.toHapi() })
+    }
+    if (hasExclude()) {
+      hapiValue.setExcludeElement(exclude.toHapi())
+    }
+    if (hasUnitOfMeasure()) {
+      hapiValue.setUnitOfMeasure(unitOfMeasure.toHapi())
+    }
+    if (hasStudyEffectiveDescription()) {
+      hapiValue.setStudyEffectiveDescriptionElement(studyEffectiveDescription.toHapi())
+    }
+    if (hasStudyEffective()) {
+      hapiValue.setStudyEffective(
+        studyEffective.researchElementDefinitionCharacteristicStudyEffectiveToHapi()
+      )
+    }
+    if (hasStudyEffectiveTimeFromStart()) {
+      hapiValue.setStudyEffectiveTimeFromStart(studyEffectiveTimeFromStart.toHapi())
+    }
     hapiValue.setStudyEffectiveGroupMeasure(
       org.hl7.fhir.r4.model.ResearchElementDefinition.GroupMeasure.valueOf(
         studyEffectiveGroupMeasure.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setParticipantEffectiveDescriptionElement(participantEffectiveDescription.toHapi())
-    hapiValue.setParticipantEffective(
-      participantEffective.researchElementDefinitionCharacteristicParticipantEffectiveToHapi()
-    )
-    hapiValue.setParticipantEffectiveTimeFromStart(participantEffectiveTimeFromStart.toHapi())
+    if (hasParticipantEffectiveDescription()) {
+      hapiValue.setParticipantEffectiveDescriptionElement(participantEffectiveDescription.toHapi())
+    }
+    if (hasParticipantEffective()) {
+      hapiValue.setParticipantEffective(
+        participantEffective.researchElementDefinitionCharacteristicParticipantEffectiveToHapi()
+      )
+    }
+    if (hasParticipantEffectiveTimeFromStart()) {
+      hapiValue.setParticipantEffectiveTimeFromStart(participantEffectiveTimeFromStart.toHapi())
+    }
     hapiValue.setParticipantEffectiveGroupMeasure(
       org.hl7.fhir.r4.model.ResearchElementDefinition.GroupMeasure.valueOf(
         participantEffectiveGroupMeasure.value.name.hapiCodeCheck().replace("_", "")

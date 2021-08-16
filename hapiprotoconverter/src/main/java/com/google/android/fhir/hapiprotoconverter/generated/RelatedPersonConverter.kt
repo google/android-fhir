@@ -56,74 +56,141 @@ public object RelatedPersonConverter {
   public fun RelatedPerson.toHapi(): org.hl7.fhir.r4.model.RelatedPerson {
     val hapiValue = org.hl7.fhir.r4.model.RelatedPerson()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setActiveElement(active.toHapi())
-    hapiValue.setPatient(patient.toHapi())
-    hapiValue.setRelationship(relationshipList.map { it.toHapi() })
-    hapiValue.setName(nameList.map { it.toHapi() })
-    hapiValue.setTelecom(telecomList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasActive()) {
+      hapiValue.setActiveElement(active.toHapi())
+    }
+    if (hasPatient()) {
+      hapiValue.setPatient(patient.toHapi())
+    }
+    if (relationshipCount > 0) {
+      hapiValue.setRelationship(relationshipList.map { it.toHapi() })
+    }
+    if (nameCount > 0) {
+      hapiValue.setName(nameList.map { it.toHapi() })
+    }
+    if (telecomCount > 0) {
+      hapiValue.setTelecom(telecomList.map { it.toHapi() })
+    }
     hapiValue.setGender(
       Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setBirthDateElement(birthDate.toHapi())
-    hapiValue.setAddress(addressList.map { it.toHapi() })
-    hapiValue.setPhoto(photoList.map { it.toHapi() })
-    hapiValue.setPeriod(period.toHapi())
-    hapiValue.setCommunication(communicationList.map { it.toHapi() })
+    if (hasBirthDate()) {
+      hapiValue.setBirthDateElement(birthDate.toHapi())
+    }
+    if (addressCount > 0) {
+      hapiValue.setAddress(addressList.map { it.toHapi() })
+    }
+    if (photoCount > 0) {
+      hapiValue.setPhoto(photoList.map { it.toHapi() })
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
+    if (communicationCount > 0) {
+      hapiValue.setCommunication(communicationList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.RelatedPerson.toProto(): RelatedPerson {
-    val protoValue =
-      RelatedPerson.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setActive(activeElement.toProto())
-        .setPatient(patient.toProto())
-        .addAllRelationship(relationship.map { it.toProto() })
-        .addAllName(name.map { it.toProto() })
-        .addAllTelecom(telecom.map { it.toProto() })
-        .setGender(
-          RelatedPerson.GenderCode.newBuilder()
-            .setValue(
-              AdministrativeGenderCode.Value.valueOf(
-                gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = RelatedPerson.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasActive()) {
+      protoValue.setActive(activeElement.toProto())
+    }
+    if (hasPatient()) {
+      protoValue.setPatient(patient.toProto())
+    }
+    if (hasRelationship()) {
+      protoValue.addAllRelationship(relationship.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.addAllName(name.map { it.toProto() })
+    }
+    if (hasTelecom()) {
+      protoValue.addAllTelecom(telecom.map { it.toProto() })
+    }
+    protoValue.setGender(
+      RelatedPerson.GenderCode.newBuilder()
+        .setValue(
+          AdministrativeGenderCode.Value.valueOf(
+            gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setBirthDate(birthDateElement.toProto())
-        .addAllAddress(address.map { it.toProto() })
-        .addAllPhoto(photo.map { it.toProto() })
-        .setPeriod(period.toProto())
-        .addAllCommunication(communication.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasBirthDate()) {
+      protoValue.setBirthDate(birthDateElement.toProto())
+    }
+    if (hasAddress()) {
+      protoValue.addAllAddress(address.map { it.toProto() })
+    }
+    if (hasPhoto()) {
+      protoValue.addAllPhoto(photo.map { it.toProto() })
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    if (hasCommunication()) {
+      protoValue.addAllCommunication(communication.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.RelatedPerson.RelatedPersonCommunicationComponent.toProto():
     RelatedPerson.Communication {
     val protoValue =
-      RelatedPerson.Communication.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setLanguage(language.toProto())
-        .setPreferred(preferredElement.toProto())
-        .build()
-    return protoValue
+      RelatedPerson.Communication.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasLanguage()) {
+      protoValue.setLanguage(language.toProto())
+    }
+    if (hasPreferred()) {
+      protoValue.setPreferred(preferredElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -131,10 +198,18 @@ public object RelatedPersonConverter {
     org.hl7.fhir.r4.model.RelatedPerson.RelatedPersonCommunicationComponent {
     val hapiValue = org.hl7.fhir.r4.model.RelatedPerson.RelatedPersonCommunicationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setLanguage(language.toHapi())
-    hapiValue.setPreferredElement(preferred.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasLanguage()) {
+      hapiValue.setLanguage(language.toHapi())
+    }
+    if (hasPreferred()) {
+      hapiValue.setPreferredElement(preferred.toHapi())
+    }
     return hapiValue
   }
 }

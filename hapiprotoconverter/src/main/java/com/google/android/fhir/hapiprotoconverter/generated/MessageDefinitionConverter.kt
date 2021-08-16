@@ -90,142 +90,256 @@ public object MessageDefinitionConverter {
   public fun MessageDefinition.toHapi(): org.hl7.fhir.r4.model.MessageDefinition {
     val hapiValue = org.hl7.fhir.r4.model.MessageDefinition()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setVersionElement(version.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setTitleElement(title.toHapi())
-    hapiValue.setReplaces(replacesList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasTitle()) {
+      hapiValue.setTitleElement(title.toHapi())
+    }
+    if (replacesCount > 0) {
+      hapiValue.setReplaces(replacesList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setExperimentalElement(experimental.toHapi())
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setPublisherElement(publisher.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setUseContext(useContextList.map { it.toHapi() })
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
-    hapiValue.setPurposeElement(purpose.toHapi())
-    hapiValue.setCopyrightElement(copyright.toHapi())
-    hapiValue.setBaseElement(base.toHapi())
-    hapiValue.setParent(parentList.map { it.toHapi() })
-    hapiValue.setEvent(event.messageDefinitionEventToHapi())
+    if (hasExperimental()) {
+      hapiValue.setExperimentalElement(experimental.toHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasPublisher()) {
+      hapiValue.setPublisherElement(publisher.toHapi())
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (useContextCount > 0) {
+      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+    }
+    if (jurisdictionCount > 0) {
+      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    }
+    if (hasPurpose()) {
+      hapiValue.setPurposeElement(purpose.toHapi())
+    }
+    if (hasCopyright()) {
+      hapiValue.setCopyrightElement(copyright.toHapi())
+    }
+    if (hasBase()) {
+      hapiValue.setBaseElement(base.toHapi())
+    }
+    if (parentCount > 0) {
+      hapiValue.setParent(parentList.map { it.toHapi() })
+    }
+    if (hasEvent()) {
+      hapiValue.setEvent(event.messageDefinitionEventToHapi())
+    }
     hapiValue.setCategory(
       org.hl7.fhir.r4.model.MessageDefinition.MessageSignificanceCategory.valueOf(
         category.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setFocus(focusList.map { it.toHapi() })
+    if (focusCount > 0) {
+      hapiValue.setFocus(focusList.map { it.toHapi() })
+    }
     hapiValue.setResponseRequired(
       org.hl7.fhir.r4.model.MessageDefinition.MessageheaderResponseRequest.valueOf(
         responseRequired.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setAllowedResponse(allowedResponseList.map { it.toHapi() })
-    hapiValue.setGraph(graphList.map { it.toHapi() })
+    if (allowedResponseCount > 0) {
+      hapiValue.setAllowedResponse(allowedResponseList.map { it.toHapi() })
+    }
+    if (graphCount > 0) {
+      hapiValue.setGraph(graphList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.MessageDefinition.toProto(): MessageDefinition {
-    val protoValue =
-      MessageDefinition.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUrl(urlElement.toProto())
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setVersion(versionElement.toProto())
-        .setName(nameElement.toProto())
-        .setTitle(titleElement.toProto())
-        .addAllReplaces(replaces.map { it.toProto() })
-        .setStatus(
-          MessageDefinition.StatusCode.newBuilder()
-            .setValue(
-              PublicationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = MessageDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasTitle()) {
+      protoValue.setTitle(titleElement.toProto())
+    }
+    if (hasReplaces()) {
+      protoValue.addAllReplaces(replaces.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      MessageDefinition.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setExperimental(experimentalElement.toProto())
-        .setDate(dateElement.toProto())
-        .setPublisher(publisherElement.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .addAllUseContext(useContext.map { it.toProto() })
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .setPurpose(purposeElement.toProto())
-        .setCopyright(copyrightElement.toProto())
-        .setBase(baseElement.toProto())
-        .addAllParent(parent.map { it.toProto() })
-        .setEvent(event.messageDefinitionEventToProto())
-        .setCategory(
-          MessageDefinition.CategoryCode.newBuilder()
-            .setValue(
-              MessageSignificanceCategoryCode.Value.valueOf(
-                category.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .addAllFocus(focus.map { it.toProto() })
-        .setResponseRequired(
-          MessageDefinition.ResponseRequiredCode.newBuilder()
-            .setValue(
-              MessageheaderResponseRequestCode.Value.valueOf(
-                responseRequired.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .addAllAllowedResponse(allowedResponse.map { it.toProto() })
-        .addAllGraph(graph.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasExperimental()) {
+      protoValue.setExperimental(experimentalElement.toProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasPublisher()) {
+      protoValue.setPublisher(publisherElement.toProto())
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasUseContext()) {
+      protoValue.addAllUseContext(useContext.map { it.toProto() })
+    }
+    if (hasJurisdiction()) {
+      protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
+    }
+    if (hasPurpose()) {
+      protoValue.setPurpose(purposeElement.toProto())
+    }
+    if (hasCopyright()) {
+      protoValue.setCopyright(copyrightElement.toProto())
+    }
+    if (hasBase()) {
+      protoValue.setBase(baseElement.toProto())
+    }
+    if (hasParent()) {
+      protoValue.addAllParent(parent.map { it.toProto() })
+    }
+    if (hasEvent()) {
+      protoValue.setEvent(event.messageDefinitionEventToProto())
+    }
+    protoValue.setCategory(
+      MessageDefinition.CategoryCode.newBuilder()
+        .setValue(
+          MessageSignificanceCategoryCode.Value.valueOf(
+            category.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasFocus()) {
+      protoValue.addAllFocus(focus.map { it.toProto() })
+    }
+    protoValue.setResponseRequired(
+      MessageDefinition.ResponseRequiredCode.newBuilder()
+        .setValue(
+          MessageheaderResponseRequestCode.Value.valueOf(
+            responseRequired.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasAllowedResponse()) {
+      protoValue.addAllAllowedResponse(allowedResponse.map { it.toProto() })
+    }
+    if (hasGraph()) {
+      protoValue.addAllGraph(graph.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionFocusComponent.toProto():
     MessageDefinition.Focus {
-    val protoValue =
-      MessageDefinition.Focus.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(
-          MessageDefinition.Focus.CodeType.newBuilder()
-            .setValue(ResourceTypeCode.Value.valueOf(code))
-            .build()
-        )
-        .setProfile(profileElement.toProto())
-        .setMin(minElement.toProto())
-        .setMax(maxElement.toProto())
+    val protoValue = MessageDefinition.Focus.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setCode(
+      MessageDefinition.Focus.CodeType.newBuilder()
+        .setValue(ResourceTypeCode.Value.valueOf(code))
         .build()
-    return protoValue
+    )
+    if (hasProfile()) {
+      protoValue.setProfile(profileElement.toProto())
+    }
+    if (hasMin()) {
+      protoValue.setMin(minElement.toProto())
+    }
+    if (hasMax()) {
+      protoValue.setMax(maxElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionAllowedResponseComponent.toProto():
     MessageDefinition.AllowedResponse {
     val protoValue =
-      MessageDefinition.AllowedResponse.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setMessage(messageElement.toProto())
-        .setSituation(situationElement.toProto())
-        .build()
-    return protoValue
+      MessageDefinition.AllowedResponse.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasMessage()) {
+      protoValue.setMessage(messageElement.toProto())
+    }
+    if (hasSituation()) {
+      protoValue.setSituation(situationElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -233,12 +347,22 @@ public object MessageDefinitionConverter {
     org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionFocusComponent {
     val hapiValue = org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionFocusComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setCode(code.value.name)
-    hapiValue.setProfileElement(profile.toHapi())
-    hapiValue.setMinElement(min.toHapi())
-    hapiValue.setMaxElement(max.toHapi())
+    if (hasProfile()) {
+      hapiValue.setProfileElement(profile.toHapi())
+    }
+    if (hasMin()) {
+      hapiValue.setMinElement(min.toHapi())
+    }
+    if (hasMax()) {
+      hapiValue.setMaxElement(max.toHapi())
+    }
     return hapiValue
   }
 
@@ -248,10 +372,18 @@ public object MessageDefinitionConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionAllowedResponseComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setMessageElement(message.toHapi())
-    hapiValue.setSituationElement(situation.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasMessage()) {
+      hapiValue.setMessageElement(message.toHapi())
+    }
+    if (hasSituation()) {
+      hapiValue.setSituationElement(situation.toHapi())
+    }
     return hapiValue
   }
 }

@@ -78,21 +78,30 @@ public object UsageContextConverter {
   public fun UsageContext.toHapi(): org.hl7.fhir.r4.model.UsageContext {
     val hapiValue = org.hl7.fhir.r4.model.UsageContext()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setValue(value.usageContextValueToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.usageContextValueToHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.UsageContext.toProto(): UsageContext {
-    val protoValue =
-      UsageContext.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setCode(code.toProto())
-        .setValue(value.usageContextValueToProto())
-        .build()
-    return protoValue
+    val protoValue = UsageContext.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.usageContextValueToProto())
+    }
+    return protoValue.build()
   }
 }

@@ -79,88 +79,178 @@ public object DiagnosticReportConverter {
   public fun DiagnosticReport.toHapi(): org.hl7.fhir.r4.model.DiagnosticReport {
     val hapiValue = org.hl7.fhir.r4.model.DiagnosticReport()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (basedOnCount > 0) {
+      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setCategory(categoryList.map { it.toHapi() })
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setSubject(subject.toHapi())
-    hapiValue.setEncounter(encounter.toHapi())
-    hapiValue.setEffective(effective.diagnosticReportEffectiveToHapi())
-    hapiValue.setIssuedElement(issued.toHapi())
-    hapiValue.setPerformer(performerList.map { it.toHapi() })
-    hapiValue.setResultsInterpreter(resultsInterpreterList.map { it.toHapi() })
-    hapiValue.setSpecimen(specimenList.map { it.toHapi() })
-    hapiValue.setResult(resultList.map { it.toHapi() })
-    hapiValue.setImagingStudy(imagingStudyList.map { it.toHapi() })
-    hapiValue.setMedia(mediaList.map { it.toHapi() })
-    hapiValue.setConclusionElement(conclusion.toHapi())
-    hapiValue.setConclusionCode(conclusionCodeList.map { it.toHapi() })
-    hapiValue.setPresentedForm(presentedFormList.map { it.toHapi() })
+    if (categoryCount > 0) {
+      hapiValue.setCategory(categoryList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.toHapi())
+    }
+    if (hasEncounter()) {
+      hapiValue.setEncounter(encounter.toHapi())
+    }
+    if (hasEffective()) {
+      hapiValue.setEffective(effective.diagnosticReportEffectiveToHapi())
+    }
+    if (hasIssued()) {
+      hapiValue.setIssuedElement(issued.toHapi())
+    }
+    if (performerCount > 0) {
+      hapiValue.setPerformer(performerList.map { it.toHapi() })
+    }
+    if (resultsInterpreterCount > 0) {
+      hapiValue.setResultsInterpreter(resultsInterpreterList.map { it.toHapi() })
+    }
+    if (specimenCount > 0) {
+      hapiValue.setSpecimen(specimenList.map { it.toHapi() })
+    }
+    if (resultCount > 0) {
+      hapiValue.setResult(resultList.map { it.toHapi() })
+    }
+    if (imagingStudyCount > 0) {
+      hapiValue.setImagingStudy(imagingStudyList.map { it.toHapi() })
+    }
+    if (mediaCount > 0) {
+      hapiValue.setMedia(mediaList.map { it.toHapi() })
+    }
+    if (hasConclusion()) {
+      hapiValue.setConclusionElement(conclusion.toHapi())
+    }
+    if (conclusionCodeCount > 0) {
+      hapiValue.setConclusionCode(conclusionCodeList.map { it.toHapi() })
+    }
+    if (presentedFormCount > 0) {
+      hapiValue.setPresentedForm(presentedFormList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.DiagnosticReport.toProto(): DiagnosticReport {
-    val protoValue =
-      DiagnosticReport.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .addAllBasedOn(basedOn.map { it.toProto() })
-        .setStatus(
-          DiagnosticReport.StatusCode.newBuilder()
-            .setValue(
-              DiagnosticReportStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = DiagnosticReport.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasBasedOn()) {
+      protoValue.addAllBasedOn(basedOn.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      DiagnosticReport.StatusCode.newBuilder()
+        .setValue(
+          DiagnosticReportStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .addAllCategory(category.map { it.toProto() })
-        .setCode(code.toProto())
-        .setSubject(subject.toProto())
-        .setEncounter(encounter.toProto())
-        .setEffective(effective.diagnosticReportEffectiveToProto())
-        .setIssued(issuedElement.toProto())
-        .addAllPerformer(performer.map { it.toProto() })
-        .addAllResultsInterpreter(resultsInterpreter.map { it.toProto() })
-        .addAllSpecimen(specimen.map { it.toProto() })
-        .addAllResult(result.map { it.toProto() })
-        .addAllImagingStudy(imagingStudy.map { it.toProto() })
-        .addAllMedia(media.map { it.toProto() })
-        .setConclusion(conclusionElement.toProto())
-        .addAllConclusionCode(conclusionCode.map { it.toProto() })
-        .addAllPresentedForm(presentedForm.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasCategory()) {
+      protoValue.addAllCategory(category.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.toProto())
+    }
+    if (hasEncounter()) {
+      protoValue.setEncounter(encounter.toProto())
+    }
+    if (hasEffective()) {
+      protoValue.setEffective(effective.diagnosticReportEffectiveToProto())
+    }
+    if (hasIssued()) {
+      protoValue.setIssued(issuedElement.toProto())
+    }
+    if (hasPerformer()) {
+      protoValue.addAllPerformer(performer.map { it.toProto() })
+    }
+    if (hasResultsInterpreter()) {
+      protoValue.addAllResultsInterpreter(resultsInterpreter.map { it.toProto() })
+    }
+    if (hasSpecimen()) {
+      protoValue.addAllSpecimen(specimen.map { it.toProto() })
+    }
+    if (hasResult()) {
+      protoValue.addAllResult(result.map { it.toProto() })
+    }
+    if (hasImagingStudy()) {
+      protoValue.addAllImagingStudy(imagingStudy.map { it.toProto() })
+    }
+    if (hasMedia()) {
+      protoValue.addAllMedia(media.map { it.toProto() })
+    }
+    if (hasConclusion()) {
+      protoValue.setConclusion(conclusionElement.toProto())
+    }
+    if (hasConclusionCode()) {
+      protoValue.addAllConclusionCode(conclusionCode.map { it.toProto() })
+    }
+    if (hasPresentedForm()) {
+      protoValue.addAllPresentedForm(presentedForm.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportMediaComponent.toProto():
     DiagnosticReport.Media {
-    val protoValue =
-      DiagnosticReport.Media.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setComment(commentElement.toProto())
-        .setLink(link.toProto())
-        .build()
-    return protoValue
+    val protoValue = DiagnosticReport.Media.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasComment()) {
+      protoValue.setComment(commentElement.toProto())
+    }
+    if (hasLink()) {
+      protoValue.setLink(link.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -168,10 +258,18 @@ public object DiagnosticReportConverter {
     org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportMediaComponent {
     val hapiValue = org.hl7.fhir.r4.model.DiagnosticReport.DiagnosticReportMediaComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCommentElement(comment.toHapi())
-    hapiValue.setLink(link.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasComment()) {
+      hapiValue.setCommentElement(comment.toHapi())
+    }
+    if (hasLink()) {
+      hapiValue.setLink(link.toHapi())
+    }
     return hapiValue
   }
 }

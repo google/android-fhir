@@ -114,105 +114,211 @@ public object ConceptMapConverter {
   public fun ConceptMap.toHapi(): org.hl7.fhir.r4.model.ConceptMap {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setIdentifier(identifier.toHapi())
-    hapiValue.setVersionElement(version.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setTitleElement(title.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
+    if (hasIdentifier()) {
+      hapiValue.setIdentifier(identifier.toHapi())
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasTitle()) {
+      hapiValue.setTitleElement(title.toHapi())
+    }
     hapiValue.setStatus(
       Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setExperimentalElement(experimental.toHapi())
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setPublisherElement(publisher.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setUseContext(useContextList.map { it.toHapi() })
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
-    hapiValue.setPurposeElement(purpose.toHapi())
-    hapiValue.setCopyrightElement(copyright.toHapi())
-    hapiValue.setSource(source.conceptMapSourceToHapi())
-    hapiValue.setTarget(target.conceptMapTargetToHapi())
-    hapiValue.setGroup(groupList.map { it.toHapi() })
+    if (hasExperimental()) {
+      hapiValue.setExperimentalElement(experimental.toHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasPublisher()) {
+      hapiValue.setPublisherElement(publisher.toHapi())
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (useContextCount > 0) {
+      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+    }
+    if (jurisdictionCount > 0) {
+      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    }
+    if (hasPurpose()) {
+      hapiValue.setPurposeElement(purpose.toHapi())
+    }
+    if (hasCopyright()) {
+      hapiValue.setCopyrightElement(copyright.toHapi())
+    }
+    if (hasSource()) {
+      hapiValue.setSource(source.conceptMapSourceToHapi())
+    }
+    if (hasTarget()) {
+      hapiValue.setTarget(target.conceptMapTargetToHapi())
+    }
+    if (groupCount > 0) {
+      hapiValue.setGroup(groupList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.ConceptMap.toProto(): ConceptMap {
-    val protoValue =
-      ConceptMap.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUrl(urlElement.toProto())
-        .setIdentifier(identifier.toProto())
-        .setVersion(versionElement.toProto())
-        .setName(nameElement.toProto())
-        .setTitle(titleElement.toProto())
-        .setStatus(
-          ConceptMap.StatusCode.newBuilder()
-            .setValue(
-              PublicationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = ConceptMap.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    if (hasIdentifier()) {
+      protoValue.setIdentifier(identifier.toProto())
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasTitle()) {
+      protoValue.setTitle(titleElement.toProto())
+    }
+    protoValue.setStatus(
+      ConceptMap.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setExperimental(experimentalElement.toProto())
-        .setDate(dateElement.toProto())
-        .setPublisher(publisherElement.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .addAllUseContext(useContext.map { it.toProto() })
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .setPurpose(purposeElement.toProto())
-        .setCopyright(copyrightElement.toProto())
-        .setSource(source.conceptMapSourceToProto())
-        .setTarget(target.conceptMapTargetToProto())
-        .addAllGroup(group.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasExperimental()) {
+      protoValue.setExperimental(experimentalElement.toProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasPublisher()) {
+      protoValue.setPublisher(publisherElement.toProto())
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasUseContext()) {
+      protoValue.addAllUseContext(useContext.map { it.toProto() })
+    }
+    if (hasJurisdiction()) {
+      protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
+    }
+    if (hasPurpose()) {
+      protoValue.setPurpose(purposeElement.toProto())
+    }
+    if (hasCopyright()) {
+      protoValue.setCopyright(copyrightElement.toProto())
+    }
+    if (hasSource()) {
+      protoValue.setSource(source.conceptMapSourceToProto())
+    }
+    if (hasTarget()) {
+      protoValue.setTarget(target.conceptMapTargetToProto())
+    }
+    if (hasGroup()) {
+      protoValue.addAllGroup(group.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupComponent.toProto():
     ConceptMap.Group {
-    val protoValue =
-      ConceptMap.Group.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSource(sourceElement.toProto())
-        .setSourceVersion(sourceVersionElement.toProto())
-        .setTarget(targetElement.toProto())
-        .setTargetVersion(targetVersionElement.toProto())
-        .addAllElement(element.map { it.toProto() })
-        .setUnmapped(unmapped.toProto())
-        .build()
-    return protoValue
+    val protoValue = ConceptMap.Group.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSource()) {
+      protoValue.setSource(sourceElement.toProto())
+    }
+    if (hasSourceVersion()) {
+      protoValue.setSourceVersion(sourceVersionElement.toProto())
+    }
+    if (hasTarget()) {
+      protoValue.setTarget(targetElement.toProto())
+    }
+    if (hasTargetVersion()) {
+      protoValue.setTargetVersion(targetVersionElement.toProto())
+    }
+    if (hasElement()) {
+      protoValue.addAllElement(element.map { it.toProto() })
+    }
+    if (hasUnmapped()) {
+      protoValue.setUnmapped(unmapped.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ConceptMap.SourceElementComponent.toProto():
     ConceptMap.Group.SourceElement {
     val protoValue =
-      ConceptMap.Group.SourceElement.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(codeElement.toProto())
-        .setDisplay(displayElement.toProto())
-        .addAllTarget(target.map { it.toProto() })
-        .build()
-    return protoValue
+      ConceptMap.Group.SourceElement.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(codeElement.toProto())
+    }
+    if (hasDisplay()) {
+      protoValue.setDisplay(displayElement.toProto())
+    }
+    if (hasTarget()) {
+      protoValue.addAllTarget(target.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -221,23 +327,34 @@ public object ConceptMapConverter {
     val protoValue =
       ConceptMap.Group.SourceElement.TargetElement.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(codeElement.toProto())
-        .setDisplay(displayElement.toProto())
-        .setEquivalence(
-          ConceptMap.Group.SourceElement.TargetElement.EquivalenceCode.newBuilder()
-            .setValue(
-              ConceptMapEquivalenceCode.Value.valueOf(
-                equivalence.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(codeElement.toProto())
+    }
+    if (hasDisplay()) {
+      protoValue.setDisplay(displayElement.toProto())
+    }
+    protoValue.setEquivalence(
+      ConceptMap.Group.SourceElement.TargetElement.EquivalenceCode.newBuilder()
+        .setValue(
+          ConceptMapEquivalenceCode.Value.valueOf(
+            equivalence.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setComment(commentElement.toProto())
-        .addAllDependsOn(dependsOn.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasComment()) {
+      protoValue.setComment(commentElement.toProto())
+    }
+    if (hasDependsOn()) {
+      protoValue.addAllDependsOn(dependsOn.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -246,52 +363,86 @@ public object ConceptMapConverter {
     val protoValue =
       ConceptMap.Group.SourceElement.TargetElement.OtherElement.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setProperty(propertyElement.toProto())
-        .setSystem(systemElement.toProto())
-        .setValue(valueElement.toProto())
-        .setDisplay(displayElement.toProto())
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasProperty()) {
+      protoValue.setProperty(propertyElement.toProto())
+    }
+    if (hasSystem()) {
+      protoValue.setSystem(systemElement.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(valueElement.toProto())
+    }
+    if (hasDisplay()) {
+      protoValue.setDisplay(displayElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupUnmappedComponent.toProto():
     ConceptMap.Group.Unmapped {
-    val protoValue =
-      ConceptMap.Group.Unmapped.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setMode(
-          ConceptMap.Group.Unmapped.ModeCode.newBuilder()
-            .setValue(
-              ConceptMapGroupUnmappedModeCode.Value.valueOf(
-                mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = ConceptMap.Group.Unmapped.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setMode(
+      ConceptMap.Group.Unmapped.ModeCode.newBuilder()
+        .setValue(
+          ConceptMapGroupUnmappedModeCode.Value.valueOf(
+            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setCode(codeElement.toProto())
-        .setDisplay(displayElement.toProto())
-        .setUrl(urlElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasCode()) {
+      protoValue.setCode(codeElement.toProto())
+    }
+    if (hasDisplay()) {
+      protoValue.setDisplay(displayElement.toProto())
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun ConceptMap.Group.toHapi(): org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSourceElement(source.toHapi())
-    hapiValue.setSourceVersionElement(sourceVersion.toHapi())
-    hapiValue.setTargetElement(target.toHapi())
-    hapiValue.setTargetVersionElement(targetVersion.toHapi())
-    hapiValue.setElement(elementList.map { it.toHapi() })
-    hapiValue.setUnmapped(unmapped.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSource()) {
+      hapiValue.setSourceElement(source.toHapi())
+    }
+    if (hasSourceVersion()) {
+      hapiValue.setSourceVersionElement(sourceVersion.toHapi())
+    }
+    if (hasTarget()) {
+      hapiValue.setTargetElement(target.toHapi())
+    }
+    if (hasTargetVersion()) {
+      hapiValue.setTargetVersionElement(targetVersion.toHapi())
+    }
+    if (elementCount > 0) {
+      hapiValue.setElement(elementList.map { it.toHapi() })
+    }
+    if (hasUnmapped()) {
+      hapiValue.setUnmapped(unmapped.toHapi())
+    }
     return hapiValue
   }
 
@@ -300,11 +451,21 @@ public object ConceptMapConverter {
     org.hl7.fhir.r4.model.ConceptMap.SourceElementComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.SourceElementComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCodeElement(code.toHapi())
-    hapiValue.setDisplayElement(display.toHapi())
-    hapiValue.setTarget(targetList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCodeElement(code.toHapi())
+    }
+    if (hasDisplay()) {
+      hapiValue.setDisplayElement(display.toHapi())
+    }
+    if (targetCount > 0) {
+      hapiValue.setTarget(targetList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -313,17 +474,29 @@ public object ConceptMapConverter {
     org.hl7.fhir.r4.model.ConceptMap.TargetElementComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.TargetElementComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCodeElement(code.toHapi())
-    hapiValue.setDisplayElement(display.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCodeElement(code.toHapi())
+    }
+    if (hasDisplay()) {
+      hapiValue.setDisplayElement(display.toHapi())
+    }
     hapiValue.setEquivalence(
       Enumerations.ConceptMapEquivalence.valueOf(
         equivalence.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setCommentElement(comment.toHapi())
-    hapiValue.setDependsOn(dependsOnList.map { it.toHapi() })
+    if (hasComment()) {
+      hapiValue.setCommentElement(comment.toHapi())
+    }
+    if (dependsOnCount > 0) {
+      hapiValue.setDependsOn(dependsOnList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -332,12 +505,24 @@ public object ConceptMapConverter {
     org.hl7.fhir.r4.model.ConceptMap.OtherElementComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.OtherElementComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setPropertyElement(property.toHapi())
-    hapiValue.setSystemElement(system.toHapi())
-    hapiValue.setValueElement(value.toHapi())
-    hapiValue.setDisplayElement(display.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasProperty()) {
+      hapiValue.setPropertyElement(property.toHapi())
+    }
+    if (hasSystem()) {
+      hapiValue.setSystemElement(system.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValueElement(value.toHapi())
+    }
+    if (hasDisplay()) {
+      hapiValue.setDisplayElement(display.toHapi())
+    }
     return hapiValue
   }
 
@@ -346,16 +531,26 @@ public object ConceptMapConverter {
     org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupUnmappedComponent {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupUnmappedComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setMode(
       org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupUnmappedMode.valueOf(
         mode.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setCodeElement(code.toHapi())
-    hapiValue.setDisplayElement(display.toHapi())
-    hapiValue.setUrlElement(url.toHapi())
+    if (hasCode()) {
+      hapiValue.setCodeElement(code.toHapi())
+    }
+    if (hasDisplay()) {
+      hapiValue.setDisplayElement(display.toHapi())
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
     return hapiValue
   }
 }

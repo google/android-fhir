@@ -35,25 +35,42 @@ public object SimpleQuantityConverter {
   public fun SimpleQuantity.toHapi(): org.hl7.fhir.r4.model.SimpleQuantity {
     val hapiValue = org.hl7.fhir.r4.model.SimpleQuantity()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setValueElement(value.toHapi())
-    hapiValue.setUnitElement(unit.toHapi())
-    hapiValue.setSystemElement(system.toHapi())
-    hapiValue.setCodeElement(code.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasValue()) {
+      hapiValue.setValueElement(value.toHapi())
+    }
+    if (hasUnit()) {
+      hapiValue.setUnitElement(unit.toHapi())
+    }
+    if (hasSystem()) {
+      hapiValue.setSystemElement(system.toHapi())
+    }
+    if (hasCode()) {
+      hapiValue.setCodeElement(code.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.SimpleQuantity.toProto(): SimpleQuantity {
-    val protoValue =
-      SimpleQuantity.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setValue(valueElement.toProto())
-        .setUnit(unitElement.toProto())
-        .setSystem(systemElement.toProto())
-        .setCode(codeElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = SimpleQuantity.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasValue()) {
+      protoValue.setValue(valueElement.toProto())
+    }
+    if (hasUnit()) {
+      protoValue.setUnit(unitElement.toProto())
+    }
+    if (hasSystem()) {
+      protoValue.setSystem(systemElement.toProto())
+    }
+    if (hasCode()) {
+      protoValue.setCode(codeElement.toProto())
+    }
+    return protoValue.build()
   }
 }

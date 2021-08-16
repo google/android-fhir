@@ -81,112 +81,232 @@ public object MedicinalProductConverter {
   public fun MedicinalProduct.toHapi(): org.hl7.fhir.r4.model.MedicinalProduct {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProduct()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
-    hapiValue.setDomain(domain.toHapi())
-    hapiValue.setCombinedPharmaceuticalDoseForm(combinedPharmaceuticalDoseForm.toHapi())
-    hapiValue.setLegalStatusOfSupply(legalStatusOfSupply.toHapi())
-    hapiValue.setAdditionalMonitoringIndicator(additionalMonitoringIndicator.toHapi())
-    hapiValue.setSpecialMeasures(specialMeasuresList.map { it.toHapi() })
-    hapiValue.setPaediatricUseIndicator(paediatricUseIndicator.toHapi())
-    hapiValue.setProductClassification(productClassificationList.map { it.toHapi() })
-    hapiValue.setMarketingStatus(marketingStatusList.map { it.toHapi() })
-    hapiValue.setPharmaceuticalProduct(pharmaceuticalProductList.map { it.toHapi() })
-    hapiValue.setPackagedMedicinalProduct(packagedMedicinalProductList.map { it.toHapi() })
-    hapiValue.setAttachedDocument(attachedDocumentList.map { it.toHapi() })
-    hapiValue.setMasterFile(masterFileList.map { it.toHapi() })
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setClinicalTrial(clinicalTrialList.map { it.toHapi() })
-    hapiValue.setName(nameList.map { it.toHapi() })
-    hapiValue.setCrossReference(crossReferenceList.map { it.toHapi() })
-    hapiValue.setManufacturingBusinessOperation(
-      manufacturingBusinessOperationList.map { it.toHapi() }
-    )
-    hapiValue.setSpecialDesignation(specialDesignationList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasDomain()) {
+      hapiValue.setDomain(domain.toHapi())
+    }
+    if (hasCombinedPharmaceuticalDoseForm()) {
+      hapiValue.setCombinedPharmaceuticalDoseForm(combinedPharmaceuticalDoseForm.toHapi())
+    }
+    if (hasLegalStatusOfSupply()) {
+      hapiValue.setLegalStatusOfSupply(legalStatusOfSupply.toHapi())
+    }
+    if (hasAdditionalMonitoringIndicator()) {
+      hapiValue.setAdditionalMonitoringIndicator(additionalMonitoringIndicator.toHapi())
+    }
+    if (specialMeasuresCount > 0) {
+      hapiValue.setSpecialMeasures(specialMeasuresList.map { it.toHapi() })
+    }
+    if (hasPaediatricUseIndicator()) {
+      hapiValue.setPaediatricUseIndicator(paediatricUseIndicator.toHapi())
+    }
+    if (productClassificationCount > 0) {
+      hapiValue.setProductClassification(productClassificationList.map { it.toHapi() })
+    }
+    if (marketingStatusCount > 0) {
+      hapiValue.setMarketingStatus(marketingStatusList.map { it.toHapi() })
+    }
+    if (pharmaceuticalProductCount > 0) {
+      hapiValue.setPharmaceuticalProduct(pharmaceuticalProductList.map { it.toHapi() })
+    }
+    if (packagedMedicinalProductCount > 0) {
+      hapiValue.setPackagedMedicinalProduct(packagedMedicinalProductList.map { it.toHapi() })
+    }
+    if (attachedDocumentCount > 0) {
+      hapiValue.setAttachedDocument(attachedDocumentList.map { it.toHapi() })
+    }
+    if (masterFileCount > 0) {
+      hapiValue.setMasterFile(masterFileList.map { it.toHapi() })
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (clinicalTrialCount > 0) {
+      hapiValue.setClinicalTrial(clinicalTrialList.map { it.toHapi() })
+    }
+    if (nameCount > 0) {
+      hapiValue.setName(nameList.map { it.toHapi() })
+    }
+    if (crossReferenceCount > 0) {
+      hapiValue.setCrossReference(crossReferenceList.map { it.toHapi() })
+    }
+    if (manufacturingBusinessOperationCount > 0) {
+      hapiValue.setManufacturingBusinessOperation(
+        manufacturingBusinessOperationList.map { it.toHapi() }
+      )
+    }
+    if (specialDesignationCount > 0) {
+      hapiValue.setSpecialDesignation(specialDesignationList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.MedicinalProduct.toProto(): MedicinalProduct {
-    val protoValue =
-      MedicinalProduct.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setType(type.toProto())
-        .setDomain(domain.toProto())
-        .setCombinedPharmaceuticalDoseForm(combinedPharmaceuticalDoseForm.toProto())
-        .setLegalStatusOfSupply(legalStatusOfSupply.toProto())
-        .setAdditionalMonitoringIndicator(additionalMonitoringIndicator.toProto())
-        .addAllSpecialMeasures(specialMeasures.map { it.toProto() })
-        .setPaediatricUseIndicator(paediatricUseIndicator.toProto())
-        .addAllProductClassification(productClassification.map { it.toProto() })
-        .addAllMarketingStatus(marketingStatus.map { it.toProto() })
-        .addAllPharmaceuticalProduct(pharmaceuticalProduct.map { it.toProto() })
-        .addAllPackagedMedicinalProduct(packagedMedicinalProduct.map { it.toProto() })
-        .addAllAttachedDocument(attachedDocument.map { it.toProto() })
-        .addAllMasterFile(masterFile.map { it.toProto() })
-        .addAllContact(contact.map { it.toProto() })
-        .addAllClinicalTrial(clinicalTrial.map { it.toProto() })
-        .addAllName(name.map { it.toProto() })
-        .addAllCrossReference(crossReference.map { it.toProto() })
-        .addAllManufacturingBusinessOperation(manufacturingBusinessOperation.map { it.toProto() })
-        .addAllSpecialDesignation(specialDesignation.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = MedicinalProduct.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasDomain()) {
+      protoValue.setDomain(domain.toProto())
+    }
+    if (hasCombinedPharmaceuticalDoseForm()) {
+      protoValue.setCombinedPharmaceuticalDoseForm(combinedPharmaceuticalDoseForm.toProto())
+    }
+    if (hasLegalStatusOfSupply()) {
+      protoValue.setLegalStatusOfSupply(legalStatusOfSupply.toProto())
+    }
+    if (hasAdditionalMonitoringIndicator()) {
+      protoValue.setAdditionalMonitoringIndicator(additionalMonitoringIndicator.toProto())
+    }
+    if (hasSpecialMeasures()) {
+      protoValue.addAllSpecialMeasures(specialMeasures.map { it.toProto() })
+    }
+    if (hasPaediatricUseIndicator()) {
+      protoValue.setPaediatricUseIndicator(paediatricUseIndicator.toProto())
+    }
+    if (hasProductClassification()) {
+      protoValue.addAllProductClassification(productClassification.map { it.toProto() })
+    }
+    if (hasMarketingStatus()) {
+      protoValue.addAllMarketingStatus(marketingStatus.map { it.toProto() })
+    }
+    if (hasPharmaceuticalProduct()) {
+      protoValue.addAllPharmaceuticalProduct(pharmaceuticalProduct.map { it.toProto() })
+    }
+    if (hasPackagedMedicinalProduct()) {
+      protoValue.addAllPackagedMedicinalProduct(packagedMedicinalProduct.map { it.toProto() })
+    }
+    if (hasAttachedDocument()) {
+      protoValue.addAllAttachedDocument(attachedDocument.map { it.toProto() })
+    }
+    if (hasMasterFile()) {
+      protoValue.addAllMasterFile(masterFile.map { it.toProto() })
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasClinicalTrial()) {
+      protoValue.addAllClinicalTrial(clinicalTrial.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.addAllName(name.map { it.toProto() })
+    }
+    if (hasCrossReference()) {
+      protoValue.addAllCrossReference(crossReference.map { it.toProto() })
+    }
+    if (hasManufacturingBusinessOperation()) {
+      protoValue.addAllManufacturingBusinessOperation(
+        manufacturingBusinessOperation.map { it.toProto() }
+      )
+    }
+    if (hasSpecialDesignation()) {
+      protoValue.addAllSpecialDesignation(specialDesignation.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameComponent.toProto():
     MedicinalProduct.Name {
-    val protoValue =
-      MedicinalProduct.Name.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setProductName(productNameElement.toProto())
-        .addAllNamePart(namePart.map { it.toProto() })
-        .addAllCountryLanguage(countryLanguage.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = MedicinalProduct.Name.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasProductName()) {
+      protoValue.setProductName(productNameElement.toProto())
+    }
+    if (hasNamePart()) {
+      protoValue.addAllNamePart(namePart.map { it.toProto() })
+    }
+    if (hasCountryLanguage()) {
+      protoValue.addAllCountryLanguage(countryLanguage.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameNamePartComponent.toProto():
     MedicinalProduct.Name.NamePart {
     val protoValue =
-      MedicinalProduct.Name.NamePart.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setPart(partElement.toProto())
-        .setType(type.toProto())
-        .build()
-    return protoValue
+      MedicinalProduct.Name.NamePart.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasPart()) {
+      protoValue.setPart(partElement.toProto())
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameCountryLanguageComponent.toProto():
     MedicinalProduct.Name.CountryLanguage {
     val protoValue =
-      MedicinalProduct.Name.CountryLanguage.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCountry(country.toProto())
-        .setJurisdiction(jurisdiction.toProto())
-        .setLanguage(language.toProto())
-        .build()
-    return protoValue
+      MedicinalProduct.Name.CountryLanguage.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCountry()) {
+      protoValue.setCountry(country.toProto())
+    }
+    if (hasJurisdiction()) {
+      protoValue.setJurisdiction(jurisdiction.toProto())
+    }
+    if (hasLanguage()) {
+      protoValue.setLanguage(language.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -195,35 +315,66 @@ public object MedicinalProductConverter {
     val protoValue =
       MedicinalProduct.ManufacturingBusinessOperation.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setOperationType(operationType.toProto())
-        .setAuthorisationReferenceNumber(authorisationReferenceNumber.toProto())
-        .setEffectiveDate(effectiveDateElement.toProto())
-        .setConfidentialityIndicator(confidentialityIndicator.toProto())
-        .addAllManufacturer(manufacturer.map { it.toProto() })
-        .setRegulator(regulator.toProto())
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasOperationType()) {
+      protoValue.setOperationType(operationType.toProto())
+    }
+    if (hasAuthorisationReferenceNumber()) {
+      protoValue.setAuthorisationReferenceNumber(authorisationReferenceNumber.toProto())
+    }
+    if (hasEffectiveDate()) {
+      protoValue.setEffectiveDate(effectiveDateElement.toProto())
+    }
+    if (hasConfidentialityIndicator()) {
+      protoValue.setConfidentialityIndicator(confidentialityIndicator.toProto())
+    }
+    if (hasManufacturer()) {
+      protoValue.addAllManufacturer(manufacturer.map { it.toProto() })
+    }
+    if (hasRegulator()) {
+      protoValue.setRegulator(regulator.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductSpecialDesignationComponent.toProto():
     MedicinalProduct.SpecialDesignation {
     val protoValue =
-      MedicinalProduct.SpecialDesignation.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setType(type.toProto())
-        .setIntendedUse(intendedUse.toProto())
-        .setIndication(indication.medicinalProductSpecialDesignationIndicationToProto())
-        .setStatus(status.toProto())
-        .setDate(dateElement.toProto())
-        .setSpecies(species.toProto())
-        .build()
-    return protoValue
+      MedicinalProduct.SpecialDesignation.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasIntendedUse()) {
+      protoValue.setIntendedUse(intendedUse.toProto())
+    }
+    if (hasIndication()) {
+      protoValue.setIndication(indication.medicinalProductSpecialDesignationIndicationToProto())
+    }
+    if (hasStatus()) {
+      protoValue.setStatus(status.toProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasSpecies()) {
+      protoValue.setSpecies(species.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -231,11 +382,21 @@ public object MedicinalProductConverter {
     org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameComponent {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setProductNameElement(productName.toHapi())
-    hapiValue.setNamePart(namePartList.map { it.toHapi() })
-    hapiValue.setCountryLanguage(countryLanguageList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasProductName()) {
+      hapiValue.setProductNameElement(productName.toHapi())
+    }
+    if (namePartCount > 0) {
+      hapiValue.setNamePart(namePartList.map { it.toHapi() })
+    }
+    if (countryLanguageCount > 0) {
+      hapiValue.setCountryLanguage(countryLanguageList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -244,10 +405,18 @@ public object MedicinalProductConverter {
     org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameNamePartComponent {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameNamePartComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setPartElement(part.toHapi())
-    hapiValue.setType(type.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasPart()) {
+      hapiValue.setPartElement(part.toHapi())
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
     return hapiValue
   }
 
@@ -257,11 +426,21 @@ public object MedicinalProductConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameCountryLanguageComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCountry(country.toHapi())
-    hapiValue.setJurisdiction(jurisdiction.toHapi())
-    hapiValue.setLanguage(language.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCountry()) {
+      hapiValue.setCountry(country.toHapi())
+    }
+    if (hasJurisdiction()) {
+      hapiValue.setJurisdiction(jurisdiction.toHapi())
+    }
+    if (hasLanguage()) {
+      hapiValue.setLanguage(language.toHapi())
+    }
     return hapiValue
   }
 
@@ -272,14 +451,30 @@ public object MedicinalProductConverter {
       org.hl7.fhir.r4.model.MedicinalProduct
         .MedicinalProductManufacturingBusinessOperationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setOperationType(operationType.toHapi())
-    hapiValue.setAuthorisationReferenceNumber(authorisationReferenceNumber.toHapi())
-    hapiValue.setEffectiveDateElement(effectiveDate.toHapi())
-    hapiValue.setConfidentialityIndicator(confidentialityIndicator.toHapi())
-    hapiValue.setManufacturer(manufacturerList.map { it.toHapi() })
-    hapiValue.setRegulator(regulator.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasOperationType()) {
+      hapiValue.setOperationType(operationType.toHapi())
+    }
+    if (hasAuthorisationReferenceNumber()) {
+      hapiValue.setAuthorisationReferenceNumber(authorisationReferenceNumber.toHapi())
+    }
+    if (hasEffectiveDate()) {
+      hapiValue.setEffectiveDateElement(effectiveDate.toHapi())
+    }
+    if (hasConfidentialityIndicator()) {
+      hapiValue.setConfidentialityIndicator(confidentialityIndicator.toHapi())
+    }
+    if (manufacturerCount > 0) {
+      hapiValue.setManufacturer(manufacturerList.map { it.toHapi() })
+    }
+    if (hasRegulator()) {
+      hapiValue.setRegulator(regulator.toHapi())
+    }
     return hapiValue
   }
 
@@ -289,15 +484,33 @@ public object MedicinalProductConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductSpecialDesignationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
-    hapiValue.setIntendedUse(intendedUse.toHapi())
-    hapiValue.setIndication(indication.medicinalProductSpecialDesignationIndicationToHapi())
-    hapiValue.setStatus(status.toHapi())
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setSpecies(species.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasIntendedUse()) {
+      hapiValue.setIntendedUse(intendedUse.toHapi())
+    }
+    if (hasIndication()) {
+      hapiValue.setIndication(indication.medicinalProductSpecialDesignationIndicationToHapi())
+    }
+    if (hasStatus()) {
+      hapiValue.setStatus(status.toHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasSpecies()) {
+      hapiValue.setSpecies(species.toHapi())
+    }
     return hapiValue
   }
 }

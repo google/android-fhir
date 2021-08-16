@@ -32,43 +32,66 @@ public object HumanNameConverter {
   public fun HumanName.toHapi(): org.hl7.fhir.r4.model.HumanName {
     val hapiValue = org.hl7.fhir.r4.model.HumanName()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
     hapiValue.setUse(
       org.hl7.fhir.r4.model.HumanName.NameUse.valueOf(
         use.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setTextElement(text.toHapi())
-    hapiValue.setFamilyElement(family.toHapi())
-    hapiValue.setGiven(givenList.map { it.toHapi() })
-    hapiValue.setPrefix(prefixList.map { it.toHapi() })
-    hapiValue.setSuffix(suffixList.map { it.toHapi() })
-    hapiValue.setPeriod(period.toHapi())
+    if (hasText()) {
+      hapiValue.setTextElement(text.toHapi())
+    }
+    if (hasFamily()) {
+      hapiValue.setFamilyElement(family.toHapi())
+    }
+    if (givenCount > 0) {
+      hapiValue.setGiven(givenList.map { it.toHapi() })
+    }
+    if (prefixCount > 0) {
+      hapiValue.setPrefix(prefixList.map { it.toHapi() })
+    }
+    if (suffixCount > 0) {
+      hapiValue.setSuffix(suffixList.map { it.toHapi() })
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.HumanName.toProto(): HumanName {
-    val protoValue =
-      HumanName.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setUse(
-          HumanName.UseCode.newBuilder()
-            .setValue(
-              NameUseCode.Value.valueOf(
-                use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = HumanName.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    protoValue.setUse(
+      HumanName.UseCode.newBuilder()
+        .setValue(
+          NameUseCode.Value.valueOf(use.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
         )
-        .setText(textElement.toProto())
-        .setFamily(familyElement.toProto())
-        .addAllGiven(given.map { it.toProto() })
-        .addAllPrefix(prefix.map { it.toProto() })
-        .addAllSuffix(suffix.map { it.toProto() })
-        .setPeriod(period.toProto())
         .build()
-    return protoValue
+    )
+    if (hasText()) {
+      protoValue.setText(textElement.toProto())
+    }
+    if (hasFamily()) {
+      protoValue.setFamily(familyElement.toProto())
+    }
+    if (hasGiven()) {
+      protoValue.addAllGiven(given.map { it.toProto() })
+    }
+    if (hasPrefix()) {
+      protoValue.addAllPrefix(prefix.map { it.toProto() })
+    }
+    if (hasSuffix()) {
+      protoValue.addAllSuffix(suffix.map { it.toProto() })
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    return protoValue.build()
   }
 }

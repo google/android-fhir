@@ -154,94 +154,168 @@ public object SupplyRequestConverter {
   public fun SupplyRequest.toHapi(): org.hl7.fhir.r4.model.SupplyRequest {
     val hapiValue = org.hl7.fhir.r4.model.SupplyRequest()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setCategory(category.toHapi())
+    if (hasCategory()) {
+      hapiValue.setCategory(category.toHapi())
+    }
     hapiValue.setPriority(
       org.hl7.fhir.r4.model.SupplyRequest.RequestPriority.valueOf(
         priority.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setItem(item.supplyRequestItemToHapi())
-    hapiValue.setQuantity(quantity.toHapi())
-    hapiValue.setParameter(parameterList.map { it.toHapi() })
-    hapiValue.setOccurrence(occurrence.supplyRequestOccurrenceToHapi())
-    hapiValue.setAuthoredOnElement(authoredOn.toHapi())
-    hapiValue.setRequester(requester.toHapi())
-    hapiValue.setSupplier(supplierList.map { it.toHapi() })
-    hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
-    hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
-    hapiValue.setDeliverFrom(deliverFrom.toHapi())
-    hapiValue.setDeliverTo(deliverTo.toHapi())
+    if (hasItem()) {
+      hapiValue.setItem(item.supplyRequestItemToHapi())
+    }
+    if (hasQuantity()) {
+      hapiValue.setQuantity(quantity.toHapi())
+    }
+    if (parameterCount > 0) {
+      hapiValue.setParameter(parameterList.map { it.toHapi() })
+    }
+    if (hasOccurrence()) {
+      hapiValue.setOccurrence(occurrence.supplyRequestOccurrenceToHapi())
+    }
+    if (hasAuthoredOn()) {
+      hapiValue.setAuthoredOnElement(authoredOn.toHapi())
+    }
+    if (hasRequester()) {
+      hapiValue.setRequester(requester.toHapi())
+    }
+    if (supplierCount > 0) {
+      hapiValue.setSupplier(supplierList.map { it.toHapi() })
+    }
+    if (reasonCodeCount > 0) {
+      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+    }
+    if (reasonReferenceCount > 0) {
+      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+    }
+    if (hasDeliverFrom()) {
+      hapiValue.setDeliverFrom(deliverFrom.toHapi())
+    }
+    if (hasDeliverTo()) {
+      hapiValue.setDeliverTo(deliverTo.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.SupplyRequest.toProto(): SupplyRequest {
-    val protoValue =
-      SupplyRequest.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setStatus(
-          SupplyRequest.StatusCode.newBuilder()
-            .setValue(
-              SupplyRequestStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = SupplyRequest.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      SupplyRequest.StatusCode.newBuilder()
+        .setValue(
+          SupplyRequestStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setCategory(category.toProto())
-        .setPriority(
-          SupplyRequest.PriorityCode.newBuilder()
-            .setValue(
-              RequestPriorityCode.Value.valueOf(
-                priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setItem(item.supplyRequestItemToProto())
-        .setQuantity(quantity.toProto())
-        .addAllParameter(parameter.map { it.toProto() })
-        .setOccurrence(occurrence.supplyRequestOccurrenceToProto())
-        .setAuthoredOn(authoredOnElement.toProto())
-        .setRequester(requester.toProto())
-        .addAllSupplier(supplier.map { it.toProto() })
-        .addAllReasonCode(reasonCode.map { it.toProto() })
-        .addAllReasonReference(reasonReference.map { it.toProto() })
-        .setDeliverFrom(deliverFrom.toProto())
-        .setDeliverTo(deliverTo.toProto())
         .build()
-    return protoValue
+    )
+    if (hasCategory()) {
+      protoValue.setCategory(category.toProto())
+    }
+    protoValue.setPriority(
+      SupplyRequest.PriorityCode.newBuilder()
+        .setValue(
+          RequestPriorityCode.Value.valueOf(
+            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasItem()) {
+      protoValue.setItem(item.supplyRequestItemToProto())
+    }
+    if (hasQuantity()) {
+      protoValue.setQuantity(quantity.toProto())
+    }
+    if (hasParameter()) {
+      protoValue.addAllParameter(parameter.map { it.toProto() })
+    }
+    if (hasOccurrence()) {
+      protoValue.setOccurrence(occurrence.supplyRequestOccurrenceToProto())
+    }
+    if (hasAuthoredOn()) {
+      protoValue.setAuthoredOn(authoredOnElement.toProto())
+    }
+    if (hasRequester()) {
+      protoValue.setRequester(requester.toProto())
+    }
+    if (hasSupplier()) {
+      protoValue.addAllSupplier(supplier.map { it.toProto() })
+    }
+    if (hasReasonCode()) {
+      protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
+    }
+    if (hasReasonReference()) {
+      protoValue.addAllReasonReference(reasonReference.map { it.toProto() })
+    }
+    if (hasDeliverFrom()) {
+      protoValue.setDeliverFrom(deliverFrom.toProto())
+    }
+    if (hasDeliverTo()) {
+      protoValue.setDeliverTo(deliverTo.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestParameterComponent.toProto():
     SupplyRequest.Parameter {
-    val protoValue =
-      SupplyRequest.Parameter.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(code.toProto())
-        .setValue(value.supplyRequestParameterValueToProto())
-        .build()
-    return protoValue
+    val protoValue = SupplyRequest.Parameter.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.supplyRequestParameterValueToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -249,10 +323,18 @@ public object SupplyRequestConverter {
     org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestParameterComponent {
     val hapiValue = org.hl7.fhir.r4.model.SupplyRequest.SupplyRequestParameterComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setValue(value.supplyRequestParameterValueToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.supplyRequestParameterValueToHapi())
+    }
     return hapiValue
   }
 }

@@ -142,99 +142,206 @@ public object ConditionConverter {
   public fun Condition.toHapi(): org.hl7.fhir.r4.model.Condition {
     val hapiValue = org.hl7.fhir.r4.model.Condition()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setClinicalStatus(clinicalStatus.toHapi())
-    hapiValue.setVerificationStatus(verificationStatus.toHapi())
-    hapiValue.setCategory(categoryList.map { it.toHapi() })
-    hapiValue.setSeverity(severity.toHapi())
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setBodySite(bodySiteList.map { it.toHapi() })
-    hapiValue.setSubject(subject.toHapi())
-    hapiValue.setEncounter(encounter.toHapi())
-    hapiValue.setOnset(onset.conditionOnsetToHapi())
-    hapiValue.setAbatement(abatement.conditionAbatementToHapi())
-    hapiValue.setRecordedDateElement(recordedDate.toHapi())
-    hapiValue.setRecorder(recorder.toHapi())
-    hapiValue.setAsserter(asserter.toHapi())
-    hapiValue.setStage(stageList.map { it.toHapi() })
-    hapiValue.setEvidence(evidenceList.map { it.toHapi() })
-    hapiValue.setNote(noteList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasClinicalStatus()) {
+      hapiValue.setClinicalStatus(clinicalStatus.toHapi())
+    }
+    if (hasVerificationStatus()) {
+      hapiValue.setVerificationStatus(verificationStatus.toHapi())
+    }
+    if (categoryCount > 0) {
+      hapiValue.setCategory(categoryList.map { it.toHapi() })
+    }
+    if (hasSeverity()) {
+      hapiValue.setSeverity(severity.toHapi())
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (bodySiteCount > 0) {
+      hapiValue.setBodySite(bodySiteList.map { it.toHapi() })
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.toHapi())
+    }
+    if (hasEncounter()) {
+      hapiValue.setEncounter(encounter.toHapi())
+    }
+    if (hasOnset()) {
+      hapiValue.setOnset(onset.conditionOnsetToHapi())
+    }
+    if (hasAbatement()) {
+      hapiValue.setAbatement(abatement.conditionAbatementToHapi())
+    }
+    if (hasRecordedDate()) {
+      hapiValue.setRecordedDateElement(recordedDate.toHapi())
+    }
+    if (hasRecorder()) {
+      hapiValue.setRecorder(recorder.toHapi())
+    }
+    if (hasAsserter()) {
+      hapiValue.setAsserter(asserter.toHapi())
+    }
+    if (stageCount > 0) {
+      hapiValue.setStage(stageList.map { it.toHapi() })
+    }
+    if (evidenceCount > 0) {
+      hapiValue.setEvidence(evidenceList.map { it.toHapi() })
+    }
+    if (noteCount > 0) {
+      hapiValue.setNote(noteList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Condition.toProto(): Condition {
-    val protoValue =
-      Condition.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setClinicalStatus(clinicalStatus.toProto())
-        .setVerificationStatus(verificationStatus.toProto())
-        .addAllCategory(category.map { it.toProto() })
-        .setSeverity(severity.toProto())
-        .setCode(code.toProto())
-        .addAllBodySite(bodySite.map { it.toProto() })
-        .setSubject(subject.toProto())
-        .setEncounter(encounter.toProto())
-        .setOnset(onset.conditionOnsetToProto())
-        .setAbatement(abatement.conditionAbatementToProto())
-        .setRecordedDate(recordedDateElement.toProto())
-        .setRecorder(recorder.toProto())
-        .setAsserter(asserter.toProto())
-        .addAllStage(stage.map { it.toProto() })
-        .addAllEvidence(evidence.map { it.toProto() })
-        .addAllNote(note.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = Condition.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasClinicalStatus()) {
+      protoValue.setClinicalStatus(clinicalStatus.toProto())
+    }
+    if (hasVerificationStatus()) {
+      protoValue.setVerificationStatus(verificationStatus.toProto())
+    }
+    if (hasCategory()) {
+      protoValue.addAllCategory(category.map { it.toProto() })
+    }
+    if (hasSeverity()) {
+      protoValue.setSeverity(severity.toProto())
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasBodySite()) {
+      protoValue.addAllBodySite(bodySite.map { it.toProto() })
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.toProto())
+    }
+    if (hasEncounter()) {
+      protoValue.setEncounter(encounter.toProto())
+    }
+    if (hasOnset()) {
+      protoValue.setOnset(onset.conditionOnsetToProto())
+    }
+    if (hasAbatement()) {
+      protoValue.setAbatement(abatement.conditionAbatementToProto())
+    }
+    if (hasRecordedDate()) {
+      protoValue.setRecordedDate(recordedDateElement.toProto())
+    }
+    if (hasRecorder()) {
+      protoValue.setRecorder(recorder.toProto())
+    }
+    if (hasAsserter()) {
+      protoValue.setAsserter(asserter.toProto())
+    }
+    if (hasStage()) {
+      protoValue.addAllStage(stage.map { it.toProto() })
+    }
+    if (hasEvidence()) {
+      protoValue.addAllEvidence(evidence.map { it.toProto() })
+    }
+    if (hasNote()) {
+      protoValue.addAllNote(note.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Condition.ConditionStageComponent.toProto(): Condition.Stage {
-    val protoValue =
-      Condition.Stage.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSummary(summary.toProto())
-        .addAllAssessment(assessment.map { it.toProto() })
-        .setType(type.toProto())
-        .build()
-    return protoValue
+    val protoValue = Condition.Stage.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSummary()) {
+      protoValue.setSummary(summary.toProto())
+    }
+    if (hasAssessment()) {
+      protoValue.addAllAssessment(assessment.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent.toProto():
     Condition.Evidence {
-    val protoValue =
-      Condition.Evidence.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllCode(code.map { it.toProto() })
-        .addAllDetail(detail.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = Condition.Evidence.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.addAllCode(code.map { it.toProto() })
+    }
+    if (hasDetail()) {
+      protoValue.addAllDetail(detail.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun Condition.Stage.toHapi(): org.hl7.fhir.r4.model.Condition.ConditionStageComponent {
     val hapiValue = org.hl7.fhir.r4.model.Condition.ConditionStageComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSummary(summary.toHapi())
-    hapiValue.setAssessment(assessmentList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSummary()) {
+      hapiValue.setSummary(summary.toHapi())
+    }
+    if (assessmentCount > 0) {
+      hapiValue.setAssessment(assessmentList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
     return hapiValue
   }
 
@@ -243,10 +350,18 @@ public object ConditionConverter {
     org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent {
     val hapiValue = org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCode(codeList.map { it.toHapi() })
-    hapiValue.setDetail(detailList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (codeCount > 0) {
+      hapiValue.setCode(codeList.map { it.toHapi() })
+    }
+    if (detailCount > 0) {
+      hapiValue.setDetail(detailList.map { it.toHapi() })
+    }
     return hapiValue
   }
 }

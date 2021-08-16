@@ -41,52 +41,121 @@ public object SubstanceSourceMaterialConverter {
   public fun SubstanceSourceMaterial.toHapi(): org.hl7.fhir.r4.model.SubstanceSourceMaterial {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceSourceMaterial()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSourceMaterialClass(sourceMaterialClass.toHapi())
-    hapiValue.setSourceMaterialType(sourceMaterialType.toHapi())
-    hapiValue.setSourceMaterialState(sourceMaterialState.toHapi())
-    hapiValue.setOrganismId(organismId.toHapi())
-    hapiValue.setOrganismNameElement(organismName.toHapi())
-    hapiValue.setParentSubstanceId(parentSubstanceIdList.map { it.toHapi() })
-    hapiValue.setParentSubstanceName(parentSubstanceNameList.map { it.toHapi() })
-    hapiValue.setCountryOfOrigin(countryOfOriginList.map { it.toHapi() })
-    hapiValue.setGeographicalLocation(geographicalLocationList.map { it.toHapi() })
-    hapiValue.setDevelopmentStage(developmentStage.toHapi())
-    hapiValue.setFractionDescription(fractionDescriptionList.map { it.toHapi() })
-    hapiValue.setOrganism(organism.toHapi())
-    hapiValue.setPartDescription(partDescriptionList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSourceMaterialClass()) {
+      hapiValue.setSourceMaterialClass(sourceMaterialClass.toHapi())
+    }
+    if (hasSourceMaterialType()) {
+      hapiValue.setSourceMaterialType(sourceMaterialType.toHapi())
+    }
+    if (hasSourceMaterialState()) {
+      hapiValue.setSourceMaterialState(sourceMaterialState.toHapi())
+    }
+    if (hasOrganismId()) {
+      hapiValue.setOrganismId(organismId.toHapi())
+    }
+    if (hasOrganismName()) {
+      hapiValue.setOrganismNameElement(organismName.toHapi())
+    }
+    if (parentSubstanceIdCount > 0) {
+      hapiValue.setParentSubstanceId(parentSubstanceIdList.map { it.toHapi() })
+    }
+    if (parentSubstanceNameCount > 0) {
+      hapiValue.setParentSubstanceName(parentSubstanceNameList.map { it.toHapi() })
+    }
+    if (countryOfOriginCount > 0) {
+      hapiValue.setCountryOfOrigin(countryOfOriginList.map { it.toHapi() })
+    }
+    if (geographicalLocationCount > 0) {
+      hapiValue.setGeographicalLocation(geographicalLocationList.map { it.toHapi() })
+    }
+    if (hasDevelopmentStage()) {
+      hapiValue.setDevelopmentStage(developmentStage.toHapi())
+    }
+    if (fractionDescriptionCount > 0) {
+      hapiValue.setFractionDescription(fractionDescriptionList.map { it.toHapi() })
+    }
+    if (hasOrganism()) {
+      hapiValue.setOrganism(organism.toHapi())
+    }
+    if (partDescriptionCount > 0) {
+      hapiValue.setPartDescription(partDescriptionList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.toProto(): SubstanceSourceMaterial {
-    val protoValue =
-      SubstanceSourceMaterial.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSourceMaterialClass(sourceMaterialClass.toProto())
-        .setSourceMaterialType(sourceMaterialType.toProto())
-        .setSourceMaterialState(sourceMaterialState.toProto())
-        .setOrganismId(organismId.toProto())
-        .setOrganismName(organismNameElement.toProto())
-        .addAllParentSubstanceId(parentSubstanceId.map { it.toProto() })
-        .addAllParentSubstanceName(parentSubstanceName.map { it.toProto() })
-        .addAllCountryOfOrigin(countryOfOrigin.map { it.toProto() })
-        .addAllGeographicalLocation(geographicalLocation.map { it.toProto() })
-        .setDevelopmentStage(developmentStage.toProto())
-        .addAllFractionDescription(fractionDescription.map { it.toProto() })
-        .setOrganism(organism.toProto())
-        .addAllPartDescription(partDescription.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = SubstanceSourceMaterial.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSourceMaterialClass()) {
+      protoValue.setSourceMaterialClass(sourceMaterialClass.toProto())
+    }
+    if (hasSourceMaterialType()) {
+      protoValue.setSourceMaterialType(sourceMaterialType.toProto())
+    }
+    if (hasSourceMaterialState()) {
+      protoValue.setSourceMaterialState(sourceMaterialState.toProto())
+    }
+    if (hasOrganismId()) {
+      protoValue.setOrganismId(organismId.toProto())
+    }
+    if (hasOrganismName()) {
+      protoValue.setOrganismName(organismNameElement.toProto())
+    }
+    if (hasParentSubstanceId()) {
+      protoValue.addAllParentSubstanceId(parentSubstanceId.map { it.toProto() })
+    }
+    if (hasParentSubstanceName()) {
+      protoValue.addAllParentSubstanceName(parentSubstanceName.map { it.toProto() })
+    }
+    if (hasCountryOfOrigin()) {
+      protoValue.addAllCountryOfOrigin(countryOfOrigin.map { it.toProto() })
+    }
+    if (hasGeographicalLocation()) {
+      protoValue.addAllGeographicalLocation(geographicalLocation.map { it.toProto() })
+    }
+    if (hasDevelopmentStage()) {
+      protoValue.setDevelopmentStage(developmentStage.toProto())
+    }
+    if (hasFractionDescription()) {
+      protoValue.addAllFractionDescription(fractionDescription.map { it.toProto() })
+    }
+    if (hasOrganism()) {
+      protoValue.setOrganism(organism.toProto())
+    }
+    if (hasPartDescription()) {
+      protoValue.addAllPartDescription(partDescription.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -95,63 +164,106 @@ public object SubstanceSourceMaterialConverter {
     val protoValue =
       SubstanceSourceMaterial.FractionDescription.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setFraction(fractionElement.toProto())
-        .setMaterialType(materialType.toProto())
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasFraction()) {
+      protoValue.setFraction(fractionElement.toProto())
+    }
+    if (hasMaterialType()) {
+      protoValue.setMaterialType(materialType.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismComponent.toProto():
     SubstanceSourceMaterial.Organism {
     val protoValue =
-      SubstanceSourceMaterial.Organism.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setFamily(family.toProto())
-        .setGenus(genus.toProto())
-        .setSpecies(species.toProto())
-        .setIntraspecificType(intraspecificType.toProto())
-        .setIntraspecificDescription(intraspecificDescriptionElement.toProto())
-        .addAllAuthor(author.map { it.toProto() })
-        .setHybrid(hybrid.toProto())
-        .setOrganismGeneral(organismGeneral.toProto())
-        .build()
-    return protoValue
+      SubstanceSourceMaterial.Organism.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasFamily()) {
+      protoValue.setFamily(family.toProto())
+    }
+    if (hasGenus()) {
+      protoValue.setGenus(genus.toProto())
+    }
+    if (hasSpecies()) {
+      protoValue.setSpecies(species.toProto())
+    }
+    if (hasIntraspecificType()) {
+      protoValue.setIntraspecificType(intraspecificType.toProto())
+    }
+    if (hasIntraspecificDescription()) {
+      protoValue.setIntraspecificDescription(intraspecificDescriptionElement.toProto())
+    }
+    if (hasAuthor()) {
+      protoValue.addAllAuthor(author.map { it.toProto() })
+    }
+    if (hasHybrid()) {
+      protoValue.setHybrid(hybrid.toProto())
+    }
+    if (hasOrganismGeneral()) {
+      protoValue.setOrganismGeneral(organismGeneral.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismAuthorComponent.toProto():
     SubstanceSourceMaterial.Organism.Author {
     val protoValue =
-      SubstanceSourceMaterial.Organism.Author.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setAuthorType(authorType.toProto())
-        .setAuthorDescription(authorDescriptionElement.toProto())
-        .build()
-    return protoValue
+      SubstanceSourceMaterial.Organism.Author.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasAuthorType()) {
+      protoValue.setAuthorType(authorType.toProto())
+    }
+    if (hasAuthorDescription()) {
+      protoValue.setAuthorDescription(authorDescriptionElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismHybridComponent.toProto():
     SubstanceSourceMaterial.Organism.Hybrid {
     val protoValue =
-      SubstanceSourceMaterial.Organism.Hybrid.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setMaternalOrganismId(maternalOrganismIdElement.toProto())
-        .setMaternalOrganismName(maternalOrganismNameElement.toProto())
-        .setPaternalOrganismId(paternalOrganismIdElement.toProto())
-        .setPaternalOrganismName(paternalOrganismNameElement.toProto())
-        .setHybridType(hybridType.toProto())
-        .build()
-    return protoValue
+      SubstanceSourceMaterial.Organism.Hybrid.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasMaternalOrganismId()) {
+      protoValue.setMaternalOrganismId(maternalOrganismIdElement.toProto())
+    }
+    if (hasMaternalOrganismName()) {
+      protoValue.setMaternalOrganismName(maternalOrganismNameElement.toProto())
+    }
+    if (hasPaternalOrganismId()) {
+      protoValue.setPaternalOrganismId(paternalOrganismIdElement.toProto())
+    }
+    if (hasPaternalOrganismName()) {
+      protoValue.setPaternalOrganismName(paternalOrganismNameElement.toProto())
+    }
+    if (hasHybridType()) {
+      protoValue.setHybridType(hybridType.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -160,28 +272,45 @@ public object SubstanceSourceMaterialConverter {
     val protoValue =
       SubstanceSourceMaterial.Organism.OrganismGeneral.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setKingdom(kingdom.toProto())
-        .setPhylum(phylum.toProto())
-        .setClassValue(class_.toProto())
-        .setOrder(order.toProto())
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasKingdom()) {
+      protoValue.setKingdom(kingdom.toProto())
+    }
+    if (hasPhylum()) {
+      protoValue.setPhylum(phylum.toProto())
+    }
+    if (hasClass_()) {
+      protoValue.setClassValue(class_.toProto())
+    }
+    if (hasOrder()) {
+      protoValue.setOrder(order.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialPartDescriptionComponent.toProto():
     SubstanceSourceMaterial.PartDescription {
     val protoValue =
-      SubstanceSourceMaterial.PartDescription.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setPart(part.toProto())
-        .setPartLocation(partLocation.toProto())
-        .build()
-    return protoValue
+      SubstanceSourceMaterial.PartDescription.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasPart()) {
+      protoValue.setPart(part.toProto())
+    }
+    if (hasPartLocation()) {
+      protoValue.setPartLocation(partLocation.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -191,10 +320,18 @@ public object SubstanceSourceMaterialConverter {
       org.hl7.fhir.r4.model.SubstanceSourceMaterial
         .SubstanceSourceMaterialFractionDescriptionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setFractionElement(fraction.toHapi())
-    hapiValue.setMaterialType(materialType.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasFraction()) {
+      hapiValue.setFractionElement(fraction.toHapi())
+    }
+    if (hasMaterialType()) {
+      hapiValue.setMaterialType(materialType.toHapi())
+    }
     return hapiValue
   }
 
@@ -204,16 +341,36 @@ public object SubstanceSourceMaterialConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setFamily(family.toHapi())
-    hapiValue.setGenus(genus.toHapi())
-    hapiValue.setSpecies(species.toHapi())
-    hapiValue.setIntraspecificType(intraspecificType.toHapi())
-    hapiValue.setIntraspecificDescriptionElement(intraspecificDescription.toHapi())
-    hapiValue.setAuthor(authorList.map { it.toHapi() })
-    hapiValue.setHybrid(hybrid.toHapi())
-    hapiValue.setOrganismGeneral(organismGeneral.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasFamily()) {
+      hapiValue.setFamily(family.toHapi())
+    }
+    if (hasGenus()) {
+      hapiValue.setGenus(genus.toHapi())
+    }
+    if (hasSpecies()) {
+      hapiValue.setSpecies(species.toHapi())
+    }
+    if (hasIntraspecificType()) {
+      hapiValue.setIntraspecificType(intraspecificType.toHapi())
+    }
+    if (hasIntraspecificDescription()) {
+      hapiValue.setIntraspecificDescriptionElement(intraspecificDescription.toHapi())
+    }
+    if (authorCount > 0) {
+      hapiValue.setAuthor(authorList.map { it.toHapi() })
+    }
+    if (hasHybrid()) {
+      hapiValue.setHybrid(hybrid.toHapi())
+    }
+    if (hasOrganismGeneral()) {
+      hapiValue.setOrganismGeneral(organismGeneral.toHapi())
+    }
     return hapiValue
   }
 
@@ -223,10 +380,18 @@ public object SubstanceSourceMaterialConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismAuthorComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setAuthorType(authorType.toHapi())
-    hapiValue.setAuthorDescriptionElement(authorDescription.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasAuthorType()) {
+      hapiValue.setAuthorType(authorType.toHapi())
+    }
+    if (hasAuthorDescription()) {
+      hapiValue.setAuthorDescriptionElement(authorDescription.toHapi())
+    }
     return hapiValue
   }
 
@@ -236,13 +401,27 @@ public object SubstanceSourceMaterialConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSourceMaterial.SubstanceSourceMaterialOrganismHybridComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setMaternalOrganismIdElement(maternalOrganismId.toHapi())
-    hapiValue.setMaternalOrganismNameElement(maternalOrganismName.toHapi())
-    hapiValue.setPaternalOrganismIdElement(paternalOrganismId.toHapi())
-    hapiValue.setPaternalOrganismNameElement(paternalOrganismName.toHapi())
-    hapiValue.setHybridType(hybridType.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasMaternalOrganismId()) {
+      hapiValue.setMaternalOrganismIdElement(maternalOrganismId.toHapi())
+    }
+    if (hasMaternalOrganismName()) {
+      hapiValue.setMaternalOrganismNameElement(maternalOrganismName.toHapi())
+    }
+    if (hasPaternalOrganismId()) {
+      hapiValue.setPaternalOrganismIdElement(paternalOrganismId.toHapi())
+    }
+    if (hasPaternalOrganismName()) {
+      hapiValue.setPaternalOrganismNameElement(paternalOrganismName.toHapi())
+    }
+    if (hasHybridType()) {
+      hapiValue.setHybridType(hybridType.toHapi())
+    }
     return hapiValue
   }
 
@@ -253,12 +432,24 @@ public object SubstanceSourceMaterialConverter {
       org.hl7.fhir.r4.model.SubstanceSourceMaterial
         .SubstanceSourceMaterialOrganismOrganismGeneralComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setKingdom(kingdom.toHapi())
-    hapiValue.setPhylum(phylum.toHapi())
-    hapiValue.setClass_(classValue.toHapi())
-    hapiValue.setOrder(order.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasKingdom()) {
+      hapiValue.setKingdom(kingdom.toHapi())
+    }
+    if (hasPhylum()) {
+      hapiValue.setPhylum(phylum.toHapi())
+    }
+    if (hasClassValue()) {
+      hapiValue.setClass_(classValue.toHapi())
+    }
+    if (hasOrder()) {
+      hapiValue.setOrder(order.toHapi())
+    }
     return hapiValue
   }
 
@@ -269,10 +460,18 @@ public object SubstanceSourceMaterialConverter {
       org.hl7.fhir.r4.model.SubstanceSourceMaterial
         .SubstanceSourceMaterialPartDescriptionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setPart(part.toHapi())
-    hapiValue.setPartLocation(partLocation.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasPart()) {
+      hapiValue.setPart(part.toHapi())
+    }
+    if (hasPartLocation()) {
+      hapiValue.setPartLocation(partLocation.toHapi())
+    }
     return hapiValue
   }
 }

@@ -65,188 +65,319 @@ public object StructureDefinitionConverter {
   public fun StructureDefinition.toHapi(): org.hl7.fhir.r4.model.StructureDefinition {
     val hapiValue = org.hl7.fhir.r4.model.StructureDefinition()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setVersionElement(version.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setTitleElement(title.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasTitle()) {
+      hapiValue.setTitleElement(title.toHapi())
+    }
     hapiValue.setStatus(
       Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setExperimentalElement(experimental.toHapi())
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setPublisherElement(publisher.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setUseContext(useContextList.map { it.toHapi() })
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
-    hapiValue.setPurposeElement(purpose.toHapi())
-    hapiValue.setCopyrightElement(copyright.toHapi())
-    hapiValue.setKeyword(keywordList.map { it.toHapi() })
+    if (hasExperimental()) {
+      hapiValue.setExperimentalElement(experimental.toHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasPublisher()) {
+      hapiValue.setPublisherElement(publisher.toHapi())
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (useContextCount > 0) {
+      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+    }
+    if (jurisdictionCount > 0) {
+      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    }
+    if (hasPurpose()) {
+      hapiValue.setPurposeElement(purpose.toHapi())
+    }
+    if (hasCopyright()) {
+      hapiValue.setCopyrightElement(copyright.toHapi())
+    }
+    if (keywordCount > 0) {
+      hapiValue.setKeyword(keywordList.map { it.toHapi() })
+    }
     hapiValue.setFhirVersion(
       Enumerations.FHIRVersion.valueOf(fhirVersion.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setMapping(mappingList.map { it.toHapi() })
+    if (mappingCount > 0) {
+      hapiValue.setMapping(mappingList.map { it.toHapi() })
+    }
     hapiValue.setKind(
       org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionKind.valueOf(
         kind.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setAbstractElement(abstract.toHapi())
-    hapiValue.setContext(contextList.map { it.toHapi() })
-    hapiValue.setContextInvariant(contextInvariantList.map { it.toHapi() })
-    hapiValue.setTypeElement(type.toHapi())
-    hapiValue.setBaseDefinitionElement(baseDefinition.toHapi())
+    if (hasAbstract()) {
+      hapiValue.setAbstractElement(abstract.toHapi())
+    }
+    if (contextCount > 0) {
+      hapiValue.setContext(contextList.map { it.toHapi() })
+    }
+    if (contextInvariantCount > 0) {
+      hapiValue.setContextInvariant(contextInvariantList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setTypeElement(type.toHapi())
+    }
+    if (hasBaseDefinition()) {
+      hapiValue.setBaseDefinitionElement(baseDefinition.toHapi())
+    }
     hapiValue.setDerivation(
       org.hl7.fhir.r4.model.StructureDefinition.TypeDerivationRule.valueOf(
         derivation.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setSnapshot(snapshot.toHapi())
-    hapiValue.setDifferential(differential.toHapi())
+    if (hasSnapshot()) {
+      hapiValue.setSnapshot(snapshot.toHapi())
+    }
+    if (hasDifferential()) {
+      hapiValue.setDifferential(differential.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.StructureDefinition.toProto(): StructureDefinition {
-    val protoValue =
-      StructureDefinition.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUrl(urlElement.toProto())
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setVersion(versionElement.toProto())
-        .setName(nameElement.toProto())
-        .setTitle(titleElement.toProto())
-        .setStatus(
-          StructureDefinition.StatusCode.newBuilder()
-            .setValue(
-              PublicationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = StructureDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasTitle()) {
+      protoValue.setTitle(titleElement.toProto())
+    }
+    protoValue.setStatus(
+      StructureDefinition.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setExperimental(experimentalElement.toProto())
-        .setDate(dateElement.toProto())
-        .setPublisher(publisherElement.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .addAllUseContext(useContext.map { it.toProto() })
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .setPurpose(purposeElement.toProto())
-        .setCopyright(copyrightElement.toProto())
-        .addAllKeyword(keyword.map { it.toProto() })
-        .setFhirVersion(
-          StructureDefinition.FhirVersionCode.newBuilder()
-            .setValue(
-              FHIRVersionCode.Value.valueOf(
-                fhirVersion.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .addAllMapping(mapping.map { it.toProto() })
-        .setKind(
-          StructureDefinition.KindCode.newBuilder()
-            .setValue(
-              StructureDefinitionKindCode.Value.valueOf(
-                kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setAbstract(abstractElement.toProto())
-        .addAllContext(context.map { it.toProto() })
-        .addAllContextInvariant(contextInvariant.map { it.toProto() })
-        .setType(typeElement.toProto())
-        .setBaseDefinition(baseDefinitionElement.toProto())
-        .setDerivation(
-          StructureDefinition.DerivationCode.newBuilder()
-            .setValue(
-              TypeDerivationRuleCode.Value.valueOf(
-                derivation.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setSnapshot(snapshot.toProto())
-        .setDifferential(differential.toProto())
         .build()
-    return protoValue
+    )
+    if (hasExperimental()) {
+      protoValue.setExperimental(experimentalElement.toProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasPublisher()) {
+      protoValue.setPublisher(publisherElement.toProto())
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasUseContext()) {
+      protoValue.addAllUseContext(useContext.map { it.toProto() })
+    }
+    if (hasJurisdiction()) {
+      protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
+    }
+    if (hasPurpose()) {
+      protoValue.setPurpose(purposeElement.toProto())
+    }
+    if (hasCopyright()) {
+      protoValue.setCopyright(copyrightElement.toProto())
+    }
+    if (hasKeyword()) {
+      protoValue.addAllKeyword(keyword.map { it.toProto() })
+    }
+    protoValue.setFhirVersion(
+      StructureDefinition.FhirVersionCode.newBuilder()
+        .setValue(
+          FHIRVersionCode.Value.valueOf(
+            fhirVersion.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasMapping()) {
+      protoValue.addAllMapping(mapping.map { it.toProto() })
+    }
+    protoValue.setKind(
+      StructureDefinition.KindCode.newBuilder()
+        .setValue(
+          StructureDefinitionKindCode.Value.valueOf(
+            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasAbstract()) {
+      protoValue.setAbstract(abstractElement.toProto())
+    }
+    if (hasContext()) {
+      protoValue.addAllContext(context.map { it.toProto() })
+    }
+    if (hasContextInvariant()) {
+      protoValue.addAllContextInvariant(contextInvariant.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(typeElement.toProto())
+    }
+    if (hasBaseDefinition()) {
+      protoValue.setBaseDefinition(baseDefinitionElement.toProto())
+    }
+    protoValue.setDerivation(
+      StructureDefinition.DerivationCode.newBuilder()
+        .setValue(
+          TypeDerivationRuleCode.Value.valueOf(
+            derivation.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasSnapshot()) {
+      protoValue.setSnapshot(snapshot.toProto())
+    }
+    if (hasDifferential()) {
+      protoValue.setDifferential(differential.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionMappingComponent.toProto():
     StructureDefinition.Mapping {
     val protoValue =
-      StructureDefinition.Mapping.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setIdentity(identityElement.toProto())
-        .setUri(uriElement.toProto())
-        .setName(nameElement.toProto())
-        .setComment(commentElement.toProto())
-        .build()
-    return protoValue
+      StructureDefinition.Mapping.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentity()) {
+      protoValue.setIdentity(identityElement.toProto())
+    }
+    if (hasUri()) {
+      protoValue.setUri(uriElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasComment()) {
+      protoValue.setComment(commentElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionContextComponent.toProto():
     StructureDefinition.Context {
     val protoValue =
-      StructureDefinition.Context.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(
-          StructureDefinition.Context.TypeCode.newBuilder()
-            .setValue(
-              ExtensionContextTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      StructureDefinition.Context.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setType(
+      StructureDefinition.Context.TypeCode.newBuilder()
+        .setValue(
+          ExtensionContextTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setExpression(expressionElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasExpression()) {
+      protoValue.setExpression(expressionElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionSnapshotComponent.toProto():
     StructureDefinition.Snapshot {
     val protoValue =
-      StructureDefinition.Snapshot.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllElement(element.map { it.toProto() })
-        .build()
-    return protoValue
+      StructureDefinition.Snapshot.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasElement()) {
+      protoValue.addAllElement(element.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionDifferentialComponent.toProto():
     StructureDefinition.Differential {
     val protoValue =
-      StructureDefinition.Differential.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllElement(element.map { it.toProto() })
-        .build()
-    return protoValue
+      StructureDefinition.Differential.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasElement()) {
+      protoValue.addAllElement(element.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -254,12 +385,24 @@ public object StructureDefinitionConverter {
     org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionMappingComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionMappingComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentityElement(identity.toHapi())
-    hapiValue.setUriElement(uri.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setCommentElement(comment.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasIdentity()) {
+      hapiValue.setIdentityElement(identity.toHapi())
+    }
+    if (hasUri()) {
+      hapiValue.setUriElement(uri.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasComment()) {
+      hapiValue.setCommentElement(comment.toHapi())
+    }
     return hapiValue
   }
 
@@ -268,14 +411,20 @@ public object StructureDefinitionConverter {
     org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionContextComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionContextComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setType(
       org.hl7.fhir.r4.model.StructureDefinition.ExtensionContextType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setExpressionElement(expression.toHapi())
+    if (hasExpression()) {
+      hapiValue.setExpressionElement(expression.toHapi())
+    }
     return hapiValue
   }
 
@@ -284,9 +433,15 @@ public object StructureDefinitionConverter {
     org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionSnapshotComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionSnapshotComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setElement(elementList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (elementCount > 0) {
+      hapiValue.setElement(elementList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -296,9 +451,15 @@ public object StructureDefinitionConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.StructureDefinition.StructureDefinitionDifferentialComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setElement(elementList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (elementCount > 0) {
+      hapiValue.setElement(elementList.map { it.toHapi() })
+    }
     return hapiValue
   }
 }

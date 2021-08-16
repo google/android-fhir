@@ -144,35 +144,41 @@ object CompositeCodegen {
       if (element.contentReference.value != "") {
         val isSingle = element.max.value == "1"
         if (isSingle) {
-
+          getToProtoBuilder(element).beginControlFlow("if (has%L())", element.getHapiMethodName())
           getToProtoBuilder(element)
             .addStatement(
-              "$singleMethodTemplate(%L.toProto())",
-              element.getProtoMethodName().capitalizeFirst(),
-              element.getHapiMethodName().lowerCaseFirst().checkForKotlinKeyWord()
+              "protoValue$singleMethodTemplate(%L.toProto())",
+              element.getProtoMethodName(),
+              element.getHapiFieldName()
             )
+          getToProtoBuilder(element).endControlFlow()
 
+          getToHapiBuilder(element).beginControlFlow("if (has%L())", element.getProtoMethodName())
           getToHapiBuilder(element)
             .addStatement(
               "hapiValue$singleMethodTemplate(%L.toHapi())",
-              element.getHapiMethodName().capitalizeFirst(),
-              element.getProtoMethodName().lowerCaseFirst().checkForKotlinKeyWord()
+              element.getHapiMethodName(),
+              element.getProtoFieldName()
             )
+          getToHapiBuilder(element).endControlFlow()
         } else {
-
+          getToProtoBuilder(element).beginControlFlow("if (has%L())", element.getHapiMethodName())
           getToProtoBuilder(element)
             .addStatement(
-              "$multipleMethodTemplate(%L.map{it.toProto()})",
-              element.getProtoMethodName().capitalizeFirst(),
-              element.getHapiMethodName().lowerCaseFirst().checkForKotlinKeyWord()
+              "protoValue$multipleMethodTemplate(%L.map{it.toProto()})",
+              element.getProtoMethodName(),
+              element.getHapiMethodName()
             )
-
+          getToProtoBuilder(element).endControlFlow()
+          getToHapiBuilder(element)
+            .beginControlFlow("if (%LCount > 0)", element.getProtoFieldName())
           getToHapiBuilder(element)
             .addStatement(
               "hapiValue$singleMethodTemplate(%L.map{it.toHapi()})",
               element.getHapiMethodName().capitalizeFirst(),
               element.getProtoMethodName().lowerCaseFirst() + "List"
             )
+          getToHapiBuilder(element).endControlFlow()
         }
         continue
       }
@@ -207,15 +213,14 @@ object CompositeCodegen {
         handleOtherType(element, getToHapiBuilder(element), getToProtoBuilder(element), fileBuilder)
       }
     }
-    toProtoBuilder.addStatement(".build()")
-    toProtoBuilder.addStatement("return protoValue")
+    toProtoBuilder.addStatement("return protoValue.build()")
     toHapiBuilder.addStatement("return hapiValue")
     functionsList.add(toHapiBuilder.build())
     functionsList.add(toProtoBuilder.build())
     // TODO there is definitely a better way to do this just can't figure it out at the time
     functionsList.addAll(
       backboneElementMap.values.map {
-        it.protoBuilder.addStatement(".build()").addStatement("return protoValue").build()
+        it.protoBuilder.addStatement("return protoValue.build()").build()
       }
     )
     functionsList.addAll(

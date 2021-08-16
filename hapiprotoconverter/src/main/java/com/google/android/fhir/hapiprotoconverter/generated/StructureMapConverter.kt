@@ -568,267 +568,432 @@ public object StructureMapConverter {
   public fun StructureMap.toHapi(): org.hl7.fhir.r4.model.StructureMap {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setVersionElement(version.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setTitleElement(title.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasTitle()) {
+      hapiValue.setTitleElement(title.toHapi())
+    }
     hapiValue.setStatus(
       Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setExperimentalElement(experimental.toHapi())
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setPublisherElement(publisher.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setUseContext(useContextList.map { it.toHapi() })
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
-    hapiValue.setPurposeElement(purpose.toHapi())
-    hapiValue.setCopyrightElement(copyright.toHapi())
-    hapiValue.setStructure(structureList.map { it.toHapi() })
-    hapiValue.setImport(importList.map { it.toHapi() })
-    hapiValue.setGroup(groupList.map { it.toHapi() })
+    if (hasExperimental()) {
+      hapiValue.setExperimentalElement(experimental.toHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasPublisher()) {
+      hapiValue.setPublisherElement(publisher.toHapi())
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (useContextCount > 0) {
+      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+    }
+    if (jurisdictionCount > 0) {
+      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    }
+    if (hasPurpose()) {
+      hapiValue.setPurposeElement(purpose.toHapi())
+    }
+    if (hasCopyright()) {
+      hapiValue.setCopyrightElement(copyright.toHapi())
+    }
+    if (structureCount > 0) {
+      hapiValue.setStructure(structureList.map { it.toHapi() })
+    }
+    if (importCount > 0) {
+      hapiValue.setImport(importList.map { it.toHapi() })
+    }
+    if (groupCount > 0) {
+      hapiValue.setGroup(groupList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.StructureMap.toProto(): StructureMap {
-    val protoValue =
-      StructureMap.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUrl(urlElement.toProto())
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setVersion(versionElement.toProto())
-        .setName(nameElement.toProto())
-        .setTitle(titleElement.toProto())
-        .setStatus(
-          StructureMap.StatusCode.newBuilder()
-            .setValue(
-              PublicationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = StructureMap.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasTitle()) {
+      protoValue.setTitle(titleElement.toProto())
+    }
+    protoValue.setStatus(
+      StructureMap.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setExperimental(experimentalElement.toProto())
-        .setDate(dateElement.toProto())
-        .setPublisher(publisherElement.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .addAllUseContext(useContext.map { it.toProto() })
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .setPurpose(purposeElement.toProto())
-        .setCopyright(copyrightElement.toProto())
-        .addAllStructure(structure.map { it.toProto() })
-        .addAllImport(import.map { it.toProto() })
-        .addAllGroup(group.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasExperimental()) {
+      protoValue.setExperimental(experimentalElement.toProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasPublisher()) {
+      protoValue.setPublisher(publisherElement.toProto())
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasUseContext()) {
+      protoValue.addAllUseContext(useContext.map { it.toProto() })
+    }
+    if (hasJurisdiction()) {
+      protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
+    }
+    if (hasPurpose()) {
+      protoValue.setPurpose(purposeElement.toProto())
+    }
+    if (hasCopyright()) {
+      protoValue.setCopyright(copyrightElement.toProto())
+    }
+    if (hasStructure()) {
+      protoValue.addAllStructure(structure.map { it.toProto() })
+    }
+    if (hasImport()) {
+      protoValue.addAllImport(import.map { it.toProto() })
+    }
+    if (hasGroup()) {
+      protoValue.addAllGroup(group.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureMap.StructureMapStructureComponent.toProto():
     StructureMap.Structure {
-    val protoValue =
-      StructureMap.Structure.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUrl(urlElement.toProto())
-        .setMode(
-          StructureMap.Structure.ModeCode.newBuilder()
-            .setValue(
-              StructureMapModelModeCode.Value.valueOf(
-                mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = StructureMap.Structure.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    protoValue.setMode(
+      StructureMap.Structure.ModeCode.newBuilder()
+        .setValue(
+          StructureMapModelModeCode.Value.valueOf(
+            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setAlias(aliasElement.toProto())
-        .setDocumentation(documentationElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasAlias()) {
+      protoValue.setAlias(aliasElement.toProto())
+    }
+    if (hasDocumentation()) {
+      protoValue.setDocumentation(documentationElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureMap.StructureMapGroupComponent.toProto():
     StructureMap.Group {
-    val protoValue =
-      StructureMap.Group.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .setExtends(extendsElement.toProto())
-        .setTypeMode(
-          StructureMap.Group.TypeModeCode.newBuilder()
-            .setValue(
-              StructureMapGroupTypeModeCode.Value.valueOf(
-                typeMode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = StructureMap.Group.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasExtends()) {
+      protoValue.setExtends(extendsElement.toProto())
+    }
+    protoValue.setTypeMode(
+      StructureMap.Group.TypeModeCode.newBuilder()
+        .setValue(
+          StructureMapGroupTypeModeCode.Value.valueOf(
+            typeMode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setDocumentation(documentationElement.toProto())
-        .addAllInput(input.map { it.toProto() })
-        .addAllRule(rule.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasDocumentation()) {
+      protoValue.setDocumentation(documentationElement.toProto())
+    }
+    if (hasInput()) {
+      protoValue.addAllInput(input.map { it.toProto() })
+    }
+    if (hasRule()) {
+      protoValue.addAllRule(rule.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureMap.StructureMapGroupInputComponent.toProto():
     StructureMap.Group.Input {
-    val protoValue =
-      StructureMap.Group.Input.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .setType(typeElement.toProto())
-        .setMode(
-          StructureMap.Group.Input.ModeCode.newBuilder()
-            .setValue(
-              StructureMapInputModeCode.Value.valueOf(
-                mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = StructureMap.Group.Input.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasType()) {
+      protoValue.setType(typeElement.toProto())
+    }
+    protoValue.setMode(
+      StructureMap.Group.Input.ModeCode.newBuilder()
+        .setValue(
+          StructureMapInputModeCode.Value.valueOf(
+            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setDocumentation(documentationElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasDocumentation()) {
+      protoValue.setDocumentation(documentationElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleComponent.toProto():
     StructureMap.Group.Rule {
-    val protoValue =
-      StructureMap.Group.Rule.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .addAllSource(source.map { it.toProto() })
-        .addAllTarget(target.map { it.toProto() })
-        .addAllDependent(dependent.map { it.toProto() })
-        .setDocumentation(documentationElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = StructureMap.Group.Rule.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasSource()) {
+      protoValue.addAllSource(source.map { it.toProto() })
+    }
+    if (hasTarget()) {
+      protoValue.addAllTarget(target.map { it.toProto() })
+    }
+    if (hasDependent()) {
+      protoValue.addAllDependent(dependent.map { it.toProto() })
+    }
+    if (hasDocumentation()) {
+      protoValue.setDocumentation(documentationElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleSourceComponent.toProto():
     StructureMap.Group.Rule.Source {
     val protoValue =
-      StructureMap.Group.Rule.Source.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setContext(contextElement.toProto())
-        .setMin(minElement.toProto())
-        .setMax(maxElement.toProto())
-        .setType(typeElement.toProto())
-        .setDefaultValue(defaultValue.structureMapGroupRuleSourceDefaultValueToProto())
-        .setElement(elementElement.toProto())
-        .setListMode(
-          StructureMap.Group.Rule.Source.ListModeCode.newBuilder()
-            .setValue(
-              StructureMapSourceListModeCode.Value.valueOf(
-                listMode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      StructureMap.Group.Rule.Source.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasContext()) {
+      protoValue.setContext(contextElement.toProto())
+    }
+    if (hasMin()) {
+      protoValue.setMin(minElement.toProto())
+    }
+    if (hasMax()) {
+      protoValue.setMax(maxElement.toProto())
+    }
+    if (hasType()) {
+      protoValue.setType(typeElement.toProto())
+    }
+    if (hasDefaultValue()) {
+      protoValue.setDefaultValue(defaultValue.structureMapGroupRuleSourceDefaultValueToProto())
+    }
+    if (hasElement()) {
+      protoValue.setElement(elementElement.toProto())
+    }
+    protoValue.setListMode(
+      StructureMap.Group.Rule.Source.ListModeCode.newBuilder()
+        .setValue(
+          StructureMapSourceListModeCode.Value.valueOf(
+            listMode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setVariable(variableElement.toProto())
-        .setCondition(conditionElement.toProto())
-        .setCheck(checkElement.toProto())
-        .setLogMessage(logMessageElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasVariable()) {
+      protoValue.setVariable(variableElement.toProto())
+    }
+    if (hasCondition()) {
+      protoValue.setCondition(conditionElement.toProto())
+    }
+    if (hasCheck()) {
+      protoValue.setCheck(checkElement.toProto())
+    }
+    if (hasLogMessage()) {
+      protoValue.setLogMessage(logMessageElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleTargetComponent.toProto():
     StructureMap.Group.Rule.Target {
     val protoValue =
-      StructureMap.Group.Rule.Target.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setContext(contextElement.toProto())
-        .setContextType(
-          StructureMap.Group.Rule.Target.ContextTypeCode.newBuilder()
-            .setValue(
-              StructureMapContextTypeCode.Value.valueOf(
-                contextType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      StructureMap.Group.Rule.Target.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasContext()) {
+      protoValue.setContext(contextElement.toProto())
+    }
+    protoValue.setContextType(
+      StructureMap.Group.Rule.Target.ContextTypeCode.newBuilder()
+        .setValue(
+          StructureMapContextTypeCode.Value.valueOf(
+            contextType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setElement(elementElement.toProto())
-        .setVariable(variableElement.toProto())
-        .addAllListMode(
-          listMode.map {
-            StructureMap.Group.Rule.Target.ListModeCode.newBuilder()
-              .setValue(
-                StructureMapTargetListModeCode.Value.valueOf(
-                  it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-                )
-              )
-              .build()
-          }
-        )
-        .setListRuleId(listRuleIdElement.toProto())
-        .setTransform(
-          StructureMap.Group.Rule.Target.TransformCode.newBuilder()
-            .setValue(
-              StructureMapTransformCode.Value.valueOf(
-                transform.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .addAllParameter(parameter.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasElement()) {
+      protoValue.setElement(elementElement.toProto())
+    }
+    if (hasVariable()) {
+      protoValue.setVariable(variableElement.toProto())
+    }
+    protoValue.addAllListMode(
+      listMode.map {
+        StructureMap.Group.Rule.Target.ListModeCode.newBuilder()
+          .setValue(
+            StructureMapTargetListModeCode.Value.valueOf(
+              it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
+          )
+          .build()
+      }
+    )
+    if (hasListRuleId()) {
+      protoValue.setListRuleId(listRuleIdElement.toProto())
+    }
+    protoValue.setTransform(
+      StructureMap.Group.Rule.Target.TransformCode.newBuilder()
+        .setValue(
+          StructureMapTransformCode.Value.valueOf(
+            transform.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasParameter()) {
+      protoValue.addAllParameter(parameter.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleTargetParameterComponent.toProto():
     StructureMap.Group.Rule.Target.Parameter {
     val protoValue =
-      StructureMap.Group.Rule.Target.Parameter.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setValue(value.structureMapGroupRuleTargetParameterValueToProto())
-        .build()
-    return protoValue
+      StructureMap.Group.Rule.Target.Parameter.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.structureMapGroupRuleTargetParameterValueToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleDependentComponent.toProto():
     StructureMap.Group.Rule.Dependent {
     val protoValue =
-      StructureMap.Group.Rule.Dependent.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .addAllVariable(variable.map { it.toProto() })
-        .build()
-    return protoValue
+      StructureMap.Group.Rule.Dependent.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasVariable()) {
+      protoValue.addAllVariable(variable.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -836,16 +1001,26 @@ public object StructureMapConverter {
     org.hl7.fhir.r4.model.StructureMap.StructureMapStructureComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapStructureComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setUrlElement(url.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
     hapiValue.setMode(
       org.hl7.fhir.r4.model.StructureMap.StructureMapModelMode.valueOf(
         mode.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setAliasElement(alias.toHapi())
-    hapiValue.setDocumentationElement(documentation.toHapi())
+    if (hasAlias()) {
+      hapiValue.setAliasElement(alias.toHapi())
+    }
+    if (hasDocumentation()) {
+      hapiValue.setDocumentationElement(documentation.toHapi())
+    }
     return hapiValue
   }
 
@@ -854,18 +1029,32 @@ public object StructureMapConverter {
     org.hl7.fhir.r4.model.StructureMap.StructureMapGroupComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setExtendsElement(extends.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasExtends()) {
+      hapiValue.setExtendsElement(extends.toHapi())
+    }
     hapiValue.setTypeMode(
       org.hl7.fhir.r4.model.StructureMap.StructureMapGroupTypeMode.valueOf(
         typeMode.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setDocumentationElement(documentation.toHapi())
-    hapiValue.setInput(inputList.map { it.toHapi() })
-    hapiValue.setRule(ruleList.map { it.toHapi() })
+    if (hasDocumentation()) {
+      hapiValue.setDocumentationElement(documentation.toHapi())
+    }
+    if (inputCount > 0) {
+      hapiValue.setInput(inputList.map { it.toHapi() })
+    }
+    if (ruleCount > 0) {
+      hapiValue.setRule(ruleList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -874,16 +1063,26 @@ public object StructureMapConverter {
     org.hl7.fhir.r4.model.StructureMap.StructureMapGroupInputComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupInputComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setTypeElement(type.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasType()) {
+      hapiValue.setTypeElement(type.toHapi())
+    }
     hapiValue.setMode(
       org.hl7.fhir.r4.model.StructureMap.StructureMapInputMode.valueOf(
         mode.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setDocumentationElement(documentation.toHapi())
+    if (hasDocumentation()) {
+      hapiValue.setDocumentationElement(documentation.toHapi())
+    }
     return hapiValue
   }
 
@@ -892,13 +1091,27 @@ public object StructureMapConverter {
     org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setSource(sourceList.map { it.toHapi() })
-    hapiValue.setTarget(targetList.map { it.toHapi() })
-    hapiValue.setDependent(dependentList.map { it.toHapi() })
-    hapiValue.setDocumentationElement(documentation.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (sourceCount > 0) {
+      hapiValue.setSource(sourceList.map { it.toHapi() })
+    }
+    if (targetCount > 0) {
+      hapiValue.setTarget(targetList.map { it.toHapi() })
+    }
+    if (dependentCount > 0) {
+      hapiValue.setDependent(dependentList.map { it.toHapi() })
+    }
+    if (hasDocumentation()) {
+      hapiValue.setDocumentationElement(documentation.toHapi())
+    }
     return hapiValue
   }
 
@@ -907,23 +1120,47 @@ public object StructureMapConverter {
     org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleSourceComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleSourceComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setContextElement(context.toHapi())
-    hapiValue.setMinElement(min.toHapi())
-    hapiValue.setMaxElement(max.toHapi())
-    hapiValue.setTypeElement(type.toHapi())
-    hapiValue.setDefaultValue(defaultValue.structureMapGroupRuleSourceDefaultValueToHapi())
-    hapiValue.setElementElement(element.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasContext()) {
+      hapiValue.setContextElement(context.toHapi())
+    }
+    if (hasMin()) {
+      hapiValue.setMinElement(min.toHapi())
+    }
+    if (hasMax()) {
+      hapiValue.setMaxElement(max.toHapi())
+    }
+    if (hasType()) {
+      hapiValue.setTypeElement(type.toHapi())
+    }
+    if (hasDefaultValue()) {
+      hapiValue.setDefaultValue(defaultValue.structureMapGroupRuleSourceDefaultValueToHapi())
+    }
+    if (hasElement()) {
+      hapiValue.setElementElement(element.toHapi())
+    }
     hapiValue.setListMode(
       org.hl7.fhir.r4.model.StructureMap.StructureMapSourceListMode.valueOf(
         listMode.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setVariableElement(variable.toHapi())
-    hapiValue.setConditionElement(condition.toHapi())
-    hapiValue.setCheckElement(check.toHapi())
-    hapiValue.setLogMessageElement(logMessage.toHapi())
+    if (hasVariable()) {
+      hapiValue.setVariableElement(variable.toHapi())
+    }
+    if (hasCondition()) {
+      hapiValue.setConditionElement(condition.toHapi())
+    }
+    if (hasCheck()) {
+      hapiValue.setCheckElement(check.toHapi())
+    }
+    if (hasLogMessage()) {
+      hapiValue.setLogMessageElement(logMessage.toHapi())
+    }
     return hapiValue
   }
 
@@ -932,16 +1169,26 @@ public object StructureMapConverter {
     org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleTargetComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleTargetComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setContextElement(context.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasContext()) {
+      hapiValue.setContextElement(context.toHapi())
+    }
     hapiValue.setContextType(
       org.hl7.fhir.r4.model.StructureMap.StructureMapContextType.valueOf(
         contextType.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setElementElement(element.toHapi())
-    hapiValue.setVariableElement(variable.toHapi())
+    if (hasElement()) {
+      hapiValue.setElementElement(element.toHapi())
+    }
+    if (hasVariable()) {
+      hapiValue.setVariableElement(variable.toHapi())
+    }
     listModeList.forEach {
       hapiValue.addListMode(
         org.hl7.fhir.r4.model.StructureMap.StructureMapTargetListMode.valueOf(
@@ -949,13 +1196,17 @@ public object StructureMapConverter {
         )
       )
     }
-    hapiValue.setListRuleIdElement(listRuleId.toHapi())
+    if (hasListRuleId()) {
+      hapiValue.setListRuleIdElement(listRuleId.toHapi())
+    }
     hapiValue.setTransform(
       org.hl7.fhir.r4.model.StructureMap.StructureMapTransform.valueOf(
         transform.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setParameter(parameterList.map { it.toHapi() })
+    if (parameterCount > 0) {
+      hapiValue.setParameter(parameterList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -965,9 +1216,15 @@ public object StructureMapConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleTargetParameterComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setValue(value.structureMapGroupRuleTargetParameterValueToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.structureMapGroupRuleTargetParameterValueToHapi())
+    }
     return hapiValue
   }
 
@@ -976,10 +1233,18 @@ public object StructureMapConverter {
     org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleDependentComponent {
     val hapiValue = org.hl7.fhir.r4.model.StructureMap.StructureMapGroupRuleDependentComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setVariable(variableList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (variableCount > 0) {
+      hapiValue.setVariable(variableList.map { it.toHapi() })
+    }
     return hapiValue
   }
 }

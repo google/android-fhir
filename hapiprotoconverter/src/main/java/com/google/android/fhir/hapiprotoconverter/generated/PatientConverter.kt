@@ -117,146 +117,258 @@ public object PatientConverter {
   public fun Patient.toHapi(): org.hl7.fhir.r4.model.Patient {
     val hapiValue = org.hl7.fhir.r4.model.Patient()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setActiveElement(active.toHapi())
-    hapiValue.setName(nameList.map { it.toHapi() })
-    hapiValue.setTelecom(telecomList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasActive()) {
+      hapiValue.setActiveElement(active.toHapi())
+    }
+    if (nameCount > 0) {
+      hapiValue.setName(nameList.map { it.toHapi() })
+    }
+    if (telecomCount > 0) {
+      hapiValue.setTelecom(telecomList.map { it.toHapi() })
+    }
     hapiValue.setGender(
       Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setBirthDateElement(birthDate.toHapi())
-    hapiValue.setDeceased(deceased.patientDeceasedToHapi())
-    hapiValue.setAddress(addressList.map { it.toHapi() })
-    hapiValue.setMaritalStatus(maritalStatus.toHapi())
-    hapiValue.setMultipleBirth(multipleBirth.patientMultipleBirthToHapi())
-    hapiValue.setPhoto(photoList.map { it.toHapi() })
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setCommunication(communicationList.map { it.toHapi() })
-    hapiValue.setGeneralPractitioner(generalPractitionerList.map { it.toHapi() })
-    hapiValue.setManagingOrganization(managingOrganization.toHapi())
-    hapiValue.setLink(linkList.map { it.toHapi() })
+    if (hasBirthDate()) {
+      hapiValue.setBirthDateElement(birthDate.toHapi())
+    }
+    if (hasDeceased()) {
+      hapiValue.setDeceased(deceased.patientDeceasedToHapi())
+    }
+    if (addressCount > 0) {
+      hapiValue.setAddress(addressList.map { it.toHapi() })
+    }
+    if (hasMaritalStatus()) {
+      hapiValue.setMaritalStatus(maritalStatus.toHapi())
+    }
+    if (hasMultipleBirth()) {
+      hapiValue.setMultipleBirth(multipleBirth.patientMultipleBirthToHapi())
+    }
+    if (photoCount > 0) {
+      hapiValue.setPhoto(photoList.map { it.toHapi() })
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (communicationCount > 0) {
+      hapiValue.setCommunication(communicationList.map { it.toHapi() })
+    }
+    if (generalPractitionerCount > 0) {
+      hapiValue.setGeneralPractitioner(generalPractitionerList.map { it.toHapi() })
+    }
+    if (hasManagingOrganization()) {
+      hapiValue.setManagingOrganization(managingOrganization.toHapi())
+    }
+    if (linkCount > 0) {
+      hapiValue.setLink(linkList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Patient.toProto(): Patient {
-    val protoValue =
-      Patient.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setActive(activeElement.toProto())
-        .addAllName(name.map { it.toProto() })
-        .addAllTelecom(telecom.map { it.toProto() })
-        .setGender(
-          Patient.GenderCode.newBuilder()
-            .setValue(
-              AdministrativeGenderCode.Value.valueOf(
-                gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Patient.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasActive()) {
+      protoValue.setActive(activeElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.addAllName(name.map { it.toProto() })
+    }
+    if (hasTelecom()) {
+      protoValue.addAllTelecom(telecom.map { it.toProto() })
+    }
+    protoValue.setGender(
+      Patient.GenderCode.newBuilder()
+        .setValue(
+          AdministrativeGenderCode.Value.valueOf(
+            gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setBirthDate(birthDateElement.toProto())
-        .setDeceased(deceased.patientDeceasedToProto())
-        .addAllAddress(address.map { it.toProto() })
-        .setMaritalStatus(maritalStatus.toProto())
-        .setMultipleBirth(multipleBirth.patientMultipleBirthToProto())
-        .addAllPhoto(photo.map { it.toProto() })
-        .addAllContact(contact.map { it.toProto() })
-        .addAllCommunication(communication.map { it.toProto() })
-        .addAllGeneralPractitioner(generalPractitioner.map { it.toProto() })
-        .setManagingOrganization(managingOrganization.toProto())
-        .addAllLink(link.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasBirthDate()) {
+      protoValue.setBirthDate(birthDateElement.toProto())
+    }
+    if (hasDeceased()) {
+      protoValue.setDeceased(deceased.patientDeceasedToProto())
+    }
+    if (hasAddress()) {
+      protoValue.addAllAddress(address.map { it.toProto() })
+    }
+    if (hasMaritalStatus()) {
+      protoValue.setMaritalStatus(maritalStatus.toProto())
+    }
+    if (hasMultipleBirth()) {
+      protoValue.setMultipleBirth(multipleBirth.patientMultipleBirthToProto())
+    }
+    if (hasPhoto()) {
+      protoValue.addAllPhoto(photo.map { it.toProto() })
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasCommunication()) {
+      protoValue.addAllCommunication(communication.map { it.toProto() })
+    }
+    if (hasGeneralPractitioner()) {
+      protoValue.addAllGeneralPractitioner(generalPractitioner.map { it.toProto() })
+    }
+    if (hasManagingOrganization()) {
+      protoValue.setManagingOrganization(managingOrganization.toProto())
+    }
+    if (hasLink()) {
+      protoValue.addAllLink(link.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Patient.ContactComponent.toProto(): Patient.Contact {
-    val protoValue =
-      Patient.Contact.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllRelationship(relationship.map { it.toProto() })
-        .setName(name.toProto())
-        .addAllTelecom(telecom.map { it.toProto() })
-        .setAddress(address.toProto())
-        .setGender(
-          Patient.Contact.GenderCode.newBuilder()
-            .setValue(
-              AdministrativeGenderCode.Value.valueOf(
-                gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Patient.Contact.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasRelationship()) {
+      protoValue.addAllRelationship(relationship.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(name.toProto())
+    }
+    if (hasTelecom()) {
+      protoValue.addAllTelecom(telecom.map { it.toProto() })
+    }
+    if (hasAddress()) {
+      protoValue.setAddress(address.toProto())
+    }
+    protoValue.setGender(
+      Patient.Contact.GenderCode.newBuilder()
+        .setValue(
+          AdministrativeGenderCode.Value.valueOf(
+            gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setOrganization(organization.toProto())
-        .setPeriod(period.toProto())
         .build()
-    return protoValue
+    )
+    if (hasOrganization()) {
+      protoValue.setOrganization(organization.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Patient.PatientCommunicationComponent.toProto():
     Patient.Communication {
-    val protoValue =
-      Patient.Communication.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setLanguage(language.toProto())
-        .setPreferred(preferredElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Patient.Communication.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasLanguage()) {
+      protoValue.setLanguage(language.toProto())
+    }
+    if (hasPreferred()) {
+      protoValue.setPreferred(preferredElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Patient.PatientLinkComponent.toProto(): Patient.Link {
-    val protoValue =
-      Patient.Link.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setOther(other.toProto())
-        .setType(
-          Patient.Link.TypeCode.newBuilder()
-            .setValue(
-              LinkTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Patient.Link.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasOther()) {
+      protoValue.setOther(other.toProto())
+    }
+    protoValue.setType(
+      Patient.Link.TypeCode.newBuilder()
+        .setValue(
+          LinkTypeCode.Value.valueOf(type.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
         )
         .build()
-    return protoValue
+    )
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun Patient.Contact.toHapi(): org.hl7.fhir.r4.model.Patient.ContactComponent {
     val hapiValue = org.hl7.fhir.r4.model.Patient.ContactComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setRelationship(relationshipList.map { it.toHapi() })
-    hapiValue.setName(name.toHapi())
-    hapiValue.setTelecom(telecomList.map { it.toHapi() })
-    hapiValue.setAddress(address.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (relationshipCount > 0) {
+      hapiValue.setRelationship(relationshipList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setName(name.toHapi())
+    }
+    if (telecomCount > 0) {
+      hapiValue.setTelecom(telecomList.map { it.toHapi() })
+    }
+    if (hasAddress()) {
+      hapiValue.setAddress(address.toHapi())
+    }
     hapiValue.setGender(
       Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setOrganization(organization.toHapi())
-    hapiValue.setPeriod(period.toHapi())
+    if (hasOrganization()) {
+      hapiValue.setOrganization(organization.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
     return hapiValue
   }
 
@@ -265,10 +377,18 @@ public object PatientConverter {
     org.hl7.fhir.r4.model.Patient.PatientCommunicationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Patient.PatientCommunicationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setLanguage(language.toHapi())
-    hapiValue.setPreferredElement(preferred.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasLanguage()) {
+      hapiValue.setLanguage(language.toHapi())
+    }
+    if (hasPreferred()) {
+      hapiValue.setPreferredElement(preferred.toHapi())
+    }
     return hapiValue
   }
 
@@ -276,9 +396,15 @@ public object PatientConverter {
   private fun Patient.Link.toHapi(): org.hl7.fhir.r4.model.Patient.PatientLinkComponent {
     val hapiValue = org.hl7.fhir.r4.model.Patient.PatientLinkComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setOther(other.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasOther()) {
+      hapiValue.setOther(other.toHapi())
+    }
     hapiValue.setType(
       org.hl7.fhir.r4.model.Patient.LinkType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")

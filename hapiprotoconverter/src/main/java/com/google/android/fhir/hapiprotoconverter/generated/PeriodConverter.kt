@@ -29,21 +29,30 @@ public object PeriodConverter {
   public fun Period.toHapi(): org.hl7.fhir.r4.model.Period {
     val hapiValue = org.hl7.fhir.r4.model.Period()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setStartElement(start.toHapi())
-    hapiValue.setEndElement(end.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasStart()) {
+      hapiValue.setStartElement(start.toHapi())
+    }
+    if (hasEnd()) {
+      hapiValue.setEndElement(end.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Period.toProto(): Period {
-    val protoValue =
-      Period.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setStart(startElement.toProto())
-        .setEnd(endElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Period.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasStart()) {
+      protoValue.setStart(startElement.toProto())
+    }
+    if (hasEnd()) {
+      protoValue.setEnd(endElement.toProto())
+    }
+    return protoValue.build()
   }
 }

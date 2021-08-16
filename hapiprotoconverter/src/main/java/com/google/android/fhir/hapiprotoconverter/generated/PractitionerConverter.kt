@@ -56,72 +56,134 @@ public object PractitionerConverter {
   public fun Practitioner.toHapi(): org.hl7.fhir.r4.model.Practitioner {
     val hapiValue = org.hl7.fhir.r4.model.Practitioner()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setActiveElement(active.toHapi())
-    hapiValue.setName(nameList.map { it.toHapi() })
-    hapiValue.setTelecom(telecomList.map { it.toHapi() })
-    hapiValue.setAddress(addressList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasActive()) {
+      hapiValue.setActiveElement(active.toHapi())
+    }
+    if (nameCount > 0) {
+      hapiValue.setName(nameList.map { it.toHapi() })
+    }
+    if (telecomCount > 0) {
+      hapiValue.setTelecom(telecomList.map { it.toHapi() })
+    }
+    if (addressCount > 0) {
+      hapiValue.setAddress(addressList.map { it.toHapi() })
+    }
     hapiValue.setGender(
       Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setBirthDateElement(birthDate.toHapi())
-    hapiValue.setPhoto(photoList.map { it.toHapi() })
-    hapiValue.setQualification(qualificationList.map { it.toHapi() })
-    hapiValue.setCommunication(communicationList.map { it.toHapi() })
+    if (hasBirthDate()) {
+      hapiValue.setBirthDateElement(birthDate.toHapi())
+    }
+    if (photoCount > 0) {
+      hapiValue.setPhoto(photoList.map { it.toHapi() })
+    }
+    if (qualificationCount > 0) {
+      hapiValue.setQualification(qualificationList.map { it.toHapi() })
+    }
+    if (communicationCount > 0) {
+      hapiValue.setCommunication(communicationList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Practitioner.toProto(): Practitioner {
-    val protoValue =
-      Practitioner.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setActive(activeElement.toProto())
-        .addAllName(name.map { it.toProto() })
-        .addAllTelecom(telecom.map { it.toProto() })
-        .addAllAddress(address.map { it.toProto() })
-        .setGender(
-          Practitioner.GenderCode.newBuilder()
-            .setValue(
-              AdministrativeGenderCode.Value.valueOf(
-                gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Practitioner.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasActive()) {
+      protoValue.setActive(activeElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.addAllName(name.map { it.toProto() })
+    }
+    if (hasTelecom()) {
+      protoValue.addAllTelecom(telecom.map { it.toProto() })
+    }
+    if (hasAddress()) {
+      protoValue.addAllAddress(address.map { it.toProto() })
+    }
+    protoValue.setGender(
+      Practitioner.GenderCode.newBuilder()
+        .setValue(
+          AdministrativeGenderCode.Value.valueOf(
+            gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setBirthDate(birthDateElement.toProto())
-        .addAllPhoto(photo.map { it.toProto() })
-        .addAllQualification(qualification.map { it.toProto() })
-        .addAllCommunication(communication.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasBirthDate()) {
+      protoValue.setBirthDate(birthDateElement.toProto())
+    }
+    if (hasPhoto()) {
+      protoValue.addAllPhoto(photo.map { it.toProto() })
+    }
+    if (hasQualification()) {
+      protoValue.addAllQualification(qualification.map { it.toProto() })
+    }
+    if (hasCommunication()) {
+      protoValue.addAllCommunication(communication.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Practitioner.PractitionerQualificationComponent.toProto():
     Practitioner.Qualification {
-    val protoValue =
-      Practitioner.Qualification.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setCode(code.toProto())
-        .setPeriod(period.toProto())
-        .setIssuer(issuer.toProto())
-        .build()
-    return protoValue
+    val protoValue = Practitioner.Qualification.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    if (hasIssuer()) {
+      protoValue.setIssuer(issuer.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -129,12 +191,24 @@ public object PractitionerConverter {
     org.hl7.fhir.r4.model.Practitioner.PractitionerQualificationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Practitioner.PractitionerQualificationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setPeriod(period.toHapi())
-    hapiValue.setIssuer(issuer.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
+    if (hasIssuer()) {
+      hapiValue.setIssuer(issuer.toHapi())
+    }
     return hapiValue
   }
 }

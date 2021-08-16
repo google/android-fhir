@@ -28,7 +28,9 @@ public object NarrativeConverter {
   public fun Narrative.toHapi(): org.hl7.fhir.r4.model.Narrative {
     val hapiValue = org.hl7.fhir.r4.model.Narrative()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Narrative.NarrativeStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
@@ -39,20 +41,19 @@ public object NarrativeConverter {
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Narrative.toProto(): Narrative {
-    val protoValue =
-      Narrative.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setStatus(
-          Narrative.StatusCode.newBuilder()
-            .setValue(
-              NarrativeStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Narrative.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      Narrative.StatusCode.newBuilder()
+        .setValue(
+          NarrativeStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
         .build()
-    return protoValue
+    )
+    return protoValue.build()
   }
 }

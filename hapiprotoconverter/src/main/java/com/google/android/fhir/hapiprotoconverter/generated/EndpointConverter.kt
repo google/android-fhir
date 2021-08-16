@@ -50,63 +50,116 @@ public object EndpointConverter {
   public fun Endpoint.toHapi(): org.hl7.fhir.r4.model.Endpoint {
     val hapiValue = org.hl7.fhir.r4.model.Endpoint()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Endpoint.EndpointStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setConnectionType(connectionType.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setManagingOrganization(managingOrganization.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setPeriod(period.toHapi())
-    hapiValue.setPayloadType(payloadTypeList.map { it.toHapi() })
+    if (hasConnectionType()) {
+      hapiValue.setConnectionType(connectionType.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasManagingOrganization()) {
+      hapiValue.setManagingOrganization(managingOrganization.toHapi())
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
+    if (payloadTypeCount > 0) {
+      hapiValue.setPayloadType(payloadTypeList.map { it.toHapi() })
+    }
     payloadMimeTypeList.map { hapiValue.addPayloadMimeType(it.value.hapiCodeCheck()) }
-    hapiValue.setAddressElement(address.toHapi())
-    hapiValue.setHeader(headerList.map { it.toHapi() })
+    if (hasAddress()) {
+      hapiValue.setAddressElement(address.toHapi())
+    }
+    if (headerCount > 0) {
+      hapiValue.setHeader(headerList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Endpoint.toProto(): Endpoint {
-    val protoValue =
-      Endpoint.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setStatus(
-          Endpoint.StatusCode.newBuilder()
-            .setValue(
-              EndpointStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Endpoint.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      Endpoint.StatusCode.newBuilder()
+        .setValue(
+          EndpointStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setConnectionType(connectionType.toProto())
-        .setName(nameElement.toProto())
-        .setManagingOrganization(managingOrganization.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setPeriod(period.toProto())
-        .addAllPayloadType(payloadType.map { it.toProto() })
-        .addAllPayloadMimeType(
-          payloadMimeType.map {
-            Endpoint.PayloadMimeTypeCode.newBuilder().setValue(it.value.protoCodeCheck()).build()
-          }
-        )
-        .setAddress(addressElement.toProto())
-        .addAllHeader(header.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasConnectionType()) {
+      protoValue.setConnectionType(connectionType.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasManagingOrganization()) {
+      protoValue.setManagingOrganization(managingOrganization.toProto())
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    if (hasPayloadType()) {
+      protoValue.addAllPayloadType(payloadType.map { it.toProto() })
+    }
+    protoValue.addAllPayloadMimeType(
+      payloadMimeType.map {
+        Endpoint.PayloadMimeTypeCode.newBuilder().setValue(it.value.protoCodeCheck()).build()
+      }
+    )
+    if (hasAddress()) {
+      protoValue.setAddress(addressElement.toProto())
+    }
+    if (hasHeader()) {
+      protoValue.addAllHeader(header.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 }

@@ -280,120 +280,251 @@ public object ObservationConverter {
   public fun Observation.toHapi(): org.hl7.fhir.r4.model.Observation {
     val hapiValue = org.hl7.fhir.r4.model.Observation()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
-    hapiValue.setPartOf(partOfList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (basedOnCount > 0) {
+      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+    }
+    if (partOfCount > 0) {
+      hapiValue.setPartOf(partOfList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Observation.ObservationStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setCategory(categoryList.map { it.toHapi() })
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setSubject(subject.toHapi())
-    hapiValue.setFocus(focusList.map { it.toHapi() })
-    hapiValue.setEncounter(encounter.toHapi())
-    hapiValue.setEffective(effective.observationEffectiveToHapi())
-    hapiValue.setIssuedElement(issued.toHapi())
-    hapiValue.setPerformer(performerList.map { it.toHapi() })
-    hapiValue.setValue(value.observationValueToHapi())
-    hapiValue.setDataAbsentReason(dataAbsentReason.toHapi())
-    hapiValue.setInterpretation(interpretationList.map { it.toHapi() })
-    hapiValue.setNote(noteList.map { it.toHapi() })
-    hapiValue.setBodySite(bodySite.toHapi())
-    hapiValue.setMethod(method.toHapi())
-    hapiValue.setSpecimen(specimen.toHapi())
-    hapiValue.setDevice(device.toHapi())
-    hapiValue.setReferenceRange(referenceRangeList.map { it.toHapi() })
-    hapiValue.setHasMember(hasMemberList.map { it.toHapi() })
-    hapiValue.setDerivedFrom(derivedFromList.map { it.toHapi() })
-    hapiValue.setComponent(componentList.map { it.toHapi() })
+    if (categoryCount > 0) {
+      hapiValue.setCategory(categoryList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.toHapi())
+    }
+    if (focusCount > 0) {
+      hapiValue.setFocus(focusList.map { it.toHapi() })
+    }
+    if (hasEncounter()) {
+      hapiValue.setEncounter(encounter.toHapi())
+    }
+    if (hasEffective()) {
+      hapiValue.setEffective(effective.observationEffectiveToHapi())
+    }
+    if (hasIssued()) {
+      hapiValue.setIssuedElement(issued.toHapi())
+    }
+    if (performerCount > 0) {
+      hapiValue.setPerformer(performerList.map { it.toHapi() })
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.observationValueToHapi())
+    }
+    if (hasDataAbsentReason()) {
+      hapiValue.setDataAbsentReason(dataAbsentReason.toHapi())
+    }
+    if (interpretationCount > 0) {
+      hapiValue.setInterpretation(interpretationList.map { it.toHapi() })
+    }
+    if (noteCount > 0) {
+      hapiValue.setNote(noteList.map { it.toHapi() })
+    }
+    if (hasBodySite()) {
+      hapiValue.setBodySite(bodySite.toHapi())
+    }
+    if (hasMethod()) {
+      hapiValue.setMethod(method.toHapi())
+    }
+    if (hasSpecimen()) {
+      hapiValue.setSpecimen(specimen.toHapi())
+    }
+    if (hasDevice()) {
+      hapiValue.setDevice(device.toHapi())
+    }
+    if (referenceRangeCount > 0) {
+      hapiValue.setReferenceRange(referenceRangeList.map { it.toHapi() })
+    }
+    if (hasMemberCount > 0) {
+      hapiValue.setHasMember(hasMemberList.map { it.toHapi() })
+    }
+    if (derivedFromCount > 0) {
+      hapiValue.setDerivedFrom(derivedFromList.map { it.toHapi() })
+    }
+    if (componentCount > 0) {
+      hapiValue.setComponent(componentList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Observation.toProto(): Observation {
-    val protoValue =
-      Observation.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .addAllBasedOn(basedOn.map { it.toProto() })
-        .addAllPartOf(partOf.map { it.toProto() })
-        .setStatus(
-          Observation.StatusCode.newBuilder()
-            .setValue(
-              ObservationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Observation.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasBasedOn()) {
+      protoValue.addAllBasedOn(basedOn.map { it.toProto() })
+    }
+    if (hasPartOf()) {
+      protoValue.addAllPartOf(partOf.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      Observation.StatusCode.newBuilder()
+        .setValue(
+          ObservationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .addAllCategory(category.map { it.toProto() })
-        .setCode(code.toProto())
-        .setSubject(subject.toProto())
-        .addAllFocus(focus.map { it.toProto() })
-        .setEncounter(encounter.toProto())
-        .setEffective(effective.observationEffectiveToProto())
-        .setIssued(issuedElement.toProto())
-        .addAllPerformer(performer.map { it.toProto() })
-        .setValue(value.observationValueToProto())
-        .setDataAbsentReason(dataAbsentReason.toProto())
-        .addAllInterpretation(interpretation.map { it.toProto() })
-        .addAllNote(note.map { it.toProto() })
-        .setBodySite(bodySite.toProto())
-        .setMethod(method.toProto())
-        .setSpecimen(specimen.toProto())
-        .setDevice(device.toProto())
-        .addAllReferenceRange(referenceRange.map { it.toProto() })
-        .addAllHasMember(hasMember.map { it.toProto() })
-        .addAllDerivedFrom(derivedFrom.map { it.toProto() })
-        .addAllComponent(component.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasCategory()) {
+      protoValue.addAllCategory(category.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.toProto())
+    }
+    if (hasFocus()) {
+      protoValue.addAllFocus(focus.map { it.toProto() })
+    }
+    if (hasEncounter()) {
+      protoValue.setEncounter(encounter.toProto())
+    }
+    if (hasEffective()) {
+      protoValue.setEffective(effective.observationEffectiveToProto())
+    }
+    if (hasIssued()) {
+      protoValue.setIssued(issuedElement.toProto())
+    }
+    if (hasPerformer()) {
+      protoValue.addAllPerformer(performer.map { it.toProto() })
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.observationValueToProto())
+    }
+    if (hasDataAbsentReason()) {
+      protoValue.setDataAbsentReason(dataAbsentReason.toProto())
+    }
+    if (hasInterpretation()) {
+      protoValue.addAllInterpretation(interpretation.map { it.toProto() })
+    }
+    if (hasNote()) {
+      protoValue.addAllNote(note.map { it.toProto() })
+    }
+    if (hasBodySite()) {
+      protoValue.setBodySite(bodySite.toProto())
+    }
+    if (hasMethod()) {
+      protoValue.setMethod(method.toProto())
+    }
+    if (hasSpecimen()) {
+      protoValue.setSpecimen(specimen.toProto())
+    }
+    if (hasDevice()) {
+      protoValue.setDevice(device.toProto())
+    }
+    if (hasReferenceRange()) {
+      protoValue.addAllReferenceRange(referenceRange.map { it.toProto() })
+    }
+    if (hasHasMember()) {
+      protoValue.addAllHasMember(hasMember.map { it.toProto() })
+    }
+    if (hasDerivedFrom()) {
+      protoValue.addAllDerivedFrom(derivedFrom.map { it.toProto() })
+    }
+    if (hasComponent()) {
+      protoValue.addAllComponent(component.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent.toProto():
     Observation.ReferenceRange {
-    val protoValue =
-      Observation.ReferenceRange.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setLow((low as SimpleQuantity).toProto())
-        .setHigh((high as SimpleQuantity).toProto())
-        .setType(type.toProto())
-        .addAllAppliesTo(appliesTo.map { it.toProto() })
-        .setAge(age.toProto())
-        .setText(textElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Observation.ReferenceRange.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasLow()) {
+      protoValue.setLow((low as SimpleQuantity).toProto())
+    }
+    if (hasHigh()) {
+      protoValue.setHigh((high as SimpleQuantity).toProto())
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasAppliesTo()) {
+      protoValue.addAllAppliesTo(appliesTo.map { it.toProto() })
+    }
+    if (hasAge()) {
+      protoValue.setAge(age.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(textElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Observation.ObservationComponentComponent.toProto():
     Observation.Component {
-    val protoValue =
-      Observation.Component.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(code.toProto())
-        .setValue(value.observationComponentValueToProto())
-        .setDataAbsentReason(dataAbsentReason.toProto())
-        .addAllInterpretation(interpretation.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = Observation.Component.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.observationComponentValueToProto())
+    }
+    if (hasDataAbsentReason()) {
+      protoValue.setDataAbsentReason(dataAbsentReason.toProto())
+    }
+    if (hasInterpretation()) {
+      protoValue.addAllInterpretation(interpretation.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -401,14 +532,30 @@ public object ObservationConverter {
     org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent {
     val hapiValue = org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setLow(low.toHapi())
-    hapiValue.setHigh(high.toHapi())
-    hapiValue.setType(type.toHapi())
-    hapiValue.setAppliesTo(appliesToList.map { it.toHapi() })
-    hapiValue.setAge(age.toHapi())
-    hapiValue.setTextElement(text.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasLow()) {
+      hapiValue.setLow(low.toHapi())
+    }
+    if (hasHigh()) {
+      hapiValue.setHigh(high.toHapi())
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (appliesToCount > 0) {
+      hapiValue.setAppliesTo(appliesToList.map { it.toHapi() })
+    }
+    if (hasAge()) {
+      hapiValue.setAge(age.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setTextElement(text.toHapi())
+    }
     return hapiValue
   }
 
@@ -417,12 +564,24 @@ public object ObservationConverter {
     org.hl7.fhir.r4.model.Observation.ObservationComponentComponent {
     val hapiValue = org.hl7.fhir.r4.model.Observation.ObservationComponentComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setValue(value.observationComponentValueToHapi())
-    hapiValue.setDataAbsentReason(dataAbsentReason.toHapi())
-    hapiValue.setInterpretation(interpretationList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.observationComponentValueToHapi())
+    }
+    if (hasDataAbsentReason()) {
+      hapiValue.setDataAbsentReason(dataAbsentReason.toHapi())
+    }
+    if (interpretationCount > 0) {
+      hapiValue.setInterpretation(interpretationList.map { it.toHapi() })
+    }
     return hapiValue
   }
 }

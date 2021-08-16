@@ -33,7 +33,9 @@ public object AddressConverter {
   public fun Address.toHapi(): org.hl7.fhir.r4.model.Address {
     val hapiValue = org.hl7.fhir.r4.model.Address()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
     hapiValue.setUse(
       org.hl7.fhir.r4.model.Address.AddressUse.valueOf(
         use.value.name.hapiCodeCheck().replace("_", "")
@@ -44,50 +46,81 @@ public object AddressConverter {
         type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setTextElement(text.toHapi())
-    hapiValue.setLine(lineList.map { it.toHapi() })
-    hapiValue.setCityElement(city.toHapi())
-    hapiValue.setDistrictElement(district.toHapi())
-    hapiValue.setStateElement(state.toHapi())
-    hapiValue.setPostalCodeElement(postalCode.toHapi())
-    hapiValue.setCountryElement(country.toHapi())
-    hapiValue.setPeriod(period.toHapi())
+    if (hasText()) {
+      hapiValue.setTextElement(text.toHapi())
+    }
+    if (lineCount > 0) {
+      hapiValue.setLine(lineList.map { it.toHapi() })
+    }
+    if (hasCity()) {
+      hapiValue.setCityElement(city.toHapi())
+    }
+    if (hasDistrict()) {
+      hapiValue.setDistrictElement(district.toHapi())
+    }
+    if (hasState()) {
+      hapiValue.setStateElement(state.toHapi())
+    }
+    if (hasPostalCode()) {
+      hapiValue.setPostalCodeElement(postalCode.toHapi())
+    }
+    if (hasCountry()) {
+      hapiValue.setCountryElement(country.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Address.toProto(): Address {
-    val protoValue =
-      Address.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setUse(
-          Address.UseCode.newBuilder()
-            .setValue(
-              AddressUseCode.Value.valueOf(
-                use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Address.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    protoValue.setUse(
+      Address.UseCode.newBuilder()
+        .setValue(
+          AddressUseCode.Value.valueOf(
+            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setType(
-          Address.TypeCode.newBuilder()
-            .setValue(
-              AddressTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setText(textElement.toProto())
-        .addAllLine(line.map { it.toProto() })
-        .setCity(cityElement.toProto())
-        .setDistrict(districtElement.toProto())
-        .setState(stateElement.toProto())
-        .setPostalCode(postalCodeElement.toProto())
-        .setCountry(countryElement.toProto())
-        .setPeriod(period.toProto())
         .build()
-    return protoValue
+    )
+    protoValue.setType(
+      Address.TypeCode.newBuilder()
+        .setValue(
+          AddressTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasText()) {
+      protoValue.setText(textElement.toProto())
+    }
+    if (hasLine()) {
+      protoValue.addAllLine(line.map { it.toProto() })
+    }
+    if (hasCity()) {
+      protoValue.setCity(cityElement.toProto())
+    }
+    if (hasDistrict()) {
+      protoValue.setDistrict(districtElement.toProto())
+    }
+    if (hasState()) {
+      protoValue.setState(stateElement.toProto())
+    }
+    if (hasPostalCode()) {
+      protoValue.setPostalCode(postalCodeElement.toProto())
+    }
+    if (hasCountry()) {
+      protoValue.setCountry(countryElement.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    return protoValue.build()
   }
 }

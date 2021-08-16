@@ -137,156 +137,314 @@ public object ImmunizationConverter {
   public fun Immunization.toHapi(): org.hl7.fhir.r4.model.Immunization {
     val hapiValue = org.hl7.fhir.r4.model.Immunization()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Immunization.ImmunizationStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setStatusReason(statusReason.toHapi())
-    hapiValue.setVaccineCode(vaccineCode.toHapi())
-    hapiValue.setPatient(patient.toHapi())
-    hapiValue.setEncounter(encounter.toHapi())
-    hapiValue.setOccurrence(occurrence.immunizationOccurrenceToHapi())
-    hapiValue.setRecordedElement(recorded.toHapi())
-    hapiValue.setPrimarySourceElement(primarySource.toHapi())
-    hapiValue.setReportOrigin(reportOrigin.toHapi())
-    hapiValue.setLocation(location.toHapi())
-    hapiValue.setManufacturer(manufacturer.toHapi())
-    hapiValue.setLotNumberElement(lotNumber.toHapi())
-    hapiValue.setExpirationDateElement(expirationDate.toHapi())
-    hapiValue.setSite(site.toHapi())
-    hapiValue.setRoute(route.toHapi())
-    hapiValue.setDoseQuantity(doseQuantity.toHapi())
-    hapiValue.setPerformer(performerList.map { it.toHapi() })
-    hapiValue.setNote(noteList.map { it.toHapi() })
-    hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
-    hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
-    hapiValue.setIsSubpotentElement(isSubpotent.toHapi())
-    hapiValue.setSubpotentReason(subpotentReasonList.map { it.toHapi() })
-    hapiValue.setEducation(educationList.map { it.toHapi() })
-    hapiValue.setProgramEligibility(programEligibilityList.map { it.toHapi() })
-    hapiValue.setFundingSource(fundingSource.toHapi())
-    hapiValue.setReaction(reactionList.map { it.toHapi() })
-    hapiValue.setProtocolApplied(protocolAppliedList.map { it.toHapi() })
+    if (hasStatusReason()) {
+      hapiValue.setStatusReason(statusReason.toHapi())
+    }
+    if (hasVaccineCode()) {
+      hapiValue.setVaccineCode(vaccineCode.toHapi())
+    }
+    if (hasPatient()) {
+      hapiValue.setPatient(patient.toHapi())
+    }
+    if (hasEncounter()) {
+      hapiValue.setEncounter(encounter.toHapi())
+    }
+    if (hasOccurrence()) {
+      hapiValue.setOccurrence(occurrence.immunizationOccurrenceToHapi())
+    }
+    if (hasRecorded()) {
+      hapiValue.setRecordedElement(recorded.toHapi())
+    }
+    if (hasPrimarySource()) {
+      hapiValue.setPrimarySourceElement(primarySource.toHapi())
+    }
+    if (hasReportOrigin()) {
+      hapiValue.setReportOrigin(reportOrigin.toHapi())
+    }
+    if (hasLocation()) {
+      hapiValue.setLocation(location.toHapi())
+    }
+    if (hasManufacturer()) {
+      hapiValue.setManufacturer(manufacturer.toHapi())
+    }
+    if (hasLotNumber()) {
+      hapiValue.setLotNumberElement(lotNumber.toHapi())
+    }
+    if (hasExpirationDate()) {
+      hapiValue.setExpirationDateElement(expirationDate.toHapi())
+    }
+    if (hasSite()) {
+      hapiValue.setSite(site.toHapi())
+    }
+    if (hasRoute()) {
+      hapiValue.setRoute(route.toHapi())
+    }
+    if (hasDoseQuantity()) {
+      hapiValue.setDoseQuantity(doseQuantity.toHapi())
+    }
+    if (performerCount > 0) {
+      hapiValue.setPerformer(performerList.map { it.toHapi() })
+    }
+    if (noteCount > 0) {
+      hapiValue.setNote(noteList.map { it.toHapi() })
+    }
+    if (reasonCodeCount > 0) {
+      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+    }
+    if (reasonReferenceCount > 0) {
+      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+    }
+    if (hasIsSubpotent()) {
+      hapiValue.setIsSubpotentElement(isSubpotent.toHapi())
+    }
+    if (subpotentReasonCount > 0) {
+      hapiValue.setSubpotentReason(subpotentReasonList.map { it.toHapi() })
+    }
+    if (educationCount > 0) {
+      hapiValue.setEducation(educationList.map { it.toHapi() })
+    }
+    if (programEligibilityCount > 0) {
+      hapiValue.setProgramEligibility(programEligibilityList.map { it.toHapi() })
+    }
+    if (hasFundingSource()) {
+      hapiValue.setFundingSource(fundingSource.toHapi())
+    }
+    if (reactionCount > 0) {
+      hapiValue.setReaction(reactionList.map { it.toHapi() })
+    }
+    if (protocolAppliedCount > 0) {
+      hapiValue.setProtocolApplied(protocolAppliedList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Immunization.toProto(): Immunization {
-    val protoValue =
-      Immunization.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setStatus(
-          Immunization.StatusCode.newBuilder()
-            .setValue(
-              ImmunizationStatusCodesValueSet.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Immunization.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      Immunization.StatusCode.newBuilder()
+        .setValue(
+          ImmunizationStatusCodesValueSet.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setStatusReason(statusReason.toProto())
-        .setVaccineCode(vaccineCode.toProto())
-        .setPatient(patient.toProto())
-        .setEncounter(encounter.toProto())
-        .setOccurrence(occurrence.immunizationOccurrenceToProto())
-        .setRecorded(recordedElement.toProto())
-        .setPrimarySource(primarySourceElement.toProto())
-        .setReportOrigin(reportOrigin.toProto())
-        .setLocation(location.toProto())
-        .setManufacturer(manufacturer.toProto())
-        .setLotNumber(lotNumberElement.toProto())
-        .setExpirationDate(expirationDateElement.toProto())
-        .setSite(site.toProto())
-        .setRoute(route.toProto())
-        .setDoseQuantity((doseQuantity as SimpleQuantity).toProto())
-        .addAllPerformer(performer.map { it.toProto() })
-        .addAllNote(note.map { it.toProto() })
-        .addAllReasonCode(reasonCode.map { it.toProto() })
-        .addAllReasonReference(reasonReference.map { it.toProto() })
-        .setIsSubpotent(isSubpotentElement.toProto())
-        .addAllSubpotentReason(subpotentReason.map { it.toProto() })
-        .addAllEducation(education.map { it.toProto() })
-        .addAllProgramEligibility(programEligibility.map { it.toProto() })
-        .setFundingSource(fundingSource.toProto())
-        .addAllReaction(reaction.map { it.toProto() })
-        .addAllProtocolApplied(protocolApplied.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasStatusReason()) {
+      protoValue.setStatusReason(statusReason.toProto())
+    }
+    if (hasVaccineCode()) {
+      protoValue.setVaccineCode(vaccineCode.toProto())
+    }
+    if (hasPatient()) {
+      protoValue.setPatient(patient.toProto())
+    }
+    if (hasEncounter()) {
+      protoValue.setEncounter(encounter.toProto())
+    }
+    if (hasOccurrence()) {
+      protoValue.setOccurrence(occurrence.immunizationOccurrenceToProto())
+    }
+    if (hasRecorded()) {
+      protoValue.setRecorded(recordedElement.toProto())
+    }
+    if (hasPrimarySource()) {
+      protoValue.setPrimarySource(primarySourceElement.toProto())
+    }
+    if (hasReportOrigin()) {
+      protoValue.setReportOrigin(reportOrigin.toProto())
+    }
+    if (hasLocation()) {
+      protoValue.setLocation(location.toProto())
+    }
+    if (hasManufacturer()) {
+      protoValue.setManufacturer(manufacturer.toProto())
+    }
+    if (hasLotNumber()) {
+      protoValue.setLotNumber(lotNumberElement.toProto())
+    }
+    if (hasExpirationDate()) {
+      protoValue.setExpirationDate(expirationDateElement.toProto())
+    }
+    if (hasSite()) {
+      protoValue.setSite(site.toProto())
+    }
+    if (hasRoute()) {
+      protoValue.setRoute(route.toProto())
+    }
+    if (hasDoseQuantity()) {
+      protoValue.setDoseQuantity((doseQuantity as SimpleQuantity).toProto())
+    }
+    if (hasPerformer()) {
+      protoValue.addAllPerformer(performer.map { it.toProto() })
+    }
+    if (hasNote()) {
+      protoValue.addAllNote(note.map { it.toProto() })
+    }
+    if (hasReasonCode()) {
+      protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
+    }
+    if (hasReasonReference()) {
+      protoValue.addAllReasonReference(reasonReference.map { it.toProto() })
+    }
+    if (hasIsSubpotent()) {
+      protoValue.setIsSubpotent(isSubpotentElement.toProto())
+    }
+    if (hasSubpotentReason()) {
+      protoValue.addAllSubpotentReason(subpotentReason.map { it.toProto() })
+    }
+    if (hasEducation()) {
+      protoValue.addAllEducation(education.map { it.toProto() })
+    }
+    if (hasProgramEligibility()) {
+      protoValue.addAllProgramEligibility(programEligibility.map { it.toProto() })
+    }
+    if (hasFundingSource()) {
+      protoValue.setFundingSource(fundingSource.toProto())
+    }
+    if (hasReaction()) {
+      protoValue.addAllReaction(reaction.map { it.toProto() })
+    }
+    if (hasProtocolApplied()) {
+      protoValue.addAllProtocolApplied(protocolApplied.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Immunization.ImmunizationPerformerComponent.toProto():
     Immunization.Performer {
-    val protoValue =
-      Immunization.Performer.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setFunction(function.toProto())
-        .setActor(actor.toProto())
-        .build()
-    return protoValue
+    val protoValue = Immunization.Performer.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasFunction()) {
+      protoValue.setFunction(function.toProto())
+    }
+    if (hasActor()) {
+      protoValue.setActor(actor.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Immunization.ImmunizationEducationComponent.toProto():
     Immunization.Education {
-    val protoValue =
-      Immunization.Education.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setDocumentType(documentTypeElement.toProto())
-        .setReference(referenceElement.toProto())
-        .setPublicationDate(publicationDateElement.toProto())
-        .setPresentationDate(presentationDateElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Immunization.Education.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasDocumentType()) {
+      protoValue.setDocumentType(documentTypeElement.toProto())
+    }
+    if (hasReference()) {
+      protoValue.setReference(referenceElement.toProto())
+    }
+    if (hasPublicationDate()) {
+      protoValue.setPublicationDate(publicationDateElement.toProto())
+    }
+    if (hasPresentationDate()) {
+      protoValue.setPresentationDate(presentationDateElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Immunization.ImmunizationReactionComponent.toProto():
     Immunization.Reaction {
-    val protoValue =
-      Immunization.Reaction.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setDate(dateElement.toProto())
-        .setDetail(detail.toProto())
-        .setReported(reportedElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Immunization.Reaction.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasDetail()) {
+      protoValue.setDetail(detail.toProto())
+    }
+    if (hasReported()) {
+      protoValue.setReported(reportedElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Immunization.ImmunizationProtocolAppliedComponent.toProto():
     Immunization.ProtocolApplied {
     val protoValue =
-      Immunization.ProtocolApplied.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSeries(seriesElement.toProto())
-        .setAuthority(authority.toProto())
-        .addAllTargetDisease(targetDisease.map { it.toProto() })
-        .setDoseNumber(doseNumber.immunizationProtocolAppliedDoseNumberToProto())
-        .setSeriesDoses(seriesDoses.immunizationProtocolAppliedSeriesDosesToProto())
-        .build()
-    return protoValue
+      Immunization.ProtocolApplied.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSeries()) {
+      protoValue.setSeries(seriesElement.toProto())
+    }
+    if (hasAuthority()) {
+      protoValue.setAuthority(authority.toProto())
+    }
+    if (hasTargetDisease()) {
+      protoValue.addAllTargetDisease(targetDisease.map { it.toProto() })
+    }
+    if (hasDoseNumber()) {
+      protoValue.setDoseNumber(doseNumber.immunizationProtocolAppliedDoseNumberToProto())
+    }
+    if (hasSeriesDoses()) {
+      protoValue.setSeriesDoses(seriesDoses.immunizationProtocolAppliedSeriesDosesToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -294,10 +452,18 @@ public object ImmunizationConverter {
     org.hl7.fhir.r4.model.Immunization.ImmunizationPerformerComponent {
     val hapiValue = org.hl7.fhir.r4.model.Immunization.ImmunizationPerformerComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setFunction(function.toHapi())
-    hapiValue.setActor(actor.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasFunction()) {
+      hapiValue.setFunction(function.toHapi())
+    }
+    if (hasActor()) {
+      hapiValue.setActor(actor.toHapi())
+    }
     return hapiValue
   }
 
@@ -306,12 +472,24 @@ public object ImmunizationConverter {
     org.hl7.fhir.r4.model.Immunization.ImmunizationEducationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Immunization.ImmunizationEducationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setDocumentTypeElement(documentType.toHapi())
-    hapiValue.setReferenceElement(reference.toHapi())
-    hapiValue.setPublicationDateElement(publicationDate.toHapi())
-    hapiValue.setPresentationDateElement(presentationDate.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasDocumentType()) {
+      hapiValue.setDocumentTypeElement(documentType.toHapi())
+    }
+    if (hasReference()) {
+      hapiValue.setReferenceElement(reference.toHapi())
+    }
+    if (hasPublicationDate()) {
+      hapiValue.setPublicationDateElement(publicationDate.toHapi())
+    }
+    if (hasPresentationDate()) {
+      hapiValue.setPresentationDateElement(presentationDate.toHapi())
+    }
     return hapiValue
   }
 
@@ -320,11 +498,21 @@ public object ImmunizationConverter {
     org.hl7.fhir.r4.model.Immunization.ImmunizationReactionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Immunization.ImmunizationReactionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setDetail(detail.toHapi())
-    hapiValue.setReportedElement(reported.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasDetail()) {
+      hapiValue.setDetail(detail.toHapi())
+    }
+    if (hasReported()) {
+      hapiValue.setReportedElement(reported.toHapi())
+    }
     return hapiValue
   }
 
@@ -333,13 +521,27 @@ public object ImmunizationConverter {
     org.hl7.fhir.r4.model.Immunization.ImmunizationProtocolAppliedComponent {
     val hapiValue = org.hl7.fhir.r4.model.Immunization.ImmunizationProtocolAppliedComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSeriesElement(series.toHapi())
-    hapiValue.setAuthority(authority.toHapi())
-    hapiValue.setTargetDisease(targetDiseaseList.map { it.toHapi() })
-    hapiValue.setDoseNumber(doseNumber.immunizationProtocolAppliedDoseNumberToHapi())
-    hapiValue.setSeriesDoses(seriesDoses.immunizationProtocolAppliedSeriesDosesToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSeries()) {
+      hapiValue.setSeriesElement(series.toHapi())
+    }
+    if (hasAuthority()) {
+      hapiValue.setAuthority(authority.toHapi())
+    }
+    if (targetDiseaseCount > 0) {
+      hapiValue.setTargetDisease(targetDiseaseList.map { it.toHapi() })
+    }
+    if (hasDoseNumber()) {
+      hapiValue.setDoseNumber(doseNumber.immunizationProtocolAppliedDoseNumberToHapi())
+    }
+    if (hasSeriesDoses()) {
+      hapiValue.setSeriesDoses(seriesDoses.immunizationProtocolAppliedSeriesDosesToHapi())
+    }
     return hapiValue
   }
 }

@@ -46,99 +46,171 @@ public object EpisodeOfCareConverter {
   public fun EpisodeOfCare.toHapi(): org.hl7.fhir.r4.model.EpisodeOfCare {
     val hapiValue = org.hl7.fhir.r4.model.EpisodeOfCare()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setStatusHistory(statusHistoryList.map { it.toHapi() })
-    hapiValue.setType(typeList.map { it.toHapi() })
-    hapiValue.setDiagnosis(diagnosisList.map { it.toHapi() })
-    hapiValue.setPatient(patient.toHapi())
-    hapiValue.setManagingOrganization(managingOrganization.toHapi())
-    hapiValue.setPeriod(period.toHapi())
-    hapiValue.setReferralRequest(referralRequestList.map { it.toHapi() })
-    hapiValue.setCareManager(careManager.toHapi())
-    hapiValue.setTeam(teamList.map { it.toHapi() })
-    hapiValue.setAccount(accountList.map { it.toHapi() })
+    if (statusHistoryCount > 0) {
+      hapiValue.setStatusHistory(statusHistoryList.map { it.toHapi() })
+    }
+    if (typeCount > 0) {
+      hapiValue.setType(typeList.map { it.toHapi() })
+    }
+    if (diagnosisCount > 0) {
+      hapiValue.setDiagnosis(diagnosisList.map { it.toHapi() })
+    }
+    if (hasPatient()) {
+      hapiValue.setPatient(patient.toHapi())
+    }
+    if (hasManagingOrganization()) {
+      hapiValue.setManagingOrganization(managingOrganization.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
+    if (referralRequestCount > 0) {
+      hapiValue.setReferralRequest(referralRequestList.map { it.toHapi() })
+    }
+    if (hasCareManager()) {
+      hapiValue.setCareManager(careManager.toHapi())
+    }
+    if (teamCount > 0) {
+      hapiValue.setTeam(teamList.map { it.toHapi() })
+    }
+    if (accountCount > 0) {
+      hapiValue.setAccount(accountList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.EpisodeOfCare.toProto(): EpisodeOfCare {
-    val protoValue =
-      EpisodeOfCare.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setStatus(
-          EpisodeOfCare.StatusCode.newBuilder()
-            .setValue(
-              EpisodeOfCareStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = EpisodeOfCare.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      EpisodeOfCare.StatusCode.newBuilder()
+        .setValue(
+          EpisodeOfCareStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .addAllStatusHistory(statusHistory.map { it.toProto() })
-        .addAllType(type.map { it.toProto() })
-        .addAllDiagnosis(diagnosis.map { it.toProto() })
-        .setPatient(patient.toProto())
-        .setManagingOrganization(managingOrganization.toProto())
-        .setPeriod(period.toProto())
-        .addAllReferralRequest(referralRequest.map { it.toProto() })
-        .setCareManager(careManager.toProto())
-        .addAllTeam(team.map { it.toProto() })
-        .addAllAccount(account.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasStatusHistory()) {
+      protoValue.addAllStatusHistory(statusHistory.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.addAllType(type.map { it.toProto() })
+    }
+    if (hasDiagnosis()) {
+      protoValue.addAllDiagnosis(diagnosis.map { it.toProto() })
+    }
+    if (hasPatient()) {
+      protoValue.setPatient(patient.toProto())
+    }
+    if (hasManagingOrganization()) {
+      protoValue.setManagingOrganization(managingOrganization.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    if (hasReferralRequest()) {
+      protoValue.addAllReferralRequest(referralRequest.map { it.toProto() })
+    }
+    if (hasCareManager()) {
+      protoValue.setCareManager(careManager.toProto())
+    }
+    if (hasTeam()) {
+      protoValue.addAllTeam(team.map { it.toProto() })
+    }
+    if (hasAccount()) {
+      protoValue.addAllAccount(account.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatusHistoryComponent.toProto():
     EpisodeOfCare.StatusHistory {
     val protoValue =
-      EpisodeOfCare.StatusHistory.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setStatus(
-          EpisodeOfCare.StatusHistory.StatusCode.newBuilder()
-            .setValue(
-              EpisodeOfCareStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      EpisodeOfCare.StatusHistory.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      EpisodeOfCare.StatusHistory.StatusCode.newBuilder()
+        .setValue(
+          EpisodeOfCareStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setPeriod(period.toProto())
         .build()
-    return protoValue
+    )
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.EpisodeOfCare.DiagnosisComponent.toProto():
     EpisodeOfCare.Diagnosis {
-    val protoValue =
-      EpisodeOfCare.Diagnosis.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCondition(condition.toProto())
-        .setRole(role.toProto())
-        .setRank(rankElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = EpisodeOfCare.Diagnosis.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCondition()) {
+      protoValue.setCondition(condition.toProto())
+    }
+    if (hasRole()) {
+      protoValue.setRole(role.toProto())
+    }
+    if (hasRank()) {
+      protoValue.setRank(rankElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -146,14 +218,20 @@ public object EpisodeOfCareConverter {
     org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatusHistoryComponent {
     val hapiValue = org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatusHistoryComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.EpisodeOfCare.EpisodeOfCareStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setPeriod(period.toHapi())
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
     return hapiValue
   }
 
@@ -162,11 +240,21 @@ public object EpisodeOfCareConverter {
     org.hl7.fhir.r4.model.EpisodeOfCare.DiagnosisComponent {
     val hapiValue = org.hl7.fhir.r4.model.EpisodeOfCare.DiagnosisComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCondition(condition.toHapi())
-    hapiValue.setRole(role.toHapi())
-    hapiValue.setRankElement(rank.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCondition()) {
+      hapiValue.setCondition(condition.toHapi())
+    }
+    if (hasRole()) {
+      hapiValue.setRole(role.toHapi())
+    }
+    if (hasRank()) {
+      hapiValue.setRankElement(rank.toHapi())
+    }
     return hapiValue
   }
 }

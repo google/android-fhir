@@ -42,40 +42,85 @@ public object MedicinalProductManufacturedConverter {
     org.hl7.fhir.r4.model.MedicinalProductManufactured {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductManufactured()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setManufacturedDoseForm(manufacturedDoseForm.toHapi())
-    hapiValue.setUnitOfPresentation(unitOfPresentation.toHapi())
-    hapiValue.setQuantity(quantity.toHapi())
-    hapiValue.setManufacturer(manufacturerList.map { it.toHapi() })
-    hapiValue.setIngredient(ingredientList.map { it.toHapi() })
-    hapiValue.setPhysicalCharacteristics(physicalCharacteristics.toHapi())
-    hapiValue.setOtherCharacteristics(otherCharacteristicsList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasManufacturedDoseForm()) {
+      hapiValue.setManufacturedDoseForm(manufacturedDoseForm.toHapi())
+    }
+    if (hasUnitOfPresentation()) {
+      hapiValue.setUnitOfPresentation(unitOfPresentation.toHapi())
+    }
+    if (hasQuantity()) {
+      hapiValue.setQuantity(quantity.toHapi())
+    }
+    if (manufacturerCount > 0) {
+      hapiValue.setManufacturer(manufacturerList.map { it.toHapi() })
+    }
+    if (ingredientCount > 0) {
+      hapiValue.setIngredient(ingredientList.map { it.toHapi() })
+    }
+    if (hasPhysicalCharacteristics()) {
+      hapiValue.setPhysicalCharacteristics(physicalCharacteristics.toHapi())
+    }
+    if (otherCharacteristicsCount > 0) {
+      hapiValue.setOtherCharacteristics(otherCharacteristicsList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.MedicinalProductManufactured.toProto():
     MedicinalProductManufactured {
-    val protoValue =
-      MedicinalProductManufactured.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setManufacturedDoseForm(manufacturedDoseForm.toProto())
-        .setUnitOfPresentation(unitOfPresentation.toProto())
-        .setQuantity(quantity.toProto())
-        .addAllManufacturer(manufacturer.map { it.toProto() })
-        .addAllIngredient(ingredient.map { it.toProto() })
-        .setPhysicalCharacteristics(physicalCharacteristics.toProto())
-        .addAllOtherCharacteristics(otherCharacteristics.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = MedicinalProductManufactured.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasManufacturedDoseForm()) {
+      protoValue.setManufacturedDoseForm(manufacturedDoseForm.toProto())
+    }
+    if (hasUnitOfPresentation()) {
+      protoValue.setUnitOfPresentation(unitOfPresentation.toProto())
+    }
+    if (hasQuantity()) {
+      protoValue.setQuantity(quantity.toProto())
+    }
+    if (hasManufacturer()) {
+      protoValue.addAllManufacturer(manufacturer.map { it.toProto() })
+    }
+    if (hasIngredient()) {
+      protoValue.addAllIngredient(ingredient.map { it.toProto() })
+    }
+    if (hasPhysicalCharacteristics()) {
+      protoValue.setPhysicalCharacteristics(physicalCharacteristics.toProto())
+    }
+    if (hasOtherCharacteristics()) {
+      protoValue.addAllOtherCharacteristics(otherCharacteristics.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 }

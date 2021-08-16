@@ -271,312 +271,608 @@ public object ClaimConverter {
   public fun Claim.toHapi(): org.hl7.fhir.r4.model.Claim {
     val hapiValue = org.hl7.fhir.r4.model.Claim()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Claim.ClaimStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setType(type.toHapi())
-    hapiValue.setSubType(subType.toHapi())
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasSubType()) {
+      hapiValue.setSubType(subType.toHapi())
+    }
     hapiValue.setUse(
       org.hl7.fhir.r4.model.Claim.Use.valueOf(use.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setPatient(patient.toHapi())
-    hapiValue.setBillablePeriod(billablePeriod.toHapi())
-    hapiValue.setCreatedElement(created.toHapi())
-    hapiValue.setEnterer(enterer.toHapi())
-    hapiValue.setInsurer(insurer.toHapi())
-    hapiValue.setProvider(provider.toHapi())
-    hapiValue.setPriority(priority.toHapi())
-    hapiValue.setFundsReserve(fundsReserve.toHapi())
-    hapiValue.setRelated(relatedList.map { it.toHapi() })
-    hapiValue.setPrescription(prescription.toHapi())
-    hapiValue.setOriginalPrescription(originalPrescription.toHapi())
-    hapiValue.setPayee(payee.toHapi())
-    hapiValue.setReferral(referral.toHapi())
-    hapiValue.setFacility(facility.toHapi())
-    hapiValue.setCareTeam(careTeamList.map { it.toHapi() })
-    hapiValue.setSupportingInfo(supportingInfoList.map { it.toHapi() })
-    hapiValue.setDiagnosis(diagnosisList.map { it.toHapi() })
-    hapiValue.setProcedure(procedureList.map { it.toHapi() })
-    hapiValue.setInsurance(insuranceList.map { it.toHapi() })
-    hapiValue.setAccident(accident.toHapi())
-    hapiValue.setItem(itemList.map { it.toHapi() })
-    hapiValue.setTotal(total.toHapi())
+    if (hasPatient()) {
+      hapiValue.setPatient(patient.toHapi())
+    }
+    if (hasBillablePeriod()) {
+      hapiValue.setBillablePeriod(billablePeriod.toHapi())
+    }
+    if (hasCreated()) {
+      hapiValue.setCreatedElement(created.toHapi())
+    }
+    if (hasEnterer()) {
+      hapiValue.setEnterer(enterer.toHapi())
+    }
+    if (hasInsurer()) {
+      hapiValue.setInsurer(insurer.toHapi())
+    }
+    if (hasProvider()) {
+      hapiValue.setProvider(provider.toHapi())
+    }
+    if (hasPriority()) {
+      hapiValue.setPriority(priority.toHapi())
+    }
+    if (hasFundsReserve()) {
+      hapiValue.setFundsReserve(fundsReserve.toHapi())
+    }
+    if (relatedCount > 0) {
+      hapiValue.setRelated(relatedList.map { it.toHapi() })
+    }
+    if (hasPrescription()) {
+      hapiValue.setPrescription(prescription.toHapi())
+    }
+    if (hasOriginalPrescription()) {
+      hapiValue.setOriginalPrescription(originalPrescription.toHapi())
+    }
+    if (hasPayee()) {
+      hapiValue.setPayee(payee.toHapi())
+    }
+    if (hasReferral()) {
+      hapiValue.setReferral(referral.toHapi())
+    }
+    if (hasFacility()) {
+      hapiValue.setFacility(facility.toHapi())
+    }
+    if (careTeamCount > 0) {
+      hapiValue.setCareTeam(careTeamList.map { it.toHapi() })
+    }
+    if (supportingInfoCount > 0) {
+      hapiValue.setSupportingInfo(supportingInfoList.map { it.toHapi() })
+    }
+    if (diagnosisCount > 0) {
+      hapiValue.setDiagnosis(diagnosisList.map { it.toHapi() })
+    }
+    if (procedureCount > 0) {
+      hapiValue.setProcedure(procedureList.map { it.toHapi() })
+    }
+    if (insuranceCount > 0) {
+      hapiValue.setInsurance(insuranceList.map { it.toHapi() })
+    }
+    if (hasAccident()) {
+      hapiValue.setAccident(accident.toHapi())
+    }
+    if (itemCount > 0) {
+      hapiValue.setItem(itemList.map { it.toHapi() })
+    }
+    if (hasTotal()) {
+      hapiValue.setTotal(total.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Claim.toProto(): Claim {
-    val protoValue =
-      Claim.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setStatus(
-          Claim.StatusCode.newBuilder()
-            .setValue(
-              FinancialResourceStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Claim.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      Claim.StatusCode.newBuilder()
+        .setValue(
+          FinancialResourceStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setType(type.toProto())
-        .setSubType(subType.toProto())
-        .setUse(
-          Claim.UseCode.newBuilder()
-            .setValue(
-              UseCode.Value.valueOf(use.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
-            )
-            .build()
-        )
-        .setPatient(patient.toProto())
-        .setBillablePeriod(billablePeriod.toProto())
-        .setCreated(createdElement.toProto())
-        .setEnterer(enterer.toProto())
-        .setInsurer(insurer.toProto())
-        .setProvider(provider.toProto())
-        .setPriority(priority.toProto())
-        .setFundsReserve(fundsReserve.toProto())
-        .addAllRelated(related.map { it.toProto() })
-        .setPrescription(prescription.toProto())
-        .setOriginalPrescription(originalPrescription.toProto())
-        .setPayee(payee.toProto())
-        .setReferral(referral.toProto())
-        .setFacility(facility.toProto())
-        .addAllCareTeam(careTeam.map { it.toProto() })
-        .addAllSupportingInfo(supportingInfo.map { it.toProto() })
-        .addAllDiagnosis(diagnosis.map { it.toProto() })
-        .addAllProcedure(procedure.map { it.toProto() })
-        .addAllInsurance(insurance.map { it.toProto() })
-        .setAccident(accident.toProto())
-        .addAllItem(item.map { it.toProto() })
-        .setTotal(total.toProto())
         .build()
-    return protoValue
+    )
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasSubType()) {
+      protoValue.setSubType(subType.toProto())
+    }
+    protoValue.setUse(
+      Claim.UseCode.newBuilder()
+        .setValue(
+          UseCode.Value.valueOf(use.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
+        )
+        .build()
+    )
+    if (hasPatient()) {
+      protoValue.setPatient(patient.toProto())
+    }
+    if (hasBillablePeriod()) {
+      protoValue.setBillablePeriod(billablePeriod.toProto())
+    }
+    if (hasCreated()) {
+      protoValue.setCreated(createdElement.toProto())
+    }
+    if (hasEnterer()) {
+      protoValue.setEnterer(enterer.toProto())
+    }
+    if (hasInsurer()) {
+      protoValue.setInsurer(insurer.toProto())
+    }
+    if (hasProvider()) {
+      protoValue.setProvider(provider.toProto())
+    }
+    if (hasPriority()) {
+      protoValue.setPriority(priority.toProto())
+    }
+    if (hasFundsReserve()) {
+      protoValue.setFundsReserve(fundsReserve.toProto())
+    }
+    if (hasRelated()) {
+      protoValue.addAllRelated(related.map { it.toProto() })
+    }
+    if (hasPrescription()) {
+      protoValue.setPrescription(prescription.toProto())
+    }
+    if (hasOriginalPrescription()) {
+      protoValue.setOriginalPrescription(originalPrescription.toProto())
+    }
+    if (hasPayee()) {
+      protoValue.setPayee(payee.toProto())
+    }
+    if (hasReferral()) {
+      protoValue.setReferral(referral.toProto())
+    }
+    if (hasFacility()) {
+      protoValue.setFacility(facility.toProto())
+    }
+    if (hasCareTeam()) {
+      protoValue.addAllCareTeam(careTeam.map { it.toProto() })
+    }
+    if (hasSupportingInfo()) {
+      protoValue.addAllSupportingInfo(supportingInfo.map { it.toProto() })
+    }
+    if (hasDiagnosis()) {
+      protoValue.addAllDiagnosis(diagnosis.map { it.toProto() })
+    }
+    if (hasProcedure()) {
+      protoValue.addAllProcedure(procedure.map { it.toProto() })
+    }
+    if (hasInsurance()) {
+      protoValue.addAllInsurance(insurance.map { it.toProto() })
+    }
+    if (hasAccident()) {
+      protoValue.setAccident(accident.toProto())
+    }
+    if (hasItem()) {
+      protoValue.addAllItem(item.map { it.toProto() })
+    }
+    if (hasTotal()) {
+      protoValue.setTotal(total.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.RelatedClaimComponent.toProto(): Claim.RelatedClaim {
-    val protoValue =
-      Claim.RelatedClaim.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setRelationship(relationship.toProto())
-        .setReference(reference.toProto())
-        .build()
-    return protoValue
+    val protoValue = Claim.RelatedClaim.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasRelationship()) {
+      protoValue.setRelationship(relationship.toProto())
+    }
+    if (hasReference()) {
+      protoValue.setReference(reference.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.PayeeComponent.toProto(): Claim.Payee {
-    val protoValue =
-      Claim.Payee.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(type.toProto())
-        .setParty(party.toProto())
-        .build()
-    return protoValue
+    val protoValue = Claim.Payee.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasParty()) {
+      protoValue.setParty(party.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.CareTeamComponent.toProto(): Claim.CareTeam {
-    val protoValue =
-      Claim.CareTeam.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSequence(sequenceElement.toProto())
-        .setProvider(provider.toProto())
-        .setResponsible(responsibleElement.toProto())
-        .setRole(role.toProto())
-        .setQualification(qualification.toProto())
-        .build()
-    return protoValue
+    val protoValue = Claim.CareTeam.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSequence()) {
+      protoValue.setSequence(sequenceElement.toProto())
+    }
+    if (hasProvider()) {
+      protoValue.setProvider(provider.toProto())
+    }
+    if (hasResponsible()) {
+      protoValue.setResponsible(responsibleElement.toProto())
+    }
+    if (hasRole()) {
+      protoValue.setRole(role.toProto())
+    }
+    if (hasQualification()) {
+      protoValue.setQualification(qualification.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.SupportingInformationComponent.toProto():
     Claim.SupportingInformation {
     val protoValue =
-      Claim.SupportingInformation.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSequence(sequenceElement.toProto())
-        .setCategory(category.toProto())
-        .setCode(code.toProto())
-        .setTiming(timing.claimSupportingInfoTimingToProto())
-        .setValue(value.claimSupportingInfoValueToProto())
-        .setReason(reason.toProto())
-        .build()
-    return protoValue
+      Claim.SupportingInformation.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSequence()) {
+      protoValue.setSequence(sequenceElement.toProto())
+    }
+    if (hasCategory()) {
+      protoValue.setCategory(category.toProto())
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasTiming()) {
+      protoValue.setTiming(timing.claimSupportingInfoTimingToProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.claimSupportingInfoValueToProto())
+    }
+    if (hasReason()) {
+      protoValue.setReason(reason.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.DiagnosisComponent.toProto(): Claim.Diagnosis {
-    val protoValue =
-      Claim.Diagnosis.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSequence(sequenceElement.toProto())
-        .setDiagnosis(diagnosis.claimDiagnosisDiagnosisToProto())
-        .addAllType(type.map { it.toProto() })
-        .setOnAdmission(onAdmission.toProto())
-        .setPackageCode(packageCode.toProto())
-        .build()
-    return protoValue
+    val protoValue = Claim.Diagnosis.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSequence()) {
+      protoValue.setSequence(sequenceElement.toProto())
+    }
+    if (hasDiagnosis()) {
+      protoValue.setDiagnosis(diagnosis.claimDiagnosisDiagnosisToProto())
+    }
+    if (hasType()) {
+      protoValue.addAllType(type.map { it.toProto() })
+    }
+    if (hasOnAdmission()) {
+      protoValue.setOnAdmission(onAdmission.toProto())
+    }
+    if (hasPackageCode()) {
+      protoValue.setPackageCode(packageCode.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.ProcedureComponent.toProto(): Claim.Procedure {
-    val protoValue =
-      Claim.Procedure.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSequence(sequenceElement.toProto())
-        .addAllType(type.map { it.toProto() })
-        .setDate(dateElement.toProto())
-        .setProcedure(procedure.claimProcedureProcedureToProto())
-        .addAllUdi(udi.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = Claim.Procedure.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSequence()) {
+      protoValue.setSequence(sequenceElement.toProto())
+    }
+    if (hasType()) {
+      protoValue.addAllType(type.map { it.toProto() })
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasProcedure()) {
+      protoValue.setProcedure(procedure.claimProcedureProcedureToProto())
+    }
+    if (hasUdi()) {
+      protoValue.addAllUdi(udi.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.InsuranceComponent.toProto(): Claim.Insurance {
-    val protoValue =
-      Claim.Insurance.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSequence(sequenceElement.toProto())
-        .setFocal(focalElement.toProto())
-        .setIdentifier(identifier.toProto())
-        .setCoverage(coverage.toProto())
-        .setBusinessArrangement(businessArrangementElement.toProto())
-        .addAllPreAuthRef(preAuthRef.map { it.toProto() })
-        .setClaimResponse(claimResponse.toProto())
-        .build()
-    return protoValue
+    val protoValue = Claim.Insurance.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSequence()) {
+      protoValue.setSequence(sequenceElement.toProto())
+    }
+    if (hasFocal()) {
+      protoValue.setFocal(focalElement.toProto())
+    }
+    if (hasIdentifier()) {
+      protoValue.setIdentifier(identifier.toProto())
+    }
+    if (hasCoverage()) {
+      protoValue.setCoverage(coverage.toProto())
+    }
+    if (hasBusinessArrangement()) {
+      protoValue.setBusinessArrangement(businessArrangementElement.toProto())
+    }
+    if (hasPreAuthRef()) {
+      protoValue.addAllPreAuthRef(preAuthRef.map { it.toProto() })
+    }
+    if (hasClaimResponse()) {
+      protoValue.setClaimResponse(claimResponse.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.AccidentComponent.toProto(): Claim.Accident {
-    val protoValue =
-      Claim.Accident.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setDate(dateElement.toProto())
-        .setType(type.toProto())
-        .setLocation(location.claimAccidentLocationToProto())
-        .build()
-    return protoValue
+    val protoValue = Claim.Accident.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasLocation()) {
+      protoValue.setLocation(location.claimAccidentLocationToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.ItemComponent.toProto(): Claim.Item {
-    val protoValue =
-      Claim.Item.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSequence(sequenceElement.toProto())
-        .addAllCareTeamSequence(careTeamSequence.map { it.toProto() })
-        .addAllDiagnosisSequence(diagnosisSequence.map { it.toProto() })
-        .addAllProcedureSequence(procedureSequence.map { it.toProto() })
-        .addAllInformationSequence(informationSequence.map { it.toProto() })
-        .setRevenue(revenue.toProto())
-        .setCategory(category.toProto())
-        .setProductOrService(productOrService.toProto())
-        .addAllModifier(modifier.map { it.toProto() })
-        .addAllProgramCode(programCode.map { it.toProto() })
-        .setServiced(serviced.claimItemServicedToProto())
-        .setLocation(location.claimItemLocationToProto())
-        .setQuantity((quantity as SimpleQuantity).toProto())
-        .setUnitPrice(unitPrice.toProto())
-        .setFactor(factorElement.toProto())
-        .setNet(net.toProto())
-        .addAllUdi(udi.map { it.toProto() })
-        .setBodySite(bodySite.toProto())
-        .addAllSubSite(subSite.map { it.toProto() })
-        .addAllEncounter(encounter.map { it.toProto() })
-        .addAllDetail(detail.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = Claim.Item.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSequence()) {
+      protoValue.setSequence(sequenceElement.toProto())
+    }
+    if (hasCareTeamSequence()) {
+      protoValue.addAllCareTeamSequence(careTeamSequence.map { it.toProto() })
+    }
+    if (hasDiagnosisSequence()) {
+      protoValue.addAllDiagnosisSequence(diagnosisSequence.map { it.toProto() })
+    }
+    if (hasProcedureSequence()) {
+      protoValue.addAllProcedureSequence(procedureSequence.map { it.toProto() })
+    }
+    if (hasInformationSequence()) {
+      protoValue.addAllInformationSequence(informationSequence.map { it.toProto() })
+    }
+    if (hasRevenue()) {
+      protoValue.setRevenue(revenue.toProto())
+    }
+    if (hasCategory()) {
+      protoValue.setCategory(category.toProto())
+    }
+    if (hasProductOrService()) {
+      protoValue.setProductOrService(productOrService.toProto())
+    }
+    if (hasModifier()) {
+      protoValue.addAllModifier(modifier.map { it.toProto() })
+    }
+    if (hasProgramCode()) {
+      protoValue.addAllProgramCode(programCode.map { it.toProto() })
+    }
+    if (hasServiced()) {
+      protoValue.setServiced(serviced.claimItemServicedToProto())
+    }
+    if (hasLocation()) {
+      protoValue.setLocation(location.claimItemLocationToProto())
+    }
+    if (hasQuantity()) {
+      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+    }
+    if (hasUnitPrice()) {
+      protoValue.setUnitPrice(unitPrice.toProto())
+    }
+    if (hasFactor()) {
+      protoValue.setFactor(factorElement.toProto())
+    }
+    if (hasNet()) {
+      protoValue.setNet(net.toProto())
+    }
+    if (hasUdi()) {
+      protoValue.addAllUdi(udi.map { it.toProto() })
+    }
+    if (hasBodySite()) {
+      protoValue.setBodySite(bodySite.toProto())
+    }
+    if (hasSubSite()) {
+      protoValue.addAllSubSite(subSite.map { it.toProto() })
+    }
+    if (hasEncounter()) {
+      protoValue.addAllEncounter(encounter.map { it.toProto() })
+    }
+    if (hasDetail()) {
+      protoValue.addAllDetail(detail.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.DetailComponent.toProto(): Claim.Item.Detail {
-    val protoValue =
-      Claim.Item.Detail.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSequence(sequenceElement.toProto())
-        .setRevenue(revenue.toProto())
-        .setCategory(category.toProto())
-        .setProductOrService(productOrService.toProto())
-        .addAllModifier(modifier.map { it.toProto() })
-        .addAllProgramCode(programCode.map { it.toProto() })
-        .setQuantity((quantity as SimpleQuantity).toProto())
-        .setUnitPrice(unitPrice.toProto())
-        .setFactor(factorElement.toProto())
-        .setNet(net.toProto())
-        .addAllUdi(udi.map { it.toProto() })
-        .addAllSubDetail(subDetail.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = Claim.Item.Detail.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSequence()) {
+      protoValue.setSequence(sequenceElement.toProto())
+    }
+    if (hasRevenue()) {
+      protoValue.setRevenue(revenue.toProto())
+    }
+    if (hasCategory()) {
+      protoValue.setCategory(category.toProto())
+    }
+    if (hasProductOrService()) {
+      protoValue.setProductOrService(productOrService.toProto())
+    }
+    if (hasModifier()) {
+      protoValue.addAllModifier(modifier.map { it.toProto() })
+    }
+    if (hasProgramCode()) {
+      protoValue.addAllProgramCode(programCode.map { it.toProto() })
+    }
+    if (hasQuantity()) {
+      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+    }
+    if (hasUnitPrice()) {
+      protoValue.setUnitPrice(unitPrice.toProto())
+    }
+    if (hasFactor()) {
+      protoValue.setFactor(factorElement.toProto())
+    }
+    if (hasNet()) {
+      protoValue.setNet(net.toProto())
+    }
+    if (hasUdi()) {
+      protoValue.addAllUdi(udi.map { it.toProto() })
+    }
+    if (hasSubDetail()) {
+      protoValue.addAllSubDetail(subDetail.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Claim.SubDetailComponent.toProto():
     Claim.Item.Detail.SubDetail {
     val protoValue =
-      Claim.Item.Detail.SubDetail.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSequence(sequenceElement.toProto())
-        .setRevenue(revenue.toProto())
-        .setCategory(category.toProto())
-        .setProductOrService(productOrService.toProto())
-        .addAllModifier(modifier.map { it.toProto() })
-        .addAllProgramCode(programCode.map { it.toProto() })
-        .setQuantity((quantity as SimpleQuantity).toProto())
-        .setUnitPrice(unitPrice.toProto())
-        .setFactor(factorElement.toProto())
-        .setNet(net.toProto())
-        .addAllUdi(udi.map { it.toProto() })
-        .build()
-    return protoValue
+      Claim.Item.Detail.SubDetail.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSequence()) {
+      protoValue.setSequence(sequenceElement.toProto())
+    }
+    if (hasRevenue()) {
+      protoValue.setRevenue(revenue.toProto())
+    }
+    if (hasCategory()) {
+      protoValue.setCategory(category.toProto())
+    }
+    if (hasProductOrService()) {
+      protoValue.setProductOrService(productOrService.toProto())
+    }
+    if (hasModifier()) {
+      protoValue.addAllModifier(modifier.map { it.toProto() })
+    }
+    if (hasProgramCode()) {
+      protoValue.addAllProgramCode(programCode.map { it.toProto() })
+    }
+    if (hasQuantity()) {
+      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+    }
+    if (hasUnitPrice()) {
+      protoValue.setUnitPrice(unitPrice.toProto())
+    }
+    if (hasFactor()) {
+      protoValue.setFactor(factorElement.toProto())
+    }
+    if (hasNet()) {
+      protoValue.setNet(net.toProto())
+    }
+    if (hasUdi()) {
+      protoValue.addAllUdi(udi.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun Claim.RelatedClaim.toHapi(): org.hl7.fhir.r4.model.Claim.RelatedClaimComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.RelatedClaimComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setRelationship(relationship.toHapi())
-    hapiValue.setReference(reference.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasRelationship()) {
+      hapiValue.setRelationship(relationship.toHapi())
+    }
+    if (hasReference()) {
+      hapiValue.setReference(reference.toHapi())
+    }
     return hapiValue
   }
 
@@ -584,10 +880,18 @@ public object ClaimConverter {
   private fun Claim.Payee.toHapi(): org.hl7.fhir.r4.model.Claim.PayeeComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.PayeeComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
-    hapiValue.setParty(party.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasParty()) {
+      hapiValue.setParty(party.toHapi())
+    }
     return hapiValue
   }
 
@@ -595,13 +899,27 @@ public object ClaimConverter {
   private fun Claim.CareTeam.toHapi(): org.hl7.fhir.r4.model.Claim.CareTeamComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.CareTeamComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSequenceElement(sequence.toHapi())
-    hapiValue.setProvider(provider.toHapi())
-    hapiValue.setResponsibleElement(responsible.toHapi())
-    hapiValue.setRole(role.toHapi())
-    hapiValue.setQualification(qualification.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSequence()) {
+      hapiValue.setSequenceElement(sequence.toHapi())
+    }
+    if (hasProvider()) {
+      hapiValue.setProvider(provider.toHapi())
+    }
+    if (hasResponsible()) {
+      hapiValue.setResponsibleElement(responsible.toHapi())
+    }
+    if (hasRole()) {
+      hapiValue.setRole(role.toHapi())
+    }
+    if (hasQualification()) {
+      hapiValue.setQualification(qualification.toHapi())
+    }
     return hapiValue
   }
 
@@ -610,14 +928,30 @@ public object ClaimConverter {
     org.hl7.fhir.r4.model.Claim.SupportingInformationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.SupportingInformationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSequenceElement(sequence.toHapi())
-    hapiValue.setCategory(category.toHapi())
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setTiming(timing.claimSupportingInfoTimingToHapi())
-    hapiValue.setValue(value.claimSupportingInfoValueToHapi())
-    hapiValue.setReason(reason.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSequence()) {
+      hapiValue.setSequenceElement(sequence.toHapi())
+    }
+    if (hasCategory()) {
+      hapiValue.setCategory(category.toHapi())
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasTiming()) {
+      hapiValue.setTiming(timing.claimSupportingInfoTimingToHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.claimSupportingInfoValueToHapi())
+    }
+    if (hasReason()) {
+      hapiValue.setReason(reason.toHapi())
+    }
     return hapiValue
   }
 
@@ -625,13 +959,27 @@ public object ClaimConverter {
   private fun Claim.Diagnosis.toHapi(): org.hl7.fhir.r4.model.Claim.DiagnosisComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.DiagnosisComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSequenceElement(sequence.toHapi())
-    hapiValue.setDiagnosis(diagnosis.claimDiagnosisDiagnosisToHapi())
-    hapiValue.setType(typeList.map { it.toHapi() })
-    hapiValue.setOnAdmission(onAdmission.toHapi())
-    hapiValue.setPackageCode(packageCode.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSequence()) {
+      hapiValue.setSequenceElement(sequence.toHapi())
+    }
+    if (hasDiagnosis()) {
+      hapiValue.setDiagnosis(diagnosis.claimDiagnosisDiagnosisToHapi())
+    }
+    if (typeCount > 0) {
+      hapiValue.setType(typeList.map { it.toHapi() })
+    }
+    if (hasOnAdmission()) {
+      hapiValue.setOnAdmission(onAdmission.toHapi())
+    }
+    if (hasPackageCode()) {
+      hapiValue.setPackageCode(packageCode.toHapi())
+    }
     return hapiValue
   }
 
@@ -639,13 +987,27 @@ public object ClaimConverter {
   private fun Claim.Procedure.toHapi(): org.hl7.fhir.r4.model.Claim.ProcedureComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.ProcedureComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSequenceElement(sequence.toHapi())
-    hapiValue.setType(typeList.map { it.toHapi() })
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setProcedure(procedure.claimProcedureProcedureToHapi())
-    hapiValue.setUdi(udiList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSequence()) {
+      hapiValue.setSequenceElement(sequence.toHapi())
+    }
+    if (typeCount > 0) {
+      hapiValue.setType(typeList.map { it.toHapi() })
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasProcedure()) {
+      hapiValue.setProcedure(procedure.claimProcedureProcedureToHapi())
+    }
+    if (udiCount > 0) {
+      hapiValue.setUdi(udiList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -653,15 +1015,33 @@ public object ClaimConverter {
   private fun Claim.Insurance.toHapi(): org.hl7.fhir.r4.model.Claim.InsuranceComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.InsuranceComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSequenceElement(sequence.toHapi())
-    hapiValue.setFocalElement(focal.toHapi())
-    hapiValue.setIdentifier(identifier.toHapi())
-    hapiValue.setCoverage(coverage.toHapi())
-    hapiValue.setBusinessArrangementElement(businessArrangement.toHapi())
-    hapiValue.setPreAuthRef(preAuthRefList.map { it.toHapi() })
-    hapiValue.setClaimResponse(claimResponse.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSequence()) {
+      hapiValue.setSequenceElement(sequence.toHapi())
+    }
+    if (hasFocal()) {
+      hapiValue.setFocalElement(focal.toHapi())
+    }
+    if (hasIdentifier()) {
+      hapiValue.setIdentifier(identifier.toHapi())
+    }
+    if (hasCoverage()) {
+      hapiValue.setCoverage(coverage.toHapi())
+    }
+    if (hasBusinessArrangement()) {
+      hapiValue.setBusinessArrangementElement(businessArrangement.toHapi())
+    }
+    if (preAuthRefCount > 0) {
+      hapiValue.setPreAuthRef(preAuthRefList.map { it.toHapi() })
+    }
+    if (hasClaimResponse()) {
+      hapiValue.setClaimResponse(claimResponse.toHapi())
+    }
     return hapiValue
   }
 
@@ -669,11 +1049,21 @@ public object ClaimConverter {
   private fun Claim.Accident.toHapi(): org.hl7.fhir.r4.model.Claim.AccidentComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.AccidentComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setType(type.toHapi())
-    hapiValue.setLocation(location.claimAccidentLocationToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasLocation()) {
+      hapiValue.setLocation(location.claimAccidentLocationToHapi())
+    }
     return hapiValue
   }
 
@@ -681,29 +1071,75 @@ public object ClaimConverter {
   private fun Claim.Item.toHapi(): org.hl7.fhir.r4.model.Claim.ItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.ItemComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSequenceElement(sequence.toHapi())
-    hapiValue.setCareTeamSequence(careTeamSequenceList.map { it.toHapi() })
-    hapiValue.setDiagnosisSequence(diagnosisSequenceList.map { it.toHapi() })
-    hapiValue.setProcedureSequence(procedureSequenceList.map { it.toHapi() })
-    hapiValue.setInformationSequence(informationSequenceList.map { it.toHapi() })
-    hapiValue.setRevenue(revenue.toHapi())
-    hapiValue.setCategory(category.toHapi())
-    hapiValue.setProductOrService(productOrService.toHapi())
-    hapiValue.setModifier(modifierList.map { it.toHapi() })
-    hapiValue.setProgramCode(programCodeList.map { it.toHapi() })
-    hapiValue.setServiced(serviced.claimItemServicedToHapi())
-    hapiValue.setLocation(location.claimItemLocationToHapi())
-    hapiValue.setQuantity(quantity.toHapi())
-    hapiValue.setUnitPrice(unitPrice.toHapi())
-    hapiValue.setFactorElement(factor.toHapi())
-    hapiValue.setNet(net.toHapi())
-    hapiValue.setUdi(udiList.map { it.toHapi() })
-    hapiValue.setBodySite(bodySite.toHapi())
-    hapiValue.setSubSite(subSiteList.map { it.toHapi() })
-    hapiValue.setEncounter(encounterList.map { it.toHapi() })
-    hapiValue.setDetail(detailList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSequence()) {
+      hapiValue.setSequenceElement(sequence.toHapi())
+    }
+    if (careTeamSequenceCount > 0) {
+      hapiValue.setCareTeamSequence(careTeamSequenceList.map { it.toHapi() })
+    }
+    if (diagnosisSequenceCount > 0) {
+      hapiValue.setDiagnosisSequence(diagnosisSequenceList.map { it.toHapi() })
+    }
+    if (procedureSequenceCount > 0) {
+      hapiValue.setProcedureSequence(procedureSequenceList.map { it.toHapi() })
+    }
+    if (informationSequenceCount > 0) {
+      hapiValue.setInformationSequence(informationSequenceList.map { it.toHapi() })
+    }
+    if (hasRevenue()) {
+      hapiValue.setRevenue(revenue.toHapi())
+    }
+    if (hasCategory()) {
+      hapiValue.setCategory(category.toHapi())
+    }
+    if (hasProductOrService()) {
+      hapiValue.setProductOrService(productOrService.toHapi())
+    }
+    if (modifierCount > 0) {
+      hapiValue.setModifier(modifierList.map { it.toHapi() })
+    }
+    if (programCodeCount > 0) {
+      hapiValue.setProgramCode(programCodeList.map { it.toHapi() })
+    }
+    if (hasServiced()) {
+      hapiValue.setServiced(serviced.claimItemServicedToHapi())
+    }
+    if (hasLocation()) {
+      hapiValue.setLocation(location.claimItemLocationToHapi())
+    }
+    if (hasQuantity()) {
+      hapiValue.setQuantity(quantity.toHapi())
+    }
+    if (hasUnitPrice()) {
+      hapiValue.setUnitPrice(unitPrice.toHapi())
+    }
+    if (hasFactor()) {
+      hapiValue.setFactorElement(factor.toHapi())
+    }
+    if (hasNet()) {
+      hapiValue.setNet(net.toHapi())
+    }
+    if (udiCount > 0) {
+      hapiValue.setUdi(udiList.map { it.toHapi() })
+    }
+    if (hasBodySite()) {
+      hapiValue.setBodySite(bodySite.toHapi())
+    }
+    if (subSiteCount > 0) {
+      hapiValue.setSubSite(subSiteList.map { it.toHapi() })
+    }
+    if (encounterCount > 0) {
+      hapiValue.setEncounter(encounterList.map { it.toHapi() })
+    }
+    if (detailCount > 0) {
+      hapiValue.setDetail(detailList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -711,20 +1147,48 @@ public object ClaimConverter {
   private fun Claim.Item.Detail.toHapi(): org.hl7.fhir.r4.model.Claim.DetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.DetailComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSequenceElement(sequence.toHapi())
-    hapiValue.setRevenue(revenue.toHapi())
-    hapiValue.setCategory(category.toHapi())
-    hapiValue.setProductOrService(productOrService.toHapi())
-    hapiValue.setModifier(modifierList.map { it.toHapi() })
-    hapiValue.setProgramCode(programCodeList.map { it.toHapi() })
-    hapiValue.setQuantity(quantity.toHapi())
-    hapiValue.setUnitPrice(unitPrice.toHapi())
-    hapiValue.setFactorElement(factor.toHapi())
-    hapiValue.setNet(net.toHapi())
-    hapiValue.setUdi(udiList.map { it.toHapi() })
-    hapiValue.setSubDetail(subDetailList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSequence()) {
+      hapiValue.setSequenceElement(sequence.toHapi())
+    }
+    if (hasRevenue()) {
+      hapiValue.setRevenue(revenue.toHapi())
+    }
+    if (hasCategory()) {
+      hapiValue.setCategory(category.toHapi())
+    }
+    if (hasProductOrService()) {
+      hapiValue.setProductOrService(productOrService.toHapi())
+    }
+    if (modifierCount > 0) {
+      hapiValue.setModifier(modifierList.map { it.toHapi() })
+    }
+    if (programCodeCount > 0) {
+      hapiValue.setProgramCode(programCodeList.map { it.toHapi() })
+    }
+    if (hasQuantity()) {
+      hapiValue.setQuantity(quantity.toHapi())
+    }
+    if (hasUnitPrice()) {
+      hapiValue.setUnitPrice(unitPrice.toHapi())
+    }
+    if (hasFactor()) {
+      hapiValue.setFactorElement(factor.toHapi())
+    }
+    if (hasNet()) {
+      hapiValue.setNet(net.toHapi())
+    }
+    if (udiCount > 0) {
+      hapiValue.setUdi(udiList.map { it.toHapi() })
+    }
+    if (subDetailCount > 0) {
+      hapiValue.setSubDetail(subDetailList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -732,19 +1196,45 @@ public object ClaimConverter {
   private fun Claim.Item.Detail.SubDetail.toHapi(): org.hl7.fhir.r4.model.Claim.SubDetailComponent {
     val hapiValue = org.hl7.fhir.r4.model.Claim.SubDetailComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSequenceElement(sequence.toHapi())
-    hapiValue.setRevenue(revenue.toHapi())
-    hapiValue.setCategory(category.toHapi())
-    hapiValue.setProductOrService(productOrService.toHapi())
-    hapiValue.setModifier(modifierList.map { it.toHapi() })
-    hapiValue.setProgramCode(programCodeList.map { it.toHapi() })
-    hapiValue.setQuantity(quantity.toHapi())
-    hapiValue.setUnitPrice(unitPrice.toHapi())
-    hapiValue.setFactorElement(factor.toHapi())
-    hapiValue.setNet(net.toHapi())
-    hapiValue.setUdi(udiList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSequence()) {
+      hapiValue.setSequenceElement(sequence.toHapi())
+    }
+    if (hasRevenue()) {
+      hapiValue.setRevenue(revenue.toHapi())
+    }
+    if (hasCategory()) {
+      hapiValue.setCategory(category.toHapi())
+    }
+    if (hasProductOrService()) {
+      hapiValue.setProductOrService(productOrService.toHapi())
+    }
+    if (modifierCount > 0) {
+      hapiValue.setModifier(modifierList.map { it.toHapi() })
+    }
+    if (programCodeCount > 0) {
+      hapiValue.setProgramCode(programCodeList.map { it.toHapi() })
+    }
+    if (hasQuantity()) {
+      hapiValue.setQuantity(quantity.toHapi())
+    }
+    if (hasUnitPrice()) {
+      hapiValue.setUnitPrice(unitPrice.toHapi())
+    }
+    if (hasFactor()) {
+      hapiValue.setFactorElement(factor.toHapi())
+    }
+    if (hasNet()) {
+      hapiValue.setNet(net.toHapi())
+    }
+    if (udiCount > 0) {
+      hapiValue.setUdi(udiList.map { it.toHapi() })
+    }
     return hapiValue
   }
 }

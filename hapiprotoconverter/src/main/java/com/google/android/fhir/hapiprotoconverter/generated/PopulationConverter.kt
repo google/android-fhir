@@ -58,27 +58,48 @@ public object PopulationConverter {
   public fun Population.toHapi(): org.hl7.fhir.r4.model.Population {
     val hapiValue = org.hl7.fhir.r4.model.Population()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setAge(age.populationAgeToHapi())
-    hapiValue.setGender(gender.toHapi())
-    hapiValue.setRace(race.toHapi())
-    hapiValue.setPhysiologicalCondition(physiologicalCondition.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasAge()) {
+      hapiValue.setAge(age.populationAgeToHapi())
+    }
+    if (hasGender()) {
+      hapiValue.setGender(gender.toHapi())
+    }
+    if (hasRace()) {
+      hapiValue.setRace(race.toHapi())
+    }
+    if (hasPhysiologicalCondition()) {
+      hapiValue.setPhysiologicalCondition(physiologicalCondition.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Population.toProto(): Population {
-    val protoValue =
-      Population.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setAge(age.populationAgeToProto())
-        .setGender(gender.toProto())
-        .setRace(race.toProto())
-        .setPhysiologicalCondition(physiologicalCondition.toProto())
-        .build()
-    return protoValue
+    val protoValue = Population.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasAge()) {
+      protoValue.setAge(age.populationAgeToProto())
+    }
+    if (hasGender()) {
+      protoValue.setGender(gender.toProto())
+    }
+    if (hasRace()) {
+      protoValue.setRace(race.toProto())
+    }
+    if (hasPhysiologicalCondition()) {
+      protoValue.setPhysiologicalCondition(physiologicalCondition.toProto())
+    }
+    return protoValue.build()
   }
 }

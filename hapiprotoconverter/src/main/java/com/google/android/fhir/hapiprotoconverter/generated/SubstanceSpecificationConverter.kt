@@ -209,136 +209,281 @@ public object SubstanceSpecificationConverter {
   public fun SubstanceSpecification.toHapi(): org.hl7.fhir.r4.model.SubstanceSpecification {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceSpecification()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifier.toHapi())
-    hapiValue.setType(type.toHapi())
-    hapiValue.setStatus(status.toHapi())
-    hapiValue.setDomain(domain.toHapi())
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setSource(sourceList.map { it.toHapi() })
-    hapiValue.setCommentElement(comment.toHapi())
-    hapiValue.setMoiety(moietyList.map { it.toHapi() })
-    hapiValue.setProperty(propertyList.map { it.toHapi() })
-    hapiValue.setReferenceInformation(referenceInformation.toHapi())
-    hapiValue.setStructure(structure.toHapi())
-    hapiValue.setCode(codeList.map { it.toHapi() })
-    hapiValue.setName(nameList.map { it.toHapi() })
-    hapiValue.setRelationship(relationshipList.map { it.toHapi() })
-    hapiValue.setNucleicAcid(nucleicAcid.toHapi())
-    hapiValue.setPolymer(polymer.toHapi())
-    hapiValue.setProtein(protein.toHapi())
-    hapiValue.setSourceMaterial(sourceMaterial.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasIdentifier()) {
+      hapiValue.setIdentifier(identifier.toHapi())
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasStatus()) {
+      hapiValue.setStatus(status.toHapi())
+    }
+    if (hasDomain()) {
+      hapiValue.setDomain(domain.toHapi())
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (sourceCount > 0) {
+      hapiValue.setSource(sourceList.map { it.toHapi() })
+    }
+    if (hasComment()) {
+      hapiValue.setCommentElement(comment.toHapi())
+    }
+    if (moietyCount > 0) {
+      hapiValue.setMoiety(moietyList.map { it.toHapi() })
+    }
+    if (propertyCount > 0) {
+      hapiValue.setProperty(propertyList.map { it.toHapi() })
+    }
+    if (hasReferenceInformation()) {
+      hapiValue.setReferenceInformation(referenceInformation.toHapi())
+    }
+    if (hasStructure()) {
+      hapiValue.setStructure(structure.toHapi())
+    }
+    if (codeCount > 0) {
+      hapiValue.setCode(codeList.map { it.toHapi() })
+    }
+    if (nameCount > 0) {
+      hapiValue.setName(nameList.map { it.toHapi() })
+    }
+    if (relationshipCount > 0) {
+      hapiValue.setRelationship(relationshipList.map { it.toHapi() })
+    }
+    if (hasNucleicAcid()) {
+      hapiValue.setNucleicAcid(nucleicAcid.toHapi())
+    }
+    if (hasPolymer()) {
+      hapiValue.setPolymer(polymer.toHapi())
+    }
+    if (hasProtein()) {
+      hapiValue.setProtein(protein.toHapi())
+    }
+    if (hasSourceMaterial()) {
+      hapiValue.setSourceMaterial(sourceMaterial.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.SubstanceSpecification.toProto(): SubstanceSpecification {
-    val protoValue =
-      SubstanceSpecification.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setIdentifier(identifier.toProto())
-        .setType(type.toProto())
-        .setStatus(status.toProto())
-        .setDomain(domain.toProto())
-        .setDescription(descriptionElement.toProto())
-        .addAllSource(source.map { it.toProto() })
-        .setComment(commentElement.toProto())
-        .addAllMoiety(moiety.map { it.toProto() })
-        .addAllProperty(property.map { it.toProto() })
-        .setReferenceInformation(referenceInformation.toProto())
-        .setStructure(structure.toProto())
-        .addAllCode(code.map { it.toProto() })
-        .addAllName(name.map { it.toProto() })
-        .addAllRelationship(relationship.map { it.toProto() })
-        .setNucleicAcid(nucleicAcid.toProto())
-        .setPolymer(polymer.toProto())
-        .setProtein(protein.toProto())
-        .setSourceMaterial(sourceMaterial.toProto())
-        .build()
-    return protoValue
+    val protoValue = SubstanceSpecification.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.setIdentifier(identifier.toProto())
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasStatus()) {
+      protoValue.setStatus(status.toProto())
+    }
+    if (hasDomain()) {
+      protoValue.setDomain(domain.toProto())
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasSource()) {
+      protoValue.addAllSource(source.map { it.toProto() })
+    }
+    if (hasComment()) {
+      protoValue.setComment(commentElement.toProto())
+    }
+    if (hasMoiety()) {
+      protoValue.addAllMoiety(moiety.map { it.toProto() })
+    }
+    if (hasProperty()) {
+      protoValue.addAllProperty(property.map { it.toProto() })
+    }
+    if (hasReferenceInformation()) {
+      protoValue.setReferenceInformation(referenceInformation.toProto())
+    }
+    if (hasStructure()) {
+      protoValue.setStructure(structure.toProto())
+    }
+    if (hasCode()) {
+      protoValue.addAllCode(code.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.addAllName(name.map { it.toProto() })
+    }
+    if (hasRelationship()) {
+      protoValue.addAllRelationship(relationship.map { it.toProto() })
+    }
+    if (hasNucleicAcid()) {
+      protoValue.setNucleicAcid(nucleicAcid.toProto())
+    }
+    if (hasPolymer()) {
+      protoValue.setPolymer(polymer.toProto())
+    }
+    if (hasProtein()) {
+      protoValue.setProtein(protein.toProto())
+    }
+    if (hasSourceMaterial()) {
+      protoValue.setSourceMaterial(sourceMaterial.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationMoietyComponent.toProto():
     SubstanceSpecification.Moiety {
     val protoValue =
-      SubstanceSpecification.Moiety.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setRole(role.toProto())
-        .setIdentifier(identifier.toProto())
-        .setName(nameElement.toProto())
-        .setStereochemistry(stereochemistry.toProto())
-        .setOpticalActivity(opticalActivity.toProto())
-        .setMolecularFormula(molecularFormulaElement.toProto())
-        .setAmount(amount.substanceSpecificationMoietyAmountToProto())
-        .build()
-    return protoValue
+      SubstanceSpecification.Moiety.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasRole()) {
+      protoValue.setRole(role.toProto())
+    }
+    if (hasIdentifier()) {
+      protoValue.setIdentifier(identifier.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasStereochemistry()) {
+      protoValue.setStereochemistry(stereochemistry.toProto())
+    }
+    if (hasOpticalActivity()) {
+      protoValue.setOpticalActivity(opticalActivity.toProto())
+    }
+    if (hasMolecularFormula()) {
+      protoValue.setMolecularFormula(molecularFormulaElement.toProto())
+    }
+    if (hasAmount()) {
+      protoValue.setAmount(amount.substanceSpecificationMoietyAmountToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationPropertyComponent.toProto():
     SubstanceSpecification.Property {
     val protoValue =
-      SubstanceSpecification.Property.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCategory(category.toProto())
-        .setCode(code.toProto())
-        .setParameters(parametersElement.toProto())
-        .setDefiningSubstance(
-          definingSubstance.substanceSpecificationPropertyDefiningSubstanceToProto()
-        )
-        .setAmount(amount.substanceSpecificationPropertyAmountToProto())
-        .build()
-    return protoValue
+      SubstanceSpecification.Property.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCategory()) {
+      protoValue.setCategory(category.toProto())
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasParameters()) {
+      protoValue.setParameters(parametersElement.toProto())
+    }
+    if (hasDefiningSubstance()) {
+      protoValue.setDefiningSubstance(
+        definingSubstance.substanceSpecificationPropertyDefiningSubstanceToProto()
+      )
+    }
+    if (hasAmount()) {
+      protoValue.setAmount(amount.substanceSpecificationPropertyAmountToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureComponent.toProto():
     SubstanceSpecification.Structure {
     val protoValue =
-      SubstanceSpecification.Structure.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setStereochemistry(stereochemistry.toProto())
-        .setOpticalActivity(opticalActivity.toProto())
-        .setMolecularFormula(molecularFormulaElement.toProto())
-        .setMolecularFormulaByMoiety(molecularFormulaByMoietyElement.toProto())
-        .addAllIsotope(isotope.map { it.toProto() })
-        .addAllSource(source.map { it.toProto() })
-        .addAllRepresentation(representation.map { it.toProto() })
-        .build()
-    return protoValue
+      SubstanceSpecification.Structure.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasStereochemistry()) {
+      protoValue.setStereochemistry(stereochemistry.toProto())
+    }
+    if (hasOpticalActivity()) {
+      protoValue.setOpticalActivity(opticalActivity.toProto())
+    }
+    if (hasMolecularFormula()) {
+      protoValue.setMolecularFormula(molecularFormulaElement.toProto())
+    }
+    if (hasMolecularFormulaByMoiety()) {
+      protoValue.setMolecularFormulaByMoiety(molecularFormulaByMoietyElement.toProto())
+    }
+    if (hasIsotope()) {
+      protoValue.addAllIsotope(isotope.map { it.toProto() })
+    }
+    if (hasSource()) {
+      protoValue.addAllSource(source.map { it.toProto() })
+    }
+    if (hasRepresentation()) {
+      protoValue.addAllRepresentation(representation.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureIsotopeComponent.toProto():
     SubstanceSpecification.Structure.Isotope {
     val protoValue =
-      SubstanceSpecification.Structure.Isotope.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setIdentifier(identifier.toProto())
-        .setName(name.toProto())
-        .setSubstitution(substitution.toProto())
-        .setHalfLife(halfLife.toProto())
-        .setMolecularWeight(molecularWeight.toProto())
-        .build()
-    return protoValue
+      SubstanceSpecification.Structure.Isotope.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.setIdentifier(identifier.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(name.toProto())
+    }
+    if (hasSubstitution()) {
+      protoValue.setSubstitution(substitution.toProto())
+    }
+    if (hasHalfLife()) {
+      protoValue.setHalfLife(halfLife.toProto())
+    }
+    if (hasMolecularWeight()) {
+      protoValue.setMolecularWeight(molecularWeight.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -347,13 +492,22 @@ public object SubstanceSpecificationConverter {
     val protoValue =
       SubstanceSpecification.Structure.Isotope.MolecularWeight.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setMethod(method.toProto())
-        .setType(type.toProto())
-        .setAmount(amount.toProto())
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasMethod()) {
+      protoValue.setMethod(method.toProto())
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasAmount()) {
+      protoValue.setAmount(amount.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -362,85 +516,150 @@ public object SubstanceSpecificationConverter {
     val protoValue =
       SubstanceSpecification.Structure.Representation.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(type.toProto())
-        .setRepresentation(representationElement.toProto())
-        .setAttachment(attachment.toProto())
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasRepresentation()) {
+      protoValue.setRepresentation(representationElement.toProto())
+    }
+    if (hasAttachment()) {
+      protoValue.setAttachment(attachment.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationCodeComponent.toProto():
     SubstanceSpecification.CodeType {
     val protoValue =
-      SubstanceSpecification.CodeType.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(code.toProto())
-        .setStatus(status.toProto())
-        .setStatusDate(statusDateElement.toProto())
-        .setComment(commentElement.toProto())
-        .addAllSource(source.map { it.toProto() })
-        .build()
-    return protoValue
+      SubstanceSpecification.CodeType.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasStatus()) {
+      protoValue.setStatus(status.toProto())
+    }
+    if (hasStatusDate()) {
+      protoValue.setStatusDate(statusDateElement.toProto())
+    }
+    if (hasComment()) {
+      protoValue.setComment(commentElement.toProto())
+    }
+    if (hasSource()) {
+      protoValue.addAllSource(source.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationNameComponent.toProto():
     SubstanceSpecification.Name {
     val protoValue =
-      SubstanceSpecification.Name.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .setType(type.toProto())
-        .setStatus(status.toProto())
-        .setPreferred(preferredElement.toProto())
-        .addAllLanguage(language.map { it.toProto() })
-        .addAllDomain(domain.map { it.toProto() })
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .addAllOfficial(official.map { it.toProto() })
-        .addAllSource(source.map { it.toProto() })
-        .build()
-    return protoValue
+      SubstanceSpecification.Name.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasStatus()) {
+      protoValue.setStatus(status.toProto())
+    }
+    if (hasPreferred()) {
+      protoValue.setPreferred(preferredElement.toProto())
+    }
+    if (hasLanguage()) {
+      protoValue.addAllLanguage(language.map { it.toProto() })
+    }
+    if (hasDomain()) {
+      protoValue.addAllDomain(domain.map { it.toProto() })
+    }
+    if (hasJurisdiction()) {
+      protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
+    }
+    if (hasOfficial()) {
+      protoValue.addAllOfficial(official.map { it.toProto() })
+    }
+    if (hasSource()) {
+      protoValue.addAllSource(source.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationNameOfficialComponent.toProto():
     SubstanceSpecification.Name.Official {
     val protoValue =
-      SubstanceSpecification.Name.Official.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setAuthority(authority.toProto())
-        .setStatus(status.toProto())
-        .setDate(dateElement.toProto())
-        .build()
-    return protoValue
+      SubstanceSpecification.Name.Official.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasAuthority()) {
+      protoValue.setAuthority(authority.toProto())
+    }
+    if (hasStatus()) {
+      protoValue.setStatus(status.toProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationRelationshipComponent.toProto():
     SubstanceSpecification.Relationship {
     val protoValue =
-      SubstanceSpecification.Relationship.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSubstance(substance.substanceSpecificationRelationshipSubstanceToProto())
-        .setRelationship(relationship.toProto())
-        .setIsDefining(isDefiningElement.toProto())
-        .setAmount(amount.substanceSpecificationRelationshipAmountToProto())
-        .setAmountRatioLowLimit(amountRatioLowLimit.toProto())
-        .setAmountType(amountType.toProto())
-        .addAllSource(source.map { it.toProto() })
-        .build()
-    return protoValue
+      SubstanceSpecification.Relationship.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSubstance()) {
+      protoValue.setSubstance(substance.substanceSpecificationRelationshipSubstanceToProto())
+    }
+    if (hasRelationship()) {
+      protoValue.setRelationship(relationship.toProto())
+    }
+    if (hasIsDefining()) {
+      protoValue.setIsDefining(isDefiningElement.toProto())
+    }
+    if (hasAmount()) {
+      protoValue.setAmount(amount.substanceSpecificationRelationshipAmountToProto())
+    }
+    if (hasAmountRatioLowLimit()) {
+      protoValue.setAmountRatioLowLimit(amountRatioLowLimit.toProto())
+    }
+    if (hasAmountType()) {
+      protoValue.setAmountType(amountType.toProto())
+    }
+    if (hasSource()) {
+      protoValue.addAllSource(source.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -449,15 +668,33 @@ public object SubstanceSpecificationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationMoietyComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setRole(role.toHapi())
-    hapiValue.setIdentifier(identifier.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setStereochemistry(stereochemistry.toHapi())
-    hapiValue.setOpticalActivity(opticalActivity.toHapi())
-    hapiValue.setMolecularFormulaElement(molecularFormula.toHapi())
-    hapiValue.setAmount(amount.substanceSpecificationMoietyAmountToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasRole()) {
+      hapiValue.setRole(role.toHapi())
+    }
+    if (hasIdentifier()) {
+      hapiValue.setIdentifier(identifier.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasStereochemistry()) {
+      hapiValue.setStereochemistry(stereochemistry.toHapi())
+    }
+    if (hasOpticalActivity()) {
+      hapiValue.setOpticalActivity(opticalActivity.toHapi())
+    }
+    if (hasMolecularFormula()) {
+      hapiValue.setMolecularFormulaElement(molecularFormula.toHapi())
+    }
+    if (hasAmount()) {
+      hapiValue.setAmount(amount.substanceSpecificationMoietyAmountToHapi())
+    }
     return hapiValue
   }
 
@@ -467,15 +704,29 @@ public object SubstanceSpecificationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationPropertyComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCategory(category.toHapi())
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setParametersElement(parameters.toHapi())
-    hapiValue.setDefiningSubstance(
-      definingSubstance.substanceSpecificationPropertyDefiningSubstanceToHapi()
-    )
-    hapiValue.setAmount(amount.substanceSpecificationPropertyAmountToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCategory()) {
+      hapiValue.setCategory(category.toHapi())
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasParameters()) {
+      hapiValue.setParametersElement(parameters.toHapi())
+    }
+    if (hasDefiningSubstance()) {
+      hapiValue.setDefiningSubstance(
+        definingSubstance.substanceSpecificationPropertyDefiningSubstanceToHapi()
+      )
+    }
+    if (hasAmount()) {
+      hapiValue.setAmount(amount.substanceSpecificationPropertyAmountToHapi())
+    }
     return hapiValue
   }
 
@@ -485,15 +736,33 @@ public object SubstanceSpecificationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setStereochemistry(stereochemistry.toHapi())
-    hapiValue.setOpticalActivity(opticalActivity.toHapi())
-    hapiValue.setMolecularFormulaElement(molecularFormula.toHapi())
-    hapiValue.setMolecularFormulaByMoietyElement(molecularFormulaByMoiety.toHapi())
-    hapiValue.setIsotope(isotopeList.map { it.toHapi() })
-    hapiValue.setSource(sourceList.map { it.toHapi() })
-    hapiValue.setRepresentation(representationList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasStereochemistry()) {
+      hapiValue.setStereochemistry(stereochemistry.toHapi())
+    }
+    if (hasOpticalActivity()) {
+      hapiValue.setOpticalActivity(opticalActivity.toHapi())
+    }
+    if (hasMolecularFormula()) {
+      hapiValue.setMolecularFormulaElement(molecularFormula.toHapi())
+    }
+    if (hasMolecularFormulaByMoiety()) {
+      hapiValue.setMolecularFormulaByMoietyElement(molecularFormulaByMoiety.toHapi())
+    }
+    if (isotopeCount > 0) {
+      hapiValue.setIsotope(isotopeList.map { it.toHapi() })
+    }
+    if (sourceCount > 0) {
+      hapiValue.setSource(sourceList.map { it.toHapi() })
+    }
+    if (representationCount > 0) {
+      hapiValue.setRepresentation(representationList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -503,13 +772,27 @@ public object SubstanceSpecificationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationStructureIsotopeComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifier.toHapi())
-    hapiValue.setName(name.toHapi())
-    hapiValue.setSubstitution(substitution.toHapi())
-    hapiValue.setHalfLife(halfLife.toHapi())
-    hapiValue.setMolecularWeight(molecularWeight.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasIdentifier()) {
+      hapiValue.setIdentifier(identifier.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setName(name.toHapi())
+    }
+    if (hasSubstitution()) {
+      hapiValue.setSubstitution(substitution.toHapi())
+    }
+    if (hasHalfLife()) {
+      hapiValue.setHalfLife(halfLife.toHapi())
+    }
+    if (hasMolecularWeight()) {
+      hapiValue.setMolecularWeight(molecularWeight.toHapi())
+    }
     return hapiValue
   }
 
@@ -520,11 +803,21 @@ public object SubstanceSpecificationConverter {
       org.hl7.fhir.r4.model.SubstanceSpecification
         .SubstanceSpecificationStructureIsotopeMolecularWeightComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setMethod(method.toHapi())
-    hapiValue.setType(type.toHapi())
-    hapiValue.setAmount(amount.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasMethod()) {
+      hapiValue.setMethod(method.toHapi())
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasAmount()) {
+      hapiValue.setAmount(amount.toHapi())
+    }
     return hapiValue
   }
 
@@ -535,11 +828,21 @@ public object SubstanceSpecificationConverter {
       org.hl7.fhir.r4.model.SubstanceSpecification
         .SubstanceSpecificationStructureRepresentationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
-    hapiValue.setRepresentationElement(representation.toHapi())
-    hapiValue.setAttachment(attachment.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasRepresentation()) {
+      hapiValue.setRepresentationElement(representation.toHapi())
+    }
+    if (hasAttachment()) {
+      hapiValue.setAttachment(attachment.toHapi())
+    }
     return hapiValue
   }
 
@@ -549,13 +852,27 @@ public object SubstanceSpecificationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationCodeComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setStatus(status.toHapi())
-    hapiValue.setStatusDateElement(statusDate.toHapi())
-    hapiValue.setCommentElement(comment.toHapi())
-    hapiValue.setSource(sourceList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasStatus()) {
+      hapiValue.setStatus(status.toHapi())
+    }
+    if (hasStatusDate()) {
+      hapiValue.setStatusDateElement(statusDate.toHapi())
+    }
+    if (hasComment()) {
+      hapiValue.setCommentElement(comment.toHapi())
+    }
+    if (sourceCount > 0) {
+      hapiValue.setSource(sourceList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -565,17 +882,39 @@ public object SubstanceSpecificationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationNameComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setType(type.toHapi())
-    hapiValue.setStatus(status.toHapi())
-    hapiValue.setPreferredElement(preferred.toHapi())
-    hapiValue.setLanguage(languageList.map { it.toHapi() })
-    hapiValue.setDomain(domainList.map { it.toHapi() })
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
-    hapiValue.setOfficial(officialList.map { it.toHapi() })
-    hapiValue.setSource(sourceList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasStatus()) {
+      hapiValue.setStatus(status.toHapi())
+    }
+    if (hasPreferred()) {
+      hapiValue.setPreferredElement(preferred.toHapi())
+    }
+    if (languageCount > 0) {
+      hapiValue.setLanguage(languageList.map { it.toHapi() })
+    }
+    if (domainCount > 0) {
+      hapiValue.setDomain(domainList.map { it.toHapi() })
+    }
+    if (jurisdictionCount > 0) {
+      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    }
+    if (officialCount > 0) {
+      hapiValue.setOfficial(officialList.map { it.toHapi() })
+    }
+    if (sourceCount > 0) {
+      hapiValue.setSource(sourceList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -585,11 +924,21 @@ public object SubstanceSpecificationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationNameOfficialComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setAuthority(authority.toHapi())
-    hapiValue.setStatus(status.toHapi())
-    hapiValue.setDateElement(date.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasAuthority()) {
+      hapiValue.setAuthority(authority.toHapi())
+    }
+    if (hasStatus()) {
+      hapiValue.setStatus(status.toHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
     return hapiValue
   }
 
@@ -599,15 +948,33 @@ public object SubstanceSpecificationConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.SubstanceSpecification.SubstanceSpecificationRelationshipComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSubstance(substance.substanceSpecificationRelationshipSubstanceToHapi())
-    hapiValue.setRelationship(relationship.toHapi())
-    hapiValue.setIsDefiningElement(isDefining.toHapi())
-    hapiValue.setAmount(amount.substanceSpecificationRelationshipAmountToHapi())
-    hapiValue.setAmountRatioLowLimit(amountRatioLowLimit.toHapi())
-    hapiValue.setAmountType(amountType.toHapi())
-    hapiValue.setSource(sourceList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSubstance()) {
+      hapiValue.setSubstance(substance.substanceSpecificationRelationshipSubstanceToHapi())
+    }
+    if (hasRelationship()) {
+      hapiValue.setRelationship(relationship.toHapi())
+    }
+    if (hasIsDefining()) {
+      hapiValue.setIsDefiningElement(isDefining.toHapi())
+    }
+    if (hasAmount()) {
+      hapiValue.setAmount(amount.substanceSpecificationRelationshipAmountToHapi())
+    }
+    if (hasAmountRatioLowLimit()) {
+      hapiValue.setAmountRatioLowLimit(amountRatioLowLimit.toHapi())
+    }
+    if (hasAmountType()) {
+      hapiValue.setAmountType(amountType.toHapi())
+    }
+    if (sourceCount > 0) {
+      hapiValue.setSource(sourceList.map { it.toHapi() })
+    }
     return hapiValue
   }
 }

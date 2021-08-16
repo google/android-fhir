@@ -46,59 +46,116 @@ public object SlotConverter {
   public fun Slot.toHapi(): org.hl7.fhir.r4.model.Slot {
     val hapiValue = org.hl7.fhir.r4.model.Slot()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setServiceCategory(serviceCategoryList.map { it.toHapi() })
-    hapiValue.setServiceType(serviceTypeList.map { it.toHapi() })
-    hapiValue.setSpecialty(specialtyList.map { it.toHapi() })
-    hapiValue.setAppointmentType(appointmentType.toHapi())
-    hapiValue.setSchedule(schedule.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (serviceCategoryCount > 0) {
+      hapiValue.setServiceCategory(serviceCategoryList.map { it.toHapi() })
+    }
+    if (serviceTypeCount > 0) {
+      hapiValue.setServiceType(serviceTypeList.map { it.toHapi() })
+    }
+    if (specialtyCount > 0) {
+      hapiValue.setSpecialty(specialtyList.map { it.toHapi() })
+    }
+    if (hasAppointmentType()) {
+      hapiValue.setAppointmentType(appointmentType.toHapi())
+    }
+    if (hasSchedule()) {
+      hapiValue.setSchedule(schedule.toHapi())
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Slot.SlotStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setStartElement(start.toHapi())
-    hapiValue.setEndElement(end.toHapi())
-    hapiValue.setOverbookedElement(overbooked.toHapi())
-    hapiValue.setCommentElement(comment.toHapi())
+    if (hasStart()) {
+      hapiValue.setStartElement(start.toHapi())
+    }
+    if (hasEnd()) {
+      hapiValue.setEndElement(end.toHapi())
+    }
+    if (hasOverbooked()) {
+      hapiValue.setOverbookedElement(overbooked.toHapi())
+    }
+    if (hasComment()) {
+      hapiValue.setCommentElement(comment.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Slot.toProto(): Slot {
-    val protoValue =
-      Slot.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .addAllServiceCategory(serviceCategory.map { it.toProto() })
-        .addAllServiceType(serviceType.map { it.toProto() })
-        .addAllSpecialty(specialty.map { it.toProto() })
-        .setAppointmentType(appointmentType.toProto())
-        .setSchedule(schedule.toProto())
-        .setStatus(
-          Slot.StatusCode.newBuilder()
-            .setValue(
-              SlotStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Slot.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasServiceCategory()) {
+      protoValue.addAllServiceCategory(serviceCategory.map { it.toProto() })
+    }
+    if (hasServiceType()) {
+      protoValue.addAllServiceType(serviceType.map { it.toProto() })
+    }
+    if (hasSpecialty()) {
+      protoValue.addAllSpecialty(specialty.map { it.toProto() })
+    }
+    if (hasAppointmentType()) {
+      protoValue.setAppointmentType(appointmentType.toProto())
+    }
+    if (hasSchedule()) {
+      protoValue.setSchedule(schedule.toProto())
+    }
+    protoValue.setStatus(
+      Slot.StatusCode.newBuilder()
+        .setValue(
+          SlotStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setStart(startElement.toProto())
-        .setEnd(endElement.toProto())
-        .setOverbooked(overbookedElement.toProto())
-        .setComment(commentElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasStart()) {
+      protoValue.setStart(startElement.toProto())
+    }
+    if (hasEnd()) {
+      protoValue.setEnd(endElement.toProto())
+    }
+    if (hasOverbooked()) {
+      protoValue.setOverbooked(overbookedElement.toProto())
+    }
+    if (hasComment()) {
+      protoValue.setComment(commentElement.toProto())
+    }
+    return protoValue.build()
   }
 }

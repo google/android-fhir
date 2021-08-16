@@ -88,91 +88,216 @@ public object EventDefinitionConverter {
   public fun EventDefinition.toHapi(): org.hl7.fhir.r4.model.EventDefinition {
     val hapiValue = org.hl7.fhir.r4.model.EventDefinition()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setVersionElement(version.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setTitleElement(title.toHapi())
-    hapiValue.setSubtitleElement(subtitle.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasTitle()) {
+      hapiValue.setTitleElement(title.toHapi())
+    }
+    if (hasSubtitle()) {
+      hapiValue.setSubtitleElement(subtitle.toHapi())
+    }
     hapiValue.setStatus(
       Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setExperimentalElement(experimental.toHapi())
-    hapiValue.setSubject(subject.eventDefinitionSubjectToHapi())
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setPublisherElement(publisher.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setUseContext(useContextList.map { it.toHapi() })
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
-    hapiValue.setPurposeElement(purpose.toHapi())
-    hapiValue.setUsageElement(usage.toHapi())
-    hapiValue.setCopyrightElement(copyright.toHapi())
-    hapiValue.setApprovalDateElement(approvalDate.toHapi())
-    hapiValue.setLastReviewDateElement(lastReviewDate.toHapi())
-    hapiValue.setEffectivePeriod(effectivePeriod.toHapi())
-    hapiValue.setTopic(topicList.map { it.toHapi() })
-    hapiValue.setAuthor(authorList.map { it.toHapi() })
-    hapiValue.setEditor(editorList.map { it.toHapi() })
-    hapiValue.setReviewer(reviewerList.map { it.toHapi() })
-    hapiValue.setEndorser(endorserList.map { it.toHapi() })
-    hapiValue.setRelatedArtifact(relatedArtifactList.map { it.toHapi() })
-    hapiValue.setTrigger(triggerList.map { it.toHapi() })
+    if (hasExperimental()) {
+      hapiValue.setExperimentalElement(experimental.toHapi())
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.eventDefinitionSubjectToHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasPublisher()) {
+      hapiValue.setPublisherElement(publisher.toHapi())
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (useContextCount > 0) {
+      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+    }
+    if (jurisdictionCount > 0) {
+      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    }
+    if (hasPurpose()) {
+      hapiValue.setPurposeElement(purpose.toHapi())
+    }
+    if (hasUsage()) {
+      hapiValue.setUsageElement(usage.toHapi())
+    }
+    if (hasCopyright()) {
+      hapiValue.setCopyrightElement(copyright.toHapi())
+    }
+    if (hasApprovalDate()) {
+      hapiValue.setApprovalDateElement(approvalDate.toHapi())
+    }
+    if (hasLastReviewDate()) {
+      hapiValue.setLastReviewDateElement(lastReviewDate.toHapi())
+    }
+    if (hasEffectivePeriod()) {
+      hapiValue.setEffectivePeriod(effectivePeriod.toHapi())
+    }
+    if (topicCount > 0) {
+      hapiValue.setTopic(topicList.map { it.toHapi() })
+    }
+    if (authorCount > 0) {
+      hapiValue.setAuthor(authorList.map { it.toHapi() })
+    }
+    if (editorCount > 0) {
+      hapiValue.setEditor(editorList.map { it.toHapi() })
+    }
+    if (reviewerCount > 0) {
+      hapiValue.setReviewer(reviewerList.map { it.toHapi() })
+    }
+    if (endorserCount > 0) {
+      hapiValue.setEndorser(endorserList.map { it.toHapi() })
+    }
+    if (relatedArtifactCount > 0) {
+      hapiValue.setRelatedArtifact(relatedArtifactList.map { it.toHapi() })
+    }
+    if (triggerCount > 0) {
+      hapiValue.setTrigger(triggerList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.EventDefinition.toProto(): EventDefinition {
-    val protoValue =
-      EventDefinition.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUrl(urlElement.toProto())
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setVersion(versionElement.toProto())
-        .setName(nameElement.toProto())
-        .setTitle(titleElement.toProto())
-        .setSubtitle(subtitleElement.toProto())
-        .setStatus(
-          EventDefinition.StatusCode.newBuilder()
-            .setValue(
-              PublicationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = EventDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasTitle()) {
+      protoValue.setTitle(titleElement.toProto())
+    }
+    if (hasSubtitle()) {
+      protoValue.setSubtitle(subtitleElement.toProto())
+    }
+    protoValue.setStatus(
+      EventDefinition.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setExperimental(experimentalElement.toProto())
-        .setSubject(subject.eventDefinitionSubjectToProto())
-        .setDate(dateElement.toProto())
-        .setPublisher(publisherElement.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .addAllUseContext(useContext.map { it.toProto() })
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .setPurpose(purposeElement.toProto())
-        .setUsage(usageElement.toProto())
-        .setCopyright(copyrightElement.toProto())
-        .setApprovalDate(approvalDateElement.toProto())
-        .setLastReviewDate(lastReviewDateElement.toProto())
-        .setEffectivePeriod(effectivePeriod.toProto())
-        .addAllTopic(topic.map { it.toProto() })
-        .addAllAuthor(author.map { it.toProto() })
-        .addAllEditor(editor.map { it.toProto() })
-        .addAllReviewer(reviewer.map { it.toProto() })
-        .addAllEndorser(endorser.map { it.toProto() })
-        .addAllRelatedArtifact(relatedArtifact.map { it.toProto() })
-        .addAllTrigger(trigger.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasExperimental()) {
+      protoValue.setExperimental(experimentalElement.toProto())
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.eventDefinitionSubjectToProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasPublisher()) {
+      protoValue.setPublisher(publisherElement.toProto())
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasUseContext()) {
+      protoValue.addAllUseContext(useContext.map { it.toProto() })
+    }
+    if (hasJurisdiction()) {
+      protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
+    }
+    if (hasPurpose()) {
+      protoValue.setPurpose(purposeElement.toProto())
+    }
+    if (hasUsage()) {
+      protoValue.setUsage(usageElement.toProto())
+    }
+    if (hasCopyright()) {
+      protoValue.setCopyright(copyrightElement.toProto())
+    }
+    if (hasApprovalDate()) {
+      protoValue.setApprovalDate(approvalDateElement.toProto())
+    }
+    if (hasLastReviewDate()) {
+      protoValue.setLastReviewDate(lastReviewDateElement.toProto())
+    }
+    if (hasEffectivePeriod()) {
+      protoValue.setEffectivePeriod(effectivePeriod.toProto())
+    }
+    if (hasTopic()) {
+      protoValue.addAllTopic(topic.map { it.toProto() })
+    }
+    if (hasAuthor()) {
+      protoValue.addAllAuthor(author.map { it.toProto() })
+    }
+    if (hasEditor()) {
+      protoValue.addAllEditor(editor.map { it.toProto() })
+    }
+    if (hasReviewer()) {
+      protoValue.addAllReviewer(reviewer.map { it.toProto() })
+    }
+    if (hasEndorser()) {
+      protoValue.addAllEndorser(endorser.map { it.toProto() })
+    }
+    if (hasRelatedArtifact()) {
+      protoValue.addAllRelatedArtifact(relatedArtifact.map { it.toProto() })
+    }
+    if (hasTrigger()) {
+      protoValue.addAllTrigger(trigger.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 }

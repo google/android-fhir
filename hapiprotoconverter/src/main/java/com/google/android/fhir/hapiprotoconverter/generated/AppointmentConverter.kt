@@ -56,115 +56,223 @@ public object AppointmentConverter {
   public fun Appointment.toHapi(): org.hl7.fhir.r4.model.Appointment {
     val hapiValue = org.hl7.fhir.r4.model.Appointment()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Appointment.AppointmentStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setCancelationReason(cancelationReason.toHapi())
-    hapiValue.setServiceCategory(serviceCategoryList.map { it.toHapi() })
-    hapiValue.setServiceType(serviceTypeList.map { it.toHapi() })
-    hapiValue.setSpecialty(specialtyList.map { it.toHapi() })
-    hapiValue.setAppointmentType(appointmentType.toHapi())
-    hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
-    hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
-    hapiValue.setPriorityElement(priority.toHapi())
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setSupportingInformation(supportingInformationList.map { it.toHapi() })
-    hapiValue.setStartElement(start.toHapi())
-    hapiValue.setEndElement(end.toHapi())
-    hapiValue.setMinutesDurationElement(minutesDuration.toHapi())
-    hapiValue.setSlot(slotList.map { it.toHapi() })
-    hapiValue.setCreatedElement(created.toHapi())
-    hapiValue.setCommentElement(comment.toHapi())
-    hapiValue.setPatientInstructionElement(patientInstruction.toHapi())
-    hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
-    hapiValue.setParticipant(participantList.map { it.toHapi() })
-    hapiValue.setRequestedPeriod(requestedPeriodList.map { it.toHapi() })
+    if (hasCancelationReason()) {
+      hapiValue.setCancelationReason(cancelationReason.toHapi())
+    }
+    if (serviceCategoryCount > 0) {
+      hapiValue.setServiceCategory(serviceCategoryList.map { it.toHapi() })
+    }
+    if (serviceTypeCount > 0) {
+      hapiValue.setServiceType(serviceTypeList.map { it.toHapi() })
+    }
+    if (specialtyCount > 0) {
+      hapiValue.setSpecialty(specialtyList.map { it.toHapi() })
+    }
+    if (hasAppointmentType()) {
+      hapiValue.setAppointmentType(appointmentType.toHapi())
+    }
+    if (reasonCodeCount > 0) {
+      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+    }
+    if (reasonReferenceCount > 0) {
+      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+    }
+    if (hasPriority()) {
+      hapiValue.setPriorityElement(priority.toHapi())
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (supportingInformationCount > 0) {
+      hapiValue.setSupportingInformation(supportingInformationList.map { it.toHapi() })
+    }
+    if (hasStart()) {
+      hapiValue.setStartElement(start.toHapi())
+    }
+    if (hasEnd()) {
+      hapiValue.setEndElement(end.toHapi())
+    }
+    if (hasMinutesDuration()) {
+      hapiValue.setMinutesDurationElement(minutesDuration.toHapi())
+    }
+    if (slotCount > 0) {
+      hapiValue.setSlot(slotList.map { it.toHapi() })
+    }
+    if (hasCreated()) {
+      hapiValue.setCreatedElement(created.toHapi())
+    }
+    if (hasComment()) {
+      hapiValue.setCommentElement(comment.toHapi())
+    }
+    if (hasPatientInstruction()) {
+      hapiValue.setPatientInstructionElement(patientInstruction.toHapi())
+    }
+    if (basedOnCount > 0) {
+      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+    }
+    if (participantCount > 0) {
+      hapiValue.setParticipant(participantList.map { it.toHapi() })
+    }
+    if (requestedPeriodCount > 0) {
+      hapiValue.setRequestedPeriod(requestedPeriodList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Appointment.toProto(): Appointment {
-    val protoValue =
-      Appointment.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setStatus(
-          Appointment.StatusCode.newBuilder()
-            .setValue(
-              AppointmentStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Appointment.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      Appointment.StatusCode.newBuilder()
+        .setValue(
+          AppointmentStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setCancelationReason(cancelationReason.toProto())
-        .addAllServiceCategory(serviceCategory.map { it.toProto() })
-        .addAllServiceType(serviceType.map { it.toProto() })
-        .addAllSpecialty(specialty.map { it.toProto() })
-        .setAppointmentType(appointmentType.toProto())
-        .addAllReasonCode(reasonCode.map { it.toProto() })
-        .addAllReasonReference(reasonReference.map { it.toProto() })
-        .setPriority(priorityElement.toProto())
-        .setDescription(descriptionElement.toProto())
-        .addAllSupportingInformation(supportingInformation.map { it.toProto() })
-        .setStart(startElement.toProto())
-        .setEnd(endElement.toProto())
-        .setMinutesDuration(minutesDurationElement.toProto())
-        .addAllSlot(slot.map { it.toProto() })
-        .setCreated(createdElement.toProto())
-        .setComment(commentElement.toProto())
-        .setPatientInstruction(patientInstructionElement.toProto())
-        .addAllBasedOn(basedOn.map { it.toProto() })
-        .addAllParticipant(participant.map { it.toProto() })
-        .addAllRequestedPeriod(requestedPeriod.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasCancelationReason()) {
+      protoValue.setCancelationReason(cancelationReason.toProto())
+    }
+    if (hasServiceCategory()) {
+      protoValue.addAllServiceCategory(serviceCategory.map { it.toProto() })
+    }
+    if (hasServiceType()) {
+      protoValue.addAllServiceType(serviceType.map { it.toProto() })
+    }
+    if (hasSpecialty()) {
+      protoValue.addAllSpecialty(specialty.map { it.toProto() })
+    }
+    if (hasAppointmentType()) {
+      protoValue.setAppointmentType(appointmentType.toProto())
+    }
+    if (hasReasonCode()) {
+      protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
+    }
+    if (hasReasonReference()) {
+      protoValue.addAllReasonReference(reasonReference.map { it.toProto() })
+    }
+    if (hasPriority()) {
+      protoValue.setPriority(priorityElement.toProto())
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasSupportingInformation()) {
+      protoValue.addAllSupportingInformation(supportingInformation.map { it.toProto() })
+    }
+    if (hasStart()) {
+      protoValue.setStart(startElement.toProto())
+    }
+    if (hasEnd()) {
+      protoValue.setEnd(endElement.toProto())
+    }
+    if (hasMinutesDuration()) {
+      protoValue.setMinutesDuration(minutesDurationElement.toProto())
+    }
+    if (hasSlot()) {
+      protoValue.addAllSlot(slot.map { it.toProto() })
+    }
+    if (hasCreated()) {
+      protoValue.setCreated(createdElement.toProto())
+    }
+    if (hasComment()) {
+      protoValue.setComment(commentElement.toProto())
+    }
+    if (hasPatientInstruction()) {
+      protoValue.setPatientInstruction(patientInstructionElement.toProto())
+    }
+    if (hasBasedOn()) {
+      protoValue.addAllBasedOn(basedOn.map { it.toProto() })
+    }
+    if (hasParticipant()) {
+      protoValue.addAllParticipant(participant.map { it.toProto() })
+    }
+    if (hasRequestedPeriod()) {
+      protoValue.addAllRequestedPeriod(requestedPeriod.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Appointment.AppointmentParticipantComponent.toProto():
     Appointment.Participant {
-    val protoValue =
-      Appointment.Participant.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllType(type.map { it.toProto() })
-        .setActor(actor.toProto())
-        .setRequired(
-          Appointment.Participant.RequiredCode.newBuilder()
-            .setValue(
-              ParticipantRequiredCode.Value.valueOf(
-                required.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Appointment.Participant.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.addAllType(type.map { it.toProto() })
+    }
+    if (hasActor()) {
+      protoValue.setActor(actor.toProto())
+    }
+    protoValue.setRequired(
+      Appointment.Participant.RequiredCode.newBuilder()
+        .setValue(
+          ParticipantRequiredCode.Value.valueOf(
+            required.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setStatus(
-          Appointment.Participant.StatusCode.newBuilder()
-            .setValue(
-              ParticipationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setPeriod(period.toProto())
         .build()
-    return protoValue
+    )
+    protoValue.setStatus(
+      Appointment.Participant.StatusCode.newBuilder()
+        .setValue(
+          ParticipationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -172,10 +280,18 @@ public object AppointmentConverter {
     org.hl7.fhir.r4.model.Appointment.AppointmentParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.Appointment.AppointmentParticipantComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setType(typeList.map { it.toHapi() })
-    hapiValue.setActor(actor.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (typeCount > 0) {
+      hapiValue.setType(typeList.map { it.toHapi() })
+    }
+    if (hasActor()) {
+      hapiValue.setActor(actor.toHapi())
+    }
     hapiValue.setRequired(
       org.hl7.fhir.r4.model.Appointment.ParticipantRequired.valueOf(
         required.value.name.hapiCodeCheck().replace("_", "")
@@ -186,7 +302,9 @@ public object AppointmentConverter {
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setPeriod(period.toHapi())
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
     return hapiValue
   }
 }

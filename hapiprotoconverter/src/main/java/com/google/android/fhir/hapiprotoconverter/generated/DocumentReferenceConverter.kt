@@ -55,13 +55,27 @@ public object DocumentReferenceConverter {
   public fun DocumentReference.toHapi(): org.hl7.fhir.r4.model.DocumentReference {
     val hapiValue = org.hl7.fhir.r4.model.DocumentReference()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setMasterIdentifier(masterIdentifier.toHapi())
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasMasterIdentifier()) {
+      hapiValue.setMasterIdentifier(masterIdentifier.toHapi())
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       Enumerations.DocumentReferenceStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
@@ -72,120 +86,203 @@ public object DocumentReferenceConverter {
         docStatus.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setType(type.toHapi())
-    hapiValue.setCategory(categoryList.map { it.toHapi() })
-    hapiValue.setSubject(subject.toHapi())
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setAuthor(authorList.map { it.toHapi() })
-    hapiValue.setAuthenticator(authenticator.toHapi())
-    hapiValue.setCustodian(custodian.toHapi())
-    hapiValue.setRelatesTo(relatesToList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setSecurityLabel(securityLabelList.map { it.toHapi() })
-    hapiValue.setContent(contentList.map { it.toHapi() })
-    hapiValue.setContext(context.toHapi())
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (categoryCount > 0) {
+      hapiValue.setCategory(categoryList.map { it.toHapi() })
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.toHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (authorCount > 0) {
+      hapiValue.setAuthor(authorList.map { it.toHapi() })
+    }
+    if (hasAuthenticator()) {
+      hapiValue.setAuthenticator(authenticator.toHapi())
+    }
+    if (hasCustodian()) {
+      hapiValue.setCustodian(custodian.toHapi())
+    }
+    if (relatesToCount > 0) {
+      hapiValue.setRelatesTo(relatesToList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (securityLabelCount > 0) {
+      hapiValue.setSecurityLabel(securityLabelList.map { it.toHapi() })
+    }
+    if (contentCount > 0) {
+      hapiValue.setContent(contentList.map { it.toHapi() })
+    }
+    if (hasContext()) {
+      hapiValue.setContext(context.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.DocumentReference.toProto(): DocumentReference {
-    val protoValue =
-      DocumentReference.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setMasterIdentifier(masterIdentifier.toProto())
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setStatus(
-          DocumentReference.StatusCode.newBuilder()
-            .setValue(
-              DocumentReferenceStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = DocumentReference.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasMasterIdentifier()) {
+      protoValue.setMasterIdentifier(masterIdentifier.toProto())
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      DocumentReference.StatusCode.newBuilder()
+        .setValue(
+          DocumentReferenceStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setDocStatus(
-          DocumentReference.DocStatusCode.newBuilder()
-            .setValue(
-              CompositionStatusCode.Value.valueOf(
-                docStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setType(type.toProto())
-        .addAllCategory(category.map { it.toProto() })
-        .setSubject(subject.toProto())
-        .setDate(dateElement.toProto())
-        .addAllAuthor(author.map { it.toProto() })
-        .setAuthenticator(authenticator.toProto())
-        .setCustodian(custodian.toProto())
-        .addAllRelatesTo(relatesTo.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .addAllSecurityLabel(securityLabel.map { it.toProto() })
-        .addAllContent(content.map { it.toProto() })
-        .setContext(context.toProto())
         .build()
-    return protoValue
+    )
+    protoValue.setDocStatus(
+      DocumentReference.DocStatusCode.newBuilder()
+        .setValue(
+          CompositionStatusCode.Value.valueOf(
+            docStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasCategory()) {
+      protoValue.addAllCategory(category.map { it.toProto() })
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.toProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasAuthor()) {
+      protoValue.addAllAuthor(author.map { it.toProto() })
+    }
+    if (hasAuthenticator()) {
+      protoValue.setAuthenticator(authenticator.toProto())
+    }
+    if (hasCustodian()) {
+      protoValue.setCustodian(custodian.toProto())
+    }
+    if (hasRelatesTo()) {
+      protoValue.addAllRelatesTo(relatesTo.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasSecurityLabel()) {
+      protoValue.addAllSecurityLabel(securityLabel.map { it.toProto() })
+    }
+    if (hasContent()) {
+      protoValue.addAllContent(content.map { it.toProto() })
+    }
+    if (hasContext()) {
+      protoValue.setContext(context.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceRelatesToComponent.toProto():
     DocumentReference.RelatesTo {
     val protoValue =
-      DocumentReference.RelatesTo.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(
-          DocumentReference.RelatesTo.CodeType.newBuilder()
-            .setValue(
-              DocumentRelationshipTypeCode.Value.valueOf(
-                code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      DocumentReference.RelatesTo.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setCode(
+      DocumentReference.RelatesTo.CodeType.newBuilder()
+        .setValue(
+          DocumentRelationshipTypeCode.Value.valueOf(
+            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setTarget(target.toProto())
         .build()
-    return protoValue
+    )
+    if (hasTarget()) {
+      protoValue.setTarget(target.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContentComponent.toProto():
     DocumentReference.Content {
-    val protoValue =
-      DocumentReference.Content.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setAttachment(attachment.toProto())
-        .setFormat(format.toProto())
-        .build()
-    return protoValue
+    val protoValue = DocumentReference.Content.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasAttachment()) {
+      protoValue.setAttachment(attachment.toProto())
+    }
+    if (hasFormat()) {
+      protoValue.setFormat(format.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContextComponent.toProto():
     DocumentReference.Context {
-    val protoValue =
-      DocumentReference.Context.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllEncounter(encounter.map { it.toProto() })
-        .addAllEvent(event.map { it.toProto() })
-        .setPeriod(period.toProto())
-        .setFacilityType(facilityType.toProto())
-        .setPracticeSetting(practiceSetting.toProto())
-        .setSourcePatientInfo(sourcePatientInfo.toProto())
-        .addAllRelated(related.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = DocumentReference.Context.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasEncounter()) {
+      protoValue.addAllEncounter(encounter.map { it.toProto() })
+    }
+    if (hasEvent()) {
+      protoValue.addAllEvent(event.map { it.toProto() })
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    if (hasFacilityType()) {
+      protoValue.setFacilityType(facilityType.toProto())
+    }
+    if (hasPracticeSetting()) {
+      protoValue.setPracticeSetting(practiceSetting.toProto())
+    }
+    if (hasSourcePatientInfo()) {
+      protoValue.setSourcePatientInfo(sourcePatientInfo.toProto())
+    }
+    if (hasRelated()) {
+      protoValue.addAllRelated(related.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -193,14 +290,20 @@ public object DocumentReferenceConverter {
     org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceRelatesToComponent {
     val hapiValue = org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceRelatesToComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setCode(
       org.hl7.fhir.r4.model.DocumentReference.DocumentRelationshipType.valueOf(
         code.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setTarget(target.toHapi())
+    if (hasTarget()) {
+      hapiValue.setTarget(target.toHapi())
+    }
     return hapiValue
   }
 
@@ -209,10 +312,18 @@ public object DocumentReferenceConverter {
     org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContentComponent {
     val hapiValue = org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContentComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setAttachment(attachment.toHapi())
-    hapiValue.setFormat(format.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasAttachment()) {
+      hapiValue.setAttachment(attachment.toHapi())
+    }
+    if (hasFormat()) {
+      hapiValue.setFormat(format.toHapi())
+    }
     return hapiValue
   }
 
@@ -221,15 +332,33 @@ public object DocumentReferenceConverter {
     org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContextComponent {
     val hapiValue = org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContextComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setEncounter(encounterList.map { it.toHapi() })
-    hapiValue.setEvent(eventList.map { it.toHapi() })
-    hapiValue.setPeriod(period.toHapi())
-    hapiValue.setFacilityType(facilityType.toHapi())
-    hapiValue.setPracticeSetting(practiceSetting.toHapi())
-    hapiValue.setSourcePatientInfo(sourcePatientInfo.toHapi())
-    hapiValue.setRelated(relatedList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (encounterCount > 0) {
+      hapiValue.setEncounter(encounterList.map { it.toHapi() })
+    }
+    if (eventCount > 0) {
+      hapiValue.setEvent(eventList.map { it.toHapi() })
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
+    if (hasFacilityType()) {
+      hapiValue.setFacilityType(facilityType.toHapi())
+    }
+    if (hasPracticeSetting()) {
+      hapiValue.setPracticeSetting(practiceSetting.toHapi())
+    }
+    if (hasSourcePatientInfo()) {
+      hapiValue.setSourcePatientInfo(sourcePatientInfo.toHapi())
+    }
+    if (relatedCount > 0) {
+      hapiValue.setRelated(relatedList.map { it.toHapi() })
+    }
     return hapiValue
   }
 }

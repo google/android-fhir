@@ -80,104 +80,192 @@ public object MessageHeaderConverter {
   public fun MessageHeader.toHapi(): org.hl7.fhir.r4.model.MessageHeader {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setEvent(event.messageHeaderEventToHapi())
-    hapiValue.setDestination(destinationList.map { it.toHapi() })
-    hapiValue.setSender(sender.toHapi())
-    hapiValue.setEnterer(enterer.toHapi())
-    hapiValue.setAuthor(author.toHapi())
-    hapiValue.setSource(source.toHapi())
-    hapiValue.setResponsible(responsible.toHapi())
-    hapiValue.setReason(reason.toHapi())
-    hapiValue.setResponse(response.toHapi())
-    hapiValue.setFocus(focusList.map { it.toHapi() })
-    hapiValue.setDefinitionElement(definition.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasEvent()) {
+      hapiValue.setEvent(event.messageHeaderEventToHapi())
+    }
+    if (destinationCount > 0) {
+      hapiValue.setDestination(destinationList.map { it.toHapi() })
+    }
+    if (hasSender()) {
+      hapiValue.setSender(sender.toHapi())
+    }
+    if (hasEnterer()) {
+      hapiValue.setEnterer(enterer.toHapi())
+    }
+    if (hasAuthor()) {
+      hapiValue.setAuthor(author.toHapi())
+    }
+    if (hasSource()) {
+      hapiValue.setSource(source.toHapi())
+    }
+    if (hasResponsible()) {
+      hapiValue.setResponsible(responsible.toHapi())
+    }
+    if (hasReason()) {
+      hapiValue.setReason(reason.toHapi())
+    }
+    if (hasResponse()) {
+      hapiValue.setResponse(response.toHapi())
+    }
+    if (focusCount > 0) {
+      hapiValue.setFocus(focusList.map { it.toHapi() })
+    }
+    if (hasDefinition()) {
+      hapiValue.setDefinitionElement(definition.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.MessageHeader.toProto(): MessageHeader {
-    val protoValue =
-      MessageHeader.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setEvent(event.messageHeaderEventToProto())
-        .addAllDestination(destination.map { it.toProto() })
-        .setSender(sender.toProto())
-        .setEnterer(enterer.toProto())
-        .setAuthor(author.toProto())
-        .setSource(source.toProto())
-        .setResponsible(responsible.toProto())
-        .setReason(reason.toProto())
-        .setResponse(response.toProto())
-        .addAllFocus(focus.map { it.toProto() })
-        .setDefinition(definitionElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = MessageHeader.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasEvent()) {
+      protoValue.setEvent(event.messageHeaderEventToProto())
+    }
+    if (hasDestination()) {
+      protoValue.addAllDestination(destination.map { it.toProto() })
+    }
+    if (hasSender()) {
+      protoValue.setSender(sender.toProto())
+    }
+    if (hasEnterer()) {
+      protoValue.setEnterer(enterer.toProto())
+    }
+    if (hasAuthor()) {
+      protoValue.setAuthor(author.toProto())
+    }
+    if (hasSource()) {
+      protoValue.setSource(source.toProto())
+    }
+    if (hasResponsible()) {
+      protoValue.setResponsible(responsible.toProto())
+    }
+    if (hasReason()) {
+      protoValue.setReason(reason.toProto())
+    }
+    if (hasResponse()) {
+      protoValue.setResponse(response.toProto())
+    }
+    if (hasFocus()) {
+      protoValue.addAllFocus(focus.map { it.toProto() })
+    }
+    if (hasDefinition()) {
+      protoValue.setDefinition(definitionElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.MessageHeader.MessageDestinationComponent.toProto():
     MessageHeader.MessageDestination {
     val protoValue =
-      MessageHeader.MessageDestination.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .setTarget(target.toProto())
-        .setEndpoint(endpointElement.toProto())
-        .setReceiver(receiver.toProto())
-        .build()
-    return protoValue
+      MessageHeader.MessageDestination.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasTarget()) {
+      protoValue.setTarget(target.toProto())
+    }
+    if (hasEndpoint()) {
+      protoValue.setEndpoint(endpointElement.toProto())
+    }
+    if (hasReceiver()) {
+      protoValue.setReceiver(receiver.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.MessageHeader.MessageSourceComponent.toProto():
     MessageHeader.MessageSource {
     val protoValue =
-      MessageHeader.MessageSource.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .setSoftware(softwareElement.toProto())
-        .setVersion(versionElement.toProto())
-        .setContact(contact.toProto())
-        .setEndpoint(endpointElement.toProto())
-        .build()
-    return protoValue
+      MessageHeader.MessageSource.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasSoftware()) {
+      protoValue.setSoftware(softwareElement.toProto())
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    if (hasContact()) {
+      protoValue.setContact(contact.toProto())
+    }
+    if (hasEndpoint()) {
+      protoValue.setEndpoint(endpointElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.MessageHeader.MessageHeaderResponseComponent.toProto():
     MessageHeader.Response {
-    val protoValue =
-      MessageHeader.Response.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setIdentifier(identifierElement.toProto())
-        .setCode(
-          MessageHeader.Response.CodeType.newBuilder()
-            .setValue(
-              ResponseTypeCode.Value.valueOf(
-                code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = MessageHeader.Response.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.setIdentifier(identifierElement.toProto())
+    }
+    protoValue.setCode(
+      MessageHeader.Response.CodeType.newBuilder()
+        .setValue(
+          ResponseTypeCode.Value.valueOf(
+            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setDetails(details.toProto())
         .build()
-    return protoValue
+    )
+    if (hasDetails()) {
+      protoValue.setDetails(details.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -185,12 +273,24 @@ public object MessageHeaderConverter {
     org.hl7.fhir.r4.model.MessageHeader.MessageDestinationComponent {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader.MessageDestinationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setTarget(target.toHapi())
-    hapiValue.setEndpointElement(endpoint.toHapi())
-    hapiValue.setReceiver(receiver.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasTarget()) {
+      hapiValue.setTarget(target.toHapi())
+    }
+    if (hasEndpoint()) {
+      hapiValue.setEndpointElement(endpoint.toHapi())
+    }
+    if (hasReceiver()) {
+      hapiValue.setReceiver(receiver.toHapi())
+    }
     return hapiValue
   }
 
@@ -199,13 +299,27 @@ public object MessageHeaderConverter {
     org.hl7.fhir.r4.model.MessageHeader.MessageSourceComponent {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader.MessageSourceComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setSoftwareElement(software.toHapi())
-    hapiValue.setVersionElement(version.toHapi())
-    hapiValue.setContact(contact.toHapi())
-    hapiValue.setEndpointElement(endpoint.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasSoftware()) {
+      hapiValue.setSoftwareElement(software.toHapi())
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
+    if (hasContact()) {
+      hapiValue.setContact(contact.toHapi())
+    }
+    if (hasEndpoint()) {
+      hapiValue.setEndpointElement(endpoint.toHapi())
+    }
     return hapiValue
   }
 
@@ -214,15 +328,23 @@ public object MessageHeaderConverter {
     org.hl7.fhir.r4.model.MessageHeader.MessageHeaderResponseComponent {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader.MessageHeaderResponseComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifierElement(identifier.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasIdentifier()) {
+      hapiValue.setIdentifierElement(identifier.toHapi())
+    }
     hapiValue.setCode(
       org.hl7.fhir.r4.model.MessageHeader.ResponseType.valueOf(
         code.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setDetails(details.toHapi())
+    if (hasDetails()) {
+      hapiValue.setDetails(details.toHapi())
+    }
     return hapiValue
   }
 }

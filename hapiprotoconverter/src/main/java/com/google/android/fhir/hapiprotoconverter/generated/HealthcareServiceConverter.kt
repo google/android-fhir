@@ -56,128 +56,261 @@ public object HealthcareServiceConverter {
   public fun HealthcareService.toHapi(): org.hl7.fhir.r4.model.HealthcareService {
     val hapiValue = org.hl7.fhir.r4.model.HealthcareService()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setActiveElement(active.toHapi())
-    hapiValue.setProvidedBy(providedBy.toHapi())
-    hapiValue.setCategory(categoryList.map { it.toHapi() })
-    hapiValue.setType(typeList.map { it.toHapi() })
-    hapiValue.setSpecialty(specialtyList.map { it.toHapi() })
-    hapiValue.setLocation(locationList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setCommentElement(comment.toHapi())
-    hapiValue.setExtraDetailsElement(extraDetails.toHapi())
-    hapiValue.setPhoto(photo.toHapi())
-    hapiValue.setTelecom(telecomList.map { it.toHapi() })
-    hapiValue.setCoverageArea(coverageAreaList.map { it.toHapi() })
-    hapiValue.setServiceProvisionCode(serviceProvisionCodeList.map { it.toHapi() })
-    hapiValue.setEligibility(eligibilityList.map { it.toHapi() })
-    hapiValue.setProgram(programList.map { it.toHapi() })
-    hapiValue.setCharacteristic(characteristicList.map { it.toHapi() })
-    hapiValue.setCommunication(communicationList.map { it.toHapi() })
-    hapiValue.setReferralMethod(referralMethodList.map { it.toHapi() })
-    hapiValue.setAppointmentRequiredElement(appointmentRequired.toHapi())
-    hapiValue.setAvailableTime(availableTimeList.map { it.toHapi() })
-    hapiValue.setNotAvailable(notAvailableList.map { it.toHapi() })
-    hapiValue.setAvailabilityExceptionsElement(availabilityExceptions.toHapi())
-    hapiValue.setEndpoint(endpointList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasActive()) {
+      hapiValue.setActiveElement(active.toHapi())
+    }
+    if (hasProvidedBy()) {
+      hapiValue.setProvidedBy(providedBy.toHapi())
+    }
+    if (categoryCount > 0) {
+      hapiValue.setCategory(categoryList.map { it.toHapi() })
+    }
+    if (typeCount > 0) {
+      hapiValue.setType(typeList.map { it.toHapi() })
+    }
+    if (specialtyCount > 0) {
+      hapiValue.setSpecialty(specialtyList.map { it.toHapi() })
+    }
+    if (locationCount > 0) {
+      hapiValue.setLocation(locationList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasComment()) {
+      hapiValue.setCommentElement(comment.toHapi())
+    }
+    if (hasExtraDetails()) {
+      hapiValue.setExtraDetailsElement(extraDetails.toHapi())
+    }
+    if (hasPhoto()) {
+      hapiValue.setPhoto(photo.toHapi())
+    }
+    if (telecomCount > 0) {
+      hapiValue.setTelecom(telecomList.map { it.toHapi() })
+    }
+    if (coverageAreaCount > 0) {
+      hapiValue.setCoverageArea(coverageAreaList.map { it.toHapi() })
+    }
+    if (serviceProvisionCodeCount > 0) {
+      hapiValue.setServiceProvisionCode(serviceProvisionCodeList.map { it.toHapi() })
+    }
+    if (eligibilityCount > 0) {
+      hapiValue.setEligibility(eligibilityList.map { it.toHapi() })
+    }
+    if (programCount > 0) {
+      hapiValue.setProgram(programList.map { it.toHapi() })
+    }
+    if (characteristicCount > 0) {
+      hapiValue.setCharacteristic(characteristicList.map { it.toHapi() })
+    }
+    if (communicationCount > 0) {
+      hapiValue.setCommunication(communicationList.map { it.toHapi() })
+    }
+    if (referralMethodCount > 0) {
+      hapiValue.setReferralMethod(referralMethodList.map { it.toHapi() })
+    }
+    if (hasAppointmentRequired()) {
+      hapiValue.setAppointmentRequiredElement(appointmentRequired.toHapi())
+    }
+    if (availableTimeCount > 0) {
+      hapiValue.setAvailableTime(availableTimeList.map { it.toHapi() })
+    }
+    if (notAvailableCount > 0) {
+      hapiValue.setNotAvailable(notAvailableList.map { it.toHapi() })
+    }
+    if (hasAvailabilityExceptions()) {
+      hapiValue.setAvailabilityExceptionsElement(availabilityExceptions.toHapi())
+    }
+    if (endpointCount > 0) {
+      hapiValue.setEndpoint(endpointList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.HealthcareService.toProto(): HealthcareService {
-    val protoValue =
-      HealthcareService.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setActive(activeElement.toProto())
-        .setProvidedBy(providedBy.toProto())
-        .addAllCategory(category.map { it.toProto() })
-        .addAllType(type.map { it.toProto() })
-        .addAllSpecialty(specialty.map { it.toProto() })
-        .addAllLocation(location.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .setComment(commentElement.toProto())
-        .setExtraDetails(extraDetailsElement.toProto())
-        .setPhoto(photo.toProto())
-        .addAllTelecom(telecom.map { it.toProto() })
-        .addAllCoverageArea(coverageArea.map { it.toProto() })
-        .addAllServiceProvisionCode(serviceProvisionCode.map { it.toProto() })
-        .addAllEligibility(eligibility.map { it.toProto() })
-        .addAllProgram(program.map { it.toProto() })
-        .addAllCharacteristic(characteristic.map { it.toProto() })
-        .addAllCommunication(communication.map { it.toProto() })
-        .addAllReferralMethod(referralMethod.map { it.toProto() })
-        .setAppointmentRequired(appointmentRequiredElement.toProto())
-        .addAllAvailableTime(availableTime.map { it.toProto() })
-        .addAllNotAvailable(notAvailable.map { it.toProto() })
-        .setAvailabilityExceptions(availabilityExceptionsElement.toProto())
-        .addAllEndpoint(endpoint.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = HealthcareService.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasActive()) {
+      protoValue.setActive(activeElement.toProto())
+    }
+    if (hasProvidedBy()) {
+      protoValue.setProvidedBy(providedBy.toProto())
+    }
+    if (hasCategory()) {
+      protoValue.addAllCategory(category.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.addAllType(type.map { it.toProto() })
+    }
+    if (hasSpecialty()) {
+      protoValue.addAllSpecialty(specialty.map { it.toProto() })
+    }
+    if (hasLocation()) {
+      protoValue.addAllLocation(location.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasComment()) {
+      protoValue.setComment(commentElement.toProto())
+    }
+    if (hasExtraDetails()) {
+      protoValue.setExtraDetails(extraDetailsElement.toProto())
+    }
+    if (hasPhoto()) {
+      protoValue.setPhoto(photo.toProto())
+    }
+    if (hasTelecom()) {
+      protoValue.addAllTelecom(telecom.map { it.toProto() })
+    }
+    if (hasCoverageArea()) {
+      protoValue.addAllCoverageArea(coverageArea.map { it.toProto() })
+    }
+    if (hasServiceProvisionCode()) {
+      protoValue.addAllServiceProvisionCode(serviceProvisionCode.map { it.toProto() })
+    }
+    if (hasEligibility()) {
+      protoValue.addAllEligibility(eligibility.map { it.toProto() })
+    }
+    if (hasProgram()) {
+      protoValue.addAllProgram(program.map { it.toProto() })
+    }
+    if (hasCharacteristic()) {
+      protoValue.addAllCharacteristic(characteristic.map { it.toProto() })
+    }
+    if (hasCommunication()) {
+      protoValue.addAllCommunication(communication.map { it.toProto() })
+    }
+    if (hasReferralMethod()) {
+      protoValue.addAllReferralMethod(referralMethod.map { it.toProto() })
+    }
+    if (hasAppointmentRequired()) {
+      protoValue.setAppointmentRequired(appointmentRequiredElement.toProto())
+    }
+    if (hasAvailableTime()) {
+      protoValue.addAllAvailableTime(availableTime.map { it.toProto() })
+    }
+    if (hasNotAvailable()) {
+      protoValue.addAllNotAvailable(notAvailable.map { it.toProto() })
+    }
+    if (hasAvailabilityExceptions()) {
+      protoValue.setAvailabilityExceptions(availabilityExceptionsElement.toProto())
+    }
+    if (hasEndpoint()) {
+      protoValue.addAllEndpoint(endpoint.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceEligibilityComponent.toProto():
     HealthcareService.Eligibility {
     val protoValue =
-      HealthcareService.Eligibility.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(code.toProto())
-        .setComment(commentElement.toProto())
-        .build()
-    return protoValue
+      HealthcareService.Eligibility.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasComment()) {
+      protoValue.setComment(commentElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceAvailableTimeComponent.toProto():
     HealthcareService.AvailableTime {
     val protoValue =
-      HealthcareService.AvailableTime.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllDaysOfWeek(
-          daysOfWeek.map {
-            HealthcareService.AvailableTime.DaysOfWeekCode.newBuilder()
-              .setValue(
-                DaysOfWeekCode.Value.valueOf(
-                  it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-                )
-              )
-              .build()
-          }
-        )
-        .setAllDay(allDayElement.toProto())
-        .setAvailableStartTime(availableStartTimeElement.toProto())
-        .setAvailableEndTime(availableEndTimeElement.toProto())
-        .build()
-    return protoValue
+      HealthcareService.AvailableTime.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.addAllDaysOfWeek(
+      daysOfWeek.map {
+        HealthcareService.AvailableTime.DaysOfWeekCode.newBuilder()
+          .setValue(
+            DaysOfWeekCode.Value.valueOf(
+              it.value.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+            )
+          )
+          .build()
+      }
+    )
+    if (hasAllDay()) {
+      protoValue.setAllDay(allDayElement.toProto())
+    }
+    if (hasAvailableStartTime()) {
+      protoValue.setAvailableStartTime(availableStartTimeElement.toProto())
+    }
+    if (hasAvailableEndTime()) {
+      protoValue.setAvailableEndTime(availableEndTimeElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceNotAvailableComponent.toProto():
     HealthcareService.NotAvailable {
     val protoValue =
-      HealthcareService.NotAvailable.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .setDuring(during.toProto())
-        .build()
-    return protoValue
+      HealthcareService.NotAvailable.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasDuring()) {
+      protoValue.setDuring(during.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -185,10 +318,18 @@ public object HealthcareServiceConverter {
     org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceEligibilityComponent {
     val hapiValue = org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceEligibilityComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setCommentElement(comment.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasComment()) {
+      hapiValue.setCommentElement(comment.toHapi())
+    }
     return hapiValue
   }
 
@@ -198,8 +339,12 @@ public object HealthcareServiceConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceAvailableTimeComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     daysOfWeekList.forEach {
       hapiValue.addDaysOfWeek(
         org.hl7.fhir.r4.model.HealthcareService.DaysOfWeek.valueOf(
@@ -207,9 +352,15 @@ public object HealthcareServiceConverter {
         )
       )
     }
-    hapiValue.setAllDayElement(allDay.toHapi())
-    hapiValue.setAvailableStartTimeElement(availableStartTime.toHapi())
-    hapiValue.setAvailableEndTimeElement(availableEndTime.toHapi())
+    if (hasAllDay()) {
+      hapiValue.setAllDayElement(allDay.toHapi())
+    }
+    if (hasAvailableStartTime()) {
+      hapiValue.setAvailableStartTimeElement(availableStartTime.toHapi())
+    }
+    if (hasAvailableEndTime()) {
+      hapiValue.setAvailableEndTimeElement(availableEndTime.toHapi())
+    }
     return hapiValue
   }
 
@@ -218,10 +369,18 @@ public object HealthcareServiceConverter {
     org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceNotAvailableComponent {
     val hapiValue = org.hl7.fhir.r4.model.HealthcareService.HealthcareServiceNotAvailableComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setDuring(during.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (hasDuring()) {
+      hapiValue.setDuring(during.toHapi())
+    }
     return hapiValue
   }
 }

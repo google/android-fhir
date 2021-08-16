@@ -127,74 +127,144 @@ public object DosageConverter {
   public fun Dosage.toHapi(): org.hl7.fhir.r4.model.Dosage {
     val hapiValue = org.hl7.fhir.r4.model.Dosage()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSequenceElement(sequence.toHapi())
-    hapiValue.setTextElement(text.toHapi())
-    hapiValue.setAdditionalInstruction(additionalInstructionList.map { it.toHapi() })
-    hapiValue.setPatientInstructionElement(patientInstruction.toHapi())
-    hapiValue.setTiming(timing.toHapi())
-    hapiValue.setAsNeeded(asNeeded.dosageAsNeededToHapi())
-    hapiValue.setSite(site.toHapi())
-    hapiValue.setRoute(route.toHapi())
-    hapiValue.setMethod(method.toHapi())
-    hapiValue.setDoseAndRate(doseAndRateList.map { it.toHapi() })
-    hapiValue.setMaxDosePerPeriod(maxDosePerPeriod.toHapi())
-    hapiValue.setMaxDosePerAdministration(maxDosePerAdministration.toHapi())
-    hapiValue.setMaxDosePerLifetime(maxDosePerLifetime.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSequence()) {
+      hapiValue.setSequenceElement(sequence.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setTextElement(text.toHapi())
+    }
+    if (additionalInstructionCount > 0) {
+      hapiValue.setAdditionalInstruction(additionalInstructionList.map { it.toHapi() })
+    }
+    if (hasPatientInstruction()) {
+      hapiValue.setPatientInstructionElement(patientInstruction.toHapi())
+    }
+    if (hasTiming()) {
+      hapiValue.setTiming(timing.toHapi())
+    }
+    if (hasAsNeeded()) {
+      hapiValue.setAsNeeded(asNeeded.dosageAsNeededToHapi())
+    }
+    if (hasSite()) {
+      hapiValue.setSite(site.toHapi())
+    }
+    if (hasRoute()) {
+      hapiValue.setRoute(route.toHapi())
+    }
+    if (hasMethod()) {
+      hapiValue.setMethod(method.toHapi())
+    }
+    if (doseAndRateCount > 0) {
+      hapiValue.setDoseAndRate(doseAndRateList.map { it.toHapi() })
+    }
+    if (hasMaxDosePerPeriod()) {
+      hapiValue.setMaxDosePerPeriod(maxDosePerPeriod.toHapi())
+    }
+    if (hasMaxDosePerAdministration()) {
+      hapiValue.setMaxDosePerAdministration(maxDosePerAdministration.toHapi())
+    }
+    if (hasMaxDosePerLifetime()) {
+      hapiValue.setMaxDosePerLifetime(maxDosePerLifetime.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Dosage.toProto(): Dosage {
-    val protoValue =
-      Dosage.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSequence(sequenceElement.toProto())
-        .setText(textElement.toProto())
-        .addAllAdditionalInstruction(additionalInstruction.map { it.toProto() })
-        .setPatientInstruction(patientInstructionElement.toProto())
-        .setTiming(timing.toProto())
-        .setAsNeeded(asNeeded.dosageAsNeededToProto())
-        .setSite(site.toProto())
-        .setRoute(route.toProto())
-        .setMethod(method.toProto())
-        .addAllDoseAndRate(doseAndRate.map { it.toProto() })
-        .setMaxDosePerPeriod(maxDosePerPeriod.toProto())
-        .setMaxDosePerAdministration(
-          (maxDosePerAdministration as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
-        )
-        .setMaxDosePerLifetime(
-          (maxDosePerLifetime as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
-        )
-        .build()
-    return protoValue
+    val protoValue = Dosage.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSequence()) {
+      protoValue.setSequence(sequenceElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(textElement.toProto())
+    }
+    if (hasAdditionalInstruction()) {
+      protoValue.addAllAdditionalInstruction(additionalInstruction.map { it.toProto() })
+    }
+    if (hasPatientInstruction()) {
+      protoValue.setPatientInstruction(patientInstructionElement.toProto())
+    }
+    if (hasTiming()) {
+      protoValue.setTiming(timing.toProto())
+    }
+    if (hasAsNeeded()) {
+      protoValue.setAsNeeded(asNeeded.dosageAsNeededToProto())
+    }
+    if (hasSite()) {
+      protoValue.setSite(site.toProto())
+    }
+    if (hasRoute()) {
+      protoValue.setRoute(route.toProto())
+    }
+    if (hasMethod()) {
+      protoValue.setMethod(method.toProto())
+    }
+    if (hasDoseAndRate()) {
+      protoValue.addAllDoseAndRate(doseAndRate.map { it.toProto() })
+    }
+    if (hasMaxDosePerPeriod()) {
+      protoValue.setMaxDosePerPeriod(maxDosePerPeriod.toProto())
+    }
+    if (hasMaxDosePerAdministration()) {
+      protoValue.setMaxDosePerAdministration(
+        (maxDosePerAdministration as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      )
+    }
+    if (hasMaxDosePerLifetime()) {
+      protoValue.setMaxDosePerLifetime(
+        (maxDosePerLifetime as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      )
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent.toProto():
     Dosage.DoseAndRate {
-    val protoValue =
-      Dosage.DoseAndRate.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setType(type.toProto())
-        .setDose(dose.dosageDoseAndRateDoseToProto())
-        .setRate(rate.dosageDoseAndRateRateToProto())
-        .build()
-    return protoValue
+    val protoValue = Dosage.DoseAndRate.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasDose()) {
+      protoValue.setDose(dose.dosageDoseAndRateDoseToProto())
+    }
+    if (hasRate()) {
+      protoValue.setRate(rate.dosageDoseAndRateRateToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun Dosage.DoseAndRate.toHapi(): org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent {
     val hapiValue = org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
-    hapiValue.setDose(dose.dosageDoseAndRateDoseToHapi())
-    hapiValue.setRate(rate.dosageDoseAndRateRateToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasDose()) {
+      hapiValue.setDose(dose.dosageDoseAndRateDoseToHapi())
+    }
+    if (hasRate()) {
+      hapiValue.setRate(rate.dosageDoseAndRateRateToHapi())
+    }
     return hapiValue
   }
 }

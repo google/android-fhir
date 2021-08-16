@@ -101,71 +101,152 @@ public object MedicationStatementConverter {
   public fun MedicationStatement.toHapi(): org.hl7.fhir.r4.model.MedicationStatement {
     val hapiValue = org.hl7.fhir.r4.model.MedicationStatement()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
-    hapiValue.setPartOf(partOfList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (basedOnCount > 0) {
+      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+    }
+    if (partOfCount > 0) {
+      hapiValue.setPartOf(partOfList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.MedicationStatement.MedicationStatementStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setStatusReason(statusReasonList.map { it.toHapi() })
-    hapiValue.setCategory(category.toHapi())
-    hapiValue.setMedication(medication.medicationStatementMedicationToHapi())
-    hapiValue.setSubject(subject.toHapi())
-    hapiValue.setContext(context.toHapi())
-    hapiValue.setEffective(effective.medicationStatementEffectiveToHapi())
-    hapiValue.setDateAssertedElement(dateAsserted.toHapi())
-    hapiValue.setInformationSource(informationSource.toHapi())
-    hapiValue.setDerivedFrom(derivedFromList.map { it.toHapi() })
-    hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
-    hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
-    hapiValue.setNote(noteList.map { it.toHapi() })
-    hapiValue.setDosage(dosageList.map { it.toHapi() })
+    if (statusReasonCount > 0) {
+      hapiValue.setStatusReason(statusReasonList.map { it.toHapi() })
+    }
+    if (hasCategory()) {
+      hapiValue.setCategory(category.toHapi())
+    }
+    if (hasMedication()) {
+      hapiValue.setMedication(medication.medicationStatementMedicationToHapi())
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.toHapi())
+    }
+    if (hasContext()) {
+      hapiValue.setContext(context.toHapi())
+    }
+    if (hasEffective()) {
+      hapiValue.setEffective(effective.medicationStatementEffectiveToHapi())
+    }
+    if (hasDateAsserted()) {
+      hapiValue.setDateAssertedElement(dateAsserted.toHapi())
+    }
+    if (hasInformationSource()) {
+      hapiValue.setInformationSource(informationSource.toHapi())
+    }
+    if (derivedFromCount > 0) {
+      hapiValue.setDerivedFrom(derivedFromList.map { it.toHapi() })
+    }
+    if (reasonCodeCount > 0) {
+      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+    }
+    if (reasonReferenceCount > 0) {
+      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+    }
+    if (noteCount > 0) {
+      hapiValue.setNote(noteList.map { it.toHapi() })
+    }
+    if (dosageCount > 0) {
+      hapiValue.setDosage(dosageList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.MedicationStatement.toProto(): MedicationStatement {
-    val protoValue =
-      MedicationStatement.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .addAllBasedOn(basedOn.map { it.toProto() })
-        .addAllPartOf(partOf.map { it.toProto() })
-        .setStatus(
-          MedicationStatement.StatusCode.newBuilder()
-            .setValue(
-              MedicationStatementStatusCodes.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = MedicationStatement.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasBasedOn()) {
+      protoValue.addAllBasedOn(basedOn.map { it.toProto() })
+    }
+    if (hasPartOf()) {
+      protoValue.addAllPartOf(partOf.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      MedicationStatement.StatusCode.newBuilder()
+        .setValue(
+          MedicationStatementStatusCodes.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .addAllStatusReason(statusReason.map { it.toProto() })
-        .setCategory(category.toProto())
-        .setMedication(medication.medicationStatementMedicationToProto())
-        .setSubject(subject.toProto())
-        .setContext(context.toProto())
-        .setEffective(effective.medicationStatementEffectiveToProto())
-        .setDateAsserted(dateAssertedElement.toProto())
-        .setInformationSource(informationSource.toProto())
-        .addAllDerivedFrom(derivedFrom.map { it.toProto() })
-        .addAllReasonCode(reasonCode.map { it.toProto() })
-        .addAllReasonReference(reasonReference.map { it.toProto() })
-        .addAllNote(note.map { it.toProto() })
-        .addAllDosage(dosage.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasStatusReason()) {
+      protoValue.addAllStatusReason(statusReason.map { it.toProto() })
+    }
+    if (hasCategory()) {
+      protoValue.setCategory(category.toProto())
+    }
+    if (hasMedication()) {
+      protoValue.setMedication(medication.medicationStatementMedicationToProto())
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.toProto())
+    }
+    if (hasContext()) {
+      protoValue.setContext(context.toProto())
+    }
+    if (hasEffective()) {
+      protoValue.setEffective(effective.medicationStatementEffectiveToProto())
+    }
+    if (hasDateAsserted()) {
+      protoValue.setDateAsserted(dateAssertedElement.toProto())
+    }
+    if (hasInformationSource()) {
+      protoValue.setInformationSource(informationSource.toProto())
+    }
+    if (hasDerivedFrom()) {
+      protoValue.addAllDerivedFrom(derivedFrom.map { it.toProto() })
+    }
+    if (hasReasonCode()) {
+      protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
+    }
+    if (hasReasonReference()) {
+      protoValue.addAllReasonReference(reasonReference.map { it.toProto() })
+    }
+    if (hasNote()) {
+      protoValue.addAllNote(note.map { it.toProto() })
+    }
+    if (hasDosage()) {
+      protoValue.addAllDosage(dosage.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 }

@@ -64,15 +64,33 @@ public object OperationDefinitionConverter {
   public fun OperationDefinition.toHapi(): org.hl7.fhir.r4.model.OperationDefinition {
     val hapiValue = org.hl7.fhir.r4.model.OperationDefinition()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setVersionElement(version.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setTitleElement(title.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasTitle()) {
+      hapiValue.setTitleElement(title.toHapi())
+    }
     hapiValue.setStatus(
       Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
@@ -81,153 +99,264 @@ public object OperationDefinitionConverter {
         kind.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setExperimentalElement(experimental.toHapi())
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setPublisherElement(publisher.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setUseContext(useContextList.map { it.toHapi() })
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
-    hapiValue.setPurposeElement(purpose.toHapi())
-    hapiValue.setAffectsStateElement(affectsState.toHapi())
-    hapiValue.setCodeElement(code.toHapi())
-    hapiValue.setCommentElement(comment.toHapi())
-    hapiValue.setBaseElement(base.toHapi())
+    if (hasExperimental()) {
+      hapiValue.setExperimentalElement(experimental.toHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasPublisher()) {
+      hapiValue.setPublisherElement(publisher.toHapi())
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (useContextCount > 0) {
+      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+    }
+    if (jurisdictionCount > 0) {
+      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    }
+    if (hasPurpose()) {
+      hapiValue.setPurposeElement(purpose.toHapi())
+    }
+    if (hasAffectsState()) {
+      hapiValue.setAffectsStateElement(affectsState.toHapi())
+    }
+    if (hasCode()) {
+      hapiValue.setCodeElement(code.toHapi())
+    }
+    if (hasComment()) {
+      hapiValue.setCommentElement(comment.toHapi())
+    }
+    if (hasBase()) {
+      hapiValue.setBaseElement(base.toHapi())
+    }
     resourceList.forEach { hapiValue.addResource(it.value.name.hapiCodeCheck()) }
-    hapiValue.setSystemElement(system.toHapi())
-    hapiValue.setTypeElement(type.toHapi())
-    hapiValue.setInstanceElement(instance.toHapi())
-    hapiValue.setInputProfileElement(inputProfile.toHapi())
-    hapiValue.setOutputProfileElement(outputProfile.toHapi())
-    hapiValue.setParameter(parameterList.map { it.toHapi() })
-    hapiValue.setOverload(overloadList.map { it.toHapi() })
+    if (hasSystem()) {
+      hapiValue.setSystemElement(system.toHapi())
+    }
+    if (hasType()) {
+      hapiValue.setTypeElement(type.toHapi())
+    }
+    if (hasInstance()) {
+      hapiValue.setInstanceElement(instance.toHapi())
+    }
+    if (hasInputProfile()) {
+      hapiValue.setInputProfileElement(inputProfile.toHapi())
+    }
+    if (hasOutputProfile()) {
+      hapiValue.setOutputProfileElement(outputProfile.toHapi())
+    }
+    if (parameterCount > 0) {
+      hapiValue.setParameter(parameterList.map { it.toHapi() })
+    }
+    if (overloadCount > 0) {
+      hapiValue.setOverload(overloadList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.OperationDefinition.toProto(): OperationDefinition {
-    val protoValue =
-      OperationDefinition.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUrl(urlElement.toProto())
-        .setVersion(versionElement.toProto())
-        .setName(nameElement.toProto())
-        .setTitle(titleElement.toProto())
-        .setStatus(
-          OperationDefinition.StatusCode.newBuilder()
-            .setValue(
-              PublicationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = OperationDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasTitle()) {
+      protoValue.setTitle(titleElement.toProto())
+    }
+    protoValue.setStatus(
+      OperationDefinition.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setKind(
-          OperationDefinition.KindCode.newBuilder()
-            .setValue(
-              OperationKindCode.Value.valueOf(
-                kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setExperimental(experimentalElement.toProto())
-        .setDate(dateElement.toProto())
-        .setPublisher(publisherElement.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .addAllUseContext(useContext.map { it.toProto() })
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .setPurpose(purposeElement.toProto())
-        .setAffectsState(affectsStateElement.toProto())
-        .setCode(codeElement.toProto())
-        .setComment(commentElement.toProto())
-        .setBase(baseElement.toProto())
-        .addAllResource(
-          resource.map {
-            OperationDefinition.ResourceCode.newBuilder()
-              .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString.protoCodeCheck()))
-              .build()
-          }
-        )
-        .setSystem(systemElement.toProto())
-        .setType(typeElement.toProto())
-        .setInstance(instanceElement.toProto())
-        .setInputProfile(inputProfileElement.toProto())
-        .setOutputProfile(outputProfileElement.toProto())
-        .addAllParameter(parameter.map { it.toProto() })
-        .addAllOverload(overload.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    protoValue.setKind(
+      OperationDefinition.KindCode.newBuilder()
+        .setValue(
+          OperationKindCode.Value.valueOf(
+            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasExperimental()) {
+      protoValue.setExperimental(experimentalElement.toProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasPublisher()) {
+      protoValue.setPublisher(publisherElement.toProto())
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasUseContext()) {
+      protoValue.addAllUseContext(useContext.map { it.toProto() })
+    }
+    if (hasJurisdiction()) {
+      protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
+    }
+    if (hasPurpose()) {
+      protoValue.setPurpose(purposeElement.toProto())
+    }
+    if (hasAffectsState()) {
+      protoValue.setAffectsState(affectsStateElement.toProto())
+    }
+    if (hasCode()) {
+      protoValue.setCode(codeElement.toProto())
+    }
+    if (hasComment()) {
+      protoValue.setComment(commentElement.toProto())
+    }
+    if (hasBase()) {
+      protoValue.setBase(baseElement.toProto())
+    }
+    protoValue.addAllResource(
+      resource.map {
+        OperationDefinition.ResourceCode.newBuilder()
+          .setValue(ResourceTypeCode.Value.valueOf(it.valueAsString.protoCodeCheck()))
+          .build()
+      }
+    )
+    if (hasSystem()) {
+      protoValue.setSystem(systemElement.toProto())
+    }
+    if (hasType()) {
+      protoValue.setType(typeElement.toProto())
+    }
+    if (hasInstance()) {
+      protoValue.setInstance(instanceElement.toProto())
+    }
+    if (hasInputProfile()) {
+      protoValue.setInputProfile(inputProfileElement.toProto())
+    }
+    if (hasOutputProfile()) {
+      protoValue.setOutputProfile(outputProfileElement.toProto())
+    }
+    if (hasParameter()) {
+      protoValue.addAllParameter(parameter.map { it.toProto() })
+    }
+    if (hasOverload()) {
+      protoValue.addAllOverload(overload.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterComponent.toProto():
     OperationDefinition.Parameter {
     val protoValue =
-      OperationDefinition.Parameter.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .setUse(
-          OperationDefinition.Parameter.UseCode.newBuilder()
-            .setValue(
-              OperationParameterUseCode.Value.valueOf(
-                use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      OperationDefinition.Parameter.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    protoValue.setUse(
+      OperationDefinition.Parameter.UseCode.newBuilder()
+        .setValue(
+          OperationParameterUseCode.Value.valueOf(
+            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setMin(minElement.toProto())
-        .setMax(maxElement.toProto())
-        .setDocumentation(documentationElement.toProto())
-        .setType(
-          OperationDefinition.Parameter.TypeCode.newBuilder()
-            .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
-            .build()
-        )
-        .addAllTargetProfile(targetProfile.map { it.toProto() })
-        .setSearchType(
-          OperationDefinition.Parameter.SearchTypeCode.newBuilder()
-            .setValue(
-              SearchParamTypeCode.Value.valueOf(
-                searchType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setBinding(binding.toProto())
-        .addAllReferencedFrom(referencedFrom.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasMin()) {
+      protoValue.setMin(minElement.toProto())
+    }
+    if (hasMax()) {
+      protoValue.setMax(maxElement.toProto())
+    }
+    if (hasDocumentation()) {
+      protoValue.setDocumentation(documentationElement.toProto())
+    }
+    protoValue.setType(
+      OperationDefinition.Parameter.TypeCode.newBuilder()
+        .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
+        .build()
+    )
+    if (hasTargetProfile()) {
+      protoValue.addAllTargetProfile(targetProfile.map { it.toProto() })
+    }
+    protoValue.setSearchType(
+      OperationDefinition.Parameter.SearchTypeCode.newBuilder()
+        .setValue(
+          SearchParamTypeCode.Value.valueOf(
+            searchType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasBinding()) {
+      protoValue.setBinding(binding.toProto())
+    }
+    if (hasReferencedFrom()) {
+      protoValue.addAllReferencedFrom(referencedFrom.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterBindingComponent.toProto():
     OperationDefinition.Parameter.Binding {
     val protoValue =
-      OperationDefinition.Parameter.Binding.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setStrength(
-          OperationDefinition.Parameter.Binding.StrengthCode.newBuilder()
-            .setValue(
-              BindingStrengthCode.Value.valueOf(
-                strength.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      OperationDefinition.Parameter.Binding.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setStrength(
+      OperationDefinition.Parameter.Binding.StrengthCode.newBuilder()
+        .setValue(
+          BindingStrengthCode.Value.valueOf(
+            strength.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setValueSet(valueSetElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasValueSet()) {
+      protoValue.setValueSet(valueSetElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -236,26 +365,39 @@ public object OperationDefinitionConverter {
     val protoValue =
       OperationDefinition.Parameter.ReferencedFrom.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSource(sourceElement.toProto())
-        .setSourceId(sourceIdElement.toProto())
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSource()) {
+      protoValue.setSource(sourceElement.toProto())
+    }
+    if (hasSourceId()) {
+      protoValue.setSourceId(sourceIdElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionOverloadComponent.toProto():
     OperationDefinition.Overload {
     val protoValue =
-      OperationDefinition.Overload.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllParameterName(parameterName.map { it.toProto() })
-        .setComment(commentElement.toProto())
-        .build()
-    return protoValue
+      OperationDefinition.Overload.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasParameterName()) {
+      protoValue.addAllParameterName(parameterName.map { it.toProto() })
+    }
+    if (hasComment()) {
+      protoValue.setComment(commentElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -264,24 +406,42 @@ public object OperationDefinitionConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
     hapiValue.setUse(
       org.hl7.fhir.r4.model.OperationDefinition.OperationParameterUse.valueOf(
         use.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setMinElement(min.toHapi())
-    hapiValue.setMaxElement(max.toHapi())
-    hapiValue.setDocumentationElement(documentation.toHapi())
+    if (hasMin()) {
+      hapiValue.setMinElement(min.toHapi())
+    }
+    if (hasMax()) {
+      hapiValue.setMaxElement(max.toHapi())
+    }
+    if (hasDocumentation()) {
+      hapiValue.setDocumentationElement(documentation.toHapi())
+    }
     hapiValue.setType(type.value.name)
-    hapiValue.setTargetProfile(targetProfileList.map { it.toHapi() })
+    if (targetProfileCount > 0) {
+      hapiValue.setTargetProfile(targetProfileList.map { it.toHapi() })
+    }
     hapiValue.setSearchType(
       Enumerations.SearchParamType.valueOf(searchType.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setBinding(binding.toHapi())
-    hapiValue.setReferencedFrom(referencedFromList.map { it.toHapi() })
+    if (hasBinding()) {
+      hapiValue.setBinding(binding.toHapi())
+    }
+    if (referencedFromCount > 0) {
+      hapiValue.setReferencedFrom(referencedFromList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -291,12 +451,18 @@ public object OperationDefinitionConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionParameterBindingComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setStrength(
       Enumerations.BindingStrength.valueOf(strength.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setValueSetElement(valueSet.toHapi())
+    if (hasValueSet()) {
+      hapiValue.setValueSetElement(valueSet.toHapi())
+    }
     return hapiValue
   }
 
@@ -307,10 +473,18 @@ public object OperationDefinitionConverter {
       org.hl7.fhir.r4.model.OperationDefinition
         .OperationDefinitionParameterReferencedFromComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSourceElement(source.toHapi())
-    hapiValue.setSourceIdElement(sourceId.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSource()) {
+      hapiValue.setSourceElement(source.toHapi())
+    }
+    if (hasSourceId()) {
+      hapiValue.setSourceIdElement(sourceId.toHapi())
+    }
     return hapiValue
   }
 
@@ -319,10 +493,18 @@ public object OperationDefinitionConverter {
     org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionOverloadComponent {
     val hapiValue = org.hl7.fhir.r4.model.OperationDefinition.OperationDefinitionOverloadComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setParameterName(parameterNameList.map { it.toHapi() })
-    hapiValue.setCommentElement(comment.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (parameterNameCount > 0) {
+      hapiValue.setParameterName(parameterNameList.map { it.toHapi() })
+    }
+    if (hasComment()) {
+      hapiValue.setCommentElement(comment.toHapi())
+    }
     return hapiValue
   }
 }

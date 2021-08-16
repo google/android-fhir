@@ -137,102 +137,204 @@ public object ValueSetConverter {
   public fun ValueSet.toHapi(): org.hl7.fhir.r4.model.ValueSet {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setVersionElement(version.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setTitleElement(title.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasTitle()) {
+      hapiValue.setTitleElement(title.toHapi())
+    }
     hapiValue.setStatus(
       Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setExperimentalElement(experimental.toHapi())
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setPublisherElement(publisher.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setUseContext(useContextList.map { it.toHapi() })
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
-    hapiValue.setImmutableElement(immutable.toHapi())
-    hapiValue.setPurposeElement(purpose.toHapi())
-    hapiValue.setCopyrightElement(copyright.toHapi())
-    hapiValue.setCompose(compose.toHapi())
-    hapiValue.setExpansion(expansion.toHapi())
+    if (hasExperimental()) {
+      hapiValue.setExperimentalElement(experimental.toHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasPublisher()) {
+      hapiValue.setPublisherElement(publisher.toHapi())
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (useContextCount > 0) {
+      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+    }
+    if (jurisdictionCount > 0) {
+      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    }
+    if (hasImmutable()) {
+      hapiValue.setImmutableElement(immutable.toHapi())
+    }
+    if (hasPurpose()) {
+      hapiValue.setPurposeElement(purpose.toHapi())
+    }
+    if (hasCopyright()) {
+      hapiValue.setCopyrightElement(copyright.toHapi())
+    }
+    if (hasCompose()) {
+      hapiValue.setCompose(compose.toHapi())
+    }
+    if (hasExpansion()) {
+      hapiValue.setExpansion(expansion.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.ValueSet.toProto(): ValueSet {
-    val protoValue =
-      ValueSet.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUrl(urlElement.toProto())
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setVersion(versionElement.toProto())
-        .setName(nameElement.toProto())
-        .setTitle(titleElement.toProto())
-        .setStatus(
-          ValueSet.StatusCode.newBuilder()
-            .setValue(
-              PublicationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = ValueSet.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasTitle()) {
+      protoValue.setTitle(titleElement.toProto())
+    }
+    protoValue.setStatus(
+      ValueSet.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setExperimental(experimentalElement.toProto())
-        .setDate(dateElement.toProto())
-        .setPublisher(publisherElement.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .addAllUseContext(useContext.map { it.toProto() })
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .setImmutable(immutableElement.toProto())
-        .setPurpose(purposeElement.toProto())
-        .setCopyright(copyrightElement.toProto())
-        .setCompose(compose.toProto())
-        .setExpansion(expansion.toProto())
         .build()
-    return protoValue
+    )
+    if (hasExperimental()) {
+      protoValue.setExperimental(experimentalElement.toProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasPublisher()) {
+      protoValue.setPublisher(publisherElement.toProto())
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasUseContext()) {
+      protoValue.addAllUseContext(useContext.map { it.toProto() })
+    }
+    if (hasJurisdiction()) {
+      protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
+    }
+    if (hasImmutable()) {
+      protoValue.setImmutable(immutableElement.toProto())
+    }
+    if (hasPurpose()) {
+      protoValue.setPurpose(purposeElement.toProto())
+    }
+    if (hasCopyright()) {
+      protoValue.setCopyright(copyrightElement.toProto())
+    }
+    if (hasCompose()) {
+      protoValue.setCompose(compose.toProto())
+    }
+    if (hasExpansion()) {
+      protoValue.setExpansion(expansion.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ValueSet.ValueSetComposeComponent.toProto(): ValueSet.Compose {
-    val protoValue =
-      ValueSet.Compose.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setLockedDate(lockedDateElement.toProto())
-        .setInactive(inactiveElement.toProto())
-        .addAllInclude(include.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = ValueSet.Compose.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasLockedDate()) {
+      protoValue.setLockedDate(lockedDateElement.toProto())
+    }
+    if (hasInactive()) {
+      protoValue.setInactive(inactiveElement.toProto())
+    }
+    if (hasInclude()) {
+      protoValue.addAllInclude(include.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ValueSet.ConceptSetComponent.toProto():
     ValueSet.Compose.ConceptSet {
     val protoValue =
-      ValueSet.Compose.ConceptSet.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSystem(systemElement.toProto())
-        .setVersion(versionElement.toProto())
-        .addAllConcept(concept.map { it.toProto() })
-        .addAllFilter(filter.map { it.toProto() })
-        .build()
-    return protoValue
+      ValueSet.Compose.ConceptSet.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSystem()) {
+      protoValue.setSystem(systemElement.toProto())
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    if (hasConcept()) {
+      protoValue.addAllConcept(concept.map { it.toProto() })
+    }
+    if (hasFilter()) {
+      protoValue.addAllFilter(filter.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -241,13 +343,22 @@ public object ValueSetConverter {
     val protoValue =
       ValueSet.Compose.ConceptSet.ConceptReference.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(codeElement.toProto())
-        .setDisplay(displayElement.toProto())
-        .addAllDesignation(designation.map { it.toProto() })
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(codeElement.toProto())
+    }
+    if (hasDisplay()) {
+      protoValue.setDisplay(displayElement.toProto())
+    }
+    if (hasDesignation()) {
+      protoValue.addAllDesignation(designation.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -256,96 +367,152 @@ public object ValueSetConverter {
     val protoValue =
       ValueSet.Compose.ConceptSet.ConceptReference.Designation.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUse(use.toProto())
-        .setValue(valueElement.toProto())
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasUse()) {
+      protoValue.setUse(use.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(valueElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ValueSet.ConceptSetFilterComponent.toProto():
     ValueSet.Compose.ConceptSet.Filter {
     val protoValue =
-      ValueSet.Compose.ConceptSet.Filter.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setProperty(propertyElement.toProto())
-        .setOp(
-          ValueSet.Compose.ConceptSet.Filter.OpCode.newBuilder()
-            .setValue(
-              FilterOperatorCode.Value.valueOf(
-                op.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      ValueSet.Compose.ConceptSet.Filter.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasProperty()) {
+      protoValue.setProperty(propertyElement.toProto())
+    }
+    protoValue.setOp(
+      ValueSet.Compose.ConceptSet.Filter.OpCode.newBuilder()
+        .setValue(
+          FilterOperatorCode.Value.valueOf(
+            op.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setValue(valueElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasValue()) {
+      protoValue.setValue(valueElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionComponent.toProto():
     ValueSet.Expansion {
-    val protoValue =
-      ValueSet.Expansion.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setIdentifier(identifierElement.toProto())
-        .setTimestamp(timestampElement.toProto())
-        .setTotal(totalElement.toProto())
-        .setOffset(offsetElement.toProto())
-        .addAllParameter(parameter.map { it.toProto() })
-        .addAllContains(contains.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = ValueSet.Expansion.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.setIdentifier(identifierElement.toProto())
+    }
+    if (hasTimestamp()) {
+      protoValue.setTimestamp(timestampElement.toProto())
+    }
+    if (hasTotal()) {
+      protoValue.setTotal(totalElement.toProto())
+    }
+    if (hasOffset()) {
+      protoValue.setOffset(offsetElement.toProto())
+    }
+    if (hasParameter()) {
+      protoValue.addAllParameter(parameter.map { it.toProto() })
+    }
+    if (hasContains()) {
+      protoValue.addAllContains(contains.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionParameterComponent.toProto():
     ValueSet.Expansion.Parameter {
     val protoValue =
-      ValueSet.Expansion.Parameter.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .setValue(value.valueSetExpansionParameterValueToProto())
-        .build()
-    return protoValue
+      ValueSet.Expansion.Parameter.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.valueSetExpansionParameterValueToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionContainsComponent.toProto():
     ValueSet.Expansion.Contains {
     val protoValue =
-      ValueSet.Expansion.Contains.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSystem(systemElement.toProto())
-        .setAbstract(abstractElement.toProto())
-        .setInactive(inactiveElement.toProto())
-        .setVersion(versionElement.toProto())
-        .setCode(codeElement.toProto())
-        .setDisplay(displayElement.toProto())
-        .build()
-    return protoValue
+      ValueSet.Expansion.Contains.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSystem()) {
+      protoValue.setSystem(systemElement.toProto())
+    }
+    if (hasAbstract()) {
+      protoValue.setAbstract(abstractElement.toProto())
+    }
+    if (hasInactive()) {
+      protoValue.setInactive(inactiveElement.toProto())
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    if (hasCode()) {
+      protoValue.setCode(codeElement.toProto())
+    }
+    if (hasDisplay()) {
+      protoValue.setDisplay(displayElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun ValueSet.Compose.toHapi(): org.hl7.fhir.r4.model.ValueSet.ValueSetComposeComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ValueSetComposeComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setLockedDateElement(lockedDate.toHapi())
-    hapiValue.setInactiveElement(inactive.toHapi())
-    hapiValue.setInclude(includeList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasLockedDate()) {
+      hapiValue.setLockedDateElement(lockedDate.toHapi())
+    }
+    if (hasInactive()) {
+      hapiValue.setInactiveElement(inactive.toHapi())
+    }
+    if (includeCount > 0) {
+      hapiValue.setInclude(includeList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -354,12 +521,24 @@ public object ValueSetConverter {
     org.hl7.fhir.r4.model.ValueSet.ConceptSetComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ConceptSetComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSystemElement(system.toHapi())
-    hapiValue.setVersionElement(version.toHapi())
-    hapiValue.setConcept(conceptList.map { it.toHapi() })
-    hapiValue.setFilter(filterList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSystem()) {
+      hapiValue.setSystemElement(system.toHapi())
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
+    if (conceptCount > 0) {
+      hapiValue.setConcept(conceptList.map { it.toHapi() })
+    }
+    if (filterCount > 0) {
+      hapiValue.setFilter(filterList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -368,11 +547,21 @@ public object ValueSetConverter {
     org.hl7.fhir.r4.model.ValueSet.ConceptReferenceComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ConceptReferenceComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCodeElement(code.toHapi())
-    hapiValue.setDisplayElement(display.toHapi())
-    hapiValue.setDesignation(designationList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCodeElement(code.toHapi())
+    }
+    if (hasDisplay()) {
+      hapiValue.setDisplayElement(display.toHapi())
+    }
+    if (designationCount > 0) {
+      hapiValue.setDesignation(designationList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -381,10 +570,18 @@ public object ValueSetConverter {
     org.hl7.fhir.r4.model.ValueSet.ConceptReferenceDesignationComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ConceptReferenceDesignationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setUse(use.toHapi())
-    hapiValue.setValueElement(value.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasUse()) {
+      hapiValue.setUse(use.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValueElement(value.toHapi())
+    }
     return hapiValue
   }
 
@@ -393,15 +590,23 @@ public object ValueSetConverter {
     org.hl7.fhir.r4.model.ValueSet.ConceptSetFilterComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ConceptSetFilterComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setPropertyElement(property.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasProperty()) {
+      hapiValue.setPropertyElement(property.toHapi())
+    }
     hapiValue.setOp(
       org.hl7.fhir.r4.model.ValueSet.FilterOperator.valueOf(
         op.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setValueElement(value.toHapi())
+    if (hasValue()) {
+      hapiValue.setValueElement(value.toHapi())
+    }
     return hapiValue
   }
 
@@ -410,14 +615,30 @@ public object ValueSetConverter {
     org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifierElement(identifier.toHapi())
-    hapiValue.setTimestampElement(timestamp.toHapi())
-    hapiValue.setTotalElement(total.toHapi())
-    hapiValue.setOffsetElement(offset.toHapi())
-    hapiValue.setParameter(parameterList.map { it.toHapi() })
-    hapiValue.setContains(containsList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasIdentifier()) {
+      hapiValue.setIdentifierElement(identifier.toHapi())
+    }
+    if (hasTimestamp()) {
+      hapiValue.setTimestampElement(timestamp.toHapi())
+    }
+    if (hasTotal()) {
+      hapiValue.setTotalElement(total.toHapi())
+    }
+    if (hasOffset()) {
+      hapiValue.setOffsetElement(offset.toHapi())
+    }
+    if (parameterCount > 0) {
+      hapiValue.setParameter(parameterList.map { it.toHapi() })
+    }
+    if (containsCount > 0) {
+      hapiValue.setContains(containsList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -426,10 +647,18 @@ public object ValueSetConverter {
     org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionParameterComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionParameterComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setValue(value.valueSetExpansionParameterValueToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.valueSetExpansionParameterValueToHapi())
+    }
     return hapiValue
   }
 
@@ -438,14 +667,30 @@ public object ValueSetConverter {
     org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionContainsComponent {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionContainsComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSystemElement(system.toHapi())
-    hapiValue.setAbstractElement(abstract.toHapi())
-    hapiValue.setInactiveElement(inactive.toHapi())
-    hapiValue.setVersionElement(version.toHapi())
-    hapiValue.setCodeElement(code.toHapi())
-    hapiValue.setDisplayElement(display.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSystem()) {
+      hapiValue.setSystemElement(system.toHapi())
+    }
+    if (hasAbstract()) {
+      hapiValue.setAbstractElement(abstract.toHapi())
+    }
+    if (hasInactive()) {
+      hapiValue.setInactiveElement(inactive.toHapi())
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
+    if (hasCode()) {
+      hapiValue.setCodeElement(code.toHapi())
+    }
+    if (hasDisplay()) {
+      hapiValue.setDisplayElement(display.toHapi())
+    }
     return hapiValue
   }
 }

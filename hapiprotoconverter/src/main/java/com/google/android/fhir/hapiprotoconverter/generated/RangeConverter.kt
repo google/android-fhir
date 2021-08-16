@@ -30,21 +30,30 @@ public object RangeConverter {
   public fun Range.toHapi(): org.hl7.fhir.r4.model.Range {
     val hapiValue = org.hl7.fhir.r4.model.Range()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setLow(low.toHapi())
-    hapiValue.setHigh(high.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasLow()) {
+      hapiValue.setLow(low.toHapi())
+    }
+    if (hasHigh()) {
+      hapiValue.setHigh(high.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Range.toProto(): Range {
-    val protoValue =
-      Range.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setLow((low as SimpleQuantity).toProto())
-        .setHigh((high as SimpleQuantity).toProto())
-        .build()
-    return protoValue
+    val protoValue = Range.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasLow()) {
+      protoValue.setLow((low as SimpleQuantity).toProto())
+    }
+    if (hasHigh()) {
+      protoValue.setHigh((high as SimpleQuantity).toProto())
+    }
+    return protoValue.build()
   }
 }

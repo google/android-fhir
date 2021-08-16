@@ -33,23 +33,36 @@ public object ExpressionConverter {
   public fun Expression.toHapi(): org.hl7.fhir.r4.model.Expression {
     val hapiValue = org.hl7.fhir.r4.model.Expression()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setReferenceElement(reference.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasReference()) {
+      hapiValue.setReferenceElement(reference.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Expression.toProto(): Expression {
-    val protoValue =
-      Expression.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .setName(nameElement.toProto())
-        .setReference(referenceElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Expression.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasReference()) {
+      protoValue.setReference(referenceElement.toProto())
+    }
+    return protoValue.build()
   }
 }

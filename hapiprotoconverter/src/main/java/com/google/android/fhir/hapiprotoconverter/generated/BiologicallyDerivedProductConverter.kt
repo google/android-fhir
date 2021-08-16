@@ -141,142 +141,227 @@ public object BiologicallyDerivedProductConverter {
   public fun BiologicallyDerivedProduct.toHapi(): org.hl7.fhir.r4.model.BiologicallyDerivedProduct {
     val hapiValue = org.hl7.fhir.r4.model.BiologicallyDerivedProduct()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
     hapiValue.setProductCategory(
       org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductCategory.valueOf(
         productCategory.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setProductCode(productCode.toHapi())
+    if (hasProductCode()) {
+      hapiValue.setProductCode(productCode.toHapi())
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setRequest(requestList.map { it.toHapi() })
-    hapiValue.setQuantityElement(quantity.toHapi())
-    hapiValue.setParent(parentList.map { it.toHapi() })
-    hapiValue.setCollection(collection.toHapi())
-    hapiValue.setProcessing(processingList.map { it.toHapi() })
-    hapiValue.setManipulation(manipulation.toHapi())
-    hapiValue.setStorage(storageList.map { it.toHapi() })
+    if (requestCount > 0) {
+      hapiValue.setRequest(requestList.map { it.toHapi() })
+    }
+    if (hasQuantity()) {
+      hapiValue.setQuantityElement(quantity.toHapi())
+    }
+    if (parentCount > 0) {
+      hapiValue.setParent(parentList.map { it.toHapi() })
+    }
+    if (hasCollection()) {
+      hapiValue.setCollection(collection.toHapi())
+    }
+    if (processingCount > 0) {
+      hapiValue.setProcessing(processingList.map { it.toHapi() })
+    }
+    if (hasManipulation()) {
+      hapiValue.setManipulation(manipulation.toHapi())
+    }
+    if (storageCount > 0) {
+      hapiValue.setStorage(storageList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.BiologicallyDerivedProduct.toProto():
     BiologicallyDerivedProduct {
-    val protoValue =
-      BiologicallyDerivedProduct.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setProductCategory(
-          BiologicallyDerivedProduct.ProductCategoryCode.newBuilder()
-            .setValue(
-              BiologicallyDerivedProductCategoryCode.Value.valueOf(
-                productCategory.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = BiologicallyDerivedProduct.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    protoValue.setProductCategory(
+      BiologicallyDerivedProduct.ProductCategoryCode.newBuilder()
+        .setValue(
+          BiologicallyDerivedProductCategoryCode.Value.valueOf(
+            productCategory.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setProductCode(productCode.toProto())
-        .setStatus(
-          BiologicallyDerivedProduct.StatusCode.newBuilder()
-            .setValue(
-              BiologicallyDerivedProductStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .addAllRequest(request.map { it.toProto() })
-        .setQuantity(quantityElement.toProto())
-        .addAllParent(parent.map { it.toProto() })
-        .setCollection(collection.toProto())
-        .addAllProcessing(processing.map { it.toProto() })
-        .setManipulation(manipulation.toProto())
-        .addAllStorage(storage.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasProductCode()) {
+      protoValue.setProductCode(productCode.toProto())
+    }
+    protoValue.setStatus(
+      BiologicallyDerivedProduct.StatusCode.newBuilder()
+        .setValue(
+          BiologicallyDerivedProductStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasRequest()) {
+      protoValue.addAllRequest(request.map { it.toProto() })
+    }
+    if (hasQuantity()) {
+      protoValue.setQuantity(quantityElement.toProto())
+    }
+    if (hasParent()) {
+      protoValue.addAllParent(parent.map { it.toProto() })
+    }
+    if (hasCollection()) {
+      protoValue.setCollection(collection.toProto())
+    }
+    if (hasProcessing()) {
+      protoValue.addAllProcessing(processing.map { it.toProto() })
+    }
+    if (hasManipulation()) {
+      protoValue.setManipulation(manipulation.toProto())
+    }
+    if (hasStorage()) {
+      protoValue.addAllStorage(storage.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductCollectionComponent.toProto():
     BiologicallyDerivedProduct.Collection {
     val protoValue =
-      BiologicallyDerivedProduct.Collection.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCollector(collector.toProto())
-        .setSource(source.toProto())
-        .setCollected(collected.biologicallyDerivedProductCollectionCollectedToProto())
-        .build()
-    return protoValue
+      BiologicallyDerivedProduct.Collection.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCollector()) {
+      protoValue.setCollector(collector.toProto())
+    }
+    if (hasSource()) {
+      protoValue.setSource(source.toProto())
+    }
+    if (hasCollected()) {
+      protoValue.setCollected(collected.biologicallyDerivedProductCollectionCollectedToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductProcessingComponent.toProto():
     BiologicallyDerivedProduct.Processing {
     val protoValue =
-      BiologicallyDerivedProduct.Processing.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .setProcedure(procedure.toProto())
-        .setAdditive(additive.toProto())
-        .setTime(time.biologicallyDerivedProductProcessingTimeToProto())
-        .build()
-    return protoValue
+      BiologicallyDerivedProduct.Processing.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasProcedure()) {
+      protoValue.setProcedure(procedure.toProto())
+    }
+    if (hasAdditive()) {
+      protoValue.setAdditive(additive.toProto())
+    }
+    if (hasTime()) {
+      protoValue.setTime(time.biologicallyDerivedProductProcessingTimeToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductManipulationComponent.toProto():
     BiologicallyDerivedProduct.Manipulation {
     val protoValue =
-      BiologicallyDerivedProduct.Manipulation.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .setTime(time.biologicallyDerivedProductManipulationTimeToProto())
-        .build()
-    return protoValue
+      BiologicallyDerivedProduct.Manipulation.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasTime()) {
+      protoValue.setTime(time.biologicallyDerivedProductManipulationTimeToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductStorageComponent.toProto():
     BiologicallyDerivedProduct.Storage {
     val protoValue =
-      BiologicallyDerivedProduct.Storage.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .setTemperature(temperatureElement.toProto())
-        .setScale(
-          BiologicallyDerivedProduct.Storage.ScaleCode.newBuilder()
-            .setValue(
-              BiologicallyDerivedProductStorageScaleCode.Value.valueOf(
-                scale.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+      BiologicallyDerivedProduct.Storage.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasTemperature()) {
+      protoValue.setTemperature(temperatureElement.toProto())
+    }
+    protoValue.setScale(
+      BiologicallyDerivedProduct.Storage.ScaleCode.newBuilder()
+        .setValue(
+          BiologicallyDerivedProductStorageScaleCode.Value.valueOf(
+            scale.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setDuration(duration.toProto())
         .build()
-    return protoValue
+    )
+    if (hasDuration()) {
+      protoValue.setDuration(duration.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -286,11 +371,21 @@ public object BiologicallyDerivedProductConverter {
       org.hl7.fhir.r4.model.BiologicallyDerivedProduct
         .BiologicallyDerivedProductCollectionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCollector(collector.toHapi())
-    hapiValue.setSource(source.toHapi())
-    hapiValue.setCollected(collected.biologicallyDerivedProductCollectionCollectedToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCollector()) {
+      hapiValue.setCollector(collector.toHapi())
+    }
+    if (hasSource()) {
+      hapiValue.setSource(source.toHapi())
+    }
+    if (hasCollected()) {
+      hapiValue.setCollected(collected.biologicallyDerivedProductCollectionCollectedToHapi())
+    }
     return hapiValue
   }
 
@@ -301,12 +396,24 @@ public object BiologicallyDerivedProductConverter {
       org.hl7.fhir.r4.model.BiologicallyDerivedProduct
         .BiologicallyDerivedProductProcessingComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setProcedure(procedure.toHapi())
-    hapiValue.setAdditive(additive.toHapi())
-    hapiValue.setTime(time.biologicallyDerivedProductProcessingTimeToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (hasProcedure()) {
+      hapiValue.setProcedure(procedure.toHapi())
+    }
+    if (hasAdditive()) {
+      hapiValue.setAdditive(additive.toHapi())
+    }
+    if (hasTime()) {
+      hapiValue.setTime(time.biologicallyDerivedProductProcessingTimeToHapi())
+    }
     return hapiValue
   }
 
@@ -317,10 +424,18 @@ public object BiologicallyDerivedProductConverter {
       org.hl7.fhir.r4.model.BiologicallyDerivedProduct
         .BiologicallyDerivedProductManipulationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setTime(time.biologicallyDerivedProductManipulationTimeToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (hasTime()) {
+      hapiValue.setTime(time.biologicallyDerivedProductManipulationTimeToHapi())
+    }
     return hapiValue
   }
 
@@ -330,15 +445,25 @@ public object BiologicallyDerivedProductConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductStorageComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setTemperatureElement(temperature.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (hasTemperature()) {
+      hapiValue.setTemperatureElement(temperature.toHapi())
+    }
     hapiValue.setScale(
       org.hl7.fhir.r4.model.BiologicallyDerivedProduct.BiologicallyDerivedProductStorageScale
         .valueOf(scale.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setDuration(duration.toHapi())
+    if (hasDuration()) {
+      hapiValue.setDuration(duration.toHapi())
+    }
     return hapiValue
   }
 }

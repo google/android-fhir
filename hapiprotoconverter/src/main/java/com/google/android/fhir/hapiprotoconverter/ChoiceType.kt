@@ -106,18 +106,23 @@ internal fun handleChoiceType(
     IllegalArgumentException::class,
     "Invalid Type for ${element.path.value}"
   )
+
+  protoBuilder.beginControlFlow("if (has%L())", element.getHapiMethodName())
   protoBuilder.addStatement(
-    "$singleMethodTemplate(%L.%N())",
+    "protoValue$singleMethodTemplate(%L.%N())",
     element.getProtoMethodName(),
     element.getHapiFieldName(),
     elementToProtoBuilder.build()
   )
+  protoBuilder.endControlFlow()
+
+  hapiBuilder.beginControlFlow("if (has%L())", element.getProtoMethodName())
   hapiBuilder.addStatement(
     "hapiValue$singleMethodTemplate(%L.%N())",
     element.getHapiMethodName(),
     element.getProtoFieldName(),
     elementToHapiBuilder.build()
   )
-
+  hapiBuilder.endControlFlow()
   return listOf(elementToHapiBuilder.build(), elementToProtoBuilder.build())
 }

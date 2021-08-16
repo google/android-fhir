@@ -31,21 +31,30 @@ public object CodeableConceptConverter {
   public fun CodeableConcept.toHapi(): org.hl7.fhir.r4.model.CodeableConcept {
     val hapiValue = org.hl7.fhir.r4.model.CodeableConcept()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setCoding(codingList.map { it.toHapi() })
-    hapiValue.setTextElement(text.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (codingCount > 0) {
+      hapiValue.setCoding(codingList.map { it.toHapi() })
+    }
+    if (hasText()) {
+      hapiValue.setTextElement(text.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.CodeableConcept.toProto(): CodeableConcept {
-    val protoValue =
-      CodeableConcept.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllCoding(coding.map { it.toProto() })
-        .setText(textElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = CodeableConcept.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasCoding()) {
+      protoValue.addAllCoding(coding.map { it.toProto() })
+    }
+    if (hasText()) {
+      protoValue.setText(textElement.toProto())
+    }
+    return protoValue.build()
   }
 }

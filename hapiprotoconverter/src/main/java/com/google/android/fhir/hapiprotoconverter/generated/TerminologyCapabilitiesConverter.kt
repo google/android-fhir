@@ -61,151 +61,272 @@ public object TerminologyCapabilitiesConverter {
   public fun TerminologyCapabilities.toHapi(): org.hl7.fhir.r4.model.TerminologyCapabilities {
     val hapiValue = org.hl7.fhir.r4.model.TerminologyCapabilities()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setVersionElement(version.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setTitleElement(title.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasTitle()) {
+      hapiValue.setTitleElement(title.toHapi())
+    }
     hapiValue.setStatus(
       Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     )
-    hapiValue.setExperimentalElement(experimental.toHapi())
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setPublisherElement(publisher.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setUseContext(useContextList.map { it.toHapi() })
-    hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
-    hapiValue.setPurposeElement(purpose.toHapi())
-    hapiValue.setCopyrightElement(copyright.toHapi())
+    if (hasExperimental()) {
+      hapiValue.setExperimentalElement(experimental.toHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasPublisher()) {
+      hapiValue.setPublisherElement(publisher.toHapi())
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (useContextCount > 0) {
+      hapiValue.setUseContext(useContextList.map { it.toHapi() })
+    }
+    if (jurisdictionCount > 0) {
+      hapiValue.setJurisdiction(jurisdictionList.map { it.toHapi() })
+    }
+    if (hasPurpose()) {
+      hapiValue.setPurposeElement(purpose.toHapi())
+    }
+    if (hasCopyright()) {
+      hapiValue.setCopyrightElement(copyright.toHapi())
+    }
     hapiValue.setKind(
       org.hl7.fhir.r4.model.TerminologyCapabilities.CapabilityStatementKind.valueOf(
         kind.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setSoftware(software.toHapi())
-    hapiValue.setImplementation(implementation.toHapi())
-    hapiValue.setLockedDateElement(lockedDate.toHapi())
-    hapiValue.setCodeSystem(codeSystemList.map { it.toHapi() })
-    hapiValue.setExpansion(expansion.toHapi())
+    if (hasSoftware()) {
+      hapiValue.setSoftware(software.toHapi())
+    }
+    if (hasImplementation()) {
+      hapiValue.setImplementation(implementation.toHapi())
+    }
+    if (hasLockedDate()) {
+      hapiValue.setLockedDateElement(lockedDate.toHapi())
+    }
+    if (codeSystemCount > 0) {
+      hapiValue.setCodeSystem(codeSystemList.map { it.toHapi() })
+    }
+    if (hasExpansion()) {
+      hapiValue.setExpansion(expansion.toHapi())
+    }
     hapiValue.setCodeSearch(
       org.hl7.fhir.r4.model.TerminologyCapabilities.CodeSearchSupport.valueOf(
         codeSearch.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setValidateCode(validateCode.toHapi())
-    hapiValue.setTranslation(translation.toHapi())
-    hapiValue.setClosure(closure.toHapi())
+    if (hasValidateCode()) {
+      hapiValue.setValidateCode(validateCode.toHapi())
+    }
+    if (hasTranslation()) {
+      hapiValue.setTranslation(translation.toHapi())
+    }
+    if (hasClosure()) {
+      hapiValue.setClosure(closure.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.TerminologyCapabilities.toProto(): TerminologyCapabilities {
-    val protoValue =
-      TerminologyCapabilities.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUrl(urlElement.toProto())
-        .setVersion(versionElement.toProto())
-        .setName(nameElement.toProto())
-        .setTitle(titleElement.toProto())
-        .setStatus(
-          TerminologyCapabilities.StatusCode.newBuilder()
-            .setValue(
-              PublicationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = TerminologyCapabilities.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasTitle()) {
+      protoValue.setTitle(titleElement.toProto())
+    }
+    protoValue.setStatus(
+      TerminologyCapabilities.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setExperimental(experimentalElement.toProto())
-        .setDate(dateElement.toProto())
-        .setPublisher(publisherElement.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .addAllUseContext(useContext.map { it.toProto() })
-        .addAllJurisdiction(jurisdiction.map { it.toProto() })
-        .setPurpose(purposeElement.toProto())
-        .setCopyright(copyrightElement.toProto())
-        .setKind(
-          TerminologyCapabilities.KindCode.newBuilder()
-            .setValue(
-              CapabilityStatementKindCode.Value.valueOf(
-                kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setSoftware(software.toProto())
-        .setImplementation(implementation.toProto())
-        .setLockedDate(lockedDateElement.toProto())
-        .addAllCodeSystem(codeSystem.map { it.toProto() })
-        .setExpansion(expansion.toProto())
-        .setCodeSearch(
-          TerminologyCapabilities.CodeSearchCode.newBuilder()
-            .setValue(
-              CodeSearchSupportCode.Value.valueOf(
-                codeSearch.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setValidateCode(validateCode.toProto())
-        .setTranslation(translation.toProto())
-        .setClosure(closure.toProto())
         .build()
-    return protoValue
+    )
+    if (hasExperimental()) {
+      protoValue.setExperimental(experimentalElement.toProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasPublisher()) {
+      protoValue.setPublisher(publisherElement.toProto())
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasUseContext()) {
+      protoValue.addAllUseContext(useContext.map { it.toProto() })
+    }
+    if (hasJurisdiction()) {
+      protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
+    }
+    if (hasPurpose()) {
+      protoValue.setPurpose(purposeElement.toProto())
+    }
+    if (hasCopyright()) {
+      protoValue.setCopyright(copyrightElement.toProto())
+    }
+    protoValue.setKind(
+      TerminologyCapabilities.KindCode.newBuilder()
+        .setValue(
+          CapabilityStatementKindCode.Value.valueOf(
+            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasSoftware()) {
+      protoValue.setSoftware(software.toProto())
+    }
+    if (hasImplementation()) {
+      protoValue.setImplementation(implementation.toProto())
+    }
+    if (hasLockedDate()) {
+      protoValue.setLockedDate(lockedDateElement.toProto())
+    }
+    if (hasCodeSystem()) {
+      protoValue.addAllCodeSystem(codeSystem.map { it.toProto() })
+    }
+    if (hasExpansion()) {
+      protoValue.setExpansion(expansion.toProto())
+    }
+    protoValue.setCodeSearch(
+      TerminologyCapabilities.CodeSearchCode.newBuilder()
+        .setValue(
+          CodeSearchSupportCode.Value.valueOf(
+            codeSearch.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasValidateCode()) {
+      protoValue.setValidateCode(validateCode.toProto())
+    }
+    if (hasTranslation()) {
+      protoValue.setTranslation(translation.toProto())
+    }
+    if (hasClosure()) {
+      protoValue.setClosure(closure.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesSoftwareComponent.toProto():
     TerminologyCapabilities.Software {
     val protoValue =
-      TerminologyCapabilities.Software.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .setVersion(versionElement.toProto())
-        .build()
-    return protoValue
+      TerminologyCapabilities.Software.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesImplementationComponent.toProto():
     TerminologyCapabilities.Implementation {
     val protoValue =
-      TerminologyCapabilities.Implementation.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .setUrl(urlElement.toProto())
-        .build()
-    return protoValue
+      TerminologyCapabilities.Implementation.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesCodeSystemComponent.toProto():
     TerminologyCapabilities.CodeSystem {
     val protoValue =
-      TerminologyCapabilities.CodeSystem.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setUri(uriElement.toProto())
-        .addAllVersion(version.map { it.toProto() })
-        .setSubsumption(subsumptionElement.toProto())
-        .build()
-    return protoValue
+      TerminologyCapabilities.CodeSystem.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasUri()) {
+      protoValue.setUri(uriElement.toProto())
+    }
+    if (hasVersion()) {
+      protoValue.addAllVersion(version.map { it.toProto() })
+    }
+    if (hasSubsumption()) {
+      protoValue.setSubsumption(subsumptionElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -214,16 +335,31 @@ public object TerminologyCapabilitiesConverter {
     val protoValue =
       TerminologyCapabilities.CodeSystem.Version.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(codeElement.toProto())
-        .setIsDefault(isDefaultElement.toProto())
-        .setCompositional(compositionalElement.toProto())
-        .addAllLanguage(language.map { it.toProto() })
-        .addAllFilter(filter.map { it.toProto() })
-        .addAllProperty(property.map { it.toProto() })
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(codeElement.toProto())
+    }
+    if (hasIsDefault()) {
+      protoValue.setIsDefault(isDefaultElement.toProto())
+    }
+    if (hasCompositional()) {
+      protoValue.setCompositional(compositionalElement.toProto())
+    }
+    if (hasLanguage()) {
+      protoValue.addAllLanguage(language.map { it.toProto() })
+    }
+    if (hasFilter()) {
+      protoValue.addAllFilter(filter.map { it.toProto() })
+    }
+    if (hasProperty()) {
+      protoValue.addAllProperty(property.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -232,29 +368,48 @@ public object TerminologyCapabilitiesConverter {
     val protoValue =
       TerminologyCapabilities.CodeSystem.Version.Filter.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(codeElement.toProto())
-        .addAllOp(op.map { it.toProto() })
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(codeElement.toProto())
+    }
+    if (hasOp()) {
+      protoValue.addAllOp(op.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesExpansionComponent.toProto():
     TerminologyCapabilities.Expansion {
     val protoValue =
-      TerminologyCapabilities.Expansion.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setHierarchical(hierarchicalElement.toProto())
-        .setPaging(pagingElement.toProto())
-        .setIncomplete(incompleteElement.toProto())
-        .addAllParameter(parameter.map { it.toProto() })
-        .setTextFilter(textFilterElement.toProto())
-        .build()
-    return protoValue
+      TerminologyCapabilities.Expansion.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasHierarchical()) {
+      protoValue.setHierarchical(hierarchicalElement.toProto())
+    }
+    if (hasPaging()) {
+      protoValue.setPaging(pagingElement.toProto())
+    }
+    if (hasIncomplete()) {
+      protoValue.setIncomplete(incompleteElement.toProto())
+    }
+    if (hasParameter()) {
+      protoValue.addAllParameter(parameter.map { it.toProto() })
+    }
+    if (hasTextFilter()) {
+      protoValue.setTextFilter(textFilterElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -263,51 +418,70 @@ public object TerminologyCapabilitiesConverter {
     val protoValue =
       TerminologyCapabilities.Expansion.Parameter.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .setDocumentation(documentationElement.toProto())
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasDocumentation()) {
+      protoValue.setDocumentation(documentationElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesValidateCodeComponent.toProto():
     TerminologyCapabilities.ValidateCode {
     val protoValue =
-      TerminologyCapabilities.ValidateCode.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setTranslations(translationsElement.toProto())
-        .build()
-    return protoValue
+      TerminologyCapabilities.ValidateCode.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasTranslations()) {
+      protoValue.setTranslations(translationsElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesTranslationComponent.toProto():
     TerminologyCapabilities.Translation {
     val protoValue =
-      TerminologyCapabilities.Translation.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setNeedsMap(needsMapElement.toProto())
-        .build()
-    return protoValue
+      TerminologyCapabilities.Translation.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasNeedsMap()) {
+      protoValue.setNeedsMap(needsMapElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesClosureComponent.toProto():
     TerminologyCapabilities.Closure {
     val protoValue =
-      TerminologyCapabilities.Closure.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setTranslation(translationElement.toProto())
-        .build()
-    return protoValue
+      TerminologyCapabilities.Closure.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasTranslation()) {
+      protoValue.setTranslation(translationElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -316,10 +490,18 @@ public object TerminologyCapabilitiesConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesSoftwareComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setVersionElement(version.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
     return hapiValue
   }
 
@@ -329,10 +511,18 @@ public object TerminologyCapabilitiesConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesImplementationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setUrlElement(url.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
     return hapiValue
   }
 
@@ -342,11 +532,21 @@ public object TerminologyCapabilitiesConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesCodeSystemComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setUriElement(uri.toHapi())
-    hapiValue.setVersion(versionList.map { it.toHapi() })
-    hapiValue.setSubsumptionElement(subsumption.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasUri()) {
+      hapiValue.setUriElement(uri.toHapi())
+    }
+    if (versionCount > 0) {
+      hapiValue.setVersion(versionList.map { it.toHapi() })
+    }
+    if (hasSubsumption()) {
+      hapiValue.setSubsumptionElement(subsumption.toHapi())
+    }
     return hapiValue
   }
 
@@ -357,14 +557,30 @@ public object TerminologyCapabilitiesConverter {
       org.hl7.fhir.r4.model.TerminologyCapabilities
         .TerminologyCapabilitiesCodeSystemVersionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCodeElement(code.toHapi())
-    hapiValue.setIsDefaultElement(isDefault.toHapi())
-    hapiValue.setCompositionalElement(compositional.toHapi())
-    hapiValue.setLanguage(languageList.map { it.toHapi() })
-    hapiValue.setFilter(filterList.map { it.toHapi() })
-    hapiValue.setProperty(propertyList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCodeElement(code.toHapi())
+    }
+    if (hasIsDefault()) {
+      hapiValue.setIsDefaultElement(isDefault.toHapi())
+    }
+    if (hasCompositional()) {
+      hapiValue.setCompositionalElement(compositional.toHapi())
+    }
+    if (languageCount > 0) {
+      hapiValue.setLanguage(languageList.map { it.toHapi() })
+    }
+    if (filterCount > 0) {
+      hapiValue.setFilter(filterList.map { it.toHapi() })
+    }
+    if (propertyCount > 0) {
+      hapiValue.setProperty(propertyList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -375,10 +591,18 @@ public object TerminologyCapabilitiesConverter {
       org.hl7.fhir.r4.model.TerminologyCapabilities
         .TerminologyCapabilitiesCodeSystemVersionFilterComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCodeElement(code.toHapi())
-    hapiValue.setOp(opList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCodeElement(code.toHapi())
+    }
+    if (opCount > 0) {
+      hapiValue.setOp(opList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -388,13 +612,27 @@ public object TerminologyCapabilitiesConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesExpansionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setHierarchicalElement(hierarchical.toHapi())
-    hapiValue.setPagingElement(paging.toHapi())
-    hapiValue.setIncompleteElement(incomplete.toHapi())
-    hapiValue.setParameter(parameterList.map { it.toHapi() })
-    hapiValue.setTextFilterElement(textFilter.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasHierarchical()) {
+      hapiValue.setHierarchicalElement(hierarchical.toHapi())
+    }
+    if (hasPaging()) {
+      hapiValue.setPagingElement(paging.toHapi())
+    }
+    if (hasIncomplete()) {
+      hapiValue.setIncompleteElement(incomplete.toHapi())
+    }
+    if (parameterCount > 0) {
+      hapiValue.setParameter(parameterList.map { it.toHapi() })
+    }
+    if (hasTextFilter()) {
+      hapiValue.setTextFilterElement(textFilter.toHapi())
+    }
     return hapiValue
   }
 
@@ -405,10 +643,18 @@ public object TerminologyCapabilitiesConverter {
       org.hl7.fhir.r4.model.TerminologyCapabilities
         .TerminologyCapabilitiesExpansionParameterComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setDocumentationElement(documentation.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasDocumentation()) {
+      hapiValue.setDocumentationElement(documentation.toHapi())
+    }
     return hapiValue
   }
 
@@ -418,9 +664,15 @@ public object TerminologyCapabilitiesConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesValidateCodeComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setTranslationsElement(translations.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasTranslations()) {
+      hapiValue.setTranslationsElement(translations.toHapi())
+    }
     return hapiValue
   }
 
@@ -430,9 +682,15 @@ public object TerminologyCapabilitiesConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesTranslationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setNeedsMapElement(needsMap.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasNeedsMap()) {
+      hapiValue.setNeedsMapElement(needsMap.toHapi())
+    }
     return hapiValue
   }
 
@@ -442,9 +700,15 @@ public object TerminologyCapabilitiesConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesClosureComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setTranslationElement(translation.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasTranslation()) {
+      hapiValue.setTranslationElement(translation.toHapi())
+    }
     return hapiValue
   }
 }

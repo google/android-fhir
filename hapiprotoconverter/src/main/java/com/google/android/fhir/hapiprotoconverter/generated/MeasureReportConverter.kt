@@ -55,12 +55,24 @@ public object MeasureReportConverter {
   public fun MeasureReport.toHapi(): org.hl7.fhir.r4.model.MeasureReport {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
@@ -71,101 +83,165 @@ public object MeasureReportConverter {
         type.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setMeasureElement(measure.toHapi())
-    hapiValue.setSubject(subject.toHapi())
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setReporter(reporter.toHapi())
-    hapiValue.setPeriod(period.toHapi())
-    hapiValue.setImprovementNotation(improvementNotation.toHapi())
-    hapiValue.setGroup(groupList.map { it.toHapi() })
-    hapiValue.setEvaluatedResource(evaluatedResourceList.map { it.toHapi() })
+    if (hasMeasure()) {
+      hapiValue.setMeasureElement(measure.toHapi())
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.toHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasReporter()) {
+      hapiValue.setReporter(reporter.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
+    if (hasImprovementNotation()) {
+      hapiValue.setImprovementNotation(improvementNotation.toHapi())
+    }
+    if (groupCount > 0) {
+      hapiValue.setGroup(groupList.map { it.toHapi() })
+    }
+    if (evaluatedResourceCount > 0) {
+      hapiValue.setEvaluatedResource(evaluatedResourceList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.MeasureReport.toProto(): MeasureReport {
-    val protoValue =
-      MeasureReport.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setStatus(
-          MeasureReport.StatusCode.newBuilder()
-            .setValue(
-              MeasureReportStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = MeasureReport.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      MeasureReport.StatusCode.newBuilder()
+        .setValue(
+          MeasureReportStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setType(
-          MeasureReport.TypeCode.newBuilder()
-            .setValue(
-              MeasureReportTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setMeasure(measureElement.toProto())
-        .setSubject(subject.toProto())
-        .setDate(dateElement.toProto())
-        .setReporter(reporter.toProto())
-        .setPeriod(period.toProto())
-        .setImprovementNotation(improvementNotation.toProto())
-        .addAllGroup(group.map { it.toProto() })
-        .addAllEvaluatedResource(evaluatedResource.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    protoValue.setType(
+      MeasureReport.TypeCode.newBuilder()
+        .setValue(
+          MeasureReportTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasMeasure()) {
+      protoValue.setMeasure(measureElement.toProto())
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.toProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasReporter()) {
+      protoValue.setReporter(reporter.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    if (hasImprovementNotation()) {
+      protoValue.setImprovementNotation(improvementNotation.toProto())
+    }
+    if (hasGroup()) {
+      protoValue.addAllGroup(group.map { it.toProto() })
+    }
+    if (hasEvaluatedResource()) {
+      protoValue.addAllEvaluatedResource(evaluatedResource.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent.toProto():
     MeasureReport.Group {
-    val protoValue =
-      MeasureReport.Group.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(code.toProto())
-        .addAllPopulation(population.map { it.toProto() })
-        .setMeasureScore(measureScore.toProto())
-        .addAllStratifier(stratifier.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = MeasureReport.Group.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasPopulation()) {
+      protoValue.addAllPopulation(population.map { it.toProto() })
+    }
+    if (hasMeasureScore()) {
+      protoValue.setMeasureScore(measureScore.toProto())
+    }
+    if (hasStratifier()) {
+      protoValue.addAllStratifier(stratifier.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent.toProto():
     MeasureReport.Group.Population {
     val protoValue =
-      MeasureReport.Group.Population.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(code.toProto())
-        .setCount(countElement.toProto())
-        .setSubjectResults(subjectResults.toProto())
-        .build()
-    return protoValue
+      MeasureReport.Group.Population.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasCount()) {
+      protoValue.setCount(countElement.toProto())
+    }
+    if (hasSubjectResults()) {
+      protoValue.setSubjectResults(subjectResults.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupStratifierComponent.toProto():
     MeasureReport.Group.Stratifier {
     val protoValue =
-      MeasureReport.Group.Stratifier.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllCode(code.map { it.toProto() })
-        .addAllStratum(stratum.map { it.toProto() })
-        .build()
-    return protoValue
+      MeasureReport.Group.Stratifier.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.addAllCode(code.map { it.toProto() })
+    }
+    if (hasStratum()) {
+      protoValue.addAllStratum(stratum.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -174,14 +250,25 @@ public object MeasureReportConverter {
     val protoValue =
       MeasureReport.Group.Stratifier.StratifierGroup.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setValue(value.toProto())
-        .addAllComponent(component.map { it.toProto() })
-        .addAllPopulation(population.map { it.toProto() })
-        .setMeasureScore(measureScore.toProto())
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.toProto())
+    }
+    if (hasComponent()) {
+      protoValue.addAllComponent(component.map { it.toProto() })
+    }
+    if (hasPopulation()) {
+      protoValue.addAllPopulation(population.map { it.toProto() })
+    }
+    if (hasMeasureScore()) {
+      protoValue.setMeasureScore(measureScore.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -190,12 +277,19 @@ public object MeasureReportConverter {
     val protoValue =
       MeasureReport.Group.Stratifier.StratifierGroup.Component.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(code.toProto())
-        .setValue(value.toProto())
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(value.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -204,13 +298,22 @@ public object MeasureReportConverter {
     val protoValue =
       MeasureReport.Group.Stratifier.StratifierGroup.StratifierGroupPopulation.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(code.toProto())
-        .setCount(countElement.toProto())
-        .setSubjectResults(subjectResults.toProto())
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasCount()) {
+      protoValue.setCount(countElement.toProto())
+    }
+    if (hasSubjectResults()) {
+      protoValue.setSubjectResults(subjectResults.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -218,12 +321,24 @@ public object MeasureReportConverter {
     org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setPopulation(populationList.map { it.toHapi() })
-    hapiValue.setMeasureScore(measureScore.toHapi())
-    hapiValue.setStratifier(stratifierList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (populationCount > 0) {
+      hapiValue.setPopulation(populationList.map { it.toHapi() })
+    }
+    if (hasMeasureScore()) {
+      hapiValue.setMeasureScore(measureScore.toHapi())
+    }
+    if (stratifierCount > 0) {
+      hapiValue.setStratifier(stratifierList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -232,11 +347,21 @@ public object MeasureReportConverter {
     org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setCountElement(count.toHapi())
-    hapiValue.setSubjectResults(subjectResults.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasCount()) {
+      hapiValue.setCountElement(count.toHapi())
+    }
+    if (hasSubjectResults()) {
+      hapiValue.setSubjectResults(subjectResults.toHapi())
+    }
     return hapiValue
   }
 
@@ -245,10 +370,18 @@ public object MeasureReportConverter {
     org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupStratifierComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupStratifierComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCode(codeList.map { it.toHapi() })
-    hapiValue.setStratum(stratumList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (codeCount > 0) {
+      hapiValue.setCode(codeList.map { it.toHapi() })
+    }
+    if (stratumCount > 0) {
+      hapiValue.setStratum(stratumList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -257,12 +390,24 @@ public object MeasureReportConverter {
     org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setValue(value.toHapi())
-    hapiValue.setComponent(componentList.map { it.toHapi() })
-    hapiValue.setPopulation(populationList.map { it.toHapi() })
-    hapiValue.setMeasureScore(measureScore.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.toHapi())
+    }
+    if (componentCount > 0) {
+      hapiValue.setComponent(componentList.map { it.toHapi() })
+    }
+    if (populationCount > 0) {
+      hapiValue.setPopulation(populationList.map { it.toHapi() })
+    }
+    if (hasMeasureScore()) {
+      hapiValue.setMeasureScore(measureScore.toHapi())
+    }
     return hapiValue
   }
 
@@ -271,10 +416,18 @@ public object MeasureReportConverter {
     org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponentComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponentComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setValue(value.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValue(value.toHapi())
+    }
     return hapiValue
   }
 
@@ -283,11 +436,21 @@ public object MeasureReportConverter {
     org.hl7.fhir.r4.model.MeasureReport.StratifierGroupPopulationComponent {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.StratifierGroupPopulationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setCountElement(count.toHapi())
-    hapiValue.setSubjectResults(subjectResults.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasCount()) {
+      hapiValue.setCountElement(count.toHapi())
+    }
+    if (hasSubjectResults()) {
+      hapiValue.setSubjectResults(subjectResults.toHapi())
+    }
     return hapiValue
   }
 }

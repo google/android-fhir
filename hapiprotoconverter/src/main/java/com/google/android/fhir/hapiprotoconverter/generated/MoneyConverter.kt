@@ -29,21 +29,28 @@ public object MoneyConverter {
   public fun Money.toHapi(): org.hl7.fhir.r4.model.Money {
     val hapiValue = org.hl7.fhir.r4.model.Money()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setValueElement(value.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasValue()) {
+      hapiValue.setValueElement(value.toHapi())
+    }
     hapiValue.setCurrency(currency.value.hapiCodeCheck())
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Money.toProto(): Money {
-    val protoValue =
-      Money.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setValue(valueElement.toProto())
-        .setCurrency(Money.CurrencyCode.newBuilder().setValue(currency.protoCodeCheck()).build())
-        .build()
-    return protoValue
+    val protoValue = Money.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasValue()) {
+      protoValue.setValue(valueElement.toProto())
+    }
+    protoValue.setCurrency(
+      Money.CurrencyCode.newBuilder().setValue(currency.protoCodeCheck()).build()
+    )
+    return protoValue.build()
   }
 }

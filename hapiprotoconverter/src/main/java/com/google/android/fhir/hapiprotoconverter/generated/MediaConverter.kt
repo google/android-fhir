@@ -84,81 +84,182 @@ public object MediaConverter {
   public fun Media.toHapi(): org.hl7.fhir.r4.model.Media {
     val hapiValue = org.hl7.fhir.r4.model.Media()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
-    hapiValue.setPartOf(partOfList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (basedOnCount > 0) {
+      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+    }
+    if (partOfCount > 0) {
+      hapiValue.setPartOf(partOfList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Media.MediaStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setType(type.toHapi())
-    hapiValue.setModality(modality.toHapi())
-    hapiValue.setView(view.toHapi())
-    hapiValue.setSubject(subject.toHapi())
-    hapiValue.setEncounter(encounter.toHapi())
-    hapiValue.setCreated(created.mediaCreatedToHapi())
-    hapiValue.setIssuedElement(issued.toHapi())
-    hapiValue.setOperator(operator.toHapi())
-    hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
-    hapiValue.setBodySite(bodySite.toHapi())
-    hapiValue.setDeviceNameElement(deviceName.toHapi())
-    hapiValue.setDevice(device.toHapi())
-    hapiValue.setHeightElement(height.toHapi())
-    hapiValue.setWidthElement(width.toHapi())
-    hapiValue.setFramesElement(frames.toHapi())
-    hapiValue.setDurationElement(duration.toHapi())
-    hapiValue.setContent(content.toHapi())
-    hapiValue.setNote(noteList.map { it.toHapi() })
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasModality()) {
+      hapiValue.setModality(modality.toHapi())
+    }
+    if (hasView()) {
+      hapiValue.setView(view.toHapi())
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.toHapi())
+    }
+    if (hasEncounter()) {
+      hapiValue.setEncounter(encounter.toHapi())
+    }
+    if (hasCreated()) {
+      hapiValue.setCreated(created.mediaCreatedToHapi())
+    }
+    if (hasIssued()) {
+      hapiValue.setIssuedElement(issued.toHapi())
+    }
+    if (hasOperator()) {
+      hapiValue.setOperator(operator.toHapi())
+    }
+    if (reasonCodeCount > 0) {
+      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+    }
+    if (hasBodySite()) {
+      hapiValue.setBodySite(bodySite.toHapi())
+    }
+    if (hasDeviceName()) {
+      hapiValue.setDeviceNameElement(deviceName.toHapi())
+    }
+    if (hasDevice()) {
+      hapiValue.setDevice(device.toHapi())
+    }
+    if (hasHeight()) {
+      hapiValue.setHeightElement(height.toHapi())
+    }
+    if (hasWidth()) {
+      hapiValue.setWidthElement(width.toHapi())
+    }
+    if (hasFrames()) {
+      hapiValue.setFramesElement(frames.toHapi())
+    }
+    if (hasDuration()) {
+      hapiValue.setDurationElement(duration.toHapi())
+    }
+    if (hasContent()) {
+      hapiValue.setContent(content.toHapi())
+    }
+    if (noteCount > 0) {
+      hapiValue.setNote(noteList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Media.toProto(): Media {
-    val protoValue =
-      Media.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .addAllBasedOn(basedOn.map { it.toProto() })
-        .addAllPartOf(partOf.map { it.toProto() })
-        .setStatus(
-          Media.StatusCode.newBuilder()
-            .setValue(
-              EventStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Media.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasBasedOn()) {
+      protoValue.addAllBasedOn(basedOn.map { it.toProto() })
+    }
+    if (hasPartOf()) {
+      protoValue.addAllPartOf(partOf.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      Media.StatusCode.newBuilder()
+        .setValue(
+          EventStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setType(type.toProto())
-        .setModality(modality.toProto())
-        .setView(view.toProto())
-        .setSubject(subject.toProto())
-        .setEncounter(encounter.toProto())
-        .setCreated(created.mediaCreatedToProto())
-        .setIssued(issuedElement.toProto())
-        .setOperator(operator.toProto())
-        .addAllReasonCode(reasonCode.map { it.toProto() })
-        .setBodySite(bodySite.toProto())
-        .setDeviceName(deviceNameElement.toProto())
-        .setDevice(device.toProto())
-        .setHeight(heightElement.toProto())
-        .setWidth(widthElement.toProto())
-        .setFrames(framesElement.toProto())
-        .setDuration(durationElement.toProto())
-        .setContent(content.toProto())
-        .addAllNote(note.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasModality()) {
+      protoValue.setModality(modality.toProto())
+    }
+    if (hasView()) {
+      protoValue.setView(view.toProto())
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.toProto())
+    }
+    if (hasEncounter()) {
+      protoValue.setEncounter(encounter.toProto())
+    }
+    if (hasCreated()) {
+      protoValue.setCreated(created.mediaCreatedToProto())
+    }
+    if (hasIssued()) {
+      protoValue.setIssued(issuedElement.toProto())
+    }
+    if (hasOperator()) {
+      protoValue.setOperator(operator.toProto())
+    }
+    if (hasReasonCode()) {
+      protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
+    }
+    if (hasBodySite()) {
+      protoValue.setBodySite(bodySite.toProto())
+    }
+    if (hasDeviceName()) {
+      protoValue.setDeviceName(deviceNameElement.toProto())
+    }
+    if (hasDevice()) {
+      protoValue.setDevice(device.toProto())
+    }
+    if (hasHeight()) {
+      protoValue.setHeight(heightElement.toProto())
+    }
+    if (hasWidth()) {
+      protoValue.setWidth(widthElement.toProto())
+    }
+    if (hasFrames()) {
+      protoValue.setFrames(framesElement.toProto())
+    }
+    if (hasDuration()) {
+      protoValue.setDuration(durationElement.toProto())
+    }
+    if (hasContent()) {
+      protoValue.setContent(content.toProto())
+    }
+    if (hasNote()) {
+      protoValue.addAllNote(note.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 }

@@ -69,41 +69,66 @@ public object SubstanceAmountConverter {
   public fun SubstanceAmount.toHapi(): org.hl7.fhir.r4.model.SubstanceAmount {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceAmount()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setAmount(amount.substanceAmountAmountToHapi())
-    hapiValue.setAmountType(amountType.toHapi())
-    hapiValue.setAmountTextElement(amountText.toHapi())
-    hapiValue.setReferenceRange(referenceRange.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasAmount()) {
+      hapiValue.setAmount(amount.substanceAmountAmountToHapi())
+    }
+    if (hasAmountType()) {
+      hapiValue.setAmountType(amountType.toHapi())
+    }
+    if (hasAmountText()) {
+      hapiValue.setAmountTextElement(amountText.toHapi())
+    }
+    if (hasReferenceRange()) {
+      hapiValue.setReferenceRange(referenceRange.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.SubstanceAmount.toProto(): SubstanceAmount {
-    val protoValue =
-      SubstanceAmount.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setAmount(amount.substanceAmountAmountToProto())
-        .setAmountType(amountType.toProto())
-        .setAmountText(amountTextElement.toProto())
-        .setReferenceRange(referenceRange.toProto())
-        .build()
-    return protoValue
+    val protoValue = SubstanceAmount.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasAmount()) {
+      protoValue.setAmount(amount.substanceAmountAmountToProto())
+    }
+    if (hasAmountType()) {
+      protoValue.setAmountType(amountType.toProto())
+    }
+    if (hasAmountText()) {
+      protoValue.setAmountText(amountTextElement.toProto())
+    }
+    if (hasReferenceRange()) {
+      protoValue.setReferenceRange(referenceRange.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.SubstanceAmount.SubstanceAmountReferenceRangeComponent.toProto():
     SubstanceAmount.ReferenceRange {
     val protoValue =
-      SubstanceAmount.ReferenceRange.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setLowLimit(lowLimit.toProto())
-        .setHighLimit(highLimit.toProto())
-        .build()
-    return protoValue
+      SubstanceAmount.ReferenceRange.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasLowLimit()) {
+      protoValue.setLowLimit(lowLimit.toProto())
+    }
+    if (hasHighLimit()) {
+      protoValue.setHighLimit(highLimit.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -111,9 +136,15 @@ public object SubstanceAmountConverter {
     org.hl7.fhir.r4.model.SubstanceAmount.SubstanceAmountReferenceRangeComponent {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceAmount.SubstanceAmountReferenceRangeComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setLowLimit(lowLimit.toHapi())
-    hapiValue.setHighLimit(highLimit.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasLowLimit()) {
+      hapiValue.setLowLimit(lowLimit.toHapi())
+    }
+    if (hasHighLimit()) {
+      hapiValue.setHighLimit(highLimit.toHapi())
+    }
     return hapiValue
   }
 }

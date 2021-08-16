@@ -52,194 +52,347 @@ public object EncounterConverter {
   public fun Encounter.toHapi(): org.hl7.fhir.r4.model.Encounter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setStatusHistory(statusHistoryList.map { it.toHapi() })
-    hapiValue.setClass_(classValue.toHapi())
-    hapiValue.setClassHistory(classHistoryList.map { it.toHapi() })
-    hapiValue.setType(typeList.map { it.toHapi() })
-    hapiValue.setServiceType(serviceType.toHapi())
-    hapiValue.setPriority(priority.toHapi())
-    hapiValue.setSubject(subject.toHapi())
-    hapiValue.setEpisodeOfCare(episodeOfCareList.map { it.toHapi() })
-    hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
-    hapiValue.setParticipant(participantList.map { it.toHapi() })
-    hapiValue.setAppointment(appointmentList.map { it.toHapi() })
-    hapiValue.setPeriod(period.toHapi())
-    hapiValue.setLength(length.toHapi())
-    hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
-    hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
-    hapiValue.setDiagnosis(diagnosisList.map { it.toHapi() })
-    hapiValue.setAccount(accountList.map { it.toHapi() })
-    hapiValue.setHospitalization(hospitalization.toHapi())
-    hapiValue.setLocation(locationList.map { it.toHapi() })
-    hapiValue.setServiceProvider(serviceProvider.toHapi())
-    hapiValue.setPartOf(partOf.toHapi())
+    if (statusHistoryCount > 0) {
+      hapiValue.setStatusHistory(statusHistoryList.map { it.toHapi() })
+    }
+    if (hasClassValue()) {
+      hapiValue.setClass_(classValue.toHapi())
+    }
+    if (classHistoryCount > 0) {
+      hapiValue.setClassHistory(classHistoryList.map { it.toHapi() })
+    }
+    if (typeCount > 0) {
+      hapiValue.setType(typeList.map { it.toHapi() })
+    }
+    if (hasServiceType()) {
+      hapiValue.setServiceType(serviceType.toHapi())
+    }
+    if (hasPriority()) {
+      hapiValue.setPriority(priority.toHapi())
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.toHapi())
+    }
+    if (episodeOfCareCount > 0) {
+      hapiValue.setEpisodeOfCare(episodeOfCareList.map { it.toHapi() })
+    }
+    if (basedOnCount > 0) {
+      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+    }
+    if (participantCount > 0) {
+      hapiValue.setParticipant(participantList.map { it.toHapi() })
+    }
+    if (appointmentCount > 0) {
+      hapiValue.setAppointment(appointmentList.map { it.toHapi() })
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
+    if (hasLength()) {
+      hapiValue.setLength(length.toHapi())
+    }
+    if (reasonCodeCount > 0) {
+      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+    }
+    if (reasonReferenceCount > 0) {
+      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+    }
+    if (diagnosisCount > 0) {
+      hapiValue.setDiagnosis(diagnosisList.map { it.toHapi() })
+    }
+    if (accountCount > 0) {
+      hapiValue.setAccount(accountList.map { it.toHapi() })
+    }
+    if (hasHospitalization()) {
+      hapiValue.setHospitalization(hospitalization.toHapi())
+    }
+    if (locationCount > 0) {
+      hapiValue.setLocation(locationList.map { it.toHapi() })
+    }
+    if (hasServiceProvider()) {
+      hapiValue.setServiceProvider(serviceProvider.toHapi())
+    }
+    if (hasPartOf()) {
+      hapiValue.setPartOf(partOf.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Encounter.toProto(): Encounter {
-    val protoValue =
-      Encounter.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setStatus(
-          Encounter.StatusCode.newBuilder()
-            .setValue(
-              EncounterStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Encounter.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      Encounter.StatusCode.newBuilder()
+        .setValue(
+          EncounterStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .addAllStatusHistory(statusHistory.map { it.toProto() })
-        .setClassValue(class_.toProto())
-        .addAllClassHistory(classHistory.map { it.toProto() })
-        .addAllType(type.map { it.toProto() })
-        .setServiceType(serviceType.toProto())
-        .setPriority(priority.toProto())
-        .setSubject(subject.toProto())
-        .addAllEpisodeOfCare(episodeOfCare.map { it.toProto() })
-        .addAllBasedOn(basedOn.map { it.toProto() })
-        .addAllParticipant(participant.map { it.toProto() })
-        .addAllAppointment(appointment.map { it.toProto() })
-        .setPeriod(period.toProto())
-        .setLength(length.toProto())
-        .addAllReasonCode(reasonCode.map { it.toProto() })
-        .addAllReasonReference(reasonReference.map { it.toProto() })
-        .addAllDiagnosis(diagnosis.map { it.toProto() })
-        .addAllAccount(account.map { it.toProto() })
-        .setHospitalization(hospitalization.toProto())
-        .addAllLocation(location.map { it.toProto() })
-        .setServiceProvider(serviceProvider.toProto())
-        .setPartOf(partOf.toProto())
         .build()
-    return protoValue
+    )
+    if (hasStatusHistory()) {
+      protoValue.addAllStatusHistory(statusHistory.map { it.toProto() })
+    }
+    if (hasClass_()) {
+      protoValue.setClassValue(class_.toProto())
+    }
+    if (hasClassHistory()) {
+      protoValue.addAllClassHistory(classHistory.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.addAllType(type.map { it.toProto() })
+    }
+    if (hasServiceType()) {
+      protoValue.setServiceType(serviceType.toProto())
+    }
+    if (hasPriority()) {
+      protoValue.setPriority(priority.toProto())
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.toProto())
+    }
+    if (hasEpisodeOfCare()) {
+      protoValue.addAllEpisodeOfCare(episodeOfCare.map { it.toProto() })
+    }
+    if (hasBasedOn()) {
+      protoValue.addAllBasedOn(basedOn.map { it.toProto() })
+    }
+    if (hasParticipant()) {
+      protoValue.addAllParticipant(participant.map { it.toProto() })
+    }
+    if (hasAppointment()) {
+      protoValue.addAllAppointment(appointment.map { it.toProto() })
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    if (hasLength()) {
+      protoValue.setLength(length.toProto())
+    }
+    if (hasReasonCode()) {
+      protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
+    }
+    if (hasReasonReference()) {
+      protoValue.addAllReasonReference(reasonReference.map { it.toProto() })
+    }
+    if (hasDiagnosis()) {
+      protoValue.addAllDiagnosis(diagnosis.map { it.toProto() })
+    }
+    if (hasAccount()) {
+      protoValue.addAllAccount(account.map { it.toProto() })
+    }
+    if (hasHospitalization()) {
+      protoValue.setHospitalization(hospitalization.toProto())
+    }
+    if (hasLocation()) {
+      protoValue.addAllLocation(location.map { it.toProto() })
+    }
+    if (hasServiceProvider()) {
+      protoValue.setServiceProvider(serviceProvider.toProto())
+    }
+    if (hasPartOf()) {
+      protoValue.setPartOf(partOf.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Encounter.StatusHistoryComponent.toProto():
     Encounter.StatusHistory {
-    val protoValue =
-      Encounter.StatusHistory.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setStatus(
-          Encounter.StatusHistory.StatusCode.newBuilder()
-            .setValue(
-              EncounterStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Encounter.StatusHistory.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      Encounter.StatusHistory.StatusCode.newBuilder()
+        .setValue(
+          EncounterStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setPeriod(period.toProto())
         .build()
-    return protoValue
+    )
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Encounter.ClassHistoryComponent.toProto():
     Encounter.ClassHistory {
-    val protoValue =
-      Encounter.ClassHistory.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setClassValue(class_.toProto())
-        .setPeriod(period.toProto())
-        .build()
-    return protoValue
+    val protoValue = Encounter.ClassHistory.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasClass_()) {
+      protoValue.setClassValue(class_.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Encounter.EncounterParticipantComponent.toProto():
     Encounter.Participant {
-    val protoValue =
-      Encounter.Participant.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllType(type.map { it.toProto() })
-        .setPeriod(period.toProto())
-        .setIndividual(individual.toProto())
-        .build()
-    return protoValue
+    val protoValue = Encounter.Participant.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.addAllType(type.map { it.toProto() })
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    if (hasIndividual()) {
+      protoValue.setIndividual(individual.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Encounter.DiagnosisComponent.toProto(): Encounter.Diagnosis {
-    val protoValue =
-      Encounter.Diagnosis.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCondition(condition.toProto())
-        .setUse(use.toProto())
-        .setRank(rankElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Encounter.Diagnosis.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCondition()) {
+      protoValue.setCondition(condition.toProto())
+    }
+    if (hasUse()) {
+      protoValue.setUse(use.toProto())
+    }
+    if (hasRank()) {
+      protoValue.setRank(rankElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Encounter.EncounterHospitalizationComponent.toProto():
     Encounter.Hospitalization {
-    val protoValue =
-      Encounter.Hospitalization.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setPreAdmissionIdentifier(preAdmissionIdentifier.toProto())
-        .setOrigin(origin.toProto())
-        .setAdmitSource(admitSource.toProto())
-        .setReAdmission(reAdmission.toProto())
-        .addAllDietPreference(dietPreference.map { it.toProto() })
-        .addAllSpecialCourtesy(specialCourtesy.map { it.toProto() })
-        .addAllSpecialArrangement(specialArrangement.map { it.toProto() })
-        .setDestination(destination.toProto())
-        .setDischargeDisposition(dischargeDisposition.toProto())
-        .build()
-    return protoValue
+    val protoValue = Encounter.Hospitalization.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasPreAdmissionIdentifier()) {
+      protoValue.setPreAdmissionIdentifier(preAdmissionIdentifier.toProto())
+    }
+    if (hasOrigin()) {
+      protoValue.setOrigin(origin.toProto())
+    }
+    if (hasAdmitSource()) {
+      protoValue.setAdmitSource(admitSource.toProto())
+    }
+    if (hasReAdmission()) {
+      protoValue.setReAdmission(reAdmission.toProto())
+    }
+    if (hasDietPreference()) {
+      protoValue.addAllDietPreference(dietPreference.map { it.toProto() })
+    }
+    if (hasSpecialCourtesy()) {
+      protoValue.addAllSpecialCourtesy(specialCourtesy.map { it.toProto() })
+    }
+    if (hasSpecialArrangement()) {
+      protoValue.addAllSpecialArrangement(specialArrangement.map { it.toProto() })
+    }
+    if (hasDestination()) {
+      protoValue.setDestination(destination.toProto())
+    }
+    if (hasDischargeDisposition()) {
+      protoValue.setDischargeDisposition(dischargeDisposition.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Encounter.EncounterLocationComponent.toProto():
     Encounter.Location {
-    val protoValue =
-      Encounter.Location.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setLocation(location.toProto())
-        .setStatus(
-          Encounter.Location.StatusCode.newBuilder()
-            .setValue(
-              EncounterLocationStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Encounter.Location.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasLocation()) {
+      protoValue.setLocation(location.toProto())
+    }
+    protoValue.setStatus(
+      Encounter.Location.StatusCode.newBuilder()
+        .setValue(
+          EncounterLocationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setPhysicalType(physicalType.toProto())
-        .setPeriod(period.toProto())
         .build()
-    return protoValue
+    )
+    if (hasPhysicalType()) {
+      protoValue.setPhysicalType(physicalType.toProto())
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -247,14 +400,20 @@ public object EncounterConverter {
     org.hl7.fhir.r4.model.Encounter.StatusHistoryComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.StatusHistoryComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setPeriod(period.toHapi())
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
     return hapiValue
   }
 
@@ -263,10 +422,18 @@ public object EncounterConverter {
     org.hl7.fhir.r4.model.Encounter.ClassHistoryComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.ClassHistoryComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setClass_(classValue.toHapi())
-    hapiValue.setPeriod(period.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasClassValue()) {
+      hapiValue.setClass_(classValue.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
     return hapiValue
   }
 
@@ -275,11 +442,21 @@ public object EncounterConverter {
     org.hl7.fhir.r4.model.Encounter.EncounterParticipantComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.EncounterParticipantComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setType(typeList.map { it.toHapi() })
-    hapiValue.setPeriod(period.toHapi())
-    hapiValue.setIndividual(individual.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (typeCount > 0) {
+      hapiValue.setType(typeList.map { it.toHapi() })
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
+    if (hasIndividual()) {
+      hapiValue.setIndividual(individual.toHapi())
+    }
     return hapiValue
   }
 
@@ -287,11 +464,21 @@ public object EncounterConverter {
   private fun Encounter.Diagnosis.toHapi(): org.hl7.fhir.r4.model.Encounter.DiagnosisComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.DiagnosisComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCondition(condition.toHapi())
-    hapiValue.setUse(use.toHapi())
-    hapiValue.setRankElement(rank.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCondition()) {
+      hapiValue.setCondition(condition.toHapi())
+    }
+    if (hasUse()) {
+      hapiValue.setUse(use.toHapi())
+    }
+    if (hasRank()) {
+      hapiValue.setRankElement(rank.toHapi())
+    }
     return hapiValue
   }
 
@@ -300,17 +487,39 @@ public object EncounterConverter {
     org.hl7.fhir.r4.model.Encounter.EncounterHospitalizationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.EncounterHospitalizationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setPreAdmissionIdentifier(preAdmissionIdentifier.toHapi())
-    hapiValue.setOrigin(origin.toHapi())
-    hapiValue.setAdmitSource(admitSource.toHapi())
-    hapiValue.setReAdmission(reAdmission.toHapi())
-    hapiValue.setDietPreference(dietPreferenceList.map { it.toHapi() })
-    hapiValue.setSpecialCourtesy(specialCourtesyList.map { it.toHapi() })
-    hapiValue.setSpecialArrangement(specialArrangementList.map { it.toHapi() })
-    hapiValue.setDestination(destination.toHapi())
-    hapiValue.setDischargeDisposition(dischargeDisposition.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasPreAdmissionIdentifier()) {
+      hapiValue.setPreAdmissionIdentifier(preAdmissionIdentifier.toHapi())
+    }
+    if (hasOrigin()) {
+      hapiValue.setOrigin(origin.toHapi())
+    }
+    if (hasAdmitSource()) {
+      hapiValue.setAdmitSource(admitSource.toHapi())
+    }
+    if (hasReAdmission()) {
+      hapiValue.setReAdmission(reAdmission.toHapi())
+    }
+    if (dietPreferenceCount > 0) {
+      hapiValue.setDietPreference(dietPreferenceList.map { it.toHapi() })
+    }
+    if (specialCourtesyCount > 0) {
+      hapiValue.setSpecialCourtesy(specialCourtesyList.map { it.toHapi() })
+    }
+    if (specialArrangementCount > 0) {
+      hapiValue.setSpecialArrangement(specialArrangementList.map { it.toHapi() })
+    }
+    if (hasDestination()) {
+      hapiValue.setDestination(destination.toHapi())
+    }
+    if (hasDischargeDisposition()) {
+      hapiValue.setDischargeDisposition(dischargeDisposition.toHapi())
+    }
     return hapiValue
   }
 
@@ -319,16 +528,26 @@ public object EncounterConverter {
     org.hl7.fhir.r4.model.Encounter.EncounterLocationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.EncounterLocationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setLocation(location.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasLocation()) {
+      hapiValue.setLocation(location.toHapi())
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Encounter.EncounterLocationStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setPhysicalType(physicalType.toHapi())
-    hapiValue.setPeriod(period.toHapi())
+    if (hasPhysicalType()) {
+      hapiValue.setPhysicalType(physicalType.toHapi())
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
     return hapiValue
   }
 }

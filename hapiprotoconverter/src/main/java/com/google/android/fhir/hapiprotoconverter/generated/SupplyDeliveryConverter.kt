@@ -111,74 +111,137 @@ public object SupplyDeliveryConverter {
   public fun SupplyDelivery.toHapi(): org.hl7.fhir.r4.model.SupplyDelivery {
     val hapiValue = org.hl7.fhir.r4.model.SupplyDelivery()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
-    hapiValue.setPartOf(partOfList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (basedOnCount > 0) {
+      hapiValue.setBasedOn(basedOnList.map { it.toHapi() })
+    }
+    if (partOfCount > 0) {
+      hapiValue.setPartOf(partOfList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.SupplyDelivery.SupplyDeliveryStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setPatient(patient.toHapi())
-    hapiValue.setType(type.toHapi())
-    hapiValue.setSuppliedItem(suppliedItem.toHapi())
-    hapiValue.setOccurrence(occurrence.supplyDeliveryOccurrenceToHapi())
-    hapiValue.setSupplier(supplier.toHapi())
-    hapiValue.setDestination(destination.toHapi())
-    hapiValue.setReceiver(receiverList.map { it.toHapi() })
+    if (hasPatient()) {
+      hapiValue.setPatient(patient.toHapi())
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasSuppliedItem()) {
+      hapiValue.setSuppliedItem(suppliedItem.toHapi())
+    }
+    if (hasOccurrence()) {
+      hapiValue.setOccurrence(occurrence.supplyDeliveryOccurrenceToHapi())
+    }
+    if (hasSupplier()) {
+      hapiValue.setSupplier(supplier.toHapi())
+    }
+    if (hasDestination()) {
+      hapiValue.setDestination(destination.toHapi())
+    }
+    if (receiverCount > 0) {
+      hapiValue.setReceiver(receiverList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.SupplyDelivery.toProto(): SupplyDelivery {
-    val protoValue =
-      SupplyDelivery.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .addAllBasedOn(basedOn.map { it.toProto() })
-        .addAllPartOf(partOf.map { it.toProto() })
-        .setStatus(
-          SupplyDelivery.StatusCode.newBuilder()
-            .setValue(
-              SupplyDeliveryStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = SupplyDelivery.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasBasedOn()) {
+      protoValue.addAllBasedOn(basedOn.map { it.toProto() })
+    }
+    if (hasPartOf()) {
+      protoValue.addAllPartOf(partOf.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      SupplyDelivery.StatusCode.newBuilder()
+        .setValue(
+          SupplyDeliveryStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setPatient(patient.toProto())
-        .setType(type.toProto())
-        .setSuppliedItem(suppliedItem.toProto())
-        .setOccurrence(occurrence.supplyDeliveryOccurrenceToProto())
-        .setSupplier(supplier.toProto())
-        .setDestination(destination.toProto())
-        .addAllReceiver(receiver.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasPatient()) {
+      protoValue.setPatient(patient.toProto())
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasSuppliedItem()) {
+      protoValue.setSuppliedItem(suppliedItem.toProto())
+    }
+    if (hasOccurrence()) {
+      protoValue.setOccurrence(occurrence.supplyDeliveryOccurrenceToProto())
+    }
+    if (hasSupplier()) {
+      protoValue.setSupplier(supplier.toProto())
+    }
+    if (hasDestination()) {
+      protoValue.setDestination(destination.toProto())
+    }
+    if (hasReceiver()) {
+      protoValue.addAllReceiver(receiver.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.SupplyDelivery.SupplyDeliverySuppliedItemComponent.toProto():
     SupplyDelivery.SuppliedItem {
     val protoValue =
-      SupplyDelivery.SuppliedItem.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setQuantity((quantity as SimpleQuantity).toProto())
-        .setItem(item.supplyDeliverySuppliedItemItemToProto())
-        .build()
-    return protoValue
+      SupplyDelivery.SuppliedItem.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasQuantity()) {
+      protoValue.setQuantity((quantity as SimpleQuantity).toProto())
+    }
+    if (hasItem()) {
+      protoValue.setItem(item.supplyDeliverySuppliedItemItemToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -186,10 +249,18 @@ public object SupplyDeliveryConverter {
     org.hl7.fhir.r4.model.SupplyDelivery.SupplyDeliverySuppliedItemComponent {
     val hapiValue = org.hl7.fhir.r4.model.SupplyDelivery.SupplyDeliverySuppliedItemComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setQuantity(quantity.toHapi())
-    hapiValue.setItem(item.supplyDeliverySuppliedItemItemToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasQuantity()) {
+      hapiValue.setQuantity(quantity.toHapi())
+    }
+    if (hasItem()) {
+      hapiValue.setItem(item.supplyDeliverySuppliedItemItemToHapi())
+    }
     return hapiValue
   }
 }

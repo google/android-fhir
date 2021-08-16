@@ -41,62 +41,92 @@ public object OperationOutcomeConverter {
   public fun OperationOutcome.toHapi(): org.hl7.fhir.r4.model.OperationOutcome {
     val hapiValue = org.hl7.fhir.r4.model.OperationOutcome()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIssue(issueList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (issueCount > 0) {
+      hapiValue.setIssue(issueList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.OperationOutcome.toProto(): OperationOutcome {
-    val protoValue =
-      OperationOutcome.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIssue(issue.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = OperationOutcome.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIssue()) {
+      protoValue.addAllIssue(issue.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.OperationOutcome.OperationOutcomeIssueComponent.toProto():
     OperationOutcome.Issue {
-    val protoValue =
-      OperationOutcome.Issue.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSeverity(
-          OperationOutcome.Issue.SeverityCode.newBuilder()
-            .setValue(
-              IssueSeverityCode.Value.valueOf(
-                severity.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = OperationOutcome.Issue.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setSeverity(
+      OperationOutcome.Issue.SeverityCode.newBuilder()
+        .setValue(
+          IssueSeverityCode.Value.valueOf(
+            severity.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setCode(
-          OperationOutcome.Issue.CodeType.newBuilder()
-            .setValue(
-              IssueTypeCode.Value.valueOf(
-                code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setDetails(details.toProto())
-        .setDiagnostics(diagnosticsElement.toProto())
-        .addAllLocation(location.map { it.toProto() })
-        .addAllExpression(expression.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    protoValue.setCode(
+      OperationOutcome.Issue.CodeType.newBuilder()
+        .setValue(
+          IssueTypeCode.Value.valueOf(
+            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasDetails()) {
+      protoValue.setDetails(details.toProto())
+    }
+    if (hasDiagnostics()) {
+      protoValue.setDiagnostics(diagnosticsElement.toProto())
+    }
+    if (hasLocation()) {
+      protoValue.addAllLocation(location.map { it.toProto() })
+    }
+    if (hasExpression()) {
+      protoValue.addAllExpression(expression.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -104,8 +134,12 @@ public object OperationOutcomeConverter {
     org.hl7.fhir.r4.model.OperationOutcome.OperationOutcomeIssueComponent {
     val hapiValue = org.hl7.fhir.r4.model.OperationOutcome.OperationOutcomeIssueComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setSeverity(
       org.hl7.fhir.r4.model.OperationOutcome.IssueSeverity.valueOf(
         severity.value.name.hapiCodeCheck().replace("_", "")
@@ -116,10 +150,18 @@ public object OperationOutcomeConverter {
         code.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setDetails(details.toHapi())
-    hapiValue.setDiagnosticsElement(diagnostics.toHapi())
-    hapiValue.setLocation(locationList.map { it.toHapi() })
-    hapiValue.setExpression(expressionList.map { it.toHapi() })
+    if (hasDetails()) {
+      hapiValue.setDetails(details.toHapi())
+    }
+    if (hasDiagnostics()) {
+      hapiValue.setDiagnosticsElement(diagnostics.toHapi())
+    }
+    if (locationCount > 0) {
+      hapiValue.setLocation(locationList.map { it.toHapi() })
+    }
+    if (expressionCount > 0) {
+      hapiValue.setExpression(expressionList.map { it.toHapi() })
+    }
     return hapiValue
   }
 }

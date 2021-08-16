@@ -81,168 +81,267 @@ public object CompositionConverter {
   public fun Composition.toHapi(): org.hl7.fhir.r4.model.Composition {
     val hapiValue = org.hl7.fhir.r4.model.Composition()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifier.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasIdentifier()) {
+      hapiValue.setIdentifier(identifier.toHapi())
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Composition.CompositionStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setType(type.toHapi())
-    hapiValue.setCategory(categoryList.map { it.toHapi() })
-    hapiValue.setSubject(subject.toHapi())
-    hapiValue.setEncounter(encounter.toHapi())
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setAuthor(authorList.map { it.toHapi() })
-    hapiValue.setTitleElement(title.toHapi())
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (categoryCount > 0) {
+      hapiValue.setCategory(categoryList.map { it.toHapi() })
+    }
+    if (hasSubject()) {
+      hapiValue.setSubject(subject.toHapi())
+    }
+    if (hasEncounter()) {
+      hapiValue.setEncounter(encounter.toHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (authorCount > 0) {
+      hapiValue.setAuthor(authorList.map { it.toHapi() })
+    }
+    if (hasTitle()) {
+      hapiValue.setTitleElement(title.toHapi())
+    }
     hapiValue.setConfidentiality(
       org.hl7.fhir.r4.model.Composition.DocumentConfidentiality.valueOf(
         confidentiality.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setAttester(attesterList.map { it.toHapi() })
-    hapiValue.setCustodian(custodian.toHapi())
-    hapiValue.setRelatesTo(relatesToList.map { it.toHapi() })
-    hapiValue.setEvent(eventList.map { it.toHapi() })
-    hapiValue.setSection(sectionList.map { it.toHapi() })
+    if (attesterCount > 0) {
+      hapiValue.setAttester(attesterList.map { it.toHapi() })
+    }
+    if (hasCustodian()) {
+      hapiValue.setCustodian(custodian.toHapi())
+    }
+    if (relatesToCount > 0) {
+      hapiValue.setRelatesTo(relatesToList.map { it.toHapi() })
+    }
+    if (eventCount > 0) {
+      hapiValue.setEvent(eventList.map { it.toHapi() })
+    }
+    if (sectionCount > 0) {
+      hapiValue.setSection(sectionList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Composition.toProto(): Composition {
-    val protoValue =
-      Composition.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setIdentifier(identifier.toProto())
-        .setStatus(
-          Composition.StatusCode.newBuilder()
-            .setValue(
-              CompositionStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Composition.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.setIdentifier(identifier.toProto())
+    }
+    protoValue.setStatus(
+      Composition.StatusCode.newBuilder()
+        .setValue(
+          CompositionStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setType(type.toProto())
-        .addAllCategory(category.map { it.toProto() })
-        .setSubject(subject.toProto())
-        .setEncounter(encounter.toProto())
-        .setDate(dateElement.toProto())
-        .addAllAuthor(author.map { it.toProto() })
-        .setTitle(titleElement.toProto())
-        .setConfidentiality(
-          Composition.ConfidentialityCode.newBuilder()
-            .setValue(
-              V3ConfidentialityClassificationValueSet.Value.valueOf(
-                confidentiality.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .addAllAttester(attester.map { it.toProto() })
-        .setCustodian(custodian.toProto())
-        .addAllRelatesTo(relatesTo.map { it.toProto() })
-        .addAllEvent(event.map { it.toProto() })
-        .addAllSection(section.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasCategory()) {
+      protoValue.addAllCategory(category.map { it.toProto() })
+    }
+    if (hasSubject()) {
+      protoValue.setSubject(subject.toProto())
+    }
+    if (hasEncounter()) {
+      protoValue.setEncounter(encounter.toProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasAuthor()) {
+      protoValue.addAllAuthor(author.map { it.toProto() })
+    }
+    if (hasTitle()) {
+      protoValue.setTitle(titleElement.toProto())
+    }
+    protoValue.setConfidentiality(
+      Composition.ConfidentialityCode.newBuilder()
+        .setValue(
+          V3ConfidentialityClassificationValueSet.Value.valueOf(
+            confidentiality.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasAttester()) {
+      protoValue.addAllAttester(attester.map { it.toProto() })
+    }
+    if (hasCustodian()) {
+      protoValue.setCustodian(custodian.toProto())
+    }
+    if (hasRelatesTo()) {
+      protoValue.addAllRelatesTo(relatesTo.map { it.toProto() })
+    }
+    if (hasEvent()) {
+      protoValue.addAllEvent(event.map { it.toProto() })
+    }
+    if (hasSection()) {
+      protoValue.addAllSection(section.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Composition.CompositionAttesterComponent.toProto():
     Composition.Attester {
-    val protoValue =
-      Composition.Attester.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setMode(
-          Composition.Attester.ModeCode.newBuilder()
-            .setValue(
-              CompositionAttestationModeCode.Value.valueOf(
-                mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Composition.Attester.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setMode(
+      Composition.Attester.ModeCode.newBuilder()
+        .setValue(
+          CompositionAttestationModeCode.Value.valueOf(
+            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setTime(timeElement.toProto())
-        .setParty(party.toProto())
         .build()
-    return protoValue
+    )
+    if (hasTime()) {
+      protoValue.setTime(timeElement.toProto())
+    }
+    if (hasParty()) {
+      protoValue.setParty(party.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Composition.CompositionRelatesToComponent.toProto():
     Composition.RelatesTo {
-    val protoValue =
-      Composition.RelatesTo.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(
-          Composition.RelatesTo.CodeType.newBuilder()
-            .setValue(
-              DocumentRelationshipTypeCode.Value.valueOf(
-                code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Composition.RelatesTo.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setCode(
+      Composition.RelatesTo.CodeType.newBuilder()
+        .setValue(
+          DocumentRelationshipTypeCode.Value.valueOf(
+            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setTarget(target.compositionRelatesToTargetToProto())
         .build()
-    return protoValue
+    )
+    if (hasTarget()) {
+      protoValue.setTarget(target.compositionRelatesToTargetToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Composition.CompositionEventComponent.toProto():
     Composition.Event {
-    val protoValue =
-      Composition.Event.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllCode(code.map { it.toProto() })
-        .setPeriod(period.toProto())
-        .addAllDetail(detail.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = Composition.Event.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.addAllCode(code.map { it.toProto() })
+    }
+    if (hasPeriod()) {
+      protoValue.setPeriod(period.toProto())
+    }
+    if (hasDetail()) {
+      protoValue.addAllDetail(detail.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Composition.SectionComponent.toProto(): Composition.Section {
-    val protoValue =
-      Composition.Section.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setTitle(titleElement.toProto())
-        .setCode(code.toProto())
-        .addAllAuthor(author.map { it.toProto() })
-        .setFocus(focus.toProto())
-        .setText(text.toProto())
-        .setMode(
-          Composition.Section.ModeCode.newBuilder()
-            .setValue(
-              ListModeCode.Value.valueOf(
-                mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Composition.Section.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasTitle()) {
+      protoValue.setTitle(titleElement.toProto())
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasAuthor()) {
+      protoValue.addAllAuthor(author.map { it.toProto() })
+    }
+    if (hasFocus()) {
+      protoValue.setFocus(focus.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    protoValue.setMode(
+      Composition.Section.ModeCode.newBuilder()
+        .setValue(
+          ListModeCode.Value.valueOf(mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
         )
-        .setOrderedBy(orderedBy.toProto())
-        .addAllEntry(entry.map { it.toProto() })
-        .setEmptyReason(emptyReason.toProto())
         .build()
-    return protoValue
+    )
+    if (hasOrderedBy()) {
+      protoValue.setOrderedBy(orderedBy.toProto())
+    }
+    if (hasEntry()) {
+      protoValue.addAllEntry(entry.map { it.toProto() })
+    }
+    if (hasEmptyReason()) {
+      protoValue.setEmptyReason(emptyReason.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -250,15 +349,23 @@ public object CompositionConverter {
     org.hl7.fhir.r4.model.Composition.CompositionAttesterComponent {
     val hapiValue = org.hl7.fhir.r4.model.Composition.CompositionAttesterComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setMode(
       org.hl7.fhir.r4.model.Composition.CompositionAttestationMode.valueOf(
         mode.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setTimeElement(time.toHapi())
-    hapiValue.setParty(party.toHapi())
+    if (hasTime()) {
+      hapiValue.setTimeElement(time.toHapi())
+    }
+    if (hasParty()) {
+      hapiValue.setParty(party.toHapi())
+    }
     return hapiValue
   }
 
@@ -267,14 +374,20 @@ public object CompositionConverter {
     org.hl7.fhir.r4.model.Composition.CompositionRelatesToComponent {
     val hapiValue = org.hl7.fhir.r4.model.Composition.CompositionRelatesToComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setCode(
       org.hl7.fhir.r4.model.Composition.DocumentRelationshipType.valueOf(
         code.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setTarget(target.compositionRelatesToTargetToHapi())
+    if (hasTarget()) {
+      hapiValue.setTarget(target.compositionRelatesToTargetToHapi())
+    }
     return hapiValue
   }
 
@@ -283,11 +396,21 @@ public object CompositionConverter {
     org.hl7.fhir.r4.model.Composition.CompositionEventComponent {
     val hapiValue = org.hl7.fhir.r4.model.Composition.CompositionEventComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCode(codeList.map { it.toHapi() })
-    hapiValue.setPeriod(period.toHapi())
-    hapiValue.setDetail(detailList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (codeCount > 0) {
+      hapiValue.setCode(codeList.map { it.toHapi() })
+    }
+    if (hasPeriod()) {
+      hapiValue.setPeriod(period.toHapi())
+    }
+    if (detailCount > 0) {
+      hapiValue.setDetail(detailList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
@@ -295,21 +418,41 @@ public object CompositionConverter {
   private fun Composition.Section.toHapi(): org.hl7.fhir.r4.model.Composition.SectionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Composition.SectionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setTitleElement(title.toHapi())
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setAuthor(authorList.map { it.toHapi() })
-    hapiValue.setFocus(focus.toHapi())
-    hapiValue.setText(text.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasTitle()) {
+      hapiValue.setTitleElement(title.toHapi())
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (authorCount > 0) {
+      hapiValue.setAuthor(authorList.map { it.toHapi() })
+    }
+    if (hasFocus()) {
+      hapiValue.setFocus(focus.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
     hapiValue.setMode(
       org.hl7.fhir.r4.model.Composition.SectionMode.valueOf(
         mode.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setOrderedBy(orderedBy.toHapi())
-    hapiValue.setEntry(entryList.map { it.toHapi() })
-    hapiValue.setEmptyReason(emptyReason.toHapi())
+    if (hasOrderedBy()) {
+      hapiValue.setOrderedBy(orderedBy.toHapi())
+    }
+    if (entryCount > 0) {
+      hapiValue.setEntry(entryList.map { it.toHapi() })
+    }
+    if (hasEmptyReason()) {
+      hapiValue.setEmptyReason(emptyReason.toHapi())
+    }
     return hapiValue
   }
 }

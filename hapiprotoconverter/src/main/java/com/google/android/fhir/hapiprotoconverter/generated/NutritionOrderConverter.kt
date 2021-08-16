@@ -90,15 +90,33 @@ public object NutritionOrderConverter {
   public fun NutritionOrder.toHapi(): org.hl7.fhir.r4.model.NutritionOrder {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setInstantiatesCanonical(instantiatesCanonicalList.map { it.toHapi() })
-    hapiValue.setInstantiatesUri(instantiatesUriList.map { it.toHapi() })
-    hapiValue.setInstantiates(instantiatesList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (instantiatesCanonicalCount > 0) {
+      hapiValue.setInstantiatesCanonical(instantiatesCanonicalList.map { it.toHapi() })
+    }
+    if (instantiatesUriCount > 0) {
+      hapiValue.setInstantiatesUri(instantiatesUriList.map { it.toHapi() })
+    }
+    if (instantiatesCount > 0) {
+      hapiValue.setInstantiates(instantiatesList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
@@ -109,151 +127,268 @@ public object NutritionOrderConverter {
         intent.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setPatient(patient.toHapi())
-    hapiValue.setEncounter(encounter.toHapi())
-    hapiValue.setDateTimeElement(dateTime.toHapi())
-    hapiValue.setOrderer(orderer.toHapi())
-    hapiValue.setAllergyIntolerance(allergyIntoleranceList.map { it.toHapi() })
-    hapiValue.setFoodPreferenceModifier(foodPreferenceModifierList.map { it.toHapi() })
-    hapiValue.setExcludeFoodModifier(excludeFoodModifierList.map { it.toHapi() })
-    hapiValue.setOralDiet(oralDiet.toHapi())
-    hapiValue.setSupplement(supplementList.map { it.toHapi() })
-    hapiValue.setEnteralFormula(enteralFormula.toHapi())
-    hapiValue.setNote(noteList.map { it.toHapi() })
+    if (hasPatient()) {
+      hapiValue.setPatient(patient.toHapi())
+    }
+    if (hasEncounter()) {
+      hapiValue.setEncounter(encounter.toHapi())
+    }
+    if (hasDateTime()) {
+      hapiValue.setDateTimeElement(dateTime.toHapi())
+    }
+    if (hasOrderer()) {
+      hapiValue.setOrderer(orderer.toHapi())
+    }
+    if (allergyIntoleranceCount > 0) {
+      hapiValue.setAllergyIntolerance(allergyIntoleranceList.map { it.toHapi() })
+    }
+    if (foodPreferenceModifierCount > 0) {
+      hapiValue.setFoodPreferenceModifier(foodPreferenceModifierList.map { it.toHapi() })
+    }
+    if (excludeFoodModifierCount > 0) {
+      hapiValue.setExcludeFoodModifier(excludeFoodModifierList.map { it.toHapi() })
+    }
+    if (hasOralDiet()) {
+      hapiValue.setOralDiet(oralDiet.toHapi())
+    }
+    if (supplementCount > 0) {
+      hapiValue.setSupplement(supplementList.map { it.toHapi() })
+    }
+    if (hasEnteralFormula()) {
+      hapiValue.setEnteralFormula(enteralFormula.toHapi())
+    }
+    if (noteCount > 0) {
+      hapiValue.setNote(noteList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.NutritionOrder.toProto(): NutritionOrder {
-    val protoValue =
-      NutritionOrder.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .addAllInstantiatesCanonical(instantiatesCanonical.map { it.toProto() })
-        .addAllInstantiatesUri(instantiatesUri.map { it.toProto() })
-        .addAllInstantiates(instantiates.map { it.toProto() })
-        .setStatus(
-          NutritionOrder.StatusCode.newBuilder()
-            .setValue(
-              RequestStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = NutritionOrder.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasInstantiatesCanonical()) {
+      protoValue.addAllInstantiatesCanonical(instantiatesCanonical.map { it.toProto() })
+    }
+    if (hasInstantiatesUri()) {
+      protoValue.addAllInstantiatesUri(instantiatesUri.map { it.toProto() })
+    }
+    if (hasInstantiates()) {
+      protoValue.addAllInstantiates(instantiates.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      NutritionOrder.StatusCode.newBuilder()
+        .setValue(
+          RequestStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setIntent(
-          NutritionOrder.IntentCode.newBuilder()
-            .setValue(
-              RequestIntentCode.Value.valueOf(
-                intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
-        )
-        .setPatient(patient.toProto())
-        .setEncounter(encounter.toProto())
-        .setDateTime(dateTimeElement.toProto())
-        .setOrderer(orderer.toProto())
-        .addAllAllergyIntolerance(allergyIntolerance.map { it.toProto() })
-        .addAllFoodPreferenceModifier(foodPreferenceModifier.map { it.toProto() })
-        .addAllExcludeFoodModifier(excludeFoodModifier.map { it.toProto() })
-        .setOralDiet(oralDiet.toProto())
-        .addAllSupplement(supplement.map { it.toProto() })
-        .setEnteralFormula(enteralFormula.toProto())
-        .addAllNote(note.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    protoValue.setIntent(
+      NutritionOrder.IntentCode.newBuilder()
+        .setValue(
+          RequestIntentCode.Value.valueOf(
+            intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
+        )
+        .build()
+    )
+    if (hasPatient()) {
+      protoValue.setPatient(patient.toProto())
+    }
+    if (hasEncounter()) {
+      protoValue.setEncounter(encounter.toProto())
+    }
+    if (hasDateTime()) {
+      protoValue.setDateTime(dateTimeElement.toProto())
+    }
+    if (hasOrderer()) {
+      protoValue.setOrderer(orderer.toProto())
+    }
+    if (hasAllergyIntolerance()) {
+      protoValue.addAllAllergyIntolerance(allergyIntolerance.map { it.toProto() })
+    }
+    if (hasFoodPreferenceModifier()) {
+      protoValue.addAllFoodPreferenceModifier(foodPreferenceModifier.map { it.toProto() })
+    }
+    if (hasExcludeFoodModifier()) {
+      protoValue.addAllExcludeFoodModifier(excludeFoodModifier.map { it.toProto() })
+    }
+    if (hasOralDiet()) {
+      protoValue.setOralDiet(oralDiet.toProto())
+    }
+    if (hasSupplement()) {
+      protoValue.addAllSupplement(supplement.map { it.toProto() })
+    }
+    if (hasEnteralFormula()) {
+      protoValue.setEnteralFormula(enteralFormula.toProto())
+    }
+    if (hasNote()) {
+      protoValue.addAllNote(note.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietComponent.toProto():
     NutritionOrder.OralDiet {
-    val protoValue =
-      NutritionOrder.OralDiet.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllType(type.map { it.toProto() })
-        .addAllSchedule(schedule.map { it.toProto() })
-        .addAllNutrient(nutrient.map { it.toProto() })
-        .addAllTexture(texture.map { it.toProto() })
-        .addAllFluidConsistencyType(fluidConsistencyType.map { it.toProto() })
-        .setInstruction(instructionElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = NutritionOrder.OralDiet.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.addAllType(type.map { it.toProto() })
+    }
+    if (hasSchedule()) {
+      protoValue.addAllSchedule(schedule.map { it.toProto() })
+    }
+    if (hasNutrient()) {
+      protoValue.addAllNutrient(nutrient.map { it.toProto() })
+    }
+    if (hasTexture()) {
+      protoValue.addAllTexture(texture.map { it.toProto() })
+    }
+    if (hasFluidConsistencyType()) {
+      protoValue.addAllFluidConsistencyType(fluidConsistencyType.map { it.toProto() })
+    }
+    if (hasInstruction()) {
+      protoValue.setInstruction(instructionElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietNutrientComponent.toProto():
     NutritionOrder.OralDiet.Nutrient {
     val protoValue =
-      NutritionOrder.OralDiet.Nutrient.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setModifier(modifier.toProto())
-        .setAmount((amount as org.hl7.fhir.r4.model.SimpleQuantity).toProto())
-        .build()
-    return protoValue
+      NutritionOrder.OralDiet.Nutrient.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasModifier()) {
+      protoValue.setModifier(modifier.toProto())
+    }
+    if (hasAmount()) {
+      protoValue.setAmount((amount as org.hl7.fhir.r4.model.SimpleQuantity).toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietTextureComponent.toProto():
     NutritionOrder.OralDiet.Texture {
     val protoValue =
-      NutritionOrder.OralDiet.Texture.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setModifier(modifier.toProto())
-        .setFoodType(foodType.toProto())
-        .build()
-    return protoValue
+      NutritionOrder.OralDiet.Texture.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasModifier()) {
+      protoValue.setModifier(modifier.toProto())
+    }
+    if (hasFoodType()) {
+      protoValue.setFoodType(foodType.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderSupplementComponent.toProto():
     NutritionOrder.Supplement {
-    val protoValue =
-      NutritionOrder.Supplement.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(type.toProto())
-        .setProductName(productNameElement.toProto())
-        .addAllSchedule(schedule.map { it.toProto() })
-        .setQuantity((quantity as org.hl7.fhir.r4.model.SimpleQuantity).toProto())
-        .setInstruction(instructionElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = NutritionOrder.Supplement.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasProductName()) {
+      protoValue.setProductName(productNameElement.toProto())
+    }
+    if (hasSchedule()) {
+      protoValue.addAllSchedule(schedule.map { it.toProto() })
+    }
+    if (hasQuantity()) {
+      protoValue.setQuantity((quantity as org.hl7.fhir.r4.model.SimpleQuantity).toProto())
+    }
+    if (hasInstruction()) {
+      protoValue.setInstruction(instructionElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderEnteralFormulaComponent.toProto():
     NutritionOrder.EnteralFormula {
     val protoValue =
-      NutritionOrder.EnteralFormula.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setBaseFormulaType(baseFormulaType.toProto())
-        .setBaseFormulaProductName(baseFormulaProductNameElement.toProto())
-        .setAdditiveType(additiveType.toProto())
-        .setAdditiveProductName(additiveProductNameElement.toProto())
-        .setCaloricDensity((caloricDensity as org.hl7.fhir.r4.model.SimpleQuantity).toProto())
-        .setRouteofAdministration(routeofAdministration.toProto())
-        .addAllAdministration(administration.map { it.toProto() })
-        .setMaxVolumeToDeliver(
-          (maxVolumeToDeliver as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
-        )
-        .setAdministrationInstruction(administrationInstructionElement.toProto())
-        .build()
-    return protoValue
+      NutritionOrder.EnteralFormula.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasBaseFormulaType()) {
+      protoValue.setBaseFormulaType(baseFormulaType.toProto())
+    }
+    if (hasBaseFormulaProductName()) {
+      protoValue.setBaseFormulaProductName(baseFormulaProductNameElement.toProto())
+    }
+    if (hasAdditiveType()) {
+      protoValue.setAdditiveType(additiveType.toProto())
+    }
+    if (hasAdditiveProductName()) {
+      protoValue.setAdditiveProductName(additiveProductNameElement.toProto())
+    }
+    if (hasCaloricDensity()) {
+      protoValue.setCaloricDensity(
+        (caloricDensity as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      )
+    }
+    if (hasRouteofAdministration()) {
+      protoValue.setRouteofAdministration(routeofAdministration.toProto())
+    }
+    if (hasAdministration()) {
+      protoValue.addAllAdministration(administration.map { it.toProto() })
+    }
+    if (hasMaxVolumeToDeliver()) {
+      protoValue.setMaxVolumeToDeliver(
+        (maxVolumeToDeliver as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      )
+    }
+    if (hasAdministrationInstruction()) {
+      protoValue.setAdministrationInstruction(administrationInstructionElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -262,13 +397,22 @@ public object NutritionOrderConverter {
     val protoValue =
       NutritionOrder.EnteralFormula.Administration.newBuilder()
         .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSchedule(schedule.toProto())
-        .setQuantity((quantity as org.hl7.fhir.r4.model.SimpleQuantity).toProto())
-        .setRate(rate.nutritionOrderEnteralFormulaAdministrationRateToProto())
-        .build()
-    return protoValue
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSchedule()) {
+      protoValue.setSchedule(schedule.toProto())
+    }
+    if (hasQuantity()) {
+      protoValue.setQuantity((quantity as org.hl7.fhir.r4.model.SimpleQuantity).toProto())
+    }
+    if (hasRate()) {
+      protoValue.setRate(rate.nutritionOrderEnteralFormulaAdministrationRateToProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -276,14 +420,30 @@ public object NutritionOrderConverter {
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietComponent {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setType(typeList.map { it.toHapi() })
-    hapiValue.setSchedule(scheduleList.map { it.toHapi() })
-    hapiValue.setNutrient(nutrientList.map { it.toHapi() })
-    hapiValue.setTexture(textureList.map { it.toHapi() })
-    hapiValue.setFluidConsistencyType(fluidConsistencyTypeList.map { it.toHapi() })
-    hapiValue.setInstructionElement(instruction.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (typeCount > 0) {
+      hapiValue.setType(typeList.map { it.toHapi() })
+    }
+    if (scheduleCount > 0) {
+      hapiValue.setSchedule(scheduleList.map { it.toHapi() })
+    }
+    if (nutrientCount > 0) {
+      hapiValue.setNutrient(nutrientList.map { it.toHapi() })
+    }
+    if (textureCount > 0) {
+      hapiValue.setTexture(textureList.map { it.toHapi() })
+    }
+    if (fluidConsistencyTypeCount > 0) {
+      hapiValue.setFluidConsistencyType(fluidConsistencyTypeList.map { it.toHapi() })
+    }
+    if (hasInstruction()) {
+      hapiValue.setInstructionElement(instruction.toHapi())
+    }
     return hapiValue
   }
 
@@ -292,10 +452,18 @@ public object NutritionOrderConverter {
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietNutrientComponent {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietNutrientComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setModifier(modifier.toHapi())
-    hapiValue.setAmount(amount.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasModifier()) {
+      hapiValue.setModifier(modifier.toHapi())
+    }
+    if (hasAmount()) {
+      hapiValue.setAmount(amount.toHapi())
+    }
     return hapiValue
   }
 
@@ -304,10 +472,18 @@ public object NutritionOrderConverter {
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietTextureComponent {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderOralDietTextureComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setModifier(modifier.toHapi())
-    hapiValue.setFoodType(foodType.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasModifier()) {
+      hapiValue.setModifier(modifier.toHapi())
+    }
+    if (hasFoodType()) {
+      hapiValue.setFoodType(foodType.toHapi())
+    }
     return hapiValue
   }
 
@@ -316,13 +492,27 @@ public object NutritionOrderConverter {
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderSupplementComponent {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderSupplementComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
-    hapiValue.setProductNameElement(productName.toHapi())
-    hapiValue.setSchedule(scheduleList.map { it.toHapi() })
-    hapiValue.setQuantity(quantity.toHapi())
-    hapiValue.setInstructionElement(instruction.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasProductName()) {
+      hapiValue.setProductNameElement(productName.toHapi())
+    }
+    if (scheduleCount > 0) {
+      hapiValue.setSchedule(scheduleList.map { it.toHapi() })
+    }
+    if (hasQuantity()) {
+      hapiValue.setQuantity(quantity.toHapi())
+    }
+    if (hasInstruction()) {
+      hapiValue.setInstructionElement(instruction.toHapi())
+    }
     return hapiValue
   }
 
@@ -331,17 +521,39 @@ public object NutritionOrderConverter {
     org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderEnteralFormulaComponent {
     val hapiValue = org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderEnteralFormulaComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setBaseFormulaType(baseFormulaType.toHapi())
-    hapiValue.setBaseFormulaProductNameElement(baseFormulaProductName.toHapi())
-    hapiValue.setAdditiveType(additiveType.toHapi())
-    hapiValue.setAdditiveProductNameElement(additiveProductName.toHapi())
-    hapiValue.setCaloricDensity(caloricDensity.toHapi())
-    hapiValue.setRouteofAdministration(routeofAdministration.toHapi())
-    hapiValue.setAdministration(administrationList.map { it.toHapi() })
-    hapiValue.setMaxVolumeToDeliver(maxVolumeToDeliver.toHapi())
-    hapiValue.setAdministrationInstructionElement(administrationInstruction.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasBaseFormulaType()) {
+      hapiValue.setBaseFormulaType(baseFormulaType.toHapi())
+    }
+    if (hasBaseFormulaProductName()) {
+      hapiValue.setBaseFormulaProductNameElement(baseFormulaProductName.toHapi())
+    }
+    if (hasAdditiveType()) {
+      hapiValue.setAdditiveType(additiveType.toHapi())
+    }
+    if (hasAdditiveProductName()) {
+      hapiValue.setAdditiveProductNameElement(additiveProductName.toHapi())
+    }
+    if (hasCaloricDensity()) {
+      hapiValue.setCaloricDensity(caloricDensity.toHapi())
+    }
+    if (hasRouteofAdministration()) {
+      hapiValue.setRouteofAdministration(routeofAdministration.toHapi())
+    }
+    if (administrationCount > 0) {
+      hapiValue.setAdministration(administrationList.map { it.toHapi() })
+    }
+    if (hasMaxVolumeToDeliver()) {
+      hapiValue.setMaxVolumeToDeliver(maxVolumeToDeliver.toHapi())
+    }
+    if (hasAdministrationInstruction()) {
+      hapiValue.setAdministrationInstructionElement(administrationInstruction.toHapi())
+    }
     return hapiValue
   }
 
@@ -351,11 +563,21 @@ public object NutritionOrderConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.NutritionOrder.NutritionOrderEnteralFormulaAdministrationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSchedule(schedule.toHapi())
-    hapiValue.setQuantity(quantity.toHapi())
-    hapiValue.setRate(rate.nutritionOrderEnteralFormulaAdministrationRateToHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSchedule()) {
+      hapiValue.setSchedule(schedule.toHapi())
+    }
+    if (hasQuantity()) {
+      hapiValue.setQuantity(quantity.toHapi())
+    }
+    if (hasRate()) {
+      hapiValue.setRate(rate.nutritionOrderEnteralFormulaAdministrationRateToHapi())
+    }
     return hapiValue
   }
 }

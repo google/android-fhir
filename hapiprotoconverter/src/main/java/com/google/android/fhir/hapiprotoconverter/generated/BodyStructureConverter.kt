@@ -45,41 +45,90 @@ public object BodyStructureConverter {
   public fun BodyStructure.toHapi(): org.hl7.fhir.r4.model.BodyStructure {
     val hapiValue = org.hl7.fhir.r4.model.BodyStructure()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setActiveElement(active.toHapi())
-    hapiValue.setMorphology(morphology.toHapi())
-    hapiValue.setLocation(location.toHapi())
-    hapiValue.setLocationQualifier(locationQualifierList.map { it.toHapi() })
-    hapiValue.setDescriptionElement(description.toHapi())
-    hapiValue.setImage(imageList.map { it.toHapi() })
-    hapiValue.setPatient(patient.toHapi())
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasActive()) {
+      hapiValue.setActiveElement(active.toHapi())
+    }
+    if (hasMorphology()) {
+      hapiValue.setMorphology(morphology.toHapi())
+    }
+    if (hasLocation()) {
+      hapiValue.setLocation(location.toHapi())
+    }
+    if (locationQualifierCount > 0) {
+      hapiValue.setLocationQualifier(locationQualifierList.map { it.toHapi() })
+    }
+    if (hasDescription()) {
+      hapiValue.setDescriptionElement(description.toHapi())
+    }
+    if (imageCount > 0) {
+      hapiValue.setImage(imageList.map { it.toHapi() })
+    }
+    if (hasPatient()) {
+      hapiValue.setPatient(patient.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.BodyStructure.toProto(): BodyStructure {
-    val protoValue =
-      BodyStructure.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setActive(activeElement.toProto())
-        .setMorphology(morphology.toProto())
-        .setLocation(location.toProto())
-        .addAllLocationQualifier(locationQualifier.map { it.toProto() })
-        .setDescription(descriptionElement.toProto())
-        .addAllImage(image.map { it.toProto() })
-        .setPatient(patient.toProto())
-        .build()
-    return protoValue
+    val protoValue = BodyStructure.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasActive()) {
+      protoValue.setActive(activeElement.toProto())
+    }
+    if (hasMorphology()) {
+      protoValue.setMorphology(morphology.toProto())
+    }
+    if (hasLocation()) {
+      protoValue.setLocation(location.toProto())
+    }
+    if (hasLocationQualifier()) {
+      protoValue.addAllLocationQualifier(locationQualifier.map { it.toProto() })
+    }
+    if (hasDescription()) {
+      protoValue.setDescription(descriptionElement.toProto())
+    }
+    if (hasImage()) {
+      protoValue.addAllImage(image.map { it.toProto() })
+    }
+    if (hasPatient()) {
+      protoValue.setPatient(patient.toProto())
+    }
+    return protoValue.build()
   }
 }

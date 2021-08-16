@@ -76,96 +76,177 @@ public object ProvenanceConverter {
   public fun Provenance.toHapi(): org.hl7.fhir.r4.model.Provenance {
     val hapiValue = org.hl7.fhir.r4.model.Provenance()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setTarget(targetList.map { it.toHapi() })
-    hapiValue.setOccurred(occurred.provenanceOccurredToHapi())
-    hapiValue.setRecordedElement(recorded.toHapi())
-    hapiValue.setPolicy(policyList.map { it.toHapi() })
-    hapiValue.setLocation(location.toHapi())
-    hapiValue.setReason(reasonList.map { it.toHapi() })
-    hapiValue.setActivity(activity.toHapi())
-    hapiValue.setAgent(agentList.map { it.toHapi() })
-    hapiValue.setEntity(entityList.map { it.toHapi() })
-    hapiValue.setSignature(signatureList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (targetCount > 0) {
+      hapiValue.setTarget(targetList.map { it.toHapi() })
+    }
+    if (hasOccurred()) {
+      hapiValue.setOccurred(occurred.provenanceOccurredToHapi())
+    }
+    if (hasRecorded()) {
+      hapiValue.setRecordedElement(recorded.toHapi())
+    }
+    if (policyCount > 0) {
+      hapiValue.setPolicy(policyList.map { it.toHapi() })
+    }
+    if (hasLocation()) {
+      hapiValue.setLocation(location.toHapi())
+    }
+    if (reasonCount > 0) {
+      hapiValue.setReason(reasonList.map { it.toHapi() })
+    }
+    if (hasActivity()) {
+      hapiValue.setActivity(activity.toHapi())
+    }
+    if (agentCount > 0) {
+      hapiValue.setAgent(agentList.map { it.toHapi() })
+    }
+    if (entityCount > 0) {
+      hapiValue.setEntity(entityList.map { it.toHapi() })
+    }
+    if (signatureCount > 0) {
+      hapiValue.setSignature(signatureList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Provenance.toProto(): Provenance {
-    val protoValue =
-      Provenance.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllTarget(target.map { it.toProto() })
-        .setOccurred(occurred.provenanceOccurredToProto())
-        .setRecorded(recordedElement.toProto())
-        .addAllPolicy(policy.map { it.toProto() })
-        .setLocation(location.toProto())
-        .addAllReason(reason.map { it.toProto() })
-        .setActivity(activity.toProto())
-        .addAllAgent(agent.map { it.toProto() })
-        .addAllEntity(entity.map { it.toProto() })
-        .addAllSignature(signature.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = Provenance.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasTarget()) {
+      protoValue.addAllTarget(target.map { it.toProto() })
+    }
+    if (hasOccurred()) {
+      protoValue.setOccurred(occurred.provenanceOccurredToProto())
+    }
+    if (hasRecorded()) {
+      protoValue.setRecorded(recordedElement.toProto())
+    }
+    if (hasPolicy()) {
+      protoValue.addAllPolicy(policy.map { it.toProto() })
+    }
+    if (hasLocation()) {
+      protoValue.setLocation(location.toProto())
+    }
+    if (hasReason()) {
+      protoValue.addAllReason(reason.map { it.toProto() })
+    }
+    if (hasActivity()) {
+      protoValue.setActivity(activity.toProto())
+    }
+    if (hasAgent()) {
+      protoValue.addAllAgent(agent.map { it.toProto() })
+    }
+    if (hasEntity()) {
+      protoValue.addAllEntity(entity.map { it.toProto() })
+    }
+    if (hasSignature()) {
+      protoValue.addAllSignature(signature.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Provenance.ProvenanceAgentComponent.toProto():
     Provenance.Agent {
-    val protoValue =
-      Provenance.Agent.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(type.toProto())
-        .addAllRole(role.map { it.toProto() })
-        .setWho(who.toProto())
-        .setOnBehalfOf(onBehalfOf.toProto())
-        .build()
-    return protoValue
+    val protoValue = Provenance.Agent.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasRole()) {
+      protoValue.addAllRole(role.map { it.toProto() })
+    }
+    if (hasWho()) {
+      protoValue.setWho(who.toProto())
+    }
+    if (hasOnBehalfOf()) {
+      protoValue.setOnBehalfOf(onBehalfOf.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Provenance.ProvenanceEntityComponent.toProto():
     Provenance.Entity {
-    val protoValue =
-      Provenance.Entity.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setRole(
-          Provenance.Entity.RoleCode.newBuilder()
-            .setValue(
-              ProvenanceEntityRoleCode.Value.valueOf(
-                role.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Provenance.Entity.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    protoValue.setRole(
+      Provenance.Entity.RoleCode.newBuilder()
+        .setValue(
+          ProvenanceEntityRoleCode.Value.valueOf(
+            role.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setWhat(what.toProto())
         .build()
-    return protoValue
+    )
+    if (hasWhat()) {
+      protoValue.setWhat(what.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun Provenance.Agent.toHapi(): org.hl7.fhir.r4.model.Provenance.ProvenanceAgentComponent {
     val hapiValue = org.hl7.fhir.r4.model.Provenance.ProvenanceAgentComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
-    hapiValue.setRole(roleList.map { it.toHapi() })
-    hapiValue.setWho(who.toHapi())
-    hapiValue.setOnBehalfOf(onBehalfOf.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (roleCount > 0) {
+      hapiValue.setRole(roleList.map { it.toHapi() })
+    }
+    if (hasWho()) {
+      hapiValue.setWho(who.toHapi())
+    }
+    if (hasOnBehalfOf()) {
+      hapiValue.setOnBehalfOf(onBehalfOf.toHapi())
+    }
     return hapiValue
   }
 
@@ -174,14 +255,20 @@ public object ProvenanceConverter {
     org.hl7.fhir.r4.model.Provenance.ProvenanceEntityComponent {
     val hapiValue = org.hl7.fhir.r4.model.Provenance.ProvenanceEntityComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
     hapiValue.setRole(
       org.hl7.fhir.r4.model.Provenance.ProvenanceEntityRole.valueOf(
         role.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setWhat(what.toHapi())
+    if (hasWhat()) {
+      hapiValue.setWhat(what.toHapi())
+    }
     return hapiValue
   }
 }

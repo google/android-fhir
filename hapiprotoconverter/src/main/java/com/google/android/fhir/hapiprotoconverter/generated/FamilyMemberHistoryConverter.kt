@@ -205,91 +205,188 @@ public object FamilyMemberHistoryConverter {
   public fun FamilyMemberHistory.toHapi(): org.hl7.fhir.r4.model.FamilyMemberHistory {
     val hapiValue = org.hl7.fhir.r4.model.FamilyMemberHistory()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setInstantiatesCanonical(instantiatesCanonicalList.map { it.toHapi() })
-    hapiValue.setInstantiatesUri(instantiatesUriList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (instantiatesCanonicalCount > 0) {
+      hapiValue.setInstantiatesCanonical(instantiatesCanonicalList.map { it.toHapi() })
+    }
+    if (instantiatesUriCount > 0) {
+      hapiValue.setInstantiatesUri(instantiatesUriList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.FamilyMemberHistory.FamilyHistoryStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setDataAbsentReason(dataAbsentReason.toHapi())
-    hapiValue.setPatient(patient.toHapi())
-    hapiValue.setDateElement(date.toHapi())
-    hapiValue.setNameElement(name.toHapi())
-    hapiValue.setRelationship(relationship.toHapi())
-    hapiValue.setSex(sex.toHapi())
-    hapiValue.setBorn(born.familyMemberHistoryBornToHapi())
-    hapiValue.setAge(age.familyMemberHistoryAgeToHapi())
-    hapiValue.setEstimatedAgeElement(estimatedAge.toHapi())
-    hapiValue.setDeceased(deceased.familyMemberHistoryDeceasedToHapi())
-    hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
-    hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
-    hapiValue.setNote(noteList.map { it.toHapi() })
-    hapiValue.setCondition(conditionList.map { it.toHapi() })
+    if (hasDataAbsentReason()) {
+      hapiValue.setDataAbsentReason(dataAbsentReason.toHapi())
+    }
+    if (hasPatient()) {
+      hapiValue.setPatient(patient.toHapi())
+    }
+    if (hasDate()) {
+      hapiValue.setDateElement(date.toHapi())
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
+    if (hasRelationship()) {
+      hapiValue.setRelationship(relationship.toHapi())
+    }
+    if (hasSex()) {
+      hapiValue.setSex(sex.toHapi())
+    }
+    if (hasBorn()) {
+      hapiValue.setBorn(born.familyMemberHistoryBornToHapi())
+    }
+    if (hasAge()) {
+      hapiValue.setAge(age.familyMemberHistoryAgeToHapi())
+    }
+    if (hasEstimatedAge()) {
+      hapiValue.setEstimatedAgeElement(estimatedAge.toHapi())
+    }
+    if (hasDeceased()) {
+      hapiValue.setDeceased(deceased.familyMemberHistoryDeceasedToHapi())
+    }
+    if (reasonCodeCount > 0) {
+      hapiValue.setReasonCode(reasonCodeList.map { it.toHapi() })
+    }
+    if (reasonReferenceCount > 0) {
+      hapiValue.setReasonReference(reasonReferenceList.map { it.toHapi() })
+    }
+    if (noteCount > 0) {
+      hapiValue.setNote(noteList.map { it.toHapi() })
+    }
+    if (conditionCount > 0) {
+      hapiValue.setCondition(conditionList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.FamilyMemberHistory.toProto(): FamilyMemberHistory {
-    val protoValue =
-      FamilyMemberHistory.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .addAllInstantiatesCanonical(instantiatesCanonical.map { it.toProto() })
-        .addAllInstantiatesUri(instantiatesUri.map { it.toProto() })
-        .setStatus(
-          FamilyMemberHistory.StatusCode.newBuilder()
-            .setValue(
-              FamilyHistoryStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = FamilyMemberHistory.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasInstantiatesCanonical()) {
+      protoValue.addAllInstantiatesCanonical(instantiatesCanonical.map { it.toProto() })
+    }
+    if (hasInstantiatesUri()) {
+      protoValue.addAllInstantiatesUri(instantiatesUri.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      FamilyMemberHistory.StatusCode.newBuilder()
+        .setValue(
+          FamilyHistoryStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setDataAbsentReason(dataAbsentReason.toProto())
-        .setPatient(patient.toProto())
-        .setDate(dateElement.toProto())
-        .setName(nameElement.toProto())
-        .setRelationship(relationship.toProto())
-        .setSex(sex.toProto())
-        .setBorn(born.familyMemberHistoryBornToProto())
-        .setAge(age.familyMemberHistoryAgeToProto())
-        .setEstimatedAge(estimatedAgeElement.toProto())
-        .setDeceased(deceased.familyMemberHistoryDeceasedToProto())
-        .addAllReasonCode(reasonCode.map { it.toProto() })
-        .addAllReasonReference(reasonReference.map { it.toProto() })
-        .addAllNote(note.map { it.toProto() })
-        .addAllCondition(condition.map { it.toProto() })
         .build()
-    return protoValue
+    )
+    if (hasDataAbsentReason()) {
+      protoValue.setDataAbsentReason(dataAbsentReason.toProto())
+    }
+    if (hasPatient()) {
+      protoValue.setPatient(patient.toProto())
+    }
+    if (hasDate()) {
+      protoValue.setDate(dateElement.toProto())
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    if (hasRelationship()) {
+      protoValue.setRelationship(relationship.toProto())
+    }
+    if (hasSex()) {
+      protoValue.setSex(sex.toProto())
+    }
+    if (hasBorn()) {
+      protoValue.setBorn(born.familyMemberHistoryBornToProto())
+    }
+    if (hasAge()) {
+      protoValue.setAge(age.familyMemberHistoryAgeToProto())
+    }
+    if (hasEstimatedAge()) {
+      protoValue.setEstimatedAge(estimatedAgeElement.toProto())
+    }
+    if (hasDeceased()) {
+      protoValue.setDeceased(deceased.familyMemberHistoryDeceasedToProto())
+    }
+    if (hasReasonCode()) {
+      protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
+    }
+    if (hasReasonReference()) {
+      protoValue.addAllReasonReference(reasonReference.map { it.toProto() })
+    }
+    if (hasNote()) {
+      protoValue.addAllNote(note.map { it.toProto() })
+    }
+    if (hasCondition()) {
+      protoValue.addAllCondition(condition.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.FamilyMemberHistory.FamilyMemberHistoryConditionComponent.toProto():
     FamilyMemberHistory.Condition {
     val protoValue =
-      FamilyMemberHistory.Condition.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setCode(code.toProto())
-        .setOutcome(outcome.toProto())
-        .setContributedToDeath(contributedToDeathElement.toProto())
-        .setOnset(onset.familyMemberHistoryConditionOnsetToProto())
-        .addAllNote(note.map { it.toProto() })
-        .build()
-    return protoValue
+      FamilyMemberHistory.Condition.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasCode()) {
+      protoValue.setCode(code.toProto())
+    }
+    if (hasOutcome()) {
+      protoValue.setOutcome(outcome.toProto())
+    }
+    if (hasContributedToDeath()) {
+      protoValue.setContributedToDeath(contributedToDeathElement.toProto())
+    }
+    if (hasOnset()) {
+      protoValue.setOnset(onset.familyMemberHistoryConditionOnsetToProto())
+    }
+    if (hasNote()) {
+      protoValue.addAllNote(note.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
@@ -298,13 +395,27 @@ public object FamilyMemberHistoryConverter {
     val hapiValue =
       org.hl7.fhir.r4.model.FamilyMemberHistory.FamilyMemberHistoryConditionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setCode(code.toHapi())
-    hapiValue.setOutcome(outcome.toHapi())
-    hapiValue.setContributedToDeathElement(contributedToDeath.toHapi())
-    hapiValue.setOnset(onset.familyMemberHistoryConditionOnsetToHapi())
-    hapiValue.setNote(noteList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasCode()) {
+      hapiValue.setCode(code.toHapi())
+    }
+    if (hasOutcome()) {
+      hapiValue.setOutcome(outcome.toHapi())
+    }
+    if (hasContributedToDeath()) {
+      hapiValue.setContributedToDeathElement(contributedToDeath.toHapi())
+    }
+    if (hasOnset()) {
+      hapiValue.setOnset(onset.familyMemberHistoryConditionOnsetToHapi())
+    }
+    if (noteCount > 0) {
+      hapiValue.setNote(noteList.map { it.toHapi() })
+    }
     return hapiValue
   }
 }

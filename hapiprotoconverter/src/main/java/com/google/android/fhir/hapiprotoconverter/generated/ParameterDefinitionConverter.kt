@@ -37,47 +37,68 @@ public object ParameterDefinitionConverter {
   public fun ParameterDefinition.toHapi(): org.hl7.fhir.r4.model.ParameterDefinition {
     val hapiValue = org.hl7.fhir.r4.model.ParameterDefinition()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
     hapiValue.setUse(
       org.hl7.fhir.r4.model.ParameterDefinition.ParameterUse.valueOf(
         use.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setMinElement(min.toHapi())
-    hapiValue.setMaxElement(max.toHapi())
-    hapiValue.setDocumentationElement(documentation.toHapi())
+    if (hasMin()) {
+      hapiValue.setMinElement(min.toHapi())
+    }
+    if (hasMax()) {
+      hapiValue.setMaxElement(max.toHapi())
+    }
+    if (hasDocumentation()) {
+      hapiValue.setDocumentationElement(documentation.toHapi())
+    }
     hapiValue.setType(type.value.name)
-    hapiValue.setProfileElement(profile.toHapi())
+    if (hasProfile()) {
+      hapiValue.setProfileElement(profile.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.ParameterDefinition.toProto(): ParameterDefinition {
-    val protoValue =
-      ParameterDefinition.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .setUse(
-          ParameterDefinition.UseCode.newBuilder()
-            .setValue(
-              OperationParameterUseCode.Value.valueOf(
-                use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = ParameterDefinition.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    protoValue.setUse(
+      ParameterDefinition.UseCode.newBuilder()
+        .setValue(
+          OperationParameterUseCode.Value.valueOf(
+            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .setMin(minElement.toProto())
-        .setMax(maxElement.toProto())
-        .setDocumentation(documentationElement.toProto())
-        .setType(
-          ParameterDefinition.TypeCode.newBuilder()
-            .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
-            .build()
-        )
-        .setProfile(profileElement.toProto())
         .build()
-    return protoValue
+    )
+    if (hasMin()) {
+      protoValue.setMin(minElement.toProto())
+    }
+    if (hasMax()) {
+      protoValue.setMax(maxElement.toProto())
+    }
+    if (hasDocumentation()) {
+      protoValue.setDocumentation(documentationElement.toProto())
+    }
+    protoValue.setType(
+      ParameterDefinition.TypeCode.newBuilder()
+        .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
+        .build()
+    )
+    if (hasProfile()) {
+      protoValue.setProfile(profileElement.toProto())
+    }
+    return protoValue.build()
   }
 }

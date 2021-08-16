@@ -37,29 +37,54 @@ public object MetaConverter {
   public fun Meta.toHapi(): org.hl7.fhir.r4.model.Meta {
     val hapiValue = org.hl7.fhir.r4.model.Meta()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setVersionIdElement(versionId.toHapi())
-    hapiValue.setLastUpdatedElement(lastUpdated.toHapi())
-    hapiValue.setSourceElement(source.toHapi())
-    hapiValue.setProfile(profileList.map { it.toHapi() })
-    hapiValue.setSecurity(securityList.map { it.toHapi() })
-    hapiValue.setTag(tagList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (hasVersionId()) {
+      hapiValue.setVersionIdElement(versionId.toHapi())
+    }
+    if (hasLastUpdated()) {
+      hapiValue.setLastUpdatedElement(lastUpdated.toHapi())
+    }
+    if (hasSource()) {
+      hapiValue.setSourceElement(source.toHapi())
+    }
+    if (profileCount > 0) {
+      hapiValue.setProfile(profileList.map { it.toHapi() })
+    }
+    if (securityCount > 0) {
+      hapiValue.setSecurity(securityList.map { it.toHapi() })
+    }
+    if (tagCount > 0) {
+      hapiValue.setTag(tagList.map { it.toHapi() })
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Meta.toProto(): Meta {
-    val protoValue =
-      Meta.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .setVersionId(versionIdElement.toProto())
-        .setLastUpdated(lastUpdatedElement.toProto())
-        .setSource(sourceElement.toProto())
-        .addAllProfile(profile.map { it.toProto() })
-        .addAllSecurity(security.map { it.toProto() })
-        .addAllTag(tag.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = Meta.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasVersionId()) {
+      protoValue.setVersionId(versionIdElement.toProto())
+    }
+    if (hasLastUpdated()) {
+      protoValue.setLastUpdated(lastUpdatedElement.toProto())
+    }
+    if (hasSource()) {
+      protoValue.setSource(sourceElement.toProto())
+    }
+    if (hasProfile()) {
+      protoValue.addAllProfile(profile.map { it.toProto() })
+    }
+    if (hasSecurity()) {
+      protoValue.addAllSecurity(security.map { it.toProto() })
+    }
+    if (hasTag()) {
+      protoValue.addAllTag(tag.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 }

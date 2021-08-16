@@ -57,191 +57,355 @@ public object DeviceConverter {
   public fun Device.toHapi(): org.hl7.fhir.r4.model.Device {
     val hapiValue = org.hl7.fhir.r4.model.Device()
     hapiValue.id = id.value
-    hapiValue.setMeta(meta.toHapi())
-    hapiValue.setImplicitRulesElement(implicitRules.toHapi())
-    hapiValue.setText(text.toHapi())
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setIdentifier(identifierList.map { it.toHapi() })
-    hapiValue.setDefinition(definition.toHapi())
-    hapiValue.setUdiCarrier(udiCarrierList.map { it.toHapi() })
+    if (hasMeta()) {
+      hapiValue.setMeta(meta.toHapi())
+    }
+    if (hasImplicitRules()) {
+      hapiValue.setImplicitRulesElement(implicitRules.toHapi())
+    }
+    if (hasText()) {
+      hapiValue.setText(text.toHapi())
+    }
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (identifierCount > 0) {
+      hapiValue.setIdentifier(identifierList.map { it.toHapi() })
+    }
+    if (hasDefinition()) {
+      hapiValue.setDefinition(definition.toHapi())
+    }
+    if (udiCarrierCount > 0) {
+      hapiValue.setUdiCarrier(udiCarrierList.map { it.toHapi() })
+    }
     hapiValue.setStatus(
       org.hl7.fhir.r4.model.Device.FHIRDeviceStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
       )
     )
-    hapiValue.setStatusReason(statusReasonList.map { it.toHapi() })
-    hapiValue.setDistinctIdentifierElement(distinctIdentifier.toHapi())
-    hapiValue.setManufacturerElement(manufacturer.toHapi())
-    hapiValue.setManufactureDateElement(manufactureDate.toHapi())
-    hapiValue.setExpirationDateElement(expirationDate.toHapi())
-    hapiValue.setLotNumberElement(lotNumber.toHapi())
-    hapiValue.setSerialNumberElement(serialNumber.toHapi())
-    hapiValue.setDeviceName(deviceNameList.map { it.toHapi() })
-    hapiValue.setModelNumberElement(modelNumber.toHapi())
-    hapiValue.setPartNumberElement(partNumber.toHapi())
-    hapiValue.setType(type.toHapi())
-    hapiValue.setSpecialization(specializationList.map { it.toHapi() })
-    hapiValue.setVersion(versionList.map { it.toHapi() })
-    hapiValue.setProperty(propertyList.map { it.toHapi() })
-    hapiValue.setPatient(patient.toHapi())
-    hapiValue.setOwner(owner.toHapi())
-    hapiValue.setContact(contactList.map { it.toHapi() })
-    hapiValue.setLocation(location.toHapi())
-    hapiValue.setUrlElement(url.toHapi())
-    hapiValue.setNote(noteList.map { it.toHapi() })
-    hapiValue.setSafety(safetyList.map { it.toHapi() })
-    hapiValue.setParent(parent.toHapi())
+    if (statusReasonCount > 0) {
+      hapiValue.setStatusReason(statusReasonList.map { it.toHapi() })
+    }
+    if (hasDistinctIdentifier()) {
+      hapiValue.setDistinctIdentifierElement(distinctIdentifier.toHapi())
+    }
+    if (hasManufacturer()) {
+      hapiValue.setManufacturerElement(manufacturer.toHapi())
+    }
+    if (hasManufactureDate()) {
+      hapiValue.setManufactureDateElement(manufactureDate.toHapi())
+    }
+    if (hasExpirationDate()) {
+      hapiValue.setExpirationDateElement(expirationDate.toHapi())
+    }
+    if (hasLotNumber()) {
+      hapiValue.setLotNumberElement(lotNumber.toHapi())
+    }
+    if (hasSerialNumber()) {
+      hapiValue.setSerialNumberElement(serialNumber.toHapi())
+    }
+    if (deviceNameCount > 0) {
+      hapiValue.setDeviceName(deviceNameList.map { it.toHapi() })
+    }
+    if (hasModelNumber()) {
+      hapiValue.setModelNumberElement(modelNumber.toHapi())
+    }
+    if (hasPartNumber()) {
+      hapiValue.setPartNumberElement(partNumber.toHapi())
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (specializationCount > 0) {
+      hapiValue.setSpecialization(specializationList.map { it.toHapi() })
+    }
+    if (versionCount > 0) {
+      hapiValue.setVersion(versionList.map { it.toHapi() })
+    }
+    if (propertyCount > 0) {
+      hapiValue.setProperty(propertyList.map { it.toHapi() })
+    }
+    if (hasPatient()) {
+      hapiValue.setPatient(patient.toHapi())
+    }
+    if (hasOwner()) {
+      hapiValue.setOwner(owner.toHapi())
+    }
+    if (contactCount > 0) {
+      hapiValue.setContact(contactList.map { it.toHapi() })
+    }
+    if (hasLocation()) {
+      hapiValue.setLocation(location.toHapi())
+    }
+    if (hasUrl()) {
+      hapiValue.setUrlElement(url.toHapi())
+    }
+    if (noteCount > 0) {
+      hapiValue.setNote(noteList.map { it.toHapi() })
+    }
+    if (safetyCount > 0) {
+      hapiValue.setSafety(safetyList.map { it.toHapi() })
+    }
+    if (hasParent()) {
+      hapiValue.setParent(parent.toHapi())
+    }
     return hapiValue
   }
 
   @JvmStatic
   public fun org.hl7.fhir.r4.model.Device.toProto(): Device {
-    val protoValue =
-      Device.newBuilder()
-        .setId(Id.newBuilder().setValue(id))
-        .setMeta(meta.toProto())
-        .setImplicitRules(implicitRulesElement.toProto())
-        .setText(text.toProto())
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .addAllIdentifier(identifier.map { it.toProto() })
-        .setDefinition(definition.toProto())
-        .addAllUdiCarrier(udiCarrier.map { it.toProto() })
-        .setStatus(
-          Device.StatusCode.newBuilder()
-            .setValue(
-              FHIRDeviceStatusCode.Value.valueOf(
-                status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Device.newBuilder().setId(Id.newBuilder().setValue(id))
+    if (hasMeta()) {
+      protoValue.setMeta(meta.toProto())
+    }
+    if (hasImplicitRules()) {
+      protoValue.setImplicitRules(implicitRulesElement.toProto())
+    }
+    if (hasText()) {
+      protoValue.setText(text.toProto())
+    }
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasIdentifier()) {
+      protoValue.addAllIdentifier(identifier.map { it.toProto() })
+    }
+    if (hasDefinition()) {
+      protoValue.setDefinition(definition.toProto())
+    }
+    if (hasUdiCarrier()) {
+      protoValue.addAllUdiCarrier(udiCarrier.map { it.toProto() })
+    }
+    protoValue.setStatus(
+      Device.StatusCode.newBuilder()
+        .setValue(
+          FHIRDeviceStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
-        .addAllStatusReason(statusReason.map { it.toProto() })
-        .setDistinctIdentifier(distinctIdentifierElement.toProto())
-        .setManufacturer(manufacturerElement.toProto())
-        .setManufactureDate(manufactureDateElement.toProto())
-        .setExpirationDate(expirationDateElement.toProto())
-        .setLotNumber(lotNumberElement.toProto())
-        .setSerialNumber(serialNumberElement.toProto())
-        .addAllDeviceName(deviceName.map { it.toProto() })
-        .setModelNumber(modelNumberElement.toProto())
-        .setPartNumber(partNumberElement.toProto())
-        .setType(type.toProto())
-        .addAllSpecialization(specialization.map { it.toProto() })
-        .addAllVersion(version.map { it.toProto() })
-        .addAllProperty(property.map { it.toProto() })
-        .setPatient(patient.toProto())
-        .setOwner(owner.toProto())
-        .addAllContact(contact.map { it.toProto() })
-        .setLocation(location.toProto())
-        .setUrl(urlElement.toProto())
-        .addAllNote(note.map { it.toProto() })
-        .addAllSafety(safety.map { it.toProto() })
-        .setParent(parent.toProto())
         .build()
-    return protoValue
+    )
+    if (hasStatusReason()) {
+      protoValue.addAllStatusReason(statusReason.map { it.toProto() })
+    }
+    if (hasDistinctIdentifier()) {
+      protoValue.setDistinctIdentifier(distinctIdentifierElement.toProto())
+    }
+    if (hasManufacturer()) {
+      protoValue.setManufacturer(manufacturerElement.toProto())
+    }
+    if (hasManufactureDate()) {
+      protoValue.setManufactureDate(manufactureDateElement.toProto())
+    }
+    if (hasExpirationDate()) {
+      protoValue.setExpirationDate(expirationDateElement.toProto())
+    }
+    if (hasLotNumber()) {
+      protoValue.setLotNumber(lotNumberElement.toProto())
+    }
+    if (hasSerialNumber()) {
+      protoValue.setSerialNumber(serialNumberElement.toProto())
+    }
+    if (hasDeviceName()) {
+      protoValue.addAllDeviceName(deviceName.map { it.toProto() })
+    }
+    if (hasModelNumber()) {
+      protoValue.setModelNumber(modelNumberElement.toProto())
+    }
+    if (hasPartNumber()) {
+      protoValue.setPartNumber(partNumberElement.toProto())
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasSpecialization()) {
+      protoValue.addAllSpecialization(specialization.map { it.toProto() })
+    }
+    if (hasVersion()) {
+      protoValue.addAllVersion(version.map { it.toProto() })
+    }
+    if (hasProperty()) {
+      protoValue.addAllProperty(property.map { it.toProto() })
+    }
+    if (hasPatient()) {
+      protoValue.setPatient(patient.toProto())
+    }
+    if (hasOwner()) {
+      protoValue.setOwner(owner.toProto())
+    }
+    if (hasContact()) {
+      protoValue.addAllContact(contact.map { it.toProto() })
+    }
+    if (hasLocation()) {
+      protoValue.setLocation(location.toProto())
+    }
+    if (hasUrl()) {
+      protoValue.setUrl(urlElement.toProto())
+    }
+    if (hasNote()) {
+      protoValue.addAllNote(note.map { it.toProto() })
+    }
+    if (hasSafety()) {
+      protoValue.addAllSafety(safety.map { it.toProto() })
+    }
+    if (hasParent()) {
+      protoValue.setParent(parent.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Device.DeviceUdiCarrierComponent.toProto(): Device.UdiCarrier {
-    val protoValue =
-      Device.UdiCarrier.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setDeviceIdentifier(deviceIdentifierElement.toProto())
-        .setIssuer(issuerElement.toProto())
-        .setJurisdiction(jurisdictionElement.toProto())
-        .setCarrierAidc(carrierAIDCElement.toProto())
-        .setCarrierHrf(carrierHRFElement.toProto())
-        .setEntryType(
-          Device.UdiCarrier.EntryTypeCode.newBuilder()
-            .setValue(
-              UDIEntryTypeCode.Value.valueOf(
-                entryType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Device.UdiCarrier.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasDeviceIdentifier()) {
+      protoValue.setDeviceIdentifier(deviceIdentifierElement.toProto())
+    }
+    if (hasIssuer()) {
+      protoValue.setIssuer(issuerElement.toProto())
+    }
+    if (hasJurisdiction()) {
+      protoValue.setJurisdiction(jurisdictionElement.toProto())
+    }
+    if (hasCarrierAIDC()) {
+      protoValue.setCarrierAidc(carrierAIDCElement.toProto())
+    }
+    if (hasCarrierHRF()) {
+      protoValue.setCarrierHrf(carrierHRFElement.toProto())
+    }
+    protoValue.setEntryType(
+      Device.UdiCarrier.EntryTypeCode.newBuilder()
+        .setValue(
+          UDIEntryTypeCode.Value.valueOf(
+            entryType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
         .build()
-    return protoValue
+    )
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Device.DeviceDeviceNameComponent.toProto(): Device.DeviceName {
-    val protoValue =
-      Device.DeviceName.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setName(nameElement.toProto())
-        .setType(
-          Device.DeviceName.TypeCode.newBuilder()
-            .setValue(
-              DeviceNameTypeCode.Value.valueOf(
-                type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
-            )
-            .build()
+    val protoValue = Device.DeviceName.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasName()) {
+      protoValue.setName(nameElement.toProto())
+    }
+    protoValue.setType(
+      Device.DeviceName.TypeCode.newBuilder()
+        .setValue(
+          DeviceNameTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
+          )
         )
         .build()
-    return protoValue
+    )
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Device.DeviceSpecializationComponent.toProto():
     Device.Specialization {
-    val protoValue =
-      Device.Specialization.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setSystemType(systemType.toProto())
-        .setVersion(versionElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Device.Specialization.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasSystemType()) {
+      protoValue.setSystemType(systemType.toProto())
+    }
+    if (hasVersion()) {
+      protoValue.setVersion(versionElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Device.DeviceVersionComponent.toProto(): Device.Version {
-    val protoValue =
-      Device.Version.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(type.toProto())
-        .setComponent(component.toProto())
-        .setValue(valueElement.toProto())
-        .build()
-    return protoValue
+    val protoValue = Device.Version.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasComponent()) {
+      protoValue.setComponent(component.toProto())
+    }
+    if (hasValue()) {
+      protoValue.setValue(valueElement.toProto())
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun org.hl7.fhir.r4.model.Device.DevicePropertyComponent.toProto(): Device.Property {
-    val protoValue =
-      Device.Property.newBuilder()
-        .setId(String.newBuilder().setValue(id))
-        .addAllExtension(extension.map { it.toProto() })
-        .addAllModifierExtension(modifierExtension.map { it.toProto() })
-        .setType(type.toProto())
-        .addAllValueQuantity(valueQuantity.map { it.toProto() })
-        .addAllValueCode(valueCode.map { it.toProto() })
-        .build()
-    return protoValue
+    val protoValue = Device.Property.newBuilder().setId(String.newBuilder().setValue(id))
+    if (hasExtension()) {
+      protoValue.addAllExtension(extension.map { it.toProto() })
+    }
+    if (hasModifierExtension()) {
+      protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
+    }
+    if (hasType()) {
+      protoValue.setType(type.toProto())
+    }
+    if (hasValueQuantity()) {
+      protoValue.addAllValueQuantity(valueQuantity.map { it.toProto() })
+    }
+    if (hasValueCode()) {
+      protoValue.addAllValueCode(valueCode.map { it.toProto() })
+    }
+    return protoValue.build()
   }
 
   @JvmStatic
   private fun Device.UdiCarrier.toHapi(): org.hl7.fhir.r4.model.Device.DeviceUdiCarrierComponent {
     val hapiValue = org.hl7.fhir.r4.model.Device.DeviceUdiCarrierComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setDeviceIdentifierElement(deviceIdentifier.toHapi())
-    hapiValue.setIssuerElement(issuer.toHapi())
-    hapiValue.setJurisdictionElement(jurisdiction.toHapi())
-    hapiValue.setCarrierAIDCElement(carrierAidc.toHapi())
-    hapiValue.setCarrierHRFElement(carrierHrf.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasDeviceIdentifier()) {
+      hapiValue.setDeviceIdentifierElement(deviceIdentifier.toHapi())
+    }
+    if (hasIssuer()) {
+      hapiValue.setIssuerElement(issuer.toHapi())
+    }
+    if (hasJurisdiction()) {
+      hapiValue.setJurisdictionElement(jurisdiction.toHapi())
+    }
+    if (hasCarrierAidc()) {
+      hapiValue.setCarrierAIDCElement(carrierAidc.toHapi())
+    }
+    if (hasCarrierHrf()) {
+      hapiValue.setCarrierHRFElement(carrierHrf.toHapi())
+    }
     hapiValue.setEntryType(
       org.hl7.fhir.r4.model.Device.UDIEntryType.valueOf(
         entryType.value.name.hapiCodeCheck().replace("_", "")
@@ -254,9 +418,15 @@ public object DeviceConverter {
   private fun Device.DeviceName.toHapi(): org.hl7.fhir.r4.model.Device.DeviceDeviceNameComponent {
     val hapiValue = org.hl7.fhir.r4.model.Device.DeviceDeviceNameComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setNameElement(name.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasName()) {
+      hapiValue.setNameElement(name.toHapi())
+    }
     hapiValue.setType(
       org.hl7.fhir.r4.model.Device.DeviceNameType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")
@@ -270,10 +440,18 @@ public object DeviceConverter {
     org.hl7.fhir.r4.model.Device.DeviceSpecializationComponent {
     val hapiValue = org.hl7.fhir.r4.model.Device.DeviceSpecializationComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setSystemType(systemType.toHapi())
-    hapiValue.setVersionElement(version.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasSystemType()) {
+      hapiValue.setSystemType(systemType.toHapi())
+    }
+    if (hasVersion()) {
+      hapiValue.setVersionElement(version.toHapi())
+    }
     return hapiValue
   }
 
@@ -281,11 +459,21 @@ public object DeviceConverter {
   private fun Device.Version.toHapi(): org.hl7.fhir.r4.model.Device.DeviceVersionComponent {
     val hapiValue = org.hl7.fhir.r4.model.Device.DeviceVersionComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
-    hapiValue.setComponent(component.toHapi())
-    hapiValue.setValueElement(value.toHapi())
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (hasComponent()) {
+      hapiValue.setComponent(component.toHapi())
+    }
+    if (hasValue()) {
+      hapiValue.setValueElement(value.toHapi())
+    }
     return hapiValue
   }
 
@@ -293,11 +481,21 @@ public object DeviceConverter {
   private fun Device.Property.toHapi(): org.hl7.fhir.r4.model.Device.DevicePropertyComponent {
     val hapiValue = org.hl7.fhir.r4.model.Device.DevicePropertyComponent()
     hapiValue.id = id.value
-    hapiValue.setExtension(extensionList.map { it.toHapi() })
-    hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
-    hapiValue.setType(type.toHapi())
-    hapiValue.setValueQuantity(valueQuantityList.map { it.toHapi() })
-    hapiValue.setValueCode(valueCodeList.map { it.toHapi() })
+    if (extensionCount > 0) {
+      hapiValue.setExtension(extensionList.map { it.toHapi() })
+    }
+    if (modifierExtensionCount > 0) {
+      hapiValue.setModifierExtension(modifierExtensionList.map { it.toHapi() })
+    }
+    if (hasType()) {
+      hapiValue.setType(type.toHapi())
+    }
+    if (valueQuantityCount > 0) {
+      hapiValue.setValueQuantity(valueQuantityList.map { it.toHapi() })
+    }
+    if (valueCodeCount > 0) {
+      hapiValue.setValueCode(valueCodeList.map { it.toHapi() })
+    }
     return hapiValue
   }
 }
