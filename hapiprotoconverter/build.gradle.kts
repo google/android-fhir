@@ -34,7 +34,7 @@ java {
 
 dependencies {
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
-  implementation(Dependencies.FhirProto.fhirProtobufs)
+  api(Dependencies.FhirProto.fhirProtobufs)
   implementation(Dependencies.Kotlin.stdlib)
   runtimeOnly(Dependencies.kotlinPoet)
   testImplementation(Dependencies.junit)
