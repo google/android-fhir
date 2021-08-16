@@ -23,12 +23,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.reference.util.getRiskAssessments
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.RiskAssessment
 
 /**
  * The ViewModel helper class for PatientItemRecyclerViewAdapter, that is responsible for preparing
@@ -70,7 +72,37 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
       .take(MAX_RESOURCE_COUNT)
       .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
       .let { patients.addAll(it) }
+
+    val risks = getRiskAssessments()
+    //    val risks = getRiskAssessments(fhirEngine)
+    patients.map { patient ->
+      risks.filter { it?.subject?.reference == "Patient/${patient.resourceId}" }.map {
+        patient.risk = it?.prediction?.first()?.qualitativeRisk?.coding?.first()?.code
+      }
+    }
     return patients
+  }
+
+  private suspend fun getRiskAssessments(): Collection<RiskAssessment?> {
+    return fhirEngine
+      .search<RiskAssessment> {}
+      .groupBy { it.subject.reference }
+      .mapValues { entry ->
+        entry
+          .value
+          .filter { it.hasOccurrence() }
+          .sortedWith(
+            compareBy<RiskAssessment> { it.occurrenceDateTimeType.year }
+              .thenBy { it.occurrenceDateTimeType.month }
+              .thenBy { it.occurrenceDateTimeType.day }
+              .thenBy { it.occurrenceDateTimeType.hour }
+              .thenBy { it.occurrenceDateTimeType.minute }
+              .thenBy { it.occurrenceDateTimeType.second }
+          )
+          .reversed()
+          .firstOrNull()
+      }
+      .values
   }
 
   /** The Patient's details for display purposes. */
@@ -82,9 +114,10 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val dob: String,
     val phone: String,
     val city: String,
-    val country: String,
+    val country: String? = "",
     val isActive: Boolean,
     val html: String,
+    var risk: String? = "",
   ) {
     override fun toString(): String = name
   }

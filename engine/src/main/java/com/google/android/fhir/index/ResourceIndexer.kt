@@ -284,6 +284,8 @@ internal object ResourceIndexer {
             canonicalValue = ucumUnit.value
           } catch (exception: ConverterException) {
             // TODO handle this
+          }catch (e: NullPointerException) {
+            // TODO handle this
           }
         }
         QuantityIndex(

@@ -18,15 +18,24 @@ package com.google.android.fhir.reference
 
 import android.app.Application
 import android.content.res.Resources
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.search
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.launch
+import org.apache.commons.lang3.StringUtils
 import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.RiskAssessment
+import org.hl7.fhir.r4.model.codesystems.RiskProbability
 
 /**
  * The ViewModel helper class for PatientItemRecyclerViewAdapter, that is responsible for preparing
@@ -41,12 +50,41 @@ class PatientDetailsViewModel(
   val livePatientData = liveData { emit(getPatient()) }
   val livePatientObservation = liveData { emit(getPatientObservations()) }
   val livePatientCondition = liveData { emit(getPatientConditions()) }
+  val livePatientRiskAssessment = MutableLiveData<RiskAssessmentItem>()
+
+  /** Returns latest RiskAssessment resource as per occurrence date. */
+  fun getPatientRiskAssessment() {
+    viewModelScope.launch {
+      val riskAssessment =
+        fhirEngine
+          .search<RiskAssessment> {
+            filter(RiskAssessment.SUBJECT) { value = "Patient/$patientId" }
+          }
+          .filter { it.hasOccurrence() }
+          .sortedWith(
+            compareBy<RiskAssessment> { it.occurrenceDateTimeType.year }
+              .thenBy { it.occurrenceDateTimeType.month }
+              .thenBy { it.occurrenceDateTimeType.day }
+              .thenBy { it.occurrenceDateTimeType.hour }
+              .thenBy { it.occurrenceDateTimeType.minute }
+              .thenBy { it.occurrenceDateTimeType.second }
+          )
+          .reversed()
+          .firstOrNull()
+      livePatientRiskAssessment.value =
+        RiskAssessmentItem(
+          getRiskAssessmentColor(riskAssessment),
+          getRiskAssessmentStatus(riskAssessment),
+          fetchLastContactedDate(riskAssessment),
+          getRiskAssessmentBackgroundColor(riskAssessment)
+        )
+    }
+  }
 
   private suspend fun getPatient(): PatientListViewModel.PatientItem {
     val patient = fhirEngine.load(Patient::class.java, patientId)
     return patient.toPatientItem(0)
   }
-
   private suspend fun getPatientObservations(): List<PatientListViewModel.ObservationItem> {
     val observations: MutableList<PatientListViewModel.ObservationItem> = mutableListOf()
     fhirEngine
@@ -129,6 +167,54 @@ class PatientDetailsViewModel(
       )
     }
   }
+
+  private fun getRiskAssessmentColor(riskAssessment: RiskAssessment?): Int {
+    riskAssessment?.let {
+      return when (it.prediction.first().qualitativeRisk.coding.first().code) {
+        RiskProbability.LOW.toCode() -> ContextCompat.getColor(getApplication(), R.color.low_risk)
+        RiskProbability.MODERATE.toCode() ->
+          ContextCompat.getColor(getApplication(), R.color.moderate_risk)
+        RiskProbability.HIGH.toCode() -> ContextCompat.getColor(getApplication(), R.color.high_risk)
+        else -> ContextCompat.getColor(getApplication(), R.color.unknown_risk)
+      }
+    }
+    return ContextCompat.getColor(getApplication(), R.color.unknown_risk)
+  }
+
+  private fun getRiskAssessmentBackgroundColor(riskAssessment: RiskAssessment?): Int {
+    riskAssessment?.let {
+      return when (it.prediction.first().qualitativeRisk.coding.first().code) {
+        RiskProbability.LOW.toCode() ->
+          ContextCompat.getColor(getApplication(), R.color.low_risk_background)
+        RiskProbability.MODERATE.toCode() ->
+          ContextCompat.getColor(getApplication(), R.color.moderate_risk_background)
+        RiskProbability.HIGH.toCode() ->
+          ContextCompat.getColor(getApplication(), R.color.high_risk_background)
+        else -> ContextCompat.getColor(getApplication(), R.color.unknown_risk_background)
+      }
+    }
+    return ContextCompat.getColor(getApplication(), R.color.unknown_risk_background)
+  }
+
+  private fun getRiskAssessmentStatus(riskAssessment: RiskAssessment?): String {
+    riskAssessment?.let {
+      return StringUtils.upperCase(it.prediction.first().qualitativeRisk.coding.first().display)
+    }
+    return getApplication<FhirApplication>().getString(R.string.unknown)
+  }
+
+  private fun fetchLastContactedDate(riskAssessment: RiskAssessment?): String {
+    riskAssessment?.let {
+      if (it.hasOccurrence()) {
+        return LocalDate.parse(
+            it.occurrenceDateTimeType.valueAsString,
+            DateTimeFormatter.ISO_DATE_TIME
+          )
+          .toString()
+      }
+    }
+    return getApplication<FhirApplication>().getString(R.string.none)
+  }
 }
 
 class PatientDetailsViewModelFactory(
@@ -144,3 +230,10 @@ class PatientDetailsViewModelFactory(
     return PatientDetailsViewModel(application, fhirEngine, patientId) as T
   }
 }
+
+data class RiskAssessmentItem(
+  val color: Int,
+  val status: String,
+  val contacted: String,
+  val backgroundColor: Int
+)

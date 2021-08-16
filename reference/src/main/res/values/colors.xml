@@ -18,4 +18,12 @@
     <color name="colorPrimary">#175adf</color>
     <color name="colorPrimaryDark">#175adf</color>
     <color name="colorAccent">#175adf</color>
+    <color name="low_risk">#388e3c</color>
+    <color name="low_risk_background">#e8f5e9</color>
+    <color name="moderate_risk">#FFBF00</color>
+    <color name="moderate_risk_background">#fff8e1</color>
+    <color name="high_risk">#c62828</color>
+    <color name="high_risk_background">#ffebee</color>
+    <color name="unknown_risk_background">#10156125</color>
+    <color name="unknown_risk">#ffffff</color>
 </resources>
