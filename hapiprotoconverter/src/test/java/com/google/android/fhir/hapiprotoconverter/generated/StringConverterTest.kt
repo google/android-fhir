@@ -42,8 +42,6 @@ class StringConverterTest(private val hapi: StringType, private val proto: Strin
   }
 
   companion object {
-    @Parameterized.Parameters
-    @JvmStatic
-    fun `data`(): List<Any> = PrimitiveTestData.STRING_DATA
+    @Parameterized.Parameters @JvmStatic fun `data`(): List<Any> = PrimitiveTestData.STRING_DATA
   }
 }

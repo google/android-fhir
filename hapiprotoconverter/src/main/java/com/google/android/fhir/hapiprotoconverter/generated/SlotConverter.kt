@@ -47,52 +47,53 @@ object SlotConverter {
     val hapiValue = org.hl7.fhir.r4.model.Slot()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (serviceCategoryCount > 0) {
-        hapiValue.serviceCategory = serviceCategoryList.map { it.toHapi() }
+      hapiValue.serviceCategory = serviceCategoryList.map { it.toHapi() }
     }
     if (serviceTypeCount > 0) {
-        hapiValue.serviceType = serviceTypeList.map { it.toHapi() }
+      hapiValue.serviceType = serviceTypeList.map { it.toHapi() }
     }
     if (specialtyCount > 0) {
-        hapiValue.specialty = specialtyList.map { it.toHapi() }
+      hapiValue.specialty = specialtyList.map { it.toHapi() }
     }
     if (hasAppointmentType()) {
-        hapiValue.appointmentType = appointmentType.toHapi()
+      hapiValue.appointmentType = appointmentType.toHapi()
     }
     if (hasSchedule()) {
-        hapiValue.schedule = schedule.toHapi()
+      hapiValue.schedule = schedule.toHapi()
     }
-      hapiValue.status = org.hl7.fhir.r4.model.Slot.SlotStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.Slot.SlotStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasStart()) {
-        hapiValue.startElement = start.toHapi()
+      hapiValue.startElement = start.toHapi()
     }
     if (hasEnd()) {
-        hapiValue.endElement = end.toHapi()
+      hapiValue.endElement = end.toHapi()
     }
     if (hasOverbooked()) {
-        hapiValue.overbookedElement = overbooked.toHapi()
+      hapiValue.overbookedElement = overbooked.toHapi()
     }
     if (hasComment()) {
-        hapiValue.commentElement = comment.toHapi()
+      hapiValue.commentElement = comment.toHapi()
     }
     return hapiValue
   }
@@ -101,13 +102,13 @@ object SlotConverter {
   fun org.hl7.fhir.r4.model.Slot.toProto(): Slot {
     val protoValue = Slot.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -128,29 +129,30 @@ object SlotConverter {
       protoValue.addAllSpecialty(specialty.map { it.toProto() })
     }
     if (hasAppointmentType()) {
-        protoValue.appointmentType = appointmentType.toProto()
+      protoValue.appointmentType = appointmentType.toProto()
     }
     if (hasSchedule()) {
-        protoValue.schedule = schedule.toProto()
+      protoValue.schedule = schedule.toProto()
     }
-      protoValue.status = Slot.StatusCode.newBuilder()
-          .setValue(
-              SlotStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      Slot.StatusCode.newBuilder()
+        .setValue(
+          SlotStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasStart()) {
-        protoValue.start = startElement.toProto()
+      protoValue.start = startElement.toProto()
     }
     if (hasEnd()) {
-        protoValue.end = endElement.toProto()
+      protoValue.end = endElement.toProto()
     }
     if (hasOverbooked()) {
-        protoValue.overbooked = overbookedElement.toProto()
+      protoValue.overbooked = overbookedElement.toProto()
     }
     if (hasComment()) {
-        protoValue.comment = commentElement.toProto()
+      protoValue.comment = commentElement.toProto()
     }
     return protoValue.build()
   }

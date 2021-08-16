@@ -46,43 +46,43 @@ object BodyStructureConverter {
     val hapiValue = org.hl7.fhir.r4.model.BodyStructure()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasActive()) {
-        hapiValue.activeElement = active.toHapi()
+      hapiValue.activeElement = active.toHapi()
     }
     if (hasMorphology()) {
-        hapiValue.morphology = morphology.toHapi()
+      hapiValue.morphology = morphology.toHapi()
     }
     if (hasLocation()) {
-        hapiValue.location = location.toHapi()
+      hapiValue.location = location.toHapi()
     }
     if (locationQualifierCount > 0) {
-        hapiValue.locationQualifier = locationQualifierList.map { it.toHapi() }
+      hapiValue.locationQualifier = locationQualifierList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (imageCount > 0) {
-        hapiValue.image = imageList.map { it.toHapi() }
+      hapiValue.image = imageList.map { it.toHapi() }
     }
     if (hasPatient()) {
-        hapiValue.patient = patient.toHapi()
+      hapiValue.patient = patient.toHapi()
     }
     return hapiValue
   }
@@ -91,13 +91,13 @@ object BodyStructureConverter {
   fun org.hl7.fhir.r4.model.BodyStructure.toProto(): BodyStructure {
     val protoValue = BodyStructure.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -109,25 +109,25 @@ object BodyStructureConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasActive()) {
-        protoValue.active = activeElement.toProto()
+      protoValue.active = activeElement.toProto()
     }
     if (hasMorphology()) {
-        protoValue.morphology = morphology.toProto()
+      protoValue.morphology = morphology.toProto()
     }
     if (hasLocation()) {
-        protoValue.location = location.toProto()
+      protoValue.location = location.toProto()
     }
     if (hasLocationQualifier()) {
       protoValue.addAllLocationQualifier(locationQualifier.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasImage()) {
       protoValue.addAllImage(image.map { it.toProto() })
     }
     if (hasPatient()) {
-        protoValue.patient = patient.toProto()
+      protoValue.patient = patient.toProto()
     }
     return protoValue.build()
   }

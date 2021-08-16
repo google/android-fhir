@@ -83,19 +83,19 @@ object ProcedureConverter {
   private fun Type.procedurePerformedToProto(): Procedure.PerformedX {
     val protoValue = Procedure.PerformedX.newBuilder()
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     if (this is StringType) {
-        protoValue.stringValue = this.toProto()
+      protoValue.stringValue = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Age) {
-        protoValue.age = this.toProto()
+      protoValue.age = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     return protoValue.build()
   }
@@ -105,103 +105,104 @@ object ProcedureConverter {
     val hapiValue = org.hl7.fhir.r4.model.Procedure()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (instantiatesCanonicalCount > 0) {
-        hapiValue.instantiatesCanonical = instantiatesCanonicalList.map { it.toHapi() }
+      hapiValue.instantiatesCanonical = instantiatesCanonicalList.map { it.toHapi() }
     }
     if (instantiatesUriCount > 0) {
-        hapiValue.instantiatesUri = instantiatesUriList.map { it.toHapi() }
+      hapiValue.instantiatesUri = instantiatesUriList.map { it.toHapi() }
     }
     if (basedOnCount > 0) {
-        hapiValue.basedOn = basedOnList.map { it.toHapi() }
+      hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
     if (partOfCount > 0) {
-        hapiValue.partOf = partOfList.map { it.toHapi() }
+      hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.Procedure.ProcedureStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.Procedure.ProcedureStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasStatusReason()) {
-        hapiValue.statusReason = statusReason.toHapi()
+      hapiValue.statusReason = statusReason.toHapi()
     }
     if (hasCategory()) {
-        hapiValue.category = category.toHapi()
+      hapiValue.category = category.toHapi()
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-        hapiValue.encounter = encounter.toHapi()
+      hapiValue.encounter = encounter.toHapi()
     }
     if (hasPerformed()) {
-        hapiValue.performed = performed.procedurePerformedToHapi()
+      hapiValue.performed = performed.procedurePerformedToHapi()
     }
     if (hasRecorder()) {
-        hapiValue.recorder = recorder.toHapi()
+      hapiValue.recorder = recorder.toHapi()
     }
     if (hasAsserter()) {
-        hapiValue.asserter = asserter.toHapi()
+      hapiValue.asserter = asserter.toHapi()
     }
     if (performerCount > 0) {
-        hapiValue.performer = performerList.map { it.toHapi() }
+      hapiValue.performer = performerList.map { it.toHapi() }
     }
     if (hasLocation()) {
-        hapiValue.location = location.toHapi()
+      hapiValue.location = location.toHapi()
     }
     if (reasonCodeCount > 0) {
-        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
+      hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
+      hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (bodySiteCount > 0) {
-        hapiValue.bodySite = bodySiteList.map { it.toHapi() }
+      hapiValue.bodySite = bodySiteList.map { it.toHapi() }
     }
     if (hasOutcome()) {
-        hapiValue.outcome = outcome.toHapi()
+      hapiValue.outcome = outcome.toHapi()
     }
     if (reportCount > 0) {
-        hapiValue.report = reportList.map { it.toHapi() }
+      hapiValue.report = reportList.map { it.toHapi() }
     }
     if (complicationCount > 0) {
-        hapiValue.complication = complicationList.map { it.toHapi() }
+      hapiValue.complication = complicationList.map { it.toHapi() }
     }
     if (complicationDetailCount > 0) {
-        hapiValue.complicationDetail = complicationDetailList.map { it.toHapi() }
+      hapiValue.complicationDetail = complicationDetailList.map { it.toHapi() }
     }
     if (followUpCount > 0) {
-        hapiValue.followUp = followUpList.map { it.toHapi() }
+      hapiValue.followUp = followUpList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     if (focalDeviceCount > 0) {
-        hapiValue.focalDevice = focalDeviceList.map { it.toHapi() }
+      hapiValue.focalDevice = focalDeviceList.map { it.toHapi() }
     }
     if (usedReferenceCount > 0) {
-        hapiValue.usedReference = usedReferenceList.map { it.toHapi() }
+      hapiValue.usedReference = usedReferenceList.map { it.toHapi() }
     }
     if (usedCodeCount > 0) {
-        hapiValue.usedCode = usedCodeList.map { it.toHapi() }
+      hapiValue.usedCode = usedCodeList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -210,13 +211,13 @@ object ProcedureConverter {
   fun org.hl7.fhir.r4.model.Procedure.toProto(): Procedure {
     val protoValue = Procedure.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -239,42 +240,43 @@ object ProcedureConverter {
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-      protoValue.status = Procedure.StatusCode.newBuilder()
-          .setValue(
-              EventStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      Procedure.StatusCode.newBuilder()
+        .setValue(
+          EventStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasStatusReason()) {
-        protoValue.statusReason = statusReason.toProto()
+      protoValue.statusReason = statusReason.toProto()
     }
     if (hasCategory()) {
-        protoValue.category = category.toProto()
+      protoValue.category = category.toProto()
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-        protoValue.encounter = encounter.toProto()
+      protoValue.encounter = encounter.toProto()
     }
     if (hasPerformed()) {
-        protoValue.performed = performed.procedurePerformedToProto()
+      protoValue.performed = performed.procedurePerformedToProto()
     }
     if (hasRecorder()) {
-        protoValue.recorder = recorder.toProto()
+      protoValue.recorder = recorder.toProto()
     }
     if (hasAsserter()) {
-        protoValue.asserter = asserter.toProto()
+      protoValue.asserter = asserter.toProto()
     }
     if (hasPerformer()) {
       protoValue.addAllPerformer(performer.map { it.toProto() })
     }
     if (hasLocation()) {
-        protoValue.location = location.toProto()
+      protoValue.location = location.toProto()
     }
     if (hasReasonCode()) {
       protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
@@ -286,7 +288,7 @@ object ProcedureConverter {
       protoValue.addAllBodySite(bodySite.map { it.toProto() })
     }
     if (hasOutcome()) {
-        protoValue.outcome = outcome.toProto()
+      protoValue.outcome = outcome.toProto()
     }
     if (hasReport()) {
       protoValue.addAllReport(report.map { it.toProto() })
@@ -326,13 +328,13 @@ object ProcedureConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasFunction()) {
-        protoValue.function = function.toProto()
+      protoValue.function = function.toProto()
     }
     if (hasActor()) {
-        protoValue.actor = actor.toProto()
+      protoValue.actor = actor.toProto()
     }
     if (hasOnBehalfOf()) {
-        protoValue.onBehalfOf = onBehalfOf.toProto()
+      protoValue.onBehalfOf = onBehalfOf.toProto()
     }
     return protoValue.build()
   }
@@ -348,10 +350,10 @@ object ProcedureConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasAction()) {
-        protoValue.action = action.toProto()
+      protoValue.action = action.toProto()
     }
     if (hasManipulated()) {
-        protoValue.manipulated = manipulated.toProto()
+      protoValue.manipulated = manipulated.toProto()
     }
     return protoValue.build()
   }
@@ -362,19 +364,19 @@ object ProcedureConverter {
     val hapiValue = org.hl7.fhir.r4.model.Procedure.ProcedurePerformerComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasFunction()) {
-        hapiValue.function = function.toHapi()
+      hapiValue.function = function.toHapi()
     }
     if (hasActor()) {
-        hapiValue.actor = actor.toHapi()
+      hapiValue.actor = actor.toHapi()
     }
     if (hasOnBehalfOf()) {
-        hapiValue.onBehalfOf = onBehalfOf.toHapi()
+      hapiValue.onBehalfOf = onBehalfOf.toHapi()
     }
     return hapiValue
   }
@@ -385,16 +387,16 @@ object ProcedureConverter {
     val hapiValue = org.hl7.fhir.r4.model.Procedure.ProcedureFocalDeviceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasAction()) {
-        hapiValue.action = action.toHapi()
+      hapiValue.action = action.toHapi()
     }
     if (hasManipulated()) {
-        hapiValue.manipulated = manipulated.toHapi()
+      hapiValue.manipulated = manipulated.toHapi()
     }
     return hapiValue
   }

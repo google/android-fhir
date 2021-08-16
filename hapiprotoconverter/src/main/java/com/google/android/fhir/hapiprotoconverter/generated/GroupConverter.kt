@@ -82,19 +82,19 @@ object GroupConverter {
   private fun Type.groupCharacteristicValueToProto(): Group.Characteristic.ValueX {
     val protoValue = Group.Characteristic.ValueX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is BooleanType) {
-        protoValue.boolean = this.toProto()
+      protoValue.boolean = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Quantity) {
-        protoValue.quantity = this.toProto()
+      protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -104,49 +104,50 @@ object GroupConverter {
     val hapiValue = org.hl7.fhir.r4.model.Group()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasActive()) {
-        hapiValue.activeElement = active.toHapi()
+      hapiValue.activeElement = active.toHapi()
     }
-      hapiValue.type = org.hl7.fhir.r4.model.Group.GroupType.valueOf(
-          type.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.type =
+      org.hl7.fhir.r4.model.Group.GroupType.valueOf(
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasActual()) {
-        hapiValue.actualElement = actual.toHapi()
+      hapiValue.actualElement = actual.toHapi()
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasQuantity()) {
-        hapiValue.quantityElement = quantity.toHapi()
+      hapiValue.quantityElement = quantity.toHapi()
     }
     if (hasManagingEntity()) {
-        hapiValue.managingEntity = managingEntity.toHapi()
+      hapiValue.managingEntity = managingEntity.toHapi()
     }
     if (characteristicCount > 0) {
-        hapiValue.characteristic = characteristicList.map { it.toHapi() }
+      hapiValue.characteristic = characteristicList.map { it.toHapi() }
     }
     if (memberCount > 0) {
-        hapiValue.member = memberList.map { it.toHapi() }
+      hapiValue.member = memberList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -155,13 +156,13 @@ object GroupConverter {
   fun org.hl7.fhir.r4.model.Group.toProto(): Group {
     val protoValue = Group.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -173,29 +174,30 @@ object GroupConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasActive()) {
-        protoValue.active = activeElement.toProto()
+      protoValue.active = activeElement.toProto()
     }
-      protoValue.type = Group.TypeCode.newBuilder()
-          .setValue(
-              GroupTypeCode.Value.valueOf(
-                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.type =
+      Group.TypeCode.newBuilder()
+        .setValue(
+          GroupTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasActual()) {
-        protoValue.actual = actualElement.toProto()
+      protoValue.actual = actualElement.toProto()
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasQuantity()) {
-        protoValue.quantity = quantityElement.toProto()
+      protoValue.quantity = quantityElement.toProto()
     }
     if (hasManagingEntity()) {
-        protoValue.managingEntity = managingEntity.toProto()
+      protoValue.managingEntity = managingEntity.toProto()
     }
     if (hasCharacteristic()) {
       protoValue.addAllCharacteristic(characteristic.map { it.toProto() })
@@ -217,16 +219,16 @@ object GroupConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasValue()) {
-        protoValue.value = value.groupCharacteristicValueToProto()
+      protoValue.value = value.groupCharacteristicValueToProto()
     }
     if (hasExclude()) {
-        protoValue.exclude = excludeElement.toProto()
+      protoValue.exclude = excludeElement.toProto()
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     return protoValue.build()
   }
@@ -241,13 +243,13 @@ object GroupConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasEntity()) {
-        protoValue.entity = entity.toProto()
+      protoValue.entity = entity.toProto()
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     if (hasInactive()) {
-        protoValue.inactive = inactiveElement.toProto()
+      protoValue.inactive = inactiveElement.toProto()
     }
     return protoValue.build()
   }
@@ -258,22 +260,22 @@ object GroupConverter {
     val hapiValue = org.hl7.fhir.r4.model.Group.GroupCharacteristicComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasValue()) {
-        hapiValue.value = value.groupCharacteristicValueToHapi()
+      hapiValue.value = value.groupCharacteristicValueToHapi()
     }
     if (hasExclude()) {
-        hapiValue.excludeElement = exclude.toHapi()
+      hapiValue.excludeElement = exclude.toHapi()
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     return hapiValue
   }
@@ -283,19 +285,19 @@ object GroupConverter {
     val hapiValue = org.hl7.fhir.r4.model.Group.GroupMemberComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasEntity()) {
-        hapiValue.entity = entity.toHapi()
+      hapiValue.entity = entity.toHapi()
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     if (hasInactive()) {
-        hapiValue.inactiveElement = inactive.toHapi()
+      hapiValue.inactiveElement = inactive.toHapi()
     }
     return hapiValue
   }

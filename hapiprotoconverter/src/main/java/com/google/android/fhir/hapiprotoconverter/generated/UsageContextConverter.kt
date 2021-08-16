@@ -60,16 +60,16 @@ object UsageContextConverter {
   private fun Type.usageContextValueToProto(): UsageContext.ValueX {
     val protoValue = UsageContext.ValueX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Quantity) {
-        protoValue.quantity = this.toProto()
+      protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -79,13 +79,13 @@ object UsageContextConverter {
     val hapiValue = org.hl7.fhir.r4.model.UsageContext()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasValue()) {
-        hapiValue.value = value.usageContextValueToHapi()
+      hapiValue.value = value.usageContextValueToHapi()
     }
     return hapiValue
   }
@@ -97,10 +97,10 @@ object UsageContextConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasValue()) {
-        protoValue.value = value.usageContextValueToProto()
+      protoValue.value = value.usageContextValueToProto()
     }
     return protoValue.build()
   }

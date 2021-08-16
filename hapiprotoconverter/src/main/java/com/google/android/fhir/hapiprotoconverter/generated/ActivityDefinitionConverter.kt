@@ -284,21 +284,24 @@ object ActivityDefinitionConverter {
     if (libraryCount > 0) {
       hapiValue.library = libraryList.map { it.toHapi() }
     }
-    hapiValue.kind = org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionKind.valueOf(
+    hapiValue.kind =
+      org.hl7.fhir.r4.model.ActivityDefinition.ActivityDefinitionKind.valueOf(
         kind.value.name.hapiCodeCheck().replace("_", "")
-    )
+      )
     if (hasProfile()) {
       hapiValue.profileElement = profile.toHapi()
     }
     if (hasCode()) {
       hapiValue.code = code.toHapi()
     }
-    hapiValue.intent = org.hl7.fhir.r4.model.ActivityDefinition.RequestIntent.valueOf(
+    hapiValue.intent =
+      org.hl7.fhir.r4.model.ActivityDefinition.RequestIntent.valueOf(
         intent.value.name.hapiCodeCheck().replace("_", "")
-    )
-    hapiValue.priority = org.hl7.fhir.r4.model.ActivityDefinition.RequestPriority.valueOf(
+      )
+    hapiValue.priority =
+      org.hl7.fhir.r4.model.ActivityDefinition.RequestPriority.valueOf(
         priority.value.name.hapiCodeCheck().replace("_", "")
-    )
+      )
     if (hasDoNotPerform()) {
       hapiValue.doNotPerformElement = doNotPerform.toHapi()
     }
@@ -377,7 +380,8 @@ object ActivityDefinitionConverter {
     if (hasSubtitle()) {
       protoValue.subtitle = subtitleElement.toProto()
     }
-    protoValue.status = ActivityDefinition.StatusCode.newBuilder()
+    protoValue.status =
+      ActivityDefinition.StatusCode.newBuilder()
         .setValue(
           PublicationStatusCode.Value.valueOf(
             status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
@@ -447,7 +451,8 @@ object ActivityDefinitionConverter {
     if (hasLibrary()) {
       protoValue.addAllLibrary(library.map { it.toProto() })
     }
-    protoValue.kind = ActivityDefinition.KindCode.newBuilder()
+    protoValue.kind =
+      ActivityDefinition.KindCode.newBuilder()
         .setValue(
           RequestResourceTypeCode.Value.valueOf(
             kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
@@ -460,14 +465,16 @@ object ActivityDefinitionConverter {
     if (hasCode()) {
       protoValue.code = code.toProto()
     }
-    protoValue.intent = ActivityDefinition.IntentCode.newBuilder()
+    protoValue.intent =
+      ActivityDefinition.IntentCode.newBuilder()
         .setValue(
           RequestIntentCode.Value.valueOf(
             intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
         )
         .build()
-    protoValue.priority = ActivityDefinition.PriorityCode.newBuilder()
+    protoValue.priority =
+      ActivityDefinition.PriorityCode.newBuilder()
         .setValue(
           RequestPriorityCode.Value.valueOf(
             priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
@@ -529,7 +536,8 @@ object ActivityDefinitionConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-    protoValue.type = ActivityDefinition.Participant.TypeCode.newBuilder()
+    protoValue.type =
+      ActivityDefinition.Participant.TypeCode.newBuilder()
         .setValue(
           ActionParticipantTypeCode.Value.valueOf(
             type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
@@ -574,9 +582,10 @@ object ActivityDefinitionConverter {
     if (modifierExtensionCount > 0) {
       hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-    hapiValue.type = org.hl7.fhir.r4.model.ActivityDefinition.ActivityParticipantType.valueOf(
+    hapiValue.type =
+      org.hl7.fhir.r4.model.ActivityDefinition.ActivityParticipantType.valueOf(
         type.value.name.hapiCodeCheck().replace("_", "")
-    )
+      )
     if (hasRole()) {
       hapiValue.role = role.toHapi()
     }

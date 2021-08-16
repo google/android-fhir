@@ -34,25 +34,25 @@ object MarketingStatusConverter {
     val hapiValue = org.hl7.fhir.r4.model.MarketingStatus()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCountry()) {
-        hapiValue.country = country.toHapi()
+      hapiValue.country = country.toHapi()
     }
     if (hasJurisdiction()) {
-        hapiValue.jurisdiction = jurisdiction.toHapi()
+      hapiValue.jurisdiction = jurisdiction.toHapi()
     }
     if (hasStatus()) {
-        hapiValue.status = status.toHapi()
+      hapiValue.status = status.toHapi()
     }
     if (hasDateRange()) {
-        hapiValue.dateRange = dateRange.toHapi()
+      hapiValue.dateRange = dateRange.toHapi()
     }
     if (hasRestoreDate()) {
-        hapiValue.restoreDateElement = restoreDate.toHapi()
+      hapiValue.restoreDateElement = restoreDate.toHapi()
     }
     return hapiValue
   }
@@ -67,19 +67,19 @@ object MarketingStatusConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCountry()) {
-        protoValue.country = country.toProto()
+      protoValue.country = country.toProto()
     }
     if (hasJurisdiction()) {
-        protoValue.jurisdiction = jurisdiction.toProto()
+      protoValue.jurisdiction = jurisdiction.toProto()
     }
     if (hasStatus()) {
-        protoValue.status = status.toProto()
+      protoValue.status = status.toProto()
     }
     if (hasDateRange()) {
-        protoValue.dateRange = dateRange.toProto()
+      protoValue.dateRange = dateRange.toProto()
     }
     if (hasRestoreDate()) {
-        protoValue.restoreDate = restoreDateElement.toProto()
+      protoValue.restoreDate = restoreDateElement.toProto()
     }
     return protoValue.build()
   }

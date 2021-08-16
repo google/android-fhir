@@ -46,34 +46,34 @@ object SubstanceNucleicAcidConverter {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceNucleicAcid()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSequenceType()) {
-        hapiValue.sequenceType = sequenceType.toHapi()
+      hapiValue.sequenceType = sequenceType.toHapi()
     }
     if (hasNumberOfSubunits()) {
-        hapiValue.numberOfSubunitsElement = numberOfSubunits.toHapi()
+      hapiValue.numberOfSubunitsElement = numberOfSubunits.toHapi()
     }
     if (hasAreaOfHybridisation()) {
-        hapiValue.areaOfHybridisationElement = areaOfHybridisation.toHapi()
+      hapiValue.areaOfHybridisationElement = areaOfHybridisation.toHapi()
     }
     if (hasOligoNucleotideType()) {
-        hapiValue.oligoNucleotideType = oligoNucleotideType.toHapi()
+      hapiValue.oligoNucleotideType = oligoNucleotideType.toHapi()
     }
     if (subunitCount > 0) {
-        hapiValue.subunit = subunitList.map { it.toHapi() }
+      hapiValue.subunit = subunitList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -82,13 +82,13 @@ object SubstanceNucleicAcidConverter {
   fun org.hl7.fhir.r4.model.SubstanceNucleicAcid.toProto(): SubstanceNucleicAcid {
     val protoValue = SubstanceNucleicAcid.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -97,16 +97,16 @@ object SubstanceNucleicAcidConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSequenceType()) {
-        protoValue.sequenceType = sequenceType.toProto()
+      protoValue.sequenceType = sequenceType.toProto()
     }
     if (hasNumberOfSubunits()) {
-        protoValue.numberOfSubunits = numberOfSubunitsElement.toProto()
+      protoValue.numberOfSubunits = numberOfSubunitsElement.toProto()
     }
     if (hasAreaOfHybridisation()) {
-        protoValue.areaOfHybridisation = areaOfHybridisationElement.toProto()
+      protoValue.areaOfHybridisation = areaOfHybridisationElement.toProto()
     }
     if (hasOligoNucleotideType()) {
-        protoValue.oligoNucleotideType = oligoNucleotideType.toProto()
+      protoValue.oligoNucleotideType = oligoNucleotideType.toProto()
     }
     if (hasSubunit()) {
       protoValue.addAllSubunit(subunit.map { it.toProto() })
@@ -126,22 +126,22 @@ object SubstanceNucleicAcidConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSubunit()) {
-        protoValue.subunit = subunitElement.toProto()
+      protoValue.subunit = subunitElement.toProto()
     }
     if (hasSequence()) {
-        protoValue.sequence = sequenceElement.toProto()
+      protoValue.sequence = sequenceElement.toProto()
     }
     if (hasLength()) {
-        protoValue.length = lengthElement.toProto()
+      protoValue.length = lengthElement.toProto()
     }
     if (hasSequenceAttachment()) {
-        protoValue.sequenceAttachment = sequenceAttachment.toProto()
+      protoValue.sequenceAttachment = sequenceAttachment.toProto()
     }
     if (hasFivePrime()) {
-        protoValue.fivePrime = fivePrime.toProto()
+      protoValue.fivePrime = fivePrime.toProto()
     }
     if (hasThreePrime()) {
-        protoValue.threePrime = threePrime.toProto()
+      protoValue.threePrime = threePrime.toProto()
     }
     if (hasLinkage()) {
       protoValue.addAllLinkage(linkage.map { it.toProto() })
@@ -164,16 +164,16 @@ object SubstanceNucleicAcidConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasConnectivity()) {
-        protoValue.connectivity = connectivityElement.toProto()
+      protoValue.connectivity = connectivityElement.toProto()
     }
     if (hasIdentifier()) {
-        protoValue.identifier = identifier.toProto()
+      protoValue.identifier = identifier.toProto()
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasResidueSite()) {
-        protoValue.residueSite = residueSiteElement.toProto()
+      protoValue.residueSite = residueSiteElement.toProto()
     }
     return protoValue.build()
   }
@@ -190,13 +190,13 @@ object SubstanceNucleicAcidConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasIdentifier()) {
-        protoValue.identifier = identifier.toProto()
+      protoValue.identifier = identifier.toProto()
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasResidueSite()) {
-        protoValue.residueSite = residueSiteElement.toProto()
+      protoValue.residueSite = residueSiteElement.toProto()
     }
     return protoValue.build()
   }
@@ -208,34 +208,34 @@ object SubstanceNucleicAcidConverter {
       org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSubunit()) {
-        hapiValue.subunitElement = subunit.toHapi()
+      hapiValue.subunitElement = subunit.toHapi()
     }
     if (hasSequence()) {
-        hapiValue.sequenceElement = sequence.toHapi()
+      hapiValue.sequenceElement = sequence.toHapi()
     }
     if (hasLength()) {
-        hapiValue.lengthElement = length.toHapi()
+      hapiValue.lengthElement = length.toHapi()
     }
     if (hasSequenceAttachment()) {
-        hapiValue.sequenceAttachment = sequenceAttachment.toHapi()
+      hapiValue.sequenceAttachment = sequenceAttachment.toHapi()
     }
     if (hasFivePrime()) {
-        hapiValue.fivePrime = fivePrime.toHapi()
+      hapiValue.fivePrime = fivePrime.toHapi()
     }
     if (hasThreePrime()) {
-        hapiValue.threePrime = threePrime.toHapi()
+      hapiValue.threePrime = threePrime.toHapi()
     }
     if (linkageCount > 0) {
-        hapiValue.linkage = linkageList.map { it.toHapi() }
+      hapiValue.linkage = linkageList.map { it.toHapi() }
     }
     if (sugarCount > 0) {
-        hapiValue.sugar = sugarList.map { it.toHapi() }
+      hapiValue.sugar = sugarList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -247,22 +247,22 @@ object SubstanceNucleicAcidConverter {
       org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitLinkageComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasConnectivity()) {
-        hapiValue.connectivityElement = connectivity.toHapi()
+      hapiValue.connectivityElement = connectivity.toHapi()
     }
     if (hasIdentifier()) {
-        hapiValue.identifier = identifier.toHapi()
+      hapiValue.identifier = identifier.toHapi()
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasResidueSite()) {
-        hapiValue.residueSiteElement = residueSite.toHapi()
+      hapiValue.residueSiteElement = residueSite.toHapi()
     }
     return hapiValue
   }
@@ -274,19 +274,19 @@ object SubstanceNucleicAcidConverter {
       org.hl7.fhir.r4.model.SubstanceNucleicAcid.SubstanceNucleicAcidSubunitSugarComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasIdentifier()) {
-        hapiValue.identifier = identifier.toHapi()
+      hapiValue.identifier = identifier.toHapi()
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasResidueSite()) {
-        hapiValue.residueSiteElement = residueSite.toHapi()
+      hapiValue.residueSiteElement = residueSite.toHapi()
     }
     return hapiValue
   }

@@ -38,26 +38,27 @@ object ParameterDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.ParameterDefinition()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
-      hapiValue.use = org.hl7.fhir.r4.model.ParameterDefinition.ParameterUse.valueOf(
-          use.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.use =
+      org.hl7.fhir.r4.model.ParameterDefinition.ParameterUse.valueOf(
+        use.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasMin()) {
-        hapiValue.minElement = min.toHapi()
+      hapiValue.minElement = min.toHapi()
     }
     if (hasMax()) {
-        hapiValue.maxElement = max.toHapi()
+      hapiValue.maxElement = max.toHapi()
     }
     if (hasDocumentation()) {
-        hapiValue.documentationElement = documentation.toHapi()
+      hapiValue.documentationElement = documentation.toHapi()
     }
-      hapiValue.type = type.value.name
+    hapiValue.type = type.value.name
     if (hasProfile()) {
-        hapiValue.profileElement = profile.toHapi()
+      hapiValue.profileElement = profile.toHapi()
     }
     return hapiValue
   }
@@ -69,29 +70,31 @@ object ParameterDefinitionConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
-      protoValue.use = ParameterDefinition.UseCode.newBuilder()
-          .setValue(
-              OperationParameterUseCode.Value.valueOf(
-                  use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.use =
+      ParameterDefinition.UseCode.newBuilder()
+        .setValue(
+          OperationParameterUseCode.Value.valueOf(
+            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasMin()) {
-        protoValue.min = minElement.toProto()
+      protoValue.min = minElement.toProto()
     }
     if (hasMax()) {
-        protoValue.max = maxElement.toProto()
+      protoValue.max = maxElement.toProto()
     }
     if (hasDocumentation()) {
-        protoValue.documentation = documentationElement.toProto()
+      protoValue.documentation = documentationElement.toProto()
     }
-      protoValue.type = ParameterDefinition.TypeCode.newBuilder()
-          .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
-          .build()
+    protoValue.type =
+      ParameterDefinition.TypeCode.newBuilder()
+        .setValue(FHIRAllTypesValueSet.Value.valueOf(type))
+        .build()
     if (hasProfile()) {
-        protoValue.profile = profileElement.toProto()
+      protoValue.profile = profileElement.toProto()
     }
     return protoValue.build()
   }

@@ -79,10 +79,10 @@ object ConceptMapConverter {
   private fun Type.conceptMapSourceToProto(): ConceptMap.SourceX {
     val protoValue = ConceptMap.SourceX.newBuilder()
     if (this is UriType) {
-        protoValue.uri = this.toProto()
+      protoValue.uri = this.toProto()
     }
     if (this is CanonicalType) {
-        protoValue.canonical = this.toProto()
+      protoValue.canonical = this.toProto()
     }
     return protoValue.build()
   }
@@ -102,10 +102,10 @@ object ConceptMapConverter {
   private fun Type.conceptMapTargetToProto(): ConceptMap.TargetX {
     val protoValue = ConceptMap.TargetX.newBuilder()
     if (this is UriType) {
-        protoValue.uri = this.toProto()
+      protoValue.uri = this.toProto()
     }
     if (this is CanonicalType) {
-        protoValue.canonical = this.toProto()
+      protoValue.canonical = this.toProto()
     }
     return protoValue.build()
   }
@@ -115,72 +115,72 @@ object ConceptMapConverter {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-        hapiValue.urlElement = url.toHapi()
+      hapiValue.urlElement = url.toHapi()
     }
     if (hasIdentifier()) {
-        hapiValue.identifier = identifier.toHapi()
+      hapiValue.identifier = identifier.toHapi()
     }
     if (hasVersion()) {
-        hapiValue.versionElement = version.toHapi()
+      hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-        hapiValue.titleElement = title.toHapi()
+      hapiValue.titleElement = title.toHapi()
     }
-      hapiValue.status =
-          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    hapiValue.status =
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-        hapiValue.experimentalElement = experimental.toHapi()
+      hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasDate()) {
-        hapiValue.dateElement = date.toHapi()
+      hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-        hapiValue.publisherElement = publisher.toHapi()
+      hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-        hapiValue.contact = contactList.map { it.toHapi() }
+      hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (useContextCount > 0) {
-        hapiValue.useContext = useContextList.map { it.toHapi() }
+      hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
+      hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasPurpose()) {
-        hapiValue.purposeElement = purpose.toHapi()
+      hapiValue.purposeElement = purpose.toHapi()
     }
     if (hasCopyright()) {
-        hapiValue.copyrightElement = copyright.toHapi()
+      hapiValue.copyrightElement = copyright.toHapi()
     }
     if (hasSource()) {
-        hapiValue.source = source.conceptMapSourceToHapi()
+      hapiValue.source = source.conceptMapSourceToHapi()
     }
     if (hasTarget()) {
-        hapiValue.target = target.conceptMapTargetToHapi()
+      hapiValue.target = target.conceptMapTargetToHapi()
     }
     if (groupCount > 0) {
-        hapiValue.group = groupList.map { it.toHapi() }
+      hapiValue.group = groupList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -189,13 +189,13 @@ object ConceptMapConverter {
   fun org.hl7.fhir.r4.model.ConceptMap.toProto(): ConceptMap {
     val protoValue = ConceptMap.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -204,41 +204,42 @@ object ConceptMapConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-        protoValue.url = urlElement.toProto()
+      protoValue.url = urlElement.toProto()
     }
     if (hasIdentifier()) {
-        protoValue.identifier = identifier.toProto()
+      protoValue.identifier = identifier.toProto()
     }
     if (hasVersion()) {
-        protoValue.version = versionElement.toProto()
+      protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-        protoValue.title = titleElement.toProto()
+      protoValue.title = titleElement.toProto()
     }
-      protoValue.status = ConceptMap.StatusCode.newBuilder()
-          .setValue(
-              PublicationStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      ConceptMap.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasExperimental()) {
-        protoValue.experimental = experimentalElement.toProto()
+      protoValue.experimental = experimentalElement.toProto()
     }
     if (hasDate()) {
-        protoValue.date = dateElement.toProto()
+      protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-        protoValue.publisher = publisherElement.toProto()
+      protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasUseContext()) {
       protoValue.addAllUseContext(useContext.map { it.toProto() })
@@ -247,16 +248,16 @@ object ConceptMapConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasPurpose()) {
-        protoValue.purpose = purposeElement.toProto()
+      protoValue.purpose = purposeElement.toProto()
     }
     if (hasCopyright()) {
-        protoValue.copyright = copyrightElement.toProto()
+      protoValue.copyright = copyrightElement.toProto()
     }
     if (hasSource()) {
-        protoValue.source = source.conceptMapSourceToProto()
+      protoValue.source = source.conceptMapSourceToProto()
     }
     if (hasTarget()) {
-        protoValue.target = target.conceptMapTargetToProto()
+      protoValue.target = target.conceptMapTargetToProto()
     }
     if (hasGroup()) {
       protoValue.addAllGroup(group.map { it.toProto() })
@@ -275,22 +276,22 @@ object ConceptMapConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSource()) {
-        protoValue.source = sourceElement.toProto()
+      protoValue.source = sourceElement.toProto()
     }
     if (hasSourceVersion()) {
-        protoValue.sourceVersion = sourceVersionElement.toProto()
+      protoValue.sourceVersion = sourceVersionElement.toProto()
     }
     if (hasTarget()) {
-        protoValue.target = targetElement.toProto()
+      protoValue.target = targetElement.toProto()
     }
     if (hasTargetVersion()) {
-        protoValue.targetVersion = targetVersionElement.toProto()
+      protoValue.targetVersion = targetVersionElement.toProto()
     }
     if (hasElement()) {
       protoValue.addAllElement(element.map { it.toProto() })
     }
     if (hasUnmapped()) {
-        protoValue.unmapped = unmapped.toProto()
+      protoValue.unmapped = unmapped.toProto()
     }
     return protoValue.build()
   }
@@ -307,10 +308,10 @@ object ConceptMapConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = codeElement.toProto()
+      protoValue.code = codeElement.toProto()
     }
     if (hasDisplay()) {
-        protoValue.display = displayElement.toProto()
+      protoValue.display = displayElement.toProto()
     }
     if (hasTarget()) {
       protoValue.addAllTarget(target.map { it.toProto() })
@@ -331,20 +332,21 @@ object ConceptMapConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = codeElement.toProto()
+      protoValue.code = codeElement.toProto()
     }
     if (hasDisplay()) {
-        protoValue.display = displayElement.toProto()
+      protoValue.display = displayElement.toProto()
     }
-      protoValue.equivalence = ConceptMap.Group.SourceElement.TargetElement.EquivalenceCode.newBuilder()
-          .setValue(
-              ConceptMapEquivalenceCode.Value.valueOf(
-                  equivalence.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.equivalence =
+      ConceptMap.Group.SourceElement.TargetElement.EquivalenceCode.newBuilder()
+        .setValue(
+          ConceptMapEquivalenceCode.Value.valueOf(
+            equivalence.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasComment()) {
-        protoValue.comment = commentElement.toProto()
+      protoValue.comment = commentElement.toProto()
     }
     if (hasDependsOn()) {
       protoValue.addAllDependsOn(dependsOn.map { it.toProto() })
@@ -365,16 +367,16 @@ object ConceptMapConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasProperty()) {
-        protoValue.property = propertyElement.toProto()
+      protoValue.property = propertyElement.toProto()
     }
     if (hasSystem()) {
-        protoValue.system = systemElement.toProto()
+      protoValue.system = systemElement.toProto()
     }
     if (hasValue()) {
-        protoValue.value = valueElement.toProto()
+      protoValue.value = valueElement.toProto()
     }
     if (hasDisplay()) {
-        protoValue.display = displayElement.toProto()
+      protoValue.display = displayElement.toProto()
     }
     return protoValue.build()
   }
@@ -389,21 +391,22 @@ object ConceptMapConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-      protoValue.mode = ConceptMap.Group.Unmapped.ModeCode.newBuilder()
-          .setValue(
-              ConceptMapGroupUnmappedModeCode.Value.valueOf(
-                  mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.mode =
+      ConceptMap.Group.Unmapped.ModeCode.newBuilder()
+        .setValue(
+          ConceptMapGroupUnmappedModeCode.Value.valueOf(
+            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasCode()) {
-        protoValue.code = codeElement.toProto()
+      protoValue.code = codeElement.toProto()
     }
     if (hasDisplay()) {
-        protoValue.display = displayElement.toProto()
+      protoValue.display = displayElement.toProto()
     }
     if (hasUrl()) {
-        protoValue.url = urlElement.toProto()
+      protoValue.url = urlElement.toProto()
     }
     return protoValue.build()
   }
@@ -413,28 +416,28 @@ object ConceptMapConverter {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSource()) {
-        hapiValue.sourceElement = source.toHapi()
+      hapiValue.sourceElement = source.toHapi()
     }
     if (hasSourceVersion()) {
-        hapiValue.sourceVersionElement = sourceVersion.toHapi()
+      hapiValue.sourceVersionElement = sourceVersion.toHapi()
     }
     if (hasTarget()) {
-        hapiValue.targetElement = target.toHapi()
+      hapiValue.targetElement = target.toHapi()
     }
     if (hasTargetVersion()) {
-        hapiValue.targetVersionElement = targetVersion.toHapi()
+      hapiValue.targetVersionElement = targetVersion.toHapi()
     }
     if (elementCount > 0) {
-        hapiValue.element = elementList.map { it.toHapi() }
+      hapiValue.element = elementList.map { it.toHapi() }
     }
     if (hasUnmapped()) {
-        hapiValue.unmapped = unmapped.toHapi()
+      hapiValue.unmapped = unmapped.toHapi()
     }
     return hapiValue
   }
@@ -445,19 +448,19 @@ object ConceptMapConverter {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.SourceElementComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.codeElement = code.toHapi()
+      hapiValue.codeElement = code.toHapi()
     }
     if (hasDisplay()) {
-        hapiValue.displayElement = display.toHapi()
+      hapiValue.displayElement = display.toHapi()
     }
     if (targetCount > 0) {
-        hapiValue.target = targetList.map { it.toHapi() }
+      hapiValue.target = targetList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -468,25 +471,26 @@ object ConceptMapConverter {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.TargetElementComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.codeElement = code.toHapi()
+      hapiValue.codeElement = code.toHapi()
     }
     if (hasDisplay()) {
-        hapiValue.displayElement = display.toHapi()
+      hapiValue.displayElement = display.toHapi()
     }
-      hapiValue.equivalence = Enumerations.ConceptMapEquivalence.valueOf(
-          equivalence.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.equivalence =
+      Enumerations.ConceptMapEquivalence.valueOf(
+        equivalence.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasComment()) {
-        hapiValue.commentElement = comment.toHapi()
+      hapiValue.commentElement = comment.toHapi()
     }
     if (dependsOnCount > 0) {
-        hapiValue.dependsOn = dependsOnList.map { it.toHapi() }
+      hapiValue.dependsOn = dependsOnList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -497,22 +501,22 @@ object ConceptMapConverter {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.OtherElementComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasProperty()) {
-        hapiValue.propertyElement = property.toHapi()
+      hapiValue.propertyElement = property.toHapi()
     }
     if (hasSystem()) {
-        hapiValue.systemElement = system.toHapi()
+      hapiValue.systemElement = system.toHapi()
     }
     if (hasValue()) {
-        hapiValue.valueElement = value.toHapi()
+      hapiValue.valueElement = value.toHapi()
     }
     if (hasDisplay()) {
-        hapiValue.displayElement = display.toHapi()
+      hapiValue.displayElement = display.toHapi()
     }
     return hapiValue
   }
@@ -523,22 +527,23 @@ object ConceptMapConverter {
     val hapiValue = org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupUnmappedComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-      hapiValue.mode = org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupUnmappedMode.valueOf(
-          mode.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.mode =
+      org.hl7.fhir.r4.model.ConceptMap.ConceptMapGroupUnmappedMode.valueOf(
+        mode.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasCode()) {
-        hapiValue.codeElement = code.toHapi()
+      hapiValue.codeElement = code.toHapi()
     }
     if (hasDisplay()) {
-        hapiValue.displayElement = display.toHapi()
+      hapiValue.displayElement = display.toHapi()
     }
     if (hasUrl()) {
-        hapiValue.urlElement = url.toHapi()
+      hapiValue.urlElement = url.toHapi()
     }
     return hapiValue
   }

@@ -33,16 +33,17 @@ object ContributorConverter {
     val hapiValue = org.hl7.fhir.r4.model.Contributor()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
-      hapiValue.type = org.hl7.fhir.r4.model.Contributor.ContributorType.valueOf(
-          type.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.type =
+      org.hl7.fhir.r4.model.Contributor.ContributorType.valueOf(
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (contactCount > 0) {
-        hapiValue.contact = contactList.map { it.toHapi() }
+      hapiValue.contact = contactList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -53,15 +54,16 @@ object ContributorConverter {
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-      protoValue.type = Contributor.TypeCode.newBuilder()
-          .setValue(
-              ContributorTypeCode.Value.valueOf(
-                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.type =
+      Contributor.TypeCode.newBuilder()
+        .setValue(
+          ContributorTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })

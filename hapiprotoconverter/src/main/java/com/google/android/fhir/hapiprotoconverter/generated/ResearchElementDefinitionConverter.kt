@@ -98,10 +98,10 @@ object ResearchElementDefinitionConverter {
   private fun Type.researchElementDefinitionSubjectToProto(): ResearchElementDefinition.SubjectX {
     val protoValue = ResearchElementDefinition.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -131,16 +131,16 @@ object ResearchElementDefinitionConverter {
     ResearchElementDefinition.Characteristic.DefinitionX {
     val protoValue = ResearchElementDefinition.Characteristic.DefinitionX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is CanonicalType) {
-        protoValue.canonical = this.toProto()
+      protoValue.canonical = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Expression) {
-        protoValue.expression = this.toProto()
+      protoValue.expression = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.DataRequirement) {
-        protoValue.dataRequirement = this.toProto()
+      protoValue.dataRequirement = this.toProto()
     }
     return protoValue.build()
   }
@@ -170,16 +170,16 @@ object ResearchElementDefinitionConverter {
     ResearchElementDefinition.Characteristic.StudyEffectiveX {
     val protoValue = ResearchElementDefinition.Characteristic.StudyEffectiveX.newBuilder()
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Duration) {
-        protoValue.duration = this.toProto()
+      protoValue.duration = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Timing) {
-        protoValue.timing = this.toProto()
+      protoValue.timing = this.toProto()
     }
     return protoValue.build()
   }
@@ -209,16 +209,16 @@ object ResearchElementDefinitionConverter {
     ResearchElementDefinition.Characteristic.ParticipantEffectiveX {
     val protoValue = ResearchElementDefinition.Characteristic.ParticipantEffectiveX.newBuilder()
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Duration) {
-        protoValue.duration = this.toProto()
+      protoValue.duration = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Timing) {
-        protoValue.timing = this.toProto()
+      protoValue.timing = this.toProto()
     }
     return protoValue.build()
   }
@@ -228,117 +228,119 @@ object ResearchElementDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.ResearchElementDefinition()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-        hapiValue.urlElement = url.toHapi()
+      hapiValue.urlElement = url.toHapi()
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasVersion()) {
-        hapiValue.versionElement = version.toHapi()
+      hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-        hapiValue.titleElement = title.toHapi()
+      hapiValue.titleElement = title.toHapi()
     }
     if (hasShortTitle()) {
-        hapiValue.shortTitleElement = shortTitle.toHapi()
+      hapiValue.shortTitleElement = shortTitle.toHapi()
     }
     if (hasSubtitle()) {
-        hapiValue.subtitleElement = subtitle.toHapi()
+      hapiValue.subtitleElement = subtitle.toHapi()
     }
-      hapiValue.status =
-          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    hapiValue.status =
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-        hapiValue.experimentalElement = experimental.toHapi()
+      hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.researchElementDefinitionSubjectToHapi()
+      hapiValue.subject = subject.researchElementDefinitionSubjectToHapi()
     }
     if (hasDate()) {
-        hapiValue.dateElement = date.toHapi()
+      hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-        hapiValue.publisherElement = publisher.toHapi()
+      hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-        hapiValue.contact = contactList.map { it.toHapi() }
+      hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (commentCount > 0) {
-        hapiValue.comment = commentList.map { it.toHapi() }
+      hapiValue.comment = commentList.map { it.toHapi() }
     }
     if (useContextCount > 0) {
-        hapiValue.useContext = useContextList.map { it.toHapi() }
+      hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
+      hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasPurpose()) {
-        hapiValue.purposeElement = purpose.toHapi()
+      hapiValue.purposeElement = purpose.toHapi()
     }
     if (hasUsage()) {
-        hapiValue.usageElement = usage.toHapi()
+      hapiValue.usageElement = usage.toHapi()
     }
     if (hasCopyright()) {
-        hapiValue.copyrightElement = copyright.toHapi()
+      hapiValue.copyrightElement = copyright.toHapi()
     }
     if (hasApprovalDate()) {
-        hapiValue.approvalDateElement = approvalDate.toHapi()
+      hapiValue.approvalDateElement = approvalDate.toHapi()
     }
     if (hasLastReviewDate()) {
-        hapiValue.lastReviewDateElement = lastReviewDate.toHapi()
+      hapiValue.lastReviewDateElement = lastReviewDate.toHapi()
     }
     if (hasEffectivePeriod()) {
-        hapiValue.effectivePeriod = effectivePeriod.toHapi()
+      hapiValue.effectivePeriod = effectivePeriod.toHapi()
     }
     if (topicCount > 0) {
-        hapiValue.topic = topicList.map { it.toHapi() }
+      hapiValue.topic = topicList.map { it.toHapi() }
     }
     if (authorCount > 0) {
-        hapiValue.author = authorList.map { it.toHapi() }
+      hapiValue.author = authorList.map { it.toHapi() }
     }
     if (editorCount > 0) {
-        hapiValue.editor = editorList.map { it.toHapi() }
+      hapiValue.editor = editorList.map { it.toHapi() }
     }
     if (reviewerCount > 0) {
-        hapiValue.reviewer = reviewerList.map { it.toHapi() }
+      hapiValue.reviewer = reviewerList.map { it.toHapi() }
     }
     if (endorserCount > 0) {
-        hapiValue.endorser = endorserList.map { it.toHapi() }
+      hapiValue.endorser = endorserList.map { it.toHapi() }
     }
     if (relatedArtifactCount > 0) {
-        hapiValue.relatedArtifact = relatedArtifactList.map { it.toHapi() }
+      hapiValue.relatedArtifact = relatedArtifactList.map { it.toHapi() }
     }
     if (libraryCount > 0) {
-        hapiValue.library = libraryList.map { it.toHapi() }
+      hapiValue.library = libraryList.map { it.toHapi() }
     }
-      hapiValue.type = org.hl7.fhir.r4.model.ResearchElementDefinition.ResearchElementType.valueOf(
-          type.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.type =
+      org.hl7.fhir.r4.model.ResearchElementDefinition.ResearchElementType.valueOf(
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
-      hapiValue.variableType = org.hl7.fhir.r4.model.ResearchElementDefinition.VariableType.valueOf(
-          variableType.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.variableType =
+      org.hl7.fhir.r4.model.ResearchElementDefinition.VariableType.valueOf(
+        variableType.value.name.hapiCodeCheck().replace("_", "")
       )
     if (characteristicCount > 0) {
-        hapiValue.characteristic = characteristicList.map { it.toHapi() }
+      hapiValue.characteristic = characteristicList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -347,13 +349,13 @@ object ResearchElementDefinitionConverter {
   fun org.hl7.fhir.r4.model.ResearchElementDefinition.toProto(): ResearchElementDefinition {
     val protoValue = ResearchElementDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -362,50 +364,51 @@ object ResearchElementDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-        protoValue.url = urlElement.toProto()
+      protoValue.url = urlElement.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasVersion()) {
-        protoValue.version = versionElement.toProto()
+      protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-        protoValue.title = titleElement.toProto()
+      protoValue.title = titleElement.toProto()
     }
     if (hasShortTitle()) {
-        protoValue.shortTitle = shortTitleElement.toProto()
+      protoValue.shortTitle = shortTitleElement.toProto()
     }
     if (hasSubtitle()) {
-        protoValue.subtitle = subtitleElement.toProto()
+      protoValue.subtitle = subtitleElement.toProto()
     }
-      protoValue.status = ResearchElementDefinition.StatusCode.newBuilder()
-          .setValue(
-              PublicationStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      ResearchElementDefinition.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasExperimental()) {
-        protoValue.experimental = experimentalElement.toProto()
+      protoValue.experimental = experimentalElement.toProto()
     }
     if (hasSubject()) {
-        protoValue.subject = subject.researchElementDefinitionSubjectToProto()
+      protoValue.subject = subject.researchElementDefinitionSubjectToProto()
     }
     if (hasDate()) {
-        protoValue.date = dateElement.toProto()
+      protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-        protoValue.publisher = publisherElement.toProto()
+      protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasComment()) {
       protoValue.addAllComment(comment.map { it.toProto() })
@@ -417,22 +420,22 @@ object ResearchElementDefinitionConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasPurpose()) {
-        protoValue.purpose = purposeElement.toProto()
+      protoValue.purpose = purposeElement.toProto()
     }
     if (hasUsage()) {
-        protoValue.usage = usageElement.toProto()
+      protoValue.usage = usageElement.toProto()
     }
     if (hasCopyright()) {
-        protoValue.copyright = copyrightElement.toProto()
+      protoValue.copyright = copyrightElement.toProto()
     }
     if (hasApprovalDate()) {
-        protoValue.approvalDate = approvalDateElement.toProto()
+      protoValue.approvalDate = approvalDateElement.toProto()
     }
     if (hasLastReviewDate()) {
-        protoValue.lastReviewDate = lastReviewDateElement.toProto()
+      protoValue.lastReviewDate = lastReviewDateElement.toProto()
     }
     if (hasEffectivePeriod()) {
-        protoValue.effectivePeriod = effectivePeriod.toProto()
+      protoValue.effectivePeriod = effectivePeriod.toProto()
     }
     if (hasTopic()) {
       protoValue.addAllTopic(topic.map { it.toProto() })
@@ -455,20 +458,22 @@ object ResearchElementDefinitionConverter {
     if (hasLibrary()) {
       protoValue.addAllLibrary(library.map { it.toProto() })
     }
-      protoValue.type = ResearchElementDefinition.TypeCode.newBuilder()
-          .setValue(
-              ResearchElementTypeCode.Value.valueOf(
-                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.type =
+      ResearchElementDefinition.TypeCode.newBuilder()
+        .setValue(
+          ResearchElementTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
-      protoValue.variableType = ResearchElementDefinition.VariableTypeCode.newBuilder()
-          .setValue(
-              EvidenceVariableTypeCode.Value.valueOf(
-                  variableType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+        )
+        .build()
+    protoValue.variableType =
+      ResearchElementDefinition.VariableTypeCode.newBuilder()
+        .setValue(
+          EvidenceVariableTypeCode.Value.valueOf(
+            variableType.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasCharacteristic()) {
       protoValue.addAllCharacteristic(characteristic.map { it.toProto() })
     }
@@ -487,53 +492,57 @@ object ResearchElementDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDefinition()) {
-        protoValue.definition = definition.researchElementDefinitionCharacteristicDefinitionToProto()
+      protoValue.definition = definition.researchElementDefinitionCharacteristicDefinitionToProto()
     }
     if (hasUsageContext()) {
       protoValue.addAllUsageContext(usageContext.map { it.toProto() })
     }
     if (hasExclude()) {
-        protoValue.exclude = excludeElement.toProto()
+      protoValue.exclude = excludeElement.toProto()
     }
     if (hasUnitOfMeasure()) {
-        protoValue.unitOfMeasure = unitOfMeasure.toProto()
+      protoValue.unitOfMeasure = unitOfMeasure.toProto()
     }
     if (hasStudyEffectiveDescription()) {
-        protoValue.studyEffectiveDescription = studyEffectiveDescriptionElement.toProto()
+      protoValue.studyEffectiveDescription = studyEffectiveDescriptionElement.toProto()
     }
     if (hasStudyEffective()) {
-        protoValue.studyEffective = studyEffective.researchElementDefinitionCharacteristicStudyEffectiveToProto()
+      protoValue.studyEffective =
+        studyEffective.researchElementDefinitionCharacteristicStudyEffectiveToProto()
     }
     if (hasStudyEffectiveTimeFromStart()) {
-        protoValue.studyEffectiveTimeFromStart = studyEffectiveTimeFromStart.toProto()
+      protoValue.studyEffectiveTimeFromStart = studyEffectiveTimeFromStart.toProto()
     }
-      protoValue.studyEffectiveGroupMeasure = ResearchElementDefinition.Characteristic.StudyEffectiveGroupMeasureCode.newBuilder()
-          .setValue(
-              GroupMeasureCode.Value.valueOf(
-                  studyEffectiveGroupMeasure.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.studyEffectiveGroupMeasure =
+      ResearchElementDefinition.Characteristic.StudyEffectiveGroupMeasureCode.newBuilder()
+        .setValue(
+          GroupMeasureCode.Value.valueOf(
+            studyEffectiveGroupMeasure.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasParticipantEffectiveDescription()) {
-        protoValue.participantEffectiveDescription = participantEffectiveDescriptionElement.toProto()
+      protoValue.participantEffectiveDescription = participantEffectiveDescriptionElement.toProto()
     }
     if (hasParticipantEffective()) {
-        protoValue.participantEffective = participantEffective.researchElementDefinitionCharacteristicParticipantEffectiveToProto()
+      protoValue.participantEffective =
+        participantEffective.researchElementDefinitionCharacteristicParticipantEffectiveToProto()
     }
     if (hasParticipantEffectiveTimeFromStart()) {
-        protoValue.participantEffectiveTimeFromStart = participantEffectiveTimeFromStart.toProto()
+      protoValue.participantEffectiveTimeFromStart = participantEffectiveTimeFromStart.toProto()
     }
-      protoValue.participantEffectiveGroupMeasure = ResearchElementDefinition.Characteristic.ParticipantEffectiveGroupMeasureCode.newBuilder()
-          .setValue(
-              GroupMeasureCode.Value.valueOf(
-                  participantEffectiveGroupMeasure
-                      .toCode()
-                      .protoCodeCheck()
-                      .replace("-", "_")
-                      .toUpperCase()
-              )
+    protoValue.participantEffectiveGroupMeasure =
+      ResearchElementDefinition.Characteristic.ParticipantEffectiveGroupMeasureCode.newBuilder()
+        .setValue(
+          GroupMeasureCode.Value.valueOf(
+            participantEffectiveGroupMeasure
+              .toCode()
+              .protoCodeCheck()
+              .replace("-", "_")
+              .toUpperCase()
           )
-          .build()
+        )
+        .build()
     return protoValue.build()
   }
 
@@ -545,46 +554,50 @@ object ResearchElementDefinitionConverter {
         .ResearchElementDefinitionCharacteristicComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDefinition()) {
-        hapiValue.definition = definition.researchElementDefinitionCharacteristicDefinitionToHapi()
+      hapiValue.definition = definition.researchElementDefinitionCharacteristicDefinitionToHapi()
     }
     if (usageContextCount > 0) {
-        hapiValue.usageContext = usageContextList.map { it.toHapi() }
+      hapiValue.usageContext = usageContextList.map { it.toHapi() }
     }
     if (hasExclude()) {
-        hapiValue.excludeElement = exclude.toHapi()
+      hapiValue.excludeElement = exclude.toHapi()
     }
     if (hasUnitOfMeasure()) {
-        hapiValue.unitOfMeasure = unitOfMeasure.toHapi()
+      hapiValue.unitOfMeasure = unitOfMeasure.toHapi()
     }
     if (hasStudyEffectiveDescription()) {
-        hapiValue.studyEffectiveDescriptionElement = studyEffectiveDescription.toHapi()
+      hapiValue.studyEffectiveDescriptionElement = studyEffectiveDescription.toHapi()
     }
     if (hasStudyEffective()) {
-        hapiValue.studyEffective = studyEffective.researchElementDefinitionCharacteristicStudyEffectiveToHapi()
+      hapiValue.studyEffective =
+        studyEffective.researchElementDefinitionCharacteristicStudyEffectiveToHapi()
     }
     if (hasStudyEffectiveTimeFromStart()) {
-        hapiValue.studyEffectiveTimeFromStart = studyEffectiveTimeFromStart.toHapi()
+      hapiValue.studyEffectiveTimeFromStart = studyEffectiveTimeFromStart.toHapi()
     }
-      hapiValue.studyEffectiveGroupMeasure = org.hl7.fhir.r4.model.ResearchElementDefinition.GroupMeasure.valueOf(
-          studyEffectiveGroupMeasure.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.studyEffectiveGroupMeasure =
+      org.hl7.fhir.r4.model.ResearchElementDefinition.GroupMeasure.valueOf(
+        studyEffectiveGroupMeasure.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasParticipantEffectiveDescription()) {
-        hapiValue.participantEffectiveDescriptionElement = participantEffectiveDescription.toHapi()
+      hapiValue.participantEffectiveDescriptionElement = participantEffectiveDescription.toHapi()
     }
     if (hasParticipantEffective()) {
-        hapiValue.participantEffective = participantEffective.researchElementDefinitionCharacteristicParticipantEffectiveToHapi()
+      hapiValue.participantEffective =
+        participantEffective.researchElementDefinitionCharacteristicParticipantEffectiveToHapi()
     }
     if (hasParticipantEffectiveTimeFromStart()) {
-        hapiValue.participantEffectiveTimeFromStart = participantEffectiveTimeFromStart.toHapi()
+      hapiValue.participantEffectiveTimeFromStart = participantEffectiveTimeFromStart.toHapi()
     }
-      hapiValue.participantEffectiveGroupMeasure = org.hl7.fhir.r4.model.ResearchElementDefinition.GroupMeasure.valueOf(
-          participantEffectiveGroupMeasure.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.participantEffectiveGroupMeasure =
+      org.hl7.fhir.r4.model.ResearchElementDefinition.GroupMeasure.valueOf(
+        participantEffectiveGroupMeasure.value.name.hapiCodeCheck().replace("_", "")
       )
     return hapiValue
   }

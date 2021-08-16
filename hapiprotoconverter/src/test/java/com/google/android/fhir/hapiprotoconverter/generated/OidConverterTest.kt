@@ -42,7 +42,6 @@ class OidConverterTest(private val hapi: OidType, private val proto: Oid) {
   }
 
   companion object {
-    @Parameterized.Parameters @JvmStatic
-    fun `data`(): List<Any> = PrimitiveTestData.OID_DATA
+    @Parameterized.Parameters @JvmStatic fun `data`(): List<Any> = PrimitiveTestData.OID_DATA
   }
 }

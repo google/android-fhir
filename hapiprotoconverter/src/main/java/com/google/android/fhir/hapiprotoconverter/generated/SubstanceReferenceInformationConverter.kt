@@ -70,67 +70,65 @@ object SubstanceReferenceInformationConverter {
     SubstanceReferenceInformation.Target.AmountX {
     val protoValue = SubstanceReferenceInformation.Target.AmountX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Quantity) {
-        protoValue.quantity = this.toProto()
+      protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     if (this is StringType) {
-        protoValue.stringValue = this.toProto()
+      protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  fun SubstanceReferenceInformation.toHapi():
-    org.hl7.fhir.r4.model.SubstanceReferenceInformation {
+  fun SubstanceReferenceInformation.toHapi(): org.hl7.fhir.r4.model.SubstanceReferenceInformation {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceReferenceInformation()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasComment()) {
-        hapiValue.commentElement = comment.toHapi()
+      hapiValue.commentElement = comment.toHapi()
     }
     if (geneCount > 0) {
-        hapiValue.gene = geneList.map { it.toHapi() }
+      hapiValue.gene = geneList.map { it.toHapi() }
     }
     if (geneElementCount > 0) {
-        hapiValue.geneElement = geneElementList.map { it.toHapi() }
+      hapiValue.geneElement = geneElementList.map { it.toHapi() }
     }
     if (classificationCount > 0) {
-        hapiValue.classification = classificationList.map { it.toHapi() }
+      hapiValue.classification = classificationList.map { it.toHapi() }
     }
     if (targetCount > 0) {
-        hapiValue.target = targetList.map { it.toHapi() }
+      hapiValue.target = targetList.map { it.toHapi() }
     }
     return hapiValue
   }
 
   @JvmStatic
-  fun org.hl7.fhir.r4.model.SubstanceReferenceInformation.toProto():
-    SubstanceReferenceInformation {
+  fun org.hl7.fhir.r4.model.SubstanceReferenceInformation.toProto(): SubstanceReferenceInformation {
     val protoValue = SubstanceReferenceInformation.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -139,7 +137,7 @@ object SubstanceReferenceInformationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasComment()) {
-        protoValue.comment = commentElement.toProto()
+      protoValue.comment = commentElement.toProto()
     }
     if (hasGene()) {
       protoValue.addAllGene(gene.map { it.toProto() })
@@ -168,10 +166,10 @@ object SubstanceReferenceInformationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasGeneSequenceOrigin()) {
-        protoValue.geneSequenceOrigin = geneSequenceOrigin.toProto()
+      protoValue.geneSequenceOrigin = geneSequenceOrigin.toProto()
     }
     if (hasGene()) {
-        protoValue.gene = gene.toProto()
+      protoValue.gene = gene.toProto()
     }
     if (hasSource()) {
       protoValue.addAllSource(source.map { it.toProto() })
@@ -191,10 +189,10 @@ object SubstanceReferenceInformationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasElement()) {
-        protoValue.element = element.toProto()
+      protoValue.element = element.toProto()
     }
     if (hasSource()) {
       protoValue.addAllSource(source.map { it.toProto() })
@@ -215,10 +213,10 @@ object SubstanceReferenceInformationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDomain()) {
-        protoValue.domain = domain.toProto()
+      protoValue.domain = domain.toProto()
     }
     if (hasClassification()) {
-        protoValue.classification = classification.toProto()
+      protoValue.classification = classification.toProto()
     }
     if (hasSubtype()) {
       protoValue.addAllSubtype(subtype.map { it.toProto() })
@@ -241,25 +239,25 @@ object SubstanceReferenceInformationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasTarget()) {
-        protoValue.target = target.toProto()
+      protoValue.target = target.toProto()
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasInteraction()) {
-        protoValue.interaction = interaction.toProto()
+      protoValue.interaction = interaction.toProto()
     }
     if (hasOrganism()) {
-        protoValue.organism = organism.toProto()
+      protoValue.organism = organism.toProto()
     }
     if (hasOrganismType()) {
-        protoValue.organismType = organismType.toProto()
+      protoValue.organismType = organismType.toProto()
     }
     if (hasAmount()) {
-        protoValue.amount = amount.substanceReferenceInformationTargetAmountToProto()
+      protoValue.amount = amount.substanceReferenceInformationTargetAmountToProto()
     }
     if (hasAmountType()) {
-        protoValue.amountType = amountType.toProto()
+      protoValue.amountType = amountType.toProto()
     }
     if (hasSource()) {
       protoValue.addAllSource(source.map { it.toProto() })
@@ -275,19 +273,19 @@ object SubstanceReferenceInformationConverter {
         .SubstanceReferenceInformationGeneComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasGeneSequenceOrigin()) {
-        hapiValue.geneSequenceOrigin = geneSequenceOrigin.toHapi()
+      hapiValue.geneSequenceOrigin = geneSequenceOrigin.toHapi()
     }
     if (hasGene()) {
-        hapiValue.gene = gene.toHapi()
+      hapiValue.gene = gene.toHapi()
     }
     if (sourceCount > 0) {
-        hapiValue.source = sourceList.map { it.toHapi() }
+      hapiValue.source = sourceList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -300,19 +298,19 @@ object SubstanceReferenceInformationConverter {
         .SubstanceReferenceInformationGeneElementComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasElement()) {
-        hapiValue.element = element.toHapi()
+      hapiValue.element = element.toHapi()
     }
     if (sourceCount > 0) {
-        hapiValue.source = sourceList.map { it.toHapi() }
+      hapiValue.source = sourceList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -325,22 +323,22 @@ object SubstanceReferenceInformationConverter {
         .SubstanceReferenceInformationClassificationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDomain()) {
-        hapiValue.domain = domain.toHapi()
+      hapiValue.domain = domain.toHapi()
     }
     if (hasClassification()) {
-        hapiValue.classification = classification.toHapi()
+      hapiValue.classification = classification.toHapi()
     }
     if (subtypeCount > 0) {
-        hapiValue.subtype = subtypeList.map { it.toHapi() }
+      hapiValue.subtype = subtypeList.map { it.toHapi() }
     }
     if (sourceCount > 0) {
-        hapiValue.source = sourceList.map { it.toHapi() }
+      hapiValue.source = sourceList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -353,34 +351,34 @@ object SubstanceReferenceInformationConverter {
         .SubstanceReferenceInformationTargetComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasTarget()) {
-        hapiValue.target = target.toHapi()
+      hapiValue.target = target.toHapi()
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasInteraction()) {
-        hapiValue.interaction = interaction.toHapi()
+      hapiValue.interaction = interaction.toHapi()
     }
     if (hasOrganism()) {
-        hapiValue.organism = organism.toHapi()
+      hapiValue.organism = organism.toHapi()
     }
     if (hasOrganismType()) {
-        hapiValue.organismType = organismType.toHapi()
+      hapiValue.organismType = organismType.toHapi()
     }
     if (hasAmount()) {
-        hapiValue.amount = amount.substanceReferenceInformationTargetAmountToHapi()
+      hapiValue.amount = amount.substanceReferenceInformationTargetAmountToHapi()
     }
     if (hasAmountType()) {
-        hapiValue.amountType = amountType.toHapi()
+      hapiValue.amountType = amountType.toHapi()
     }
     if (sourceCount > 0) {
-        hapiValue.source = sourceList.map { it.toHapi() }
+      hapiValue.source = sourceList.map { it.toHapi() }
     }
     return hapiValue
   }

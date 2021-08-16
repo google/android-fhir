@@ -69,10 +69,10 @@ object MedicinalProductConverter {
     MedicinalProduct.SpecialDesignation.IndicationX {
     val protoValue = MedicinalProduct.SpecialDesignation.IndicationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -82,79 +82,80 @@ object MedicinalProductConverter {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProduct()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasDomain()) {
-        hapiValue.domain = domain.toHapi()
+      hapiValue.domain = domain.toHapi()
     }
     if (hasCombinedPharmaceuticalDoseForm()) {
-        hapiValue.combinedPharmaceuticalDoseForm = combinedPharmaceuticalDoseForm.toHapi()
+      hapiValue.combinedPharmaceuticalDoseForm = combinedPharmaceuticalDoseForm.toHapi()
     }
     if (hasLegalStatusOfSupply()) {
-        hapiValue.legalStatusOfSupply = legalStatusOfSupply.toHapi()
+      hapiValue.legalStatusOfSupply = legalStatusOfSupply.toHapi()
     }
     if (hasAdditionalMonitoringIndicator()) {
-        hapiValue.additionalMonitoringIndicator = additionalMonitoringIndicator.toHapi()
+      hapiValue.additionalMonitoringIndicator = additionalMonitoringIndicator.toHapi()
     }
     if (specialMeasuresCount > 0) {
-        hapiValue.specialMeasures = specialMeasuresList.map { it.toHapi() }
+      hapiValue.specialMeasures = specialMeasuresList.map { it.toHapi() }
     }
     if (hasPaediatricUseIndicator()) {
-        hapiValue.paediatricUseIndicator = paediatricUseIndicator.toHapi()
+      hapiValue.paediatricUseIndicator = paediatricUseIndicator.toHapi()
     }
     if (productClassificationCount > 0) {
-        hapiValue.productClassification = productClassificationList.map { it.toHapi() }
+      hapiValue.productClassification = productClassificationList.map { it.toHapi() }
     }
     if (marketingStatusCount > 0) {
-        hapiValue.marketingStatus = marketingStatusList.map { it.toHapi() }
+      hapiValue.marketingStatus = marketingStatusList.map { it.toHapi() }
     }
     if (pharmaceuticalProductCount > 0) {
-        hapiValue.pharmaceuticalProduct = pharmaceuticalProductList.map { it.toHapi() }
+      hapiValue.pharmaceuticalProduct = pharmaceuticalProductList.map { it.toHapi() }
     }
     if (packagedMedicinalProductCount > 0) {
-        hapiValue.packagedMedicinalProduct = packagedMedicinalProductList.map { it.toHapi() }
+      hapiValue.packagedMedicinalProduct = packagedMedicinalProductList.map { it.toHapi() }
     }
     if (attachedDocumentCount > 0) {
-        hapiValue.attachedDocument = attachedDocumentList.map { it.toHapi() }
+      hapiValue.attachedDocument = attachedDocumentList.map { it.toHapi() }
     }
     if (masterFileCount > 0) {
-        hapiValue.masterFile = masterFileList.map { it.toHapi() }
+      hapiValue.masterFile = masterFileList.map { it.toHapi() }
     }
     if (contactCount > 0) {
-        hapiValue.contact = contactList.map { it.toHapi() }
+      hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (clinicalTrialCount > 0) {
-        hapiValue.clinicalTrial = clinicalTrialList.map { it.toHapi() }
+      hapiValue.clinicalTrial = clinicalTrialList.map { it.toHapi() }
     }
     if (nameCount > 0) {
-        hapiValue.name = nameList.map { it.toHapi() }
+      hapiValue.name = nameList.map { it.toHapi() }
     }
     if (crossReferenceCount > 0) {
-        hapiValue.crossReference = crossReferenceList.map { it.toHapi() }
+      hapiValue.crossReference = crossReferenceList.map { it.toHapi() }
     }
     if (manufacturingBusinessOperationCount > 0) {
-        hapiValue.manufacturingBusinessOperation = manufacturingBusinessOperationList.map { it.toHapi() }
+      hapiValue.manufacturingBusinessOperation =
+        manufacturingBusinessOperationList.map { it.toHapi() }
     }
     if (specialDesignationCount > 0) {
-        hapiValue.specialDesignation = specialDesignationList.map { it.toHapi() }
+      hapiValue.specialDesignation = specialDesignationList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -163,13 +164,13 @@ object MedicinalProductConverter {
   fun org.hl7.fhir.r4.model.MedicinalProduct.toProto(): MedicinalProduct {
     val protoValue = MedicinalProduct.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -181,25 +182,25 @@ object MedicinalProductConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasDomain()) {
-        protoValue.domain = domain.toProto()
+      protoValue.domain = domain.toProto()
     }
     if (hasCombinedPharmaceuticalDoseForm()) {
-        protoValue.combinedPharmaceuticalDoseForm = combinedPharmaceuticalDoseForm.toProto()
+      protoValue.combinedPharmaceuticalDoseForm = combinedPharmaceuticalDoseForm.toProto()
     }
     if (hasLegalStatusOfSupply()) {
-        protoValue.legalStatusOfSupply = legalStatusOfSupply.toProto()
+      protoValue.legalStatusOfSupply = legalStatusOfSupply.toProto()
     }
     if (hasAdditionalMonitoringIndicator()) {
-        protoValue.additionalMonitoringIndicator = additionalMonitoringIndicator.toProto()
+      protoValue.additionalMonitoringIndicator = additionalMonitoringIndicator.toProto()
     }
     if (hasSpecialMeasures()) {
       protoValue.addAllSpecialMeasures(specialMeasures.map { it.toProto() })
     }
     if (hasPaediatricUseIndicator()) {
-        protoValue.paediatricUseIndicator = paediatricUseIndicator.toProto()
+      protoValue.paediatricUseIndicator = paediatricUseIndicator.toProto()
     }
     if (hasProductClassification()) {
       protoValue.addAllProductClassification(productClassification.map { it.toProto() })
@@ -253,7 +254,7 @@ object MedicinalProductConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasProductName()) {
-        protoValue.productName = productNameElement.toProto()
+      protoValue.productName = productNameElement.toProto()
     }
     if (hasNamePart()) {
       protoValue.addAllNamePart(namePart.map { it.toProto() })
@@ -276,10 +277,10 @@ object MedicinalProductConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasPart()) {
-        protoValue.part = partElement.toProto()
+      protoValue.part = partElement.toProto()
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     return protoValue.build()
   }
@@ -296,13 +297,13 @@ object MedicinalProductConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCountry()) {
-        protoValue.country = country.toProto()
+      protoValue.country = country.toProto()
     }
     if (hasJurisdiction()) {
-        protoValue.jurisdiction = jurisdiction.toProto()
+      protoValue.jurisdiction = jurisdiction.toProto()
     }
     if (hasLanguage()) {
-        protoValue.language = language.toProto()
+      protoValue.language = language.toProto()
     }
     return protoValue.build()
   }
@@ -320,22 +321,22 @@ object MedicinalProductConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasOperationType()) {
-        protoValue.operationType = operationType.toProto()
+      protoValue.operationType = operationType.toProto()
     }
     if (hasAuthorisationReferenceNumber()) {
-        protoValue.authorisationReferenceNumber = authorisationReferenceNumber.toProto()
+      protoValue.authorisationReferenceNumber = authorisationReferenceNumber.toProto()
     }
     if (hasEffectiveDate()) {
-        protoValue.effectiveDate = effectiveDateElement.toProto()
+      protoValue.effectiveDate = effectiveDateElement.toProto()
     }
     if (hasConfidentialityIndicator()) {
-        protoValue.confidentialityIndicator = confidentialityIndicator.toProto()
+      protoValue.confidentialityIndicator = confidentialityIndicator.toProto()
     }
     if (hasManufacturer()) {
       protoValue.addAllManufacturer(manufacturer.map { it.toProto() })
     }
     if (hasRegulator()) {
-        protoValue.regulator = regulator.toProto()
+      protoValue.regulator = regulator.toProto()
     }
     return protoValue.build()
   }
@@ -355,22 +356,22 @@ object MedicinalProductConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasIntendedUse()) {
-        protoValue.intendedUse = intendedUse.toProto()
+      protoValue.intendedUse = intendedUse.toProto()
     }
     if (hasIndication()) {
-        protoValue.indication = indication.medicinalProductSpecialDesignationIndicationToProto()
+      protoValue.indication = indication.medicinalProductSpecialDesignationIndicationToProto()
     }
     if (hasStatus()) {
-        protoValue.status = status.toProto()
+      protoValue.status = status.toProto()
     }
     if (hasDate()) {
-        protoValue.date = dateElement.toProto()
+      protoValue.date = dateElement.toProto()
     }
     if (hasSpecies()) {
-        protoValue.species = species.toProto()
+      protoValue.species = species.toProto()
     }
     return protoValue.build()
   }
@@ -381,19 +382,19 @@ object MedicinalProductConverter {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasProductName()) {
-        hapiValue.productNameElement = productName.toHapi()
+      hapiValue.productNameElement = productName.toHapi()
     }
     if (namePartCount > 0) {
-        hapiValue.namePart = namePartList.map { it.toHapi() }
+      hapiValue.namePart = namePartList.map { it.toHapi() }
     }
     if (countryLanguageCount > 0) {
-        hapiValue.countryLanguage = countryLanguageList.map { it.toHapi() }
+      hapiValue.countryLanguage = countryLanguageList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -404,16 +405,16 @@ object MedicinalProductConverter {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameNamePartComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasPart()) {
-        hapiValue.partElement = part.toHapi()
+      hapiValue.partElement = part.toHapi()
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     return hapiValue
   }
@@ -425,19 +426,19 @@ object MedicinalProductConverter {
       org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductNameCountryLanguageComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCountry()) {
-        hapiValue.country = country.toHapi()
+      hapiValue.country = country.toHapi()
     }
     if (hasJurisdiction()) {
-        hapiValue.jurisdiction = jurisdiction.toHapi()
+      hapiValue.jurisdiction = jurisdiction.toHapi()
     }
     if (hasLanguage()) {
-        hapiValue.language = language.toHapi()
+      hapiValue.language = language.toHapi()
     }
     return hapiValue
   }
@@ -450,28 +451,28 @@ object MedicinalProductConverter {
         .MedicinalProductManufacturingBusinessOperationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasOperationType()) {
-        hapiValue.operationType = operationType.toHapi()
+      hapiValue.operationType = operationType.toHapi()
     }
     if (hasAuthorisationReferenceNumber()) {
-        hapiValue.authorisationReferenceNumber = authorisationReferenceNumber.toHapi()
+      hapiValue.authorisationReferenceNumber = authorisationReferenceNumber.toHapi()
     }
     if (hasEffectiveDate()) {
-        hapiValue.effectiveDateElement = effectiveDate.toHapi()
+      hapiValue.effectiveDateElement = effectiveDate.toHapi()
     }
     if (hasConfidentialityIndicator()) {
-        hapiValue.confidentialityIndicator = confidentialityIndicator.toHapi()
+      hapiValue.confidentialityIndicator = confidentialityIndicator.toHapi()
     }
     if (manufacturerCount > 0) {
-        hapiValue.manufacturer = manufacturerList.map { it.toHapi() }
+      hapiValue.manufacturer = manufacturerList.map { it.toHapi() }
     }
     if (hasRegulator()) {
-        hapiValue.regulator = regulator.toHapi()
+      hapiValue.regulator = regulator.toHapi()
     }
     return hapiValue
   }
@@ -483,31 +484,31 @@ object MedicinalProductConverter {
       org.hl7.fhir.r4.model.MedicinalProduct.MedicinalProductSpecialDesignationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasIntendedUse()) {
-        hapiValue.intendedUse = intendedUse.toHapi()
+      hapiValue.intendedUse = intendedUse.toHapi()
     }
     if (hasIndication()) {
-        hapiValue.indication = indication.medicinalProductSpecialDesignationIndicationToHapi()
+      hapiValue.indication = indication.medicinalProductSpecialDesignationIndicationToHapi()
     }
     if (hasStatus()) {
-        hapiValue.status = status.toHapi()
+      hapiValue.status = status.toHapi()
     }
     if (hasDate()) {
-        hapiValue.dateElement = date.toHapi()
+      hapiValue.dateElement = date.toHapi()
     }
     if (hasSpecies()) {
-        hapiValue.species = species.toHapi()
+      hapiValue.species = species.toHapi()
     }
     return hapiValue
   }

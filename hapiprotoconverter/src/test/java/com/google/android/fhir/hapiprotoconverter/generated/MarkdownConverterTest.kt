@@ -42,8 +42,6 @@ class MarkdownConverterTest(private val hapi: MarkdownType, private val proto: M
   }
 
   companion object {
-    @Parameterized.Parameters
-    @JvmStatic
-    fun `data`(): List<Any> = PrimitiveTestData.MARKDOWN_DATA
+    @Parameterized.Parameters @JvmStatic fun `data`(): List<Any> = PrimitiveTestData.MARKDOWN_DATA
   }
 }

@@ -36,24 +36,24 @@ object SignatureConverter {
     val hapiValue = org.hl7.fhir.r4.model.Signature()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (typeCount > 0) {
-        hapiValue.type = typeList.map { it.toHapi() }
+      hapiValue.type = typeList.map { it.toHapi() }
     }
     if (hasWhen()) {
-        hapiValue.whenElement = `when`.toHapi()
+      hapiValue.whenElement = `when`.toHapi()
     }
     if (hasWho()) {
-        hapiValue.who = who.toHapi()
+      hapiValue.who = who.toHapi()
     }
     if (hasOnBehalfOf()) {
-        hapiValue.onBehalfOf = onBehalfOf.toHapi()
+      hapiValue.onBehalfOf = onBehalfOf.toHapi()
     }
-      hapiValue.targetFormat = targetFormat.value.hapiCodeCheck()
-      hapiValue.sigFormat = sigFormat.value.hapiCodeCheck()
+    hapiValue.targetFormat = targetFormat.value.hapiCodeCheck()
+    hapiValue.sigFormat = sigFormat.value.hapiCodeCheck()
     if (hasData()) {
-        hapiValue.dataElement = data.toHapi()
+      hapiValue.dataElement = data.toHapi()
     }
     return hapiValue
   }
@@ -71,17 +71,17 @@ object SignatureConverter {
       protoValue.setWhen(whenElement.toProto())
     }
     if (hasWho()) {
-        protoValue.who = who.toProto()
+      protoValue.who = who.toProto()
     }
     if (hasOnBehalfOf()) {
-        protoValue.onBehalfOf = onBehalfOf.toProto()
+      protoValue.onBehalfOf = onBehalfOf.toProto()
     }
-      protoValue.targetFormat =
-          Signature.TargetFormatCode.newBuilder().setValue(targetFormat.protoCodeCheck()).build()
-      protoValue.sigFormat =
-          Signature.SigFormatCode.newBuilder().setValue(sigFormat.protoCodeCheck()).build()
+    protoValue.targetFormat =
+      Signature.TargetFormatCode.newBuilder().setValue(targetFormat.protoCodeCheck()).build()
+    protoValue.sigFormat =
+      Signature.SigFormatCode.newBuilder().setValue(sigFormat.protoCodeCheck()).build()
     if (hasData()) {
-        protoValue.data = dataElement.toProto()
+      protoValue.data = dataElement.toProto()
     }
     return protoValue.build()
   }

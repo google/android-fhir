@@ -355,151 +355,151 @@ object TaskConverter {
   private fun Type.taskInputValueToProto(): Task.Parameter.ValueX {
     val protoValue = Task.Parameter.ValueX.newBuilder()
     if (this is Base64BinaryType) {
-        protoValue.base64Binary = this.toProto()
+      protoValue.base64Binary = this.toProto()
     }
     if (this is BooleanType) {
-        protoValue.boolean = this.toProto()
+      protoValue.boolean = this.toProto()
     }
     if (this is CanonicalType) {
-        protoValue.canonical = this.toProto()
+      protoValue.canonical = this.toProto()
     }
     if (this is CodeType) {
-        protoValue.code = this.toProto()
+      protoValue.code = this.toProto()
     }
     if (this is DateType) {
-        protoValue.date = this.toProto()
+      protoValue.date = this.toProto()
     }
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is DecimalType) {
-        protoValue.decimal = this.toProto()
+      protoValue.decimal = this.toProto()
     }
     if (this is IdType) {
-        protoValue.id = this.toProto()
+      protoValue.id = this.toProto()
     }
     if (this is InstantType) {
-        protoValue.instant = this.toProto()
+      protoValue.instant = this.toProto()
     }
     if (this is IntegerType) {
-        protoValue.integer = this.toProto()
+      protoValue.integer = this.toProto()
     }
     if (this is MarkdownType) {
-        protoValue.markdown = this.toProto()
+      protoValue.markdown = this.toProto()
     }
     if (this is OidType) {
-        protoValue.oid = this.toProto()
+      protoValue.oid = this.toProto()
     }
     if (this is PositiveIntType) {
-        protoValue.positiveInt = this.toProto()
+      protoValue.positiveInt = this.toProto()
     }
     if (this is StringType) {
-        protoValue.stringValue = this.toProto()
+      protoValue.stringValue = this.toProto()
     }
     if (this is TimeType) {
-        protoValue.time = this.toProto()
+      protoValue.time = this.toProto()
     }
     if (this is UnsignedIntType) {
-        protoValue.unsignedInt = this.toProto()
+      protoValue.unsignedInt = this.toProto()
     }
     if (this is UriType) {
-        protoValue.uri = this.toProto()
+      protoValue.uri = this.toProto()
     }
     if (this is UrlType) {
-        protoValue.url = this.toProto()
+      protoValue.url = this.toProto()
     }
     if (this is UuidType) {
-        protoValue.uuid = this.toProto()
+      protoValue.uuid = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Address) {
-        protoValue.address = this.toProto()
+      protoValue.address = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Age) {
-        protoValue.age = this.toProto()
+      protoValue.age = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Annotation) {
-        protoValue.annotation = this.toProto()
+      protoValue.annotation = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Attachment) {
-        protoValue.attachment = this.toProto()
+      protoValue.attachment = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Coding) {
-        protoValue.coding = this.toProto()
+      protoValue.coding = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.ContactPoint) {
-        protoValue.contactPoint = this.toProto()
+      protoValue.contactPoint = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Count) {
-        protoValue.count = this.toProto()
+      protoValue.count = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Distance) {
-        protoValue.distance = this.toProto()
+      protoValue.distance = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Duration) {
-        protoValue.duration = this.toProto()
+      protoValue.duration = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.HumanName) {
-        protoValue.humanName = this.toProto()
+      protoValue.humanName = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Identifier) {
-        protoValue.identifier = this.toProto()
+      protoValue.identifier = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Money) {
-        protoValue.money = this.toProto()
+      protoValue.money = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Quantity) {
-        protoValue.quantity = this.toProto()
+      protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Ratio) {
-        protoValue.ratio = this.toProto()
+      protoValue.ratio = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.SampledData) {
-        protoValue.sampledData = this.toProto()
+      protoValue.sampledData = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Signature) {
-        protoValue.signature = this.toProto()
+      protoValue.signature = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Timing) {
-        protoValue.timing = this.toProto()
+      protoValue.timing = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.ContactDetail) {
-        protoValue.contactDetail = this.toProto()
+      protoValue.contactDetail = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Contributor) {
-        protoValue.contributor = this.toProto()
+      protoValue.contributor = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.DataRequirement) {
-        protoValue.dataRequirement = this.toProto()
+      protoValue.dataRequirement = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Expression) {
-        protoValue.expression = this.toProto()
+      protoValue.expression = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.ParameterDefinition) {
-        protoValue.parameterDefinition = this.toProto()
+      protoValue.parameterDefinition = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.RelatedArtifact) {
-        protoValue.relatedArtifact = this.toProto()
+      protoValue.relatedArtifact = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.TriggerDefinition) {
-        protoValue.triggerDefinition = this.toProto()
+      protoValue.triggerDefinition = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.UsageContext) {
-        protoValue.usageContext = this.toProto()
+      protoValue.usageContext = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Dosage) {
-        protoValue.dosage = this.toProto()
+      protoValue.dosage = this.toProto()
     }
     return protoValue.build()
   }
@@ -660,151 +660,151 @@ object TaskConverter {
   private fun Type.taskOutputValueToProto(): Task.Output.ValueX {
     val protoValue = Task.Output.ValueX.newBuilder()
     if (this is Base64BinaryType) {
-        protoValue.base64Binary = this.toProto()
+      protoValue.base64Binary = this.toProto()
     }
     if (this is BooleanType) {
-        protoValue.boolean = this.toProto()
+      protoValue.boolean = this.toProto()
     }
     if (this is CanonicalType) {
-        protoValue.canonical = this.toProto()
+      protoValue.canonical = this.toProto()
     }
     if (this is CodeType) {
-        protoValue.code = this.toProto()
+      protoValue.code = this.toProto()
     }
     if (this is DateType) {
-        protoValue.date = this.toProto()
+      protoValue.date = this.toProto()
     }
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is DecimalType) {
-        protoValue.decimal = this.toProto()
+      protoValue.decimal = this.toProto()
     }
     if (this is IdType) {
-        protoValue.id = this.toProto()
+      protoValue.id = this.toProto()
     }
     if (this is InstantType) {
-        protoValue.instant = this.toProto()
+      protoValue.instant = this.toProto()
     }
     if (this is IntegerType) {
-        protoValue.integer = this.toProto()
+      protoValue.integer = this.toProto()
     }
     if (this is MarkdownType) {
-        protoValue.markdown = this.toProto()
+      protoValue.markdown = this.toProto()
     }
     if (this is OidType) {
-        protoValue.oid = this.toProto()
+      protoValue.oid = this.toProto()
     }
     if (this is PositiveIntType) {
-        protoValue.positiveInt = this.toProto()
+      protoValue.positiveInt = this.toProto()
     }
     if (this is StringType) {
-        protoValue.stringValue = this.toProto()
+      protoValue.stringValue = this.toProto()
     }
     if (this is TimeType) {
-        protoValue.time = this.toProto()
+      protoValue.time = this.toProto()
     }
     if (this is UnsignedIntType) {
-        protoValue.unsignedInt = this.toProto()
+      protoValue.unsignedInt = this.toProto()
     }
     if (this is UriType) {
-        protoValue.uri = this.toProto()
+      protoValue.uri = this.toProto()
     }
     if (this is UrlType) {
-        protoValue.url = this.toProto()
+      protoValue.url = this.toProto()
     }
     if (this is UuidType) {
-        protoValue.uuid = this.toProto()
+      protoValue.uuid = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Address) {
-        protoValue.address = this.toProto()
+      protoValue.address = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Age) {
-        protoValue.age = this.toProto()
+      protoValue.age = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Annotation) {
-        protoValue.annotation = this.toProto()
+      protoValue.annotation = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Attachment) {
-        protoValue.attachment = this.toProto()
+      protoValue.attachment = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Coding) {
-        protoValue.coding = this.toProto()
+      protoValue.coding = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.ContactPoint) {
-        protoValue.contactPoint = this.toProto()
+      protoValue.contactPoint = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Count) {
-        protoValue.count = this.toProto()
+      protoValue.count = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Distance) {
-        protoValue.distance = this.toProto()
+      protoValue.distance = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Duration) {
-        protoValue.duration = this.toProto()
+      protoValue.duration = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.HumanName) {
-        protoValue.humanName = this.toProto()
+      protoValue.humanName = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Identifier) {
-        protoValue.identifier = this.toProto()
+      protoValue.identifier = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Money) {
-        protoValue.money = this.toProto()
+      protoValue.money = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Quantity) {
-        protoValue.quantity = this.toProto()
+      protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Ratio) {
-        protoValue.ratio = this.toProto()
+      protoValue.ratio = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.SampledData) {
-        protoValue.sampledData = this.toProto()
+      protoValue.sampledData = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Signature) {
-        protoValue.signature = this.toProto()
+      protoValue.signature = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Timing) {
-        protoValue.timing = this.toProto()
+      protoValue.timing = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.ContactDetail) {
-        protoValue.contactDetail = this.toProto()
+      protoValue.contactDetail = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Contributor) {
-        protoValue.contributor = this.toProto()
+      protoValue.contributor = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.DataRequirement) {
-        protoValue.dataRequirement = this.toProto()
+      protoValue.dataRequirement = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Expression) {
-        protoValue.expression = this.toProto()
+      protoValue.expression = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.ParameterDefinition) {
-        protoValue.parameterDefinition = this.toProto()
+      protoValue.parameterDefinition = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.RelatedArtifact) {
-        protoValue.relatedArtifact = this.toProto()
+      protoValue.relatedArtifact = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.TriggerDefinition) {
-        protoValue.triggerDefinition = this.toProto()
+      protoValue.triggerDefinition = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.UsageContext) {
-        protoValue.usageContext = this.toProto()
+      protoValue.usageContext = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Dosage) {
-        protoValue.dosage = this.toProto()
+      protoValue.dosage = this.toProto()
     }
     return protoValue.build()
   }
@@ -814,112 +814,115 @@ object TaskConverter {
     val hapiValue = org.hl7.fhir.r4.model.Task()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasInstantiatesCanonical()) {
-        hapiValue.instantiatesCanonicalElement = instantiatesCanonical.toHapi()
+      hapiValue.instantiatesCanonicalElement = instantiatesCanonical.toHapi()
     }
     if (hasInstantiatesUri()) {
-        hapiValue.instantiatesUriElement = instantiatesUri.toHapi()
+      hapiValue.instantiatesUriElement = instantiatesUri.toHapi()
     }
     if (basedOnCount > 0) {
-        hapiValue.basedOn = basedOnList.map { it.toHapi() }
+      hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
     if (hasGroupIdentifier()) {
-        hapiValue.groupIdentifier = groupIdentifier.toHapi()
+      hapiValue.groupIdentifier = groupIdentifier.toHapi()
     }
     if (partOfCount > 0) {
-        hapiValue.partOf = partOfList.map { it.toHapi() }
+      hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.Task.TaskStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.Task.TaskStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasStatusReason()) {
-        hapiValue.statusReason = statusReason.toHapi()
+      hapiValue.statusReason = statusReason.toHapi()
     }
     if (hasBusinessStatus()) {
-        hapiValue.businessStatus = businessStatus.toHapi()
+      hapiValue.businessStatus = businessStatus.toHapi()
     }
-      hapiValue.intent = org.hl7.fhir.r4.model.Task.TaskIntent.valueOf(
-          intent.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.intent =
+      org.hl7.fhir.r4.model.Task.TaskIntent.valueOf(
+        intent.value.name.hapiCodeCheck().replace("_", "")
       )
-      hapiValue.priority = org.hl7.fhir.r4.model.Task.TaskPriority.valueOf(
-          priority.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.priority =
+      org.hl7.fhir.r4.model.Task.TaskPriority.valueOf(
+        priority.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (hasFocus()) {
-        hapiValue.focus = focus.toHapi()
+      hapiValue.focus = focus.toHapi()
     }
     if (hasForValue()) {
       hapiValue.setFor(forValue.toHapi())
     }
     if (hasEncounter()) {
-        hapiValue.encounter = encounter.toHapi()
+      hapiValue.encounter = encounter.toHapi()
     }
     if (hasExecutionPeriod()) {
-        hapiValue.executionPeriod = executionPeriod.toHapi()
+      hapiValue.executionPeriod = executionPeriod.toHapi()
     }
     if (hasAuthoredOn()) {
-        hapiValue.authoredOnElement = authoredOn.toHapi()
+      hapiValue.authoredOnElement = authoredOn.toHapi()
     }
     if (hasLastModified()) {
-        hapiValue.lastModifiedElement = lastModified.toHapi()
+      hapiValue.lastModifiedElement = lastModified.toHapi()
     }
     if (hasRequester()) {
-        hapiValue.requester = requester.toHapi()
+      hapiValue.requester = requester.toHapi()
     }
     if (performerTypeCount > 0) {
-        hapiValue.performerType = performerTypeList.map { it.toHapi() }
+      hapiValue.performerType = performerTypeList.map { it.toHapi() }
     }
     if (hasOwner()) {
-        hapiValue.owner = owner.toHapi()
+      hapiValue.owner = owner.toHapi()
     }
     if (hasLocation()) {
-        hapiValue.location = location.toHapi()
+      hapiValue.location = location.toHapi()
     }
     if (hasReasonCode()) {
-        hapiValue.reasonCode = reasonCode.toHapi()
+      hapiValue.reasonCode = reasonCode.toHapi()
     }
     if (hasReasonReference()) {
-        hapiValue.reasonReference = reasonReference.toHapi()
+      hapiValue.reasonReference = reasonReference.toHapi()
     }
     if (insuranceCount > 0) {
-        hapiValue.insurance = insuranceList.map { it.toHapi() }
+      hapiValue.insurance = insuranceList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     if (relevantHistoryCount > 0) {
-        hapiValue.relevantHistory = relevantHistoryList.map { it.toHapi() }
+      hapiValue.relevantHistory = relevantHistoryList.map { it.toHapi() }
     }
     if (hasRestriction()) {
-        hapiValue.restriction = restriction.toHapi()
+      hapiValue.restriction = restriction.toHapi()
     }
     if (inputCount > 0) {
-        hapiValue.input = inputList.map { it.toHapi() }
+      hapiValue.input = inputList.map { it.toHapi() }
     }
     if (outputCount > 0) {
-        hapiValue.output = outputList.map { it.toHapi() }
+      hapiValue.output = outputList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -928,13 +931,13 @@ object TaskConverter {
   fun org.hl7.fhir.r4.model.Task.toProto(): Task {
     val protoValue = Task.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -946,88 +949,91 @@ object TaskConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasInstantiatesCanonical()) {
-        protoValue.instantiatesCanonical = instantiatesCanonicalElement.toProto()
+      protoValue.instantiatesCanonical = instantiatesCanonicalElement.toProto()
     }
     if (hasInstantiatesUri()) {
-        protoValue.instantiatesUri = instantiatesUriElement.toProto()
+      protoValue.instantiatesUri = instantiatesUriElement.toProto()
     }
     if (hasBasedOn()) {
       protoValue.addAllBasedOn(basedOn.map { it.toProto() })
     }
     if (hasGroupIdentifier()) {
-        protoValue.groupIdentifier = groupIdentifier.toProto()
+      protoValue.groupIdentifier = groupIdentifier.toProto()
     }
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-      protoValue.status = Task.StatusCode.newBuilder()
-          .setValue(
-              TaskStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      Task.StatusCode.newBuilder()
+        .setValue(
+          TaskStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasStatusReason()) {
-        protoValue.statusReason = statusReason.toProto()
+      protoValue.statusReason = statusReason.toProto()
     }
     if (hasBusinessStatus()) {
-        protoValue.businessStatus = businessStatus.toProto()
+      protoValue.businessStatus = businessStatus.toProto()
     }
-      protoValue.intent = Task.IntentCode.newBuilder()
-          .setValue(
-              TaskIntentValueSet.Value.valueOf(
-                  intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.intent =
+      Task.IntentCode.newBuilder()
+        .setValue(
+          TaskIntentValueSet.Value.valueOf(
+            intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
-      protoValue.priority = Task.PriorityCode.newBuilder()
-          .setValue(
-              RequestPriorityCode.Value.valueOf(
-                  priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+        )
+        .build()
+    protoValue.priority =
+      Task.PriorityCode.newBuilder()
+        .setValue(
+          RequestPriorityCode.Value.valueOf(
+            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasFocus()) {
-        protoValue.focus = focus.toProto()
+      protoValue.focus = focus.toProto()
     }
     if (hasFor()) {
-        protoValue.forValue = `for`.toProto()
+      protoValue.forValue = `for`.toProto()
     }
     if (hasEncounter()) {
-        protoValue.encounter = encounter.toProto()
+      protoValue.encounter = encounter.toProto()
     }
     if (hasExecutionPeriod()) {
-        protoValue.executionPeriod = executionPeriod.toProto()
+      protoValue.executionPeriod = executionPeriod.toProto()
     }
     if (hasAuthoredOn()) {
-        protoValue.authoredOn = authoredOnElement.toProto()
+      protoValue.authoredOn = authoredOnElement.toProto()
     }
     if (hasLastModified()) {
-        protoValue.lastModified = lastModifiedElement.toProto()
+      protoValue.lastModified = lastModifiedElement.toProto()
     }
     if (hasRequester()) {
-        protoValue.requester = requester.toProto()
+      protoValue.requester = requester.toProto()
     }
     if (hasPerformerType()) {
       protoValue.addAllPerformerType(performerType.map { it.toProto() })
     }
     if (hasOwner()) {
-        protoValue.owner = owner.toProto()
+      protoValue.owner = owner.toProto()
     }
     if (hasLocation()) {
-        protoValue.location = location.toProto()
+      protoValue.location = location.toProto()
     }
     if (hasReasonCode()) {
-        protoValue.reasonCode = reasonCode.toProto()
+      protoValue.reasonCode = reasonCode.toProto()
     }
     if (hasReasonReference()) {
-        protoValue.reasonReference = reasonReference.toProto()
+      protoValue.reasonReference = reasonReference.toProto()
     }
     if (hasInsurance()) {
       protoValue.addAllInsurance(insurance.map { it.toProto() })
@@ -1039,7 +1045,7 @@ object TaskConverter {
       protoValue.addAllRelevantHistory(relevantHistory.map { it.toProto() })
     }
     if (hasRestriction()) {
-        protoValue.restriction = restriction.toProto()
+      protoValue.restriction = restriction.toProto()
     }
     if (hasInput()) {
       protoValue.addAllInput(input.map { it.toProto() })
@@ -1060,10 +1066,10 @@ object TaskConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasRepetitions()) {
-        protoValue.repetitions = repetitionsElement.toProto()
+      protoValue.repetitions = repetitionsElement.toProto()
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     if (hasRecipient()) {
       protoValue.addAllRecipient(recipient.map { it.toProto() })
@@ -1081,10 +1087,10 @@ object TaskConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasValue()) {
-        protoValue.value = value.taskInputValueToProto()
+      protoValue.value = value.taskInputValueToProto()
     }
     return protoValue.build()
   }
@@ -1099,10 +1105,10 @@ object TaskConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasValue()) {
-        protoValue.value = value.taskOutputValueToProto()
+      protoValue.value = value.taskOutputValueToProto()
     }
     return protoValue.build()
   }
@@ -1112,19 +1118,19 @@ object TaskConverter {
     val hapiValue = org.hl7.fhir.r4.model.Task.TaskRestrictionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasRepetitions()) {
-        hapiValue.repetitionsElement = repetitions.toHapi()
+      hapiValue.repetitionsElement = repetitions.toHapi()
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     if (recipientCount > 0) {
-        hapiValue.recipient = recipientList.map { it.toHapi() }
+      hapiValue.recipient = recipientList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -1134,16 +1140,16 @@ object TaskConverter {
     val hapiValue = org.hl7.fhir.r4.model.Task.ParameterComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasValue()) {
-        hapiValue.value = value.taskInputValueToHapi()
+      hapiValue.value = value.taskInputValueToHapi()
     }
     return hapiValue
   }
@@ -1153,16 +1159,16 @@ object TaskConverter {
     val hapiValue = org.hl7.fhir.r4.model.Task.TaskOutputComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasValue()) {
-        hapiValue.value = value.taskOutputValueToHapi()
+      hapiValue.value = value.taskOutputValueToHapi()
     }
     return hapiValue
   }

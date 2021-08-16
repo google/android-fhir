@@ -53,61 +53,61 @@ object PractitionerRoleConverter {
     val hapiValue = org.hl7.fhir.r4.model.PractitionerRole()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasActive()) {
-        hapiValue.activeElement = active.toHapi()
+      hapiValue.activeElement = active.toHapi()
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     if (hasPractitioner()) {
-        hapiValue.practitioner = practitioner.toHapi()
+      hapiValue.practitioner = practitioner.toHapi()
     }
     if (hasOrganization()) {
-        hapiValue.organization = organization.toHapi()
+      hapiValue.organization = organization.toHapi()
     }
     if (codeCount > 0) {
-        hapiValue.code = codeList.map { it.toHapi() }
+      hapiValue.code = codeList.map { it.toHapi() }
     }
     if (specialtyCount > 0) {
-        hapiValue.specialty = specialtyList.map { it.toHapi() }
+      hapiValue.specialty = specialtyList.map { it.toHapi() }
     }
     if (locationCount > 0) {
-        hapiValue.location = locationList.map { it.toHapi() }
+      hapiValue.location = locationList.map { it.toHapi() }
     }
     if (healthcareServiceCount > 0) {
-        hapiValue.healthcareService = healthcareServiceList.map { it.toHapi() }
+      hapiValue.healthcareService = healthcareServiceList.map { it.toHapi() }
     }
     if (telecomCount > 0) {
-        hapiValue.telecom = telecomList.map { it.toHapi() }
+      hapiValue.telecom = telecomList.map { it.toHapi() }
     }
     if (availableTimeCount > 0) {
-        hapiValue.availableTime = availableTimeList.map { it.toHapi() }
+      hapiValue.availableTime = availableTimeList.map { it.toHapi() }
     }
     if (notAvailableCount > 0) {
-        hapiValue.notAvailable = notAvailableList.map { it.toHapi() }
+      hapiValue.notAvailable = notAvailableList.map { it.toHapi() }
     }
     if (hasAvailabilityExceptions()) {
-        hapiValue.availabilityExceptionsElement = availabilityExceptions.toHapi()
+      hapiValue.availabilityExceptionsElement = availabilityExceptions.toHapi()
     }
     if (endpointCount > 0) {
-        hapiValue.endpoint = endpointList.map { it.toHapi() }
+      hapiValue.endpoint = endpointList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -116,13 +116,13 @@ object PractitionerRoleConverter {
   fun org.hl7.fhir.r4.model.PractitionerRole.toProto(): PractitionerRole {
     val protoValue = PractitionerRole.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -134,16 +134,16 @@ object PractitionerRoleConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasActive()) {
-        protoValue.active = activeElement.toProto()
+      protoValue.active = activeElement.toProto()
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     if (hasPractitioner()) {
-        protoValue.practitioner = practitioner.toProto()
+      protoValue.practitioner = practitioner.toProto()
     }
     if (hasOrganization()) {
-        protoValue.organization = organization.toProto()
+      protoValue.organization = organization.toProto()
     }
     if (hasCode()) {
       protoValue.addAllCode(code.map { it.toProto() })
@@ -167,7 +167,7 @@ object PractitionerRoleConverter {
       protoValue.addAllNotAvailable(notAvailable.map { it.toProto() })
     }
     if (hasAvailabilityExceptions()) {
-        protoValue.availabilityExceptions = availabilityExceptionsElement.toProto()
+      protoValue.availabilityExceptions = availabilityExceptionsElement.toProto()
     }
     if (hasEndpoint()) {
       protoValue.addAllEndpoint(endpoint.map { it.toProto() })
@@ -198,13 +198,13 @@ object PractitionerRoleConverter {
       }
     )
     if (hasAllDay()) {
-        protoValue.allDay = allDayElement.toProto()
+      protoValue.allDay = allDayElement.toProto()
     }
     if (hasAvailableStartTime()) {
-        protoValue.availableStartTime = availableStartTimeElement.toProto()
+      protoValue.availableStartTime = availableStartTimeElement.toProto()
     }
     if (hasAvailableEndTime()) {
-        protoValue.availableEndTime = availableEndTimeElement.toProto()
+      protoValue.availableEndTime = availableEndTimeElement.toProto()
     }
     return protoValue.build()
   }
@@ -221,10 +221,10 @@ object PractitionerRoleConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasDuring()) {
-        protoValue.during = during.toProto()
+      protoValue.during = during.toProto()
     }
     return protoValue.build()
   }
@@ -235,10 +235,10 @@ object PractitionerRoleConverter {
     val hapiValue = org.hl7.fhir.r4.model.PractitionerRole.PractitionerRoleAvailableTimeComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     daysOfWeekList.forEach {
       hapiValue.addDaysOfWeek(
@@ -248,13 +248,13 @@ object PractitionerRoleConverter {
       )
     }
     if (hasAllDay()) {
-        hapiValue.allDayElement = allDay.toHapi()
+      hapiValue.allDayElement = allDay.toHapi()
     }
     if (hasAvailableStartTime()) {
-        hapiValue.availableStartTimeElement = availableStartTime.toHapi()
+      hapiValue.availableStartTimeElement = availableStartTime.toHapi()
     }
     if (hasAvailableEndTime()) {
-        hapiValue.availableEndTimeElement = availableEndTime.toHapi()
+      hapiValue.availableEndTimeElement = availableEndTime.toHapi()
     }
     return hapiValue
   }
@@ -265,16 +265,16 @@ object PractitionerRoleConverter {
     val hapiValue = org.hl7.fhir.r4.model.PractitionerRole.PractitionerRoleNotAvailableComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (hasDuring()) {
-        hapiValue.during = during.toHapi()
+      hapiValue.during = during.toHapi()
     }
     return hapiValue
   }

@@ -62,90 +62,92 @@ object TerminologyCapabilitiesConverter {
     val hapiValue = org.hl7.fhir.r4.model.TerminologyCapabilities()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-        hapiValue.urlElement = url.toHapi()
+      hapiValue.urlElement = url.toHapi()
     }
     if (hasVersion()) {
-        hapiValue.versionElement = version.toHapi()
+      hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-        hapiValue.titleElement = title.toHapi()
+      hapiValue.titleElement = title.toHapi()
     }
-      hapiValue.status =
-          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    hapiValue.status =
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-        hapiValue.experimentalElement = experimental.toHapi()
+      hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasDate()) {
-        hapiValue.dateElement = date.toHapi()
+      hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-        hapiValue.publisherElement = publisher.toHapi()
+      hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-        hapiValue.contact = contactList.map { it.toHapi() }
+      hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (useContextCount > 0) {
-        hapiValue.useContext = useContextList.map { it.toHapi() }
+      hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
+      hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasPurpose()) {
-        hapiValue.purposeElement = purpose.toHapi()
+      hapiValue.purposeElement = purpose.toHapi()
     }
     if (hasCopyright()) {
-        hapiValue.copyrightElement = copyright.toHapi()
+      hapiValue.copyrightElement = copyright.toHapi()
     }
-      hapiValue.kind = org.hl7.fhir.r4.model.TerminologyCapabilities.CapabilityStatementKind.valueOf(
-          kind.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.kind =
+      org.hl7.fhir.r4.model.TerminologyCapabilities.CapabilityStatementKind.valueOf(
+        kind.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasSoftware()) {
-        hapiValue.software = software.toHapi()
+      hapiValue.software = software.toHapi()
     }
     if (hasImplementation()) {
-        hapiValue.implementation = implementation.toHapi()
+      hapiValue.implementation = implementation.toHapi()
     }
     if (hasLockedDate()) {
-        hapiValue.lockedDateElement = lockedDate.toHapi()
+      hapiValue.lockedDateElement = lockedDate.toHapi()
     }
     if (codeSystemCount > 0) {
-        hapiValue.codeSystem = codeSystemList.map { it.toHapi() }
+      hapiValue.codeSystem = codeSystemList.map { it.toHapi() }
     }
     if (hasExpansion()) {
-        hapiValue.expansion = expansion.toHapi()
+      hapiValue.expansion = expansion.toHapi()
     }
-      hapiValue.codeSearch = org.hl7.fhir.r4.model.TerminologyCapabilities.CodeSearchSupport.valueOf(
-          codeSearch.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.codeSearch =
+      org.hl7.fhir.r4.model.TerminologyCapabilities.CodeSearchSupport.valueOf(
+        codeSearch.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasValidateCode()) {
-        hapiValue.validateCode = validateCode.toHapi()
+      hapiValue.validateCode = validateCode.toHapi()
     }
     if (hasTranslation()) {
-        hapiValue.translation = translation.toHapi()
+      hapiValue.translation = translation.toHapi()
     }
     if (hasClosure()) {
-        hapiValue.closure = closure.toHapi()
+      hapiValue.closure = closure.toHapi()
     }
     return hapiValue
   }
@@ -154,13 +156,13 @@ object TerminologyCapabilitiesConverter {
   fun org.hl7.fhir.r4.model.TerminologyCapabilities.toProto(): TerminologyCapabilities {
     val protoValue = TerminologyCapabilities.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -169,38 +171,39 @@ object TerminologyCapabilitiesConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-        protoValue.url = urlElement.toProto()
+      protoValue.url = urlElement.toProto()
     }
     if (hasVersion()) {
-        protoValue.version = versionElement.toProto()
+      protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-        protoValue.title = titleElement.toProto()
+      protoValue.title = titleElement.toProto()
     }
-      protoValue.status = TerminologyCapabilities.StatusCode.newBuilder()
-          .setValue(
-              PublicationStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      TerminologyCapabilities.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasExperimental()) {
-        protoValue.experimental = experimentalElement.toProto()
+      protoValue.experimental = experimentalElement.toProto()
     }
     if (hasDate()) {
-        protoValue.date = dateElement.toProto()
+      protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-        protoValue.publisher = publisherElement.toProto()
+      protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasUseContext()) {
       protoValue.addAllUseContext(useContext.map { it.toProto() })
@@ -209,48 +212,50 @@ object TerminologyCapabilitiesConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasPurpose()) {
-        protoValue.purpose = purposeElement.toProto()
+      protoValue.purpose = purposeElement.toProto()
     }
     if (hasCopyright()) {
-        protoValue.copyright = copyrightElement.toProto()
+      protoValue.copyright = copyrightElement.toProto()
     }
-      protoValue.kind = TerminologyCapabilities.KindCode.newBuilder()
-          .setValue(
-              CapabilityStatementKindCode.Value.valueOf(
-                  kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.kind =
+      TerminologyCapabilities.KindCode.newBuilder()
+        .setValue(
+          CapabilityStatementKindCode.Value.valueOf(
+            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasSoftware()) {
-        protoValue.software = software.toProto()
+      protoValue.software = software.toProto()
     }
     if (hasImplementation()) {
-        protoValue.implementation = implementation.toProto()
+      protoValue.implementation = implementation.toProto()
     }
     if (hasLockedDate()) {
-        protoValue.lockedDate = lockedDateElement.toProto()
+      protoValue.lockedDate = lockedDateElement.toProto()
     }
     if (hasCodeSystem()) {
       protoValue.addAllCodeSystem(codeSystem.map { it.toProto() })
     }
     if (hasExpansion()) {
-        protoValue.expansion = expansion.toProto()
+      protoValue.expansion = expansion.toProto()
     }
-      protoValue.codeSearch = TerminologyCapabilities.CodeSearchCode.newBuilder()
-          .setValue(
-              CodeSearchSupportCode.Value.valueOf(
-                  codeSearch.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.codeSearch =
+      TerminologyCapabilities.CodeSearchCode.newBuilder()
+        .setValue(
+          CodeSearchSupportCode.Value.valueOf(
+            codeSearch.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasValidateCode()) {
-        protoValue.validateCode = validateCode.toProto()
+      protoValue.validateCode = validateCode.toProto()
     }
     if (hasTranslation()) {
-        protoValue.translation = translation.toProto()
+      protoValue.translation = translation.toProto()
     }
     if (hasClosure()) {
-        protoValue.closure = closure.toProto()
+      protoValue.closure = closure.toProto()
     }
     return protoValue.build()
   }
@@ -267,10 +272,10 @@ object TerminologyCapabilitiesConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasVersion()) {
-        protoValue.version = versionElement.toProto()
+      protoValue.version = versionElement.toProto()
     }
     return protoValue.build()
   }
@@ -287,10 +292,10 @@ object TerminologyCapabilitiesConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasUrl()) {
-        protoValue.url = urlElement.toProto()
+      protoValue.url = urlElement.toProto()
     }
     return protoValue.build()
   }
@@ -307,13 +312,13 @@ object TerminologyCapabilitiesConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUri()) {
-        protoValue.uri = uriElement.toProto()
+      protoValue.uri = uriElement.toProto()
     }
     if (hasVersion()) {
       protoValue.addAllVersion(version.map { it.toProto() })
     }
     if (hasSubsumption()) {
-        protoValue.subsumption = subsumptionElement.toProto()
+      protoValue.subsumption = subsumptionElement.toProto()
     }
     return protoValue.build()
   }
@@ -331,13 +336,13 @@ object TerminologyCapabilitiesConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = codeElement.toProto()
+      protoValue.code = codeElement.toProto()
     }
     if (hasIsDefault()) {
-        protoValue.isDefault = isDefaultElement.toProto()
+      protoValue.isDefault = isDefaultElement.toProto()
     }
     if (hasCompositional()) {
-        protoValue.compositional = compositionalElement.toProto()
+      protoValue.compositional = compositionalElement.toProto()
     }
     if (hasLanguage()) {
       protoValue.addAllLanguage(language.map { it.toProto() })
@@ -364,7 +369,7 @@ object TerminologyCapabilitiesConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = codeElement.toProto()
+      protoValue.code = codeElement.toProto()
     }
     if (hasOp()) {
       protoValue.addAllOp(op.map { it.toProto() })
@@ -384,19 +389,19 @@ object TerminologyCapabilitiesConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasHierarchical()) {
-        protoValue.hierarchical = hierarchicalElement.toProto()
+      protoValue.hierarchical = hierarchicalElement.toProto()
     }
     if (hasPaging()) {
-        protoValue.paging = pagingElement.toProto()
+      protoValue.paging = pagingElement.toProto()
     }
     if (hasIncomplete()) {
-        protoValue.incomplete = incompleteElement.toProto()
+      protoValue.incomplete = incompleteElement.toProto()
     }
     if (hasParameter()) {
       protoValue.addAllParameter(parameter.map { it.toProto() })
     }
     if (hasTextFilter()) {
-        protoValue.textFilter = textFilterElement.toProto()
+      protoValue.textFilter = textFilterElement.toProto()
     }
     return protoValue.build()
   }
@@ -414,10 +419,10 @@ object TerminologyCapabilitiesConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasDocumentation()) {
-        protoValue.documentation = documentationElement.toProto()
+      protoValue.documentation = documentationElement.toProto()
     }
     return protoValue.build()
   }
@@ -434,7 +439,7 @@ object TerminologyCapabilitiesConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasTranslations()) {
-        protoValue.translations = translationsElement.toProto()
+      protoValue.translations = translationsElement.toProto()
     }
     return protoValue.build()
   }
@@ -451,7 +456,7 @@ object TerminologyCapabilitiesConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasNeedsMap()) {
-        protoValue.needsMap = needsMapElement.toProto()
+      protoValue.needsMap = needsMapElement.toProto()
     }
     return protoValue.build()
   }
@@ -468,7 +473,7 @@ object TerminologyCapabilitiesConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasTranslation()) {
-        protoValue.translation = translationElement.toProto()
+      protoValue.translation = translationElement.toProto()
     }
     return protoValue.build()
   }
@@ -480,16 +485,16 @@ object TerminologyCapabilitiesConverter {
       org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesSoftwareComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasVersion()) {
-        hapiValue.versionElement = version.toHapi()
+      hapiValue.versionElement = version.toHapi()
     }
     return hapiValue
   }
@@ -501,16 +506,16 @@ object TerminologyCapabilitiesConverter {
       org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesImplementationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (hasUrl()) {
-        hapiValue.urlElement = url.toHapi()
+      hapiValue.urlElement = url.toHapi()
     }
     return hapiValue
   }
@@ -522,19 +527,19 @@ object TerminologyCapabilitiesConverter {
       org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesCodeSystemComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUri()) {
-        hapiValue.uriElement = uri.toHapi()
+      hapiValue.uriElement = uri.toHapi()
     }
     if (versionCount > 0) {
-        hapiValue.version = versionList.map { it.toHapi() }
+      hapiValue.version = versionList.map { it.toHapi() }
     }
     if (hasSubsumption()) {
-        hapiValue.subsumptionElement = subsumption.toHapi()
+      hapiValue.subsumptionElement = subsumption.toHapi()
     }
     return hapiValue
   }
@@ -547,28 +552,28 @@ object TerminologyCapabilitiesConverter {
         .TerminologyCapabilitiesCodeSystemVersionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.codeElement = code.toHapi()
+      hapiValue.codeElement = code.toHapi()
     }
     if (hasIsDefault()) {
-        hapiValue.isDefaultElement = isDefault.toHapi()
+      hapiValue.isDefaultElement = isDefault.toHapi()
     }
     if (hasCompositional()) {
-        hapiValue.compositionalElement = compositional.toHapi()
+      hapiValue.compositionalElement = compositional.toHapi()
     }
     if (languageCount > 0) {
-        hapiValue.language = languageList.map { it.toHapi() }
+      hapiValue.language = languageList.map { it.toHapi() }
     }
     if (filterCount > 0) {
-        hapiValue.filter = filterList.map { it.toHapi() }
+      hapiValue.filter = filterList.map { it.toHapi() }
     }
     if (propertyCount > 0) {
-        hapiValue.property = propertyList.map { it.toHapi() }
+      hapiValue.property = propertyList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -581,16 +586,16 @@ object TerminologyCapabilitiesConverter {
         .TerminologyCapabilitiesCodeSystemVersionFilterComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.codeElement = code.toHapi()
+      hapiValue.codeElement = code.toHapi()
     }
     if (opCount > 0) {
-        hapiValue.op = opList.map { it.toHapi() }
+      hapiValue.op = opList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -602,25 +607,25 @@ object TerminologyCapabilitiesConverter {
       org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesExpansionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasHierarchical()) {
-        hapiValue.hierarchicalElement = hierarchical.toHapi()
+      hapiValue.hierarchicalElement = hierarchical.toHapi()
     }
     if (hasPaging()) {
-        hapiValue.pagingElement = paging.toHapi()
+      hapiValue.pagingElement = paging.toHapi()
     }
     if (hasIncomplete()) {
-        hapiValue.incompleteElement = incomplete.toHapi()
+      hapiValue.incompleteElement = incomplete.toHapi()
     }
     if (parameterCount > 0) {
-        hapiValue.parameter = parameterList.map { it.toHapi() }
+      hapiValue.parameter = parameterList.map { it.toHapi() }
     }
     if (hasTextFilter()) {
-        hapiValue.textFilterElement = textFilter.toHapi()
+      hapiValue.textFilterElement = textFilter.toHapi()
     }
     return hapiValue
   }
@@ -633,16 +638,16 @@ object TerminologyCapabilitiesConverter {
         .TerminologyCapabilitiesExpansionParameterComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasDocumentation()) {
-        hapiValue.documentationElement = documentation.toHapi()
+      hapiValue.documentationElement = documentation.toHapi()
     }
     return hapiValue
   }
@@ -654,13 +659,13 @@ object TerminologyCapabilitiesConverter {
       org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesValidateCodeComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasTranslations()) {
-        hapiValue.translationsElement = translations.toHapi()
+      hapiValue.translationsElement = translations.toHapi()
     }
     return hapiValue
   }
@@ -672,13 +677,13 @@ object TerminologyCapabilitiesConverter {
       org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesTranslationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasNeedsMap()) {
-        hapiValue.needsMapElement = needsMap.toHapi()
+      hapiValue.needsMapElement = needsMap.toHapi()
     }
     return hapiValue
   }
@@ -690,13 +695,13 @@ object TerminologyCapabilitiesConverter {
       org.hl7.fhir.r4.model.TerminologyCapabilities.TerminologyCapabilitiesClosureComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasTranslation()) {
-        hapiValue.translationElement = translation.toHapi()
+      hapiValue.translationElement = translation.toHapi()
     }
     return hapiValue
   }

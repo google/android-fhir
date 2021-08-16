@@ -30,13 +30,13 @@ object RatioConverter {
     val hapiValue = org.hl7.fhir.r4.model.Ratio()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasNumerator()) {
-        hapiValue.numerator = numerator.toHapi()
+      hapiValue.numerator = numerator.toHapi()
     }
     if (hasDenominator()) {
-        hapiValue.denominator = denominator.toHapi()
+      hapiValue.denominator = denominator.toHapi()
     }
     return hapiValue
   }
@@ -48,10 +48,10 @@ object RatioConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasNumerator()) {
-        protoValue.numerator = numerator.toProto()
+      protoValue.numerator = numerator.toProto()
     }
     if (hasDenominator()) {
-        protoValue.denominator = denominator.toProto()
+      protoValue.denominator = denominator.toProto()
     }
     return protoValue.build()
   }

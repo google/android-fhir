@@ -42,8 +42,6 @@ class DecimalConverterTest(private val hapi: DecimalType, private val proto: Dec
   }
 
   companion object {
-    @Parameterized.Parameters
-    @JvmStatic
-    fun `data`(): List<Any> = PrimitiveTestData.DECIMAL_DATA
+    @Parameterized.Parameters @JvmStatic fun `data`(): List<Any> = PrimitiveTestData.DECIMAL_DATA
   }
 }

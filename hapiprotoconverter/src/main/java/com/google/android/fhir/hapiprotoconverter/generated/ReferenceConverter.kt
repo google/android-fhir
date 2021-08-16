@@ -34,16 +34,16 @@ object ReferenceConverter {
     val hapiValue = org.hl7.fhir.r4.model.Reference()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.typeElement = type.toHapi()
+      hapiValue.typeElement = type.toHapi()
     }
     if (hasIdentifier()) {
-        hapiValue.identifier = identifier.toHapi()
+      hapiValue.identifier = identifier.toHapi()
     }
     if (hasDisplay()) {
-        hapiValue.displayElement = display.toHapi()
+      hapiValue.displayElement = display.toHapi()
     }
     return hapiValue
   }
@@ -55,13 +55,13 @@ object ReferenceConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = typeElement.toProto()
+      protoValue.type = typeElement.toProto()
     }
     if (hasIdentifier()) {
-        protoValue.identifier = identifier.toProto()
+      protoValue.identifier = identifier.toProto()
     }
     if (hasDisplay()) {
-        protoValue.display = displayElement.toProto()
+      protoValue.display = displayElement.toProto()
     }
     return protoValue.build()
   }

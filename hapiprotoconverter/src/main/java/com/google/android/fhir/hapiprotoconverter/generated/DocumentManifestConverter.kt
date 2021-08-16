@@ -47,55 +47,56 @@ object DocumentManifestConverter {
     val hapiValue = org.hl7.fhir.r4.model.DocumentManifest()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasMasterIdentifier()) {
-        hapiValue.masterIdentifier = masterIdentifier.toHapi()
+      hapiValue.masterIdentifier = masterIdentifier.toHapi()
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-      hapiValue.status = Enumerations.DocumentReferenceStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      Enumerations.DocumentReferenceStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (hasCreated()) {
-        hapiValue.createdElement = created.toHapi()
+      hapiValue.createdElement = created.toHapi()
     }
     if (authorCount > 0) {
-        hapiValue.author = authorList.map { it.toHapi() }
+      hapiValue.author = authorList.map { it.toHapi() }
     }
     if (recipientCount > 0) {
-        hapiValue.recipient = recipientList.map { it.toHapi() }
+      hapiValue.recipient = recipientList.map { it.toHapi() }
     }
     if (hasSource()) {
-        hapiValue.sourceElement = source.toHapi()
+      hapiValue.sourceElement = source.toHapi()
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (contentCount > 0) {
-        hapiValue.content = contentList.map { it.toHapi() }
+      hapiValue.content = contentList.map { it.toHapi() }
     }
     if (relatedCount > 0) {
-        hapiValue.related = relatedList.map { it.toHapi() }
+      hapiValue.related = relatedList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -104,13 +105,13 @@ object DocumentManifestConverter {
   fun org.hl7.fhir.r4.model.DocumentManifest.toProto(): DocumentManifest {
     val protoValue = DocumentManifest.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -119,26 +120,27 @@ object DocumentManifestConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasMasterIdentifier()) {
-        protoValue.masterIdentifier = masterIdentifier.toProto()
+      protoValue.masterIdentifier = masterIdentifier.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-      protoValue.status = DocumentManifest.StatusCode.newBuilder()
-          .setValue(
-              DocumentReferenceStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      DocumentManifest.StatusCode.newBuilder()
+        .setValue(
+          DocumentReferenceStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasCreated()) {
-        protoValue.created = createdElement.toProto()
+      protoValue.created = createdElement.toProto()
     }
     if (hasAuthor()) {
       protoValue.addAllAuthor(author.map { it.toProto() })
@@ -147,10 +149,10 @@ object DocumentManifestConverter {
       protoValue.addAllRecipient(recipient.map { it.toProto() })
     }
     if (hasSource()) {
-        protoValue.source = sourceElement.toProto()
+      protoValue.source = sourceElement.toProto()
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasContent()) {
       protoValue.addAllContent(content.map { it.toProto() })
@@ -172,10 +174,10 @@ object DocumentManifestConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasIdentifier()) {
-        protoValue.identifier = identifier.toProto()
+      protoValue.identifier = identifier.toProto()
     }
     if (hasRef()) {
-        protoValue.ref = ref.toProto()
+      protoValue.ref = ref.toProto()
     }
     return protoValue.build()
   }
@@ -186,16 +188,16 @@ object DocumentManifestConverter {
     val hapiValue = org.hl7.fhir.r4.model.DocumentManifest.DocumentManifestRelatedComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasIdentifier()) {
-        hapiValue.identifier = identifier.toHapi()
+      hapiValue.identifier = identifier.toHapi()
     }
     if (hasRef()) {
-        hapiValue.ref = ref.toHapi()
+      hapiValue.ref = ref.toHapi()
     }
     return hapiValue
   }

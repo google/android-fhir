@@ -78,10 +78,10 @@ object MessageDefinitionConverter {
   private fun Type.messageDefinitionEventToProto(): MessageDefinition.EventX {
     val protoValue = MessageDefinition.EventX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Coding) {
-        protoValue.coding = this.toProto()
+      protoValue.coding = this.toProto()
     }
     if (this is UriType) {
-        protoValue.uri = this.toProto()
+      protoValue.uri = this.toProto()
     }
     return protoValue.build()
   }
@@ -91,90 +91,92 @@ object MessageDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.MessageDefinition()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-        hapiValue.urlElement = url.toHapi()
+      hapiValue.urlElement = url.toHapi()
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasVersion()) {
-        hapiValue.versionElement = version.toHapi()
+      hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-        hapiValue.titleElement = title.toHapi()
+      hapiValue.titleElement = title.toHapi()
     }
     if (replacesCount > 0) {
-        hapiValue.replaces = replacesList.map { it.toHapi() }
+      hapiValue.replaces = replacesList.map { it.toHapi() }
     }
-      hapiValue.status =
-          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    hapiValue.status =
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-        hapiValue.experimentalElement = experimental.toHapi()
+      hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasDate()) {
-        hapiValue.dateElement = date.toHapi()
+      hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-        hapiValue.publisherElement = publisher.toHapi()
+      hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-        hapiValue.contact = contactList.map { it.toHapi() }
+      hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (useContextCount > 0) {
-        hapiValue.useContext = useContextList.map { it.toHapi() }
+      hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
+      hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasPurpose()) {
-        hapiValue.purposeElement = purpose.toHapi()
+      hapiValue.purposeElement = purpose.toHapi()
     }
     if (hasCopyright()) {
-        hapiValue.copyrightElement = copyright.toHapi()
+      hapiValue.copyrightElement = copyright.toHapi()
     }
     if (hasBase()) {
-        hapiValue.baseElement = base.toHapi()
+      hapiValue.baseElement = base.toHapi()
     }
     if (parentCount > 0) {
-        hapiValue.parent = parentList.map { it.toHapi() }
+      hapiValue.parent = parentList.map { it.toHapi() }
     }
     if (hasEvent()) {
-        hapiValue.event = event.messageDefinitionEventToHapi()
+      hapiValue.event = event.messageDefinitionEventToHapi()
     }
-      hapiValue.category = org.hl7.fhir.r4.model.MessageDefinition.MessageSignificanceCategory.valueOf(
-          category.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.category =
+      org.hl7.fhir.r4.model.MessageDefinition.MessageSignificanceCategory.valueOf(
+        category.value.name.hapiCodeCheck().replace("_", "")
       )
     if (focusCount > 0) {
-        hapiValue.focus = focusList.map { it.toHapi() }
+      hapiValue.focus = focusList.map { it.toHapi() }
     }
-      hapiValue.responseRequired = org.hl7.fhir.r4.model.MessageDefinition.MessageheaderResponseRequest.valueOf(
-          responseRequired.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.responseRequired =
+      org.hl7.fhir.r4.model.MessageDefinition.MessageheaderResponseRequest.valueOf(
+        responseRequired.value.name.hapiCodeCheck().replace("_", "")
       )
     if (allowedResponseCount > 0) {
-        hapiValue.allowedResponse = allowedResponseList.map { it.toHapi() }
+      hapiValue.allowedResponse = allowedResponseList.map { it.toHapi() }
     }
     if (graphCount > 0) {
-        hapiValue.graph = graphList.map { it.toHapi() }
+      hapiValue.graph = graphList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -183,13 +185,13 @@ object MessageDefinitionConverter {
   fun org.hl7.fhir.r4.model.MessageDefinition.toProto(): MessageDefinition {
     val protoValue = MessageDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -198,44 +200,45 @@ object MessageDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-        protoValue.url = urlElement.toProto()
+      protoValue.url = urlElement.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasVersion()) {
-        protoValue.version = versionElement.toProto()
+      protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-        protoValue.title = titleElement.toProto()
+      protoValue.title = titleElement.toProto()
     }
     if (hasReplaces()) {
       protoValue.addAllReplaces(replaces.map { it.toProto() })
     }
-      protoValue.status = MessageDefinition.StatusCode.newBuilder()
-          .setValue(
-              PublicationStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      MessageDefinition.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasExperimental()) {
-        protoValue.experimental = experimentalElement.toProto()
+      protoValue.experimental = experimentalElement.toProto()
     }
     if (hasDate()) {
-        protoValue.date = dateElement.toProto()
+      protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-        protoValue.publisher = publisherElement.toProto()
+      protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasUseContext()) {
       protoValue.addAllUseContext(useContext.map { it.toProto() })
@@ -244,37 +247,39 @@ object MessageDefinitionConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasPurpose()) {
-        protoValue.purpose = purposeElement.toProto()
+      protoValue.purpose = purposeElement.toProto()
     }
     if (hasCopyright()) {
-        protoValue.copyright = copyrightElement.toProto()
+      protoValue.copyright = copyrightElement.toProto()
     }
     if (hasBase()) {
-        protoValue.base = baseElement.toProto()
+      protoValue.base = baseElement.toProto()
     }
     if (hasParent()) {
       protoValue.addAllParent(parent.map { it.toProto() })
     }
     if (hasEvent()) {
-        protoValue.event = event.messageDefinitionEventToProto()
+      protoValue.event = event.messageDefinitionEventToProto()
     }
-      protoValue.category = MessageDefinition.CategoryCode.newBuilder()
-          .setValue(
-              MessageSignificanceCategoryCode.Value.valueOf(
-                  category.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.category =
+      MessageDefinition.CategoryCode.newBuilder()
+        .setValue(
+          MessageSignificanceCategoryCode.Value.valueOf(
+            category.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasFocus()) {
       protoValue.addAllFocus(focus.map { it.toProto() })
     }
-      protoValue.responseRequired = MessageDefinition.ResponseRequiredCode.newBuilder()
-          .setValue(
-              MessageheaderResponseRequestCode.Value.valueOf(
-                  responseRequired.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.responseRequired =
+      MessageDefinition.ResponseRequiredCode.newBuilder()
+        .setValue(
+          MessageheaderResponseRequestCode.Value.valueOf(
+            responseRequired.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasAllowedResponse()) {
       protoValue.addAllAllowedResponse(allowedResponse.map { it.toProto() })
     }
@@ -294,17 +299,18 @@ object MessageDefinitionConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-      protoValue.code = MessageDefinition.Focus.CodeType.newBuilder()
-          .setValue(ResourceTypeCode.Value.valueOf(code))
-          .build()
+    protoValue.code =
+      MessageDefinition.Focus.CodeType.newBuilder()
+        .setValue(ResourceTypeCode.Value.valueOf(code))
+        .build()
     if (hasProfile()) {
-        protoValue.profile = profileElement.toProto()
+      protoValue.profile = profileElement.toProto()
     }
     if (hasMin()) {
-        protoValue.min = minElement.toProto()
+      protoValue.min = minElement.toProto()
     }
     if (hasMax()) {
-        protoValue.max = maxElement.toProto()
+      protoValue.max = maxElement.toProto()
     }
     return protoValue.build()
   }
@@ -321,10 +327,10 @@ object MessageDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasMessage()) {
-        protoValue.message = messageElement.toProto()
+      protoValue.message = messageElement.toProto()
     }
     if (hasSituation()) {
-        protoValue.situation = situationElement.toProto()
+      protoValue.situation = situationElement.toProto()
     }
     return protoValue.build()
   }
@@ -335,20 +341,20 @@ object MessageDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionFocusComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-      hapiValue.code = code.value.name
+    hapiValue.code = code.value.name
     if (hasProfile()) {
-        hapiValue.profileElement = profile.toHapi()
+      hapiValue.profileElement = profile.toHapi()
     }
     if (hasMin()) {
-        hapiValue.minElement = min.toHapi()
+      hapiValue.minElement = min.toHapi()
     }
     if (hasMax()) {
-        hapiValue.maxElement = max.toHapi()
+      hapiValue.maxElement = max.toHapi()
     }
     return hapiValue
   }
@@ -360,16 +366,16 @@ object MessageDefinitionConverter {
       org.hl7.fhir.r4.model.MessageDefinition.MessageDefinitionAllowedResponseComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasMessage()) {
-        hapiValue.messageElement = message.toHapi()
+      hapiValue.messageElement = message.toHapi()
     }
     if (hasSituation()) {
-        hapiValue.situationElement = situation.toHapi()
+      hapiValue.situationElement = situation.toHapi()
     }
     return hapiValue
   }

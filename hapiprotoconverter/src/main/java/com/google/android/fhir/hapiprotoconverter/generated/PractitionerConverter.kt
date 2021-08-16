@@ -57,48 +57,48 @@ object PractitionerConverter {
     val hapiValue = org.hl7.fhir.r4.model.Practitioner()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasActive()) {
-        hapiValue.activeElement = active.toHapi()
+      hapiValue.activeElement = active.toHapi()
     }
     if (nameCount > 0) {
-        hapiValue.name = nameList.map { it.toHapi() }
+      hapiValue.name = nameList.map { it.toHapi() }
     }
     if (telecomCount > 0) {
-        hapiValue.telecom = telecomList.map { it.toHapi() }
+      hapiValue.telecom = telecomList.map { it.toHapi() }
     }
     if (addressCount > 0) {
-        hapiValue.address = addressList.map { it.toHapi() }
+      hapiValue.address = addressList.map { it.toHapi() }
     }
-      hapiValue.gender =
-          Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
+    hapiValue.gender =
+      Enumerations.AdministrativeGender.valueOf(gender.value.name.hapiCodeCheck().replace("_", ""))
     if (hasBirthDate()) {
-        hapiValue.birthDateElement = birthDate.toHapi()
+      hapiValue.birthDateElement = birthDate.toHapi()
     }
     if (photoCount > 0) {
-        hapiValue.photo = photoList.map { it.toHapi() }
+      hapiValue.photo = photoList.map { it.toHapi() }
     }
     if (qualificationCount > 0) {
-        hapiValue.qualification = qualificationList.map { it.toHapi() }
+      hapiValue.qualification = qualificationList.map { it.toHapi() }
     }
     if (communicationCount > 0) {
-        hapiValue.communication = communicationList.map { it.toHapi() }
+      hapiValue.communication = communicationList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -107,13 +107,13 @@ object PractitionerConverter {
   fun org.hl7.fhir.r4.model.Practitioner.toProto(): Practitioner {
     val protoValue = Practitioner.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -125,7 +125,7 @@ object PractitionerConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasActive()) {
-        protoValue.active = activeElement.toProto()
+      protoValue.active = activeElement.toProto()
     }
     if (hasName()) {
       protoValue.addAllName(name.map { it.toProto() })
@@ -136,15 +136,16 @@ object PractitionerConverter {
     if (hasAddress()) {
       protoValue.addAllAddress(address.map { it.toProto() })
     }
-      protoValue.gender = Practitioner.GenderCode.newBuilder()
-          .setValue(
-              AdministrativeGenderCode.Value.valueOf(
-                  gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.gender =
+      Practitioner.GenderCode.newBuilder()
+        .setValue(
+          AdministrativeGenderCode.Value.valueOf(
+            gender.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasBirthDate()) {
-        protoValue.birthDate = birthDateElement.toProto()
+      protoValue.birthDate = birthDateElement.toProto()
     }
     if (hasPhoto()) {
       protoValue.addAllPhoto(photo.map { it.toProto() })
@@ -172,13 +173,13 @@ object PractitionerConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     if (hasIssuer()) {
-        protoValue.issuer = issuer.toProto()
+      protoValue.issuer = issuer.toProto()
     }
     return protoValue.build()
   }
@@ -189,22 +190,22 @@ object PractitionerConverter {
     val hapiValue = org.hl7.fhir.r4.model.Practitioner.PractitionerQualificationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     if (hasIssuer()) {
-        hapiValue.issuer = issuer.toHapi()
+      hapiValue.issuer = issuer.toHapi()
     }
     return hapiValue
   }

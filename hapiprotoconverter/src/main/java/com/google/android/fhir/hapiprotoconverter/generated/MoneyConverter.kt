@@ -30,12 +30,12 @@ object MoneyConverter {
     val hapiValue = org.hl7.fhir.r4.model.Money()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasValue()) {
-        hapiValue.valueElement = value.toHapi()
+      hapiValue.valueElement = value.toHapi()
     }
-      hapiValue.currency = currency.value.hapiCodeCheck()
+    hapiValue.currency = currency.value.hapiCodeCheck()
     return hapiValue
   }
 
@@ -46,9 +46,10 @@ object MoneyConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasValue()) {
-        protoValue.value = valueElement.toProto()
+      protoValue.value = valueElement.toProto()
     }
-      protoValue.currency = Money.CurrencyCode.newBuilder().setValue(currency.protoCodeCheck()).build()
+    protoValue.currency =
+      Money.CurrencyCode.newBuilder().setValue(currency.protoCodeCheck()).build()
     return protoValue.build()
   }
 }

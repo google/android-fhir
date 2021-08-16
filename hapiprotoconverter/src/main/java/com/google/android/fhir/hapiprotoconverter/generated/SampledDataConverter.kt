@@ -37,28 +37,28 @@ object SampledDataConverter {
     val hapiValue = org.hl7.fhir.r4.model.SampledData()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasOrigin()) {
-        hapiValue.origin = origin.toHapi()
+      hapiValue.origin = origin.toHapi()
     }
     if (hasPeriod()) {
-        hapiValue.periodElement = period.toHapi()
+      hapiValue.periodElement = period.toHapi()
     }
     if (hasFactor()) {
-        hapiValue.factorElement = factor.toHapi()
+      hapiValue.factorElement = factor.toHapi()
     }
     if (hasLowerLimit()) {
-        hapiValue.lowerLimitElement = lowerLimit.toHapi()
+      hapiValue.lowerLimitElement = lowerLimit.toHapi()
     }
     if (hasUpperLimit()) {
-        hapiValue.upperLimitElement = upperLimit.toHapi()
+      hapiValue.upperLimitElement = upperLimit.toHapi()
     }
     if (hasDimensions()) {
-        hapiValue.dimensionsElement = dimensions.toHapi()
+      hapiValue.dimensionsElement = dimensions.toHapi()
     }
     if (hasData()) {
-        hapiValue.dataElement = data.toHapi()
+      hapiValue.dataElement = data.toHapi()
     }
     return hapiValue
   }
@@ -70,25 +70,25 @@ object SampledDataConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasOrigin()) {
-        protoValue.origin = (origin as SimpleQuantity).toProto()
+      protoValue.origin = (origin as SimpleQuantity).toProto()
     }
     if (hasPeriod()) {
-        protoValue.period = periodElement.toProto()
+      protoValue.period = periodElement.toProto()
     }
     if (hasFactor()) {
-        protoValue.factor = factorElement.toProto()
+      protoValue.factor = factorElement.toProto()
     }
     if (hasLowerLimit()) {
-        protoValue.lowerLimit = lowerLimitElement.toProto()
+      protoValue.lowerLimit = lowerLimitElement.toProto()
     }
     if (hasUpperLimit()) {
-        protoValue.upperLimit = upperLimitElement.toProto()
+      protoValue.upperLimit = upperLimitElement.toProto()
     }
     if (hasDimensions()) {
-        protoValue.dimensions = dimensionsElement.toProto()
+      protoValue.dimensions = dimensionsElement.toProto()
     }
     if (hasData()) {
-        protoValue.data = dataElement.toProto()
+      protoValue.data = dataElement.toProto()
     }
     return protoValue.build()
   }

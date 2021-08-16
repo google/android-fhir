@@ -42,8 +42,6 @@ class CodeConverterTest(private val hapi: CodeType, private val proto: Code) {
   }
 
   companion object {
-    @Parameterized.Parameters
-    @JvmStatic
-    fun `data`(): List<Any> = PrimitiveTestData.CODE_DATA
+    @Parameterized.Parameters @JvmStatic fun `data`(): List<Any> = PrimitiveTestData.CODE_DATA
   }
 }

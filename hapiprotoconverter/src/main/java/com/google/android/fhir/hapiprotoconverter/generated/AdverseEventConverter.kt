@@ -47,79 +47,80 @@ object AdverseEventConverter {
     val hapiValue = org.hl7.fhir.r4.model.AdverseEvent()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasIdentifier()) {
-        hapiValue.identifier = identifier.toHapi()
+      hapiValue.identifier = identifier.toHapi()
     }
-      hapiValue.actuality = org.hl7.fhir.r4.model.AdverseEvent.AdverseEventActuality.valueOf(
-          actuality.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.actuality =
+      org.hl7.fhir.r4.model.AdverseEvent.AdverseEventActuality.valueOf(
+        actuality.value.name.hapiCodeCheck().replace("_", "")
       )
     if (categoryCount > 0) {
-        hapiValue.category = categoryList.map { it.toHapi() }
+      hapiValue.category = categoryList.map { it.toHapi() }
     }
     if (hasEvent()) {
-        hapiValue.event = event.toHapi()
+      hapiValue.event = event.toHapi()
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-        hapiValue.encounter = encounter.toHapi()
+      hapiValue.encounter = encounter.toHapi()
     }
     if (hasDate()) {
-        hapiValue.dateElement = date.toHapi()
+      hapiValue.dateElement = date.toHapi()
     }
     if (hasDetected()) {
-        hapiValue.detectedElement = detected.toHapi()
+      hapiValue.detectedElement = detected.toHapi()
     }
     if (hasRecordedDate()) {
-        hapiValue.recordedDateElement = recordedDate.toHapi()
+      hapiValue.recordedDateElement = recordedDate.toHapi()
     }
     if (resultingConditionCount > 0) {
-        hapiValue.resultingCondition = resultingConditionList.map { it.toHapi() }
+      hapiValue.resultingCondition = resultingConditionList.map { it.toHapi() }
     }
     if (hasLocation()) {
-        hapiValue.location = location.toHapi()
+      hapiValue.location = location.toHapi()
     }
     if (hasSeriousness()) {
-        hapiValue.seriousness = seriousness.toHapi()
+      hapiValue.seriousness = seriousness.toHapi()
     }
     if (hasSeverity()) {
-        hapiValue.severity = severity.toHapi()
+      hapiValue.severity = severity.toHapi()
     }
     if (hasOutcome()) {
-        hapiValue.outcome = outcome.toHapi()
+      hapiValue.outcome = outcome.toHapi()
     }
     if (hasRecorder()) {
-        hapiValue.recorder = recorder.toHapi()
+      hapiValue.recorder = recorder.toHapi()
     }
     if (contributorCount > 0) {
-        hapiValue.contributor = contributorList.map { it.toHapi() }
+      hapiValue.contributor = contributorList.map { it.toHapi() }
     }
     if (suspectEntityCount > 0) {
-        hapiValue.suspectEntity = suspectEntityList.map { it.toHapi() }
+      hapiValue.suspectEntity = suspectEntityList.map { it.toHapi() }
     }
     if (subjectMedicalHistoryCount > 0) {
-        hapiValue.subjectMedicalHistory = subjectMedicalHistoryList.map { it.toHapi() }
+      hapiValue.subjectMedicalHistory = subjectMedicalHistoryList.map { it.toHapi() }
     }
     if (referenceDocumentCount > 0) {
-        hapiValue.referenceDocument = referenceDocumentList.map { it.toHapi() }
+      hapiValue.referenceDocument = referenceDocumentList.map { it.toHapi() }
     }
     if (studyCount > 0) {
-        hapiValue.study = studyList.map { it.toHapi() }
+      hapiValue.study = studyList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -128,13 +129,13 @@ object AdverseEventConverter {
   fun org.hl7.fhir.r4.model.AdverseEvent.toProto(): AdverseEvent {
     val protoValue = AdverseEvent.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -143,53 +144,54 @@ object AdverseEventConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasIdentifier()) {
-        protoValue.identifier = identifier.toProto()
+      protoValue.identifier = identifier.toProto()
     }
-      protoValue.actuality = AdverseEvent.ActualityCode.newBuilder()
-          .setValue(
-              AdverseEventActualityCode.Value.valueOf(
-                  actuality.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.actuality =
+      AdverseEvent.ActualityCode.newBuilder()
+        .setValue(
+          AdverseEventActualityCode.Value.valueOf(
+            actuality.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
     if (hasEvent()) {
-        protoValue.event = event.toProto()
+      protoValue.event = event.toProto()
     }
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-        protoValue.encounter = encounter.toProto()
+      protoValue.encounter = encounter.toProto()
     }
     if (hasDate()) {
-        protoValue.date = dateElement.toProto()
+      protoValue.date = dateElement.toProto()
     }
     if (hasDetected()) {
-        protoValue.detected = detectedElement.toProto()
+      protoValue.detected = detectedElement.toProto()
     }
     if (hasRecordedDate()) {
-        protoValue.recordedDate = recordedDateElement.toProto()
+      protoValue.recordedDate = recordedDateElement.toProto()
     }
     if (hasResultingCondition()) {
       protoValue.addAllResultingCondition(resultingCondition.map { it.toProto() })
     }
     if (hasLocation()) {
-        protoValue.location = location.toProto()
+      protoValue.location = location.toProto()
     }
     if (hasSeriousness()) {
-        protoValue.seriousness = seriousness.toProto()
+      protoValue.seriousness = seriousness.toProto()
     }
     if (hasSeverity()) {
-        protoValue.severity = severity.toProto()
+      protoValue.severity = severity.toProto()
     }
     if (hasOutcome()) {
-        protoValue.outcome = outcome.toProto()
+      protoValue.outcome = outcome.toProto()
     }
     if (hasRecorder()) {
-        protoValue.recorder = recorder.toProto()
+      protoValue.recorder = recorder.toProto()
     }
     if (hasContributor()) {
       protoValue.addAllContributor(contributor.map { it.toProto() })
@@ -220,7 +222,7 @@ object AdverseEventConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasInstance()) {
-        protoValue.instance = instance.toProto()
+      protoValue.instance = instance.toProto()
     }
     if (hasCausality()) {
       protoValue.addAllCausality(causality.map { it.toProto() })
@@ -240,16 +242,16 @@ object AdverseEventConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasAssessment()) {
-        protoValue.assessment = assessment.toProto()
+      protoValue.assessment = assessment.toProto()
     }
     if (hasProductRelatedness()) {
-        protoValue.productRelatedness = productRelatednessElement.toProto()
+      protoValue.productRelatedness = productRelatednessElement.toProto()
     }
     if (hasAuthor()) {
-        protoValue.author = author.toProto()
+      protoValue.author = author.toProto()
     }
     if (hasMethod()) {
-        protoValue.method = method.toProto()
+      protoValue.method = method.toProto()
     }
     return protoValue.build()
   }
@@ -260,16 +262,16 @@ object AdverseEventConverter {
     val hapiValue = org.hl7.fhir.r4.model.AdverseEvent.AdverseEventSuspectEntityComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasInstance()) {
-        hapiValue.instance = instance.toHapi()
+      hapiValue.instance = instance.toHapi()
     }
     if (causalityCount > 0) {
-        hapiValue.causality = causalityList.map { it.toHapi() }
+      hapiValue.causality = causalityList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -280,22 +282,22 @@ object AdverseEventConverter {
     val hapiValue = org.hl7.fhir.r4.model.AdverseEvent.AdverseEventSuspectEntityCausalityComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasAssessment()) {
-        hapiValue.assessment = assessment.toHapi()
+      hapiValue.assessment = assessment.toHapi()
     }
     if (hasProductRelatedness()) {
-        hapiValue.productRelatednessElement = productRelatedness.toHapi()
+      hapiValue.productRelatednessElement = productRelatedness.toHapi()
     }
     if (hasAuthor()) {
-        hapiValue.author = author.toHapi()
+      hapiValue.author = author.toHapi()
     }
     if (hasMethod()) {
-        hapiValue.method = method.toHapi()
+      hapiValue.method = method.toHapi()
     }
     return hapiValue
   }

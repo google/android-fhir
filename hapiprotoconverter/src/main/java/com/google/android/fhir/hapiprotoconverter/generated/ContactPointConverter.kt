@@ -36,22 +36,24 @@ object ContactPointConverter {
     val hapiValue = org.hl7.fhir.r4.model.ContactPoint()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
-      hapiValue.system = org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem.valueOf(
-          system.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.system =
+      org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem.valueOf(
+        system.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasValue()) {
-        hapiValue.valueElement = value.toHapi()
+      hapiValue.valueElement = value.toHapi()
     }
-      hapiValue.use = org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.valueOf(
-          use.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.use =
+      org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.valueOf(
+        use.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasRank()) {
-        hapiValue.rankElement = rank.toHapi()
+      hapiValue.rankElement = rank.toHapi()
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     return hapiValue
   }
@@ -62,28 +64,30 @@ object ContactPointConverter {
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-      protoValue.system = ContactPoint.SystemCode.newBuilder()
-          .setValue(
-              ContactPointSystemCode.Value.valueOf(
-                  system.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.system =
+      ContactPoint.SystemCode.newBuilder()
+        .setValue(
+          ContactPointSystemCode.Value.valueOf(
+            system.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasValue()) {
-        protoValue.value = valueElement.toProto()
+      protoValue.value = valueElement.toProto()
     }
-      protoValue.use = ContactPoint.UseCode.newBuilder()
-          .setValue(
-              ContactPointUseCode.Value.valueOf(
-                  use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.use =
+      ContactPoint.UseCode.newBuilder()
+        .setValue(
+          ContactPointUseCode.Value.valueOf(
+            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasRank()) {
-        protoValue.rank = rankElement.toProto()
+      protoValue.rank = rankElement.toProto()
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     return protoValue.build()
   }

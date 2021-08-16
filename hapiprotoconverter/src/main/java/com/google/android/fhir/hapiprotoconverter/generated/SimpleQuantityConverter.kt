@@ -36,19 +36,19 @@ object SimpleQuantityConverter {
     val hapiValue = org.hl7.fhir.r4.model.SimpleQuantity()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasValue()) {
-        hapiValue.valueElement = value.toHapi()
+      hapiValue.valueElement = value.toHapi()
     }
     if (hasUnit()) {
-        hapiValue.unitElement = unit.toHapi()
+      hapiValue.unitElement = unit.toHapi()
     }
     if (hasSystem()) {
-        hapiValue.systemElement = system.toHapi()
+      hapiValue.systemElement = system.toHapi()
     }
     if (hasCode()) {
-        hapiValue.codeElement = code.toHapi()
+      hapiValue.codeElement = code.toHapi()
     }
     return hapiValue
   }
@@ -60,16 +60,16 @@ object SimpleQuantityConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasValue()) {
-        protoValue.value = valueElement.toProto()
+      protoValue.value = valueElement.toProto()
     }
     if (hasUnit()) {
-        protoValue.unit = unitElement.toProto()
+      protoValue.unit = unitElement.toProto()
     }
     if (hasSystem()) {
-        protoValue.system = systemElement.toProto()
+      protoValue.system = systemElement.toProto()
     }
     if (hasCode()) {
-        protoValue.code = codeElement.toProto()
+      protoValue.code = codeElement.toProto()
     }
     return protoValue.build()
   }

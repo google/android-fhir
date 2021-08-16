@@ -83,10 +83,10 @@ object DeviceRequestConverter {
   private fun Type.deviceRequestCodeToProto(): DeviceRequest.CodeX {
     val protoValue = DeviceRequest.CodeX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
@@ -112,16 +112,16 @@ object DeviceRequestConverter {
   private fun Type.deviceRequestParameterValueToProto(): DeviceRequest.Parameter.ValueX {
     val protoValue = DeviceRequest.Parameter.ValueX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Quantity) {
-        protoValue.quantity = this.toProto()
+      protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     if (this is BooleanType) {
-        protoValue.boolean = this.toProto()
+      protoValue.boolean = this.toProto()
     }
     return protoValue.build()
   }
@@ -144,13 +144,13 @@ object DeviceRequestConverter {
   private fun Type.deviceRequestOccurrenceToProto(): DeviceRequest.OccurrenceX {
     val protoValue = DeviceRequest.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Timing) {
-        protoValue.timing = this.toProto()
+      protoValue.timing = this.toProto()
     }
     return protoValue.build()
   }
@@ -160,91 +160,94 @@ object DeviceRequestConverter {
     val hapiValue = org.hl7.fhir.r4.model.DeviceRequest()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (instantiatesCanonicalCount > 0) {
-        hapiValue.instantiatesCanonical = instantiatesCanonicalList.map { it.toHapi() }
+      hapiValue.instantiatesCanonical = instantiatesCanonicalList.map { it.toHapi() }
     }
     if (instantiatesUriCount > 0) {
-        hapiValue.instantiatesUri = instantiatesUriList.map { it.toHapi() }
+      hapiValue.instantiatesUri = instantiatesUriList.map { it.toHapi() }
     }
     if (basedOnCount > 0) {
-        hapiValue.basedOn = basedOnList.map { it.toHapi() }
+      hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
     if (priorRequestCount > 0) {
-        hapiValue.priorRequest = priorRequestList.map { it.toHapi() }
+      hapiValue.priorRequest = priorRequestList.map { it.toHapi() }
     }
     if (hasGroupIdentifier()) {
-        hapiValue.groupIdentifier = groupIdentifier.toHapi()
+      hapiValue.groupIdentifier = groupIdentifier.toHapi()
     }
-      hapiValue.status = org.hl7.fhir.r4.model.DeviceRequest.DeviceRequestStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.DeviceRequest.DeviceRequestStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
-      hapiValue.intent = org.hl7.fhir.r4.model.DeviceRequest.RequestIntent.valueOf(
-          intent.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.intent =
+      org.hl7.fhir.r4.model.DeviceRequest.RequestIntent.valueOf(
+        intent.value.name.hapiCodeCheck().replace("_", "")
       )
-      hapiValue.priority = org.hl7.fhir.r4.model.DeviceRequest.RequestPriority.valueOf(
-          priority.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.priority =
+      org.hl7.fhir.r4.model.DeviceRequest.RequestPriority.valueOf(
+        priority.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasCode()) {
-        hapiValue.code = code.deviceRequestCodeToHapi()
+      hapiValue.code = code.deviceRequestCodeToHapi()
     }
     if (parameterCount > 0) {
-        hapiValue.parameter = parameterList.map { it.toHapi() }
+      hapiValue.parameter = parameterList.map { it.toHapi() }
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-        hapiValue.encounter = encounter.toHapi()
+      hapiValue.encounter = encounter.toHapi()
     }
     if (hasOccurrence()) {
-        hapiValue.occurrence = occurrence.deviceRequestOccurrenceToHapi()
+      hapiValue.occurrence = occurrence.deviceRequestOccurrenceToHapi()
     }
     if (hasAuthoredOn()) {
-        hapiValue.authoredOnElement = authoredOn.toHapi()
+      hapiValue.authoredOnElement = authoredOn.toHapi()
     }
     if (hasRequester()) {
-        hapiValue.requester = requester.toHapi()
+      hapiValue.requester = requester.toHapi()
     }
     if (hasPerformerType()) {
-        hapiValue.performerType = performerType.toHapi()
+      hapiValue.performerType = performerType.toHapi()
     }
     if (hasPerformer()) {
-        hapiValue.performer = performer.toHapi()
+      hapiValue.performer = performer.toHapi()
     }
     if (reasonCodeCount > 0) {
-        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
+      hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
+      hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (insuranceCount > 0) {
-        hapiValue.insurance = insuranceList.map { it.toHapi() }
+      hapiValue.insurance = insuranceList.map { it.toHapi() }
     }
     if (supportingInfoCount > 0) {
-        hapiValue.supportingInfo = supportingInfoList.map { it.toHapi() }
+      hapiValue.supportingInfo = supportingInfoList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     if (relevantHistoryCount > 0) {
-        hapiValue.relevantHistory = relevantHistoryList.map { it.toHapi() }
+      hapiValue.relevantHistory = relevantHistoryList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -253,13 +256,13 @@ object DeviceRequestConverter {
   fun org.hl7.fhir.r4.model.DeviceRequest.toProto(): DeviceRequest {
     val protoValue = DeviceRequest.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -283,55 +286,58 @@ object DeviceRequestConverter {
       protoValue.addAllPriorRequest(priorRequest.map { it.toProto() })
     }
     if (hasGroupIdentifier()) {
-        protoValue.groupIdentifier = groupIdentifier.toProto()
+      protoValue.groupIdentifier = groupIdentifier.toProto()
     }
-      protoValue.status = DeviceRequest.StatusCode.newBuilder()
-          .setValue(
-              RequestStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      DeviceRequest.StatusCode.newBuilder()
+        .setValue(
+          RequestStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
-      protoValue.intent = DeviceRequest.IntentCode.newBuilder()
-          .setValue(
-              RequestIntentCode.Value.valueOf(
-                  intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+        )
+        .build()
+    protoValue.intent =
+      DeviceRequest.IntentCode.newBuilder()
+        .setValue(
+          RequestIntentCode.Value.valueOf(
+            intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
-      protoValue.priority = DeviceRequest.PriorityCode.newBuilder()
-          .setValue(
-              RequestPriorityCode.Value.valueOf(
-                  priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+        )
+        .build()
+    protoValue.priority =
+      DeviceRequest.PriorityCode.newBuilder()
+        .setValue(
+          RequestPriorityCode.Value.valueOf(
+            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasCode()) {
-        protoValue.code = code.deviceRequestCodeToProto()
+      protoValue.code = code.deviceRequestCodeToProto()
     }
     if (hasParameter()) {
       protoValue.addAllParameter(parameter.map { it.toProto() })
     }
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-        protoValue.encounter = encounter.toProto()
+      protoValue.encounter = encounter.toProto()
     }
     if (hasOccurrence()) {
-        protoValue.occurrence = occurrence.deviceRequestOccurrenceToProto()
+      protoValue.occurrence = occurrence.deviceRequestOccurrenceToProto()
     }
     if (hasAuthoredOn()) {
-        protoValue.authoredOn = authoredOnElement.toProto()
+      protoValue.authoredOn = authoredOnElement.toProto()
     }
     if (hasRequester()) {
-        protoValue.requester = requester.toProto()
+      protoValue.requester = requester.toProto()
     }
     if (hasPerformerType()) {
-        protoValue.performerType = performerType.toProto()
+      protoValue.performerType = performerType.toProto()
     }
     if (hasPerformer()) {
-        protoValue.performer = performer.toProto()
+      protoValue.performer = performer.toProto()
     }
     if (hasReasonCode()) {
       protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
@@ -365,10 +371,10 @@ object DeviceRequestConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasValue()) {
-        protoValue.value = value.deviceRequestParameterValueToProto()
+      protoValue.value = value.deviceRequestParameterValueToProto()
     }
     return protoValue.build()
   }
@@ -379,16 +385,16 @@ object DeviceRequestConverter {
     val hapiValue = org.hl7.fhir.r4.model.DeviceRequest.DeviceRequestParameterComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasValue()) {
-        hapiValue.value = value.deviceRequestParameterValueToHapi()
+      hapiValue.value = value.deviceRequestParameterValueToHapi()
     }
     return hapiValue
   }

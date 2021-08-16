@@ -110,25 +110,25 @@ object ValueSetConverter {
   private fun Type.valueSetExpansionParameterValueToProto(): ValueSet.Expansion.Parameter.ValueX {
     val protoValue = ValueSet.Expansion.Parameter.ValueX.newBuilder()
     if (this is StringType) {
-        protoValue.stringValue = this.toProto()
+      protoValue.stringValue = this.toProto()
     }
     if (this is BooleanType) {
-        protoValue.boolean = this.toProto()
+      protoValue.boolean = this.toProto()
     }
     if (this is IntegerType) {
-        protoValue.integer = this.toProto()
+      protoValue.integer = this.toProto()
     }
     if (this is DecimalType) {
-        protoValue.decimal = this.toProto()
+      protoValue.decimal = this.toProto()
     }
     if (this is UriType) {
-        protoValue.uri = this.toProto()
+      protoValue.uri = this.toProto()
     }
     if (this is CodeType) {
-        protoValue.code = this.toProto()
+      protoValue.code = this.toProto()
     }
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     return protoValue.build()
   }
@@ -138,72 +138,72 @@ object ValueSetConverter {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-        hapiValue.urlElement = url.toHapi()
+      hapiValue.urlElement = url.toHapi()
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasVersion()) {
-        hapiValue.versionElement = version.toHapi()
+      hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-        hapiValue.titleElement = title.toHapi()
+      hapiValue.titleElement = title.toHapi()
     }
-      hapiValue.status =
-          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    hapiValue.status =
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-        hapiValue.experimentalElement = experimental.toHapi()
+      hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasDate()) {
-        hapiValue.dateElement = date.toHapi()
+      hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-        hapiValue.publisherElement = publisher.toHapi()
+      hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-        hapiValue.contact = contactList.map { it.toHapi() }
+      hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (useContextCount > 0) {
-        hapiValue.useContext = useContextList.map { it.toHapi() }
+      hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
+      hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasImmutable()) {
-        hapiValue.immutableElement = immutable.toHapi()
+      hapiValue.immutableElement = immutable.toHapi()
     }
     if (hasPurpose()) {
-        hapiValue.purposeElement = purpose.toHapi()
+      hapiValue.purposeElement = purpose.toHapi()
     }
     if (hasCopyright()) {
-        hapiValue.copyrightElement = copyright.toHapi()
+      hapiValue.copyrightElement = copyright.toHapi()
     }
     if (hasCompose()) {
-        hapiValue.compose = compose.toHapi()
+      hapiValue.compose = compose.toHapi()
     }
     if (hasExpansion()) {
-        hapiValue.expansion = expansion.toHapi()
+      hapiValue.expansion = expansion.toHapi()
     }
     return hapiValue
   }
@@ -212,13 +212,13 @@ object ValueSetConverter {
   fun org.hl7.fhir.r4.model.ValueSet.toProto(): ValueSet {
     val protoValue = ValueSet.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -227,41 +227,42 @@ object ValueSetConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-        protoValue.url = urlElement.toProto()
+      protoValue.url = urlElement.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasVersion()) {
-        protoValue.version = versionElement.toProto()
+      protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-        protoValue.title = titleElement.toProto()
+      protoValue.title = titleElement.toProto()
     }
-      protoValue.status = ValueSet.StatusCode.newBuilder()
-          .setValue(
-              PublicationStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      ValueSet.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasExperimental()) {
-        protoValue.experimental = experimentalElement.toProto()
+      protoValue.experimental = experimentalElement.toProto()
     }
     if (hasDate()) {
-        protoValue.date = dateElement.toProto()
+      protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-        protoValue.publisher = publisherElement.toProto()
+      protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasUseContext()) {
       protoValue.addAllUseContext(useContext.map { it.toProto() })
@@ -270,19 +271,19 @@ object ValueSetConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasImmutable()) {
-        protoValue.immutable = immutableElement.toProto()
+      protoValue.immutable = immutableElement.toProto()
     }
     if (hasPurpose()) {
-        protoValue.purpose = purposeElement.toProto()
+      protoValue.purpose = purposeElement.toProto()
     }
     if (hasCopyright()) {
-        protoValue.copyright = copyrightElement.toProto()
+      protoValue.copyright = copyrightElement.toProto()
     }
     if (hasCompose()) {
-        protoValue.compose = compose.toProto()
+      protoValue.compose = compose.toProto()
     }
     if (hasExpansion()) {
-        protoValue.expansion = expansion.toProto()
+      protoValue.expansion = expansion.toProto()
     }
     return protoValue.build()
   }
@@ -297,10 +298,10 @@ object ValueSetConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasLockedDate()) {
-        protoValue.lockedDate = lockedDateElement.toProto()
+      protoValue.lockedDate = lockedDateElement.toProto()
     }
     if (hasInactive()) {
-        protoValue.inactive = inactiveElement.toProto()
+      protoValue.inactive = inactiveElement.toProto()
     }
     if (hasInclude()) {
       protoValue.addAllInclude(include.map { it.toProto() })
@@ -320,10 +321,10 @@ object ValueSetConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSystem()) {
-        protoValue.system = systemElement.toProto()
+      protoValue.system = systemElement.toProto()
     }
     if (hasVersion()) {
-        protoValue.version = versionElement.toProto()
+      protoValue.version = versionElement.toProto()
     }
     if (hasConcept()) {
       protoValue.addAllConcept(concept.map { it.toProto() })
@@ -347,10 +348,10 @@ object ValueSetConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = codeElement.toProto()
+      protoValue.code = codeElement.toProto()
     }
     if (hasDisplay()) {
-        protoValue.display = displayElement.toProto()
+      protoValue.display = displayElement.toProto()
     }
     if (hasDesignation()) {
       protoValue.addAllDesignation(designation.map { it.toProto() })
@@ -371,10 +372,10 @@ object ValueSetConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUse()) {
-        protoValue.use = use.toProto()
+      protoValue.use = use.toProto()
     }
     if (hasValue()) {
-        protoValue.value = valueElement.toProto()
+      protoValue.value = valueElement.toProto()
     }
     return protoValue.build()
   }
@@ -391,17 +392,18 @@ object ValueSetConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasProperty()) {
-        protoValue.property = propertyElement.toProto()
+      protoValue.property = propertyElement.toProto()
     }
-      protoValue.op = ValueSet.Compose.ConceptSet.Filter.OpCode.newBuilder()
-          .setValue(
-              FilterOperatorCode.Value.valueOf(
-                  op.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.op =
+      ValueSet.Compose.ConceptSet.Filter.OpCode.newBuilder()
+        .setValue(
+          FilterOperatorCode.Value.valueOf(
+            op.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasValue()) {
-        protoValue.value = valueElement.toProto()
+      protoValue.value = valueElement.toProto()
     }
     return protoValue.build()
   }
@@ -417,16 +419,16 @@ object ValueSetConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasIdentifier()) {
-        protoValue.identifier = identifierElement.toProto()
+      protoValue.identifier = identifierElement.toProto()
     }
     if (hasTimestamp()) {
-        protoValue.timestamp = timestampElement.toProto()
+      protoValue.timestamp = timestampElement.toProto()
     }
     if (hasTotal()) {
-        protoValue.total = totalElement.toProto()
+      protoValue.total = totalElement.toProto()
     }
     if (hasOffset()) {
-        protoValue.offset = offsetElement.toProto()
+      protoValue.offset = offsetElement.toProto()
     }
     if (hasParameter()) {
       protoValue.addAllParameter(parameter.map { it.toProto() })
@@ -449,10 +451,10 @@ object ValueSetConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasValue()) {
-        protoValue.value = value.valueSetExpansionParameterValueToProto()
+      protoValue.value = value.valueSetExpansionParameterValueToProto()
     }
     return protoValue.build()
   }
@@ -469,22 +471,22 @@ object ValueSetConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSystem()) {
-        protoValue.system = systemElement.toProto()
+      protoValue.system = systemElement.toProto()
     }
     if (hasAbstract()) {
-        protoValue.abstract = abstractElement.toProto()
+      protoValue.abstract = abstractElement.toProto()
     }
     if (hasInactive()) {
-        protoValue.inactive = inactiveElement.toProto()
+      protoValue.inactive = inactiveElement.toProto()
     }
     if (hasVersion()) {
-        protoValue.version = versionElement.toProto()
+      protoValue.version = versionElement.toProto()
     }
     if (hasCode()) {
-        protoValue.code = codeElement.toProto()
+      protoValue.code = codeElement.toProto()
     }
     if (hasDisplay()) {
-        protoValue.display = displayElement.toProto()
+      protoValue.display = displayElement.toProto()
     }
     return protoValue.build()
   }
@@ -494,19 +496,19 @@ object ValueSetConverter {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ValueSetComposeComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasLockedDate()) {
-        hapiValue.lockedDateElement = lockedDate.toHapi()
+      hapiValue.lockedDateElement = lockedDate.toHapi()
     }
     if (hasInactive()) {
-        hapiValue.inactiveElement = inactive.toHapi()
+      hapiValue.inactiveElement = inactive.toHapi()
     }
     if (includeCount > 0) {
-        hapiValue.include = includeList.map { it.toHapi() }
+      hapiValue.include = includeList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -517,22 +519,22 @@ object ValueSetConverter {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ConceptSetComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSystem()) {
-        hapiValue.systemElement = system.toHapi()
+      hapiValue.systemElement = system.toHapi()
     }
     if (hasVersion()) {
-        hapiValue.versionElement = version.toHapi()
+      hapiValue.versionElement = version.toHapi()
     }
     if (conceptCount > 0) {
-        hapiValue.concept = conceptList.map { it.toHapi() }
+      hapiValue.concept = conceptList.map { it.toHapi() }
     }
     if (filterCount > 0) {
-        hapiValue.filter = filterList.map { it.toHapi() }
+      hapiValue.filter = filterList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -543,19 +545,19 @@ object ValueSetConverter {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ConceptReferenceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.codeElement = code.toHapi()
+      hapiValue.codeElement = code.toHapi()
     }
     if (hasDisplay()) {
-        hapiValue.displayElement = display.toHapi()
+      hapiValue.displayElement = display.toHapi()
     }
     if (designationCount > 0) {
-        hapiValue.designation = designationList.map { it.toHapi() }
+      hapiValue.designation = designationList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -566,16 +568,16 @@ object ValueSetConverter {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ConceptReferenceDesignationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUse()) {
-        hapiValue.use = use.toHapi()
+      hapiValue.use = use.toHapi()
     }
     if (hasValue()) {
-        hapiValue.valueElement = value.toHapi()
+      hapiValue.valueElement = value.toHapi()
     }
     return hapiValue
   }
@@ -586,19 +588,20 @@ object ValueSetConverter {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ConceptSetFilterComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasProperty()) {
-        hapiValue.propertyElement = property.toHapi()
+      hapiValue.propertyElement = property.toHapi()
     }
-      hapiValue.op = org.hl7.fhir.r4.model.ValueSet.FilterOperator.valueOf(
-          op.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.op =
+      org.hl7.fhir.r4.model.ValueSet.FilterOperator.valueOf(
+        op.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasValue()) {
-        hapiValue.valueElement = value.toHapi()
+      hapiValue.valueElement = value.toHapi()
     }
     return hapiValue
   }
@@ -609,28 +612,28 @@ object ValueSetConverter {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasIdentifier()) {
-        hapiValue.identifierElement = identifier.toHapi()
+      hapiValue.identifierElement = identifier.toHapi()
     }
     if (hasTimestamp()) {
-        hapiValue.timestampElement = timestamp.toHapi()
+      hapiValue.timestampElement = timestamp.toHapi()
     }
     if (hasTotal()) {
-        hapiValue.totalElement = total.toHapi()
+      hapiValue.totalElement = total.toHapi()
     }
     if (hasOffset()) {
-        hapiValue.offsetElement = offset.toHapi()
+      hapiValue.offsetElement = offset.toHapi()
     }
     if (parameterCount > 0) {
-        hapiValue.parameter = parameterList.map { it.toHapi() }
+      hapiValue.parameter = parameterList.map { it.toHapi() }
     }
     if (containsCount > 0) {
-        hapiValue.contains = containsList.map { it.toHapi() }
+      hapiValue.contains = containsList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -641,16 +644,16 @@ object ValueSetConverter {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionParameterComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasValue()) {
-        hapiValue.value = value.valueSetExpansionParameterValueToHapi()
+      hapiValue.value = value.valueSetExpansionParameterValueToHapi()
     }
     return hapiValue
   }
@@ -661,28 +664,28 @@ object ValueSetConverter {
     val hapiValue = org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionContainsComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSystem()) {
-        hapiValue.systemElement = system.toHapi()
+      hapiValue.systemElement = system.toHapi()
     }
     if (hasAbstract()) {
-        hapiValue.abstractElement = abstract.toHapi()
+      hapiValue.abstractElement = abstract.toHapi()
     }
     if (hasInactive()) {
-        hapiValue.inactiveElement = inactive.toHapi()
+      hapiValue.inactiveElement = inactive.toHapi()
     }
     if (hasVersion()) {
-        hapiValue.versionElement = version.toHapi()
+      hapiValue.versionElement = version.toHapi()
     }
     if (hasCode()) {
-        hapiValue.codeElement = code.toHapi()
+      hapiValue.codeElement = code.toHapi()
     }
     if (hasDisplay()) {
-        hapiValue.displayElement = display.toHapi()
+      hapiValue.displayElement = display.toHapi()
     }
     return hapiValue
   }

@@ -39,25 +39,26 @@ object IdentifierConverter {
     val hapiValue = org.hl7.fhir.r4.model.Identifier()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
-      hapiValue.use = org.hl7.fhir.r4.model.Identifier.IdentifierUse.valueOf(
-          use.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.use =
+      org.hl7.fhir.r4.model.Identifier.IdentifierUse.valueOf(
+        use.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasSystem()) {
-        hapiValue.systemElement = system.toHapi()
+      hapiValue.systemElement = system.toHapi()
     }
     if (hasValue()) {
-        hapiValue.valueElement = value.toHapi()
+      hapiValue.valueElement = value.toHapi()
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     if (hasAssigner()) {
-        hapiValue.assigner = assigner.toHapi()
+      hapiValue.assigner = assigner.toHapi()
     }
     return hapiValue
   }
@@ -68,27 +69,28 @@ object IdentifierConverter {
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-      protoValue.use = Identifier.UseCode.newBuilder()
-          .setValue(
-              IdentifierUseCode.Value.valueOf(
-                  use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.use =
+      Identifier.UseCode.newBuilder()
+        .setValue(
+          IdentifierUseCode.Value.valueOf(
+            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasSystem()) {
-        protoValue.system = systemElement.toProto()
+      protoValue.system = systemElement.toProto()
     }
     if (hasValue()) {
-        protoValue.value = valueElement.toProto()
+      protoValue.value = valueElement.toProto()
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     if (hasAssigner()) {
-        protoValue.assigner = assigner.toProto()
+      protoValue.assigner = assigner.toProto()
     }
     return protoValue.build()
   }

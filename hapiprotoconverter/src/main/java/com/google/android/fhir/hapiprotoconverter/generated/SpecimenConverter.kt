@@ -76,10 +76,10 @@ object SpecimenConverter {
   private fun Type.specimenCollectionCollectedToProto(): Specimen.Collection.CollectedX {
     val protoValue = Specimen.Collection.CollectedX.newBuilder()
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
@@ -99,10 +99,10 @@ object SpecimenConverter {
   private fun Type.specimenCollectionFastingStatusToProto(): Specimen.Collection.FastingStatusX {
     val protoValue = Specimen.Collection.FastingStatusX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Duration) {
-        protoValue.duration = this.toProto()
+      protoValue.duration = this.toProto()
     }
     return protoValue.build()
   }
@@ -122,10 +122,10 @@ object SpecimenConverter {
   private fun Type.specimenProcessingTimeToProto(): Specimen.Processing.TimeX {
     val protoValue = Specimen.Processing.TimeX.newBuilder()
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
@@ -145,10 +145,10 @@ object SpecimenConverter {
   private fun Type.specimenContainerAdditiveToProto(): Specimen.Container.AdditiveX {
     val protoValue = Specimen.Container.AdditiveX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -158,58 +158,59 @@ object SpecimenConverter {
     val hapiValue = org.hl7.fhir.r4.model.Specimen()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasAccessionIdentifier()) {
-        hapiValue.accessionIdentifier = accessionIdentifier.toHapi()
+      hapiValue.accessionIdentifier = accessionIdentifier.toHapi()
     }
-      hapiValue.status = org.hl7.fhir.r4.model.Specimen.SpecimenStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.Specimen.SpecimenStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (hasReceivedTime()) {
-        hapiValue.receivedTimeElement = receivedTime.toHapi()
+      hapiValue.receivedTimeElement = receivedTime.toHapi()
     }
     if (parentCount > 0) {
-        hapiValue.parent = parentList.map { it.toHapi() }
+      hapiValue.parent = parentList.map { it.toHapi() }
     }
     if (requestCount > 0) {
-        hapiValue.request = requestList.map { it.toHapi() }
+      hapiValue.request = requestList.map { it.toHapi() }
     }
     if (hasCollection()) {
-        hapiValue.collection = collection.toHapi()
+      hapiValue.collection = collection.toHapi()
     }
     if (processingCount > 0) {
-        hapiValue.processing = processingList.map { it.toHapi() }
+      hapiValue.processing = processingList.map { it.toHapi() }
     }
     if (containerCount > 0) {
-        hapiValue.container = containerList.map { it.toHapi() }
+      hapiValue.container = containerList.map { it.toHapi() }
     }
     if (conditionCount > 0) {
-        hapiValue.condition = conditionList.map { it.toHapi() }
+      hapiValue.condition = conditionList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -218,13 +219,13 @@ object SpecimenConverter {
   fun org.hl7.fhir.r4.model.Specimen.toProto(): Specimen {
     val protoValue = Specimen.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -236,23 +237,24 @@ object SpecimenConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasAccessionIdentifier()) {
-        protoValue.accessionIdentifier = accessionIdentifier.toProto()
+      protoValue.accessionIdentifier = accessionIdentifier.toProto()
     }
-      protoValue.status = Specimen.StatusCode.newBuilder()
-          .setValue(
-              SpecimenStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      Specimen.StatusCode.newBuilder()
+        .setValue(
+          SpecimenStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasReceivedTime()) {
-        protoValue.receivedTime = receivedTimeElement.toProto()
+      protoValue.receivedTime = receivedTimeElement.toProto()
     }
     if (hasParent()) {
       protoValue.addAllParent(parent.map { it.toProto() })
@@ -261,7 +263,7 @@ object SpecimenConverter {
       protoValue.addAllRequest(request.map { it.toProto() })
     }
     if (hasCollection()) {
-        protoValue.collection = collection.toProto()
+      protoValue.collection = collection.toProto()
     }
     if (hasProcessing()) {
       protoValue.addAllProcessing(processing.map { it.toProto() })
@@ -289,25 +291,25 @@ object SpecimenConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCollector()) {
-        protoValue.collector = collector.toProto()
+      protoValue.collector = collector.toProto()
     }
     if (hasCollected()) {
-        protoValue.collected = collected.specimenCollectionCollectedToProto()
+      protoValue.collected = collected.specimenCollectionCollectedToProto()
     }
     if (hasDuration()) {
-        protoValue.duration = duration.toProto()
+      protoValue.duration = duration.toProto()
     }
     if (hasQuantity()) {
-        protoValue.quantity = (quantity as SimpleQuantity).toProto()
+      protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasMethod()) {
-        protoValue.method = method.toProto()
+      protoValue.method = method.toProto()
     }
     if (hasBodySite()) {
-        protoValue.bodySite = bodySite.toProto()
+      protoValue.bodySite = bodySite.toProto()
     }
     if (hasFastingStatus()) {
-        protoValue.fastingStatus = fastingStatus.specimenCollectionFastingStatusToProto()
+      protoValue.fastingStatus = fastingStatus.specimenCollectionFastingStatusToProto()
     }
     return protoValue.build()
   }
@@ -323,16 +325,16 @@ object SpecimenConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasProcedure()) {
-        protoValue.procedure = procedure.toProto()
+      protoValue.procedure = procedure.toProto()
     }
     if (hasAdditive()) {
       protoValue.addAllAdditive(additive.map { it.toProto() })
     }
     if (hasTime()) {
-        protoValue.time = time.specimenProcessingTimeToProto()
+      protoValue.time = time.specimenProcessingTimeToProto()
     }
     return protoValue.build()
   }
@@ -351,19 +353,19 @@ object SpecimenConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasCapacity()) {
-        protoValue.capacity = (capacity as SimpleQuantity).toProto()
+      protoValue.capacity = (capacity as SimpleQuantity).toProto()
     }
     if (hasSpecimenQuantity()) {
-        protoValue.specimenQuantity = (specimenQuantity as SimpleQuantity).toProto()
+      protoValue.specimenQuantity = (specimenQuantity as SimpleQuantity).toProto()
     }
     if (hasAdditive()) {
-        protoValue.additive = additive.specimenContainerAdditiveToProto()
+      protoValue.additive = additive.specimenContainerAdditiveToProto()
     }
     return protoValue.build()
   }
@@ -374,31 +376,31 @@ object SpecimenConverter {
     val hapiValue = org.hl7.fhir.r4.model.Specimen.SpecimenCollectionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCollector()) {
-        hapiValue.collector = collector.toHapi()
+      hapiValue.collector = collector.toHapi()
     }
     if (hasCollected()) {
-        hapiValue.collected = collected.specimenCollectionCollectedToHapi()
+      hapiValue.collected = collected.specimenCollectionCollectedToHapi()
     }
     if (hasDuration()) {
-        hapiValue.duration = duration.toHapi()
+      hapiValue.duration = duration.toHapi()
     }
     if (hasQuantity()) {
-        hapiValue.quantity = quantity.toHapi()
+      hapiValue.quantity = quantity.toHapi()
     }
     if (hasMethod()) {
-        hapiValue.method = method.toHapi()
+      hapiValue.method = method.toHapi()
     }
     if (hasBodySite()) {
-        hapiValue.bodySite = bodySite.toHapi()
+      hapiValue.bodySite = bodySite.toHapi()
     }
     if (hasFastingStatus()) {
-        hapiValue.fastingStatus = fastingStatus.specimenCollectionFastingStatusToHapi()
+      hapiValue.fastingStatus = fastingStatus.specimenCollectionFastingStatusToHapi()
     }
     return hapiValue
   }
@@ -409,22 +411,22 @@ object SpecimenConverter {
     val hapiValue = org.hl7.fhir.r4.model.Specimen.SpecimenProcessingComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (hasProcedure()) {
-        hapiValue.procedure = procedure.toHapi()
+      hapiValue.procedure = procedure.toHapi()
     }
     if (additiveCount > 0) {
-        hapiValue.additive = additiveList.map { it.toHapi() }
+      hapiValue.additive = additiveList.map { it.toHapi() }
     }
     if (hasTime()) {
-        hapiValue.time = time.specimenProcessingTimeToHapi()
+      hapiValue.time = time.specimenProcessingTimeToHapi()
     }
     return hapiValue
   }
@@ -435,28 +437,28 @@ object SpecimenConverter {
     val hapiValue = org.hl7.fhir.r4.model.Specimen.SpecimenContainerComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasCapacity()) {
-        hapiValue.capacity = capacity.toHapi()
+      hapiValue.capacity = capacity.toHapi()
     }
     if (hasSpecimenQuantity()) {
-        hapiValue.specimenQuantity = specimenQuantity.toHapi()
+      hapiValue.specimenQuantity = specimenQuantity.toHapi()
     }
     if (hasAdditive()) {
-        hapiValue.additive = additive.specimenContainerAdditiveToHapi()
+      hapiValue.additive = additive.specimenContainerAdditiveToHapi()
     }
     return hapiValue
   }

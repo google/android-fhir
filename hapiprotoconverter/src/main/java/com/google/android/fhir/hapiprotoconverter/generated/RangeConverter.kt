@@ -31,13 +31,13 @@ object RangeConverter {
     val hapiValue = org.hl7.fhir.r4.model.Range()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasLow()) {
-        hapiValue.low = low.toHapi()
+      hapiValue.low = low.toHapi()
     }
     if (hasHigh()) {
-        hapiValue.high = high.toHapi()
+      hapiValue.high = high.toHapi()
     }
     return hapiValue
   }
@@ -49,10 +49,10 @@ object RangeConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasLow()) {
-        protoValue.low = (low as SimpleQuantity).toProto()
+      protoValue.low = (low as SimpleQuantity).toProto()
     }
     if (hasHigh()) {
-        protoValue.high = (high as SimpleQuantity).toProto()
+      protoValue.high = (high as SimpleQuantity).toProto()
     }
     return protoValue.build()
   }

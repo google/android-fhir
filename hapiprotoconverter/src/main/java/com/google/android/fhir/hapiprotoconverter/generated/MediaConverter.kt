@@ -72,10 +72,10 @@ object MediaConverter {
   private fun Type.mediaCreatedToProto(): Media.CreatedX {
     val protoValue = Media.CreatedX.newBuilder()
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
@@ -85,85 +85,86 @@ object MediaConverter {
     val hapiValue = org.hl7.fhir.r4.model.Media()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (basedOnCount > 0) {
-        hapiValue.basedOn = basedOnList.map { it.toHapi() }
+      hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
     if (partOfCount > 0) {
-        hapiValue.partOf = partOfList.map { it.toHapi() }
+      hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.Media.MediaStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.Media.MediaStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasModality()) {
-        hapiValue.modality = modality.toHapi()
+      hapiValue.modality = modality.toHapi()
     }
     if (hasView()) {
-        hapiValue.view = view.toHapi()
+      hapiValue.view = view.toHapi()
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-        hapiValue.encounter = encounter.toHapi()
+      hapiValue.encounter = encounter.toHapi()
     }
     if (hasCreated()) {
-        hapiValue.created = created.mediaCreatedToHapi()
+      hapiValue.created = created.mediaCreatedToHapi()
     }
     if (hasIssued()) {
-        hapiValue.issuedElement = issued.toHapi()
+      hapiValue.issuedElement = issued.toHapi()
     }
     if (hasOperator()) {
-        hapiValue.operator = operator.toHapi()
+      hapiValue.operator = operator.toHapi()
     }
     if (reasonCodeCount > 0) {
-        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
+      hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (hasBodySite()) {
-        hapiValue.bodySite = bodySite.toHapi()
+      hapiValue.bodySite = bodySite.toHapi()
     }
     if (hasDeviceName()) {
-        hapiValue.deviceNameElement = deviceName.toHapi()
+      hapiValue.deviceNameElement = deviceName.toHapi()
     }
     if (hasDevice()) {
-        hapiValue.device = device.toHapi()
+      hapiValue.device = device.toHapi()
     }
     if (hasHeight()) {
-        hapiValue.heightElement = height.toHapi()
+      hapiValue.heightElement = height.toHapi()
     }
     if (hasWidth()) {
-        hapiValue.widthElement = width.toHapi()
+      hapiValue.widthElement = width.toHapi()
     }
     if (hasFrames()) {
-        hapiValue.framesElement = frames.toHapi()
+      hapiValue.framesElement = frames.toHapi()
     }
     if (hasDuration()) {
-        hapiValue.durationElement = duration.toHapi()
+      hapiValue.durationElement = duration.toHapi()
     }
     if (hasContent()) {
-        hapiValue.content = content.toHapi()
+      hapiValue.content = content.toHapi()
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -172,13 +173,13 @@ object MediaConverter {
   fun org.hl7.fhir.r4.model.Media.toProto(): Media {
     val protoValue = Media.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -195,63 +196,64 @@ object MediaConverter {
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-      protoValue.status = Media.StatusCode.newBuilder()
-          .setValue(
-              EventStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      Media.StatusCode.newBuilder()
+        .setValue(
+          EventStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasModality()) {
-        protoValue.modality = modality.toProto()
+      protoValue.modality = modality.toProto()
     }
     if (hasView()) {
-        protoValue.view = view.toProto()
+      protoValue.view = view.toProto()
     }
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-        protoValue.encounter = encounter.toProto()
+      protoValue.encounter = encounter.toProto()
     }
     if (hasCreated()) {
-        protoValue.created = created.mediaCreatedToProto()
+      protoValue.created = created.mediaCreatedToProto()
     }
     if (hasIssued()) {
-        protoValue.issued = issuedElement.toProto()
+      protoValue.issued = issuedElement.toProto()
     }
     if (hasOperator()) {
-        protoValue.operator = operator.toProto()
+      protoValue.operator = operator.toProto()
     }
     if (hasReasonCode()) {
       protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
     }
     if (hasBodySite()) {
-        protoValue.bodySite = bodySite.toProto()
+      protoValue.bodySite = bodySite.toProto()
     }
     if (hasDeviceName()) {
-        protoValue.deviceName = deviceNameElement.toProto()
+      protoValue.deviceName = deviceNameElement.toProto()
     }
     if (hasDevice()) {
-        protoValue.device = device.toProto()
+      protoValue.device = device.toProto()
     }
     if (hasHeight()) {
-        protoValue.height = heightElement.toProto()
+      protoValue.height = heightElement.toProto()
     }
     if (hasWidth()) {
-        protoValue.width = widthElement.toProto()
+      protoValue.width = widthElement.toProto()
     }
     if (hasFrames()) {
-        protoValue.frames = framesElement.toProto()
+      protoValue.frames = framesElement.toProto()
     }
     if (hasDuration()) {
-        protoValue.duration = durationElement.toProto()
+      protoValue.duration = durationElement.toProto()
     }
     if (hasContent()) {
-        protoValue.content = content.toProto()
+      protoValue.content = content.toProto()
     }
     if (hasNote()) {
       protoValue.addAllNote(note.map { it.toProto() })

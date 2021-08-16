@@ -34,17 +34,17 @@ object BinaryConverter {
     val hapiValue = org.hl7.fhir.r4.model.Binary()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
-      hapiValue.contentType = contentType.value.hapiCodeCheck()
+    hapiValue.contentType = contentType.value.hapiCodeCheck()
     if (hasSecurityContext()) {
-        hapiValue.securityContext = securityContext.toHapi()
+      hapiValue.securityContext = securityContext.toHapi()
     }
     if (hasData()) {
-        hapiValue.dataElement = data.toHapi()
+      hapiValue.dataElement = data.toHapi()
     }
     return hapiValue
   }
@@ -53,18 +53,18 @@ object BinaryConverter {
   fun org.hl7.fhir.r4.model.Binary.toProto(): Binary {
     val protoValue = Binary.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
-      protoValue.contentType =
-          Binary.ContentTypeCode.newBuilder().setValue(contentType.protoCodeCheck()).build()
+    protoValue.contentType =
+      Binary.ContentTypeCode.newBuilder().setValue(contentType.protoCodeCheck()).build()
     if (hasSecurityContext()) {
-        protoValue.securityContext = securityContext.toProto()
+      protoValue.securityContext = securityContext.toProto()
     }
     if (hasData()) {
-        protoValue.data = dataElement.toProto()
+      protoValue.data = dataElement.toProto()
     }
     return protoValue.build()
   }

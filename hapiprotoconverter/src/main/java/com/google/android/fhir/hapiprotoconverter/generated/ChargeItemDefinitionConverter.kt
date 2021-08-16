@@ -68,87 +68,87 @@ object ChargeItemDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.ChargeItemDefinition()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-        hapiValue.urlElement = url.toHapi()
+      hapiValue.urlElement = url.toHapi()
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasVersion()) {
-        hapiValue.versionElement = version.toHapi()
+      hapiValue.versionElement = version.toHapi()
     }
     if (hasTitle()) {
-        hapiValue.titleElement = title.toHapi()
+      hapiValue.titleElement = title.toHapi()
     }
     if (derivedFromUriCount > 0) {
-        hapiValue.derivedFromUri = derivedFromUriList.map { it.toHapi() }
+      hapiValue.derivedFromUri = derivedFromUriList.map { it.toHapi() }
     }
     if (partOfCount > 0) {
-        hapiValue.partOf = partOfList.map { it.toHapi() }
+      hapiValue.partOf = partOfList.map { it.toHapi() }
     }
     if (replacesCount > 0) {
-        hapiValue.replaces = replacesList.map { it.toHapi() }
+      hapiValue.replaces = replacesList.map { it.toHapi() }
     }
-      hapiValue.status =
-          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    hapiValue.status =
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-        hapiValue.experimentalElement = experimental.toHapi()
+      hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasDate()) {
-        hapiValue.dateElement = date.toHapi()
+      hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-        hapiValue.publisherElement = publisher.toHapi()
+      hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-        hapiValue.contact = contactList.map { it.toHapi() }
+      hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (useContextCount > 0) {
-        hapiValue.useContext = useContextList.map { it.toHapi() }
+      hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
+      hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasCopyright()) {
-        hapiValue.copyrightElement = copyright.toHapi()
+      hapiValue.copyrightElement = copyright.toHapi()
     }
     if (hasApprovalDate()) {
-        hapiValue.approvalDateElement = approvalDate.toHapi()
+      hapiValue.approvalDateElement = approvalDate.toHapi()
     }
     if (hasLastReviewDate()) {
-        hapiValue.lastReviewDateElement = lastReviewDate.toHapi()
+      hapiValue.lastReviewDateElement = lastReviewDate.toHapi()
     }
     if (hasEffectivePeriod()) {
-        hapiValue.effectivePeriod = effectivePeriod.toHapi()
+      hapiValue.effectivePeriod = effectivePeriod.toHapi()
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (instanceCount > 0) {
-        hapiValue.instance = instanceList.map { it.toHapi() }
+      hapiValue.instance = instanceList.map { it.toHapi() }
     }
     if (applicabilityCount > 0) {
-        hapiValue.applicability = applicabilityList.map { it.toHapi() }
+      hapiValue.applicability = applicabilityList.map { it.toHapi() }
     }
     if (propertyGroupCount > 0) {
-        hapiValue.propertyGroup = propertyGroupList.map { it.toHapi() }
+      hapiValue.propertyGroup = propertyGroupList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -157,13 +157,13 @@ object ChargeItemDefinitionConverter {
   fun org.hl7.fhir.r4.model.ChargeItemDefinition.toProto(): ChargeItemDefinition {
     val protoValue = ChargeItemDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -172,16 +172,16 @@ object ChargeItemDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-        protoValue.url = urlElement.toProto()
+      protoValue.url = urlElement.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasVersion()) {
-        protoValue.version = versionElement.toProto()
+      protoValue.version = versionElement.toProto()
     }
     if (hasTitle()) {
-        protoValue.title = titleElement.toProto()
+      protoValue.title = titleElement.toProto()
     }
     if (hasDerivedFromUri()) {
       protoValue.addAllDerivedFromUri(derivedFromUri.map { it.toProto() })
@@ -192,27 +192,28 @@ object ChargeItemDefinitionConverter {
     if (hasReplaces()) {
       protoValue.addAllReplaces(replaces.map { it.toProto() })
     }
-      protoValue.status = ChargeItemDefinition.StatusCode.newBuilder()
-          .setValue(
-              PublicationStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      ChargeItemDefinition.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasExperimental()) {
-        protoValue.experimental = experimentalElement.toProto()
+      protoValue.experimental = experimentalElement.toProto()
     }
     if (hasDate()) {
-        protoValue.date = dateElement.toProto()
+      protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-        protoValue.publisher = publisherElement.toProto()
+      protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasUseContext()) {
       protoValue.addAllUseContext(useContext.map { it.toProto() })
@@ -221,19 +222,19 @@ object ChargeItemDefinitionConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasCopyright()) {
-        protoValue.copyright = copyrightElement.toProto()
+      protoValue.copyright = copyrightElement.toProto()
     }
     if (hasApprovalDate()) {
-        protoValue.approvalDate = approvalDateElement.toProto()
+      protoValue.approvalDate = approvalDateElement.toProto()
     }
     if (hasLastReviewDate()) {
-        protoValue.lastReviewDate = lastReviewDateElement.toProto()
+      protoValue.lastReviewDate = lastReviewDateElement.toProto()
     }
     if (hasEffectivePeriod()) {
-        protoValue.effectivePeriod = effectivePeriod.toProto()
+      protoValue.effectivePeriod = effectivePeriod.toProto()
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasInstance()) {
       protoValue.addAllInstance(instance.map { it.toProto() })
@@ -259,13 +260,13 @@ object ChargeItemDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasLanguage()) {
-        protoValue.language = languageElement.toProto()
+      protoValue.language = languageElement.toProto()
     }
     if (hasExpression()) {
-        protoValue.expression = expressionElement.toProto()
+      protoValue.expression = expressionElement.toProto()
     }
     return protoValue.build()
   }
@@ -299,21 +300,22 @@ object ChargeItemDefinitionConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-      protoValue.type = ChargeItemDefinition.PropertyGroup.PriceComponent.TypeCode.newBuilder()
-          .setValue(
-              InvoicePriceComponentTypeCode.Value.valueOf(
-                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.type =
+      ChargeItemDefinition.PropertyGroup.PriceComponent.TypeCode.newBuilder()
+        .setValue(
+          InvoicePriceComponentTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasFactor()) {
-        protoValue.factor = factorElement.toProto()
+      protoValue.factor = factorElement.toProto()
     }
     if (hasAmount()) {
-        protoValue.amount = amount.toProto()
+      protoValue.amount = amount.toProto()
     }
     return protoValue.build()
   }
@@ -325,19 +327,19 @@ object ChargeItemDefinitionConverter {
       org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionApplicabilityComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (hasLanguage()) {
-        hapiValue.languageElement = language.toHapi()
+      hapiValue.languageElement = language.toHapi()
     }
     if (hasExpression()) {
-        hapiValue.expressionElement = expression.toHapi()
+      hapiValue.expressionElement = expression.toHapi()
     }
     return hapiValue
   }
@@ -349,13 +351,13 @@ object ChargeItemDefinitionConverter {
       org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionPropertyGroupComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (priceComponentCount > 0) {
-        hapiValue.priceComponent = priceComponentList.map { it.toHapi() }
+      hapiValue.priceComponent = priceComponentList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -368,22 +370,23 @@ object ChargeItemDefinitionConverter {
         .ChargeItemDefinitionPropertyGroupPriceComponentComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-      hapiValue.type = org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionPriceComponentType.valueOf(
-          type.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.type =
+      org.hl7.fhir.r4.model.ChargeItemDefinition.ChargeItemDefinitionPriceComponentType.valueOf(
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasFactor()) {
-        hapiValue.factorElement = factor.toHapi()
+      hapiValue.factorElement = factor.toHapi()
     }
     if (hasAmount()) {
-        hapiValue.amount = amount.toHapi()
+      hapiValue.amount = amount.toHapi()
     }
     return hapiValue
   }

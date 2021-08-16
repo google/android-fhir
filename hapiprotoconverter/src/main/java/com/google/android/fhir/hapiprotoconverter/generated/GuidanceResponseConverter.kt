@@ -69,13 +69,13 @@ object GuidanceResponseConverter {
   private fun Type.guidanceResponseModuleToProto(): GuidanceResponse.ModuleX {
     val protoValue = GuidanceResponse.ModuleX.newBuilder()
     if (this is UriType) {
-        protoValue.uri = this.toProto()
+      protoValue.uri = this.toProto()
     }
     if (this is CanonicalType) {
-        protoValue.canonical = this.toProto()
+      protoValue.canonical = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
@@ -85,64 +85,65 @@ object GuidanceResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.GuidanceResponse()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasRequestIdentifier()) {
-        hapiValue.requestIdentifier = requestIdentifier.toHapi()
+      hapiValue.requestIdentifier = requestIdentifier.toHapi()
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasModule()) {
-        hapiValue.module = module.guidanceResponseModuleToHapi()
+      hapiValue.module = module.guidanceResponseModuleToHapi()
     }
-      hapiValue.status = org.hl7.fhir.r4.model.GuidanceResponse.GuidanceResponseStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.GuidanceResponse.GuidanceResponseStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-        hapiValue.encounter = encounter.toHapi()
+      hapiValue.encounter = encounter.toHapi()
     }
     if (hasOccurrenceDateTime()) {
-        hapiValue.occurrenceDateTimeElement = occurrenceDateTime.toHapi()
+      hapiValue.occurrenceDateTimeElement = occurrenceDateTime.toHapi()
     }
     if (hasPerformer()) {
-        hapiValue.performer = performer.toHapi()
+      hapiValue.performer = performer.toHapi()
     }
     if (reasonCodeCount > 0) {
-        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
+      hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
+      hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     if (evaluationMessageCount > 0) {
-        hapiValue.evaluationMessage = evaluationMessageList.map { it.toHapi() }
+      hapiValue.evaluationMessage = evaluationMessageList.map { it.toHapi() }
     }
     if (hasOutputParameters()) {
-        hapiValue.outputParameters = outputParameters.toHapi()
+      hapiValue.outputParameters = outputParameters.toHapi()
     }
     if (hasResult()) {
-        hapiValue.result = result.toHapi()
+      hapiValue.result = result.toHapi()
     }
     if (dataRequirementCount > 0) {
-        hapiValue.dataRequirement = dataRequirementList.map { it.toHapi() }
+      hapiValue.dataRequirement = dataRequirementList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -151,13 +152,13 @@ object GuidanceResponseConverter {
   fun org.hl7.fhir.r4.model.GuidanceResponse.toProto(): GuidanceResponse {
     val protoValue = GuidanceResponse.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -166,32 +167,33 @@ object GuidanceResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasRequestIdentifier()) {
-        protoValue.requestIdentifier = requestIdentifier.toProto()
+      protoValue.requestIdentifier = requestIdentifier.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasModule()) {
-        protoValue.module = module.guidanceResponseModuleToProto()
+      protoValue.module = module.guidanceResponseModuleToProto()
     }
-      protoValue.status = GuidanceResponse.StatusCode.newBuilder()
-          .setValue(
-              GuidanceResponseStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      GuidanceResponse.StatusCode.newBuilder()
+        .setValue(
+          GuidanceResponseStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-        protoValue.encounter = encounter.toProto()
+      protoValue.encounter = encounter.toProto()
     }
     if (hasOccurrenceDateTime()) {
-        protoValue.occurrenceDateTime = occurrenceDateTimeElement.toProto()
+      protoValue.occurrenceDateTime = occurrenceDateTimeElement.toProto()
     }
     if (hasPerformer()) {
-        protoValue.performer = performer.toProto()
+      protoValue.performer = performer.toProto()
     }
     if (hasReasonCode()) {
       protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
@@ -206,10 +208,10 @@ object GuidanceResponseConverter {
       protoValue.addAllEvaluationMessage(evaluationMessage.map { it.toProto() })
     }
     if (hasOutputParameters()) {
-        protoValue.outputParameters = outputParameters.toProto()
+      protoValue.outputParameters = outputParameters.toProto()
     }
     if (hasResult()) {
-        protoValue.result = result.toProto()
+      protoValue.result = result.toProto()
     }
     if (hasDataRequirement()) {
       protoValue.addAllDataRequirement(dataRequirement.map { it.toProto() })

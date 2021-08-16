@@ -44,8 +44,6 @@ class DateConverterTest(private val hapi: DateType, private val proto: Date) {
   }
 
   companion object {
-    @Parameterized.Parameters
-    @JvmStatic
-    fun `data`(): List<Any> = PrimitiveTestData.DATE_DATA
+    @Parameterized.Parameters @JvmStatic fun `data`(): List<Any> = PrimitiveTestData.DATE_DATA
   }
 }

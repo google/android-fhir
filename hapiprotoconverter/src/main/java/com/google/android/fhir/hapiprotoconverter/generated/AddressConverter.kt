@@ -34,37 +34,39 @@ object AddressConverter {
     val hapiValue = org.hl7.fhir.r4.model.Address()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
-      hapiValue.use = org.hl7.fhir.r4.model.Address.AddressUse.valueOf(
-          use.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.use =
+      org.hl7.fhir.r4.model.Address.AddressUse.valueOf(
+        use.value.name.hapiCodeCheck().replace("_", "")
       )
-      hapiValue.type = org.hl7.fhir.r4.model.Address.AddressType.valueOf(
-          type.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.type =
+      org.hl7.fhir.r4.model.Address.AddressType.valueOf(
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasText()) {
-        hapiValue.textElement = text.toHapi()
+      hapiValue.textElement = text.toHapi()
     }
     if (lineCount > 0) {
-        hapiValue.line = lineList.map { it.toHapi() }
+      hapiValue.line = lineList.map { it.toHapi() }
     }
     if (hasCity()) {
-        hapiValue.cityElement = city.toHapi()
+      hapiValue.cityElement = city.toHapi()
     }
     if (hasDistrict()) {
-        hapiValue.districtElement = district.toHapi()
+      hapiValue.districtElement = district.toHapi()
     }
     if (hasState()) {
-        hapiValue.stateElement = state.toHapi()
+      hapiValue.stateElement = state.toHapi()
     }
     if (hasPostalCode()) {
-        hapiValue.postalCodeElement = postalCode.toHapi()
+      hapiValue.postalCodeElement = postalCode.toHapi()
     }
     if (hasCountry()) {
-        hapiValue.countryElement = country.toHapi()
+      hapiValue.countryElement = country.toHapi()
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     return hapiValue
   }
@@ -75,43 +77,45 @@ object AddressConverter {
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-      protoValue.use = Address.UseCode.newBuilder()
-          .setValue(
-              AddressUseCode.Value.valueOf(
-                  use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.use =
+      Address.UseCode.newBuilder()
+        .setValue(
+          AddressUseCode.Value.valueOf(
+            use.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
-      protoValue.type = Address.TypeCode.newBuilder()
-          .setValue(
-              AddressTypeCode.Value.valueOf(
-                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+        )
+        .build()
+    protoValue.type =
+      Address.TypeCode.newBuilder()
+        .setValue(
+          AddressTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasText()) {
-        protoValue.text = textElement.toProto()
+      protoValue.text = textElement.toProto()
     }
     if (hasLine()) {
       protoValue.addAllLine(line.map { it.toProto() })
     }
     if (hasCity()) {
-        protoValue.city = cityElement.toProto()
+      protoValue.city = cityElement.toProto()
     }
     if (hasDistrict()) {
-        protoValue.district = districtElement.toProto()
+      protoValue.district = districtElement.toProto()
     }
     if (hasState()) {
-        protoValue.state = stateElement.toProto()
+      protoValue.state = stateElement.toProto()
     }
     if (hasPostalCode()) {
-        protoValue.postalCode = postalCodeElement.toProto()
+      protoValue.postalCode = postalCodeElement.toProto()
     }
     if (hasCountry()) {
-        protoValue.country = countryElement.toProto()
+      protoValue.country = countryElement.toProto()
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     return protoValue.build()
   }

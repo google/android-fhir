@@ -52,40 +52,40 @@ object MedicinalProductPharmaceuticalConverter {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductPharmaceutical()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasAdministrableDoseForm()) {
-        hapiValue.administrableDoseForm = administrableDoseForm.toHapi()
+      hapiValue.administrableDoseForm = administrableDoseForm.toHapi()
     }
     if (hasUnitOfPresentation()) {
-        hapiValue.unitOfPresentation = unitOfPresentation.toHapi()
+      hapiValue.unitOfPresentation = unitOfPresentation.toHapi()
     }
     if (ingredientCount > 0) {
-        hapiValue.ingredient = ingredientList.map { it.toHapi() }
+      hapiValue.ingredient = ingredientList.map { it.toHapi() }
     }
     if (deviceCount > 0) {
-        hapiValue.device = deviceList.map { it.toHapi() }
+      hapiValue.device = deviceList.map { it.toHapi() }
     }
     if (characteristicsCount > 0) {
-        hapiValue.characteristics = characteristicsList.map { it.toHapi() }
+      hapiValue.characteristics = characteristicsList.map { it.toHapi() }
     }
     if (routeOfAdministrationCount > 0) {
-        hapiValue.routeOfAdministration = routeOfAdministrationList.map { it.toHapi() }
+      hapiValue.routeOfAdministration = routeOfAdministrationList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -95,13 +95,13 @@ object MedicinalProductPharmaceuticalConverter {
     MedicinalProductPharmaceutical {
     val protoValue = MedicinalProductPharmaceutical.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -113,10 +113,10 @@ object MedicinalProductPharmaceuticalConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasAdministrableDoseForm()) {
-        protoValue.administrableDoseForm = administrableDoseForm.toProto()
+      protoValue.administrableDoseForm = administrableDoseForm.toProto()
     }
     if (hasUnitOfPresentation()) {
-        protoValue.unitOfPresentation = unitOfPresentation.toProto()
+      protoValue.unitOfPresentation = unitOfPresentation.toProto()
     }
     if (hasIngredient()) {
       protoValue.addAllIngredient(ingredient.map { it.toProto() })
@@ -146,10 +146,10 @@ object MedicinalProductPharmaceuticalConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasStatus()) {
-        protoValue.status = status.toProto()
+      protoValue.status = status.toProto()
     }
     return protoValue.build()
   }
@@ -167,22 +167,22 @@ object MedicinalProductPharmaceuticalConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasFirstDose()) {
-        protoValue.firstDose = firstDose.toProto()
+      protoValue.firstDose = firstDose.toProto()
     }
     if (hasMaxSingleDose()) {
-        protoValue.maxSingleDose = maxSingleDose.toProto()
+      protoValue.maxSingleDose = maxSingleDose.toProto()
     }
     if (hasMaxDosePerDay()) {
-        protoValue.maxDosePerDay = maxDosePerDay.toProto()
+      protoValue.maxDosePerDay = maxDosePerDay.toProto()
     }
     if (hasMaxDosePerTreatmentPeriod()) {
-        protoValue.maxDosePerTreatmentPeriod = maxDosePerTreatmentPeriod.toProto()
+      protoValue.maxDosePerTreatmentPeriod = maxDosePerTreatmentPeriod.toProto()
     }
     if (hasMaxTreatmentPeriod()) {
-        protoValue.maxTreatmentPeriod = maxTreatmentPeriod.toProto()
+      protoValue.maxTreatmentPeriod = maxTreatmentPeriod.toProto()
     }
     if (hasTargetSpecies()) {
       protoValue.addAllTargetSpecies(targetSpecies.map { it.toProto() })
@@ -203,7 +203,7 @@ object MedicinalProductPharmaceuticalConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasWithdrawalPeriod()) {
       protoValue.addAllWithdrawalPeriod(withdrawalPeriod.map { it.toProto() })
@@ -225,13 +225,13 @@ object MedicinalProductPharmaceuticalConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasTissue()) {
-        protoValue.tissue = tissue.toProto()
+      protoValue.tissue = tissue.toProto()
     }
     if (hasValue()) {
-        protoValue.value = value.toProto()
+      protoValue.value = value.toProto()
     }
     if (hasSupportingInformation()) {
-        protoValue.supportingInformation = supportingInformationElement.toProto()
+      protoValue.supportingInformation = supportingInformationElement.toProto()
     }
     return protoValue.build()
   }
@@ -244,16 +244,16 @@ object MedicinalProductPharmaceuticalConverter {
         .MedicinalProductPharmaceuticalCharacteristicsComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasStatus()) {
-        hapiValue.status = status.toHapi()
+      hapiValue.status = status.toHapi()
     }
     return hapiValue
   }
@@ -266,31 +266,31 @@ object MedicinalProductPharmaceuticalConverter {
         .MedicinalProductPharmaceuticalRouteOfAdministrationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasFirstDose()) {
-        hapiValue.firstDose = firstDose.toHapi()
+      hapiValue.firstDose = firstDose.toHapi()
     }
     if (hasMaxSingleDose()) {
-        hapiValue.maxSingleDose = maxSingleDose.toHapi()
+      hapiValue.maxSingleDose = maxSingleDose.toHapi()
     }
     if (hasMaxDosePerDay()) {
-        hapiValue.maxDosePerDay = maxDosePerDay.toHapi()
+      hapiValue.maxDosePerDay = maxDosePerDay.toHapi()
     }
     if (hasMaxDosePerTreatmentPeriod()) {
-        hapiValue.maxDosePerTreatmentPeriod = maxDosePerTreatmentPeriod.toHapi()
+      hapiValue.maxDosePerTreatmentPeriod = maxDosePerTreatmentPeriod.toHapi()
     }
     if (hasMaxTreatmentPeriod()) {
-        hapiValue.maxTreatmentPeriod = maxTreatmentPeriod.toHapi()
+      hapiValue.maxTreatmentPeriod = maxTreatmentPeriod.toHapi()
     }
     if (targetSpeciesCount > 0) {
-        hapiValue.targetSpecies = targetSpeciesList.map { it.toHapi() }
+      hapiValue.targetSpecies = targetSpeciesList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -303,16 +303,16 @@ object MedicinalProductPharmaceuticalConverter {
         .MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (withdrawalPeriodCount > 0) {
-        hapiValue.withdrawalPeriod = withdrawalPeriodList.map { it.toHapi() }
+      hapiValue.withdrawalPeriod = withdrawalPeriodList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -325,19 +325,19 @@ object MedicinalProductPharmaceuticalConverter {
         .MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesWithdrawalPeriodComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasTissue()) {
-        hapiValue.tissue = tissue.toHapi()
+      hapiValue.tissue = tissue.toHapi()
     }
     if (hasValue()) {
-        hapiValue.value = value.toHapi()
+      hapiValue.value = value.toHapi()
     }
     if (hasSupportingInformation()) {
-        hapiValue.supportingInformationElement = supportingInformation.toHapi()
+      hapiValue.supportingInformationElement = supportingInformation.toHapi()
     }
     return hapiValue
   }

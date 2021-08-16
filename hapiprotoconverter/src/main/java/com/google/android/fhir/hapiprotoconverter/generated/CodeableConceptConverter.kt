@@ -32,13 +32,13 @@ object CodeableConceptConverter {
     val hapiValue = org.hl7.fhir.r4.model.CodeableConcept()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (codingCount > 0) {
-        hapiValue.coding = codingList.map { it.toHapi() }
+      hapiValue.coding = codingList.map { it.toHapi() }
     }
     if (hasText()) {
-        hapiValue.textElement = text.toHapi()
+      hapiValue.textElement = text.toHapi()
     }
     return hapiValue
   }
@@ -53,7 +53,7 @@ object CodeableConceptConverter {
       protoValue.addAllCoding(coding.map { it.toProto() })
     }
     if (hasText()) {
-        protoValue.text = textElement.toProto()
+      protoValue.text = textElement.toProto()
     }
     return protoValue.build()
   }

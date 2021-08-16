@@ -82,10 +82,10 @@ object MedicationKnowledgeConverter {
     MedicationKnowledge.Ingredient.ItemX {
     val protoValue = MedicationKnowledge.Ingredient.ItemX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -109,10 +109,10 @@ object MedicationKnowledgeConverter {
     MedicationKnowledge.AdministrationGuidelines.IndicationX {
     val protoValue = MedicationKnowledge.AdministrationGuidelines.IndicationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -138,10 +138,10 @@ object MedicationKnowledgeConverter {
       MedicationKnowledge.AdministrationGuidelines.PatientCharacteristics.CharacteristicX
         .newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.SimpleQuantity) {
-        protoValue.quantity = this.toProto()
+      protoValue.quantity = this.toProto()
     }
     return protoValue.build()
   }
@@ -171,16 +171,16 @@ object MedicationKnowledgeConverter {
     MedicationKnowledge.DrugCharacteristic.ValueX {
     val protoValue = MedicationKnowledge.DrugCharacteristic.ValueX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is StringType) {
-        protoValue.stringValue = this.toProto()
+      protoValue.stringValue = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.SimpleQuantity) {
-        protoValue.quantity = this.toProto()
+      protoValue.quantity = this.toProto()
     }
     if (this is Base64BinaryType) {
-        protoValue.base64Binary = this.toProto()
+      protoValue.base64Binary = this.toProto()
     }
     return protoValue.build()
   }
@@ -190,85 +190,86 @@ object MedicationKnowledgeConverter {
     val hapiValue = org.hl7.fhir.r4.model.MedicationKnowledge()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
-      hapiValue.status = org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasManufacturer()) {
-        hapiValue.manufacturer = manufacturer.toHapi()
+      hapiValue.manufacturer = manufacturer.toHapi()
     }
     if (hasDoseForm()) {
-        hapiValue.doseForm = doseForm.toHapi()
+      hapiValue.doseForm = doseForm.toHapi()
     }
     if (hasAmount()) {
-        hapiValue.amount = amount.toHapi()
+      hapiValue.amount = amount.toHapi()
     }
     if (synonymCount > 0) {
-        hapiValue.synonym = synonymList.map { it.toHapi() }
+      hapiValue.synonym = synonymList.map { it.toHapi() }
     }
     if (relatedMedicationKnowledgeCount > 0) {
-        hapiValue.relatedMedicationKnowledge = relatedMedicationKnowledgeList.map { it.toHapi() }
+      hapiValue.relatedMedicationKnowledge = relatedMedicationKnowledgeList.map { it.toHapi() }
     }
     if (associatedMedicationCount > 0) {
-        hapiValue.associatedMedication = associatedMedicationList.map { it.toHapi() }
+      hapiValue.associatedMedication = associatedMedicationList.map { it.toHapi() }
     }
     if (productTypeCount > 0) {
-        hapiValue.productType = productTypeList.map { it.toHapi() }
+      hapiValue.productType = productTypeList.map { it.toHapi() }
     }
     if (monographCount > 0) {
-        hapiValue.monograph = monographList.map { it.toHapi() }
+      hapiValue.monograph = monographList.map { it.toHapi() }
     }
     if (ingredientCount > 0) {
-        hapiValue.ingredient = ingredientList.map { it.toHapi() }
+      hapiValue.ingredient = ingredientList.map { it.toHapi() }
     }
     if (hasPreparationInstruction()) {
-        hapiValue.preparationInstructionElement = preparationInstruction.toHapi()
+      hapiValue.preparationInstructionElement = preparationInstruction.toHapi()
     }
     if (intendedRouteCount > 0) {
-        hapiValue.intendedRoute = intendedRouteList.map { it.toHapi() }
+      hapiValue.intendedRoute = intendedRouteList.map { it.toHapi() }
     }
     if (costCount > 0) {
-        hapiValue.cost = costList.map { it.toHapi() }
+      hapiValue.cost = costList.map { it.toHapi() }
     }
     if (monitoringProgramCount > 0) {
-        hapiValue.monitoringProgram = monitoringProgramList.map { it.toHapi() }
+      hapiValue.monitoringProgram = monitoringProgramList.map { it.toHapi() }
     }
     if (administrationGuidelinesCount > 0) {
-        hapiValue.administrationGuidelines = administrationGuidelinesList.map { it.toHapi() }
+      hapiValue.administrationGuidelines = administrationGuidelinesList.map { it.toHapi() }
     }
     if (medicineClassificationCount > 0) {
-        hapiValue.medicineClassification = medicineClassificationList.map { it.toHapi() }
+      hapiValue.medicineClassification = medicineClassificationList.map { it.toHapi() }
     }
     if (hasPackaging()) {
-        hapiValue.packaging = packaging.toHapi()
+      hapiValue.packaging = packaging.toHapi()
     }
     if (drugCharacteristicCount > 0) {
-        hapiValue.drugCharacteristic = drugCharacteristicList.map { it.toHapi() }
+      hapiValue.drugCharacteristic = drugCharacteristicList.map { it.toHapi() }
     }
     if (contraindicationCount > 0) {
-        hapiValue.contraindication = contraindicationList.map { it.toHapi() }
+      hapiValue.contraindication = contraindicationList.map { it.toHapi() }
     }
     if (regulatoryCount > 0) {
-        hapiValue.regulatory = regulatoryList.map { it.toHapi() }
+      hapiValue.regulatory = regulatoryList.map { it.toHapi() }
     }
     if (kineticsCount > 0) {
-        hapiValue.kinetics = kineticsList.map { it.toHapi() }
+      hapiValue.kinetics = kineticsList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -277,13 +278,13 @@ object MedicationKnowledgeConverter {
   fun org.hl7.fhir.r4.model.MedicationKnowledge.toProto(): MedicationKnowledge {
     val protoValue = MedicationKnowledge.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -292,23 +293,24 @@ object MedicationKnowledgeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
-      protoValue.status = MedicationKnowledge.StatusCode.newBuilder()
-          .setValue(
-              MedicationKnowledgeStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      MedicationKnowledge.StatusCode.newBuilder()
+        .setValue(
+          MedicationKnowledgeStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasManufacturer()) {
-        protoValue.manufacturer = manufacturer.toProto()
+      protoValue.manufacturer = manufacturer.toProto()
     }
     if (hasDoseForm()) {
-        protoValue.doseForm = doseForm.toProto()
+      protoValue.doseForm = doseForm.toProto()
     }
     if (hasAmount()) {
-        protoValue.amount = (amount as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      protoValue.amount = (amount as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
     }
     if (hasSynonym()) {
       protoValue.addAllSynonym(synonym.map { it.toProto() })
@@ -329,7 +331,7 @@ object MedicationKnowledgeConverter {
       protoValue.addAllIngredient(ingredient.map { it.toProto() })
     }
     if (hasPreparationInstruction()) {
-        protoValue.preparationInstruction = preparationInstructionElement.toProto()
+      protoValue.preparationInstruction = preparationInstructionElement.toProto()
     }
     if (hasIntendedRoute()) {
       protoValue.addAllIntendedRoute(intendedRoute.map { it.toProto() })
@@ -347,7 +349,7 @@ object MedicationKnowledgeConverter {
       protoValue.addAllMedicineClassification(medicineClassification.map { it.toProto() })
     }
     if (hasPackaging()) {
-        protoValue.packaging = packaging.toProto()
+      protoValue.packaging = packaging.toProto()
     }
     if (hasDrugCharacteristic()) {
       protoValue.addAllDrugCharacteristic(drugCharacteristic.map { it.toProto() })
@@ -377,7 +379,7 @@ object MedicationKnowledgeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasReference()) {
       protoValue.addAllReference(reference.map { it.toProto() })
@@ -397,10 +399,10 @@ object MedicationKnowledgeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasSource()) {
-        protoValue.source = source.toProto()
+      protoValue.source = source.toProto()
     }
     return protoValue.build()
   }
@@ -417,13 +419,13 @@ object MedicationKnowledgeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasItem()) {
-        protoValue.item = item.medicationKnowledgeIngredientItemToProto()
+      protoValue.item = item.medicationKnowledgeIngredientItemToProto()
     }
     if (hasIsActive()) {
-        protoValue.isActive = isActiveElement.toProto()
+      protoValue.isActive = isActiveElement.toProto()
     }
     if (hasStrength()) {
-        protoValue.strength = strength.toProto()
+      protoValue.strength = strength.toProto()
     }
     return protoValue.build()
   }
@@ -439,13 +441,13 @@ object MedicationKnowledgeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasSource()) {
-        protoValue.source = sourceElement.toProto()
+      protoValue.source = sourceElement.toProto()
     }
     if (hasCost()) {
-        protoValue.cost = cost.toProto()
+      protoValue.cost = cost.toProto()
     }
     return protoValue.build()
   }
@@ -462,10 +464,10 @@ object MedicationKnowledgeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     return protoValue.build()
   }
@@ -486,7 +488,8 @@ object MedicationKnowledgeConverter {
       protoValue.addAllDosage(dosage.map { it.toProto() })
     }
     if (hasIndication()) {
-        protoValue.indication = indication.medicationKnowledgeAdministrationGuidelinesIndicationToProto()
+      protoValue.indication =
+        indication.medicationKnowledgeAdministrationGuidelinesIndicationToProto()
     }
     if (hasPatientCharacteristics()) {
       protoValue.addAllPatientCharacteristics(patientCharacteristics.map { it.toProto() })
@@ -507,7 +510,7 @@ object MedicationKnowledgeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasDosage()) {
       protoValue.addAllDosage(dosage.map { it.toProto() })
@@ -528,8 +531,9 @@ object MedicationKnowledgeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCharacteristic()) {
-        protoValue.characteristic = characteristic
-            .medicationKnowledgeAdministrationGuidelinesPatientCharacteristicsCharacteristicToProto()
+      protoValue.characteristic =
+        characteristic
+          .medicationKnowledgeAdministrationGuidelinesPatientCharacteristicsCharacteristicToProto()
     }
     if (hasValue()) {
       protoValue.addAllValue(value.map { it.toProto() })
@@ -550,7 +554,7 @@ object MedicationKnowledgeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasClassification()) {
       protoValue.addAllClassification(classification.map { it.toProto() })
@@ -570,10 +574,10 @@ object MedicationKnowledgeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasQuantity()) {
-        protoValue.quantity = (quantity as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      protoValue.quantity = (quantity as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
     }
     return protoValue.build()
   }
@@ -590,10 +594,10 @@ object MedicationKnowledgeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasValue()) {
-        protoValue.value = value.medicationKnowledgeDrugCharacteristicValueToProto()
+      protoValue.value = value.medicationKnowledgeDrugCharacteristicValueToProto()
     }
     return protoValue.build()
   }
@@ -610,7 +614,7 @@ object MedicationKnowledgeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasRegulatoryAuthority()) {
-        protoValue.regulatoryAuthority = regulatoryAuthority.toProto()
+      protoValue.regulatoryAuthority = regulatoryAuthority.toProto()
     }
     if (hasSubstitution()) {
       protoValue.addAllSubstitution(substitution.map { it.toProto() })
@@ -619,7 +623,7 @@ object MedicationKnowledgeConverter {
       protoValue.addAllSchedule(schedule.map { it.toProto() })
     }
     if (hasMaxDispense()) {
-        protoValue.maxDispense = maxDispense.toProto()
+      protoValue.maxDispense = maxDispense.toProto()
     }
     return protoValue.build()
   }
@@ -637,10 +641,10 @@ object MedicationKnowledgeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasAllowed()) {
-        protoValue.allowed = allowedElement.toProto()
+      protoValue.allowed = allowedElement.toProto()
     }
     return protoValue.build()
   }
@@ -657,7 +661,7 @@ object MedicationKnowledgeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSchedule()) {
-        protoValue.schedule = schedule.toProto()
+      protoValue.schedule = schedule.toProto()
     }
     return protoValue.build()
   }
@@ -675,10 +679,10 @@ object MedicationKnowledgeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasQuantity()) {
-        protoValue.quantity = (quantity as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      protoValue.quantity = (quantity as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     return protoValue.build()
   }
@@ -705,7 +709,7 @@ object MedicationKnowledgeConverter {
       )
     }
     if (hasHalfLifePeriod()) {
-        protoValue.halfLifePeriod = halfLifePeriod.toProto()
+      protoValue.halfLifePeriod = halfLifePeriod.toProto()
     }
     return protoValue.build()
   }
@@ -718,16 +722,16 @@ object MedicationKnowledgeConverter {
         .MedicationKnowledgeRelatedMedicationKnowledgeComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (referenceCount > 0) {
-        hapiValue.reference = referenceList.map { it.toHapi() }
+      hapiValue.reference = referenceList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -739,16 +743,16 @@ object MedicationKnowledgeConverter {
       org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeMonographComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasSource()) {
-        hapiValue.source = source.toHapi()
+      hapiValue.source = source.toHapi()
     }
     return hapiValue
   }
@@ -760,19 +764,19 @@ object MedicationKnowledgeConverter {
       org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeIngredientComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasItem()) {
-        hapiValue.item = item.medicationKnowledgeIngredientItemToHapi()
+      hapiValue.item = item.medicationKnowledgeIngredientItemToHapi()
     }
     if (hasIsActive()) {
-        hapiValue.isActiveElement = isActive.toHapi()
+      hapiValue.isActiveElement = isActive.toHapi()
     }
     if (hasStrength()) {
-        hapiValue.strength = strength.toHapi()
+      hapiValue.strength = strength.toHapi()
     }
     return hapiValue
   }
@@ -783,19 +787,19 @@ object MedicationKnowledgeConverter {
     val hapiValue = org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeCostComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasSource()) {
-        hapiValue.sourceElement = source.toHapi()
+      hapiValue.sourceElement = source.toHapi()
     }
     if (hasCost()) {
-        hapiValue.cost = cost.toHapi()
+      hapiValue.cost = cost.toHapi()
     }
     return hapiValue
   }
@@ -807,16 +811,16 @@ object MedicationKnowledgeConverter {
       org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeMonitoringProgramComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     return hapiValue
   }
@@ -829,19 +833,20 @@ object MedicationKnowledgeConverter {
         .MedicationKnowledgeAdministrationGuidelinesComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (dosageCount > 0) {
-        hapiValue.dosage = dosageList.map { it.toHapi() }
+      hapiValue.dosage = dosageList.map { it.toHapi() }
     }
     if (hasIndication()) {
-        hapiValue.indication = indication.medicationKnowledgeAdministrationGuidelinesIndicationToHapi()
+      hapiValue.indication =
+        indication.medicationKnowledgeAdministrationGuidelinesIndicationToHapi()
     }
     if (patientCharacteristicsCount > 0) {
-        hapiValue.patientCharacteristics = patientCharacteristicsList.map { it.toHapi() }
+      hapiValue.patientCharacteristics = patientCharacteristicsList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -854,16 +859,16 @@ object MedicationKnowledgeConverter {
         .MedicationKnowledgeAdministrationGuidelinesDosageComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (dosageCount > 0) {
-        hapiValue.dosage = dosageList.map { it.toHapi() }
+      hapiValue.dosage = dosageList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -876,17 +881,18 @@ object MedicationKnowledgeConverter {
         .MedicationKnowledgeAdministrationGuidelinesPatientCharacteristicsComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCharacteristic()) {
-        hapiValue.characteristic = characteristic
-            .medicationKnowledgeAdministrationGuidelinesPatientCharacteristicsCharacteristicToHapi()
+      hapiValue.characteristic =
+        characteristic
+          .medicationKnowledgeAdministrationGuidelinesPatientCharacteristicsCharacteristicToHapi()
     }
     if (valueCount > 0) {
-        hapiValue.value = valueList.map { it.toHapi() }
+      hapiValue.value = valueList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -898,16 +904,16 @@ object MedicationKnowledgeConverter {
       org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeMedicineClassificationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (classificationCount > 0) {
-        hapiValue.classification = classificationList.map { it.toHapi() }
+      hapiValue.classification = classificationList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -919,16 +925,16 @@ object MedicationKnowledgeConverter {
       org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgePackagingComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasQuantity()) {
-        hapiValue.quantity = quantity.toHapi()
+      hapiValue.quantity = quantity.toHapi()
     }
     return hapiValue
   }
@@ -940,16 +946,16 @@ object MedicationKnowledgeConverter {
       org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeDrugCharacteristicComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasValue()) {
-        hapiValue.value = value.medicationKnowledgeDrugCharacteristicValueToHapi()
+      hapiValue.value = value.medicationKnowledgeDrugCharacteristicValueToHapi()
     }
     return hapiValue
   }
@@ -961,22 +967,22 @@ object MedicationKnowledgeConverter {
       org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeRegulatoryComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasRegulatoryAuthority()) {
-        hapiValue.regulatoryAuthority = regulatoryAuthority.toHapi()
+      hapiValue.regulatoryAuthority = regulatoryAuthority.toHapi()
     }
     if (substitutionCount > 0) {
-        hapiValue.substitution = substitutionList.map { it.toHapi() }
+      hapiValue.substitution = substitutionList.map { it.toHapi() }
     }
     if (scheduleCount > 0) {
-        hapiValue.schedule = scheduleList.map { it.toHapi() }
+      hapiValue.schedule = scheduleList.map { it.toHapi() }
     }
     if (hasMaxDispense()) {
-        hapiValue.maxDispense = maxDispense.toHapi()
+      hapiValue.maxDispense = maxDispense.toHapi()
     }
     return hapiValue
   }
@@ -988,16 +994,16 @@ object MedicationKnowledgeConverter {
       org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeRegulatorySubstitutionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasAllowed()) {
-        hapiValue.allowedElement = allowed.toHapi()
+      hapiValue.allowedElement = allowed.toHapi()
     }
     return hapiValue
   }
@@ -1009,13 +1015,13 @@ object MedicationKnowledgeConverter {
       org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeRegulatoryScheduleComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSchedule()) {
-        hapiValue.schedule = schedule.toHapi()
+      hapiValue.schedule = schedule.toHapi()
     }
     return hapiValue
   }
@@ -1027,16 +1033,16 @@ object MedicationKnowledgeConverter {
       org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeRegulatoryMaxDispenseComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasQuantity()) {
-        hapiValue.quantity = quantity.toHapi()
+      hapiValue.quantity = quantity.toHapi()
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     return hapiValue
   }
@@ -1047,19 +1053,19 @@ object MedicationKnowledgeConverter {
     val hapiValue = org.hl7.fhir.r4.model.MedicationKnowledge.MedicationKnowledgeKineticsComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (areaUnderCurveCount > 0) {
-        hapiValue.areaUnderCurve = areaUnderCurveList.map { it.toHapi() }
+      hapiValue.areaUnderCurve = areaUnderCurveList.map { it.toHapi() }
     }
     if (lethalDose50Count > 0) {
-        hapiValue.lethalDose50 = lethalDose50List.map { it.toHapi() }
+      hapiValue.lethalDose50 = lethalDose50List.map { it.toHapi() }
     }
     if (hasHalfLifePeriod()) {
-        hapiValue.halfLifePeriod = halfLifePeriod.toHapi()
+      hapiValue.halfLifePeriod = halfLifePeriod.toHapi()
     }
     return hapiValue
   }

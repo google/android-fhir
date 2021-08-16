@@ -56,52 +56,54 @@ object MeasureReportConverter {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.MeasureReport.MeasureReportStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
-      hapiValue.type = org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.valueOf(
-          type.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.type =
+      org.hl7.fhir.r4.model.MeasureReport.MeasureReportType.valueOf(
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasMeasure()) {
-        hapiValue.measureElement = measure.toHapi()
+      hapiValue.measureElement = measure.toHapi()
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (hasDate()) {
-        hapiValue.dateElement = date.toHapi()
+      hapiValue.dateElement = date.toHapi()
     }
     if (hasReporter()) {
-        hapiValue.reporter = reporter.toHapi()
+      hapiValue.reporter = reporter.toHapi()
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     if (hasImprovementNotation()) {
-        hapiValue.improvementNotation = improvementNotation.toHapi()
+      hapiValue.improvementNotation = improvementNotation.toHapi()
     }
     if (groupCount > 0) {
-        hapiValue.group = groupList.map { it.toHapi() }
+      hapiValue.group = groupList.map { it.toHapi() }
     }
     if (evaluatedResourceCount > 0) {
-        hapiValue.evaluatedResource = evaluatedResourceList.map { it.toHapi() }
+      hapiValue.evaluatedResource = evaluatedResourceList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -110,13 +112,13 @@ object MeasureReportConverter {
   fun org.hl7.fhir.r4.model.MeasureReport.toProto(): MeasureReport {
     val protoValue = MeasureReport.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -127,37 +129,39 @@ object MeasureReportConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-      protoValue.status = MeasureReport.StatusCode.newBuilder()
-          .setValue(
-              MeasureReportStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      MeasureReport.StatusCode.newBuilder()
+        .setValue(
+          MeasureReportStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
-      protoValue.type = MeasureReport.TypeCode.newBuilder()
-          .setValue(
-              MeasureReportTypeCode.Value.valueOf(
-                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+        )
+        .build()
+    protoValue.type =
+      MeasureReport.TypeCode.newBuilder()
+        .setValue(
+          MeasureReportTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasMeasure()) {
-        protoValue.measure = measureElement.toProto()
+      protoValue.measure = measureElement.toProto()
     }
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasDate()) {
-        protoValue.date = dateElement.toProto()
+      protoValue.date = dateElement.toProto()
     }
     if (hasReporter()) {
-        protoValue.reporter = reporter.toProto()
+      protoValue.reporter = reporter.toProto()
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     if (hasImprovementNotation()) {
-        protoValue.improvementNotation = improvementNotation.toProto()
+      protoValue.improvementNotation = improvementNotation.toProto()
     }
     if (hasGroup()) {
       protoValue.addAllGroup(group.map { it.toProto() })
@@ -179,13 +183,13 @@ object MeasureReportConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasPopulation()) {
       protoValue.addAllPopulation(population.map { it.toProto() })
     }
     if (hasMeasureScore()) {
-        protoValue.measureScore = measureScore.toProto()
+      protoValue.measureScore = measureScore.toProto()
     }
     if (hasStratifier()) {
       protoValue.addAllStratifier(stratifier.map { it.toProto() })
@@ -205,13 +209,13 @@ object MeasureReportConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasCount()) {
-        protoValue.count = countElement.toProto()
+      protoValue.count = countElement.toProto()
     }
     if (hasSubjectResults()) {
-        protoValue.subjectResults = subjectResults.toProto()
+      protoValue.subjectResults = subjectResults.toProto()
     }
     return protoValue.build()
   }
@@ -249,7 +253,7 @@ object MeasureReportConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasValue()) {
-        protoValue.value = value.toProto()
+      protoValue.value = value.toProto()
     }
     if (hasComponent()) {
       protoValue.addAllComponent(component.map { it.toProto() })
@@ -258,7 +262,7 @@ object MeasureReportConverter {
       protoValue.addAllPopulation(population.map { it.toProto() })
     }
     if (hasMeasureScore()) {
-        protoValue.measureScore = measureScore.toProto()
+      protoValue.measureScore = measureScore.toProto()
     }
     return protoValue.build()
   }
@@ -276,10 +280,10 @@ object MeasureReportConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasValue()) {
-        protoValue.value = value.toProto()
+      protoValue.value = value.toProto()
     }
     return protoValue.build()
   }
@@ -297,13 +301,13 @@ object MeasureReportConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasCount()) {
-        protoValue.count = countElement.toProto()
+      protoValue.count = countElement.toProto()
     }
     if (hasSubjectResults()) {
-        protoValue.subjectResults = subjectResults.toProto()
+      protoValue.subjectResults = subjectResults.toProto()
     }
     return protoValue.build()
   }
@@ -314,22 +318,22 @@ object MeasureReportConverter {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (populationCount > 0) {
-        hapiValue.population = populationList.map { it.toHapi() }
+      hapiValue.population = populationList.map { it.toHapi() }
     }
     if (hasMeasureScore()) {
-        hapiValue.measureScore = measureScore.toHapi()
+      hapiValue.measureScore = measureScore.toHapi()
     }
     if (stratifierCount > 0) {
-        hapiValue.stratifier = stratifierList.map { it.toHapi() }
+      hapiValue.stratifier = stratifierList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -340,19 +344,19 @@ object MeasureReportConverter {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupPopulationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasCount()) {
-        hapiValue.countElement = count.toHapi()
+      hapiValue.countElement = count.toHapi()
     }
     if (hasSubjectResults()) {
-        hapiValue.subjectResults = subjectResults.toHapi()
+      hapiValue.subjectResults = subjectResults.toHapi()
     }
     return hapiValue
   }
@@ -363,16 +367,16 @@ object MeasureReportConverter {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.MeasureReportGroupStratifierComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (codeCount > 0) {
-        hapiValue.code = codeList.map { it.toHapi() }
+      hapiValue.code = codeList.map { it.toHapi() }
     }
     if (stratumCount > 0) {
-        hapiValue.stratum = stratumList.map { it.toHapi() }
+      hapiValue.stratum = stratumList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -383,22 +387,22 @@ object MeasureReportConverter {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasValue()) {
-        hapiValue.value = value.toHapi()
+      hapiValue.value = value.toHapi()
     }
     if (componentCount > 0) {
-        hapiValue.component = componentList.map { it.toHapi() }
+      hapiValue.component = componentList.map { it.toHapi() }
     }
     if (populationCount > 0) {
-        hapiValue.population = populationList.map { it.toHapi() }
+      hapiValue.population = populationList.map { it.toHapi() }
     }
     if (hasMeasureScore()) {
-        hapiValue.measureScore = measureScore.toHapi()
+      hapiValue.measureScore = measureScore.toHapi()
     }
     return hapiValue
   }
@@ -409,16 +413,16 @@ object MeasureReportConverter {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.StratifierGroupComponentComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasValue()) {
-        hapiValue.value = value.toHapi()
+      hapiValue.value = value.toHapi()
     }
     return hapiValue
   }
@@ -429,19 +433,19 @@ object MeasureReportConverter {
     val hapiValue = org.hl7.fhir.r4.model.MeasureReport.StratifierGroupPopulationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasCount()) {
-        hapiValue.countElement = count.toHapi()
+      hapiValue.countElement = count.toHapi()
     }
     if (hasSubjectResults()) {
-        hapiValue.subjectResults = subjectResults.toHapi()
+      hapiValue.subjectResults = subjectResults.toHapi()
     }
     return hapiValue
   }

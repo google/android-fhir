@@ -50,37 +50,37 @@ object SubstancePolymerConverter {
     val hapiValue = org.hl7.fhir.r4.model.SubstancePolymer()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasClassValue()) {
-        hapiValue.class_ = classValue.toHapi()
+      hapiValue.class_ = classValue.toHapi()
     }
     if (hasGeometry()) {
-        hapiValue.geometry = geometry.toHapi()
+      hapiValue.geometry = geometry.toHapi()
     }
     if (copolymerConnectivityCount > 0) {
-        hapiValue.copolymerConnectivity = copolymerConnectivityList.map { it.toHapi() }
+      hapiValue.copolymerConnectivity = copolymerConnectivityList.map { it.toHapi() }
     }
     if (modificationCount > 0) {
-        hapiValue.modification = modificationList.map { it.toHapi() }
+      hapiValue.modification = modificationList.map { it.toHapi() }
     }
     if (monomerSetCount > 0) {
-        hapiValue.monomerSet = monomerSetList.map { it.toHapi() }
+      hapiValue.monomerSet = monomerSetList.map { it.toHapi() }
     }
     if (repeatCount > 0) {
-        hapiValue.repeat = repeatList.map { it.toHapi() }
+      hapiValue.repeat = repeatList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -89,13 +89,13 @@ object SubstancePolymerConverter {
   fun org.hl7.fhir.r4.model.SubstancePolymer.toProto(): SubstancePolymer {
     val protoValue = SubstancePolymer.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -104,10 +104,10 @@ object SubstancePolymerConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasClass_()) {
-        protoValue.classValue = class_.toProto()
+      protoValue.classValue = class_.toProto()
     }
     if (hasGeometry()) {
-        protoValue.geometry = geometry.toProto()
+      protoValue.geometry = geometry.toProto()
     }
     if (hasCopolymerConnectivity()) {
       protoValue.addAllCopolymerConnectivity(copolymerConnectivity.map { it.toProto() })
@@ -136,7 +136,7 @@ object SubstancePolymerConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasRatioType()) {
-        protoValue.ratioType = ratioType.toProto()
+      protoValue.ratioType = ratioType.toProto()
     }
     if (hasStartingMaterial()) {
       protoValue.addAllStartingMaterial(startingMaterial.map { it.toProto() })
@@ -157,16 +157,16 @@ object SubstancePolymerConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasMaterial()) {
-        protoValue.material = material.toProto()
+      protoValue.material = material.toProto()
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasIsDefining()) {
-        protoValue.isDefining = isDefiningElement.toProto()
+      protoValue.isDefining = isDefiningElement.toProto()
     }
     if (hasAmount()) {
-        protoValue.amount = amount.toProto()
+      protoValue.amount = amount.toProto()
     }
     return protoValue.build()
   }
@@ -182,13 +182,13 @@ object SubstancePolymerConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasNumberOfUnits()) {
-        protoValue.numberOfUnits = numberOfUnitsElement.toProto()
+      protoValue.numberOfUnits = numberOfUnitsElement.toProto()
     }
     if (hasAverageMolecularFormula()) {
-        protoValue.averageMolecularFormula = averageMolecularFormulaElement.toProto()
+      protoValue.averageMolecularFormula = averageMolecularFormulaElement.toProto()
     }
     if (hasRepeatUnitAmountType()) {
-        protoValue.repeatUnitAmountType = repeatUnitAmountType.toProto()
+      protoValue.repeatUnitAmountType = repeatUnitAmountType.toProto()
     }
     if (hasRepeatUnit()) {
       protoValue.addAllRepeatUnit(repeatUnit.map { it.toProto() })
@@ -208,13 +208,13 @@ object SubstancePolymerConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasOrientationOfPolymerisation()) {
-        protoValue.orientationOfPolymerisation = orientationOfPolymerisation.toProto()
+      protoValue.orientationOfPolymerisation = orientationOfPolymerisation.toProto()
     }
     if (hasRepeatUnit()) {
-        protoValue.repeatUnit = repeatUnitElement.toProto()
+      protoValue.repeatUnit = repeatUnitElement.toProto()
     }
     if (hasAmount()) {
-        protoValue.amount = amount.toProto()
+      protoValue.amount = amount.toProto()
     }
     if (hasDegreeOfPolymerisation()) {
       protoValue.addAllDegreeOfPolymerisation(degreeOfPolymerisation.map { it.toProto() })
@@ -238,10 +238,10 @@ object SubstancePolymerConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDegree()) {
-        protoValue.degree = degree.toProto()
+      protoValue.degree = degree.toProto()
     }
     if (hasAmount()) {
-        protoValue.amount = amount.toProto()
+      protoValue.amount = amount.toProto()
     }
     return protoValue.build()
   }
@@ -259,13 +259,13 @@ object SubstancePolymerConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasRepresentation()) {
-        protoValue.representation = representationElement.toProto()
+      protoValue.representation = representationElement.toProto()
     }
     if (hasAttachment()) {
-        protoValue.attachment = attachment.toProto()
+      protoValue.attachment = attachment.toProto()
     }
     return protoValue.build()
   }
@@ -276,16 +276,16 @@ object SubstancePolymerConverter {
     val hapiValue = org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerMonomerSetComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasRatioType()) {
-        hapiValue.ratioType = ratioType.toHapi()
+      hapiValue.ratioType = ratioType.toHapi()
     }
     if (startingMaterialCount > 0) {
-        hapiValue.startingMaterial = startingMaterialList.map { it.toHapi() }
+      hapiValue.startingMaterial = startingMaterialList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -297,22 +297,22 @@ object SubstancePolymerConverter {
       org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerMonomerSetStartingMaterialComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasMaterial()) {
-        hapiValue.material = material.toHapi()
+      hapiValue.material = material.toHapi()
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasIsDefining()) {
-        hapiValue.isDefiningElement = isDefining.toHapi()
+      hapiValue.isDefiningElement = isDefining.toHapi()
     }
     if (hasAmount()) {
-        hapiValue.amount = amount.toHapi()
+      hapiValue.amount = amount.toHapi()
     }
     return hapiValue
   }
@@ -323,22 +323,22 @@ object SubstancePolymerConverter {
     val hapiValue = org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasNumberOfUnits()) {
-        hapiValue.numberOfUnitsElement = numberOfUnits.toHapi()
+      hapiValue.numberOfUnitsElement = numberOfUnits.toHapi()
     }
     if (hasAverageMolecularFormula()) {
-        hapiValue.averageMolecularFormulaElement = averageMolecularFormula.toHapi()
+      hapiValue.averageMolecularFormulaElement = averageMolecularFormula.toHapi()
     }
     if (hasRepeatUnitAmountType()) {
-        hapiValue.repeatUnitAmountType = repeatUnitAmountType.toHapi()
+      hapiValue.repeatUnitAmountType = repeatUnitAmountType.toHapi()
     }
     if (repeatUnitCount > 0) {
-        hapiValue.repeatUnit = repeatUnitList.map { it.toHapi() }
+      hapiValue.repeatUnit = repeatUnitList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -350,25 +350,25 @@ object SubstancePolymerConverter {
       org.hl7.fhir.r4.model.SubstancePolymer.SubstancePolymerRepeatRepeatUnitComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasOrientationOfPolymerisation()) {
-        hapiValue.orientationOfPolymerisation = orientationOfPolymerisation.toHapi()
+      hapiValue.orientationOfPolymerisation = orientationOfPolymerisation.toHapi()
     }
     if (hasRepeatUnit()) {
-        hapiValue.repeatUnitElement = repeatUnit.toHapi()
+      hapiValue.repeatUnitElement = repeatUnit.toHapi()
     }
     if (hasAmount()) {
-        hapiValue.amount = amount.toHapi()
+      hapiValue.amount = amount.toHapi()
     }
     if (degreeOfPolymerisationCount > 0) {
-        hapiValue.degreeOfPolymerisation = degreeOfPolymerisationList.map { it.toHapi() }
+      hapiValue.degreeOfPolymerisation = degreeOfPolymerisationList.map { it.toHapi() }
     }
     if (structuralRepresentationCount > 0) {
-        hapiValue.structuralRepresentation = structuralRepresentationList.map { it.toHapi() }
+      hapiValue.structuralRepresentation = structuralRepresentationList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -381,16 +381,16 @@ object SubstancePolymerConverter {
         .SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDegree()) {
-        hapiValue.degree = degree.toHapi()
+      hapiValue.degree = degree.toHapi()
     }
     if (hasAmount()) {
-        hapiValue.amount = amount.toHapi()
+      hapiValue.amount = amount.toHapi()
     }
     return hapiValue
   }
@@ -403,19 +403,19 @@ object SubstancePolymerConverter {
         .SubstancePolymerRepeatRepeatUnitStructuralRepresentationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasRepresentation()) {
-        hapiValue.representationElement = representation.toHapi()
+      hapiValue.representationElement = representation.toHapi()
     }
     if (hasAttachment()) {
-        hapiValue.attachment = attachment.toHapi()
+      hapiValue.attachment = attachment.toHapi()
     }
     return hapiValue
   }

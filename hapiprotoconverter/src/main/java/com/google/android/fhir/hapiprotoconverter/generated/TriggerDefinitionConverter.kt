@@ -67,16 +67,16 @@ object TriggerDefinitionConverter {
   private fun Type.triggerDefinitionTimingToProto(): TriggerDefinition.TimingX {
     val protoValue = TriggerDefinition.TimingX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Timing) {
-        protoValue.timing = this.toProto()
+      protoValue.timing = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     if (this is DateType) {
-        protoValue.date = this.toProto()
+      protoValue.date = this.toProto()
     }
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     return protoValue.build()
   }
@@ -86,22 +86,23 @@ object TriggerDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.TriggerDefinition()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
-      hapiValue.type = org.hl7.fhir.r4.model.TriggerDefinition.TriggerType.valueOf(
-          type.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.type =
+      org.hl7.fhir.r4.model.TriggerDefinition.TriggerType.valueOf(
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasTiming()) {
-        hapiValue.timing = timing.triggerDefinitionTimingToHapi()
+      hapiValue.timing = timing.triggerDefinitionTimingToHapi()
     }
     if (dataCount > 0) {
-        hapiValue.data = dataList.map { it.toHapi() }
+      hapiValue.data = dataList.map { it.toHapi() }
     }
     if (hasCondition()) {
-        hapiValue.condition = condition.toHapi()
+      hapiValue.condition = condition.toHapi()
     }
     return hapiValue
   }
@@ -112,24 +113,25 @@ object TriggerDefinitionConverter {
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-      protoValue.type = TriggerDefinition.TypeCode.newBuilder()
-          .setValue(
-              TriggerTypeCode.Value.valueOf(
-                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.type =
+      TriggerDefinition.TypeCode.newBuilder()
+        .setValue(
+          TriggerTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasTiming()) {
-        protoValue.timing = timing.triggerDefinitionTimingToProto()
+      protoValue.timing = timing.triggerDefinitionTimingToProto()
     }
     if (hasData()) {
       protoValue.addAllData(data.map { it.toProto() })
     }
     if (hasCondition()) {
-        protoValue.condition = condition.toProto()
+      protoValue.condition = condition.toProto()
     }
     return protoValue.build()
   }

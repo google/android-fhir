@@ -122,10 +122,10 @@ object PlanDefinitionConverter {
   private fun Type.planDefinitionSubjectToProto(): PlanDefinition.SubjectX {
     val protoValue = PlanDefinition.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -148,13 +148,13 @@ object PlanDefinitionConverter {
   private fun Type.planDefinitionGoalTargetDetailToProto(): PlanDefinition.Goal.Target.DetailX {
     val protoValue = PlanDefinition.Goal.Target.DetailX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Quantity) {
-        protoValue.quantity = this.toProto()
+      protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
@@ -174,10 +174,10 @@ object PlanDefinitionConverter {
   private fun Type.planDefinitionActionSubjectToProto(): PlanDefinition.Action.SubjectX {
     val protoValue = PlanDefinition.Action.SubjectX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -199,10 +199,10 @@ object PlanDefinitionConverter {
     PlanDefinition.Action.RelatedAction.OffsetX {
     val protoValue = PlanDefinition.Action.RelatedAction.OffsetX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Duration) {
-        protoValue.duration = this.toProto()
+      protoValue.duration = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     return protoValue.build()
   }
@@ -234,22 +234,22 @@ object PlanDefinitionConverter {
   private fun Type.planDefinitionActionTimingToProto(): PlanDefinition.Action.TimingX {
     val protoValue = PlanDefinition.Action.TimingX.newBuilder()
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Age) {
-        protoValue.age = this.toProto()
+      protoValue.age = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Duration) {
-        protoValue.duration = this.toProto()
+      protoValue.duration = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Timing) {
-        protoValue.timing = this.toProto()
+      protoValue.timing = this.toProto()
     }
     return protoValue.build()
   }
@@ -269,10 +269,10 @@ object PlanDefinitionConverter {
   private fun Type.planDefinitionActionDefinitionToProto(): PlanDefinition.Action.DefinitionX {
     val protoValue = PlanDefinition.Action.DefinitionX.newBuilder()
     if (this is CanonicalType) {
-        protoValue.canonical = this.toProto()
+      protoValue.canonical = this.toProto()
     }
     if (this is UriType) {
-        protoValue.uri = this.toProto()
+      protoValue.uri = this.toProto()
     }
     return protoValue.build()
   }
@@ -282,111 +282,111 @@ object PlanDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-        hapiValue.urlElement = url.toHapi()
+      hapiValue.urlElement = url.toHapi()
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasVersion()) {
-        hapiValue.versionElement = version.toHapi()
+      hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-        hapiValue.titleElement = title.toHapi()
+      hapiValue.titleElement = title.toHapi()
     }
     if (hasSubtitle()) {
-        hapiValue.subtitleElement = subtitle.toHapi()
+      hapiValue.subtitleElement = subtitle.toHapi()
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
-      hapiValue.status =
-          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    hapiValue.status =
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-        hapiValue.experimentalElement = experimental.toHapi()
+      hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.planDefinitionSubjectToHapi()
+      hapiValue.subject = subject.planDefinitionSubjectToHapi()
     }
     if (hasDate()) {
-        hapiValue.dateElement = date.toHapi()
+      hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-        hapiValue.publisherElement = publisher.toHapi()
+      hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-        hapiValue.contact = contactList.map { it.toHapi() }
+      hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (useContextCount > 0) {
-        hapiValue.useContext = useContextList.map { it.toHapi() }
+      hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
+      hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasPurpose()) {
-        hapiValue.purposeElement = purpose.toHapi()
+      hapiValue.purposeElement = purpose.toHapi()
     }
     if (hasUsage()) {
-        hapiValue.usageElement = usage.toHapi()
+      hapiValue.usageElement = usage.toHapi()
     }
     if (hasCopyright()) {
-        hapiValue.copyrightElement = copyright.toHapi()
+      hapiValue.copyrightElement = copyright.toHapi()
     }
     if (hasApprovalDate()) {
-        hapiValue.approvalDateElement = approvalDate.toHapi()
+      hapiValue.approvalDateElement = approvalDate.toHapi()
     }
     if (hasLastReviewDate()) {
-        hapiValue.lastReviewDateElement = lastReviewDate.toHapi()
+      hapiValue.lastReviewDateElement = lastReviewDate.toHapi()
     }
     if (hasEffectivePeriod()) {
-        hapiValue.effectivePeriod = effectivePeriod.toHapi()
+      hapiValue.effectivePeriod = effectivePeriod.toHapi()
     }
     if (topicCount > 0) {
-        hapiValue.topic = topicList.map { it.toHapi() }
+      hapiValue.topic = topicList.map { it.toHapi() }
     }
     if (authorCount > 0) {
-        hapiValue.author = authorList.map { it.toHapi() }
+      hapiValue.author = authorList.map { it.toHapi() }
     }
     if (editorCount > 0) {
-        hapiValue.editor = editorList.map { it.toHapi() }
+      hapiValue.editor = editorList.map { it.toHapi() }
     }
     if (reviewerCount > 0) {
-        hapiValue.reviewer = reviewerList.map { it.toHapi() }
+      hapiValue.reviewer = reviewerList.map { it.toHapi() }
     }
     if (endorserCount > 0) {
-        hapiValue.endorser = endorserList.map { it.toHapi() }
+      hapiValue.endorser = endorserList.map { it.toHapi() }
     }
     if (relatedArtifactCount > 0) {
-        hapiValue.relatedArtifact = relatedArtifactList.map { it.toHapi() }
+      hapiValue.relatedArtifact = relatedArtifactList.map { it.toHapi() }
     }
     if (libraryCount > 0) {
-        hapiValue.library = libraryList.map { it.toHapi() }
+      hapiValue.library = libraryList.map { it.toHapi() }
     }
     if (goalCount > 0) {
-        hapiValue.goal = goalList.map { it.toHapi() }
+      hapiValue.goal = goalList.map { it.toHapi() }
     }
     if (actionCount > 0) {
-        hapiValue.action = actionList.map { it.toHapi() }
+      hapiValue.action = actionList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -395,13 +395,13 @@ object PlanDefinitionConverter {
   fun org.hl7.fhir.r4.model.PlanDefinition.toProto(): PlanDefinition {
     val protoValue = PlanDefinition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -410,50 +410,51 @@ object PlanDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-        protoValue.url = urlElement.toProto()
+      protoValue.url = urlElement.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasVersion()) {
-        protoValue.version = versionElement.toProto()
+      protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-        protoValue.title = titleElement.toProto()
+      protoValue.title = titleElement.toProto()
     }
     if (hasSubtitle()) {
-        protoValue.subtitle = subtitleElement.toProto()
+      protoValue.subtitle = subtitleElement.toProto()
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
-      protoValue.status = PlanDefinition.StatusCode.newBuilder()
-          .setValue(
-              PublicationStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      PlanDefinition.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasExperimental()) {
-        protoValue.experimental = experimentalElement.toProto()
+      protoValue.experimental = experimentalElement.toProto()
     }
     if (hasSubject()) {
-        protoValue.subject = subject.planDefinitionSubjectToProto()
+      protoValue.subject = subject.planDefinitionSubjectToProto()
     }
     if (hasDate()) {
-        protoValue.date = dateElement.toProto()
+      protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-        protoValue.publisher = publisherElement.toProto()
+      protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasUseContext()) {
       protoValue.addAllUseContext(useContext.map { it.toProto() })
@@ -462,22 +463,22 @@ object PlanDefinitionConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasPurpose()) {
-        protoValue.purpose = purposeElement.toProto()
+      protoValue.purpose = purposeElement.toProto()
     }
     if (hasUsage()) {
-        protoValue.usage = usageElement.toProto()
+      protoValue.usage = usageElement.toProto()
     }
     if (hasCopyright()) {
-        protoValue.copyright = copyrightElement.toProto()
+      protoValue.copyright = copyrightElement.toProto()
     }
     if (hasApprovalDate()) {
-        protoValue.approvalDate = approvalDateElement.toProto()
+      protoValue.approvalDate = approvalDateElement.toProto()
     }
     if (hasLastReviewDate()) {
-        protoValue.lastReviewDate = lastReviewDateElement.toProto()
+      protoValue.lastReviewDate = lastReviewDateElement.toProto()
     }
     if (hasEffectivePeriod()) {
-        protoValue.effectivePeriod = effectivePeriod.toProto()
+      protoValue.effectivePeriod = effectivePeriod.toProto()
     }
     if (hasTopic()) {
       protoValue.addAllTopic(topic.map { it.toProto() })
@@ -520,16 +521,16 @@ object PlanDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCategory()) {
-        protoValue.category = category.toProto()
+      protoValue.category = category.toProto()
     }
     if (hasDescription()) {
-        protoValue.description = description.toProto()
+      protoValue.description = description.toProto()
     }
     if (hasPriority()) {
-        protoValue.priority = priority.toProto()
+      protoValue.priority = priority.toProto()
     }
     if (hasStart()) {
-        protoValue.start = start.toProto()
+      protoValue.start = start.toProto()
     }
     if (hasAddresses()) {
       protoValue.addAllAddresses(addresses.map { it.toProto() })
@@ -554,13 +555,13 @@ object PlanDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasMeasure()) {
-        protoValue.measure = measure.toProto()
+      protoValue.measure = measure.toProto()
     }
     if (hasDetail()) {
-        protoValue.detail = detail.planDefinitionGoalTargetDetailToProto()
+      protoValue.detail = detail.planDefinitionGoalTargetDetailToProto()
     }
     if (hasDue()) {
-        protoValue.due = due.toProto()
+      protoValue.due = due.toProto()
     }
     return protoValue.build()
   }
@@ -576,24 +577,25 @@ object PlanDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasPrefix()) {
-        protoValue.prefix = prefixElement.toProto()
+      protoValue.prefix = prefixElement.toProto()
     }
     if (hasTitle()) {
-        protoValue.title = titleElement.toProto()
+      protoValue.title = titleElement.toProto()
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasTextEquivalent()) {
-        protoValue.textEquivalent = textEquivalentElement.toProto()
+      protoValue.textEquivalent = textEquivalentElement.toProto()
     }
-      protoValue.priority = PlanDefinition.Action.PriorityCode.newBuilder()
-          .setValue(
-              RequestPriorityCode.Value.valueOf(
-                  priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.priority =
+      PlanDefinition.Action.PriorityCode.newBuilder()
+        .setValue(
+          RequestPriorityCode.Value.valueOf(
+            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasCode()) {
       protoValue.addAllCode(code.map { it.toProto() })
     }
@@ -607,7 +609,7 @@ object PlanDefinitionConverter {
       protoValue.addAllGoalId(goalId.map { it.toProto() })
     }
     if (hasSubject()) {
-        protoValue.subject = subject.planDefinitionActionSubjectToProto()
+      protoValue.subject = subject.planDefinitionActionSubjectToProto()
     }
     if (hasTrigger()) {
       protoValue.addAllTrigger(trigger.map { it.toProto() })
@@ -625,54 +627,59 @@ object PlanDefinitionConverter {
       protoValue.addAllRelatedAction(relatedAction.map { it.toProto() })
     }
     if (hasTiming()) {
-        protoValue.timing = timing.planDefinitionActionTimingToProto()
+      protoValue.timing = timing.planDefinitionActionTimingToProto()
     }
     if (hasParticipant()) {
       protoValue.addAllParticipant(participant.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
-      protoValue.groupingBehavior = PlanDefinition.Action.GroupingBehaviorCode.newBuilder()
-          .setValue(
-              ActionGroupingBehaviorCode.Value.valueOf(
-                  groupingBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.groupingBehavior =
+      PlanDefinition.Action.GroupingBehaviorCode.newBuilder()
+        .setValue(
+          ActionGroupingBehaviorCode.Value.valueOf(
+            groupingBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
-      protoValue.selectionBehavior = PlanDefinition.Action.SelectionBehaviorCode.newBuilder()
-          .setValue(
-              ActionSelectionBehaviorCode.Value.valueOf(
-                  selectionBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+        )
+        .build()
+    protoValue.selectionBehavior =
+      PlanDefinition.Action.SelectionBehaviorCode.newBuilder()
+        .setValue(
+          ActionSelectionBehaviorCode.Value.valueOf(
+            selectionBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
-      protoValue.requiredBehavior = PlanDefinition.Action.RequiredBehaviorCode.newBuilder()
-          .setValue(
-              ActionRequiredBehaviorCode.Value.valueOf(
-                  requiredBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+        )
+        .build()
+    protoValue.requiredBehavior =
+      PlanDefinition.Action.RequiredBehaviorCode.newBuilder()
+        .setValue(
+          ActionRequiredBehaviorCode.Value.valueOf(
+            requiredBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
-      protoValue.precheckBehavior = PlanDefinition.Action.PrecheckBehaviorCode.newBuilder()
-          .setValue(
-              ActionPrecheckBehaviorCode.Value.valueOf(
-                  precheckBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+        )
+        .build()
+    protoValue.precheckBehavior =
+      PlanDefinition.Action.PrecheckBehaviorCode.newBuilder()
+        .setValue(
+          ActionPrecheckBehaviorCode.Value.valueOf(
+            precheckBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
-      protoValue.cardinalityBehavior = PlanDefinition.Action.CardinalityBehaviorCode.newBuilder()
-          .setValue(
-              ActionCardinalityBehaviorCode.Value.valueOf(
-                  cardinalityBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+        )
+        .build()
+    protoValue.cardinalityBehavior =
+      PlanDefinition.Action.CardinalityBehaviorCode.newBuilder()
+        .setValue(
+          ActionCardinalityBehaviorCode.Value.valueOf(
+            cardinalityBehavior.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasDefinition()) {
-        protoValue.definition = definition.planDefinitionActionDefinitionToProto()
+      protoValue.definition = definition.planDefinitionActionDefinitionToProto()
     }
     if (hasTransform()) {
-        protoValue.transform = transformElement.toProto()
+      protoValue.transform = transformElement.toProto()
     }
     if (hasDynamicValue()) {
       protoValue.addAllDynamicValue(dynamicValue.map { it.toProto() })
@@ -691,15 +698,16 @@ object PlanDefinitionConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-      protoValue.kind = PlanDefinition.Action.Condition.KindCode.newBuilder()
-          .setValue(
-              ActionConditionKindCode.Value.valueOf(
-                  kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.kind =
+      PlanDefinition.Action.Condition.KindCode.newBuilder()
+        .setValue(
+          ActionConditionKindCode.Value.valueOf(
+            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasExpression()) {
-        protoValue.expression = expression.toProto()
+      protoValue.expression = expression.toProto()
     }
     return protoValue.build()
   }
@@ -716,17 +724,18 @@ object PlanDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasActionId()) {
-        protoValue.actionId = actionIdElement.toProto()
+      protoValue.actionId = actionIdElement.toProto()
     }
-      protoValue.relationship = PlanDefinition.Action.RelatedAction.RelationshipCode.newBuilder()
-          .setValue(
-              ActionRelationshipTypeCode.Value.valueOf(
-                  relationship.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.relationship =
+      PlanDefinition.Action.RelatedAction.RelationshipCode.newBuilder()
+        .setValue(
+          ActionRelationshipTypeCode.Value.valueOf(
+            relationship.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasOffset()) {
-        protoValue.offset = offset.planDefinitionActionRelatedActionOffsetToProto()
+      protoValue.offset = offset.planDefinitionActionRelatedActionOffsetToProto()
     }
     return protoValue.build()
   }
@@ -742,15 +751,16 @@ object PlanDefinitionConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-      protoValue.type = PlanDefinition.Action.Participant.TypeCode.newBuilder()
-          .setValue(
-              ActionParticipantTypeCode.Value.valueOf(
-                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.type =
+      PlanDefinition.Action.Participant.TypeCode.newBuilder()
+        .setValue(
+          ActionParticipantTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasRole()) {
-        protoValue.role = role.toProto()
+      protoValue.role = role.toProto()
     }
     return protoValue.build()
   }
@@ -767,10 +777,10 @@ object PlanDefinitionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasPath()) {
-        protoValue.path = pathElement.toProto()
+      protoValue.path = pathElement.toProto()
     }
     if (hasExpression()) {
-        protoValue.expression = expression.toProto()
+      protoValue.expression = expression.toProto()
     }
     return protoValue.build()
   }
@@ -781,31 +791,31 @@ object PlanDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCategory()) {
-        hapiValue.category = category.toHapi()
+      hapiValue.category = category.toHapi()
     }
     if (hasDescription()) {
-        hapiValue.description = description.toHapi()
+      hapiValue.description = description.toHapi()
     }
     if (hasPriority()) {
-        hapiValue.priority = priority.toHapi()
+      hapiValue.priority = priority.toHapi()
     }
     if (hasStart()) {
-        hapiValue.start = start.toHapi()
+      hapiValue.start = start.toHapi()
     }
     if (addressesCount > 0) {
-        hapiValue.addresses = addressesList.map { it.toHapi() }
+      hapiValue.addresses = addressesList.map { it.toHapi() }
     }
     if (documentationCount > 0) {
-        hapiValue.documentation = documentationList.map { it.toHapi() }
+      hapiValue.documentation = documentationList.map { it.toHapi() }
     }
     if (targetCount > 0) {
-        hapiValue.target = targetList.map { it.toHapi() }
+      hapiValue.target = targetList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -816,19 +826,19 @@ object PlanDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionGoalTargetComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasMeasure()) {
-        hapiValue.measure = measure.toHapi()
+      hapiValue.measure = measure.toHapi()
     }
     if (hasDetail()) {
-        hapiValue.detail = detail.planDefinitionGoalTargetDetailToHapi()
+      hapiValue.detail = detail.planDefinitionGoalTargetDetailToHapi()
     }
     if (hasDue()) {
-        hapiValue.due = due.toHapi()
+      hapiValue.due = due.toHapi()
     }
     return hapiValue
   }
@@ -839,88 +849,94 @@ object PlanDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasPrefix()) {
-        hapiValue.prefixElement = prefix.toHapi()
+      hapiValue.prefixElement = prefix.toHapi()
     }
     if (hasTitle()) {
-        hapiValue.titleElement = title.toHapi()
+      hapiValue.titleElement = title.toHapi()
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (hasTextEquivalent()) {
-        hapiValue.textEquivalentElement = textEquivalent.toHapi()
+      hapiValue.textEquivalentElement = textEquivalent.toHapi()
     }
-      hapiValue.priority = org.hl7.fhir.r4.model.PlanDefinition.RequestPriority.valueOf(
-          priority.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.priority =
+      org.hl7.fhir.r4.model.PlanDefinition.RequestPriority.valueOf(
+        priority.value.name.hapiCodeCheck().replace("_", "")
       )
     if (codeCount > 0) {
-        hapiValue.code = codeList.map { it.toHapi() }
+      hapiValue.code = codeList.map { it.toHapi() }
     }
     if (reasonCount > 0) {
-        hapiValue.reason = reasonList.map { it.toHapi() }
+      hapiValue.reason = reasonList.map { it.toHapi() }
     }
     if (documentationCount > 0) {
-        hapiValue.documentation = documentationList.map { it.toHapi() }
+      hapiValue.documentation = documentationList.map { it.toHapi() }
     }
     if (goalIdCount > 0) {
-        hapiValue.goalId = goalIdList.map { it.toHapi() }
+      hapiValue.goalId = goalIdList.map { it.toHapi() }
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.planDefinitionActionSubjectToHapi()
+      hapiValue.subject = subject.planDefinitionActionSubjectToHapi()
     }
     if (triggerCount > 0) {
-        hapiValue.trigger = triggerList.map { it.toHapi() }
+      hapiValue.trigger = triggerList.map { it.toHapi() }
     }
     if (conditionCount > 0) {
-        hapiValue.condition = conditionList.map { it.toHapi() }
+      hapiValue.condition = conditionList.map { it.toHapi() }
     }
     if (inputCount > 0) {
-        hapiValue.input = inputList.map { it.toHapi() }
+      hapiValue.input = inputList.map { it.toHapi() }
     }
     if (outputCount > 0) {
-        hapiValue.output = outputList.map { it.toHapi() }
+      hapiValue.output = outputList.map { it.toHapi() }
     }
     if (relatedActionCount > 0) {
-        hapiValue.relatedAction = relatedActionList.map { it.toHapi() }
+      hapiValue.relatedAction = relatedActionList.map { it.toHapi() }
     }
     if (hasTiming()) {
-        hapiValue.timing = timing.planDefinitionActionTimingToHapi()
+      hapiValue.timing = timing.planDefinitionActionTimingToHapi()
     }
     if (participantCount > 0) {
-        hapiValue.participant = participantList.map { it.toHapi() }
+      hapiValue.participant = participantList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
-      hapiValue.groupingBehavior = org.hl7.fhir.r4.model.PlanDefinition.ActionGroupingBehavior.valueOf(
-          groupingBehavior.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.groupingBehavior =
+      org.hl7.fhir.r4.model.PlanDefinition.ActionGroupingBehavior.valueOf(
+        groupingBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
-      hapiValue.selectionBehavior = org.hl7.fhir.r4.model.PlanDefinition.ActionSelectionBehavior.valueOf(
-          selectionBehavior.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.selectionBehavior =
+      org.hl7.fhir.r4.model.PlanDefinition.ActionSelectionBehavior.valueOf(
+        selectionBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
-      hapiValue.requiredBehavior = org.hl7.fhir.r4.model.PlanDefinition.ActionRequiredBehavior.valueOf(
-          requiredBehavior.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.requiredBehavior =
+      org.hl7.fhir.r4.model.PlanDefinition.ActionRequiredBehavior.valueOf(
+        requiredBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
-      hapiValue.precheckBehavior = org.hl7.fhir.r4.model.PlanDefinition.ActionPrecheckBehavior.valueOf(
-          precheckBehavior.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.precheckBehavior =
+      org.hl7.fhir.r4.model.PlanDefinition.ActionPrecheckBehavior.valueOf(
+        precheckBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
-      hapiValue.cardinalityBehavior = org.hl7.fhir.r4.model.PlanDefinition.ActionCardinalityBehavior.valueOf(
-          cardinalityBehavior.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.cardinalityBehavior =
+      org.hl7.fhir.r4.model.PlanDefinition.ActionCardinalityBehavior.valueOf(
+        cardinalityBehavior.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasDefinition()) {
-        hapiValue.definition = definition.planDefinitionActionDefinitionToHapi()
+      hapiValue.definition = definition.planDefinitionActionDefinitionToHapi()
     }
     if (hasTransform()) {
-        hapiValue.transformElement = transform.toHapi()
+      hapiValue.transformElement = transform.toHapi()
     }
     if (dynamicValueCount > 0) {
-        hapiValue.dynamicValue = dynamicValueList.map { it.toHapi() }
+      hapiValue.dynamicValue = dynamicValueList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -931,16 +947,17 @@ object PlanDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionConditionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-      hapiValue.kind = org.hl7.fhir.r4.model.PlanDefinition.ActionConditionKind.valueOf(
-          kind.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.kind =
+      org.hl7.fhir.r4.model.PlanDefinition.ActionConditionKind.valueOf(
+        kind.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasExpression()) {
-        hapiValue.expression = expression.toHapi()
+      hapiValue.expression = expression.toHapi()
     }
     return hapiValue
   }
@@ -952,19 +969,20 @@ object PlanDefinitionConverter {
       org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionRelatedActionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasActionId()) {
-        hapiValue.actionIdElement = actionId.toHapi()
+      hapiValue.actionIdElement = actionId.toHapi()
     }
-      hapiValue.relationship = org.hl7.fhir.r4.model.PlanDefinition.ActionRelationshipType.valueOf(
-          relationship.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.relationship =
+      org.hl7.fhir.r4.model.PlanDefinition.ActionRelationshipType.valueOf(
+        relationship.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasOffset()) {
-        hapiValue.offset = offset.planDefinitionActionRelatedActionOffsetToHapi()
+      hapiValue.offset = offset.planDefinitionActionRelatedActionOffsetToHapi()
     }
     return hapiValue
   }
@@ -975,16 +993,17 @@ object PlanDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionParticipantComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-      hapiValue.type = org.hl7.fhir.r4.model.PlanDefinition.ActionParticipantType.valueOf(
-          type.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.type =
+      org.hl7.fhir.r4.model.PlanDefinition.ActionParticipantType.valueOf(
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasRole()) {
-        hapiValue.role = role.toHapi()
+      hapiValue.role = role.toHapi()
     }
     return hapiValue
   }
@@ -995,16 +1014,16 @@ object PlanDefinitionConverter {
     val hapiValue = org.hl7.fhir.r4.model.PlanDefinition.PlanDefinitionActionDynamicValueComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasPath()) {
-        hapiValue.pathElement = path.toHapi()
+      hapiValue.pathElement = path.toHapi()
     }
     if (hasExpression()) {
-        hapiValue.expression = expression.toHapi()
+      hapiValue.expression = expression.toHapi()
     }
     return hapiValue
   }

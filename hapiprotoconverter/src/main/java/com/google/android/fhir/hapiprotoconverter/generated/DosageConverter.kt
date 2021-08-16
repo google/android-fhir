@@ -63,10 +63,10 @@ object DosageConverter {
   private fun Type.dosageAsNeededToProto(): Dosage.AsNeededX {
     val protoValue = Dosage.AsNeededX.newBuilder()
     if (this is BooleanType) {
-        protoValue.boolean = this.toProto()
+      protoValue.boolean = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
@@ -86,10 +86,10 @@ object DosageConverter {
   private fun Type.dosageDoseAndRateDoseToProto(): Dosage.DoseAndRate.DoseX {
     val protoValue = Dosage.DoseAndRate.DoseX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.SimpleQuantity) {
-        protoValue.quantity = this.toProto()
+      protoValue.quantity = this.toProto()
     }
     return protoValue.build()
   }
@@ -112,13 +112,13 @@ object DosageConverter {
   private fun Type.dosageDoseAndRateRateToProto(): Dosage.DoseAndRate.RateX {
     val protoValue = Dosage.DoseAndRate.RateX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Ratio) {
-        protoValue.ratio = this.toProto()
+      protoValue.ratio = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.SimpleQuantity) {
-        protoValue.quantity = this.toProto()
+      protoValue.quantity = this.toProto()
     }
     return protoValue.build()
   }
@@ -128,49 +128,49 @@ object DosageConverter {
     val hapiValue = org.hl7.fhir.r4.model.Dosage()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSequence()) {
-        hapiValue.sequenceElement = sequence.toHapi()
+      hapiValue.sequenceElement = sequence.toHapi()
     }
     if (hasText()) {
-        hapiValue.textElement = text.toHapi()
+      hapiValue.textElement = text.toHapi()
     }
     if (additionalInstructionCount > 0) {
-        hapiValue.additionalInstruction = additionalInstructionList.map { it.toHapi() }
+      hapiValue.additionalInstruction = additionalInstructionList.map { it.toHapi() }
     }
     if (hasPatientInstruction()) {
-        hapiValue.patientInstructionElement = patientInstruction.toHapi()
+      hapiValue.patientInstructionElement = patientInstruction.toHapi()
     }
     if (hasTiming()) {
-        hapiValue.timing = timing.toHapi()
+      hapiValue.timing = timing.toHapi()
     }
     if (hasAsNeeded()) {
-        hapiValue.asNeeded = asNeeded.dosageAsNeededToHapi()
+      hapiValue.asNeeded = asNeeded.dosageAsNeededToHapi()
     }
     if (hasSite()) {
-        hapiValue.site = site.toHapi()
+      hapiValue.site = site.toHapi()
     }
     if (hasRoute()) {
-        hapiValue.route = route.toHapi()
+      hapiValue.route = route.toHapi()
     }
     if (hasMethod()) {
-        hapiValue.method = method.toHapi()
+      hapiValue.method = method.toHapi()
     }
     if (doseAndRateCount > 0) {
-        hapiValue.doseAndRate = doseAndRateList.map { it.toHapi() }
+      hapiValue.doseAndRate = doseAndRateList.map { it.toHapi() }
     }
     if (hasMaxDosePerPeriod()) {
-        hapiValue.maxDosePerPeriod = maxDosePerPeriod.toHapi()
+      hapiValue.maxDosePerPeriod = maxDosePerPeriod.toHapi()
     }
     if (hasMaxDosePerAdministration()) {
-        hapiValue.maxDosePerAdministration = maxDosePerAdministration.toHapi()
+      hapiValue.maxDosePerAdministration = maxDosePerAdministration.toHapi()
     }
     if (hasMaxDosePerLifetime()) {
-        hapiValue.maxDosePerLifetime = maxDosePerLifetime.toHapi()
+      hapiValue.maxDosePerLifetime = maxDosePerLifetime.toHapi()
     }
     return hapiValue
   }
@@ -185,43 +185,45 @@ object DosageConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSequence()) {
-        protoValue.sequence = sequenceElement.toProto()
+      protoValue.sequence = sequenceElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = textElement.toProto()
+      protoValue.text = textElement.toProto()
     }
     if (hasAdditionalInstruction()) {
       protoValue.addAllAdditionalInstruction(additionalInstruction.map { it.toProto() })
     }
     if (hasPatientInstruction()) {
-        protoValue.patientInstruction = patientInstructionElement.toProto()
+      protoValue.patientInstruction = patientInstructionElement.toProto()
     }
     if (hasTiming()) {
-        protoValue.timing = timing.toProto()
+      protoValue.timing = timing.toProto()
     }
     if (hasAsNeeded()) {
-        protoValue.asNeeded = asNeeded.dosageAsNeededToProto()
+      protoValue.asNeeded = asNeeded.dosageAsNeededToProto()
     }
     if (hasSite()) {
-        protoValue.site = site.toProto()
+      protoValue.site = site.toProto()
     }
     if (hasRoute()) {
-        protoValue.route = route.toProto()
+      protoValue.route = route.toProto()
     }
     if (hasMethod()) {
-        protoValue.method = method.toProto()
+      protoValue.method = method.toProto()
     }
     if (hasDoseAndRate()) {
       protoValue.addAllDoseAndRate(doseAndRate.map { it.toProto() })
     }
     if (hasMaxDosePerPeriod()) {
-        protoValue.maxDosePerPeriod = maxDosePerPeriod.toProto()
+      protoValue.maxDosePerPeriod = maxDosePerPeriod.toProto()
     }
     if (hasMaxDosePerAdministration()) {
-        protoValue.maxDosePerAdministration = (maxDosePerAdministration as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      protoValue.maxDosePerAdministration =
+        (maxDosePerAdministration as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
     }
     if (hasMaxDosePerLifetime()) {
-        protoValue.maxDosePerLifetime = (maxDosePerLifetime as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
+      protoValue.maxDosePerLifetime =
+        (maxDosePerLifetime as org.hl7.fhir.r4.model.SimpleQuantity).toProto()
     }
     return protoValue.build()
   }
@@ -234,13 +236,13 @@ object DosageConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasDose()) {
-        protoValue.dose = dose.dosageDoseAndRateDoseToProto()
+      protoValue.dose = dose.dosageDoseAndRateDoseToProto()
     }
     if (hasRate()) {
-        protoValue.rate = rate.dosageDoseAndRateRateToProto()
+      protoValue.rate = rate.dosageDoseAndRateRateToProto()
     }
     return protoValue.build()
   }
@@ -250,16 +252,16 @@ object DosageConverter {
     val hapiValue = org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasDose()) {
-        hapiValue.dose = dose.dosageDoseAndRateDoseToHapi()
+      hapiValue.dose = dose.dosageDoseAndRateDoseToHapi()
     }
     if (hasRate()) {
-        hapiValue.rate = rate.dosageDoseAndRateRateToHapi()
+      hapiValue.rate = rate.dosageDoseAndRateRateToHapi()
     }
     return hapiValue
   }

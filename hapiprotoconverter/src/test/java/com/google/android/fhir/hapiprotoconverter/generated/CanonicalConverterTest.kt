@@ -42,8 +42,6 @@ class CanonicalConverterTest(private val hapi: CanonicalType, private val proto:
   }
 
   companion object {
-    @Parameterized.Parameters
-    @JvmStatic
-    fun `data`(): List<Any> = PrimitiveTestData.CANONICAL_DATA
+    @Parameterized.Parameters @JvmStatic fun `data`(): List<Any> = PrimitiveTestData.CANONICAL_DATA
   }
 }

@@ -41,34 +41,34 @@ object MedicinalProductUndesirableEffectConverter {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductUndesirableEffect()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (subjectCount > 0) {
-        hapiValue.subject = subjectList.map { it.toHapi() }
+      hapiValue.subject = subjectList.map { it.toHapi() }
     }
     if (hasSymptomConditionEffect()) {
-        hapiValue.symptomConditionEffect = symptomConditionEffect.toHapi()
+      hapiValue.symptomConditionEffect = symptomConditionEffect.toHapi()
     }
     if (hasClassification()) {
-        hapiValue.classification = classification.toHapi()
+      hapiValue.classification = classification.toHapi()
     }
     if (hasFrequencyOfOccurrence()) {
-        hapiValue.frequencyOfOccurrence = frequencyOfOccurrence.toHapi()
+      hapiValue.frequencyOfOccurrence = frequencyOfOccurrence.toHapi()
     }
     if (populationCount > 0) {
-        hapiValue.population = populationList.map { it.toHapi() }
+      hapiValue.population = populationList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -79,13 +79,13 @@ object MedicinalProductUndesirableEffectConverter {
     val protoValue =
       MedicinalProductUndesirableEffect.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -97,13 +97,13 @@ object MedicinalProductUndesirableEffectConverter {
       protoValue.addAllSubject(subject.map { it.toProto() })
     }
     if (hasSymptomConditionEffect()) {
-        protoValue.symptomConditionEffect = symptomConditionEffect.toProto()
+      protoValue.symptomConditionEffect = symptomConditionEffect.toProto()
     }
     if (hasClassification()) {
-        protoValue.classification = classification.toProto()
+      protoValue.classification = classification.toProto()
     }
     if (hasFrequencyOfOccurrence()) {
-        protoValue.frequencyOfOccurrence = frequencyOfOccurrence.toProto()
+      protoValue.frequencyOfOccurrence = frequencyOfOccurrence.toProto()
     }
     if (hasPopulation()) {
       protoValue.addAllPopulation(population.map { it.toProto() })

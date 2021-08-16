@@ -34,16 +34,16 @@ object ExpressionConverter {
     val hapiValue = org.hl7.fhir.r4.model.Expression()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasReference()) {
-        hapiValue.referenceElement = reference.toHapi()
+      hapiValue.referenceElement = reference.toHapi()
     }
     return hapiValue
   }
@@ -55,13 +55,13 @@ object ExpressionConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasReference()) {
-        protoValue.reference = referenceElement.toProto()
+      protoValue.reference = referenceElement.toProto()
     }
     return protoValue.build()
   }

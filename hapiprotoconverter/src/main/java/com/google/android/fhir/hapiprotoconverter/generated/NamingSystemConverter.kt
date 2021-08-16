@@ -56,57 +56,58 @@ object NamingSystemConverter {
     val hapiValue = org.hl7.fhir.r4.model.NamingSystem()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
-      hapiValue.status =
-          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
-      hapiValue.kind = org.hl7.fhir.r4.model.NamingSystem.NamingSystemType.valueOf(
-          kind.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    hapiValue.kind =
+      org.hl7.fhir.r4.model.NamingSystem.NamingSystemType.valueOf(
+        kind.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasDate()) {
-        hapiValue.dateElement = date.toHapi()
+      hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-        hapiValue.publisherElement = publisher.toHapi()
+      hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-        hapiValue.contact = contactList.map { it.toHapi() }
+      hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasResponsible()) {
-        hapiValue.responsibleElement = responsible.toHapi()
+      hapiValue.responsibleElement = responsible.toHapi()
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (useContextCount > 0) {
-        hapiValue.useContext = useContextList.map { it.toHapi() }
+      hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
+      hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasUsage()) {
-        hapiValue.usageElement = usage.toHapi()
+      hapiValue.usageElement = usage.toHapi()
     }
     if (uniqueIdCount > 0) {
-        hapiValue.uniqueId = uniqueIdList.map { it.toHapi() }
+      hapiValue.uniqueId = uniqueIdList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -115,13 +116,13 @@ object NamingSystemConverter {
   fun org.hl7.fhir.r4.model.NamingSystem.toProto(): NamingSystem {
     val protoValue = NamingSystem.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -130,39 +131,41 @@ object NamingSystemConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
-      protoValue.status = NamingSystem.StatusCode.newBuilder()
-          .setValue(
-              PublicationStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      NamingSystem.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
-      protoValue.kind = NamingSystem.KindCode.newBuilder()
-          .setValue(
-              NamingSystemTypeCode.Value.valueOf(
-                  kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+        )
+        .build()
+    protoValue.kind =
+      NamingSystem.KindCode.newBuilder()
+        .setValue(
+          NamingSystemTypeCode.Value.valueOf(
+            kind.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasDate()) {
-        protoValue.date = dateElement.toProto()
+      protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-        protoValue.publisher = publisherElement.toProto()
+      protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasResponsible()) {
-        protoValue.responsible = responsibleElement.toProto()
+      protoValue.responsible = responsibleElement.toProto()
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasUseContext()) {
       protoValue.addAllUseContext(useContext.map { it.toProto() })
@@ -171,7 +174,7 @@ object NamingSystemConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasUsage()) {
-        protoValue.usage = usageElement.toProto()
+      protoValue.usage = usageElement.toProto()
     }
     if (hasUniqueId()) {
       protoValue.addAllUniqueId(uniqueId.map { it.toProto() })
@@ -189,24 +192,25 @@ object NamingSystemConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-      protoValue.type = NamingSystem.UniqueId.TypeCode.newBuilder()
-          .setValue(
-              NamingSystemIdentifierTypeCode.Value.valueOf(
-                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.type =
+      NamingSystem.UniqueId.TypeCode.newBuilder()
+        .setValue(
+          NamingSystemIdentifierTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasValue()) {
-        protoValue.value = valueElement.toProto()
+      protoValue.value = valueElement.toProto()
     }
     if (hasPreferred()) {
-        protoValue.preferred = preferredElement.toProto()
+      protoValue.preferred = preferredElement.toProto()
     }
     if (hasComment()) {
-        protoValue.comment = commentElement.toProto()
+      protoValue.comment = commentElement.toProto()
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     return protoValue.build()
   }
@@ -217,25 +221,26 @@ object NamingSystemConverter {
     val hapiValue = org.hl7.fhir.r4.model.NamingSystem.NamingSystemUniqueIdComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-      hapiValue.type = org.hl7.fhir.r4.model.NamingSystem.NamingSystemIdentifierType.valueOf(
-          type.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.type =
+      org.hl7.fhir.r4.model.NamingSystem.NamingSystemIdentifierType.valueOf(
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasValue()) {
-        hapiValue.valueElement = value.toHapi()
+      hapiValue.valueElement = value.toHapi()
     }
     if (hasPreferred()) {
-        hapiValue.preferredElement = preferred.toHapi()
+      hapiValue.preferredElement = preferred.toHapi()
     }
     if (hasComment()) {
-        hapiValue.commentElement = comment.toHapi()
+      hapiValue.commentElement = comment.toHapi()
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     return hapiValue
   }

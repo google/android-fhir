@@ -42,8 +42,6 @@ class UuidConverterTest(private val hapi: UuidType, private val proto: Uuid) {
   }
 
   companion object {
-    @Parameterized.Parameters
-    @JvmStatic
-    fun `data`(): List<Any> = PrimitiveTestData.UUID_DATA
+    @Parameterized.Parameters @JvmStatic fun `data`(): List<Any> = PrimitiveTestData.UUID_DATA
   }
 }

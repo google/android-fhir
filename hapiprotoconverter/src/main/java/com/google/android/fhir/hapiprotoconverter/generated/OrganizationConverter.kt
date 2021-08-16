@@ -51,49 +51,49 @@ object OrganizationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Organization()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasActive()) {
-        hapiValue.activeElement = active.toHapi()
+      hapiValue.activeElement = active.toHapi()
     }
     if (typeCount > 0) {
-        hapiValue.type = typeList.map { it.toHapi() }
+      hapiValue.type = typeList.map { it.toHapi() }
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (aliasCount > 0) {
-        hapiValue.alias = aliasList.map { it.toHapi() }
+      hapiValue.alias = aliasList.map { it.toHapi() }
     }
     if (telecomCount > 0) {
-        hapiValue.telecom = telecomList.map { it.toHapi() }
+      hapiValue.telecom = telecomList.map { it.toHapi() }
     }
     if (addressCount > 0) {
-        hapiValue.address = addressList.map { it.toHapi() }
+      hapiValue.address = addressList.map { it.toHapi() }
     }
     if (hasPartOf()) {
-        hapiValue.partOf = partOf.toHapi()
+      hapiValue.partOf = partOf.toHapi()
     }
     if (contactCount > 0) {
-        hapiValue.contact = contactList.map { it.toHapi() }
+      hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (endpointCount > 0) {
-        hapiValue.endpoint = endpointList.map { it.toHapi() }
+      hapiValue.endpoint = endpointList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -102,13 +102,13 @@ object OrganizationConverter {
   fun org.hl7.fhir.r4.model.Organization.toProto(): Organization {
     val protoValue = Organization.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -120,13 +120,13 @@ object OrganizationConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasActive()) {
-        protoValue.active = activeElement.toProto()
+      protoValue.active = activeElement.toProto()
     }
     if (hasType()) {
       protoValue.addAllType(type.map { it.toProto() })
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasAlias()) {
       protoValue.addAllAlias(alias.map { it.toProto() })
@@ -138,7 +138,7 @@ object OrganizationConverter {
       protoValue.addAllAddress(address.map { it.toProto() })
     }
     if (hasPartOf()) {
-        protoValue.partOf = partOf.toProto()
+      protoValue.partOf = partOf.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
@@ -160,16 +160,16 @@ object OrganizationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasPurpose()) {
-        protoValue.purpose = purpose.toProto()
+      protoValue.purpose = purpose.toProto()
     }
     if (hasName()) {
-        protoValue.name = name.toProto()
+      protoValue.name = name.toProto()
     }
     if (hasTelecom()) {
       protoValue.addAllTelecom(telecom.map { it.toProto() })
     }
     if (hasAddress()) {
-        protoValue.address = address.toProto()
+      protoValue.address = address.toProto()
     }
     return protoValue.build()
   }
@@ -180,22 +180,22 @@ object OrganizationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Organization.OrganizationContactComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasPurpose()) {
-        hapiValue.purpose = purpose.toHapi()
+      hapiValue.purpose = purpose.toHapi()
     }
     if (hasName()) {
-        hapiValue.name = name.toHapi()
+      hapiValue.name = name.toHapi()
     }
     if (telecomCount > 0) {
-        hapiValue.telecom = telecomList.map { it.toHapi() }
+      hapiValue.telecom = telecomList.map { it.toHapi() }
     }
     if (hasAddress()) {
-        hapiValue.address = address.toHapi()
+      hapiValue.address = address.toHapi()
     }
     return hapiValue
   }

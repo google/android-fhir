@@ -38,26 +38,26 @@ object AttachmentConverter {
     val hapiValue = org.hl7.fhir.r4.model.Attachment()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
-      hapiValue.contentType = contentType.value.hapiCodeCheck()
+    hapiValue.contentType = contentType.value.hapiCodeCheck()
     if (hasData()) {
-        hapiValue.dataElement = data.toHapi()
+      hapiValue.dataElement = data.toHapi()
     }
     if (hasUrl()) {
-        hapiValue.urlElement = url.toHapi()
+      hapiValue.urlElement = url.toHapi()
     }
     if (hasSize()) {
-        hapiValue.sizeElement = size.toHapi()
+      hapiValue.sizeElement = size.toHapi()
     }
     if (hasHash()) {
-        hapiValue.hashElement = hash.toHapi()
+      hapiValue.hashElement = hash.toHapi()
     }
     if (hasTitle()) {
-        hapiValue.titleElement = title.toHapi()
+      hapiValue.titleElement = title.toHapi()
     }
     if (hasCreation()) {
-        hapiValue.creationElement = creation.toHapi()
+      hapiValue.creationElement = creation.toHapi()
     }
     return hapiValue
   }
@@ -68,25 +68,25 @@ object AttachmentConverter {
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-      protoValue.contentType =
-          Attachment.ContentTypeCode.newBuilder().setValue(contentType.protoCodeCheck()).build()
+    protoValue.contentType =
+      Attachment.ContentTypeCode.newBuilder().setValue(contentType.protoCodeCheck()).build()
     if (hasData()) {
-        protoValue.data = dataElement.toProto()
+      protoValue.data = dataElement.toProto()
     }
     if (hasUrl()) {
-        protoValue.url = urlElement.toProto()
+      protoValue.url = urlElement.toProto()
     }
     if (hasSize()) {
-        protoValue.size = sizeElement.toProto()
+      protoValue.size = sizeElement.toProto()
     }
     if (hasHash()) {
-        protoValue.hash = hashElement.toProto()
+      protoValue.hash = hashElement.toProto()
     }
     if (hasTitle()) {
-        protoValue.title = titleElement.toProto()
+      protoValue.title = titleElement.toProto()
     }
     if (hasCreation()) {
-        protoValue.creation = creationElement.toProto()
+      protoValue.creation = creationElement.toProto()
     }
     return protoValue.build()
   }

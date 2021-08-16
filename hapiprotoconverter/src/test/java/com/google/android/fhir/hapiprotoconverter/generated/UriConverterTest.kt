@@ -42,7 +42,6 @@ class UriConverterTest(private val hapi: UriType, private val proto: Uri) {
   }
 
   companion object {
-    @Parameterized.Parameters @JvmStatic
-    fun `data`(): List<Any> = PrimitiveTestData.URI_DATA
+    @Parameterized.Parameters @JvmStatic fun `data`(): List<Any> = PrimitiveTestData.URI_DATA
   }
 }

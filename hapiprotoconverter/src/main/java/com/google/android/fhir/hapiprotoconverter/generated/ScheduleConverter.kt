@@ -46,43 +46,43 @@ object ScheduleConverter {
     val hapiValue = org.hl7.fhir.r4.model.Schedule()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasActive()) {
-        hapiValue.activeElement = active.toHapi()
+      hapiValue.activeElement = active.toHapi()
     }
     if (serviceCategoryCount > 0) {
-        hapiValue.serviceCategory = serviceCategoryList.map { it.toHapi() }
+      hapiValue.serviceCategory = serviceCategoryList.map { it.toHapi() }
     }
     if (serviceTypeCount > 0) {
-        hapiValue.serviceType = serviceTypeList.map { it.toHapi() }
+      hapiValue.serviceType = serviceTypeList.map { it.toHapi() }
     }
     if (specialtyCount > 0) {
-        hapiValue.specialty = specialtyList.map { it.toHapi() }
+      hapiValue.specialty = specialtyList.map { it.toHapi() }
     }
     if (actorCount > 0) {
-        hapiValue.actor = actorList.map { it.toHapi() }
+      hapiValue.actor = actorList.map { it.toHapi() }
     }
     if (hasPlanningHorizon()) {
-        hapiValue.planningHorizon = planningHorizon.toHapi()
+      hapiValue.planningHorizon = planningHorizon.toHapi()
     }
     if (hasComment()) {
-        hapiValue.commentElement = comment.toHapi()
+      hapiValue.commentElement = comment.toHapi()
     }
     return hapiValue
   }
@@ -91,13 +91,13 @@ object ScheduleConverter {
   fun org.hl7.fhir.r4.model.Schedule.toProto(): Schedule {
     val protoValue = Schedule.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -109,7 +109,7 @@ object ScheduleConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasActive()) {
-        protoValue.active = activeElement.toProto()
+      protoValue.active = activeElement.toProto()
     }
     if (hasServiceCategory()) {
       protoValue.addAllServiceCategory(serviceCategory.map { it.toProto() })
@@ -124,10 +124,10 @@ object ScheduleConverter {
       protoValue.addAllActor(actor.map { it.toProto() })
     }
     if (hasPlanningHorizon()) {
-        protoValue.planningHorizon = planningHorizon.toProto()
+      protoValue.planningHorizon = planningHorizon.toProto()
     }
     if (hasComment()) {
-        protoValue.comment = commentElement.toProto()
+      protoValue.comment = commentElement.toProto()
     }
     return protoValue.build()
   }

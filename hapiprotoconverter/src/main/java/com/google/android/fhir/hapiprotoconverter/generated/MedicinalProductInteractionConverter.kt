@@ -60,70 +60,68 @@ object MedicinalProductInteractionConverter {
     MedicinalProductInteraction.Interactant.ItemX {
     val protoValue = MedicinalProductInteraction.Interactant.ItemX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
 
   @JvmStatic
-  fun MedicinalProductInteraction.toHapi():
-    org.hl7.fhir.r4.model.MedicinalProductInteraction {
+  fun MedicinalProductInteraction.toHapi(): org.hl7.fhir.r4.model.MedicinalProductInteraction {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductInteraction()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (subjectCount > 0) {
-        hapiValue.subject = subjectList.map { it.toHapi() }
+      hapiValue.subject = subjectList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (interactantCount > 0) {
-        hapiValue.interactant = interactantList.map { it.toHapi() }
+      hapiValue.interactant = interactantList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasEffect()) {
-        hapiValue.effect = effect.toHapi()
+      hapiValue.effect = effect.toHapi()
     }
     if (hasIncidence()) {
-        hapiValue.incidence = incidence.toHapi()
+      hapiValue.incidence = incidence.toHapi()
     }
     if (hasManagement()) {
-        hapiValue.management = management.toHapi()
+      hapiValue.management = management.toHapi()
     }
     return hapiValue
   }
 
   @JvmStatic
-  fun org.hl7.fhir.r4.model.MedicinalProductInteraction.toProto():
-    MedicinalProductInteraction {
+  fun org.hl7.fhir.r4.model.MedicinalProductInteraction.toProto(): MedicinalProductInteraction {
     val protoValue = MedicinalProductInteraction.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -135,22 +133,22 @@ object MedicinalProductInteractionConverter {
       protoValue.addAllSubject(subject.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasInteractant()) {
       protoValue.addAllInteractant(interactant.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasEffect()) {
-        protoValue.effect = effect.toProto()
+      protoValue.effect = effect.toProto()
     }
     if (hasIncidence()) {
-        protoValue.incidence = incidence.toProto()
+      protoValue.incidence = incidence.toProto()
     }
     if (hasManagement()) {
-        protoValue.management = management.toProto()
+      protoValue.management = management.toProto()
     }
     return protoValue.build()
   }
@@ -167,7 +165,7 @@ object MedicinalProductInteractionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasItem()) {
-        protoValue.item = item.medicinalProductInteractionInteractantItemToProto()
+      protoValue.item = item.medicinalProductInteractionInteractantItemToProto()
     }
     return protoValue.build()
   }
@@ -180,13 +178,13 @@ object MedicinalProductInteractionConverter {
         .MedicinalProductInteractionInteractantComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasItem()) {
-        hapiValue.item = item.medicinalProductInteractionInteractantItemToHapi()
+      hapiValue.item = item.medicinalProductInteractionInteractantItemToHapi()
     }
     return hapiValue
   }

@@ -80,19 +80,19 @@ object ConditionConverter {
   private fun Type.conditionOnsetToProto(): Condition.OnsetX {
     val protoValue = Condition.OnsetX.newBuilder()
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Age) {
-        protoValue.age = this.toProto()
+      protoValue.age = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     if (this is StringType) {
-        protoValue.stringValue = this.toProto()
+      protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
@@ -121,19 +121,19 @@ object ConditionConverter {
   private fun Type.conditionAbatementToProto(): Condition.AbatementX {
     val protoValue = Condition.AbatementX.newBuilder()
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Age) {
-        protoValue.age = this.toProto()
+      protoValue.age = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     if (this is StringType) {
-        protoValue.stringValue = this.toProto()
+      protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
@@ -143,70 +143,70 @@ object ConditionConverter {
     val hapiValue = org.hl7.fhir.r4.model.Condition()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasClinicalStatus()) {
-        hapiValue.clinicalStatus = clinicalStatus.toHapi()
+      hapiValue.clinicalStatus = clinicalStatus.toHapi()
     }
     if (hasVerificationStatus()) {
-        hapiValue.verificationStatus = verificationStatus.toHapi()
+      hapiValue.verificationStatus = verificationStatus.toHapi()
     }
     if (categoryCount > 0) {
-        hapiValue.category = categoryList.map { it.toHapi() }
+      hapiValue.category = categoryList.map { it.toHapi() }
     }
     if (hasSeverity()) {
-        hapiValue.severity = severity.toHapi()
+      hapiValue.severity = severity.toHapi()
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (bodySiteCount > 0) {
-        hapiValue.bodySite = bodySiteList.map { it.toHapi() }
+      hapiValue.bodySite = bodySiteList.map { it.toHapi() }
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-        hapiValue.encounter = encounter.toHapi()
+      hapiValue.encounter = encounter.toHapi()
     }
     if (hasOnset()) {
-        hapiValue.onset = onset.conditionOnsetToHapi()
+      hapiValue.onset = onset.conditionOnsetToHapi()
     }
     if (hasAbatement()) {
-        hapiValue.abatement = abatement.conditionAbatementToHapi()
+      hapiValue.abatement = abatement.conditionAbatementToHapi()
     }
     if (hasRecordedDate()) {
-        hapiValue.recordedDateElement = recordedDate.toHapi()
+      hapiValue.recordedDateElement = recordedDate.toHapi()
     }
     if (hasRecorder()) {
-        hapiValue.recorder = recorder.toHapi()
+      hapiValue.recorder = recorder.toHapi()
     }
     if (hasAsserter()) {
-        hapiValue.asserter = asserter.toHapi()
+      hapiValue.asserter = asserter.toHapi()
     }
     if (stageCount > 0) {
-        hapiValue.stage = stageList.map { it.toHapi() }
+      hapiValue.stage = stageList.map { it.toHapi() }
     }
     if (evidenceCount > 0) {
-        hapiValue.evidence = evidenceList.map { it.toHapi() }
+      hapiValue.evidence = evidenceList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -215,13 +215,13 @@ object ConditionConverter {
   fun org.hl7.fhir.r4.model.Condition.toProto(): Condition {
     val protoValue = Condition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -233,43 +233,43 @@ object ConditionConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasClinicalStatus()) {
-        protoValue.clinicalStatus = clinicalStatus.toProto()
+      protoValue.clinicalStatus = clinicalStatus.toProto()
     }
     if (hasVerificationStatus()) {
-        protoValue.verificationStatus = verificationStatus.toProto()
+      protoValue.verificationStatus = verificationStatus.toProto()
     }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
     if (hasSeverity()) {
-        protoValue.severity = severity.toProto()
+      protoValue.severity = severity.toProto()
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasBodySite()) {
       protoValue.addAllBodySite(bodySite.map { it.toProto() })
     }
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-        protoValue.encounter = encounter.toProto()
+      protoValue.encounter = encounter.toProto()
     }
     if (hasOnset()) {
-        protoValue.onset = onset.conditionOnsetToProto()
+      protoValue.onset = onset.conditionOnsetToProto()
     }
     if (hasAbatement()) {
-        protoValue.abatement = abatement.conditionAbatementToProto()
+      protoValue.abatement = abatement.conditionAbatementToProto()
     }
     if (hasRecordedDate()) {
-        protoValue.recordedDate = recordedDateElement.toProto()
+      protoValue.recordedDate = recordedDateElement.toProto()
     }
     if (hasRecorder()) {
-        protoValue.recorder = recorder.toProto()
+      protoValue.recorder = recorder.toProto()
     }
     if (hasAsserter()) {
-        protoValue.asserter = asserter.toProto()
+      protoValue.asserter = asserter.toProto()
     }
     if (hasStage()) {
       protoValue.addAllStage(stage.map { it.toProto() })
@@ -293,13 +293,13 @@ object ConditionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSummary()) {
-        protoValue.summary = summary.toProto()
+      protoValue.summary = summary.toProto()
     }
     if (hasAssessment()) {
       protoValue.addAllAssessment(assessment.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     return protoValue.build()
   }
@@ -328,19 +328,19 @@ object ConditionConverter {
     val hapiValue = org.hl7.fhir.r4.model.Condition.ConditionStageComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSummary()) {
-        hapiValue.summary = summary.toHapi()
+      hapiValue.summary = summary.toHapi()
     }
     if (assessmentCount > 0) {
-        hapiValue.assessment = assessmentList.map { it.toHapi() }
+      hapiValue.assessment = assessmentList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     return hapiValue
   }
@@ -351,16 +351,16 @@ object ConditionConverter {
     val hapiValue = org.hl7.fhir.r4.model.Condition.ConditionEvidenceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (codeCount > 0) {
-        hapiValue.code = codeList.map { it.toHapi() }
+      hapiValue.code = codeList.map { it.toHapi() }
     }
     if (detailCount > 0) {
-        hapiValue.detail = detailList.map { it.toHapi() }
+      hapiValue.detail = detailList.map { it.toHapi() }
     }
     return hapiValue
   }

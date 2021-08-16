@@ -73,10 +73,10 @@ object RiskAssessmentConverter {
   private fun Type.riskAssessmentOccurrenceToProto(): RiskAssessment.OccurrenceX {
     val protoValue = RiskAssessment.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
@@ -98,10 +98,10 @@ object RiskAssessmentConverter {
     RiskAssessment.Prediction.ProbabilityX {
     val protoValue = RiskAssessment.Prediction.ProbabilityX.newBuilder()
     if (this is DecimalType) {
-        protoValue.decimal = this.toProto()
+      protoValue.decimal = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     return protoValue.build()
   }
@@ -121,10 +121,10 @@ object RiskAssessmentConverter {
   private fun Type.riskAssessmentPredictionWhenToProto(): RiskAssessment.Prediction.WhenX {
     val protoValue = RiskAssessment.Prediction.WhenX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     return protoValue.build()
   }
@@ -134,70 +134,71 @@ object RiskAssessmentConverter {
     val hapiValue = org.hl7.fhir.r4.model.RiskAssessment()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasBasedOn()) {
-        hapiValue.basedOn = basedOn.toHapi()
+      hapiValue.basedOn = basedOn.toHapi()
     }
     if (hasParent()) {
-        hapiValue.parent = parent.toHapi()
+      hapiValue.parent = parent.toHapi()
     }
-      hapiValue.status = org.hl7.fhir.r4.model.RiskAssessment.RiskAssessmentStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.RiskAssessment.RiskAssessmentStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasMethod()) {
-        hapiValue.method = method.toHapi()
+      hapiValue.method = method.toHapi()
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-        hapiValue.encounter = encounter.toHapi()
+      hapiValue.encounter = encounter.toHapi()
     }
     if (hasOccurrence()) {
-        hapiValue.occurrence = occurrence.riskAssessmentOccurrenceToHapi()
+      hapiValue.occurrence = occurrence.riskAssessmentOccurrenceToHapi()
     }
     if (hasCondition()) {
-        hapiValue.condition = condition.toHapi()
+      hapiValue.condition = condition.toHapi()
     }
     if (hasPerformer()) {
-        hapiValue.performer = performer.toHapi()
+      hapiValue.performer = performer.toHapi()
     }
     if (reasonCodeCount > 0) {
-        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
+      hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
+      hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (basisCount > 0) {
-        hapiValue.basis = basisList.map { it.toHapi() }
+      hapiValue.basis = basisList.map { it.toHapi() }
     }
     if (predictionCount > 0) {
-        hapiValue.prediction = predictionList.map { it.toHapi() }
+      hapiValue.prediction = predictionList.map { it.toHapi() }
     }
     if (hasMitigation()) {
-        hapiValue.mitigationElement = mitigation.toHapi()
+      hapiValue.mitigationElement = mitigation.toHapi()
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -206,13 +207,13 @@ object RiskAssessmentConverter {
   fun org.hl7.fhir.r4.model.RiskAssessment.toProto(): RiskAssessment {
     val protoValue = RiskAssessment.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -224,38 +225,39 @@ object RiskAssessmentConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasBasedOn()) {
-        protoValue.basedOn = basedOn.toProto()
+      protoValue.basedOn = basedOn.toProto()
     }
     if (hasParent()) {
-        protoValue.parent = parent.toProto()
+      protoValue.parent = parent.toProto()
     }
-      protoValue.status = RiskAssessment.StatusCode.newBuilder()
-          .setValue(
-              ObservationStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      RiskAssessment.StatusCode.newBuilder()
+        .setValue(
+          ObservationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasMethod()) {
-        protoValue.method = method.toProto()
+      protoValue.method = method.toProto()
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-        protoValue.encounter = encounter.toProto()
+      protoValue.encounter = encounter.toProto()
     }
     if (hasOccurrence()) {
-        protoValue.occurrence = occurrence.riskAssessmentOccurrenceToProto()
+      protoValue.occurrence = occurrence.riskAssessmentOccurrenceToProto()
     }
     if (hasCondition()) {
-        protoValue.condition = condition.toProto()
+      protoValue.condition = condition.toProto()
     }
     if (hasPerformer()) {
-        protoValue.performer = performer.toProto()
+      protoValue.performer = performer.toProto()
     }
     if (hasReasonCode()) {
       protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
@@ -270,7 +272,7 @@ object RiskAssessmentConverter {
       protoValue.addAllPrediction(prediction.map { it.toProto() })
     }
     if (hasMitigation()) {
-        protoValue.mitigation = mitigationElement.toProto()
+      protoValue.mitigation = mitigationElement.toProto()
     }
     if (hasNote()) {
       protoValue.addAllNote(note.map { it.toProto() })
@@ -289,22 +291,22 @@ object RiskAssessmentConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasOutcome()) {
-        protoValue.outcome = outcome.toProto()
+      protoValue.outcome = outcome.toProto()
     }
     if (hasProbability()) {
-        protoValue.probability = probability.riskAssessmentPredictionProbabilityToProto()
+      protoValue.probability = probability.riskAssessmentPredictionProbabilityToProto()
     }
     if (hasQualitativeRisk()) {
-        protoValue.qualitativeRisk = qualitativeRisk.toProto()
+      protoValue.qualitativeRisk = qualitativeRisk.toProto()
     }
     if (hasRelativeRisk()) {
-        protoValue.relativeRisk = relativeRiskElement.toProto()
+      protoValue.relativeRisk = relativeRiskElement.toProto()
     }
     if (hasWhen()) {
       protoValue.setWhen(`when`.riskAssessmentPredictionWhenToProto())
     }
     if (hasRationale()) {
-        protoValue.rationale = rationaleElement.toProto()
+      protoValue.rationale = rationaleElement.toProto()
     }
     return protoValue.build()
   }
@@ -315,28 +317,28 @@ object RiskAssessmentConverter {
     val hapiValue = org.hl7.fhir.r4.model.RiskAssessment.RiskAssessmentPredictionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasOutcome()) {
-        hapiValue.outcome = outcome.toHapi()
+      hapiValue.outcome = outcome.toHapi()
     }
     if (hasProbability()) {
-        hapiValue.probability = probability.riskAssessmentPredictionProbabilityToHapi()
+      hapiValue.probability = probability.riskAssessmentPredictionProbabilityToHapi()
     }
     if (hasQualitativeRisk()) {
-        hapiValue.qualitativeRisk = qualitativeRisk.toHapi()
+      hapiValue.qualitativeRisk = qualitativeRisk.toHapi()
     }
     if (hasRelativeRisk()) {
-        hapiValue.relativeRiskElement = relativeRisk.toHapi()
+      hapiValue.relativeRiskElement = relativeRisk.toHapi()
     }
     if (hasWhen()) {
       hapiValue.setWhen(`when`.riskAssessmentPredictionWhenToHapi())
     }
     if (hasRationale()) {
-        hapiValue.rationaleElement = rationale.toHapi()
+      hapiValue.rationaleElement = rationale.toHapi()
     }
     return hapiValue
   }

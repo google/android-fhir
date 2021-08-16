@@ -41,40 +41,41 @@ object EnrollmentRequestConverter {
     val hapiValue = org.hl7.fhir.r4.model.EnrollmentRequest()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.EnrollmentRequest.EnrollmentRequestStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.EnrollmentRequest.EnrollmentRequestStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasCreated()) {
-        hapiValue.createdElement = created.toHapi()
+      hapiValue.createdElement = created.toHapi()
     }
     if (hasInsurer()) {
-        hapiValue.insurer = insurer.toHapi()
+      hapiValue.insurer = insurer.toHapi()
     }
     if (hasProvider()) {
-        hapiValue.provider = provider.toHapi()
+      hapiValue.provider = provider.toHapi()
     }
     if (hasCandidate()) {
-        hapiValue.candidate = candidate.toHapi()
+      hapiValue.candidate = candidate.toHapi()
     }
     if (hasCoverage()) {
-        hapiValue.coverage = coverage.toHapi()
+      hapiValue.coverage = coverage.toHapi()
     }
     return hapiValue
   }
@@ -83,13 +84,13 @@ object EnrollmentRequestConverter {
   fun org.hl7.fhir.r4.model.EnrollmentRequest.toProto(): EnrollmentRequest {
     val protoValue = EnrollmentRequest.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -100,27 +101,28 @@ object EnrollmentRequestConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-      protoValue.status = EnrollmentRequest.StatusCode.newBuilder()
-          .setValue(
-              FinancialResourceStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      EnrollmentRequest.StatusCode.newBuilder()
+        .setValue(
+          FinancialResourceStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasCreated()) {
-        protoValue.created = createdElement.toProto()
+      protoValue.created = createdElement.toProto()
     }
     if (hasInsurer()) {
-        protoValue.insurer = insurer.toProto()
+      protoValue.insurer = insurer.toProto()
     }
     if (hasProvider()) {
-        protoValue.provider = provider.toProto()
+      protoValue.provider = provider.toProto()
     }
     if (hasCandidate()) {
-        protoValue.candidate = candidate.toProto()
+      protoValue.candidate = candidate.toProto()
     }
     if (hasCoverage()) {
-        protoValue.coverage = coverage.toProto()
+      protoValue.coverage = coverage.toProto()
     }
     return protoValue.build()
   }

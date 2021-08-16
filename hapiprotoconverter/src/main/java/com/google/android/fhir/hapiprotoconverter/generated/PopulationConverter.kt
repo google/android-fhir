@@ -46,10 +46,10 @@ object PopulationConverter {
   private fun Type.populationAgeToProto(): Population.AgeX {
     val protoValue = Population.AgeX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
@@ -59,22 +59,22 @@ object PopulationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Population()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasAge()) {
-        hapiValue.age = age.populationAgeToHapi()
+      hapiValue.age = age.populationAgeToHapi()
     }
     if (hasGender()) {
-        hapiValue.gender = gender.toHapi()
+      hapiValue.gender = gender.toHapi()
     }
     if (hasRace()) {
-        hapiValue.race = race.toHapi()
+      hapiValue.race = race.toHapi()
     }
     if (hasPhysiologicalCondition()) {
-        hapiValue.physiologicalCondition = physiologicalCondition.toHapi()
+      hapiValue.physiologicalCondition = physiologicalCondition.toHapi()
     }
     return hapiValue
   }
@@ -89,16 +89,16 @@ object PopulationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasAge()) {
-        protoValue.age = age.populationAgeToProto()
+      protoValue.age = age.populationAgeToProto()
     }
     if (hasGender()) {
-        protoValue.gender = gender.toProto()
+      protoValue.gender = gender.toProto()
     }
     if (hasRace()) {
-        protoValue.race = race.toProto()
+      protoValue.race = race.toProto()
     }
     if (hasPhysiologicalCondition()) {
-        protoValue.physiologicalCondition = physiologicalCondition.toProto()
+      protoValue.physiologicalCondition = physiologicalCondition.toProto()
     }
     return protoValue.build()
   }

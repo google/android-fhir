@@ -65,10 +65,10 @@ object ClinicalImpressionConverter {
   private fun Type.clinicalImpressionEffectiveToProto(): ClinicalImpression.EffectiveX {
     val protoValue = ClinicalImpression.EffectiveX.newBuilder()
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
@@ -78,79 +78,80 @@ object ClinicalImpressionConverter {
     val hapiValue = org.hl7.fhir.r4.model.ClinicalImpression()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasStatusReason()) {
-        hapiValue.statusReason = statusReason.toHapi()
+      hapiValue.statusReason = statusReason.toHapi()
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-        hapiValue.encounter = encounter.toHapi()
+      hapiValue.encounter = encounter.toHapi()
     }
     if (hasEffective()) {
-        hapiValue.effective = effective.clinicalImpressionEffectiveToHapi()
+      hapiValue.effective = effective.clinicalImpressionEffectiveToHapi()
     }
     if (hasDate()) {
-        hapiValue.dateElement = date.toHapi()
+      hapiValue.dateElement = date.toHapi()
     }
     if (hasAssessor()) {
-        hapiValue.assessor = assessor.toHapi()
+      hapiValue.assessor = assessor.toHapi()
     }
     if (hasPrevious()) {
-        hapiValue.previous = previous.toHapi()
+      hapiValue.previous = previous.toHapi()
     }
     if (problemCount > 0) {
-        hapiValue.problem = problemList.map { it.toHapi() }
+      hapiValue.problem = problemList.map { it.toHapi() }
     }
     if (investigationCount > 0) {
-        hapiValue.investigation = investigationList.map { it.toHapi() }
+      hapiValue.investigation = investigationList.map { it.toHapi() }
     }
     if (protocolCount > 0) {
-        hapiValue.protocol = protocolList.map { it.toHapi() }
+      hapiValue.protocol = protocolList.map { it.toHapi() }
     }
     if (hasSummary()) {
-        hapiValue.summaryElement = summary.toHapi()
+      hapiValue.summaryElement = summary.toHapi()
     }
     if (findingCount > 0) {
-        hapiValue.finding = findingList.map { it.toHapi() }
+      hapiValue.finding = findingList.map { it.toHapi() }
     }
     if (prognosisCodeableConceptCount > 0) {
-        hapiValue.prognosisCodeableConcept = prognosisCodeableConceptList.map { it.toHapi() }
+      hapiValue.prognosisCodeableConcept = prognosisCodeableConceptList.map { it.toHapi() }
     }
     if (prognosisReferenceCount > 0) {
-        hapiValue.prognosisReference = prognosisReferenceList.map { it.toHapi() }
+      hapiValue.prognosisReference = prognosisReferenceList.map { it.toHapi() }
     }
     if (supportingInfoCount > 0) {
-        hapiValue.supportingInfo = supportingInfoList.map { it.toHapi() }
+      hapiValue.supportingInfo = supportingInfoList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -159,13 +160,13 @@ object ClinicalImpressionConverter {
   fun org.hl7.fhir.r4.model.ClinicalImpression.toProto(): ClinicalImpression {
     val protoValue = ClinicalImpression.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -176,39 +177,40 @@ object ClinicalImpressionConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-      protoValue.status = ClinicalImpression.StatusCode.newBuilder()
-          .setValue(
-              ClinicalImpressionStatusValueSet.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      ClinicalImpression.StatusCode.newBuilder()
+        .setValue(
+          ClinicalImpressionStatusValueSet.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasStatusReason()) {
-        protoValue.statusReason = statusReason.toProto()
+      protoValue.statusReason = statusReason.toProto()
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-        protoValue.encounter = encounter.toProto()
+      protoValue.encounter = encounter.toProto()
     }
     if (hasEffective()) {
-        protoValue.effective = effective.clinicalImpressionEffectiveToProto()
+      protoValue.effective = effective.clinicalImpressionEffectiveToProto()
     }
     if (hasDate()) {
-        protoValue.date = dateElement.toProto()
+      protoValue.date = dateElement.toProto()
     }
     if (hasAssessor()) {
-        protoValue.assessor = assessor.toProto()
+      protoValue.assessor = assessor.toProto()
     }
     if (hasPrevious()) {
-        protoValue.previous = previous.toProto()
+      protoValue.previous = previous.toProto()
     }
     if (hasProblem()) {
       protoValue.addAllProblem(problem.map { it.toProto() })
@@ -220,7 +222,7 @@ object ClinicalImpressionConverter {
       protoValue.addAllProtocol(protocol.map { it.toProto() })
     }
     if (hasSummary()) {
-        protoValue.summary = summaryElement.toProto()
+      protoValue.summary = summaryElement.toProto()
     }
     if (hasFinding()) {
       protoValue.addAllFinding(finding.map { it.toProto() })
@@ -252,7 +254,7 @@ object ClinicalImpressionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasItem()) {
       protoValue.addAllItem(item.map { it.toProto() })
@@ -271,13 +273,13 @@ object ClinicalImpressionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasItemCodeableConcept()) {
-        protoValue.itemCodeableConcept = itemCodeableConcept.toProto()
+      protoValue.itemCodeableConcept = itemCodeableConcept.toProto()
     }
     if (hasItemReference()) {
-        protoValue.itemReference = itemReference.toProto()
+      protoValue.itemReference = itemReference.toProto()
     }
     if (hasBasis()) {
-        protoValue.basis = basisElement.toProto()
+      protoValue.basis = basisElement.toProto()
     }
     return protoValue.build()
   }
@@ -289,16 +291,16 @@ object ClinicalImpressionConverter {
       org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionInvestigationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (itemCount > 0) {
-        hapiValue.item = itemList.map { it.toHapi() }
+      hapiValue.item = itemList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -309,19 +311,19 @@ object ClinicalImpressionConverter {
     val hapiValue = org.hl7.fhir.r4.model.ClinicalImpression.ClinicalImpressionFindingComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasItemCodeableConcept()) {
-        hapiValue.itemCodeableConcept = itemCodeableConcept.toHapi()
+      hapiValue.itemCodeableConcept = itemCodeableConcept.toHapi()
     }
     if (hasItemReference()) {
-        hapiValue.itemReference = itemReference.toHapi()
+      hapiValue.itemReference = itemReference.toHapi()
     }
     if (hasBasis()) {
-        hapiValue.basisElement = basis.toHapi()
+      hapiValue.basisElement = basis.toHapi()
     }
     return hapiValue
   }

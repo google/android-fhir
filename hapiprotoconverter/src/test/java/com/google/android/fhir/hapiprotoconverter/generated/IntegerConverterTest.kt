@@ -42,8 +42,6 @@ class IntegerConverterTest(private val hapi: IntegerType, private val proto: Int
   }
 
   companion object {
-    @Parameterized.Parameters
-    @JvmStatic
-    fun `data`(): List<Any> = PrimitiveTestData.INTEGER_DATA
+    @Parameterized.Parameters @JvmStatic fun `data`(): List<Any> = PrimitiveTestData.INTEGER_DATA
   }
 }

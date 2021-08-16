@@ -45,31 +45,31 @@ object SubstanceProteinConverter {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceProtein()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSequenceType()) {
-        hapiValue.sequenceType = sequenceType.toHapi()
+      hapiValue.sequenceType = sequenceType.toHapi()
     }
     if (hasNumberOfSubunits()) {
-        hapiValue.numberOfSubunitsElement = numberOfSubunits.toHapi()
+      hapiValue.numberOfSubunitsElement = numberOfSubunits.toHapi()
     }
     if (disulfideLinkageCount > 0) {
-        hapiValue.disulfideLinkage = disulfideLinkageList.map { it.toHapi() }
+      hapiValue.disulfideLinkage = disulfideLinkageList.map { it.toHapi() }
     }
     if (subunitCount > 0) {
-        hapiValue.subunit = subunitList.map { it.toHapi() }
+      hapiValue.subunit = subunitList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -78,13 +78,13 @@ object SubstanceProteinConverter {
   fun org.hl7.fhir.r4.model.SubstanceProtein.toProto(): SubstanceProtein {
     val protoValue = SubstanceProtein.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -93,10 +93,10 @@ object SubstanceProteinConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSequenceType()) {
-        protoValue.sequenceType = sequenceType.toProto()
+      protoValue.sequenceType = sequenceType.toProto()
     }
     if (hasNumberOfSubunits()) {
-        protoValue.numberOfSubunits = numberOfSubunitsElement.toProto()
+      protoValue.numberOfSubunits = numberOfSubunitsElement.toProto()
     }
     if (hasDisulfideLinkage()) {
       protoValue.addAllDisulfideLinkage(disulfideLinkage.map { it.toProto() })
@@ -118,28 +118,28 @@ object SubstanceProteinConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSubunit()) {
-        protoValue.subunit = subunitElement.toProto()
+      protoValue.subunit = subunitElement.toProto()
     }
     if (hasSequence()) {
-        protoValue.sequence = sequenceElement.toProto()
+      protoValue.sequence = sequenceElement.toProto()
     }
     if (hasLength()) {
-        protoValue.length = lengthElement.toProto()
+      protoValue.length = lengthElement.toProto()
     }
     if (hasSequenceAttachment()) {
-        protoValue.sequenceAttachment = sequenceAttachment.toProto()
+      protoValue.sequenceAttachment = sequenceAttachment.toProto()
     }
     if (hasNTerminalModificationId()) {
-        protoValue.nTerminalModificationId = nTerminalModificationId.toProto()
+      protoValue.nTerminalModificationId = nTerminalModificationId.toProto()
     }
     if (hasNTerminalModification()) {
-        protoValue.nTerminalModification = nTerminalModificationElement.toProto()
+      protoValue.nTerminalModification = nTerminalModificationElement.toProto()
     }
     if (hasCTerminalModificationId()) {
-        protoValue.cTerminalModificationId = cTerminalModificationId.toProto()
+      protoValue.cTerminalModificationId = cTerminalModificationId.toProto()
     }
     if (hasCTerminalModification()) {
-        protoValue.cTerminalModification = cTerminalModificationElement.toProto()
+      protoValue.cTerminalModification = cTerminalModificationElement.toProto()
     }
     return protoValue.build()
   }
@@ -150,34 +150,34 @@ object SubstanceProteinConverter {
     val hapiValue = org.hl7.fhir.r4.model.SubstanceProtein.SubstanceProteinSubunitComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSubunit()) {
-        hapiValue.subunitElement = subunit.toHapi()
+      hapiValue.subunitElement = subunit.toHapi()
     }
     if (hasSequence()) {
-        hapiValue.sequenceElement = sequence.toHapi()
+      hapiValue.sequenceElement = sequence.toHapi()
     }
     if (hasLength()) {
-        hapiValue.lengthElement = length.toHapi()
+      hapiValue.lengthElement = length.toHapi()
     }
     if (hasSequenceAttachment()) {
-        hapiValue.sequenceAttachment = sequenceAttachment.toHapi()
+      hapiValue.sequenceAttachment = sequenceAttachment.toHapi()
     }
     if (hasNTerminalModificationId()) {
-        hapiValue.nTerminalModificationId = nTerminalModificationId.toHapi()
+      hapiValue.nTerminalModificationId = nTerminalModificationId.toHapi()
     }
     if (hasNTerminalModification()) {
-        hapiValue.nTerminalModificationElement = nTerminalModification.toHapi()
+      hapiValue.nTerminalModificationElement = nTerminalModification.toHapi()
     }
     if (hasCTerminalModificationId()) {
-        hapiValue.cTerminalModificationId = cTerminalModificationId.toHapi()
+      hapiValue.cTerminalModificationId = cTerminalModificationId.toHapi()
     }
     if (hasCTerminalModification()) {
-        hapiValue.cTerminalModificationElement = cTerminalModification.toHapi()
+      hapiValue.cTerminalModificationElement = cTerminalModification.toHapi()
     }
     return hapiValue
   }

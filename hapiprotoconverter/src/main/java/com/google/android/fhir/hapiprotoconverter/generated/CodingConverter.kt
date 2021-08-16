@@ -36,22 +36,22 @@ object CodingConverter {
     val hapiValue = org.hl7.fhir.r4.model.Coding()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasSystem()) {
-        hapiValue.systemElement = system.toHapi()
+      hapiValue.systemElement = system.toHapi()
     }
     if (hasVersion()) {
-        hapiValue.versionElement = version.toHapi()
+      hapiValue.versionElement = version.toHapi()
     }
     if (hasCode()) {
-        hapiValue.codeElement = code.toHapi()
+      hapiValue.codeElement = code.toHapi()
     }
     if (hasDisplay()) {
-        hapiValue.displayElement = display.toHapi()
+      hapiValue.displayElement = display.toHapi()
     }
     if (hasUserSelected()) {
-        hapiValue.userSelectedElement = userSelected.toHapi()
+      hapiValue.userSelectedElement = userSelected.toHapi()
     }
     return hapiValue
   }
@@ -63,19 +63,19 @@ object CodingConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasSystem()) {
-        protoValue.system = systemElement.toProto()
+      protoValue.system = systemElement.toProto()
     }
     if (hasVersion()) {
-        protoValue.version = versionElement.toProto()
+      protoValue.version = versionElement.toProto()
     }
     if (hasCode()) {
-        protoValue.code = codeElement.toProto()
+      protoValue.code = codeElement.toProto()
     }
     if (hasDisplay()) {
-        protoValue.display = displayElement.toProto()
+      protoValue.display = displayElement.toProto()
     }
     if (hasUserSelected()) {
-        protoValue.userSelected = userSelectedElement.toProto()
+      protoValue.userSelected = userSelectedElement.toProto()
     }
     return protoValue.build()
   }

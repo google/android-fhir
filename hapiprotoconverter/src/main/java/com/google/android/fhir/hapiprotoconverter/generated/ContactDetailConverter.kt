@@ -32,13 +32,13 @@ object ContactDetailConverter {
     val hapiValue = org.hl7.fhir.r4.model.ContactDetail()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (telecomCount > 0) {
-        hapiValue.telecom = telecomList.map { it.toHapi() }
+      hapiValue.telecom = telecomList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -50,7 +50,7 @@ object ContactDetailConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasTelecom()) {
       protoValue.addAllTelecom(telecom.map { it.toProto() })

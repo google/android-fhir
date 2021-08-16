@@ -51,31 +51,32 @@ object BundleConverter {
     val hapiValue = org.hl7.fhir.r4.model.Bundle()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasIdentifier()) {
-        hapiValue.identifier = identifier.toHapi()
+      hapiValue.identifier = identifier.toHapi()
     }
-      hapiValue.type = org.hl7.fhir.r4.model.Bundle.BundleType.valueOf(
-          type.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.type =
+      org.hl7.fhir.r4.model.Bundle.BundleType.valueOf(
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasTimestamp()) {
-        hapiValue.timestampElement = timestamp.toHapi()
+      hapiValue.timestampElement = timestamp.toHapi()
     }
     if (hasTotal()) {
-        hapiValue.totalElement = total.toHapi()
+      hapiValue.totalElement = total.toHapi()
     }
     if (linkCount > 0) {
-        hapiValue.link = linkList.map { it.toHapi() }
+      hapiValue.link = linkList.map { it.toHapi() }
     }
     if (entryCount > 0) {
-        hapiValue.entry = entryList.map { it.toHapi() }
+      hapiValue.entry = entryList.map { it.toHapi() }
     }
     if (hasSignature()) {
-        hapiValue.signature = signature.toHapi()
+      hapiValue.signature = signature.toHapi()
     }
     return hapiValue
   }
@@ -84,26 +85,27 @@ object BundleConverter {
   fun org.hl7.fhir.r4.model.Bundle.toProto(): Bundle {
     val protoValue = Bundle.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasIdentifier()) {
-        protoValue.identifier = identifier.toProto()
+      protoValue.identifier = identifier.toProto()
     }
-      protoValue.type = Bundle.TypeCode.newBuilder()
-          .setValue(
-              BundleTypeCode.Value.valueOf(
-                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.type =
+      Bundle.TypeCode.newBuilder()
+        .setValue(
+          BundleTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasTimestamp()) {
-        protoValue.timestamp = timestampElement.toProto()
+      protoValue.timestamp = timestampElement.toProto()
     }
     if (hasTotal()) {
-        protoValue.total = totalElement.toProto()
+      protoValue.total = totalElement.toProto()
     }
     if (hasLink()) {
       protoValue.addAllLink(link.map { it.toProto() })
@@ -112,7 +114,7 @@ object BundleConverter {
       protoValue.addAllEntry(entry.map { it.toProto() })
     }
     if (hasSignature()) {
-        protoValue.signature = signature.toProto()
+      protoValue.signature = signature.toProto()
     }
     return protoValue.build()
   }
@@ -127,10 +129,10 @@ object BundleConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasRelation()) {
-        protoValue.relation = relationElement.toProto()
+      protoValue.relation = relationElement.toProto()
     }
     if (hasUrl()) {
-        protoValue.url = urlElement.toProto()
+      protoValue.url = urlElement.toProto()
     }
     return protoValue.build()
   }
@@ -145,16 +147,16 @@ object BundleConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasFullUrl()) {
-        protoValue.fullUrl = fullUrlElement.toProto()
+      protoValue.fullUrl = fullUrlElement.toProto()
     }
     if (hasSearch()) {
-        protoValue.search = search.toProto()
+      protoValue.search = search.toProto()
     }
     if (hasRequest()) {
-        protoValue.request = request.toProto()
+      protoValue.request = request.toProto()
     }
     if (hasResponse()) {
-        protoValue.response = response.toProto()
+      protoValue.response = response.toProto()
     }
     return protoValue.build()
   }
@@ -169,15 +171,16 @@ object BundleConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-      protoValue.mode = Bundle.Entry.Search.ModeCode.newBuilder()
-          .setValue(
-              SearchEntryModeCode.Value.valueOf(
-                  mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.mode =
+      Bundle.Entry.Search.ModeCode.newBuilder()
+        .setValue(
+          SearchEntryModeCode.Value.valueOf(
+            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasScore()) {
-        protoValue.score = scoreElement.toProto()
+      protoValue.score = scoreElement.toProto()
     }
     return protoValue.build()
   }
@@ -192,27 +195,28 @@ object BundleConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-      protoValue.method = Bundle.Entry.Request.MethodCode.newBuilder()
-          .setValue(
-              HTTPVerbCode.Value.valueOf(
-                  method.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.method =
+      Bundle.Entry.Request.MethodCode.newBuilder()
+        .setValue(
+          HTTPVerbCode.Value.valueOf(
+            method.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasUrl()) {
-        protoValue.url = urlElement.toProto()
+      protoValue.url = urlElement.toProto()
     }
     if (hasIfNoneMatch()) {
-        protoValue.ifNoneMatch = ifNoneMatchElement.toProto()
+      protoValue.ifNoneMatch = ifNoneMatchElement.toProto()
     }
     if (hasIfModifiedSince()) {
-        protoValue.ifModifiedSince = ifModifiedSinceElement.toProto()
+      protoValue.ifModifiedSince = ifModifiedSinceElement.toProto()
     }
     if (hasIfMatch()) {
-        protoValue.ifMatch = ifMatchElement.toProto()
+      protoValue.ifMatch = ifMatchElement.toProto()
     }
     if (hasIfNoneExist()) {
-        protoValue.ifNoneExist = ifNoneExistElement.toProto()
+      protoValue.ifNoneExist = ifNoneExistElement.toProto()
     }
     return protoValue.build()
   }
@@ -228,16 +232,16 @@ object BundleConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasStatus()) {
-        protoValue.status = statusElement.toProto()
+      protoValue.status = statusElement.toProto()
     }
     if (hasLocation()) {
-        protoValue.location = locationElement.toProto()
+      protoValue.location = locationElement.toProto()
     }
     if (hasEtag()) {
-        protoValue.etag = etagElement.toProto()
+      protoValue.etag = etagElement.toProto()
     }
     if (hasLastModified()) {
-        protoValue.lastModified = lastModifiedElement.toProto()
+      protoValue.lastModified = lastModifiedElement.toProto()
     }
     return protoValue.build()
   }
@@ -247,16 +251,16 @@ object BundleConverter {
     val hapiValue = org.hl7.fhir.r4.model.Bundle.BundleLinkComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasRelation()) {
-        hapiValue.relationElement = relation.toHapi()
+      hapiValue.relationElement = relation.toHapi()
     }
     if (hasUrl()) {
-        hapiValue.urlElement = url.toHapi()
+      hapiValue.urlElement = url.toHapi()
     }
     return hapiValue
   }
@@ -266,22 +270,22 @@ object BundleConverter {
     val hapiValue = org.hl7.fhir.r4.model.Bundle.BundleEntryComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasFullUrl()) {
-        hapiValue.fullUrlElement = fullUrl.toHapi()
+      hapiValue.fullUrlElement = fullUrl.toHapi()
     }
     if (hasSearch()) {
-        hapiValue.search = search.toHapi()
+      hapiValue.search = search.toHapi()
     }
     if (hasRequest()) {
-        hapiValue.request = request.toHapi()
+      hapiValue.request = request.toHapi()
     }
     if (hasResponse()) {
-        hapiValue.response = response.toHapi()
+      hapiValue.response = response.toHapi()
     }
     return hapiValue
   }
@@ -292,16 +296,17 @@ object BundleConverter {
     val hapiValue = org.hl7.fhir.r4.model.Bundle.BundleEntrySearchComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-      hapiValue.mode = org.hl7.fhir.r4.model.Bundle.SearchEntryMode.valueOf(
-          mode.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.mode =
+      org.hl7.fhir.r4.model.Bundle.SearchEntryMode.valueOf(
+        mode.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasScore()) {
-        hapiValue.scoreElement = score.toHapi()
+      hapiValue.scoreElement = score.toHapi()
     }
     return hapiValue
   }
@@ -312,28 +317,29 @@ object BundleConverter {
     val hapiValue = org.hl7.fhir.r4.model.Bundle.BundleEntryRequestComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-      hapiValue.method = org.hl7.fhir.r4.model.Bundle.HTTPVerb.valueOf(
-          method.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.method =
+      org.hl7.fhir.r4.model.Bundle.HTTPVerb.valueOf(
+        method.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasUrl()) {
-        hapiValue.urlElement = url.toHapi()
+      hapiValue.urlElement = url.toHapi()
     }
     if (hasIfNoneMatch()) {
-        hapiValue.ifNoneMatchElement = ifNoneMatch.toHapi()
+      hapiValue.ifNoneMatchElement = ifNoneMatch.toHapi()
     }
     if (hasIfModifiedSince()) {
-        hapiValue.ifModifiedSinceElement = ifModifiedSince.toHapi()
+      hapiValue.ifModifiedSinceElement = ifModifiedSince.toHapi()
     }
     if (hasIfMatch()) {
-        hapiValue.ifMatchElement = ifMatch.toHapi()
+      hapiValue.ifMatchElement = ifMatch.toHapi()
     }
     if (hasIfNoneExist()) {
-        hapiValue.ifNoneExistElement = ifNoneExist.toHapi()
+      hapiValue.ifNoneExistElement = ifNoneExist.toHapi()
     }
     return hapiValue
   }
@@ -344,22 +350,22 @@ object BundleConverter {
     val hapiValue = org.hl7.fhir.r4.model.Bundle.BundleEntryResponseComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasStatus()) {
-        hapiValue.statusElement = status.toHapi()
+      hapiValue.statusElement = status.toHapi()
     }
     if (hasLocation()) {
-        hapiValue.locationElement = location.toHapi()
+      hapiValue.locationElement = location.toHapi()
     }
     if (hasEtag()) {
-        hapiValue.etagElement = etag.toHapi()
+      hapiValue.etagElement = etag.toHapi()
     }
     if (hasLastModified()) {
-        hapiValue.lastModifiedElement = lastModified.toHapi()
+      hapiValue.lastModifiedElement = lastModified.toHapi()
     }
     return hapiValue
   }

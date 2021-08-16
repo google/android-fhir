@@ -34,22 +34,22 @@ object ProductShelfLifeConverter {
     val hapiValue = org.hl7.fhir.r4.model.ProductShelfLife()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasIdentifier()) {
-        hapiValue.identifier = identifier.toHapi()
+      hapiValue.identifier = identifier.toHapi()
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     if (specialPrecautionsForStorageCount > 0) {
-        hapiValue.specialPrecautionsForStorage = specialPrecautionsForStorageList.map { it.toHapi() }
+      hapiValue.specialPrecautionsForStorage = specialPrecautionsForStorageList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -64,13 +64,13 @@ object ProductShelfLifeConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasIdentifier()) {
-        protoValue.identifier = identifier.toProto()
+      protoValue.identifier = identifier.toProto()
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     if (hasSpecialPrecautionsForStorage()) {
       protoValue.addAllSpecialPrecautionsForStorage(

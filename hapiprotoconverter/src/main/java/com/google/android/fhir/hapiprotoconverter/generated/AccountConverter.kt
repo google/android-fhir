@@ -67,9 +67,10 @@ object AccountConverter {
     if (identifierCount > 0) {
       hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-    hapiValue.status = org.hl7.fhir.r4.model.Account.AccountStatus.valueOf(
+    hapiValue.status =
+      org.hl7.fhir.r4.model.Account.AccountStatus.valueOf(
         status.value.name.hapiCodeCheck().replace("_", "")
-    )
+      )
     if (hasType()) {
       hapiValue.type = type.toHapi()
     }
@@ -121,7 +122,8 @@ object AccountConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-    protoValue.status = Account.StatusCode.newBuilder()
+    protoValue.status =
+      Account.StatusCode.newBuilder()
         .setValue(
           AccountStatusCode.Value.valueOf(
             status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()

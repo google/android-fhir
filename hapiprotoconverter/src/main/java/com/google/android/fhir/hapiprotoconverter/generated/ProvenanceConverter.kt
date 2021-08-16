@@ -64,10 +64,10 @@ object ProvenanceConverter {
   private fun Type.provenanceOccurredToProto(): Provenance.OccurredX {
     val protoValue = Provenance.OccurredX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     return protoValue.build()
   }
@@ -77,49 +77,49 @@ object ProvenanceConverter {
     val hapiValue = org.hl7.fhir.r4.model.Provenance()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (targetCount > 0) {
-        hapiValue.target = targetList.map { it.toHapi() }
+      hapiValue.target = targetList.map { it.toHapi() }
     }
     if (hasOccurred()) {
-        hapiValue.occurred = occurred.provenanceOccurredToHapi()
+      hapiValue.occurred = occurred.provenanceOccurredToHapi()
     }
     if (hasRecorded()) {
-        hapiValue.recordedElement = recorded.toHapi()
+      hapiValue.recordedElement = recorded.toHapi()
     }
     if (policyCount > 0) {
-        hapiValue.policy = policyList.map { it.toHapi() }
+      hapiValue.policy = policyList.map { it.toHapi() }
     }
     if (hasLocation()) {
-        hapiValue.location = location.toHapi()
+      hapiValue.location = location.toHapi()
     }
     if (reasonCount > 0) {
-        hapiValue.reason = reasonList.map { it.toHapi() }
+      hapiValue.reason = reasonList.map { it.toHapi() }
     }
     if (hasActivity()) {
-        hapiValue.activity = activity.toHapi()
+      hapiValue.activity = activity.toHapi()
     }
     if (agentCount > 0) {
-        hapiValue.agent = agentList.map { it.toHapi() }
+      hapiValue.agent = agentList.map { it.toHapi() }
     }
     if (entityCount > 0) {
-        hapiValue.entity = entityList.map { it.toHapi() }
+      hapiValue.entity = entityList.map { it.toHapi() }
     }
     if (signatureCount > 0) {
-        hapiValue.signature = signatureList.map { it.toHapi() }
+      hapiValue.signature = signatureList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -128,13 +128,13 @@ object ProvenanceConverter {
   fun org.hl7.fhir.r4.model.Provenance.toProto(): Provenance {
     val protoValue = Provenance.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -146,22 +146,22 @@ object ProvenanceConverter {
       protoValue.addAllTarget(target.map { it.toProto() })
     }
     if (hasOccurred()) {
-        protoValue.occurred = occurred.provenanceOccurredToProto()
+      protoValue.occurred = occurred.provenanceOccurredToProto()
     }
     if (hasRecorded()) {
-        protoValue.recorded = recordedElement.toProto()
+      protoValue.recorded = recordedElement.toProto()
     }
     if (hasPolicy()) {
       protoValue.addAllPolicy(policy.map { it.toProto() })
     }
     if (hasLocation()) {
-        protoValue.location = location.toProto()
+      protoValue.location = location.toProto()
     }
     if (hasReason()) {
       protoValue.addAllReason(reason.map { it.toProto() })
     }
     if (hasActivity()) {
-        protoValue.activity = activity.toProto()
+      protoValue.activity = activity.toProto()
     }
     if (hasAgent()) {
       protoValue.addAllAgent(agent.map { it.toProto() })
@@ -186,16 +186,16 @@ object ProvenanceConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasRole()) {
       protoValue.addAllRole(role.map { it.toProto() })
     }
     if (hasWho()) {
-        protoValue.who = who.toProto()
+      protoValue.who = who.toProto()
     }
     if (hasOnBehalfOf()) {
-        protoValue.onBehalfOf = onBehalfOf.toProto()
+      protoValue.onBehalfOf = onBehalfOf.toProto()
     }
     return protoValue.build()
   }
@@ -210,15 +210,16 @@ object ProvenanceConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-      protoValue.role = Provenance.Entity.RoleCode.newBuilder()
-          .setValue(
-              ProvenanceEntityRoleCode.Value.valueOf(
-                  role.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.role =
+      Provenance.Entity.RoleCode.newBuilder()
+        .setValue(
+          ProvenanceEntityRoleCode.Value.valueOf(
+            role.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasWhat()) {
-        protoValue.what = what.toProto()
+      protoValue.what = what.toProto()
     }
     return protoValue.build()
   }
@@ -228,22 +229,22 @@ object ProvenanceConverter {
     val hapiValue = org.hl7.fhir.r4.model.Provenance.ProvenanceAgentComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (roleCount > 0) {
-        hapiValue.role = roleList.map { it.toHapi() }
+      hapiValue.role = roleList.map { it.toHapi() }
     }
     if (hasWho()) {
-        hapiValue.who = who.toHapi()
+      hapiValue.who = who.toHapi()
     }
     if (hasOnBehalfOf()) {
-        hapiValue.onBehalfOf = onBehalfOf.toHapi()
+      hapiValue.onBehalfOf = onBehalfOf.toHapi()
     }
     return hapiValue
   }
@@ -254,16 +255,17 @@ object ProvenanceConverter {
     val hapiValue = org.hl7.fhir.r4.model.Provenance.ProvenanceEntityComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-      hapiValue.role = org.hl7.fhir.r4.model.Provenance.ProvenanceEntityRole.valueOf(
-          role.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.role =
+      org.hl7.fhir.r4.model.Provenance.ProvenanceEntityRole.valueOf(
+        role.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasWhat()) {
-        hapiValue.what = what.toHapi()
+      hapiValue.what = what.toHapi()
     }
     return hapiValue
   }

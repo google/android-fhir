@@ -65,10 +65,10 @@ object MedicationConverter {
   private fun Type.medicationIngredientItemToProto(): Medication.Ingredient.ItemX {
     val protoValue = Medication.Ingredient.ItemX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -78,43 +78,44 @@ object MedicationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Medication()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
-      hapiValue.status = org.hl7.fhir.r4.model.Medication.MedicationStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.Medication.MedicationStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasManufacturer()) {
-        hapiValue.manufacturer = manufacturer.toHapi()
+      hapiValue.manufacturer = manufacturer.toHapi()
     }
     if (hasForm()) {
-        hapiValue.form = form.toHapi()
+      hapiValue.form = form.toHapi()
     }
     if (hasAmount()) {
-        hapiValue.amount = amount.toHapi()
+      hapiValue.amount = amount.toHapi()
     }
     if (ingredientCount > 0) {
-        hapiValue.ingredient = ingredientList.map { it.toHapi() }
+      hapiValue.ingredient = ingredientList.map { it.toHapi() }
     }
     if (hasBatch()) {
-        hapiValue.batch = batch.toHapi()
+      hapiValue.batch = batch.toHapi()
     }
     return hapiValue
   }
@@ -123,13 +124,13 @@ object MedicationConverter {
   fun org.hl7.fhir.r4.model.Medication.toProto(): Medication {
     val protoValue = Medication.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -141,29 +142,30 @@ object MedicationConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
-      protoValue.status = Medication.StatusCode.newBuilder()
-          .setValue(
-              MedicationStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      Medication.StatusCode.newBuilder()
+        .setValue(
+          MedicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasManufacturer()) {
-        protoValue.manufacturer = manufacturer.toProto()
+      protoValue.manufacturer = manufacturer.toProto()
     }
     if (hasForm()) {
-        protoValue.form = form.toProto()
+      protoValue.form = form.toProto()
     }
     if (hasAmount()) {
-        protoValue.amount = amount.toProto()
+      protoValue.amount = amount.toProto()
     }
     if (hasIngredient()) {
       protoValue.addAllIngredient(ingredient.map { it.toProto() })
     }
     if (hasBatch()) {
-        protoValue.batch = batch.toProto()
+      protoValue.batch = batch.toProto()
     }
     return protoValue.build()
   }
@@ -179,13 +181,13 @@ object MedicationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasItem()) {
-        protoValue.item = item.medicationIngredientItemToProto()
+      protoValue.item = item.medicationIngredientItemToProto()
     }
     if (hasIsActive()) {
-        protoValue.isActive = isActiveElement.toProto()
+      protoValue.isActive = isActiveElement.toProto()
     }
     if (hasStrength()) {
-        protoValue.strength = strength.toProto()
+      protoValue.strength = strength.toProto()
     }
     return protoValue.build()
   }
@@ -201,10 +203,10 @@ object MedicationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasLotNumber()) {
-        protoValue.lotNumber = lotNumberElement.toProto()
+      protoValue.lotNumber = lotNumberElement.toProto()
     }
     if (hasExpirationDate()) {
-        protoValue.expirationDate = expirationDateElement.toProto()
+      protoValue.expirationDate = expirationDateElement.toProto()
     }
     return protoValue.build()
   }
@@ -215,19 +217,19 @@ object MedicationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Medication.MedicationIngredientComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasItem()) {
-        hapiValue.item = item.medicationIngredientItemToHapi()
+      hapiValue.item = item.medicationIngredientItemToHapi()
     }
     if (hasIsActive()) {
-        hapiValue.isActiveElement = isActive.toHapi()
+      hapiValue.isActiveElement = isActive.toHapi()
     }
     if (hasStrength()) {
-        hapiValue.strength = strength.toHapi()
+      hapiValue.strength = strength.toHapi()
     }
     return hapiValue
   }
@@ -237,16 +239,16 @@ object MedicationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Medication.MedicationBatchComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasLotNumber()) {
-        hapiValue.lotNumberElement = lotNumber.toHapi()
+      hapiValue.lotNumberElement = lotNumber.toHapi()
     }
     if (hasExpirationDate()) {
-        hapiValue.expirationDateElement = expirationDate.toHapi()
+      hapiValue.expirationDateElement = expirationDate.toHapi()
     }
     return hapiValue
   }

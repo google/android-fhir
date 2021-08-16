@@ -69,10 +69,10 @@ object CompositionConverter {
   private fun Type.compositionRelatesToTargetToProto(): Composition.RelatesTo.TargetX {
     val protoValue = Composition.RelatesTo.TargetX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Identifier) {
-        protoValue.identifier = this.toProto()
+      protoValue.identifier = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -82,64 +82,66 @@ object CompositionConverter {
     val hapiValue = org.hl7.fhir.r4.model.Composition()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasIdentifier()) {
-        hapiValue.identifier = identifier.toHapi()
+      hapiValue.identifier = identifier.toHapi()
     }
-      hapiValue.status = org.hl7.fhir.r4.model.Composition.CompositionStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.Composition.CompositionStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (categoryCount > 0) {
-        hapiValue.category = categoryList.map { it.toHapi() }
+      hapiValue.category = categoryList.map { it.toHapi() }
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-        hapiValue.encounter = encounter.toHapi()
+      hapiValue.encounter = encounter.toHapi()
     }
     if (hasDate()) {
-        hapiValue.dateElement = date.toHapi()
+      hapiValue.dateElement = date.toHapi()
     }
     if (authorCount > 0) {
-        hapiValue.author = authorList.map { it.toHapi() }
+      hapiValue.author = authorList.map { it.toHapi() }
     }
     if (hasTitle()) {
-        hapiValue.titleElement = title.toHapi()
+      hapiValue.titleElement = title.toHapi()
     }
-      hapiValue.confidentiality = org.hl7.fhir.r4.model.Composition.DocumentConfidentiality.valueOf(
-          confidentiality.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.confidentiality =
+      org.hl7.fhir.r4.model.Composition.DocumentConfidentiality.valueOf(
+        confidentiality.value.name.hapiCodeCheck().replace("_", "")
       )
     if (attesterCount > 0) {
-        hapiValue.attester = attesterList.map { it.toHapi() }
+      hapiValue.attester = attesterList.map { it.toHapi() }
     }
     if (hasCustodian()) {
-        hapiValue.custodian = custodian.toHapi()
+      hapiValue.custodian = custodian.toHapi()
     }
     if (relatesToCount > 0) {
-        hapiValue.relatesTo = relatesToList.map { it.toHapi() }
+      hapiValue.relatesTo = relatesToList.map { it.toHapi() }
     }
     if (eventCount > 0) {
-        hapiValue.event = eventList.map { it.toHapi() }
+      hapiValue.event = eventList.map { it.toHapi() }
     }
     if (sectionCount > 0) {
-        hapiValue.section = sectionList.map { it.toHapi() }
+      hapiValue.section = sectionList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -148,13 +150,13 @@ object CompositionConverter {
   fun org.hl7.fhir.r4.model.Composition.toProto(): Composition {
     val protoValue = Composition.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -163,48 +165,50 @@ object CompositionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasIdentifier()) {
-        protoValue.identifier = identifier.toProto()
+      protoValue.identifier = identifier.toProto()
     }
-      protoValue.status = Composition.StatusCode.newBuilder()
-          .setValue(
-              CompositionStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      Composition.StatusCode.newBuilder()
+        .setValue(
+          CompositionStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-        protoValue.encounter = encounter.toProto()
+      protoValue.encounter = encounter.toProto()
     }
     if (hasDate()) {
-        protoValue.date = dateElement.toProto()
+      protoValue.date = dateElement.toProto()
     }
     if (hasAuthor()) {
       protoValue.addAllAuthor(author.map { it.toProto() })
     }
     if (hasTitle()) {
-        protoValue.title = titleElement.toProto()
+      protoValue.title = titleElement.toProto()
     }
-      protoValue.confidentiality = Composition.ConfidentialityCode.newBuilder()
-          .setValue(
-              V3ConfidentialityClassificationValueSet.Value.valueOf(
-                  confidentiality.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.confidentiality =
+      Composition.ConfidentialityCode.newBuilder()
+        .setValue(
+          V3ConfidentialityClassificationValueSet.Value.valueOf(
+            confidentiality.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasAttester()) {
       protoValue.addAllAttester(attester.map { it.toProto() })
     }
     if (hasCustodian()) {
-        protoValue.custodian = custodian.toProto()
+      protoValue.custodian = custodian.toProto()
     }
     if (hasRelatesTo()) {
       protoValue.addAllRelatesTo(relatesTo.map { it.toProto() })
@@ -228,18 +232,19 @@ object CompositionConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-      protoValue.mode = Composition.Attester.ModeCode.newBuilder()
-          .setValue(
-              CompositionAttestationModeCode.Value.valueOf(
-                  mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.mode =
+      Composition.Attester.ModeCode.newBuilder()
+        .setValue(
+          CompositionAttestationModeCode.Value.valueOf(
+            mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasTime()) {
-        protoValue.time = timeElement.toProto()
+      protoValue.time = timeElement.toProto()
     }
     if (hasParty()) {
-        protoValue.party = party.toProto()
+      protoValue.party = party.toProto()
     }
     return protoValue.build()
   }
@@ -254,15 +259,16 @@ object CompositionConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-      protoValue.code = Composition.RelatesTo.CodeType.newBuilder()
-          .setValue(
-              DocumentRelationshipTypeCode.Value.valueOf(
-                  code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.code =
+      Composition.RelatesTo.CodeType.newBuilder()
+        .setValue(
+          DocumentRelationshipTypeCode.Value.valueOf(
+            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasTarget()) {
-        protoValue.target = target.compositionRelatesToTargetToProto()
+      protoValue.target = target.compositionRelatesToTargetToProto()
     }
     return protoValue.build()
   }
@@ -281,7 +287,7 @@ object CompositionConverter {
       protoValue.addAllCode(code.map { it.toProto() })
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     if (hasDetail()) {
       protoValue.addAllDetail(detail.map { it.toProto() })
@@ -299,33 +305,34 @@ object CompositionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasTitle()) {
-        protoValue.title = titleElement.toProto()
+      protoValue.title = titleElement.toProto()
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasAuthor()) {
       protoValue.addAllAuthor(author.map { it.toProto() })
     }
     if (hasFocus()) {
-        protoValue.focus = focus.toProto()
+      protoValue.focus = focus.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
-      protoValue.mode = Composition.Section.ModeCode.newBuilder()
-          .setValue(
-              ListModeCode.Value.valueOf(mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
-          )
-          .build()
+    protoValue.mode =
+      Composition.Section.ModeCode.newBuilder()
+        .setValue(
+          ListModeCode.Value.valueOf(mode.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
+        )
+        .build()
     if (hasOrderedBy()) {
-        protoValue.orderedBy = orderedBy.toProto()
+      protoValue.orderedBy = orderedBy.toProto()
     }
     if (hasEntry()) {
       protoValue.addAllEntry(entry.map { it.toProto() })
     }
     if (hasEmptyReason()) {
-        protoValue.emptyReason = emptyReason.toProto()
+      protoValue.emptyReason = emptyReason.toProto()
     }
     return protoValue.build()
   }
@@ -336,19 +343,20 @@ object CompositionConverter {
     val hapiValue = org.hl7.fhir.r4.model.Composition.CompositionAttesterComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-      hapiValue.mode = org.hl7.fhir.r4.model.Composition.CompositionAttestationMode.valueOf(
-          mode.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.mode =
+      org.hl7.fhir.r4.model.Composition.CompositionAttestationMode.valueOf(
+        mode.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasTime()) {
-        hapiValue.timeElement = time.toHapi()
+      hapiValue.timeElement = time.toHapi()
     }
     if (hasParty()) {
-        hapiValue.party = party.toHapi()
+      hapiValue.party = party.toHapi()
     }
     return hapiValue
   }
@@ -359,16 +367,17 @@ object CompositionConverter {
     val hapiValue = org.hl7.fhir.r4.model.Composition.CompositionRelatesToComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-      hapiValue.code = org.hl7.fhir.r4.model.Composition.DocumentRelationshipType.valueOf(
-          code.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.code =
+      org.hl7.fhir.r4.model.Composition.DocumentRelationshipType.valueOf(
+        code.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasTarget()) {
-        hapiValue.target = target.compositionRelatesToTargetToHapi()
+      hapiValue.target = target.compositionRelatesToTargetToHapi()
     }
     return hapiValue
   }
@@ -379,19 +388,19 @@ object CompositionConverter {
     val hapiValue = org.hl7.fhir.r4.model.Composition.CompositionEventComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (codeCount > 0) {
-        hapiValue.code = codeList.map { it.toHapi() }
+      hapiValue.code = codeList.map { it.toHapi() }
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     if (detailCount > 0) {
-        hapiValue.detail = detailList.map { it.toHapi() }
+      hapiValue.detail = detailList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -401,37 +410,38 @@ object CompositionConverter {
     val hapiValue = org.hl7.fhir.r4.model.Composition.SectionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasTitle()) {
-        hapiValue.titleElement = title.toHapi()
+      hapiValue.titleElement = title.toHapi()
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (authorCount > 0) {
-        hapiValue.author = authorList.map { it.toHapi() }
+      hapiValue.author = authorList.map { it.toHapi() }
     }
     if (hasFocus()) {
-        hapiValue.focus = focus.toHapi()
+      hapiValue.focus = focus.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
-      hapiValue.mode = org.hl7.fhir.r4.model.Composition.SectionMode.valueOf(
-          mode.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.mode =
+      org.hl7.fhir.r4.model.Composition.SectionMode.valueOf(
+        mode.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasOrderedBy()) {
-        hapiValue.orderedBy = orderedBy.toHapi()
+      hapiValue.orderedBy = orderedBy.toHapi()
     }
     if (entryCount > 0) {
-        hapiValue.entry = entryList.map { it.toHapi() }
+      hapiValue.entry = entryList.map { it.toHapi() }
     }
     if (hasEmptyReason()) {
-        hapiValue.emptyReason = emptyReason.toHapi()
+      hapiValue.emptyReason = emptyReason.toHapi()
     }
     return hapiValue
   }

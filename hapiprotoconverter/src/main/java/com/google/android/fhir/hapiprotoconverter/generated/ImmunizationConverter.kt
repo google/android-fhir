@@ -75,10 +75,10 @@ object ImmunizationConverter {
   private fun Type.immunizationOccurrenceToProto(): Immunization.OccurrenceX {
     val protoValue = Immunization.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is StringType) {
-        protoValue.stringValue = this.toProto()
+      protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
@@ -100,10 +100,10 @@ object ImmunizationConverter {
     Immunization.ProtocolApplied.DoseNumberX {
     val protoValue = Immunization.ProtocolApplied.DoseNumberX.newBuilder()
     if (this is PositiveIntType) {
-        protoValue.positiveInt = this.toProto()
+      protoValue.positiveInt = this.toProto()
     }
     if (this is StringType) {
-        protoValue.stringValue = this.toProto()
+      protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
@@ -125,10 +125,10 @@ object ImmunizationConverter {
     Immunization.ProtocolApplied.SeriesDosesX {
     val protoValue = Immunization.ProtocolApplied.SeriesDosesX.newBuilder()
     if (this is PositiveIntType) {
-        protoValue.positiveInt = this.toProto()
+      protoValue.positiveInt = this.toProto()
     }
     if (this is StringType) {
-        protoValue.stringValue = this.toProto()
+      protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
@@ -138,103 +138,104 @@ object ImmunizationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Immunization()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.Immunization.ImmunizationStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.Immunization.ImmunizationStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasStatusReason()) {
-        hapiValue.statusReason = statusReason.toHapi()
+      hapiValue.statusReason = statusReason.toHapi()
     }
     if (hasVaccineCode()) {
-        hapiValue.vaccineCode = vaccineCode.toHapi()
+      hapiValue.vaccineCode = vaccineCode.toHapi()
     }
     if (hasPatient()) {
-        hapiValue.patient = patient.toHapi()
+      hapiValue.patient = patient.toHapi()
     }
     if (hasEncounter()) {
-        hapiValue.encounter = encounter.toHapi()
+      hapiValue.encounter = encounter.toHapi()
     }
     if (hasOccurrence()) {
-        hapiValue.occurrence = occurrence.immunizationOccurrenceToHapi()
+      hapiValue.occurrence = occurrence.immunizationOccurrenceToHapi()
     }
     if (hasRecorded()) {
-        hapiValue.recordedElement = recorded.toHapi()
+      hapiValue.recordedElement = recorded.toHapi()
     }
     if (hasPrimarySource()) {
-        hapiValue.primarySourceElement = primarySource.toHapi()
+      hapiValue.primarySourceElement = primarySource.toHapi()
     }
     if (hasReportOrigin()) {
-        hapiValue.reportOrigin = reportOrigin.toHapi()
+      hapiValue.reportOrigin = reportOrigin.toHapi()
     }
     if (hasLocation()) {
-        hapiValue.location = location.toHapi()
+      hapiValue.location = location.toHapi()
     }
     if (hasManufacturer()) {
-        hapiValue.manufacturer = manufacturer.toHapi()
+      hapiValue.manufacturer = manufacturer.toHapi()
     }
     if (hasLotNumber()) {
-        hapiValue.lotNumberElement = lotNumber.toHapi()
+      hapiValue.lotNumberElement = lotNumber.toHapi()
     }
     if (hasExpirationDate()) {
-        hapiValue.expirationDateElement = expirationDate.toHapi()
+      hapiValue.expirationDateElement = expirationDate.toHapi()
     }
     if (hasSite()) {
-        hapiValue.site = site.toHapi()
+      hapiValue.site = site.toHapi()
     }
     if (hasRoute()) {
-        hapiValue.route = route.toHapi()
+      hapiValue.route = route.toHapi()
     }
     if (hasDoseQuantity()) {
-        hapiValue.doseQuantity = doseQuantity.toHapi()
+      hapiValue.doseQuantity = doseQuantity.toHapi()
     }
     if (performerCount > 0) {
-        hapiValue.performer = performerList.map { it.toHapi() }
+      hapiValue.performer = performerList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     if (reasonCodeCount > 0) {
-        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
+      hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
+      hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (hasIsSubpotent()) {
-        hapiValue.isSubpotentElement = isSubpotent.toHapi()
+      hapiValue.isSubpotentElement = isSubpotent.toHapi()
     }
     if (subpotentReasonCount > 0) {
-        hapiValue.subpotentReason = subpotentReasonList.map { it.toHapi() }
+      hapiValue.subpotentReason = subpotentReasonList.map { it.toHapi() }
     }
     if (educationCount > 0) {
-        hapiValue.education = educationList.map { it.toHapi() }
+      hapiValue.education = educationList.map { it.toHapi() }
     }
     if (programEligibilityCount > 0) {
-        hapiValue.programEligibility = programEligibilityList.map { it.toHapi() }
+      hapiValue.programEligibility = programEligibilityList.map { it.toHapi() }
     }
     if (hasFundingSource()) {
-        hapiValue.fundingSource = fundingSource.toHapi()
+      hapiValue.fundingSource = fundingSource.toHapi()
     }
     if (reactionCount > 0) {
-        hapiValue.reaction = reactionList.map { it.toHapi() }
+      hapiValue.reaction = reactionList.map { it.toHapi() }
     }
     if (protocolAppliedCount > 0) {
-        hapiValue.protocolApplied = protocolAppliedList.map { it.toHapi() }
+      hapiValue.protocolApplied = protocolAppliedList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -243,13 +244,13 @@ object ImmunizationConverter {
   fun org.hl7.fhir.r4.model.Immunization.toProto(): Immunization {
     val protoValue = Immunization.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -260,57 +261,58 @@ object ImmunizationConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-      protoValue.status = Immunization.StatusCode.newBuilder()
-          .setValue(
-              ImmunizationStatusCodesValueSet.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      Immunization.StatusCode.newBuilder()
+        .setValue(
+          ImmunizationStatusCodesValueSet.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasStatusReason()) {
-        protoValue.statusReason = statusReason.toProto()
+      protoValue.statusReason = statusReason.toProto()
     }
     if (hasVaccineCode()) {
-        protoValue.vaccineCode = vaccineCode.toProto()
+      protoValue.vaccineCode = vaccineCode.toProto()
     }
     if (hasPatient()) {
-        protoValue.patient = patient.toProto()
+      protoValue.patient = patient.toProto()
     }
     if (hasEncounter()) {
-        protoValue.encounter = encounter.toProto()
+      protoValue.encounter = encounter.toProto()
     }
     if (hasOccurrence()) {
-        protoValue.occurrence = occurrence.immunizationOccurrenceToProto()
+      protoValue.occurrence = occurrence.immunizationOccurrenceToProto()
     }
     if (hasRecorded()) {
-        protoValue.recorded = recordedElement.toProto()
+      protoValue.recorded = recordedElement.toProto()
     }
     if (hasPrimarySource()) {
-        protoValue.primarySource = primarySourceElement.toProto()
+      protoValue.primarySource = primarySourceElement.toProto()
     }
     if (hasReportOrigin()) {
-        protoValue.reportOrigin = reportOrigin.toProto()
+      protoValue.reportOrigin = reportOrigin.toProto()
     }
     if (hasLocation()) {
-        protoValue.location = location.toProto()
+      protoValue.location = location.toProto()
     }
     if (hasManufacturer()) {
-        protoValue.manufacturer = manufacturer.toProto()
+      protoValue.manufacturer = manufacturer.toProto()
     }
     if (hasLotNumber()) {
-        protoValue.lotNumber = lotNumberElement.toProto()
+      protoValue.lotNumber = lotNumberElement.toProto()
     }
     if (hasExpirationDate()) {
-        protoValue.expirationDate = expirationDateElement.toProto()
+      protoValue.expirationDate = expirationDateElement.toProto()
     }
     if (hasSite()) {
-        protoValue.site = site.toProto()
+      protoValue.site = site.toProto()
     }
     if (hasRoute()) {
-        protoValue.route = route.toProto()
+      protoValue.route = route.toProto()
     }
     if (hasDoseQuantity()) {
-        protoValue.doseQuantity = (doseQuantity as SimpleQuantity).toProto()
+      protoValue.doseQuantity = (doseQuantity as SimpleQuantity).toProto()
     }
     if (hasPerformer()) {
       protoValue.addAllPerformer(performer.map { it.toProto() })
@@ -325,7 +327,7 @@ object ImmunizationConverter {
       protoValue.addAllReasonReference(reasonReference.map { it.toProto() })
     }
     if (hasIsSubpotent()) {
-        protoValue.isSubpotent = isSubpotentElement.toProto()
+      protoValue.isSubpotent = isSubpotentElement.toProto()
     }
     if (hasSubpotentReason()) {
       protoValue.addAllSubpotentReason(subpotentReason.map { it.toProto() })
@@ -337,7 +339,7 @@ object ImmunizationConverter {
       protoValue.addAllProgramEligibility(programEligibility.map { it.toProto() })
     }
     if (hasFundingSource()) {
-        protoValue.fundingSource = fundingSource.toProto()
+      protoValue.fundingSource = fundingSource.toProto()
     }
     if (hasReaction()) {
       protoValue.addAllReaction(reaction.map { it.toProto() })
@@ -359,10 +361,10 @@ object ImmunizationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasFunction()) {
-        protoValue.function = function.toProto()
+      protoValue.function = function.toProto()
     }
     if (hasActor()) {
-        protoValue.actor = actor.toProto()
+      protoValue.actor = actor.toProto()
     }
     return protoValue.build()
   }
@@ -378,16 +380,16 @@ object ImmunizationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDocumentType()) {
-        protoValue.documentType = documentTypeElement.toProto()
+      protoValue.documentType = documentTypeElement.toProto()
     }
     if (hasReference()) {
-        protoValue.reference = referenceElement.toProto()
+      protoValue.reference = referenceElement.toProto()
     }
     if (hasPublicationDate()) {
-        protoValue.publicationDate = publicationDateElement.toProto()
+      protoValue.publicationDate = publicationDateElement.toProto()
     }
     if (hasPresentationDate()) {
-        protoValue.presentationDate = presentationDateElement.toProto()
+      protoValue.presentationDate = presentationDateElement.toProto()
     }
     return protoValue.build()
   }
@@ -403,13 +405,13 @@ object ImmunizationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasDate()) {
-        protoValue.date = dateElement.toProto()
+      protoValue.date = dateElement.toProto()
     }
     if (hasDetail()) {
-        protoValue.detail = detail.toProto()
+      protoValue.detail = detail.toProto()
     }
     if (hasReported()) {
-        protoValue.reported = reportedElement.toProto()
+      protoValue.reported = reportedElement.toProto()
     }
     return protoValue.build()
   }
@@ -426,19 +428,19 @@ object ImmunizationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasSeries()) {
-        protoValue.series = seriesElement.toProto()
+      protoValue.series = seriesElement.toProto()
     }
     if (hasAuthority()) {
-        protoValue.authority = authority.toProto()
+      protoValue.authority = authority.toProto()
     }
     if (hasTargetDisease()) {
       protoValue.addAllTargetDisease(targetDisease.map { it.toProto() })
     }
     if (hasDoseNumber()) {
-        protoValue.doseNumber = doseNumber.immunizationProtocolAppliedDoseNumberToProto()
+      protoValue.doseNumber = doseNumber.immunizationProtocolAppliedDoseNumberToProto()
     }
     if (hasSeriesDoses()) {
-        protoValue.seriesDoses = seriesDoses.immunizationProtocolAppliedSeriesDosesToProto()
+      protoValue.seriesDoses = seriesDoses.immunizationProtocolAppliedSeriesDosesToProto()
     }
     return protoValue.build()
   }
@@ -449,16 +451,16 @@ object ImmunizationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Immunization.ImmunizationPerformerComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasFunction()) {
-        hapiValue.function = function.toHapi()
+      hapiValue.function = function.toHapi()
     }
     if (hasActor()) {
-        hapiValue.actor = actor.toHapi()
+      hapiValue.actor = actor.toHapi()
     }
     return hapiValue
   }
@@ -469,22 +471,22 @@ object ImmunizationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Immunization.ImmunizationEducationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDocumentType()) {
-        hapiValue.documentTypeElement = documentType.toHapi()
+      hapiValue.documentTypeElement = documentType.toHapi()
     }
     if (hasReference()) {
-        hapiValue.referenceElement = reference.toHapi()
+      hapiValue.referenceElement = reference.toHapi()
     }
     if (hasPublicationDate()) {
-        hapiValue.publicationDateElement = publicationDate.toHapi()
+      hapiValue.publicationDateElement = publicationDate.toHapi()
     }
     if (hasPresentationDate()) {
-        hapiValue.presentationDateElement = presentationDate.toHapi()
+      hapiValue.presentationDateElement = presentationDate.toHapi()
     }
     return hapiValue
   }
@@ -495,19 +497,19 @@ object ImmunizationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Immunization.ImmunizationReactionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasDate()) {
-        hapiValue.dateElement = date.toHapi()
+      hapiValue.dateElement = date.toHapi()
     }
     if (hasDetail()) {
-        hapiValue.detail = detail.toHapi()
+      hapiValue.detail = detail.toHapi()
     }
     if (hasReported()) {
-        hapiValue.reportedElement = reported.toHapi()
+      hapiValue.reportedElement = reported.toHapi()
     }
     return hapiValue
   }
@@ -518,25 +520,25 @@ object ImmunizationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Immunization.ImmunizationProtocolAppliedComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasSeries()) {
-        hapiValue.seriesElement = series.toHapi()
+      hapiValue.seriesElement = series.toHapi()
     }
     if (hasAuthority()) {
-        hapiValue.authority = authority.toHapi()
+      hapiValue.authority = authority.toHapi()
     }
     if (targetDiseaseCount > 0) {
-        hapiValue.targetDisease = targetDiseaseList.map { it.toHapi() }
+      hapiValue.targetDisease = targetDiseaseList.map { it.toHapi() }
     }
     if (hasDoseNumber()) {
-        hapiValue.doseNumber = doseNumber.immunizationProtocolAppliedDoseNumberToHapi()
+      hapiValue.doseNumber = doseNumber.immunizationProtocolAppliedDoseNumberToHapi()
     }
     if (hasSeriesDoses()) {
-        hapiValue.seriesDoses = seriesDoses.immunizationProtocolAppliedSeriesDosesToHapi()
+      hapiValue.seriesDoses = seriesDoses.immunizationProtocolAppliedSeriesDosesToHapi()
     }
     return hapiValue
   }

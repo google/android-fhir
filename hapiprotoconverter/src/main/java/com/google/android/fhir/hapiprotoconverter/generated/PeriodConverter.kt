@@ -30,13 +30,13 @@ object PeriodConverter {
     val hapiValue = org.hl7.fhir.r4.model.Period()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasStart()) {
-        hapiValue.startElement = start.toHapi()
+      hapiValue.startElement = start.toHapi()
     }
     if (hasEnd()) {
-        hapiValue.endElement = end.toHapi()
+      hapiValue.endElement = end.toHapi()
     }
     return hapiValue
   }
@@ -48,10 +48,10 @@ object PeriodConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasStart()) {
-        protoValue.start = startElement.toProto()
+      protoValue.start = startElement.toProto()
     }
     if (hasEnd()) {
-        protoValue.end = endElement.toProto()
+      protoValue.end = endElement.toProto()
     }
     return protoValue.build()
   }

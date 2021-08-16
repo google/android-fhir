@@ -88,13 +88,13 @@ object ServiceRequestConverter {
   private fun Type.serviceRequestQuantityToProto(): ServiceRequest.QuantityX {
     val protoValue = ServiceRequest.QuantityX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Quantity) {
-        protoValue.quantity = this.toProto()
+      protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Ratio) {
-        protoValue.ratio = this.toProto()
+      protoValue.ratio = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     return protoValue.build()
   }
@@ -117,13 +117,13 @@ object ServiceRequestConverter {
   private fun Type.serviceRequestOccurrenceToProto(): ServiceRequest.OccurrenceX {
     val protoValue = ServiceRequest.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Timing) {
-        protoValue.timing = this.toProto()
+      protoValue.timing = this.toProto()
     }
     return protoValue.build()
   }
@@ -143,10 +143,10 @@ object ServiceRequestConverter {
   private fun Type.serviceRequestAsNeededToProto(): ServiceRequest.AsNeededX {
     val protoValue = ServiceRequest.AsNeededX.newBuilder()
     if (this is BooleanType) {
-        protoValue.boolean = this.toProto()
+      protoValue.boolean = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
@@ -156,118 +156,121 @@ object ServiceRequestConverter {
     val hapiValue = org.hl7.fhir.r4.model.ServiceRequest()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (instantiatesCanonicalCount > 0) {
-        hapiValue.instantiatesCanonical = instantiatesCanonicalList.map { it.toHapi() }
+      hapiValue.instantiatesCanonical = instantiatesCanonicalList.map { it.toHapi() }
     }
     if (instantiatesUriCount > 0) {
-        hapiValue.instantiatesUri = instantiatesUriList.map { it.toHapi() }
+      hapiValue.instantiatesUri = instantiatesUriList.map { it.toHapi() }
     }
     if (basedOnCount > 0) {
-        hapiValue.basedOn = basedOnList.map { it.toHapi() }
+      hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
     if (replacesCount > 0) {
-        hapiValue.replaces = replacesList.map { it.toHapi() }
+      hapiValue.replaces = replacesList.map { it.toHapi() }
     }
     if (hasRequisition()) {
-        hapiValue.requisition = requisition.toHapi()
+      hapiValue.requisition = requisition.toHapi()
     }
-      hapiValue.status = org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
-      hapiValue.intent = org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestIntent.valueOf(
-          intent.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.intent =
+      org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestIntent.valueOf(
+        intent.value.name.hapiCodeCheck().replace("_", "")
       )
     if (categoryCount > 0) {
-        hapiValue.category = categoryList.map { it.toHapi() }
+      hapiValue.category = categoryList.map { it.toHapi() }
     }
-      hapiValue.priority = org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestPriority.valueOf(
-          priority.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.priority =
+      org.hl7.fhir.r4.model.ServiceRequest.ServiceRequestPriority.valueOf(
+        priority.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasDoNotPerform()) {
-        hapiValue.doNotPerformElement = doNotPerform.toHapi()
+      hapiValue.doNotPerformElement = doNotPerform.toHapi()
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (orderDetailCount > 0) {
-        hapiValue.orderDetail = orderDetailList.map { it.toHapi() }
+      hapiValue.orderDetail = orderDetailList.map { it.toHapi() }
     }
     if (hasQuantity()) {
-        hapiValue.quantity = quantity.serviceRequestQuantityToHapi()
+      hapiValue.quantity = quantity.serviceRequestQuantityToHapi()
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-        hapiValue.encounter = encounter.toHapi()
+      hapiValue.encounter = encounter.toHapi()
     }
     if (hasOccurrence()) {
-        hapiValue.occurrence = occurrence.serviceRequestOccurrenceToHapi()
+      hapiValue.occurrence = occurrence.serviceRequestOccurrenceToHapi()
     }
     if (hasAsNeeded()) {
-        hapiValue.asNeeded = asNeeded.serviceRequestAsNeededToHapi()
+      hapiValue.asNeeded = asNeeded.serviceRequestAsNeededToHapi()
     }
     if (hasAuthoredOn()) {
-        hapiValue.authoredOnElement = authoredOn.toHapi()
+      hapiValue.authoredOnElement = authoredOn.toHapi()
     }
     if (hasRequester()) {
-        hapiValue.requester = requester.toHapi()
+      hapiValue.requester = requester.toHapi()
     }
     if (hasPerformerType()) {
-        hapiValue.performerType = performerType.toHapi()
+      hapiValue.performerType = performerType.toHapi()
     }
     if (performerCount > 0) {
-        hapiValue.performer = performerList.map { it.toHapi() }
+      hapiValue.performer = performerList.map { it.toHapi() }
     }
     if (locationCodeCount > 0) {
-        hapiValue.locationCode = locationCodeList.map { it.toHapi() }
+      hapiValue.locationCode = locationCodeList.map { it.toHapi() }
     }
     if (locationReferenceCount > 0) {
-        hapiValue.locationReference = locationReferenceList.map { it.toHapi() }
+      hapiValue.locationReference = locationReferenceList.map { it.toHapi() }
     }
     if (reasonCodeCount > 0) {
-        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
+      hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
+      hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (insuranceCount > 0) {
-        hapiValue.insurance = insuranceList.map { it.toHapi() }
+      hapiValue.insurance = insuranceList.map { it.toHapi() }
     }
     if (supportingInfoCount > 0) {
-        hapiValue.supportingInfo = supportingInfoList.map { it.toHapi() }
+      hapiValue.supportingInfo = supportingInfoList.map { it.toHapi() }
     }
     if (specimenCount > 0) {
-        hapiValue.specimen = specimenList.map { it.toHapi() }
+      hapiValue.specimen = specimenList.map { it.toHapi() }
     }
     if (bodySiteCount > 0) {
-        hapiValue.bodySite = bodySiteList.map { it.toHapi() }
+      hapiValue.bodySite = bodySiteList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     if (hasPatientInstruction()) {
-        hapiValue.patientInstructionElement = patientInstruction.toHapi()
+      hapiValue.patientInstructionElement = patientInstruction.toHapi()
     }
     if (relevantHistoryCount > 0) {
-        hapiValue.relevantHistory = relevantHistoryList.map { it.toHapi() }
+      hapiValue.relevantHistory = relevantHistoryList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -276,13 +279,13 @@ object ServiceRequestConverter {
   fun org.hl7.fhir.r4.model.ServiceRequest.toProto(): ServiceRequest {
     val protoValue = ServiceRequest.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -306,64 +309,67 @@ object ServiceRequestConverter {
       protoValue.addAllReplaces(replaces.map { it.toProto() })
     }
     if (hasRequisition()) {
-        protoValue.requisition = requisition.toProto()
+      protoValue.requisition = requisition.toProto()
     }
-      protoValue.status = ServiceRequest.StatusCode.newBuilder()
-          .setValue(
-              RequestStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      ServiceRequest.StatusCode.newBuilder()
+        .setValue(
+          RequestStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
-      protoValue.intent = ServiceRequest.IntentCode.newBuilder()
-          .setValue(
-              RequestIntentCode.Value.valueOf(
-                  intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+        )
+        .build()
+    protoValue.intent =
+      ServiceRequest.IntentCode.newBuilder()
+        .setValue(
+          RequestIntentCode.Value.valueOf(
+            intent.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
-      protoValue.priority = ServiceRequest.PriorityCode.newBuilder()
-          .setValue(
-              RequestPriorityCode.Value.valueOf(
-                  priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.priority =
+      ServiceRequest.PriorityCode.newBuilder()
+        .setValue(
+          RequestPriorityCode.Value.valueOf(
+            priority.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasDoNotPerform()) {
-        protoValue.doNotPerform = doNotPerformElement.toProto()
+      protoValue.doNotPerform = doNotPerformElement.toProto()
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasOrderDetail()) {
       protoValue.addAllOrderDetail(orderDetail.map { it.toProto() })
     }
     if (hasQuantity()) {
-        protoValue.quantity = quantity.serviceRequestQuantityToProto()
+      protoValue.quantity = quantity.serviceRequestQuantityToProto()
     }
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-        protoValue.encounter = encounter.toProto()
+      protoValue.encounter = encounter.toProto()
     }
     if (hasOccurrence()) {
-        protoValue.occurrence = occurrence.serviceRequestOccurrenceToProto()
+      protoValue.occurrence = occurrence.serviceRequestOccurrenceToProto()
     }
     if (hasAsNeeded()) {
-        protoValue.asNeeded = asNeeded.serviceRequestAsNeededToProto()
+      protoValue.asNeeded = asNeeded.serviceRequestAsNeededToProto()
     }
     if (hasAuthoredOn()) {
-        protoValue.authoredOn = authoredOnElement.toProto()
+      protoValue.authoredOn = authoredOnElement.toProto()
     }
     if (hasRequester()) {
-        protoValue.requester = requester.toProto()
+      protoValue.requester = requester.toProto()
     }
     if (hasPerformerType()) {
-        protoValue.performerType = performerType.toProto()
+      protoValue.performerType = performerType.toProto()
     }
     if (hasPerformer()) {
       protoValue.addAllPerformer(performer.map { it.toProto() })
@@ -396,7 +402,7 @@ object ServiceRequestConverter {
       protoValue.addAllNote(note.map { it.toProto() })
     }
     if (hasPatientInstruction()) {
-        protoValue.patientInstruction = patientInstructionElement.toProto()
+      protoValue.patientInstruction = patientInstructionElement.toProto()
     }
     if (hasRelevantHistory()) {
       protoValue.addAllRelevantHistory(relevantHistory.map { it.toProto() })

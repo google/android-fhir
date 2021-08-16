@@ -30,10 +30,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @RunWith(Parameterized::class)
-class PositiveIntConverterTest(
-  private val hapi: PositiveIntType,
-  private val proto: PositiveInt
-) {
+class PositiveIntConverterTest(private val hapi: PositiveIntType, private val proto: PositiveInt) {
   @Test
   fun hapi() {
     Truth.assertThat(proto.toHapi().value).isEqualTo(hapi.value)

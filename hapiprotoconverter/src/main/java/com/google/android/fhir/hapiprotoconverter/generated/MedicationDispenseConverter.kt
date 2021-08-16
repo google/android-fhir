@@ -67,10 +67,10 @@ object MedicationDispenseConverter {
   private fun Type.medicationDispenseStatusReasonToProto(): MedicationDispense.StatusReasonX {
     val protoValue = MedicationDispense.StatusReasonX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -90,10 +90,10 @@ object MedicationDispenseConverter {
   private fun Type.medicationDispenseMedicationToProto(): MedicationDispense.MedicationX {
     val protoValue = MedicationDispense.MedicationX.newBuilder()
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -103,91 +103,92 @@ object MedicationDispenseConverter {
     val hapiValue = org.hl7.fhir.r4.model.MedicationDispense()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (partOfCount > 0) {
-        hapiValue.partOf = partOfList.map { it.toHapi() }
+      hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.MedicationDispense.MedicationDispenseStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.MedicationDispense.MedicationDispenseStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasStatusReason()) {
-        hapiValue.statusReason = statusReason.medicationDispenseStatusReasonToHapi()
+      hapiValue.statusReason = statusReason.medicationDispenseStatusReasonToHapi()
     }
     if (hasCategory()) {
-        hapiValue.category = category.toHapi()
+      hapiValue.category = category.toHapi()
     }
     if (hasMedication()) {
-        hapiValue.medication = medication.medicationDispenseMedicationToHapi()
+      hapiValue.medication = medication.medicationDispenseMedicationToHapi()
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (hasContext()) {
-        hapiValue.context = context.toHapi()
+      hapiValue.context = context.toHapi()
     }
     if (supportingInformationCount > 0) {
-        hapiValue.supportingInformation = supportingInformationList.map { it.toHapi() }
+      hapiValue.supportingInformation = supportingInformationList.map { it.toHapi() }
     }
     if (performerCount > 0) {
-        hapiValue.performer = performerList.map { it.toHapi() }
+      hapiValue.performer = performerList.map { it.toHapi() }
     }
     if (hasLocation()) {
-        hapiValue.location = location.toHapi()
+      hapiValue.location = location.toHapi()
     }
     if (authorizingPrescriptionCount > 0) {
-        hapiValue.authorizingPrescription = authorizingPrescriptionList.map { it.toHapi() }
+      hapiValue.authorizingPrescription = authorizingPrescriptionList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasQuantity()) {
-        hapiValue.quantity = quantity.toHapi()
+      hapiValue.quantity = quantity.toHapi()
     }
     if (hasDaysSupply()) {
-        hapiValue.daysSupply = daysSupply.toHapi()
+      hapiValue.daysSupply = daysSupply.toHapi()
     }
     if (hasWhenPrepared()) {
-        hapiValue.whenPreparedElement = whenPrepared.toHapi()
+      hapiValue.whenPreparedElement = whenPrepared.toHapi()
     }
     if (hasWhenHandedOver()) {
-        hapiValue.whenHandedOverElement = whenHandedOver.toHapi()
+      hapiValue.whenHandedOverElement = whenHandedOver.toHapi()
     }
     if (hasDestination()) {
-        hapiValue.destination = destination.toHapi()
+      hapiValue.destination = destination.toHapi()
     }
     if (receiverCount > 0) {
-        hapiValue.receiver = receiverList.map { it.toHapi() }
+      hapiValue.receiver = receiverList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     if (dosageInstructionCount > 0) {
-        hapiValue.dosageInstruction = dosageInstructionList.map { it.toHapi() }
+      hapiValue.dosageInstruction = dosageInstructionList.map { it.toHapi() }
     }
     if (hasSubstitution()) {
-        hapiValue.substitution = substitution.toHapi()
+      hapiValue.substitution = substitution.toHapi()
     }
     if (detectedIssueCount > 0) {
-        hapiValue.detectedIssue = detectedIssueList.map { it.toHapi() }
+      hapiValue.detectedIssue = detectedIssueList.map { it.toHapi() }
     }
     if (eventHistoryCount > 0) {
-        hapiValue.eventHistory = eventHistoryList.map { it.toHapi() }
+      hapiValue.eventHistory = eventHistoryList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -196,13 +197,13 @@ object MedicationDispenseConverter {
   fun org.hl7.fhir.r4.model.MedicationDispense.toProto(): MedicationDispense {
     val protoValue = MedicationDispense.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -216,27 +217,28 @@ object MedicationDispenseConverter {
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-      protoValue.status = MedicationDispense.StatusCode.newBuilder()
-          .setValue(
-              MedicationDispenseStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      MedicationDispense.StatusCode.newBuilder()
+        .setValue(
+          MedicationDispenseStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasStatusReason()) {
-        protoValue.statusReason = statusReason.medicationDispenseStatusReasonToProto()
+      protoValue.statusReason = statusReason.medicationDispenseStatusReasonToProto()
     }
     if (hasCategory()) {
-        protoValue.category = category.toProto()
+      protoValue.category = category.toProto()
     }
     if (hasMedication()) {
-        protoValue.medication = medication.medicationDispenseMedicationToProto()
+      protoValue.medication = medication.medicationDispenseMedicationToProto()
     }
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasContext()) {
-        protoValue.context = context.toProto()
+      protoValue.context = context.toProto()
     }
     if (hasSupportingInformation()) {
       protoValue.addAllSupportingInformation(supportingInformation.map { it.toProto() })
@@ -245,28 +247,28 @@ object MedicationDispenseConverter {
       protoValue.addAllPerformer(performer.map { it.toProto() })
     }
     if (hasLocation()) {
-        protoValue.location = location.toProto()
+      protoValue.location = location.toProto()
     }
     if (hasAuthorizingPrescription()) {
       protoValue.addAllAuthorizingPrescription(authorizingPrescription.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasQuantity()) {
-        protoValue.quantity = (quantity as SimpleQuantity).toProto()
+      protoValue.quantity = (quantity as SimpleQuantity).toProto()
     }
     if (hasDaysSupply()) {
-        protoValue.daysSupply = (daysSupply as SimpleQuantity).toProto()
+      protoValue.daysSupply = (daysSupply as SimpleQuantity).toProto()
     }
     if (hasWhenPrepared()) {
-        protoValue.whenPrepared = whenPreparedElement.toProto()
+      protoValue.whenPrepared = whenPreparedElement.toProto()
     }
     if (hasWhenHandedOver()) {
-        protoValue.whenHandedOver = whenHandedOverElement.toProto()
+      protoValue.whenHandedOver = whenHandedOverElement.toProto()
     }
     if (hasDestination()) {
-        protoValue.destination = destination.toProto()
+      protoValue.destination = destination.toProto()
     }
     if (hasReceiver()) {
       protoValue.addAllReceiver(receiver.map { it.toProto() })
@@ -278,7 +280,7 @@ object MedicationDispenseConverter {
       protoValue.addAllDosageInstruction(dosageInstruction.map { it.toProto() })
     }
     if (hasSubstitution()) {
-        protoValue.substitution = substitution.toProto()
+      protoValue.substitution = substitution.toProto()
     }
     if (hasDetectedIssue()) {
       protoValue.addAllDetectedIssue(detectedIssue.map { it.toProto() })
@@ -301,10 +303,10 @@ object MedicationDispenseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasFunction()) {
-        protoValue.function = function.toProto()
+      protoValue.function = function.toProto()
     }
     if (hasActor()) {
-        protoValue.actor = actor.toProto()
+      protoValue.actor = actor.toProto()
     }
     return protoValue.build()
   }
@@ -321,10 +323,10 @@ object MedicationDispenseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasWasSubstituted()) {
-        protoValue.wasSubstituted = wasSubstitutedElement.toProto()
+      protoValue.wasSubstituted = wasSubstitutedElement.toProto()
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasReason()) {
       protoValue.addAllReason(reason.map { it.toProto() })
@@ -341,16 +343,16 @@ object MedicationDispenseConverter {
     val hapiValue = org.hl7.fhir.r4.model.MedicationDispense.MedicationDispensePerformerComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasFunction()) {
-        hapiValue.function = function.toHapi()
+      hapiValue.function = function.toHapi()
     }
     if (hasActor()) {
-        hapiValue.actor = actor.toHapi()
+      hapiValue.actor = actor.toHapi()
     }
     return hapiValue
   }
@@ -362,22 +364,22 @@ object MedicationDispenseConverter {
       org.hl7.fhir.r4.model.MedicationDispense.MedicationDispenseSubstitutionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasWasSubstituted()) {
-        hapiValue.wasSubstitutedElement = wasSubstituted.toHapi()
+      hapiValue.wasSubstitutedElement = wasSubstituted.toHapi()
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (reasonCount > 0) {
-        hapiValue.reason = reasonList.map { it.toHapi() }
+      hapiValue.reason = reasonList.map { it.toHapi() }
     }
     if (responsiblePartyCount > 0) {
-        hapiValue.responsibleParty = responsiblePartyList.map { it.toHapi() }
+      hapiValue.responsibleParty = responsiblePartyList.map { it.toHapi() }
     }
     return hapiValue
   }

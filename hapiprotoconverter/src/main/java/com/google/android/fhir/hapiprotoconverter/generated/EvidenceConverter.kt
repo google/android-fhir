@@ -60,102 +60,102 @@ object EvidenceConverter {
     val hapiValue = org.hl7.fhir.r4.model.Evidence()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-        hapiValue.urlElement = url.toHapi()
+      hapiValue.urlElement = url.toHapi()
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasVersion()) {
-        hapiValue.versionElement = version.toHapi()
+      hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-        hapiValue.titleElement = title.toHapi()
+      hapiValue.titleElement = title.toHapi()
     }
     if (hasShortTitle()) {
-        hapiValue.shortTitleElement = shortTitle.toHapi()
+      hapiValue.shortTitleElement = shortTitle.toHapi()
     }
     if (hasSubtitle()) {
-        hapiValue.subtitleElement = subtitle.toHapi()
+      hapiValue.subtitleElement = subtitle.toHapi()
     }
-      hapiValue.status =
-          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    hapiValue.status =
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasDate()) {
-        hapiValue.dateElement = date.toHapi()
+      hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-        hapiValue.publisherElement = publisher.toHapi()
+      hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-        hapiValue.contact = contactList.map { it.toHapi() }
+      hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     if (useContextCount > 0) {
-        hapiValue.useContext = useContextList.map { it.toHapi() }
+      hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
+      hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasCopyright()) {
-        hapiValue.copyrightElement = copyright.toHapi()
+      hapiValue.copyrightElement = copyright.toHapi()
     }
     if (hasApprovalDate()) {
-        hapiValue.approvalDateElement = approvalDate.toHapi()
+      hapiValue.approvalDateElement = approvalDate.toHapi()
     }
     if (hasLastReviewDate()) {
-        hapiValue.lastReviewDateElement = lastReviewDate.toHapi()
+      hapiValue.lastReviewDateElement = lastReviewDate.toHapi()
     }
     if (hasEffectivePeriod()) {
-        hapiValue.effectivePeriod = effectivePeriod.toHapi()
+      hapiValue.effectivePeriod = effectivePeriod.toHapi()
     }
     if (topicCount > 0) {
-        hapiValue.topic = topicList.map { it.toHapi() }
+      hapiValue.topic = topicList.map { it.toHapi() }
     }
     if (authorCount > 0) {
-        hapiValue.author = authorList.map { it.toHapi() }
+      hapiValue.author = authorList.map { it.toHapi() }
     }
     if (editorCount > 0) {
-        hapiValue.editor = editorList.map { it.toHapi() }
+      hapiValue.editor = editorList.map { it.toHapi() }
     }
     if (reviewerCount > 0) {
-        hapiValue.reviewer = reviewerList.map { it.toHapi() }
+      hapiValue.reviewer = reviewerList.map { it.toHapi() }
     }
     if (endorserCount > 0) {
-        hapiValue.endorser = endorserList.map { it.toHapi() }
+      hapiValue.endorser = endorserList.map { it.toHapi() }
     }
     if (relatedArtifactCount > 0) {
-        hapiValue.relatedArtifact = relatedArtifactList.map { it.toHapi() }
+      hapiValue.relatedArtifact = relatedArtifactList.map { it.toHapi() }
     }
     if (hasExposureBackground()) {
-        hapiValue.exposureBackground = exposureBackground.toHapi()
+      hapiValue.exposureBackground = exposureBackground.toHapi()
     }
     if (exposureVariantCount > 0) {
-        hapiValue.exposureVariant = exposureVariantList.map { it.toHapi() }
+      hapiValue.exposureVariant = exposureVariantList.map { it.toHapi() }
     }
     if (outcomeCount > 0) {
-        hapiValue.outcome = outcomeList.map { it.toHapi() }
+      hapiValue.outcome = outcomeList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -164,13 +164,13 @@ object EvidenceConverter {
   fun org.hl7.fhir.r4.model.Evidence.toProto(): Evidence {
     val protoValue = Evidence.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -179,44 +179,45 @@ object EvidenceConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-        protoValue.url = urlElement.toProto()
+      protoValue.url = urlElement.toProto()
     }
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasVersion()) {
-        protoValue.version = versionElement.toProto()
+      protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-        protoValue.title = titleElement.toProto()
+      protoValue.title = titleElement.toProto()
     }
     if (hasShortTitle()) {
-        protoValue.shortTitle = shortTitleElement.toProto()
+      protoValue.shortTitle = shortTitleElement.toProto()
     }
     if (hasSubtitle()) {
-        protoValue.subtitle = subtitleElement.toProto()
+      protoValue.subtitle = subtitleElement.toProto()
     }
-      protoValue.status = Evidence.StatusCode.newBuilder()
-          .setValue(
-              PublicationStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      Evidence.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasDate()) {
-        protoValue.date = dateElement.toProto()
+      protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-        protoValue.publisher = publisherElement.toProto()
+      protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasNote()) {
       protoValue.addAllNote(note.map { it.toProto() })
@@ -228,16 +229,16 @@ object EvidenceConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasCopyright()) {
-        protoValue.copyright = copyrightElement.toProto()
+      protoValue.copyright = copyrightElement.toProto()
     }
     if (hasApprovalDate()) {
-        protoValue.approvalDate = approvalDateElement.toProto()
+      protoValue.approvalDate = approvalDateElement.toProto()
     }
     if (hasLastReviewDate()) {
-        protoValue.lastReviewDate = lastReviewDateElement.toProto()
+      protoValue.lastReviewDate = lastReviewDateElement.toProto()
     }
     if (hasEffectivePeriod()) {
-        protoValue.effectivePeriod = effectivePeriod.toProto()
+      protoValue.effectivePeriod = effectivePeriod.toProto()
     }
     if (hasTopic()) {
       protoValue.addAllTopic(topic.map { it.toProto() })
@@ -258,7 +259,7 @@ object EvidenceConverter {
       protoValue.addAllRelatedArtifact(relatedArtifact.map { it.toProto() })
     }
     if (hasExposureBackground()) {
-        protoValue.exposureBackground = exposureBackground.toProto()
+      protoValue.exposureBackground = exposureBackground.toProto()
     }
     if (hasExposureVariant()) {
       protoValue.addAllExposureVariant(exposureVariant.map { it.toProto() })

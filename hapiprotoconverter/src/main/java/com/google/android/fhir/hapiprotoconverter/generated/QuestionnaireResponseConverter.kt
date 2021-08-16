@@ -127,40 +127,40 @@ object QuestionnaireResponseConverter {
     QuestionnaireResponse.Item.Answer.ValueX {
     val protoValue = QuestionnaireResponse.Item.Answer.ValueX.newBuilder()
     if (this is BooleanType) {
-        protoValue.boolean = this.toProto()
+      protoValue.boolean = this.toProto()
     }
     if (this is DecimalType) {
-        protoValue.decimal = this.toProto()
+      protoValue.decimal = this.toProto()
     }
     if (this is IntegerType) {
-        protoValue.integer = this.toProto()
+      protoValue.integer = this.toProto()
     }
     if (this is DateType) {
-        protoValue.date = this.toProto()
+      protoValue.date = this.toProto()
     }
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is TimeType) {
-        protoValue.time = this.toProto()
+      protoValue.time = this.toProto()
     }
     if (this is StringType) {
-        protoValue.stringValue = this.toProto()
+      protoValue.stringValue = this.toProto()
     }
     if (this is UriType) {
-        protoValue.uri = this.toProto()
+      protoValue.uri = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Attachment) {
-        protoValue.attachment = this.toProto()
+      protoValue.attachment = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Coding) {
-        protoValue.coding = this.toProto()
+      protoValue.coding = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Quantity) {
-        protoValue.quantity = this.toProto()
+      protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -170,52 +170,53 @@ object QuestionnaireResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.QuestionnaireResponse()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasIdentifier()) {
-        hapiValue.identifier = identifier.toHapi()
+      hapiValue.identifier = identifier.toHapi()
     }
     if (basedOnCount > 0) {
-        hapiValue.basedOn = basedOnList.map { it.toHapi() }
+      hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
     if (partOfCount > 0) {
-        hapiValue.partOf = partOfList.map { it.toHapi() }
+      hapiValue.partOf = partOfList.map { it.toHapi() }
     }
     if (hasQuestionnaire()) {
-        hapiValue.questionnaireElement = questionnaire.toHapi()
+      hapiValue.questionnaireElement = questionnaire.toHapi()
     }
-      hapiValue.status = org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (hasEncounter()) {
-        hapiValue.encounter = encounter.toHapi()
+      hapiValue.encounter = encounter.toHapi()
     }
     if (hasAuthored()) {
-        hapiValue.authoredElement = authored.toHapi()
+      hapiValue.authoredElement = authored.toHapi()
     }
     if (hasAuthor()) {
-        hapiValue.author = author.toHapi()
+      hapiValue.author = author.toHapi()
     }
     if (hasSource()) {
-        hapiValue.source = source.toHapi()
+      hapiValue.source = source.toHapi()
     }
     if (itemCount > 0) {
-        hapiValue.item = itemList.map { it.toHapi() }
+      hapiValue.item = itemList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -224,13 +225,13 @@ object QuestionnaireResponseConverter {
   fun org.hl7.fhir.r4.model.QuestionnaireResponse.toProto(): QuestionnaireResponse {
     val protoValue = QuestionnaireResponse.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -239,7 +240,7 @@ object QuestionnaireResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasIdentifier()) {
-        protoValue.identifier = identifier.toProto()
+      protoValue.identifier = identifier.toProto()
     }
     if (hasBasedOn()) {
       protoValue.addAllBasedOn(basedOn.map { it.toProto() })
@@ -248,29 +249,30 @@ object QuestionnaireResponseConverter {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
     if (hasQuestionnaire()) {
-        protoValue.questionnaire = questionnaireElement.toProto()
+      protoValue.questionnaire = questionnaireElement.toProto()
     }
-      protoValue.status = QuestionnaireResponse.StatusCode.newBuilder()
-          .setValue(
-              QuestionnaireResponseStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      QuestionnaireResponse.StatusCode.newBuilder()
+        .setValue(
+          QuestionnaireResponseStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasEncounter()) {
-        protoValue.encounter = encounter.toProto()
+      protoValue.encounter = encounter.toProto()
     }
     if (hasAuthored()) {
-        protoValue.authored = authoredElement.toProto()
+      protoValue.authored = authoredElement.toProto()
     }
     if (hasAuthor()) {
-        protoValue.author = author.toProto()
+      protoValue.author = author.toProto()
     }
     if (hasSource()) {
-        protoValue.source = source.toProto()
+      protoValue.source = source.toProto()
     }
     if (hasItem()) {
       protoValue.addAllItem(item.map { it.toProto() })
@@ -289,13 +291,13 @@ object QuestionnaireResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasLinkId()) {
-        protoValue.linkId = linkIdElement.toProto()
+      protoValue.linkId = linkIdElement.toProto()
     }
     if (hasDefinition()) {
-        protoValue.definition = definitionElement.toProto()
+      protoValue.definition = definitionElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = textElement.toProto()
+      protoValue.text = textElement.toProto()
     }
     if (hasAnswer()) {
       protoValue.addAllAnswer(answer.map { it.toProto() })
@@ -315,7 +317,7 @@ object QuestionnaireResponseConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasValue()) {
-        protoValue.value = value.questionnaireResponseItemAnswerValueToProto()
+      protoValue.value = value.questionnaireResponseItemAnswerValueToProto()
     }
     return protoValue.build()
   }
@@ -326,22 +328,22 @@ object QuestionnaireResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasLinkId()) {
-        hapiValue.linkIdElement = linkId.toHapi()
+      hapiValue.linkIdElement = linkId.toHapi()
     }
     if (hasDefinition()) {
-        hapiValue.definitionElement = definition.toHapi()
+      hapiValue.definitionElement = definition.toHapi()
     }
     if (hasText()) {
-        hapiValue.textElement = text.toHapi()
+      hapiValue.textElement = text.toHapi()
     }
     if (answerCount > 0) {
-        hapiValue.answer = answerList.map { it.toHapi() }
+      hapiValue.answer = answerList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -353,13 +355,13 @@ object QuestionnaireResponseConverter {
       org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasValue()) {
-        hapiValue.value = value.questionnaireResponseItemAnswerValueToHapi()
+      hapiValue.value = value.questionnaireResponseItemAnswerValueToHapi()
     }
     return hapiValue
   }

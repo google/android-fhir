@@ -50,10 +50,10 @@ object AnnotationConverter {
   private fun Type.annotationAuthorToProto(): Annotation.AuthorX {
     val protoValue = Annotation.AuthorX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     if (this is StringType) {
-        protoValue.stringValue = this.toProto()
+      protoValue.stringValue = this.toProto()
     }
     return protoValue.build()
   }
@@ -63,16 +63,16 @@ object AnnotationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Annotation()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasAuthor()) {
-        hapiValue.author = author.annotationAuthorToHapi()
+      hapiValue.author = author.annotationAuthorToHapi()
     }
     if (hasTime()) {
-        hapiValue.timeElement = time.toHapi()
+      hapiValue.timeElement = time.toHapi()
     }
     if (hasText()) {
-        hapiValue.textElement = text.toHapi()
+      hapiValue.textElement = text.toHapi()
     }
     return hapiValue
   }
@@ -84,13 +84,13 @@ object AnnotationConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasAuthor()) {
-        protoValue.author = author.annotationAuthorToProto()
+      protoValue.author = author.annotationAuthorToProto()
     }
     if (hasTime()) {
-        protoValue.time = timeElement.toProto()
+      protoValue.time = timeElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = textElement.toProto()
+      protoValue.text = textElement.toProto()
     }
     return protoValue.build()
   }

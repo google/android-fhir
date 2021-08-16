@@ -42,7 +42,6 @@ class IdConverterTest(private val hapi: IdType, private val proto: Id) {
   }
 
   companion object {
-    @Parameterized.Parameters @JvmStatic
-    fun `data`(): List<Any> = PrimitiveTestData.ID_DATA
+    @Parameterized.Parameters @JvmStatic fun `data`(): List<Any> = PrimitiveTestData.ID_DATA
   }
 }

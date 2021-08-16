@@ -42,8 +42,6 @@ class BooleanConverterTest(private val hapi: BooleanType, private val proto: Boo
   }
 
   companion object {
-    @Parameterized.Parameters
-    @JvmStatic
-    fun `data`(): List<Any> = PrimitiveTestData.BOOLEAN_DATA
+    @Parameterized.Parameters @JvmStatic fun `data`(): List<Any> = PrimitiveTestData.BOOLEAN_DATA
   }
 }

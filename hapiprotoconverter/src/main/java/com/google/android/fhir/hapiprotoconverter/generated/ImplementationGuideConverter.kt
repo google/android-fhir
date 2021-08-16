@@ -96,10 +96,10 @@ object ImplementationGuideConverter {
     ImplementationGuide.Definition.Resource.ExampleX {
     val protoValue = ImplementationGuide.Definition.Resource.ExampleX.newBuilder()
     if (this is BooleanType) {
-        protoValue.boolean = this.toProto()
+      protoValue.boolean = this.toProto()
     }
     if (this is CanonicalType) {
-        protoValue.canonical = this.toProto()
+      protoValue.canonical = this.toProto()
     }
     return protoValue.build()
   }
@@ -121,10 +121,10 @@ object ImplementationGuideConverter {
     ImplementationGuide.Definition.Page.NameX {
     val protoValue = ImplementationGuide.Definition.Page.NameX.newBuilder()
     if (this is UrlType) {
-        protoValue.url = this.toProto()
+      protoValue.url = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     return protoValue.build()
   }
@@ -148,10 +148,10 @@ object ImplementationGuideConverter {
     ImplementationGuide.Manifest.ManifestResource.ExampleX {
     val protoValue = ImplementationGuide.Manifest.ManifestResource.ExampleX.newBuilder()
     if (this is BooleanType) {
-        protoValue.boolean = this.toProto()
+      protoValue.boolean = this.toProto()
     }
     if (this is CanonicalType) {
-        protoValue.canonical = this.toProto()
+      protoValue.canonical = this.toProto()
     }
     return protoValue.build()
   }
@@ -161,63 +161,64 @@ object ImplementationGuideConverter {
     val hapiValue = org.hl7.fhir.r4.model.ImplementationGuide()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUrl()) {
-        hapiValue.urlElement = url.toHapi()
+      hapiValue.urlElement = url.toHapi()
     }
     if (hasVersion()) {
-        hapiValue.versionElement = version.toHapi()
+      hapiValue.versionElement = version.toHapi()
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-        hapiValue.titleElement = title.toHapi()
+      hapiValue.titleElement = title.toHapi()
     }
-      hapiValue.status =
-          Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
+    hapiValue.status =
+      Enumerations.PublicationStatus.valueOf(status.value.name.hapiCodeCheck().replace("_", ""))
     if (hasExperimental()) {
-        hapiValue.experimentalElement = experimental.toHapi()
+      hapiValue.experimentalElement = experimental.toHapi()
     }
     if (hasDate()) {
-        hapiValue.dateElement = date.toHapi()
+      hapiValue.dateElement = date.toHapi()
     }
     if (hasPublisher()) {
-        hapiValue.publisherElement = publisher.toHapi()
+      hapiValue.publisherElement = publisher.toHapi()
     }
     if (contactCount > 0) {
-        hapiValue.contact = contactList.map { it.toHapi() }
+      hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (useContextCount > 0) {
-        hapiValue.useContext = useContextList.map { it.toHapi() }
+      hapiValue.useContext = useContextList.map { it.toHapi() }
     }
     if (jurisdictionCount > 0) {
-        hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
+      hapiValue.jurisdiction = jurisdictionList.map { it.toHapi() }
     }
     if (hasCopyright()) {
-        hapiValue.copyrightElement = copyright.toHapi()
+      hapiValue.copyrightElement = copyright.toHapi()
     }
     if (hasPackageId()) {
-        hapiValue.packageIdElement = packageId.toHapi()
+      hapiValue.packageIdElement = packageId.toHapi()
     }
-      hapiValue.license = org.hl7.fhir.r4.model.ImplementationGuide.SPDXLicense.valueOf(
-          license.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.license =
+      org.hl7.fhir.r4.model.ImplementationGuide.SPDXLicense.valueOf(
+        license.value.name.hapiCodeCheck().replace("_", "")
       )
     fhirVersionList.forEach {
       hapiValue.addFhirVersion(
@@ -225,16 +226,16 @@ object ImplementationGuideConverter {
       )
     }
     if (dependsOnCount > 0) {
-        hapiValue.dependsOn = dependsOnList.map { it.toHapi() }
+      hapiValue.dependsOn = dependsOnList.map { it.toHapi() }
     }
     if (globalCount > 0) {
-        hapiValue.global = globalList.map { it.toHapi() }
+      hapiValue.global = globalList.map { it.toHapi() }
     }
     if (hasDefinition()) {
-        hapiValue.definition = definition.toHapi()
+      hapiValue.definition = definition.toHapi()
     }
     if (hasManifest()) {
-        hapiValue.manifest = manifest.toHapi()
+      hapiValue.manifest = manifest.toHapi()
     }
     return hapiValue
   }
@@ -243,13 +244,13 @@ object ImplementationGuideConverter {
   fun org.hl7.fhir.r4.model.ImplementationGuide.toProto(): ImplementationGuide {
     val protoValue = ImplementationGuide.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -258,38 +259,39 @@ object ImplementationGuideConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUrl()) {
-        protoValue.url = urlElement.toProto()
+      protoValue.url = urlElement.toProto()
     }
     if (hasVersion()) {
-        protoValue.version = versionElement.toProto()
+      protoValue.version = versionElement.toProto()
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-        protoValue.title = titleElement.toProto()
+      protoValue.title = titleElement.toProto()
     }
-      protoValue.status = ImplementationGuide.StatusCode.newBuilder()
-          .setValue(
-              PublicationStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      ImplementationGuide.StatusCode.newBuilder()
+        .setValue(
+          PublicationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasExperimental()) {
-        protoValue.experimental = experimentalElement.toProto()
+      protoValue.experimental = experimentalElement.toProto()
     }
     if (hasDate()) {
-        protoValue.date = dateElement.toProto()
+      protoValue.date = dateElement.toProto()
     }
     if (hasPublisher()) {
-        protoValue.publisher = publisherElement.toProto()
+      protoValue.publisher = publisherElement.toProto()
     }
     if (hasContact()) {
       protoValue.addAllContact(contact.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasUseContext()) {
       protoValue.addAllUseContext(useContext.map { it.toProto() })
@@ -298,18 +300,19 @@ object ImplementationGuideConverter {
       protoValue.addAllJurisdiction(jurisdiction.map { it.toProto() })
     }
     if (hasCopyright()) {
-        protoValue.copyright = copyrightElement.toProto()
+      protoValue.copyright = copyrightElement.toProto()
     }
     if (hasPackageId()) {
-        protoValue.packageId = packageIdElement.toProto()
+      protoValue.packageId = packageIdElement.toProto()
     }
-      protoValue.license = ImplementationGuide.LicenseCode.newBuilder()
-          .setValue(
-              SPDXLicenseCode.Value.valueOf(
-                  license.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.license =
+      ImplementationGuide.LicenseCode.newBuilder()
+        .setValue(
+          SPDXLicenseCode.Value.valueOf(
+            license.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     protoValue.addAllFhirVersion(
       fhirVersion.map {
         ImplementationGuide.FhirVersionCode.newBuilder()
@@ -328,10 +331,10 @@ object ImplementationGuideConverter {
       protoValue.addAllGlobal(global.map { it.toProto() })
     }
     if (hasDefinition()) {
-        protoValue.definition = definition.toProto()
+      protoValue.definition = definition.toProto()
     }
     if (hasManifest()) {
-        protoValue.manifest = manifest.toProto()
+      protoValue.manifest = manifest.toProto()
     }
     return protoValue.build()
   }
@@ -348,13 +351,13 @@ object ImplementationGuideConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasUri()) {
-        protoValue.uri = uriElement.toProto()
+      protoValue.uri = uriElement.toProto()
     }
     if (hasPackageId()) {
-        protoValue.packageId = packageIdElement.toProto()
+      protoValue.packageId = packageIdElement.toProto()
     }
     if (hasVersion()) {
-        protoValue.version = versionElement.toProto()
+      protoValue.version = versionElement.toProto()
     }
     return protoValue.build()
   }
@@ -369,11 +372,12 @@ object ImplementationGuideConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-      protoValue.type = ImplementationGuide.Global.TypeCode.newBuilder()
-          .setValue(ResourceTypeCode.Value.valueOf(type))
-          .build()
+    protoValue.type =
+      ImplementationGuide.Global.TypeCode.newBuilder()
+        .setValue(ResourceTypeCode.Value.valueOf(type))
+        .build()
     if (hasProfile()) {
-        protoValue.profile = profileElement.toProto()
+      protoValue.profile = profileElement.toProto()
     }
     return protoValue.build()
   }
@@ -396,7 +400,7 @@ object ImplementationGuideConverter {
       protoValue.addAllResource(resource.map { it.toProto() })
     }
     if (hasPage()) {
-        protoValue.page = page.toProto()
+      protoValue.page = page.toProto()
     }
     if (hasParameter()) {
       protoValue.addAllParameter(parameter.map { it.toProto() })
@@ -419,10 +423,10 @@ object ImplementationGuideConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     return protoValue.build()
   }
@@ -439,7 +443,7 @@ object ImplementationGuideConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasReference()) {
-        protoValue.reference = reference.toProto()
+      protoValue.reference = reference.toProto()
     }
     protoValue.addAllFhirVersion(
       fhirVersion.map {
@@ -453,16 +457,16 @@ object ImplementationGuideConverter {
       }
     )
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasExample()) {
-        protoValue.example = example.implementationGuideDefinitionResourceExampleToProto()
+      protoValue.example = example.implementationGuideDefinitionResourceExampleToProto()
     }
     if (hasGroupingId()) {
-        protoValue.groupingId = groupingIdElement.toProto()
+      protoValue.groupingId = groupingIdElement.toProto()
     }
     return protoValue.build()
   }
@@ -479,18 +483,19 @@ object ImplementationGuideConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-        protoValue.name = name.implementationGuideDefinitionPageNameToProto()
+      protoValue.name = name.implementationGuideDefinitionPageNameToProto()
     }
     if (hasTitle()) {
-        protoValue.title = titleElement.toProto()
+      protoValue.title = titleElement.toProto()
     }
-      protoValue.generation = ImplementationGuide.Definition.Page.GenerationCode.newBuilder()
-          .setValue(
-              GuidePageGenerationCode.Value.valueOf(
-                  generation.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.generation =
+      ImplementationGuide.Definition.Page.GenerationCode.newBuilder()
+        .setValue(
+          GuidePageGenerationCode.Value.valueOf(
+            generation.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     return protoValue.build()
   }
 
@@ -505,11 +510,12 @@ object ImplementationGuideConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-      protoValue.code = ImplementationGuide.Definition.Parameter.CodeType.newBuilder()
-          .setValue(GuideParameterCode.Value.valueOf(code))
-          .build()
+    protoValue.code =
+      ImplementationGuide.Definition.Parameter.CodeType.newBuilder()
+        .setValue(GuideParameterCode.Value.valueOf(code))
+        .build()
     if (hasValue()) {
-        protoValue.value = valueElement.toProto()
+      protoValue.value = valueElement.toProto()
     }
     return protoValue.build()
   }
@@ -526,13 +532,13 @@ object ImplementationGuideConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = codeElement.toProto()
+      protoValue.code = codeElement.toProto()
     }
     if (hasSource()) {
-        protoValue.source = sourceElement.toProto()
+      protoValue.source = sourceElement.toProto()
     }
     if (hasScope()) {
-        protoValue.scope = scopeElement.toProto()
+      protoValue.scope = scopeElement.toProto()
     }
     return protoValue.build()
   }
@@ -549,7 +555,7 @@ object ImplementationGuideConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasRendering()) {
-        protoValue.rendering = renderingElement.toProto()
+      protoValue.rendering = renderingElement.toProto()
     }
     if (hasResource()) {
       protoValue.addAllResource(resource.map { it.toProto() })
@@ -579,13 +585,13 @@ object ImplementationGuideConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasReference()) {
-        protoValue.reference = reference.toProto()
+      protoValue.reference = reference.toProto()
     }
     if (hasExample()) {
-        protoValue.example = example.implementationGuideManifestResourceExampleToProto()
+      protoValue.example = example.implementationGuideManifestResourceExampleToProto()
     }
     if (hasRelativePath()) {
-        protoValue.relativePath = relativePathElement.toProto()
+      protoValue.relativePath = relativePathElement.toProto()
     }
     return protoValue.build()
   }
@@ -602,10 +608,10 @@ object ImplementationGuideConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasTitle()) {
-        protoValue.title = titleElement.toProto()
+      protoValue.title = titleElement.toProto()
     }
     if (hasAnchor()) {
       protoValue.addAllAnchor(anchor.map { it.toProto() })
@@ -620,19 +626,19 @@ object ImplementationGuideConverter {
       org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDependsOnComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasUri()) {
-        hapiValue.uriElement = uri.toHapi()
+      hapiValue.uriElement = uri.toHapi()
     }
     if (hasPackageId()) {
-        hapiValue.packageIdElement = packageId.toHapi()
+      hapiValue.packageIdElement = packageId.toHapi()
     }
     if (hasVersion()) {
-        hapiValue.versionElement = version.toHapi()
+      hapiValue.versionElement = version.toHapi()
     }
     return hapiValue
   }
@@ -643,14 +649,14 @@ object ImplementationGuideConverter {
     val hapiValue = org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideGlobalComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-      hapiValue.type = type.value.name
+    hapiValue.type = type.value.name
     if (hasProfile()) {
-        hapiValue.profileElement = profile.toHapi()
+      hapiValue.profileElement = profile.toHapi()
     }
     return hapiValue
   }
@@ -662,25 +668,25 @@ object ImplementationGuideConverter {
       org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (groupingCount > 0) {
-        hapiValue.grouping = groupingList.map { it.toHapi() }
+      hapiValue.grouping = groupingList.map { it.toHapi() }
     }
     if (resourceCount > 0) {
-        hapiValue.resource = resourceList.map { it.toHapi() }
+      hapiValue.resource = resourceList.map { it.toHapi() }
     }
     if (hasPage()) {
-        hapiValue.page = page.toHapi()
+      hapiValue.page = page.toHapi()
     }
     if (parameterCount > 0) {
-        hapiValue.parameter = parameterList.map { it.toHapi() }
+      hapiValue.parameter = parameterList.map { it.toHapi() }
     }
     if (templateCount > 0) {
-        hapiValue.template = templateList.map { it.toHapi() }
+      hapiValue.template = templateList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -692,16 +698,16 @@ object ImplementationGuideConverter {
       org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionGroupingComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     return hapiValue
   }
@@ -713,13 +719,13 @@ object ImplementationGuideConverter {
       org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionResourceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasReference()) {
-        hapiValue.reference = reference.toHapi()
+      hapiValue.reference = reference.toHapi()
     }
     fhirVersionList.forEach {
       hapiValue.addFhirVersion(
@@ -727,16 +733,16 @@ object ImplementationGuideConverter {
       )
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (hasExample()) {
-        hapiValue.example = example.implementationGuideDefinitionResourceExampleToHapi()
+      hapiValue.example = example.implementationGuideDefinitionResourceExampleToHapi()
     }
     if (hasGroupingId()) {
-        hapiValue.groupingIdElement = groupingId.toHapi()
+      hapiValue.groupingIdElement = groupingId.toHapi()
     }
     return hapiValue
   }
@@ -748,19 +754,20 @@ object ImplementationGuideConverter {
       org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionPageComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-        hapiValue.name = name.implementationGuideDefinitionPageNameToHapi()
+      hapiValue.name = name.implementationGuideDefinitionPageNameToHapi()
     }
     if (hasTitle()) {
-        hapiValue.titleElement = title.toHapi()
+      hapiValue.titleElement = title.toHapi()
     }
-      hapiValue.generation = org.hl7.fhir.r4.model.ImplementationGuide.GuidePageGeneration.valueOf(
-          generation.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.generation =
+      org.hl7.fhir.r4.model.ImplementationGuide.GuidePageGeneration.valueOf(
+        generation.value.name.hapiCodeCheck().replace("_", "")
       )
     return hapiValue
   }
@@ -772,14 +779,14 @@ object ImplementationGuideConverter {
       org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionParameterComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-      hapiValue.code = code.value.name
+    hapiValue.code = code.value.name
     if (hasValue()) {
-        hapiValue.valueElement = value.toHapi()
+      hapiValue.valueElement = value.toHapi()
     }
     return hapiValue
   }
@@ -791,19 +798,19 @@ object ImplementationGuideConverter {
       org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideDefinitionTemplateComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.codeElement = code.toHapi()
+      hapiValue.codeElement = code.toHapi()
     }
     if (hasSource()) {
-        hapiValue.sourceElement = source.toHapi()
+      hapiValue.sourceElement = source.toHapi()
     }
     if (hasScope()) {
-        hapiValue.scopeElement = scope.toHapi()
+      hapiValue.scopeElement = scope.toHapi()
     }
     return hapiValue
   }
@@ -814,25 +821,25 @@ object ImplementationGuideConverter {
     val hapiValue = org.hl7.fhir.r4.model.ImplementationGuide.ImplementationGuideManifestComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasRendering()) {
-        hapiValue.renderingElement = rendering.toHapi()
+      hapiValue.renderingElement = rendering.toHapi()
     }
     if (resourceCount > 0) {
-        hapiValue.resource = resourceList.map { it.toHapi() }
+      hapiValue.resource = resourceList.map { it.toHapi() }
     }
     if (pageCount > 0) {
-        hapiValue.page = pageList.map { it.toHapi() }
+      hapiValue.page = pageList.map { it.toHapi() }
     }
     if (imageCount > 0) {
-        hapiValue.image = imageList.map { it.toHapi() }
+      hapiValue.image = imageList.map { it.toHapi() }
     }
     if (otherCount > 0) {
-        hapiValue.other = otherList.map { it.toHapi() }
+      hapiValue.other = otherList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -843,19 +850,19 @@ object ImplementationGuideConverter {
     val hapiValue = org.hl7.fhir.r4.model.ImplementationGuide.ManifestResourceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasReference()) {
-        hapiValue.reference = reference.toHapi()
+      hapiValue.reference = reference.toHapi()
     }
     if (hasExample()) {
-        hapiValue.example = example.implementationGuideManifestResourceExampleToHapi()
+      hapiValue.example = example.implementationGuideManifestResourceExampleToHapi()
     }
     if (hasRelativePath()) {
-        hapiValue.relativePathElement = relativePath.toHapi()
+      hapiValue.relativePathElement = relativePath.toHapi()
     }
     return hapiValue
   }
@@ -866,19 +873,19 @@ object ImplementationGuideConverter {
     val hapiValue = org.hl7.fhir.r4.model.ImplementationGuide.ManifestPageComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasTitle()) {
-        hapiValue.titleElement = title.toHapi()
+      hapiValue.titleElement = title.toHapi()
     }
     if (anchorCount > 0) {
-        hapiValue.anchor = anchorList.map { it.toHapi() }
+      hapiValue.anchor = anchorList.map { it.toHapi() }
     }
     return hapiValue
   }

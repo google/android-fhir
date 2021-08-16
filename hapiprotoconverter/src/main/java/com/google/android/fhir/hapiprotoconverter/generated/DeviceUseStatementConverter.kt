@@ -68,13 +68,13 @@ object DeviceUseStatementConverter {
   private fun Type.deviceUseStatementTimingToProto(): DeviceUseStatement.TimingX {
     val protoValue = DeviceUseStatement.TimingX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Timing) {
-        protoValue.timing = this.toProto()
+      protoValue.timing = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     return protoValue.build()
   }
@@ -84,58 +84,59 @@ object DeviceUseStatementConverter {
     val hapiValue = org.hl7.fhir.r4.model.DeviceUseStatement()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (basedOnCount > 0) {
-        hapiValue.basedOn = basedOnList.map { it.toHapi() }
+      hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.DeviceUseStatement.DeviceUseStatementStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.DeviceUseStatement.DeviceUseStatementStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (derivedFromCount > 0) {
-        hapiValue.derivedFrom = derivedFromList.map { it.toHapi() }
+      hapiValue.derivedFrom = derivedFromList.map { it.toHapi() }
     }
     if (hasTiming()) {
-        hapiValue.timing = timing.deviceUseStatementTimingToHapi()
+      hapiValue.timing = timing.deviceUseStatementTimingToHapi()
     }
     if (hasRecordedOn()) {
-        hapiValue.recordedOnElement = recordedOn.toHapi()
+      hapiValue.recordedOnElement = recordedOn.toHapi()
     }
     if (hasSource()) {
-        hapiValue.source = source.toHapi()
+      hapiValue.source = source.toHapi()
     }
     if (hasDevice()) {
-        hapiValue.device = device.toHapi()
+      hapiValue.device = device.toHapi()
     }
     if (reasonCodeCount > 0) {
-        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
+      hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
+      hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (hasBodySite()) {
-        hapiValue.bodySite = bodySite.toHapi()
+      hapiValue.bodySite = bodySite.toHapi()
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -144,13 +145,13 @@ object DeviceUseStatementConverter {
   fun org.hl7.fhir.r4.model.DeviceUseStatement.toProto(): DeviceUseStatement {
     val protoValue = DeviceUseStatement.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -164,30 +165,31 @@ object DeviceUseStatementConverter {
     if (hasBasedOn()) {
       protoValue.addAllBasedOn(basedOn.map { it.toProto() })
     }
-      protoValue.status = DeviceUseStatement.StatusCode.newBuilder()
-          .setValue(
-              DeviceUseStatementStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      DeviceUseStatement.StatusCode.newBuilder()
+        .setValue(
+          DeviceUseStatementStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasDerivedFrom()) {
       protoValue.addAllDerivedFrom(derivedFrom.map { it.toProto() })
     }
     if (hasTiming()) {
-        protoValue.timing = timing.deviceUseStatementTimingToProto()
+      protoValue.timing = timing.deviceUseStatementTimingToProto()
     }
     if (hasRecordedOn()) {
-        protoValue.recordedOn = recordedOnElement.toProto()
+      protoValue.recordedOn = recordedOnElement.toProto()
     }
     if (hasSource()) {
-        protoValue.source = source.toProto()
+      protoValue.source = source.toProto()
     }
     if (hasDevice()) {
-        protoValue.device = device.toProto()
+      protoValue.device = device.toProto()
     }
     if (hasReasonCode()) {
       protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
@@ -196,7 +198,7 @@ object DeviceUseStatementConverter {
       protoValue.addAllReasonReference(reasonReference.map { it.toProto() })
     }
     if (hasBodySite()) {
-        protoValue.bodySite = bodySite.toProto()
+      protoValue.bodySite = bodySite.toProto()
     }
     if (hasNote()) {
       protoValue.addAllNote(note.map { it.toProto() })

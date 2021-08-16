@@ -30,10 +30,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @RunWith(Parameterized::class)
-class UnsignedIntConverterTest(
-  private val hapi: UnsignedIntType,
-  private val proto: UnsignedInt
-) {
+class UnsignedIntConverterTest(private val hapi: UnsignedIntType, private val proto: UnsignedInt) {
   @Test
   fun hapi() {
     Truth.assertThat(proto.toHapi().value).isEqualTo(hapi.value)

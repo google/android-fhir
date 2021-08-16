@@ -53,88 +53,89 @@ object EncounterConverter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (statusHistoryCount > 0) {
-        hapiValue.statusHistory = statusHistoryList.map { it.toHapi() }
+      hapiValue.statusHistory = statusHistoryList.map { it.toHapi() }
     }
     if (hasClassValue()) {
-        hapiValue.class_ = classValue.toHapi()
+      hapiValue.class_ = classValue.toHapi()
     }
     if (classHistoryCount > 0) {
-        hapiValue.classHistory = classHistoryList.map { it.toHapi() }
+      hapiValue.classHistory = classHistoryList.map { it.toHapi() }
     }
     if (typeCount > 0) {
-        hapiValue.type = typeList.map { it.toHapi() }
+      hapiValue.type = typeList.map { it.toHapi() }
     }
     if (hasServiceType()) {
-        hapiValue.serviceType = serviceType.toHapi()
+      hapiValue.serviceType = serviceType.toHapi()
     }
     if (hasPriority()) {
-        hapiValue.priority = priority.toHapi()
+      hapiValue.priority = priority.toHapi()
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (episodeOfCareCount > 0) {
-        hapiValue.episodeOfCare = episodeOfCareList.map { it.toHapi() }
+      hapiValue.episodeOfCare = episodeOfCareList.map { it.toHapi() }
     }
     if (basedOnCount > 0) {
-        hapiValue.basedOn = basedOnList.map { it.toHapi() }
+      hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
     if (participantCount > 0) {
-        hapiValue.participant = participantList.map { it.toHapi() }
+      hapiValue.participant = participantList.map { it.toHapi() }
     }
     if (appointmentCount > 0) {
-        hapiValue.appointment = appointmentList.map { it.toHapi() }
+      hapiValue.appointment = appointmentList.map { it.toHapi() }
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     if (hasLength()) {
-        hapiValue.length = length.toHapi()
+      hapiValue.length = length.toHapi()
     }
     if (reasonCodeCount > 0) {
-        hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
+      hapiValue.reasonCode = reasonCodeList.map { it.toHapi() }
     }
     if (reasonReferenceCount > 0) {
-        hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
+      hapiValue.reasonReference = reasonReferenceList.map { it.toHapi() }
     }
     if (diagnosisCount > 0) {
-        hapiValue.diagnosis = diagnosisList.map { it.toHapi() }
+      hapiValue.diagnosis = diagnosisList.map { it.toHapi() }
     }
     if (accountCount > 0) {
-        hapiValue.account = accountList.map { it.toHapi() }
+      hapiValue.account = accountList.map { it.toHapi() }
     }
     if (hasHospitalization()) {
-        hapiValue.hospitalization = hospitalization.toHapi()
+      hapiValue.hospitalization = hospitalization.toHapi()
     }
     if (locationCount > 0) {
-        hapiValue.location = locationList.map { it.toHapi() }
+      hapiValue.location = locationList.map { it.toHapi() }
     }
     if (hasServiceProvider()) {
-        hapiValue.serviceProvider = serviceProvider.toHapi()
+      hapiValue.serviceProvider = serviceProvider.toHapi()
     }
     if (hasPartOf()) {
-        hapiValue.partOf = partOf.toHapi()
+      hapiValue.partOf = partOf.toHapi()
     }
     return hapiValue
   }
@@ -143,13 +144,13 @@ object EncounterConverter {
   fun org.hl7.fhir.r4.model.Encounter.toProto(): Encounter {
     val protoValue = Encounter.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -160,18 +161,19 @@ object EncounterConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-      protoValue.status = Encounter.StatusCode.newBuilder()
-          .setValue(
-              EncounterStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      Encounter.StatusCode.newBuilder()
+        .setValue(
+          EncounterStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasStatusHistory()) {
       protoValue.addAllStatusHistory(statusHistory.map { it.toProto() })
     }
     if (hasClass_()) {
-        protoValue.classValue = class_.toProto()
+      protoValue.classValue = class_.toProto()
     }
     if (hasClassHistory()) {
       protoValue.addAllClassHistory(classHistory.map { it.toProto() })
@@ -180,13 +182,13 @@ object EncounterConverter {
       protoValue.addAllType(type.map { it.toProto() })
     }
     if (hasServiceType()) {
-        protoValue.serviceType = serviceType.toProto()
+      protoValue.serviceType = serviceType.toProto()
     }
     if (hasPriority()) {
-        protoValue.priority = priority.toProto()
+      protoValue.priority = priority.toProto()
     }
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasEpisodeOfCare()) {
       protoValue.addAllEpisodeOfCare(episodeOfCare.map { it.toProto() })
@@ -201,10 +203,10 @@ object EncounterConverter {
       protoValue.addAllAppointment(appointment.map { it.toProto() })
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     if (hasLength()) {
-        protoValue.length = length.toProto()
+      protoValue.length = length.toProto()
     }
     if (hasReasonCode()) {
       protoValue.addAllReasonCode(reasonCode.map { it.toProto() })
@@ -219,16 +221,16 @@ object EncounterConverter {
       protoValue.addAllAccount(account.map { it.toProto() })
     }
     if (hasHospitalization()) {
-        protoValue.hospitalization = hospitalization.toProto()
+      protoValue.hospitalization = hospitalization.toProto()
     }
     if (hasLocation()) {
       protoValue.addAllLocation(location.map { it.toProto() })
     }
     if (hasServiceProvider()) {
-        protoValue.serviceProvider = serviceProvider.toProto()
+      protoValue.serviceProvider = serviceProvider.toProto()
     }
     if (hasPartOf()) {
-        protoValue.partOf = partOf.toProto()
+      protoValue.partOf = partOf.toProto()
     }
     return protoValue.build()
   }
@@ -243,15 +245,16 @@ object EncounterConverter {
     if (hasModifierExtension()) {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
-      protoValue.status = Encounter.StatusHistory.StatusCode.newBuilder()
-          .setValue(
-              EncounterStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      Encounter.StatusHistory.StatusCode.newBuilder()
+        .setValue(
+          EncounterStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     return protoValue.build()
   }
@@ -267,10 +270,10 @@ object EncounterConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasClass_()) {
-        protoValue.classValue = class_.toProto()
+      protoValue.classValue = class_.toProto()
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     return protoValue.build()
   }
@@ -289,10 +292,10 @@ object EncounterConverter {
       protoValue.addAllType(type.map { it.toProto() })
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     if (hasIndividual()) {
-        protoValue.individual = individual.toProto()
+      protoValue.individual = individual.toProto()
     }
     return protoValue.build()
   }
@@ -307,13 +310,13 @@ object EncounterConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCondition()) {
-        protoValue.condition = condition.toProto()
+      protoValue.condition = condition.toProto()
     }
     if (hasUse()) {
-        protoValue.use = use.toProto()
+      protoValue.use = use.toProto()
     }
     if (hasRank()) {
-        protoValue.rank = rankElement.toProto()
+      protoValue.rank = rankElement.toProto()
     }
     return protoValue.build()
   }
@@ -329,16 +332,16 @@ object EncounterConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasPreAdmissionIdentifier()) {
-        protoValue.preAdmissionIdentifier = preAdmissionIdentifier.toProto()
+      protoValue.preAdmissionIdentifier = preAdmissionIdentifier.toProto()
     }
     if (hasOrigin()) {
-        protoValue.origin = origin.toProto()
+      protoValue.origin = origin.toProto()
     }
     if (hasAdmitSource()) {
-        protoValue.admitSource = admitSource.toProto()
+      protoValue.admitSource = admitSource.toProto()
     }
     if (hasReAdmission()) {
-        protoValue.reAdmission = reAdmission.toProto()
+      protoValue.reAdmission = reAdmission.toProto()
     }
     if (hasDietPreference()) {
       protoValue.addAllDietPreference(dietPreference.map { it.toProto() })
@@ -350,10 +353,10 @@ object EncounterConverter {
       protoValue.addAllSpecialArrangement(specialArrangement.map { it.toProto() })
     }
     if (hasDestination()) {
-        protoValue.destination = destination.toProto()
+      protoValue.destination = destination.toProto()
     }
     if (hasDischargeDisposition()) {
-        protoValue.dischargeDisposition = dischargeDisposition.toProto()
+      protoValue.dischargeDisposition = dischargeDisposition.toProto()
     }
     return protoValue.build()
   }
@@ -369,20 +372,21 @@ object EncounterConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasLocation()) {
-        protoValue.location = location.toProto()
+      protoValue.location = location.toProto()
     }
-      protoValue.status = Encounter.Location.StatusCode.newBuilder()
-          .setValue(
-              EncounterLocationStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      Encounter.Location.StatusCode.newBuilder()
+        .setValue(
+          EncounterLocationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasPhysicalType()) {
-        protoValue.physicalType = physicalType.toProto()
+      protoValue.physicalType = physicalType.toProto()
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     return protoValue.build()
   }
@@ -393,16 +397,17 @@ object EncounterConverter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.StatusHistoryComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.Encounter.EncounterStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     return hapiValue
   }
@@ -413,16 +418,16 @@ object EncounterConverter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.ClassHistoryComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasClassValue()) {
-        hapiValue.class_ = classValue.toHapi()
+      hapiValue.class_ = classValue.toHapi()
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     return hapiValue
   }
@@ -433,19 +438,19 @@ object EncounterConverter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.EncounterParticipantComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (typeCount > 0) {
-        hapiValue.type = typeList.map { it.toHapi() }
+      hapiValue.type = typeList.map { it.toHapi() }
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     if (hasIndividual()) {
-        hapiValue.individual = individual.toHapi()
+      hapiValue.individual = individual.toHapi()
     }
     return hapiValue
   }
@@ -455,19 +460,19 @@ object EncounterConverter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.DiagnosisComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCondition()) {
-        hapiValue.condition = condition.toHapi()
+      hapiValue.condition = condition.toHapi()
     }
     if (hasUse()) {
-        hapiValue.use = use.toHapi()
+      hapiValue.use = use.toHapi()
     }
     if (hasRank()) {
-        hapiValue.rankElement = rank.toHapi()
+      hapiValue.rankElement = rank.toHapi()
     }
     return hapiValue
   }
@@ -478,37 +483,37 @@ object EncounterConverter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.EncounterHospitalizationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasPreAdmissionIdentifier()) {
-        hapiValue.preAdmissionIdentifier = preAdmissionIdentifier.toHapi()
+      hapiValue.preAdmissionIdentifier = preAdmissionIdentifier.toHapi()
     }
     if (hasOrigin()) {
-        hapiValue.origin = origin.toHapi()
+      hapiValue.origin = origin.toHapi()
     }
     if (hasAdmitSource()) {
-        hapiValue.admitSource = admitSource.toHapi()
+      hapiValue.admitSource = admitSource.toHapi()
     }
     if (hasReAdmission()) {
-        hapiValue.reAdmission = reAdmission.toHapi()
+      hapiValue.reAdmission = reAdmission.toHapi()
     }
     if (dietPreferenceCount > 0) {
-        hapiValue.dietPreference = dietPreferenceList.map { it.toHapi() }
+      hapiValue.dietPreference = dietPreferenceList.map { it.toHapi() }
     }
     if (specialCourtesyCount > 0) {
-        hapiValue.specialCourtesy = specialCourtesyList.map { it.toHapi() }
+      hapiValue.specialCourtesy = specialCourtesyList.map { it.toHapi() }
     }
     if (specialArrangementCount > 0) {
-        hapiValue.specialArrangement = specialArrangementList.map { it.toHapi() }
+      hapiValue.specialArrangement = specialArrangementList.map { it.toHapi() }
     }
     if (hasDestination()) {
-        hapiValue.destination = destination.toHapi()
+      hapiValue.destination = destination.toHapi()
     }
     if (hasDischargeDisposition()) {
-        hapiValue.dischargeDisposition = dischargeDisposition.toHapi()
+      hapiValue.dischargeDisposition = dischargeDisposition.toHapi()
     }
     return hapiValue
   }
@@ -519,22 +524,23 @@ object EncounterConverter {
     val hapiValue = org.hl7.fhir.r4.model.Encounter.EncounterLocationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasLocation()) {
-        hapiValue.location = location.toHapi()
+      hapiValue.location = location.toHapi()
     }
-      hapiValue.status = org.hl7.fhir.r4.model.Encounter.EncounterLocationStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.Encounter.EncounterLocationStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasPhysicalType()) {
-        hapiValue.physicalType = physicalType.toHapi()
+      hapiValue.physicalType = physicalType.toHapi()
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     return hapiValue
   }

@@ -81,13 +81,13 @@ object ChargeItemConverter {
   private fun Type.chargeItemOccurrenceToProto(): ChargeItem.OccurrenceX {
     val protoValue = ChargeItem.OccurrenceX.newBuilder()
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Timing) {
-        protoValue.timing = this.toProto()
+      protoValue.timing = this.toProto()
     }
     return protoValue.build()
   }
@@ -107,10 +107,10 @@ object ChargeItemConverter {
   private fun Type.chargeItemProductToProto(): ChargeItem.ProductX {
     val protoValue = ChargeItem.ProductX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Reference) {
-        protoValue.reference = this.toProto()
+      protoValue.reference = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     return protoValue.build()
   }
@@ -120,97 +120,98 @@ object ChargeItemConverter {
     val hapiValue = org.hl7.fhir.r4.model.ChargeItem()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (definitionUriCount > 0) {
-        hapiValue.definitionUri = definitionUriList.map { it.toHapi() }
+      hapiValue.definitionUri = definitionUriList.map { it.toHapi() }
     }
     if (definitionCanonicalCount > 0) {
-        hapiValue.definitionCanonical = definitionCanonicalList.map { it.toHapi() }
+      hapiValue.definitionCanonical = definitionCanonicalList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.ChargeItem.ChargeItemStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.ChargeItem.ChargeItemStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (partOfCount > 0) {
-        hapiValue.partOf = partOfList.map { it.toHapi() }
+      hapiValue.partOf = partOfList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (hasContext()) {
-        hapiValue.context = context.toHapi()
+      hapiValue.context = context.toHapi()
     }
     if (hasOccurrence()) {
-        hapiValue.occurrence = occurrence.chargeItemOccurrenceToHapi()
+      hapiValue.occurrence = occurrence.chargeItemOccurrenceToHapi()
     }
     if (performerCount > 0) {
-        hapiValue.performer = performerList.map { it.toHapi() }
+      hapiValue.performer = performerList.map { it.toHapi() }
     }
     if (hasPerformingOrganization()) {
-        hapiValue.performingOrganization = performingOrganization.toHapi()
+      hapiValue.performingOrganization = performingOrganization.toHapi()
     }
     if (hasRequestingOrganization()) {
-        hapiValue.requestingOrganization = requestingOrganization.toHapi()
+      hapiValue.requestingOrganization = requestingOrganization.toHapi()
     }
     if (hasCostCenter()) {
-        hapiValue.costCenter = costCenter.toHapi()
+      hapiValue.costCenter = costCenter.toHapi()
     }
     if (hasQuantity()) {
-        hapiValue.quantity = quantity.toHapi()
+      hapiValue.quantity = quantity.toHapi()
     }
     if (bodysiteCount > 0) {
-        hapiValue.bodysite = bodysiteList.map { it.toHapi() }
+      hapiValue.bodysite = bodysiteList.map { it.toHapi() }
     }
     if (hasFactorOverride()) {
-        hapiValue.factorOverrideElement = factorOverride.toHapi()
+      hapiValue.factorOverrideElement = factorOverride.toHapi()
     }
     if (hasPriceOverride()) {
-        hapiValue.priceOverride = priceOverride.toHapi()
+      hapiValue.priceOverride = priceOverride.toHapi()
     }
     if (hasOverrideReason()) {
-        hapiValue.overrideReasonElement = overrideReason.toHapi()
+      hapiValue.overrideReasonElement = overrideReason.toHapi()
     }
     if (hasEnterer()) {
-        hapiValue.enterer = enterer.toHapi()
+      hapiValue.enterer = enterer.toHapi()
     }
     if (hasEnteredDate()) {
-        hapiValue.enteredDateElement = enteredDate.toHapi()
+      hapiValue.enteredDateElement = enteredDate.toHapi()
     }
     if (reasonCount > 0) {
-        hapiValue.reason = reasonList.map { it.toHapi() }
+      hapiValue.reason = reasonList.map { it.toHapi() }
     }
     if (serviceCount > 0) {
-        hapiValue.service = serviceList.map { it.toHapi() }
+      hapiValue.service = serviceList.map { it.toHapi() }
     }
     if (hasProduct()) {
-        hapiValue.product = product.chargeItemProductToHapi()
+      hapiValue.product = product.chargeItemProductToHapi()
     }
     if (accountCount > 0) {
-        hapiValue.account = accountList.map { it.toHapi() }
+      hapiValue.account = accountList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     if (supportingInformationCount > 0) {
-        hapiValue.supportingInformation = supportingInformationList.map { it.toHapi() }
+      hapiValue.supportingInformation = supportingInformationList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -219,13 +220,13 @@ object ChargeItemConverter {
   fun org.hl7.fhir.r4.model.ChargeItem.toProto(): ChargeItem {
     val protoValue = ChargeItem.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -242,60 +243,61 @@ object ChargeItemConverter {
     if (hasDefinitionCanonical()) {
       protoValue.addAllDefinitionCanonical(definitionCanonical.map { it.toProto() })
     }
-      protoValue.status = ChargeItem.StatusCode.newBuilder()
-          .setValue(
-              ChargeItemStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      ChargeItem.StatusCode.newBuilder()
+        .setValue(
+          ChargeItemStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasContext()) {
-        protoValue.context = context.toProto()
+      protoValue.context = context.toProto()
     }
     if (hasOccurrence()) {
-        protoValue.occurrence = occurrence.chargeItemOccurrenceToProto()
+      protoValue.occurrence = occurrence.chargeItemOccurrenceToProto()
     }
     if (hasPerformer()) {
       protoValue.addAllPerformer(performer.map { it.toProto() })
     }
     if (hasPerformingOrganization()) {
-        protoValue.performingOrganization = performingOrganization.toProto()
+      protoValue.performingOrganization = performingOrganization.toProto()
     }
     if (hasRequestingOrganization()) {
-        protoValue.requestingOrganization = requestingOrganization.toProto()
+      protoValue.requestingOrganization = requestingOrganization.toProto()
     }
     if (hasCostCenter()) {
-        protoValue.costCenter = costCenter.toProto()
+      protoValue.costCenter = costCenter.toProto()
     }
     if (hasQuantity()) {
-        protoValue.quantity = quantity.toProto()
+      protoValue.quantity = quantity.toProto()
     }
     if (hasBodysite()) {
       protoValue.addAllBodysite(bodysite.map { it.toProto() })
     }
     if (hasFactorOverride()) {
-        protoValue.factorOverride = factorOverrideElement.toProto()
+      protoValue.factorOverride = factorOverrideElement.toProto()
     }
     if (hasPriceOverride()) {
-        protoValue.priceOverride = priceOverride.toProto()
+      protoValue.priceOverride = priceOverride.toProto()
     }
     if (hasOverrideReason()) {
-        protoValue.overrideReason = overrideReasonElement.toProto()
+      protoValue.overrideReason = overrideReasonElement.toProto()
     }
     if (hasEnterer()) {
-        protoValue.enterer = enterer.toProto()
+      protoValue.enterer = enterer.toProto()
     }
     if (hasEnteredDate()) {
-        protoValue.enteredDate = enteredDateElement.toProto()
+      protoValue.enteredDate = enteredDateElement.toProto()
     }
     if (hasReason()) {
       protoValue.addAllReason(reason.map { it.toProto() })
@@ -304,7 +306,7 @@ object ChargeItemConverter {
       protoValue.addAllService(service.map { it.toProto() })
     }
     if (hasProduct()) {
-        protoValue.product = product.chargeItemProductToProto()
+      protoValue.product = product.chargeItemProductToProto()
     }
     if (hasAccount()) {
       protoValue.addAllAccount(account.map { it.toProto() })
@@ -329,10 +331,10 @@ object ChargeItemConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasFunction()) {
-        protoValue.function = function.toProto()
+      protoValue.function = function.toProto()
     }
     if (hasActor()) {
-        protoValue.actor = actor.toProto()
+      protoValue.actor = actor.toProto()
     }
     return protoValue.build()
   }
@@ -343,16 +345,16 @@ object ChargeItemConverter {
     val hapiValue = org.hl7.fhir.r4.model.ChargeItem.ChargeItemPerformerComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasFunction()) {
-        hapiValue.function = function.toHapi()
+      hapiValue.function = function.toHapi()
     }
     if (hasActor()) {
-        hapiValue.actor = actor.toHapi()
+      hapiValue.actor = actor.toHapi()
     }
     return hapiValue
   }

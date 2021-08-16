@@ -42,7 +42,6 @@ class UrlConverterTest(private val hapi: UrlType, private val proto: Url) {
   }
 
   companion object {
-    @Parameterized.Parameters @JvmStatic
-    fun `data`(): List<Any> = PrimitiveTestData.URL_DATA
+    @Parameterized.Parameters @JvmStatic fun `data`(): List<Any> = PrimitiveTestData.URL_DATA
   }
 }

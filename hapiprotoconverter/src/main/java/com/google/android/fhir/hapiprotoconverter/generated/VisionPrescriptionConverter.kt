@@ -59,43 +59,44 @@ object VisionPrescriptionConverter {
     val hapiValue = org.hl7.fhir.r4.model.VisionPrescription()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.VisionPrescription.VisionStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.VisionPrescription.VisionStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasCreated()) {
-        hapiValue.createdElement = created.toHapi()
+      hapiValue.createdElement = created.toHapi()
     }
     if (hasPatient()) {
-        hapiValue.patient = patient.toHapi()
+      hapiValue.patient = patient.toHapi()
     }
     if (hasEncounter()) {
-        hapiValue.encounter = encounter.toHapi()
+      hapiValue.encounter = encounter.toHapi()
     }
     if (hasDateWritten()) {
-        hapiValue.dateWrittenElement = dateWritten.toHapi()
+      hapiValue.dateWrittenElement = dateWritten.toHapi()
     }
     if (hasPrescriber()) {
-        hapiValue.prescriber = prescriber.toHapi()
+      hapiValue.prescriber = prescriber.toHapi()
     }
     if (lensSpecificationCount > 0) {
-        hapiValue.lensSpecification = lensSpecificationList.map { it.toHapi() }
+      hapiValue.lensSpecification = lensSpecificationList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -104,13 +105,13 @@ object VisionPrescriptionConverter {
   fun org.hl7.fhir.r4.model.VisionPrescription.toProto(): VisionPrescription {
     val protoValue = VisionPrescription.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -121,27 +122,28 @@ object VisionPrescriptionConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-      protoValue.status = VisionPrescription.StatusCode.newBuilder()
-          .setValue(
-              FinancialResourceStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      VisionPrescription.StatusCode.newBuilder()
+        .setValue(
+          FinancialResourceStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasCreated()) {
-        protoValue.created = createdElement.toProto()
+      protoValue.created = createdElement.toProto()
     }
     if (hasPatient()) {
-        protoValue.patient = patient.toProto()
+      protoValue.patient = patient.toProto()
     }
     if (hasEncounter()) {
-        protoValue.encounter = encounter.toProto()
+      protoValue.encounter = encounter.toProto()
     }
     if (hasDateWritten()) {
-        protoValue.dateWritten = dateWrittenElement.toProto()
+      protoValue.dateWritten = dateWrittenElement.toProto()
     }
     if (hasPrescriber()) {
-        protoValue.prescriber = prescriber.toProto()
+      protoValue.prescriber = prescriber.toProto()
     }
     if (hasLensSpecification()) {
       protoValue.addAllLensSpecification(lensSpecification.map { it.toProto() })
@@ -161,47 +163,48 @@ object VisionPrescriptionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasProduct()) {
-        protoValue.product = product.toProto()
+      protoValue.product = product.toProto()
     }
-      protoValue.eye = VisionPrescription.LensSpecification.EyeCode.newBuilder()
-          .setValue(
-              VisionEyesCode.Value.valueOf(
-                  eye.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.eye =
+      VisionPrescription.LensSpecification.EyeCode.newBuilder()
+        .setValue(
+          VisionEyesCode.Value.valueOf(
+            eye.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasSphere()) {
-        protoValue.sphere = sphereElement.toProto()
+      protoValue.sphere = sphereElement.toProto()
     }
     if (hasCylinder()) {
-        protoValue.cylinder = cylinderElement.toProto()
+      protoValue.cylinder = cylinderElement.toProto()
     }
     if (hasAxis()) {
-        protoValue.axis = axisElement.toProto()
+      protoValue.axis = axisElement.toProto()
     }
     if (hasPrism()) {
       protoValue.addAllPrism(prism.map { it.toProto() })
     }
     if (hasAdd()) {
-        protoValue.add = addElement.toProto()
+      protoValue.add = addElement.toProto()
     }
     if (hasPower()) {
-        protoValue.power = powerElement.toProto()
+      protoValue.power = powerElement.toProto()
     }
     if (hasBackCurve()) {
-        protoValue.backCurve = backCurveElement.toProto()
+      protoValue.backCurve = backCurveElement.toProto()
     }
     if (hasDiameter()) {
-        protoValue.diameter = diameterElement.toProto()
+      protoValue.diameter = diameterElement.toProto()
     }
     if (hasDuration()) {
-        protoValue.duration = (duration as SimpleQuantity).toProto()
+      protoValue.duration = (duration as SimpleQuantity).toProto()
     }
     if (hasColor()) {
-        protoValue.color = colorElement.toProto()
+      protoValue.color = colorElement.toProto()
     }
     if (hasBrand()) {
-        protoValue.brand = brandElement.toProto()
+      protoValue.brand = brandElement.toProto()
     }
     if (hasNote()) {
       protoValue.addAllNote(note.map { it.toProto() })
@@ -222,15 +225,16 @@ object VisionPrescriptionConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasAmount()) {
-        protoValue.amount = amountElement.toProto()
+      protoValue.amount = amountElement.toProto()
     }
-      protoValue.base = VisionPrescription.LensSpecification.Prism.BaseCode.newBuilder()
-          .setValue(
-              VisionBaseCode.Value.valueOf(
-                  base.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.base =
+      VisionPrescription.LensSpecification.Prism.BaseCode.newBuilder()
+        .setValue(
+          VisionBaseCode.Value.valueOf(
+            base.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     return protoValue.build()
   }
 
@@ -241,52 +245,53 @@ object VisionPrescriptionConverter {
       org.hl7.fhir.r4.model.VisionPrescription.VisionPrescriptionLensSpecificationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasProduct()) {
-        hapiValue.product = product.toHapi()
+      hapiValue.product = product.toHapi()
     }
-      hapiValue.eye = org.hl7.fhir.r4.model.VisionPrescription.VisionEyes.valueOf(
-          eye.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.eye =
+      org.hl7.fhir.r4.model.VisionPrescription.VisionEyes.valueOf(
+        eye.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasSphere()) {
-        hapiValue.sphereElement = sphere.toHapi()
+      hapiValue.sphereElement = sphere.toHapi()
     }
     if (hasCylinder()) {
-        hapiValue.cylinderElement = cylinder.toHapi()
+      hapiValue.cylinderElement = cylinder.toHapi()
     }
     if (hasAxis()) {
-        hapiValue.axisElement = axis.toHapi()
+      hapiValue.axisElement = axis.toHapi()
     }
     if (prismCount > 0) {
-        hapiValue.prism = prismList.map { it.toHapi() }
+      hapiValue.prism = prismList.map { it.toHapi() }
     }
     if (hasAdd()) {
-        hapiValue.addElement = add.toHapi()
+      hapiValue.addElement = add.toHapi()
     }
     if (hasPower()) {
-        hapiValue.powerElement = power.toHapi()
+      hapiValue.powerElement = power.toHapi()
     }
     if (hasBackCurve()) {
-        hapiValue.backCurveElement = backCurve.toHapi()
+      hapiValue.backCurveElement = backCurve.toHapi()
     }
     if (hasDiameter()) {
-        hapiValue.diameterElement = diameter.toHapi()
+      hapiValue.diameterElement = diameter.toHapi()
     }
     if (hasDuration()) {
-        hapiValue.duration = duration.toHapi()
+      hapiValue.duration = duration.toHapi()
     }
     if (hasColor()) {
-        hapiValue.colorElement = color.toHapi()
+      hapiValue.colorElement = color.toHapi()
     }
     if (hasBrand()) {
-        hapiValue.brandElement = brand.toHapi()
+      hapiValue.brandElement = brand.toHapi()
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -297,16 +302,17 @@ object VisionPrescriptionConverter {
     val hapiValue = org.hl7.fhir.r4.model.VisionPrescription.PrismComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasAmount()) {
-        hapiValue.amountElement = amount.toHapi()
+      hapiValue.amountElement = amount.toHapi()
     }
-      hapiValue.base = org.hl7.fhir.r4.model.VisionPrescription.VisionBase.valueOf(
-          base.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.base =
+      org.hl7.fhir.r4.model.VisionPrescription.VisionBase.valueOf(
+        base.value.name.hapiCodeCheck().replace("_", "")
       )
     return hapiValue
   }

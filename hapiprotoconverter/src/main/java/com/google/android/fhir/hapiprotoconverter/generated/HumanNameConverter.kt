@@ -33,28 +33,29 @@ object HumanNameConverter {
     val hapiValue = org.hl7.fhir.r4.model.HumanName()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
-      hapiValue.use = org.hl7.fhir.r4.model.HumanName.NameUse.valueOf(
-          use.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.use =
+      org.hl7.fhir.r4.model.HumanName.NameUse.valueOf(
+        use.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasText()) {
-        hapiValue.textElement = text.toHapi()
+      hapiValue.textElement = text.toHapi()
     }
     if (hasFamily()) {
-        hapiValue.familyElement = family.toHapi()
+      hapiValue.familyElement = family.toHapi()
     }
     if (givenCount > 0) {
-        hapiValue.given = givenList.map { it.toHapi() }
+      hapiValue.given = givenList.map { it.toHapi() }
     }
     if (prefixCount > 0) {
-        hapiValue.prefix = prefixList.map { it.toHapi() }
+      hapiValue.prefix = prefixList.map { it.toHapi() }
     }
     if (suffixCount > 0) {
-        hapiValue.suffix = suffixList.map { it.toHapi() }
+      hapiValue.suffix = suffixList.map { it.toHapi() }
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     return hapiValue
   }
@@ -65,16 +66,17 @@ object HumanNameConverter {
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-      protoValue.use = HumanName.UseCode.newBuilder()
-          .setValue(
-              NameUseCode.Value.valueOf(use.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
-          )
-          .build()
+    protoValue.use =
+      HumanName.UseCode.newBuilder()
+        .setValue(
+          NameUseCode.Value.valueOf(use.toCode().protoCodeCheck().replace("-", "_").toUpperCase())
+        )
+        .build()
     if (hasText()) {
-        protoValue.text = textElement.toProto()
+      protoValue.text = textElement.toProto()
     }
     if (hasFamily()) {
-        protoValue.family = familyElement.toProto()
+      protoValue.family = familyElement.toProto()
     }
     if (hasGiven()) {
       protoValue.addAllGiven(given.map { it.toProto() })
@@ -86,7 +88,7 @@ object HumanNameConverter {
       protoValue.addAllSuffix(suffix.map { it.toProto() })
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     return protoValue.build()
   }

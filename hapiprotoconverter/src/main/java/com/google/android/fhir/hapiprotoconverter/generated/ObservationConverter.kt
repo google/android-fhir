@@ -108,16 +108,16 @@ object ObservationConverter {
   private fun Type.observationEffectiveToProto(): Observation.EffectiveX {
     val protoValue = Observation.EffectiveX.newBuilder()
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Timing) {
-        protoValue.timing = this.toProto()
+      protoValue.timing = this.toProto()
     }
     if (this is InstantType) {
-        protoValue.instant = this.toProto()
+      protoValue.instant = this.toProto()
     }
     return protoValue.build()
   }
@@ -164,37 +164,37 @@ object ObservationConverter {
   private fun Type.observationValueToProto(): Observation.ValueX {
     val protoValue = Observation.ValueX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Quantity) {
-        protoValue.quantity = this.toProto()
+      protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is StringType) {
-        protoValue.stringValue = this.toProto()
+      protoValue.stringValue = this.toProto()
     }
     if (this is BooleanType) {
-        protoValue.boolean = this.toProto()
+      protoValue.boolean = this.toProto()
     }
     if (this is IntegerType) {
-        protoValue.integer = this.toProto()
+      protoValue.integer = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Ratio) {
-        protoValue.ratio = this.toProto()
+      protoValue.ratio = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.SampledData) {
-        protoValue.sampledData = this.toProto()
+      protoValue.sampledData = this.toProto()
     }
     if (this is TimeType) {
-        protoValue.time = this.toProto()
+      protoValue.time = this.toProto()
     }
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
@@ -241,37 +241,37 @@ object ObservationConverter {
   private fun Type.observationComponentValueToProto(): Observation.Component.ValueX {
     val protoValue = Observation.Component.ValueX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Quantity) {
-        protoValue.quantity = this.toProto()
+      protoValue.quantity = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.CodeableConcept) {
-        protoValue.codeableConcept = this.toProto()
+      protoValue.codeableConcept = this.toProto()
     }
     if (this is StringType) {
-        protoValue.stringValue = this.toProto()
+      protoValue.stringValue = this.toProto()
     }
     if (this is BooleanType) {
-        protoValue.boolean = this.toProto()
+      protoValue.boolean = this.toProto()
     }
     if (this is IntegerType) {
-        protoValue.integer = this.toProto()
+      protoValue.integer = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Range) {
-        protoValue.range = this.toProto()
+      protoValue.range = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Ratio) {
-        protoValue.ratio = this.toProto()
+      protoValue.ratio = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.SampledData) {
-        protoValue.sampledData = this.toProto()
+      protoValue.sampledData = this.toProto()
     }
     if (this is TimeType) {
-        protoValue.time = this.toProto()
+      protoValue.time = this.toProto()
     }
     if (this is DateTimeType) {
-        protoValue.dateTime = this.toProto()
+      protoValue.dateTime = this.toProto()
     }
     if (this is org.hl7.fhir.r4.model.Period) {
-        protoValue.period = this.toProto()
+      protoValue.period = this.toProto()
     }
     return protoValue.build()
   }
@@ -281,91 +281,92 @@ object ObservationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Observation()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (basedOnCount > 0) {
-        hapiValue.basedOn = basedOnList.map { it.toHapi() }
+      hapiValue.basedOn = basedOnList.map { it.toHapi() }
     }
     if (partOfCount > 0) {
-        hapiValue.partOf = partOfList.map { it.toHapi() }
+      hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.Observation.ObservationStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.Observation.ObservationStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (categoryCount > 0) {
-        hapiValue.category = categoryList.map { it.toHapi() }
+      hapiValue.category = categoryList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasSubject()) {
-        hapiValue.subject = subject.toHapi()
+      hapiValue.subject = subject.toHapi()
     }
     if (focusCount > 0) {
-        hapiValue.focus = focusList.map { it.toHapi() }
+      hapiValue.focus = focusList.map { it.toHapi() }
     }
     if (hasEncounter()) {
-        hapiValue.encounter = encounter.toHapi()
+      hapiValue.encounter = encounter.toHapi()
     }
     if (hasEffective()) {
-        hapiValue.effective = effective.observationEffectiveToHapi()
+      hapiValue.effective = effective.observationEffectiveToHapi()
     }
     if (hasIssued()) {
-        hapiValue.issuedElement = issued.toHapi()
+      hapiValue.issuedElement = issued.toHapi()
     }
     if (performerCount > 0) {
-        hapiValue.performer = performerList.map { it.toHapi() }
+      hapiValue.performer = performerList.map { it.toHapi() }
     }
     if (hasValue()) {
-        hapiValue.value = value.observationValueToHapi()
+      hapiValue.value = value.observationValueToHapi()
     }
     if (hasDataAbsentReason()) {
-        hapiValue.dataAbsentReason = dataAbsentReason.toHapi()
+      hapiValue.dataAbsentReason = dataAbsentReason.toHapi()
     }
     if (interpretationCount > 0) {
-        hapiValue.interpretation = interpretationList.map { it.toHapi() }
+      hapiValue.interpretation = interpretationList.map { it.toHapi() }
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     if (hasBodySite()) {
-        hapiValue.bodySite = bodySite.toHapi()
+      hapiValue.bodySite = bodySite.toHapi()
     }
     if (hasMethod()) {
-        hapiValue.method = method.toHapi()
+      hapiValue.method = method.toHapi()
     }
     if (hasSpecimen()) {
-        hapiValue.specimen = specimen.toHapi()
+      hapiValue.specimen = specimen.toHapi()
     }
     if (hasDevice()) {
-        hapiValue.device = device.toHapi()
+      hapiValue.device = device.toHapi()
     }
     if (referenceRangeCount > 0) {
-        hapiValue.referenceRange = referenceRangeList.map { it.toHapi() }
+      hapiValue.referenceRange = referenceRangeList.map { it.toHapi() }
     }
     if (hasMemberCount > 0) {
-        hapiValue.hasMember = hasMemberList.map { it.toHapi() }
+      hapiValue.hasMember = hasMemberList.map { it.toHapi() }
     }
     if (derivedFromCount > 0) {
-        hapiValue.derivedFrom = derivedFromList.map { it.toHapi() }
+      hapiValue.derivedFrom = derivedFromList.map { it.toHapi() }
     }
     if (componentCount > 0) {
-        hapiValue.component = componentList.map { it.toHapi() }
+      hapiValue.component = componentList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -374,13 +375,13 @@ object ObservationConverter {
   fun org.hl7.fhir.r4.model.Observation.toProto(): Observation {
     val protoValue = Observation.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -397,42 +398,43 @@ object ObservationConverter {
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-      protoValue.status = Observation.StatusCode.newBuilder()
-          .setValue(
-              ObservationStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      Observation.StatusCode.newBuilder()
+        .setValue(
+          ObservationStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasSubject()) {
-        protoValue.subject = subject.toProto()
+      protoValue.subject = subject.toProto()
     }
     if (hasFocus()) {
       protoValue.addAllFocus(focus.map { it.toProto() })
     }
     if (hasEncounter()) {
-        protoValue.encounter = encounter.toProto()
+      protoValue.encounter = encounter.toProto()
     }
     if (hasEffective()) {
-        protoValue.effective = effective.observationEffectiveToProto()
+      protoValue.effective = effective.observationEffectiveToProto()
     }
     if (hasIssued()) {
-        protoValue.issued = issuedElement.toProto()
+      protoValue.issued = issuedElement.toProto()
     }
     if (hasPerformer()) {
       protoValue.addAllPerformer(performer.map { it.toProto() })
     }
     if (hasValue()) {
-        protoValue.value = value.observationValueToProto()
+      protoValue.value = value.observationValueToProto()
     }
     if (hasDataAbsentReason()) {
-        protoValue.dataAbsentReason = dataAbsentReason.toProto()
+      protoValue.dataAbsentReason = dataAbsentReason.toProto()
     }
     if (hasInterpretation()) {
       protoValue.addAllInterpretation(interpretation.map { it.toProto() })
@@ -441,16 +443,16 @@ object ObservationConverter {
       protoValue.addAllNote(note.map { it.toProto() })
     }
     if (hasBodySite()) {
-        protoValue.bodySite = bodySite.toProto()
+      protoValue.bodySite = bodySite.toProto()
     }
     if (hasMethod()) {
-        protoValue.method = method.toProto()
+      protoValue.method = method.toProto()
     }
     if (hasSpecimen()) {
-        protoValue.specimen = specimen.toProto()
+      protoValue.specimen = specimen.toProto()
     }
     if (hasDevice()) {
-        protoValue.device = device.toProto()
+      protoValue.device = device.toProto()
     }
     if (hasReferenceRange()) {
       protoValue.addAllReferenceRange(referenceRange.map { it.toProto() })
@@ -478,22 +480,22 @@ object ObservationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasLow()) {
-        protoValue.low = (low as SimpleQuantity).toProto()
+      protoValue.low = (low as SimpleQuantity).toProto()
     }
     if (hasHigh()) {
-        protoValue.high = (high as SimpleQuantity).toProto()
+      protoValue.high = (high as SimpleQuantity).toProto()
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasAppliesTo()) {
       protoValue.addAllAppliesTo(appliesTo.map { it.toProto() })
     }
     if (hasAge()) {
-        protoValue.age = age.toProto()
+      protoValue.age = age.toProto()
     }
     if (hasText()) {
-        protoValue.text = textElement.toProto()
+      protoValue.text = textElement.toProto()
     }
     return protoValue.build()
   }
@@ -509,13 +511,13 @@ object ObservationConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasCode()) {
-        protoValue.code = code.toProto()
+      protoValue.code = code.toProto()
     }
     if (hasValue()) {
-        protoValue.value = value.observationComponentValueToProto()
+      protoValue.value = value.observationComponentValueToProto()
     }
     if (hasDataAbsentReason()) {
-        protoValue.dataAbsentReason = dataAbsentReason.toProto()
+      protoValue.dataAbsentReason = dataAbsentReason.toProto()
     }
     if (hasInterpretation()) {
       protoValue.addAllInterpretation(interpretation.map { it.toProto() })
@@ -529,28 +531,28 @@ object ObservationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Observation.ObservationReferenceRangeComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasLow()) {
-        hapiValue.low = low.toHapi()
+      hapiValue.low = low.toHapi()
     }
     if (hasHigh()) {
-        hapiValue.high = high.toHapi()
+      hapiValue.high = high.toHapi()
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (appliesToCount > 0) {
-        hapiValue.appliesTo = appliesToList.map { it.toHapi() }
+      hapiValue.appliesTo = appliesToList.map { it.toHapi() }
     }
     if (hasAge()) {
-        hapiValue.age = age.toHapi()
+      hapiValue.age = age.toHapi()
     }
     if (hasText()) {
-        hapiValue.textElement = text.toHapi()
+      hapiValue.textElement = text.toHapi()
     }
     return hapiValue
   }
@@ -561,22 +563,22 @@ object ObservationConverter {
     val hapiValue = org.hl7.fhir.r4.model.Observation.ObservationComponentComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasCode()) {
-        hapiValue.code = code.toHapi()
+      hapiValue.code = code.toHapi()
     }
     if (hasValue()) {
-        hapiValue.value = value.observationComponentValueToHapi()
+      hapiValue.value = value.observationComponentValueToHapi()
     }
     if (hasDataAbsentReason()) {
-        hapiValue.dataAbsentReason = dataAbsentReason.toHapi()
+      hapiValue.dataAbsentReason = dataAbsentReason.toHapi()
     }
     if (interpretationCount > 0) {
-        hapiValue.interpretation = interpretationList.map { it.toHapi() }
+      hapiValue.interpretation = interpretationList.map { it.toHapi() }
     }
     return hapiValue
   }

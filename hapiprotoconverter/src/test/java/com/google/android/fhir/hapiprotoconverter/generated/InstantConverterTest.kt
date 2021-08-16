@@ -44,8 +44,6 @@ class InstantConverterTest(private val hapi: InstantType, private val proto: Ins
   }
 
   companion object {
-    @Parameterized.Parameters
-    @JvmStatic
-    fun `data`(): List<Any> = PrimitiveTestData.INSTANT_DATA
+    @Parameterized.Parameters @JvmStatic fun `data`(): List<Any> = PrimitiveTestData.INSTANT_DATA
   }
 }

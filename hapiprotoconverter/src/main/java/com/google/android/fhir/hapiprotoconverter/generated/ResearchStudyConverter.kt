@@ -54,91 +54,92 @@ object ResearchStudyConverter {
     val hapiValue = org.hl7.fhir.r4.model.ResearchStudy()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasTitle()) {
-        hapiValue.titleElement = title.toHapi()
+      hapiValue.titleElement = title.toHapi()
     }
     if (protocolCount > 0) {
-        hapiValue.protocol = protocolList.map { it.toHapi() }
+      hapiValue.protocol = protocolList.map { it.toHapi() }
     }
     if (partOfCount > 0) {
-        hapiValue.partOf = partOfList.map { it.toHapi() }
+      hapiValue.partOf = partOfList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasPrimaryPurposeType()) {
-        hapiValue.primaryPurposeType = primaryPurposeType.toHapi()
+      hapiValue.primaryPurposeType = primaryPurposeType.toHapi()
     }
     if (hasPhase()) {
-        hapiValue.phase = phase.toHapi()
+      hapiValue.phase = phase.toHapi()
     }
     if (categoryCount > 0) {
-        hapiValue.category = categoryList.map { it.toHapi() }
+      hapiValue.category = categoryList.map { it.toHapi() }
     }
     if (focusCount > 0) {
-        hapiValue.focus = focusList.map { it.toHapi() }
+      hapiValue.focus = focusList.map { it.toHapi() }
     }
     if (conditionCount > 0) {
-        hapiValue.condition = conditionList.map { it.toHapi() }
+      hapiValue.condition = conditionList.map { it.toHapi() }
     }
     if (contactCount > 0) {
-        hapiValue.contact = contactList.map { it.toHapi() }
+      hapiValue.contact = contactList.map { it.toHapi() }
     }
     if (relatedArtifactCount > 0) {
-        hapiValue.relatedArtifact = relatedArtifactList.map { it.toHapi() }
+      hapiValue.relatedArtifact = relatedArtifactList.map { it.toHapi() }
     }
     if (keywordCount > 0) {
-        hapiValue.keyword = keywordList.map { it.toHapi() }
+      hapiValue.keyword = keywordList.map { it.toHapi() }
     }
     if (locationCount > 0) {
-        hapiValue.location = locationList.map { it.toHapi() }
+      hapiValue.location = locationList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (enrollmentCount > 0) {
-        hapiValue.enrollment = enrollmentList.map { it.toHapi() }
+      hapiValue.enrollment = enrollmentList.map { it.toHapi() }
     }
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     if (hasSponsor()) {
-        hapiValue.sponsor = sponsor.toHapi()
+      hapiValue.sponsor = sponsor.toHapi()
     }
     if (hasPrincipalInvestigator()) {
-        hapiValue.principalInvestigator = principalInvestigator.toHapi()
+      hapiValue.principalInvestigator = principalInvestigator.toHapi()
     }
     if (siteCount > 0) {
-        hapiValue.site = siteList.map { it.toHapi() }
+      hapiValue.site = siteList.map { it.toHapi() }
     }
     if (hasReasonStopped()) {
-        hapiValue.reasonStopped = reasonStopped.toHapi()
+      hapiValue.reasonStopped = reasonStopped.toHapi()
     }
     if (noteCount > 0) {
-        hapiValue.note = noteList.map { it.toHapi() }
+      hapiValue.note = noteList.map { it.toHapi() }
     }
     if (armCount > 0) {
-        hapiValue.arm = armList.map { it.toHapi() }
+      hapiValue.arm = armList.map { it.toHapi() }
     }
     if (objectiveCount > 0) {
-        hapiValue.objective = objectiveList.map { it.toHapi() }
+      hapiValue.objective = objectiveList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -147,13 +148,13 @@ object ResearchStudyConverter {
   fun org.hl7.fhir.r4.model.ResearchStudy.toProto(): ResearchStudy {
     val protoValue = ResearchStudy.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -165,7 +166,7 @@ object ResearchStudyConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasTitle()) {
-        protoValue.title = titleElement.toProto()
+      protoValue.title = titleElement.toProto()
     }
     if (hasProtocol()) {
       protoValue.addAllProtocol(protocol.map { it.toProto() })
@@ -173,18 +174,19 @@ object ResearchStudyConverter {
     if (hasPartOf()) {
       protoValue.addAllPartOf(partOf.map { it.toProto() })
     }
-      protoValue.status = ResearchStudy.StatusCode.newBuilder()
-          .setValue(
-              ResearchStudyStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      ResearchStudy.StatusCode.newBuilder()
+        .setValue(
+          ResearchStudyStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasPrimaryPurposeType()) {
-        protoValue.primaryPurposeType = primaryPurposeType.toProto()
+      protoValue.primaryPurposeType = primaryPurposeType.toProto()
     }
     if (hasPhase()) {
-        protoValue.phase = phase.toProto()
+      protoValue.phase = phase.toProto()
     }
     if (hasCategory()) {
       protoValue.addAllCategory(category.map { it.toProto() })
@@ -208,25 +210,25 @@ object ResearchStudyConverter {
       protoValue.addAllLocation(location.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasEnrollment()) {
       protoValue.addAllEnrollment(enrollment.map { it.toProto() })
     }
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     if (hasSponsor()) {
-        protoValue.sponsor = sponsor.toProto()
+      protoValue.sponsor = sponsor.toProto()
     }
     if (hasPrincipalInvestigator()) {
-        protoValue.principalInvestigator = principalInvestigator.toProto()
+      protoValue.principalInvestigator = principalInvestigator.toProto()
     }
     if (hasSite()) {
       protoValue.addAllSite(site.map { it.toProto() })
     }
     if (hasReasonStopped()) {
-        protoValue.reasonStopped = reasonStopped.toProto()
+      protoValue.reasonStopped = reasonStopped.toProto()
     }
     if (hasNote()) {
       protoValue.addAllNote(note.map { it.toProto() })
@@ -251,13 +253,13 @@ object ResearchStudyConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     return protoValue.build()
   }
@@ -273,10 +275,10 @@ object ResearchStudyConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     return protoValue.build()
   }
@@ -287,19 +289,19 @@ object ResearchStudyConverter {
     val hapiValue = org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyArmComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     return hapiValue
   }
@@ -310,16 +312,16 @@ object ResearchStudyConverter {
     val hapiValue = org.hl7.fhir.r4.model.ResearchStudy.ResearchStudyObjectiveComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     return hapiValue
   }

@@ -45,43 +45,44 @@ object AppointmentResponseConverter {
     val hapiValue = org.hl7.fhir.r4.model.AppointmentResponse()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasAppointment()) {
-        hapiValue.appointment = appointment.toHapi()
+      hapiValue.appointment = appointment.toHapi()
     }
     if (hasStart()) {
-        hapiValue.startElement = start.toHapi()
+      hapiValue.startElement = start.toHapi()
     }
     if (hasEnd()) {
-        hapiValue.endElement = end.toHapi()
+      hapiValue.endElement = end.toHapi()
     }
     if (participantTypeCount > 0) {
-        hapiValue.participantType = participantTypeList.map { it.toHapi() }
+      hapiValue.participantType = participantTypeList.map { it.toHapi() }
     }
     if (hasActor()) {
-        hapiValue.actor = actor.toHapi()
+      hapiValue.actor = actor.toHapi()
     }
-      hapiValue.participantStatus = org.hl7.fhir.r4.model.AppointmentResponse.ParticipantStatus.valueOf(
-          participantStatus.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.participantStatus =
+      org.hl7.fhir.r4.model.AppointmentResponse.ParticipantStatus.valueOf(
+        participantStatus.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasComment()) {
-        hapiValue.commentElement = comment.toHapi()
+      hapiValue.commentElement = comment.toHapi()
     }
     return hapiValue
   }
@@ -90,13 +91,13 @@ object AppointmentResponseConverter {
   fun org.hl7.fhir.r4.model.AppointmentResponse.toProto(): AppointmentResponse {
     val protoValue = AppointmentResponse.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -108,29 +109,30 @@ object AppointmentResponseConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasAppointment()) {
-        protoValue.appointment = appointment.toProto()
+      protoValue.appointment = appointment.toProto()
     }
     if (hasStart()) {
-        protoValue.start = startElement.toProto()
+      protoValue.start = startElement.toProto()
     }
     if (hasEnd()) {
-        protoValue.end = endElement.toProto()
+      protoValue.end = endElement.toProto()
     }
     if (hasParticipantType()) {
       protoValue.addAllParticipantType(participantType.map { it.toProto() })
     }
     if (hasActor()) {
-        protoValue.actor = actor.toProto()
+      protoValue.actor = actor.toProto()
     }
-      protoValue.participantStatus = AppointmentResponse.ParticipantStatusCode.newBuilder()
-          .setValue(
-              ParticipationStatusCode.Value.valueOf(
-                  participantStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.participantStatus =
+      AppointmentResponse.ParticipantStatusCode.newBuilder()
+        .setValue(
+          ParticipationStatusCode.Value.valueOf(
+            participantStatus.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasComment()) {
-        protoValue.comment = commentElement.toProto()
+      protoValue.comment = commentElement.toProto()
     }
     return protoValue.build()
   }

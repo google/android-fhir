@@ -51,46 +51,46 @@ object MedicinalProductPackagedConverter {
     val hapiValue = org.hl7.fhir.r4.model.MedicinalProductPackaged()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (subjectCount > 0) {
-        hapiValue.subject = subjectList.map { it.toHapi() }
+      hapiValue.subject = subjectList.map { it.toHapi() }
     }
     if (hasDescription()) {
-        hapiValue.descriptionElement = description.toHapi()
+      hapiValue.descriptionElement = description.toHapi()
     }
     if (hasLegalStatusOfSupply()) {
-        hapiValue.legalStatusOfSupply = legalStatusOfSupply.toHapi()
+      hapiValue.legalStatusOfSupply = legalStatusOfSupply.toHapi()
     }
     if (marketingStatusCount > 0) {
-        hapiValue.marketingStatus = marketingStatusList.map { it.toHapi() }
+      hapiValue.marketingStatus = marketingStatusList.map { it.toHapi() }
     }
     if (hasMarketingAuthorization()) {
-        hapiValue.marketingAuthorization = marketingAuthorization.toHapi()
+      hapiValue.marketingAuthorization = marketingAuthorization.toHapi()
     }
     if (manufacturerCount > 0) {
-        hapiValue.manufacturer = manufacturerList.map { it.toHapi() }
+      hapiValue.manufacturer = manufacturerList.map { it.toHapi() }
     }
     if (batchIdentifierCount > 0) {
-        hapiValue.batchIdentifier = batchIdentifierList.map { it.toHapi() }
+      hapiValue.batchIdentifier = batchIdentifierList.map { it.toHapi() }
     }
     if (packageItemCount > 0) {
-        hapiValue.packageItem = packageItemList.map { it.toHapi() }
+      hapiValue.packageItem = packageItemList.map { it.toHapi() }
     }
     return hapiValue
   }
@@ -99,13 +99,13 @@ object MedicinalProductPackagedConverter {
   fun org.hl7.fhir.r4.model.MedicinalProductPackaged.toProto(): MedicinalProductPackaged {
     val protoValue = MedicinalProductPackaged.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -120,16 +120,16 @@ object MedicinalProductPackagedConverter {
       protoValue.addAllSubject(subject.map { it.toProto() })
     }
     if (hasDescription()) {
-        protoValue.description = descriptionElement.toProto()
+      protoValue.description = descriptionElement.toProto()
     }
     if (hasLegalStatusOfSupply()) {
-        protoValue.legalStatusOfSupply = legalStatusOfSupply.toProto()
+      protoValue.legalStatusOfSupply = legalStatusOfSupply.toProto()
     }
     if (hasMarketingStatus()) {
       protoValue.addAllMarketingStatus(marketingStatus.map { it.toProto() })
     }
     if (hasMarketingAuthorization()) {
-        protoValue.marketingAuthorization = marketingAuthorization.toProto()
+      protoValue.marketingAuthorization = marketingAuthorization.toProto()
     }
     if (hasManufacturer()) {
       protoValue.addAllManufacturer(manufacturer.map { it.toProto() })
@@ -155,10 +155,10 @@ object MedicinalProductPackagedConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasOuterPackaging()) {
-        protoValue.outerPackaging = outerPackaging.toProto()
+      protoValue.outerPackaging = outerPackaging.toProto()
     }
     if (hasImmediatePackaging()) {
-        protoValue.immediatePackaging = immediatePackaging.toProto()
+      protoValue.immediatePackaging = immediatePackaging.toProto()
     }
     return protoValue.build()
   }
@@ -178,10 +178,10 @@ object MedicinalProductPackagedConverter {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
     if (hasType()) {
-        protoValue.type = type.toProto()
+      protoValue.type = type.toProto()
     }
     if (hasQuantity()) {
-        protoValue.quantity = quantity.toProto()
+      protoValue.quantity = quantity.toProto()
     }
     if (hasMaterial()) {
       protoValue.addAllMaterial(material.map { it.toProto() })
@@ -196,7 +196,7 @@ object MedicinalProductPackagedConverter {
       protoValue.addAllManufacturedItem(manufacturedItem.map { it.toProto() })
     }
     if (hasPhysicalCharacteristics()) {
-        protoValue.physicalCharacteristics = physicalCharacteristics.toProto()
+      protoValue.physicalCharacteristics = physicalCharacteristics.toProto()
     }
     if (hasOtherCharacteristics()) {
       protoValue.addAllOtherCharacteristics(otherCharacteristics.map { it.toProto() })
@@ -218,16 +218,16 @@ object MedicinalProductPackagedConverter {
         .MedicinalProductPackagedBatchIdentifierComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasOuterPackaging()) {
-        hapiValue.outerPackaging = outerPackaging.toHapi()
+      hapiValue.outerPackaging = outerPackaging.toHapi()
     }
     if (hasImmediatePackaging()) {
-        hapiValue.immediatePackaging = immediatePackaging.toHapi()
+      hapiValue.immediatePackaging = immediatePackaging.toHapi()
     }
     return hapiValue
   }
@@ -239,43 +239,43 @@ object MedicinalProductPackagedConverter {
       org.hl7.fhir.r4.model.MedicinalProductPackaged.MedicinalProductPackagedPackageItemComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
     if (hasType()) {
-        hapiValue.type = type.toHapi()
+      hapiValue.type = type.toHapi()
     }
     if (hasQuantity()) {
-        hapiValue.quantity = quantity.toHapi()
+      hapiValue.quantity = quantity.toHapi()
     }
     if (materialCount > 0) {
-        hapiValue.material = materialList.map { it.toHapi() }
+      hapiValue.material = materialList.map { it.toHapi() }
     }
     if (alternateMaterialCount > 0) {
-        hapiValue.alternateMaterial = alternateMaterialList.map { it.toHapi() }
+      hapiValue.alternateMaterial = alternateMaterialList.map { it.toHapi() }
     }
     if (deviceCount > 0) {
-        hapiValue.device = deviceList.map { it.toHapi() }
+      hapiValue.device = deviceList.map { it.toHapi() }
     }
     if (manufacturedItemCount > 0) {
-        hapiValue.manufacturedItem = manufacturedItemList.map { it.toHapi() }
+      hapiValue.manufacturedItem = manufacturedItemList.map { it.toHapi() }
     }
     if (hasPhysicalCharacteristics()) {
-        hapiValue.physicalCharacteristics = physicalCharacteristics.toHapi()
+      hapiValue.physicalCharacteristics = physicalCharacteristics.toHapi()
     }
     if (otherCharacteristicsCount > 0) {
-        hapiValue.otherCharacteristics = otherCharacteristicsList.map { it.toHapi() }
+      hapiValue.otherCharacteristics = otherCharacteristicsList.map { it.toHapi() }
     }
     if (shelfLifeStorageCount > 0) {
-        hapiValue.shelfLifeStorage = shelfLifeStorageList.map { it.toHapi() }
+      hapiValue.shelfLifeStorage = shelfLifeStorageList.map { it.toHapi() }
     }
     if (manufacturerCount > 0) {
-        hapiValue.manufacturer = manufacturerList.map { it.toHapi() }
+      hapiValue.manufacturer = manufacturerList.map { it.toHapi() }
     }
     return hapiValue
   }

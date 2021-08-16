@@ -42,8 +42,6 @@ class TimeConverterTest(private val hapi: TimeType, private val proto: Time) {
   }
 
   companion object {
-    @Parameterized.Parameters
-    @JvmStatic
-    fun `data`(): List<Any> = PrimitiveTestData.TIME_DATA
+    @Parameterized.Parameters @JvmStatic fun `data`(): List<Any> = PrimitiveTestData.TIME_DATA
   }
 }

@@ -29,10 +29,11 @@ object NarrativeConverter {
     val hapiValue = org.hl7.fhir.r4.model.Narrative()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.Narrative.NarrativeStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.Narrative.NarrativeStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     return hapiValue
   }
@@ -43,13 +44,14 @@ object NarrativeConverter {
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-      protoValue.status = Narrative.StatusCode.newBuilder()
-          .setValue(
-              NarrativeStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      Narrative.StatusCode.newBuilder()
+        .setValue(
+          NarrativeStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     return protoValue.build()
   }
 }

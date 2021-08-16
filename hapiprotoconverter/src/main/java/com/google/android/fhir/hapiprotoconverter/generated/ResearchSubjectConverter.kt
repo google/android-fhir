@@ -43,43 +43,44 @@ object ResearchSubjectConverter {
     val hapiValue = org.hl7.fhir.r4.model.ResearchSubject()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (identifierCount > 0) {
-        hapiValue.identifier = identifierList.map { it.toHapi() }
+      hapiValue.identifier = identifierList.map { it.toHapi() }
     }
-      hapiValue.status = org.hl7.fhir.r4.model.ResearchSubject.ResearchSubjectStatus.valueOf(
-          status.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.status =
+      org.hl7.fhir.r4.model.ResearchSubject.ResearchSubjectStatus.valueOf(
+        status.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasPeriod()) {
-        hapiValue.period = period.toHapi()
+      hapiValue.period = period.toHapi()
     }
     if (hasStudy()) {
-        hapiValue.study = study.toHapi()
+      hapiValue.study = study.toHapi()
     }
     if (hasIndividual()) {
-        hapiValue.individual = individual.toHapi()
+      hapiValue.individual = individual.toHapi()
     }
     if (hasAssignedArm()) {
-        hapiValue.assignedArmElement = assignedArm.toHapi()
+      hapiValue.assignedArmElement = assignedArm.toHapi()
     }
     if (hasActualArm()) {
-        hapiValue.actualArmElement = actualArm.toHapi()
+      hapiValue.actualArmElement = actualArm.toHapi()
     }
     if (hasConsent()) {
-        hapiValue.consent = consent.toHapi()
+      hapiValue.consent = consent.toHapi()
     }
     return hapiValue
   }
@@ -88,13 +89,13 @@ object ResearchSubjectConverter {
   fun org.hl7.fhir.r4.model.ResearchSubject.toProto(): ResearchSubject {
     val protoValue = ResearchSubject.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -105,30 +106,31 @@ object ResearchSubjectConverter {
     if (hasIdentifier()) {
       protoValue.addAllIdentifier(identifier.map { it.toProto() })
     }
-      protoValue.status = ResearchSubject.StatusCode.newBuilder()
-          .setValue(
-              ResearchSubjectStatusCode.Value.valueOf(
-                  status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.status =
+      ResearchSubject.StatusCode.newBuilder()
+        .setValue(
+          ResearchSubjectStatusCode.Value.valueOf(
+            status.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasPeriod()) {
-        protoValue.period = period.toProto()
+      protoValue.period = period.toProto()
     }
     if (hasStudy()) {
-        protoValue.study = study.toProto()
+      protoValue.study = study.toProto()
     }
     if (hasIndividual()) {
-        protoValue.individual = individual.toProto()
+      protoValue.individual = individual.toProto()
     }
     if (hasAssignedArm()) {
-        protoValue.assignedArm = assignedArmElement.toProto()
+      protoValue.assignedArm = assignedArmElement.toProto()
     }
     if (hasActualArm()) {
-        protoValue.actualArm = actualArmElement.toProto()
+      protoValue.actualArm = actualArmElement.toProto()
     }
     if (hasConsent()) {
-        protoValue.consent = consent.toProto()
+      protoValue.consent = consent.toProto()
     }
     return protoValue.build()
   }

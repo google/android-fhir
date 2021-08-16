@@ -39,28 +39,29 @@ object RelatedArtifactConverter {
     val hapiValue = org.hl7.fhir.r4.model.RelatedArtifact()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
-      hapiValue.type = org.hl7.fhir.r4.model.RelatedArtifact.RelatedArtifactType.valueOf(
-          type.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.type =
+      org.hl7.fhir.r4.model.RelatedArtifact.RelatedArtifactType.valueOf(
+        type.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasLabel()) {
-        hapiValue.labelElement = label.toHapi()
+      hapiValue.labelElement = label.toHapi()
     }
     if (hasDisplay()) {
-        hapiValue.displayElement = display.toHapi()
+      hapiValue.displayElement = display.toHapi()
     }
     if (hasCitation()) {
-        hapiValue.citationElement = citation.toHapi()
+      hapiValue.citationElement = citation.toHapi()
     }
     if (hasUrl()) {
-        hapiValue.urlElement = url.toHapi()
+      hapiValue.urlElement = url.toHapi()
     }
     if (hasDocument()) {
-        hapiValue.document = document.toHapi()
+      hapiValue.document = document.toHapi()
     }
     if (hasResource()) {
-        hapiValue.resourceElement = resource.toHapi()
+      hapiValue.resourceElement = resource.toHapi()
     }
     return hapiValue
   }
@@ -71,30 +72,31 @@ object RelatedArtifactConverter {
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
-      protoValue.type = RelatedArtifact.TypeCode.newBuilder()
-          .setValue(
-              RelatedArtifactTypeCode.Value.valueOf(
-                  type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.type =
+      RelatedArtifact.TypeCode.newBuilder()
+        .setValue(
+          RelatedArtifactTypeCode.Value.valueOf(
+            type.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasLabel()) {
-        protoValue.label = labelElement.toProto()
+      protoValue.label = labelElement.toProto()
     }
     if (hasDisplay()) {
-        protoValue.display = displayElement.toProto()
+      protoValue.display = displayElement.toProto()
     }
     if (hasCitation()) {
-        protoValue.citation = citationElement.toProto()
+      protoValue.citation = citationElement.toProto()
     }
     if (hasUrl()) {
-        protoValue.url = urlElement.toProto()
+      protoValue.url = urlElement.toProto()
     }
     if (hasDocument()) {
-        protoValue.document = document.toProto()
+      protoValue.document = document.toProto()
     }
     if (hasResource()) {
-        protoValue.resource = resourceElement.toProto()
+      protoValue.resource = resourceElement.toProto()
     }
     return protoValue.build()
   }

@@ -36,43 +36,43 @@ object ProdCharacteristicConverter {
     val hapiValue = org.hl7.fhir.r4.model.ProdCharacteristic()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasHeight()) {
-        hapiValue.height = height.toHapi()
+      hapiValue.height = height.toHapi()
     }
     if (hasWidth()) {
-        hapiValue.width = width.toHapi()
+      hapiValue.width = width.toHapi()
     }
     if (hasDepth()) {
-        hapiValue.depth = depth.toHapi()
+      hapiValue.depth = depth.toHapi()
     }
     if (hasWeight()) {
-        hapiValue.weight = weight.toHapi()
+      hapiValue.weight = weight.toHapi()
     }
     if (hasNominalVolume()) {
-        hapiValue.nominalVolume = nominalVolume.toHapi()
+      hapiValue.nominalVolume = nominalVolume.toHapi()
     }
     if (hasExternalDiameter()) {
-        hapiValue.externalDiameter = externalDiameter.toHapi()
+      hapiValue.externalDiameter = externalDiameter.toHapi()
     }
     if (hasShape()) {
-        hapiValue.shapeElement = shape.toHapi()
+      hapiValue.shapeElement = shape.toHapi()
     }
     if (colorCount > 0) {
-        hapiValue.color = colorList.map { it.toHapi() }
+      hapiValue.color = colorList.map { it.toHapi() }
     }
     if (imprintCount > 0) {
-        hapiValue.imprint = imprintList.map { it.toHapi() }
+      hapiValue.imprint = imprintList.map { it.toHapi() }
     }
     if (imageCount > 0) {
-        hapiValue.image = imageList.map { it.toHapi() }
+      hapiValue.image = imageList.map { it.toHapi() }
     }
     if (hasScoring()) {
-        hapiValue.scoring = scoring.toHapi()
+      hapiValue.scoring = scoring.toHapi()
     }
     return hapiValue
   }
@@ -87,25 +87,25 @@ object ProdCharacteristicConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasHeight()) {
-        protoValue.height = height.toProto()
+      protoValue.height = height.toProto()
     }
     if (hasWidth()) {
-        protoValue.width = width.toProto()
+      protoValue.width = width.toProto()
     }
     if (hasDepth()) {
-        protoValue.depth = depth.toProto()
+      protoValue.depth = depth.toProto()
     }
     if (hasWeight()) {
-        protoValue.weight = weight.toProto()
+      protoValue.weight = weight.toProto()
     }
     if (hasNominalVolume()) {
-        protoValue.nominalVolume = nominalVolume.toProto()
+      protoValue.nominalVolume = nominalVolume.toProto()
     }
     if (hasExternalDiameter()) {
-        protoValue.externalDiameter = externalDiameter.toProto()
+      protoValue.externalDiameter = externalDiameter.toProto()
     }
     if (hasShape()) {
-        protoValue.shape = shapeElement.toProto()
+      protoValue.shape = shapeElement.toProto()
     }
     if (hasColor()) {
       protoValue.addAllColor(color.map { it.toProto() })
@@ -117,7 +117,7 @@ object ProdCharacteristicConverter {
       protoValue.addAllImage(image.map { it.toProto() })
     }
     if (hasScoring()) {
-        protoValue.scoring = scoring.toProto()
+      protoValue.scoring = scoring.toProto()
     }
     return protoValue.build()
   }

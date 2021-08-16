@@ -37,22 +37,23 @@ object QuantityConverter {
     val hapiValue = org.hl7.fhir.r4.model.Quantity()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (hasValue()) {
-        hapiValue.valueElement = value.toHapi()
+      hapiValue.valueElement = value.toHapi()
     }
-      hapiValue.comparator = org.hl7.fhir.r4.model.Quantity.QuantityComparator.valueOf(
-          comparator.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.comparator =
+      org.hl7.fhir.r4.model.Quantity.QuantityComparator.valueOf(
+        comparator.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasUnit()) {
-        hapiValue.unitElement = unit.toHapi()
+      hapiValue.unitElement = unit.toHapi()
     }
     if (hasSystem()) {
-        hapiValue.systemElement = system.toHapi()
+      hapiValue.systemElement = system.toHapi()
     }
     if (hasCode()) {
-        hapiValue.codeElement = code.toHapi()
+      hapiValue.codeElement = code.toHapi()
     }
     return hapiValue
   }
@@ -64,23 +65,24 @@ object QuantityConverter {
       protoValue.addAllExtension(extension.map { it.toProto() })
     }
     if (hasValue()) {
-        protoValue.value = valueElement.toProto()
+      protoValue.value = valueElement.toProto()
     }
-      protoValue.comparator = Quantity.ComparatorCode.newBuilder()
-          .setValue(
-              QuantityComparatorCode.Value.valueOf(
-                  comparator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.comparator =
+      Quantity.ComparatorCode.newBuilder()
+        .setValue(
+          QuantityComparatorCode.Value.valueOf(
+            comparator.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasUnit()) {
-        protoValue.unit = unitElement.toProto()
+      protoValue.unit = unitElement.toProto()
     }
     if (hasSystem()) {
-        protoValue.system = systemElement.toProto()
+      protoValue.system = systemElement.toProto()
     }
     if (hasCode()) {
-        protoValue.code = codeElement.toProto()
+      protoValue.code = codeElement.toProto()
     }
     return protoValue.build()
   }

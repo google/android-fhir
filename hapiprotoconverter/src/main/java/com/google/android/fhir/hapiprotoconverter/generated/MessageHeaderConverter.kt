@@ -68,10 +68,10 @@ object MessageHeaderConverter {
   private fun Type.messageHeaderEventToProto(): MessageHeader.EventX {
     val protoValue = MessageHeader.EventX.newBuilder()
     if (this is org.hl7.fhir.r4.model.Coding) {
-        protoValue.coding = this.toProto()
+      protoValue.coding = this.toProto()
     }
     if (this is UriType) {
-        protoValue.uri = this.toProto()
+      protoValue.uri = this.toProto()
     }
     return protoValue.build()
   }
@@ -81,52 +81,52 @@ object MessageHeaderConverter {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader()
     hapiValue.id = id.value
     if (hasMeta()) {
-        hapiValue.meta = meta.toHapi()
+      hapiValue.meta = meta.toHapi()
     }
     if (hasImplicitRules()) {
-        hapiValue.implicitRulesElement = implicitRules.toHapi()
+      hapiValue.implicitRulesElement = implicitRules.toHapi()
     }
     if (hasText()) {
-        hapiValue.text = text.toHapi()
+      hapiValue.text = text.toHapi()
     }
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasEvent()) {
-        hapiValue.event = event.messageHeaderEventToHapi()
+      hapiValue.event = event.messageHeaderEventToHapi()
     }
     if (destinationCount > 0) {
-        hapiValue.destination = destinationList.map { it.toHapi() }
+      hapiValue.destination = destinationList.map { it.toHapi() }
     }
     if (hasSender()) {
-        hapiValue.sender = sender.toHapi()
+      hapiValue.sender = sender.toHapi()
     }
     if (hasEnterer()) {
-        hapiValue.enterer = enterer.toHapi()
+      hapiValue.enterer = enterer.toHapi()
     }
     if (hasAuthor()) {
-        hapiValue.author = author.toHapi()
+      hapiValue.author = author.toHapi()
     }
     if (hasSource()) {
-        hapiValue.source = source.toHapi()
+      hapiValue.source = source.toHapi()
     }
     if (hasResponsible()) {
-        hapiValue.responsible = responsible.toHapi()
+      hapiValue.responsible = responsible.toHapi()
     }
     if (hasReason()) {
-        hapiValue.reason = reason.toHapi()
+      hapiValue.reason = reason.toHapi()
     }
     if (hasResponse()) {
-        hapiValue.response = response.toHapi()
+      hapiValue.response = response.toHapi()
     }
     if (focusCount > 0) {
-        hapiValue.focus = focusList.map { it.toHapi() }
+      hapiValue.focus = focusList.map { it.toHapi() }
     }
     if (hasDefinition()) {
-        hapiValue.definitionElement = definition.toHapi()
+      hapiValue.definitionElement = definition.toHapi()
     }
     return hapiValue
   }
@@ -135,13 +135,13 @@ object MessageHeaderConverter {
   fun org.hl7.fhir.r4.model.MessageHeader.toProto(): MessageHeader {
     val protoValue = MessageHeader.newBuilder().setId(Id.newBuilder().setValue(id))
     if (hasMeta()) {
-        protoValue.meta = meta.toProto()
+      protoValue.meta = meta.toProto()
     }
     if (hasImplicitRules()) {
-        protoValue.implicitRules = implicitRulesElement.toProto()
+      protoValue.implicitRules = implicitRulesElement.toProto()
     }
     if (hasText()) {
-        protoValue.text = text.toProto()
+      protoValue.text = text.toProto()
     }
     if (hasExtension()) {
       protoValue.addAllExtension(extension.map { it.toProto() })
@@ -150,37 +150,37 @@ object MessageHeaderConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasEvent()) {
-        protoValue.event = event.messageHeaderEventToProto()
+      protoValue.event = event.messageHeaderEventToProto()
     }
     if (hasDestination()) {
       protoValue.addAllDestination(destination.map { it.toProto() })
     }
     if (hasSender()) {
-        protoValue.sender = sender.toProto()
+      protoValue.sender = sender.toProto()
     }
     if (hasEnterer()) {
-        protoValue.enterer = enterer.toProto()
+      protoValue.enterer = enterer.toProto()
     }
     if (hasAuthor()) {
-        protoValue.author = author.toProto()
+      protoValue.author = author.toProto()
     }
     if (hasSource()) {
-        protoValue.source = source.toProto()
+      protoValue.source = source.toProto()
     }
     if (hasResponsible()) {
-        protoValue.responsible = responsible.toProto()
+      protoValue.responsible = responsible.toProto()
     }
     if (hasReason()) {
-        protoValue.reason = reason.toProto()
+      protoValue.reason = reason.toProto()
     }
     if (hasResponse()) {
-        protoValue.response = response.toProto()
+      protoValue.response = response.toProto()
     }
     if (hasFocus()) {
       protoValue.addAllFocus(focus.map { it.toProto() })
     }
     if (hasDefinition()) {
-        protoValue.definition = definitionElement.toProto()
+      protoValue.definition = definitionElement.toProto()
     }
     return protoValue.build()
   }
@@ -197,16 +197,16 @@ object MessageHeaderConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasTarget()) {
-        protoValue.target = target.toProto()
+      protoValue.target = target.toProto()
     }
     if (hasEndpoint()) {
-        protoValue.endpoint = endpointElement.toProto()
+      protoValue.endpoint = endpointElement.toProto()
     }
     if (hasReceiver()) {
-        protoValue.receiver = receiver.toProto()
+      protoValue.receiver = receiver.toProto()
     }
     return protoValue.build()
   }
@@ -223,19 +223,19 @@ object MessageHeaderConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasName()) {
-        protoValue.name = nameElement.toProto()
+      protoValue.name = nameElement.toProto()
     }
     if (hasSoftware()) {
-        protoValue.software = softwareElement.toProto()
+      protoValue.software = softwareElement.toProto()
     }
     if (hasVersion()) {
-        protoValue.version = versionElement.toProto()
+      protoValue.version = versionElement.toProto()
     }
     if (hasContact()) {
-        protoValue.contact = contact.toProto()
+      protoValue.contact = contact.toProto()
     }
     if (hasEndpoint()) {
-        protoValue.endpoint = endpointElement.toProto()
+      protoValue.endpoint = endpointElement.toProto()
     }
     return protoValue.build()
   }
@@ -251,17 +251,18 @@ object MessageHeaderConverter {
       protoValue.addAllModifierExtension(modifierExtension.map { it.toProto() })
     }
     if (hasIdentifier()) {
-        protoValue.identifier = identifierElement.toProto()
+      protoValue.identifier = identifierElement.toProto()
     }
-      protoValue.code = MessageHeader.Response.CodeType.newBuilder()
-          .setValue(
-              ResponseTypeCode.Value.valueOf(
-                  code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
-              )
+    protoValue.code =
+      MessageHeader.Response.CodeType.newBuilder()
+        .setValue(
+          ResponseTypeCode.Value.valueOf(
+            code.toCode().protoCodeCheck().replace("-", "_").toUpperCase()
           )
-          .build()
+        )
+        .build()
     if (hasDetails()) {
-        protoValue.details = details.toProto()
+      protoValue.details = details.toProto()
     }
     return protoValue.build()
   }
@@ -272,22 +273,22 @@ object MessageHeaderConverter {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader.MessageDestinationComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasTarget()) {
-        hapiValue.target = target.toHapi()
+      hapiValue.target = target.toHapi()
     }
     if (hasEndpoint()) {
-        hapiValue.endpointElement = endpoint.toHapi()
+      hapiValue.endpointElement = endpoint.toHapi()
     }
     if (hasReceiver()) {
-        hapiValue.receiver = receiver.toHapi()
+      hapiValue.receiver = receiver.toHapi()
     }
     return hapiValue
   }
@@ -298,25 +299,25 @@ object MessageHeaderConverter {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader.MessageSourceComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasName()) {
-        hapiValue.nameElement = name.toHapi()
+      hapiValue.nameElement = name.toHapi()
     }
     if (hasSoftware()) {
-        hapiValue.softwareElement = software.toHapi()
+      hapiValue.softwareElement = software.toHapi()
     }
     if (hasVersion()) {
-        hapiValue.versionElement = version.toHapi()
+      hapiValue.versionElement = version.toHapi()
     }
     if (hasContact()) {
-        hapiValue.contact = contact.toHapi()
+      hapiValue.contact = contact.toHapi()
     }
     if (hasEndpoint()) {
-        hapiValue.endpointElement = endpoint.toHapi()
+      hapiValue.endpointElement = endpoint.toHapi()
     }
     return hapiValue
   }
@@ -327,19 +328,20 @@ object MessageHeaderConverter {
     val hapiValue = org.hl7.fhir.r4.model.MessageHeader.MessageHeaderResponseComponent()
     hapiValue.id = id.value
     if (extensionCount > 0) {
-        hapiValue.extension = extensionList.map { it.toHapi() }
+      hapiValue.extension = extensionList.map { it.toHapi() }
     }
     if (modifierExtensionCount > 0) {
-        hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
+      hapiValue.modifierExtension = modifierExtensionList.map { it.toHapi() }
     }
     if (hasIdentifier()) {
-        hapiValue.identifierElement = identifier.toHapi()
+      hapiValue.identifierElement = identifier.toHapi()
     }
-      hapiValue.code = org.hl7.fhir.r4.model.MessageHeader.ResponseType.valueOf(
-          code.value.name.hapiCodeCheck().replace("_", "")
+    hapiValue.code =
+      org.hl7.fhir.r4.model.MessageHeader.ResponseType.valueOf(
+        code.value.name.hapiCodeCheck().replace("_", "")
       )
     if (hasDetails()) {
-        hapiValue.details = details.toHapi()
+      hapiValue.details = details.toHapi()
     }
     return hapiValue
   }
