@@ -17,8 +17,6 @@
 package com.google.android.fhir
 
 import android.annotation.SuppressLint
-import com.google.gson.ExclusionStrategy
-import com.google.gson.FieldAttributes
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
@@ -69,22 +67,6 @@ class OffsetDateTimeTypeAdapter : TypeAdapter<OffsetDateTime>() {
   }
 
   override fun read(input: JsonReader): OffsetDateTime = OffsetDateTime.parse(input.nextString())
-}
-
-/**
- * Exclusion strategy for [Gson] that handles field exclusions for [State] returned by
- * FhirSynchronizer. It should skip serializing the exceptions to avoid WorkManager WorkData limit
- */
-internal class StateExclusionStrategy : ExclusionStrategy {
-  override fun shouldSkipField(field: FieldAttributes): Boolean {
-    return if (field.name.equals("exceptions")) {
-      return true
-    } else false
-  }
-
-  override fun shouldSkipClass(clazz: Class<*>?): Boolean {
-    return false
-  }
 }
 
 /** Url for the UCUM system of measures. */
