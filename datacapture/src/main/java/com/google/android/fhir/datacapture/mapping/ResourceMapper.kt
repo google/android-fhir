@@ -98,11 +98,19 @@ object ResourceMapper {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     structureMapProvider: (suspend (String) -> StructureMap?)? = null,
-    context: Context? = null
+    context: Context? = null,
+    transformSupportServices: StructureMapUtilities.ITransformerServices? = null
   ): Bundle {
     return if (questionnaire.targetStructureMap == null)
       extractByDefinitions(questionnaire, questionnaireResponse)
-    else extractByStructureMap(questionnaire, questionnaireResponse, structureMapProvider, context)
+    else
+      extractByStructureMap(
+        questionnaire,
+        questionnaireResponse,
+        structureMapProvider,
+        context,
+        transformSupportServices
+      )
   }
 
   /**
@@ -147,16 +155,25 @@ object ResourceMapper {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     structureMapProvider: (suspend (String) -> StructureMap?)?,
-    context: Context?
+    context: Context?,
+    transformSupportServices: StructureMapUtilities.ITransformerServices? = null
   ): Bundle {
     if (structureMapProvider == null || context == null) return Bundle()
     val structureMap = structureMapProvider(questionnaire.targetStructureMap!!) ?: return Bundle()
     val simpleWorkerContext = SimpleWorkerContextProvider.loadSimpleWorkerContext(context)
     simpleWorkerContext.setExpansionProfile(Parameters())
 
+    val structureMapUtilities =
+      if (transformSupportServices == null) StructureMapUtilities(simpleWorkerContext)
+      else StructureMapUtilities(simpleWorkerContext, transformSupportServices)
+
     return Bundle().apply {
-      StructureMapUtilities(simpleWorkerContext)
-        .transform(simpleWorkerContext, questionnaireResponse, structureMap, this)
+      structureMapUtilities.transform(
+        simpleWorkerContext,
+        questionnaireResponse,
+        structureMap,
+        this
+      )
     }
   }
 
