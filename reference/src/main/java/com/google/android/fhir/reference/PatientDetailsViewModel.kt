@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.liveData
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.search
 import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.Observation
@@ -52,23 +53,19 @@ class PatientDetailsViewModel(
     fhirEngine
       .search<Observation> { filter(Observation.SUBJECT) { value = "Patient/$patientId" } }
       .take(MAX_RESOURCE_COUNT)
-      .mapIndexed { index, fhirPatient ->
-        createObservationItem(index + 1, fhirPatient, getApplication<Application>().resources)
-      }
+      .map { createObservationItem(it, getApplication<Application>().resources) }
       .let { observations.addAll(it) }
     return observations
   }
 
   private suspend fun getPatientConditions(): List<PatientListViewModel.ConditionItem> {
-    val observations: MutableList<PatientListViewModel.ConditionItem> = mutableListOf()
+    val conditions: MutableList<PatientListViewModel.ConditionItem> = mutableListOf()
     fhirEngine
       .search<Condition> { filter(Condition.SUBJECT) { value = "Patient/$patientId" } }
       .take(MAX_RESOURCE_COUNT)
-      .mapIndexed { index, fhirPatient ->
-        createConditionItem(index + 1, fhirPatient, getApplication<Application>().resources)
-      }
-      .let { observations.addAll(it) }
-    return observations
+      .map { createConditionItem(it, getApplication<Application>().resources) }
+      .let { conditions.addAll(it) }
+    return conditions
   }
 
   companion object {
@@ -76,53 +73,63 @@ class PatientDetailsViewModel(
      * Creates ObservationItem objects with displayable values from the Fhir Observation objects.
      */
     private fun createObservationItem(
-      position: Int,
       observation: Observation,
       resources: Resources
     ): PatientListViewModel.ObservationItem {
       val observationCode = observation.code.text ?: observation.code.codingFirstRep.display
 
       // Show nothing if no values available for datetime and value quantity.
-      val dateTimeStr =
-        if (observation.hasEffectiveDateTimeType())
+      val dateTimeString =
+        if (observation.hasEffectiveDateTimeType()) {
           observation.effectiveDateTimeType.asStringValue()
-        else resources.getText(R.string.message_no_datetime).toString()
+        } else {
+          resources.getText(R.string.message_no_datetime).toString()
+        }
       val value =
-        if (observation.hasValueQuantity()) observation.valueQuantity.value.toString()
-        else resources.getText(R.string.message_no_value_quantity).toString()
+        if (observation.hasValueQuantity()) {
+          observation.valueQuantity.value.toString()
+        } else {
+          resources.getText(R.string.message_no_value_quantity).toString()
+        }
       val valueUnit =
-        if (observation.hasValueQuantity())
+        if (observation.hasValueQuantity()) {
           observation.valueQuantity.unit ?: observation.valueQuantity.code
-        else ""
+        } else {
+          ""
+        }
       val valueString = "$value $valueUnit"
 
       return PatientListViewModel.ObservationItem(
-        position.toString(),
+        observation.logicalId,
         observationCode,
-        dateTimeStr,
+        dateTimeString,
         valueString
       )
     }
 
     /** Creates ConditionItem objects with displayable values from the Fhir Condition objects. */
     private fun createConditionItem(
-      position: Int,
       condition: Condition,
       resources: Resources
     ): PatientListViewModel.ConditionItem {
-      // val observation: Observation = getObservationDetails(position)
       val observationCode = condition.code.text ?: condition.code.codingFirstRep.display ?: ""
 
       // Show nothing if no values available for datetime and value quantity.
       val dateTimeString =
-        if (condition.hasOnsetDateTimeType()) condition.onsetDateTimeType.asStringValue()
-        else resources.getText(R.string.message_no_datetime).toString()
+        if (condition.hasOnsetDateTimeType()) {
+          condition.onsetDateTimeType.asStringValue()
+        } else {
+          resources.getText(R.string.message_no_datetime).toString()
+        }
       val value =
-        if (condition.hasVerificationStatus()) condition.verificationStatus.codingFirstRep.code
-        else resources.getText(R.string.message_no_value_quantity).toString()
+        if (condition.hasVerificationStatus()) {
+          condition.verificationStatus.codingFirstRep.code
+        } else {
+          resources.getText(R.string.message_no_value_quantity).toString()
+        }
 
       return PatientListViewModel.ConditionItem(
-        position.toString(),
+        condition.logicalId,
         observationCode,
         dateTimeString,
         value

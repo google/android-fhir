@@ -94,19 +94,21 @@ class PatientDetailsFragment : Fragment() {
   private fun setupObservationsData(observationItems: List<PatientListViewModel.ObservationItem>) {
     val observations =
       observationItems.map { observation -> PatientProperty(observation.code, observation.value) }
-    binding.patientObservations.header.text = resources.getText(R.string.header_observation)
-    renderCard(binding.patientObservations.propertiesContainer, observations)
-    binding.patientObservations.container.visibility =
-      if (observations.isEmpty()) View.GONE else View.VISIBLE
+    binding.patientObservations.apply {
+      header.text = resources.getText(R.string.header_observation)
+      renderCard(propertiesContainer, observations)
+      container.visibility = if (observations.isEmpty()) View.GONE else View.VISIBLE
+    }
   }
 
   private fun setupConditionData(conditionItems: List<PatientListViewModel.ConditionItem>) {
     val conditions =
       conditionItems.map { condition -> PatientProperty(condition.code, condition.value) }
-    binding.patientConditions.header.text = resources.getText(R.string.header_conditions)
-    renderCard(binding.patientConditions.propertiesContainer, conditions)
-    binding.patientConditions.container.visibility =
-      if (conditions.isEmpty()) View.GONE else View.VISIBLE
+    binding.patientConditions.apply {
+      header.text = resources.getText(R.string.header_conditions)
+      renderCard(propertiesContainer, conditions)
+      container.visibility = if (conditions.isEmpty()) View.GONE else View.VISIBLE
+    }
   }
 
   private fun setupPatientData(patientItem: PatientListViewModel.PatientItem?) {
@@ -203,8 +205,5 @@ class PatientDetailsFragment : Fragment() {
   }
 
   /** Model to store the properties displayed on the patient details page. */
-  data class PatientProperty(
-    val header: String,
-    val value: String,
-  )
+  data class PatientProperty(val header: String, val value: String)
 }

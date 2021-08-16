@@ -23,7 +23,7 @@ import com.google.android.fhir.reference.databinding.PatientListItemViewBinding
 import java.time.LocalDate
 import java.time.Period
 
-class PatientItemViewHolder(private val binding: PatientListItemViewBinding) :
+class PatientItemViewHolder(binding: PatientListItemViewBinding) :
   RecyclerView.ViewHolder(binding.root) {
   private val statusView: ImageView = binding.status
   private val nameView: TextView = binding.name
@@ -36,9 +36,7 @@ class PatientItemViewHolder(private val binding: PatientListItemViewBinding) :
   ) {
     this.nameView.text = patientItem.name
     this.ageView.text = "${getAge(patientItem)} years old"
-    // The new ui just shows shortened id with just last 3 characters.
     this.idView.text = "Id: #---${getTruncatedId(patientItem)}"
-
     this.itemView.setOnClickListener { onItemClicked(patientItem) }
   }
 
@@ -48,6 +46,7 @@ class PatientItemViewHolder(private val binding: PatientListItemViewBinding) :
     }
   }
 
+  /** The new ui just shows shortened id with just last 3 characters. */
   private fun getTruncatedId(patientItem: PatientListViewModel.PatientItem): String {
     return patientItem.resourceId.substring(patientItem.resourceId.length - 3)
   }
