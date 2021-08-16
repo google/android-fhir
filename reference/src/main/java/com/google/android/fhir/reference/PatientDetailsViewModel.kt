@@ -73,10 +73,10 @@ class PatientDetailsViewModel(
           .firstOrNull()
       livePatientRiskAssessment.value =
         RiskAssessmentItem(
-          getRiskAssessmentColor(riskAssessment),
+          getRiskAssessmentStatusColor(riskAssessment),
           getRiskAssessmentStatus(riskAssessment),
-          fetchLastContactedDate(riskAssessment),
-          getRiskAssessmentBackgroundColor(riskAssessment)
+          getLastContactedDate(riskAssessment),
+          getPatientDetailsCardColor(riskAssessment)
         )
     }
   }
@@ -168,7 +168,7 @@ class PatientDetailsViewModel(
     }
   }
 
-  private fun getRiskAssessmentColor(riskAssessment: RiskAssessment?): Int {
+  private fun getRiskAssessmentStatusColor(riskAssessment: RiskAssessment?): Int {
     riskAssessment?.let {
       return when (it.prediction.first().qualitativeRisk.coding.first().code) {
         RiskProbability.LOW.toCode() -> ContextCompat.getColor(getApplication(), R.color.low_risk)
@@ -181,7 +181,7 @@ class PatientDetailsViewModel(
     return ContextCompat.getColor(getApplication(), R.color.unknown_risk)
   }
 
-  private fun getRiskAssessmentBackgroundColor(riskAssessment: RiskAssessment?): Int {
+  private fun getPatientDetailsCardColor(riskAssessment: RiskAssessment?): Int {
     riskAssessment?.let {
       return when (it.prediction.first().qualitativeRisk.coding.first().code) {
         RiskProbability.LOW.toCode() ->
@@ -203,7 +203,7 @@ class PatientDetailsViewModel(
     return getApplication<FhirApplication>().getString(R.string.unknown)
   }
 
-  private fun fetchLastContactedDate(riskAssessment: RiskAssessment?): String {
+  private fun getLastContactedDate(riskAssessment: RiskAssessment?): String {
     riskAssessment?.let {
       if (it.hasOccurrence()) {
         return LocalDate.parse(
@@ -232,8 +232,8 @@ class PatientDetailsViewModelFactory(
 }
 
 data class RiskAssessmentItem(
-  val color: Int,
-  val status: String,
-  val contacted: String,
+  val riskStatusColor: Int,
+  val riskStatus: String,
+  val lastContacted: String,
   val backgroundColor: Int
 )

@@ -187,10 +187,12 @@ class PatientDetailsFragment : Fragment() {
           setBackgroundColor(it.backgroundColor)
         }
         view?.findViewById<MaterialTextView>(R.id.status_value)?.apply {
-          text = it.status
-          setBackgroundColor(it.color)
+          text = it.riskStatus
+          setBackgroundColor(it.riskStatusColor)
         }
-        view?.findViewById<MaterialTextView>(R.id.last_contact_value)?.apply { text = it.contacted }
+        view?.findViewById<MaterialTextView>(R.id.last_contact_value)?.apply {
+          text = it.lastContacted
+        }
       }
     }
   }
