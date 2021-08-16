@@ -31,6 +31,7 @@ import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.sync.DataSource
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
+import java.util.Date
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DateTimeType
@@ -1296,6 +1297,74 @@ class DatabaseImplTest {
           .getQuery()
       )
     assertThat(result.filter { it.id == patient.id }).hasSize(1)
+  }
+
+  @Test
+  fun search_sortDescending_Date() = runBlocking {
+    // add 2 patients with two different date and then check for their order
+    val earlyDateId = "1"
+    val laterDateId = "2"
+
+    val earlyDate = Date(20130314)
+    val laterDate = Date(20140415)
+
+    val patient1 =
+      Patient().apply {
+        id = earlyDateId
+        birthDate = earlyDate
+      }
+    database.insert(patient1)
+
+    val patient2 =
+      Patient().apply {
+        id = laterDateId
+        birthDate = laterDate
+      }
+    database.insert(patient2)
+
+    val results =
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }.getQuery()
+      )
+
+    val ids = results.map { it.id }
+    assertThat(ids)
+      .containsExactly("Patient/$laterDateId", "Patient/$earlyDateId", "Patient/test_patient_1")
+      .inOrder()
+  }
+
+  @Test
+  fun search_sortAscending_Date() = runBlocking {
+    // add 2 patients with two different date and then check for their order
+    val earlyDateId = "1"
+    val laterDateId = "2"
+
+    val earlyDate: Date = Date(20150314)
+    val laterDate = Date(20140415)
+
+    val patient1 =
+      Patient().apply {
+        id = earlyDateId
+        birthDate = earlyDate
+      }
+    database.insert(patient1)
+
+    val patient2 =
+      Patient().apply {
+        id = laterDateId
+        birthDate = laterDate
+      }
+    database.insert(patient2)
+
+    val results =
+      database.search<Patient>(
+        Search(ResourceType.Patient).apply { sort(Patient.BIRTHDATE, Order.ASCENDING) }.getQuery()
+      )
+
+    val ids = results.map { it.id }
+    assertThat(ids)
+      .containsExactly("Patient/test_patient_1", "Patient/$earlyDateId", "Patient/$laterDateId")
+      .inOrder()
   }
 
   private companion object {
